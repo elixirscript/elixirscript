@@ -1,57 +1,49 @@
 defmodule ElixirScript do
+  require Logger
 
-  def parse(nil) do
-    "null"
+  defmodule ParseError do
+     defexception message: "Erroro while parsing SpiderMonkey JST"
   end
 
-  def parse(ast) when is_number(ast) do
-    "#{ast}"
+  def parse(ast) do
+    ElixirScript.Parser.parse(ast)
   end
 
-  def parse(ast) when is_binary(ast) do
-    "\"#{ast}\""
+  def parse_ex_files(path) do
+    path
+    |> Path.wildcard
+    |> Enum.map(fn(x) -> parse_ex_file(x) end)     
   end
 
-  def parse(ast) when is_atom(ast) do
-    atom_string = Atom.to_string(ast)
-    "Symbol(\"#{atom_string}\")"
-  end
+  def parse_ex_file(path) do
 
-  def parse(ast) when is_list(ast) do
-    array_items = Enum.map(ast, fn(x) -> parse(x) end)
-    |> Enum.join(",")
+    js_ast = path
+    |> File.read!
+    |> Code.string_to_quoted!
+    |> ElixirScript.SpiderMonkey.parse
+    |> Poison.encode!
 
-    "[#{array_items}]"
-  end
+    case System.cmd(System.cwd() <> "/escodegen", [js_ast]) do
 
-  def parse({:%{}, [], fields}) do
-    field_items = Enum.map(fields, fn({x, y}) ->  "#{x}:#{parse(y)}" end)
-    |> Enum.join(",")
+      {js_code, 0} ->
+        ex_file_name = Path.basename(path)
+        js_file_name = String.replace(ex_file_name, ".ex", ".js")
 
-    "{#{field_items}}"
-  end
-
-  def parse({param_name, [], Elixir}) do
-    "#{param_name}"
-  end
-
-  def parse({:=, [], [{variable_name, [], Elixir}, value]}) do
-    "var #{variable_name} = #{parse(value)};"
-  end
-
-  def parse({:def, _, [{def_name, _, params}, [do: do_block]]}) do
-    js_params = Enum.map(params, fn(x) -> parse(x) end)
-
-    block = if do_block == nil do
-      ""
-    else
-      parse(do_block)
+        { Path.dirname(path), js_file_name, js_code }
+      {error, _} ->
+        raise ParseError, message: error
     end
 
-    "function #{def_name}(#{Enum.join(js_params, ",")}){#{block}}"
+
   end
 
-  def parse(ast) when is_tuple(ast) do
-    Tuple.to_list(ast) |> parse
+  def write_js_files(list) do
+    Enum.each(list, fn(x) -> write_js_file(x) end)
+  end
+
+  def write_js_file({path, file_name, js}) do
+    file_name = Path.join([path, file_name])
+
+    File.write!(file_name, js)
   end
 end

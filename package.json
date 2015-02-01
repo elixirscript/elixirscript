@@ -1,0 +1,23 @@
+{
+  "name": "elixir_script",
+  "version": "1.0.0",
+  "description": "ElixirScript ============",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@git.basstype.com:basstype/elixir_script.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "acorn": "^0.11.0",
+    "escodegen": "^1.6.1",
+    "esprima": "^1.2.3"
+  }
+}
