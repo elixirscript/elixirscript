@@ -42,11 +42,15 @@ defmodule ElixirScript.SpiderMonkey do
   end
 
   def parse({:defmodule, _, [{:__aliases__, _, module_name_list}, [do: do_block]]}) do
-    Nodes.class(module_name_list, do_block)
+    Nodes.class(module_name_list, do_block) |> Nodes.export
   end
 
   def parse({:alias, _, [{:__aliases__, _, name}]}) do
     Nodes.import_declaration(name)
+  end
+
+  def parse({:fn, _, [{:->, _, [params, body]}]}) do
+    Nodes.function(params, body)
   end
 
   def parse({ :__block__, _, expressions }) do

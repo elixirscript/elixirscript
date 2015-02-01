@@ -12,10 +12,7 @@ defmodule ElixirScript.SpiderMonkey.Nodes do
   def symbol(value) do
     %{
       type: "CallExpression", 
-      callee: %{
-        type: "Identifier",
-        name: "Symbol"
-      },
+      callee: identifier("Symbol"),
       arguments: [
         literal(Atom.to_string(value))
       ]
@@ -73,18 +70,22 @@ defmodule ElixirScript.SpiderMonkey.Nodes do
       computed: false,
       key: identifier(Atom.to_string(name)),
       kind: "",
-      value: %{
-        type: "FunctionExpression",
-        id: nil,
-        params: Enum.map(params, fn({name, _, _}) -> 
-          SpiderMonkey.parse(Atom.to_string(name)) 
-        end),
-        defaults: [],
-        rest: nil,
-        generator: false,
-        body: block(body),
-        expression: false
-      }
+      value: function(params, body)
+    }
+  end
+
+  def function(params, body) do
+    %{
+      type: "FunctionExpression",
+      id: nil,
+      params: Enum.map(params, fn({name, _, _}) -> 
+        SpiderMonkey.parse(Atom.to_string(name)) 
+      end),
+      defaults: [],
+      rest: nil,
+      generator: false,
+      body: block(body),
+      expression: false
     }
   end
 
@@ -126,6 +127,16 @@ defmodule ElixirScript.SpiderMonkey.Nodes do
     }
   end
 
+  def export(node) do
+    %{
+      type: "ExportDeclaration",
+      declaration: node,
+      default: false,
+      specifiers: nil,
+      source: nil
+    }
+  end
+
   def call(module_name, function_name, params) do
       %{
         type: "CallExpression",
@@ -135,7 +146,7 @@ defmodule ElixirScript.SpiderMonkey.Nodes do
           property: identifier(function_name),
           computed: false
         },
-        arguments: Enum.map(params, &SpiderMonkey.parse(%1))
+        arguments: Enum.map(params, &SpiderMonkey.parse(&1))
       }
   end
 
@@ -148,7 +159,7 @@ defmodule ElixirScript.SpiderMonkey.Nodes do
           property: identifier(function_name),
           computed: false
         },
-        arguments: Enum.map(params, &SpiderMonkey.parse(%1))
+        arguments: Enum.map(params, &SpiderMonkey.parse(&1))
       }
   end
 

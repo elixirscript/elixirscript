@@ -30,8 +30,8 @@ var options = { ecmaVersion: 6}
 //var symbol_ast = acorn.parse('Symbol("s")', options);
 //console.log(JSON.stringify(symbol_ast));
 
-//var class_ast = acorn.parse('class Hello{ world(){var a = 1;} }', options);
-//console.log(JSON.stringify(class_ast));
+var class_ast = acorn.parse('export class Hello{ world(){var a = 1;} }', options);
+console.log(JSON.stringify(class_ast));
 
 //var import_ast = acorn.parse('import {Home} from "home"; class Hello{}', options);
 //console.log(JSON.stringify(import_ast));
@@ -39,8 +39,12 @@ var options = { ecmaVersion: 6}
 //var import_ast = acorn.parse('Home.do_it(e,z);', options);
 //console.log(JSON.stringify(import_ast));
 
-var import_ast = acorn.parse('class Hello{ world(){}; taco(a,b){this.world()}; }', options);
-console.log(JSON.stringify(import_ast));
+//var import_ast = acorn.parse('class Hello{ world(){}; taco(a,b){this.world()}; }', options);
+//console.log(JSON.stringify(import_ast));
 
-var g = escodegen.generate(import_ast);
+//var import_ast = acorn.parse('Home.do_it(e,z,function(x){});', options);
+//console.log(JSON.stringify(import_ast));
+
+
+var g = escodegen.generate(class_ast);
 console.log(g);
