@@ -1,7 +1,7 @@
-defmodule ElixirScript.SpiderMonkey.Test do
+defmodule ExToJS.SpiderMonkey.Test do
   use ExUnit.Case
-  alias ElixirScript.SpiderMonkey
-  alias ElixirScript.SpiderMonkey.Nodes
+  alias ExToJS.SpiderMonkey
+  alias ExToJS.SpiderMonkey.Nodes
 
   test "parse nil" do
     assert SpiderMonkey.parse(nil) == Nodes.literal(nil)

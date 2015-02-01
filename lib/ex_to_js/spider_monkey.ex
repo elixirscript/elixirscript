@@ -1,5 +1,5 @@
-defmodule ElixirScript.SpiderMonkey do
-  alias ElixirScript.SpiderMonkey.Nodes
+defmodule ExToJS.SpiderMonkey do
+  alias ExToJS.SpiderMonkey.Nodes
   
   def parse(nil) do
     Nodes.literal(nil)

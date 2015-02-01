@@ -2,5 +2,6 @@
 /deps
 erl_crash.dump
 *.ez
-exjs
+ex2js
 node_modules
+priv/test_project/dest

@@ -2,7 +2,7 @@ defmodule ElixirScript.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :elixir_script,
+    [app: :ex_to_js,
      version: "0.0.1",
      elixir: "~> 1.0",
      escript: escript_config,
@@ -21,7 +21,7 @@ defmodule ElixirScript.Mixfile do
   end
 
   defp escript_config do
-    [main_module: ElixirScript.CLI, name: "exjs"]
+    [main_module: ExToJS.CLI, name: "ex2js"]
   end
   
 end

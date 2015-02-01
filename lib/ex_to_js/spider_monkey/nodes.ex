@@ -1,5 +1,5 @@
-defmodule ElixirScript.SpiderMonkey.Nodes do
-  alias ElixirScript.SpiderMonkey
+defmodule ExToJS.SpiderMonkey.Nodes do
+  alias ExToJS.SpiderMonkey
   
   def literal(value) do
     %{ type: "Literal", value: value }
