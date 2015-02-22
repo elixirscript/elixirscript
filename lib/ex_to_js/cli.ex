@@ -7,7 +7,7 @@ defmodule ExToJS.CLI do
 
   defp parse_args(args) do
     switches = [ output: :binary, ast: :boolean, elixir: :boolean ]
-    aliases = [ o: :output, a: :ast, ex: :elixir ]
+    aliases = [ o: :output, t: :ast, ex: :elixir ]
     
     parse = OptionParser.parse(args, switches: switches, aliases: aliases)
 
@@ -77,7 +77,7 @@ defmodule ExToJS.CLI do
       options:
 
       -o  --output   places output in the given directory or file
-      -a  --ast      shows only produced spider monkey ast
+      -t  --ast      shows only produced spider monkey ast
       -ex --elixir  read input as elixir code string
     """
   end

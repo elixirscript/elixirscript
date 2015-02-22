@@ -16,7 +16,8 @@ defmodule ElixirScript.Mixfile do
   defp deps do
     [
       { :poison, "~> 1.3" },
-      { :inflex, "~> 0.2.5" }
+      { :inflex, "~> 0.2.5" },
+      { :spider_monkey, github: "bryanjos/spider_monkey"}
     ]
   end
 

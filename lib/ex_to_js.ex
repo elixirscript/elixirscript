@@ -1,20 +1,7 @@
 defmodule ExToJS do
-  require Logger
-
-  defmodule ParseError do
-     defexception message: "Erroro while parsing SpiderMonkey JST"
-  end
-
-  def parse(ast) do
-    ExToJS.Parser.parse(ast)
-  end
 
   def parse_elixir(ex_code) do
-    js_ast = ex_code
-    |> Code.string_to_quoted!
-    |> ExToJS.SpiderMonkey.parse
-    |> Poison.encode!
-
+    js_ast = parse(ex_code)
     [{ js_ast, "output.json" }]
   end
 
@@ -25,13 +12,25 @@ defmodule ExToJS do
   end
 
   def parse_ex_file(path) do
-    js_ast = path
-    |> File.read!
-    |> Code.string_to_quoted!
-    |> ExToJS.SpiderMonkey.parse
-    |> Poison.encode!
+    ex_code = File.read!(path)
+    js_ast = parse(ex_code)
 
     { js_ast, Path.basename(path, ".ex") <> ".json" }
+  end
+
+  def parse(ex_code) do
+    ex_ast = Code.string_to_quoted!(ex_code)
+    sm_ast = ExToJS.Parser.parse(ex_ast)
+
+    sm_ast = if is_list(sm_ast) do
+      %{type: "Program", body: sm_ast}
+    else
+      sm_ast
+    end
+
+    js_ast = Poison.encode!(sm_ast)
+
+    js_ast
   end
 
   def convert_ast_to_js(js_ast) when is_list(js_ast) do
@@ -39,11 +38,11 @@ defmodule ExToJS do
   end
 
   def convert_ast_to_js({ js_ast, path }) do
-    case System.cmd(System.cwd() <> "/escodegen", [js_ast]) do
-      {js_code, 0} ->
+    case ExToJS.Parser.js_ast_to_js(js_ast) do
+      {:ok, js_code} ->
         { js_code, Path.basename(path, ".json") <> ".js" }
-      {error, _} ->
-        raise ParseError, message: error
+      {:error, error} ->
+        raise ExToJS.ParseError, message: error
     end
   end
 

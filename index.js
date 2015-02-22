@@ -3,48 +3,72 @@ var escodegen = require('escodegen');
 
 var options = { ecmaVersion: 6}
 
-//var null_ast = acorn.parse('null', options);
-//console.log(JSON.stringify(null_ast));
-//
-//var number_ast = acorn.parse('1.10', options);
-//console.log(JSON.stringify(number_ast));
-//
-//var string_ast = acorn.parse('"batman"', options);
-//console.log(JSON.stringify(string_ast));
-//
-//var bool_ast = acorn.parse('true', options);
-//console.log(JSON.stringify(bool_ast));
-//
-//var array_ast = acorn.parse('[1, 2, 3]', options);
-//console.log(JSON.stringify(array_ast));
-//
-//var function_ast = acorn.parse('function hello(a, b) {}', options);
-//console.log(JSON.stringify(function_ast));
-//
-//var object_ast = acorn.parse('var s = {name:"Rose", age: 25 }', options);
-//console.log(JSON.stringify(object_ast));
-//
-//var assignment_ast = acorn.parse('let s = 1', options);
-//console.log(JSON.stringify(assignment_ast));
-//
-//var symbol_ast = acorn.parse('Symbol("s")', options);
-//console.log(JSON.stringify(symbol_ast));
+function parse(code){
+  var ast = acorn.parse(code, options);
+  console.log(JSON.stringify(ast));
+  return ast; 
+}
 
-var class_ast = acorn.parse('export class Hello{ world(){var a = 1;} }', options);
-console.log(JSON.stringify(class_ast));
+function parse_null(){
+  return parse('null');
+}
 
-//var import_ast = acorn.parse('import {Home} from "home"; class Hello{}', options);
-//console.log(JSON.stringify(import_ast));
+function parse_number(){
+  return parse('1.10');
+}
 
-//var import_ast = acorn.parse('Home.do_it(e,z);', options);
-//console.log(JSON.stringify(import_ast));
-
-//var import_ast = acorn.parse('class Hello{ world(){}; taco(a,b){this.world()}; }', options);
-//console.log(JSON.stringify(import_ast));
-
-//var import_ast = acorn.parse('Home.do_it(e,z,function(x){});', options);
-//console.log(JSON.stringify(import_ast));
+function parse_negative_number(){
+  return parse('-1.1');
+}
 
 
-var g = escodegen.generate(class_ast);
+function parse_string(){
+  return parse('"batman"');
+}
+
+function parse_bool(){
+  return parse('true');
+}
+
+function parse_array(){
+  return parse('[1, 2, 3]');
+}
+
+function parse_function(){
+  return parse('function hello(a, b) {}');
+}
+
+function parse_object(){
+  return parse('var s = {name:"Rose", age: 25 }');
+}
+
+function parse_let(){
+  return parse('let s = 1');
+}
+
+function parse_symbol(){
+  return parse('Symbol("s")');
+}
+
+function parse_class(){
+  return parse('export class Hello{ world(){let a = 1;} }');
+}
+
+function parse_import(){
+  return parse('import {Crane} from "icabod/crane"; export class Hello{}');
+}
+
+function parse_if(){
+  return parse('if(tacos == true){a = 1}else if(tacos == false){a = 3}else{a = 2}');
+}
+
+function parse_array_destructing(){
+  return parse('[a, b] = [1, 2]');
+}
+
+function parse_arrow_function(){
+  return parse('(x) => x * 2');
+}
+
+var g = escodegen.generate(parse_arrow_function());
 console.log(g);
