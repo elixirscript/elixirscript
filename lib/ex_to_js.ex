@@ -20,17 +20,15 @@ defmodule ExToJS do
 
   def parse(ex_code) do
     ex_ast = Code.string_to_quoted!(ex_code)
-    sm_ast = ExToJS.Parser.parse(ex_ast)
+    sm_ast = ExToJS.Translator.translate(ex_ast)
 
-    sm_ast = if is_list(sm_ast) do
-      %{type: "Program", body: sm_ast}
-    else
-      sm_ast
+    if !is_list(sm_ast) do
+      sm_ast = [sm_ast]
     end
 
-    js_ast = Poison.encode!(sm_ast)
+    sm_ast = SpiderMonkey.Builder.program(sm_ast)
 
-    js_ast
+    Poison.encode!(sm_ast)
   end
 
   def convert_ast_to_js(js_ast) when is_list(js_ast) do
@@ -38,7 +36,7 @@ defmodule ExToJS do
   end
 
   def convert_ast_to_js({ js_ast, path }) do
-    case ExToJS.Parser.js_ast_to_js(js_ast) do
+    case ExToJS.Translator.js_ast_to_js(js_ast) do
       {:ok, js_code} ->
         { js_code, Path.basename(path, ".json") <> ".js" }
       {:error, error} ->

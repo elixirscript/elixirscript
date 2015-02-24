@@ -3,7 +3,7 @@ ExUnit.start()
 defmodule ExToJS.TestHelper do
   def ex_ast_to_js(ex_ast, wrapInProgram \\ false) do
 
-    js_ast = ExToJS.Parser.parse(ex_ast)
+    js_ast = ExToJS.Translator.translate(ex_ast)
 
     if wrapInProgram do
       js_ast = SpiderMonkey.Builder.program(js_ast)
@@ -11,7 +11,7 @@ defmodule ExToJS.TestHelper do
 
     js_json = SpiderMonkey.Builder.to_json(js_ast)
 
-    result = ExToJS.Parser.js_ast_to_js(js_json)
+    result = ExToJS.Translator.js_ast_to_js(js_json)
 
     case result do
       {:ok, js_code} ->

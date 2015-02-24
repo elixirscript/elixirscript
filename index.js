@@ -21,7 +21,6 @@ function parse_negative_number(){
   return parse('-1.1');
 }
 
-
 function parse_string(){
   return parse('"batman"');
 }
@@ -58,6 +57,18 @@ function parse_import(){
   return parse('import {Crane} from "icabod/crane"; export class Hello{}');
 }
 
+function parse_star_import(){
+  return parse("import * as Crane from 'icabod/crane';");
+}
+
+function parse_alias_import(){
+  return parse("import { Crane as C } from 'icabod/crane';");
+}
+
+function parse_simple_if(){
+  return parse('if(tacos == true){a = 1}');
+}
+
 function parse_if(){
   return parse('if(tacos == true){a = 1}else if(tacos == false){a = 3}else{a = 2}');
 }
@@ -70,5 +81,13 @@ function parse_arrow_function(){
   return parse('(x) => x * 2');
 }
 
-var g = escodegen.generate(parse_arrow_function());
+function parse_constructor(){
+  return parse('export class Hello{ constructor(name = "Bob"){this.name = name;}}')
+}
+
+function parse_expression(){
+  return parse('(a=1)')
+}
+
+var g = escodegen.generate(parse_expression());
 console.log(g);
