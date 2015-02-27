@@ -1,7 +1,7 @@
 {
-  "name": "elixir_script",
+  "name": "ex_to_js",
   "version": "1.0.0",
-  "description": "ElixirScript ============",
+  "description": "Convert Elixir to JavaScript",
   "main": "index.js",
   "directories": {
     "test": "test"
@@ -11,10 +11,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@git.basstype.com:basstype/elixir_script.git"
+    "url": "git@github.com:bryanjos/ex_to_js.git"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "acorn": "^0.11.0",
     "escodegen": "^1.6.1",

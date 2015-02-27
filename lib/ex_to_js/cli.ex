@@ -5,7 +5,7 @@ defmodule ExToJS.CLI do
     |> process
   end
 
-  defp parse_args(args) do
+  def parse_args(args) do
     switches = [ output: :binary, ast: :boolean, elixir: :boolean ]
     aliases = [ o: :output, t: :ast, ex: :elixir ]
     
@@ -26,51 +26,63 @@ defmodule ExToJS.CLI do
 
   end
 
-  defp process({ input, output, :ast, :elixir }) do
+  def process({ input, output, :ast, :elixir }) do
     input 
     |> ExToJS.parse_elixir 
-    |> ExToJS.write_to_file(output)
-  end
-
-  defp process({ input, output, :ast }) do
-    input 
-    |> ExToJS.parse_ex_files 
     |> ExToJS.write_to_files(output)
   end
 
-  defp process({ input, :ast }) do
+  def process({ input, output, :ast }) do
     input 
-    |> ExToJS.parse_ex_files 
-    |> Enum.map(fn({ast, _path})-> IO.puts(ast) end)
+    |> ExToJS.parse_elixir_files 
+    |> ExToJS.write_to_files(output)
   end
 
-  defp process({ input, output, :elixir }) do
+  def process({ input, :ast }) do
+    input 
+    |> ExToJS.parse_elixir_files 
+    |> Enum.map(fn({_path, ast})-> 
+      ast
+      |> Poison.encode!
+      |> IO.puts
+    end)
+  end
+
+  def process({ input, output, :elixir }) do
     input 
     |> ExToJS.parse_elixir
     |> ExToJS.write_to_files(output)
   end
 
-  defp process({ input, :elixir }) do
+  def process({ input, :elixir }) do
     input 
     |> ExToJS.parse_elixir
-    |> Enum.map(fn({js, _path})-> IO.puts(js) end)
+    |> Enum.map(fn({_path, ast})-> 
+      ast
+      |> Poison.encode!
+      |> IO.puts
+    end)
   end
 
-  defp process({ input, output }) do
+  def process({ input, output }) do
     input 
-    |> ExToJS.parse_ex_files 
-    |> ExToJS.convert_ast_to_js 
+    |> ExToJS.parse_elixir_files 
+    |> ExToJS.javascript_ast_to_code 
     |> ExToJS.write_to_files(output)
   end
 
-  defp process({ input }) do
+  def process({ input }) do
     input 
-    |> ExToJS.parse_ex_files 
-    |> ExToJS.convert_ast_to_js 
-    |> Enum.map(fn({js, _path})-> IO.puts(js) end)
+    |> ExToJS.parse_elixir_files 
+    |> ExToJS.javascript_ast_to_code 
+    |> Enum.map(fn({_path, ast})-> 
+      ast
+      |> Poison.encode!
+      |> IO.puts
+    end)
   end
 
-  defp process(:help) do
+  def process(:help) do
     IO.puts """
       usage: ex2js <input> [options]
 

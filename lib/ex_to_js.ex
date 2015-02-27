@@ -1,54 +1,93 @@
 defmodule ExToJS do
 
-  def parse_elixir(ex_code) do
-    js_ast = parse(ex_code)
-    [{ js_ast, "output.json" }]
+  @doc """
+  Parses Elixir code string into JavaScript AST
+  """
+  @spec parse_elixir(binary) :: {binary, ESTree.Node.t}
+  def parse_elixir(elixir_code) do
+    elixir_code
+    |> Code.string_to_quoted!
+    |> parse_quoted
   end
 
-  def parse_ex_files(path) do
+  @doc """
+  Parses Elixir code in it's quoted form into JavaScript AST
+  """
+  @spec parse_quoted(Macro.t) :: {binary, ESTree.Node.t}
+  def parse_quoted(quoted) do
+    js_ast = ExToJS.Translator.translate(quoted)
+    {"output.json", js_ast}
+  end
+
+  @doc """
+  Parses Elixir code files into JavaScript AST
+  """
+  @spec parse_elixir_files(binary) :: [{binary, ESTree.Node.t}]
+  def parse_elixir_files(path) do
     path
     |> Path.wildcard
-    |> Enum.map(fn(x) -> parse_ex_file(x) end)     
+    |> Enum.map(fn(x) -> parse_elixir_file(x) end)     
   end
 
-  def parse_ex_file(path) do
-    ex_code = File.read!(path)
-    js_ast = parse(ex_code)
+  defp parse_elixir_file(path) do
+    js_ast = path
+    |> File.read!
+    |> Code.string_to_quoted!
+    |> ExToJS.Translator.translate
 
-    { js_ast, Path.basename(path, ".ex") <> ".json" }
+    file_name = Path.basename(path, ".ex") <> ".json"
+
+    {file_name, js_ast}
   end
 
-  def parse(ex_code) do
-    ex_ast = Code.string_to_quoted!(ex_code)
-    sm_ast = ExToJS.Translator.translate(ex_ast)
-
-    if !is_list(sm_ast) do
-      sm_ast = [sm_ast]
-    end
-
-    sm_ast = SpiderMonkey.Builder.program(sm_ast)
-
-    Poison.encode!(sm_ast)
+  @doc """
+  Converts JavaScript AST into JavaScript code
+  """
+  @spec javascript_ast_to_code([{binary, ESTree.Node.t}]) :: [{binary, binary} | {:error, binary}]
+  def javascript_ast_to_code(js_ast) when is_list(js_ast) do
+    Enum.map(js_ast, &javascript_ast_to_code(&1))
   end
 
-  def convert_ast_to_js(js_ast) when is_list(js_ast) do
-    Enum.map(js_ast, &convert_ast_to_js(&1))
-  end
-
-  def convert_ast_to_js({ js_ast, path }) do
-    case ExToJS.Translator.js_ast_to_js(js_ast) do
+  @doc """
+  Converts JavaScript AST into JavaScript code
+  """
+  @spec javascript_ast_to_code({binary, ESTree.Node.t}) :: {binary, binary} | {:error, binary}
+  def javascript_ast_to_code({ path, js_ast }) do
+    case javascript_ast_to_code(js_ast) do
       {:ok, js_code} ->
-        { js_code, Path.basename(path, ".json") <> ".js" }
+        { Path.basename(path, ".json") <> ".js", js_code }
       {:error, error} ->
-        raise ExToJS.ParseError, message: error
+        {:error, error}
     end
   end
 
-  def write_to_files(list, destination) do
-    Enum.each(list, fn(x) -> write_to_file(x, destination) end)
+  @doc """
+  Converts JavaScript AST into JavaScript code
+  """
+  @spec javascript_ast_to_code(ESTree.Node.t) :: {:ok, binary} | {:error, binary}
+  def javascript_ast_to_code(js_ast) do
+    js_ast = Poison.encode!(js_ast)    
+    case System.cmd(System.cwd() <> "/escodegen", [js_ast]) do
+      {js_code, 0} ->
+        {:ok, js_code }
+      {error, _} ->
+        {:error, error}
+    end
   end
 
-  def write_to_file({js, file_name}, destination) do
+  @doc """
+  Writes output to file
+  """
+  @spec write_to_files([{binary, binary}], binary) :: nil
+  def write_to_files(list, destination) when is_list(list) do
+    Enum.each(list, &write_to_files(&1, destination))
+  end
+
+  @doc """
+  Writes output to file
+  """
+  @spec write_to_files({binary, binary}, binary) :: :ok | no_return
+  def write_to_files({file_name, js}, destination) do
     file_name = Path.join([destination, file_name])
 
     if !File.exists?(destination) do

@@ -72,20 +72,20 @@ defmodule ExToJS.Translator.Test do
       def test1() do
       end
     end
-    assert ex_ast_to_js(ex_ast) |> strip_spaces == "test1(){}"
+    assert ex_ast_to_js(ex_ast) |> strip_new_lines  == "export function test1() {}"
 
     ex_ast = quote do
       def test1(alpha, beta) do
       end
     end
-    assert ex_ast_to_js(ex_ast) |> strip_spaces == "test1(alpha,beta){}"
+    assert ex_ast_to_js(ex_ast) |> strip_new_lines == "export function test1(alpha, beta) {}"
 
     ex_ast = quote do
       def test1(alpha, beta) do
         a = alpha
       end
     end
-    assert ex_ast_to_js(ex_ast) |> strip_new_lines == "test1(alpha, beta) {    let a = alpha;}"
+    assert ex_ast_to_js(ex_ast) |> strip_new_lines == "export function test1(alpha, beta) {    let a = alpha;}"
   end
 
   test "translate function calls" do
@@ -116,19 +116,19 @@ defmodule ExToJS.Translator.Test do
       end
     end
 
-    assert ex_ast_to_js(ex_ast, true) |> strip_new_lines == "export class Elephant {}"
+    assert ex_ast_to_js(ex_ast) |> strip_new_lines == ""
 
     ex_ast = quote do
       defmodule Elephant do
         def something() do
         end
 
-        def something_else() do
+        defp something_else() do
         end
       end
     end
 
-    assert ex_ast_to_js(ex_ast, true) |> strip_new_lines == "export class Elephant {    something() {    }    something_else() {    }}"
+    assert ex_ast_to_js(ex_ast) |> strip_new_lines == "export function something() {}function something_else() {}"
 
     ex_ast = quote do
       defmodule Elephant do
@@ -137,12 +137,12 @@ defmodule ExToJS.Translator.Test do
         def something() do
         end
 
-        def something_else() do
+        defp something_else() do
         end
       end
     end
 
-    assert ex_ast_to_js(ex_ast, true) |> strip_new_lines == "import { Crane } from 'icabod/crane';export class Elephant {    something() {    }    something_else() {    }}"
+    assert ex_ast_to_js(ex_ast) |> strip_new_lines == "import * as Crane from 'icabod/crane';export function something() {}function something_else() {}"
   end
 
   test "translate anonymous functions" do
@@ -180,7 +180,7 @@ defmodule ExToJS.Translator.Test do
       end
     end
 
-    assert ex_ast_to_js(ex_ast, true) |> strip_new_lines == "export class User {    constructor(name = 'john', age = 27) {        this.name = name;        this.age = age;    }}"
+    assert ex_ast_to_js(ex_ast) |> strip_new_lines == "export class User {    constructor(name = 'john', age = 27) {        this.name = name;        this.age = age;    }}"
 
     ex_ast = quote do
       defmodule User do
@@ -188,6 +188,6 @@ defmodule ExToJS.Translator.Test do
       end
     end
 
-    assert ex_ast_to_js(ex_ast, true) |> strip_new_lines == "export class User {    constructor(name, age) {        this.name = name;        this.age = age;    }}"
+    assert ex_ast_to_js(ex_ast) |> strip_new_lines == "export class User {    constructor(name, age) {        this.name = name;        this.age = age;    }}"
   end
 end

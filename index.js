@@ -58,7 +58,7 @@ function parse_import(){
 }
 
 function parse_star_import(){
-  return parse("import * as Crane from 'icabod/crane';");
+  return parse("import * as lib from 'lib'");
 }
 
 function parse_alias_import(){
@@ -89,5 +89,9 @@ function parse_expression(){
   return parse('(a=1)')
 }
 
-var g = escodegen.generate(parse_expression());
+function parse_template_string(){
+  return parse('`Hello`')
+}
+
+var g = escodegen.generate(parse_template_string());
 console.log(g);

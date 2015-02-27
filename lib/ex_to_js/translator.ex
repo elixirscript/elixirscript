@@ -1,6 +1,6 @@
 defmodule ExToJS.Translator do
   require Logger
-  alias SpiderMonkey.Builder
+  alias ESTree.Builder
 
   def translate(ex_ast) do
     do_translation(ex_ast)
@@ -89,14 +89,19 @@ defmodule ExToJS.Translator do
         [do_translation(body)]
     end
 
-    Builder.method_definition(
-      Builder.identifier(def_name),
-      Builder.function_expression(
+    function_declaration = Builder.function_declaration(
+        Builder.identifier(def_name),
         Enum.map(params, &do_translation(&1)),
         [],
         Builder.block_statement(body)
       )
-    )
+
+    case function do
+      :def ->
+        Builder.export_declaration(function_declaration)
+      _ ->
+        function_declaration
+    end
   end
 
   defp do_translation({:fn, _, [{:->, _, [params, body]}]}) do
@@ -107,23 +112,42 @@ defmodule ExToJS.Translator do
     )
   end
 
+  defp do_translation(:import, _, attributes) do
+    {_,_,name} = hd(attributes)
+
+    {_,_,importees} = List.last(attributes)
+
+    if is_list(hd(importees)) do
+      importees = Enum.flat_map(importees, fn({x,y}) -> x end)
+    end
+
+    specifiers = Enum.map(importees, fn(x) ->
+      Builder.import_specifier(Builder.identifier(x))
+    end)
+
+    source = Enum.map(name, fn(x) -> Atom.to_string(x) |> String.downcase end) |> Enum.join("/")
+    source = "'#{source}'"
+
+    Builder.import_declaration([specifiers], Builder.identifier(source))
+  end
+
   defp do_translation({:defstruct, _, attributes}) when length(attributes) == 1 do
     attributes = Enum.flat_map(attributes, fn(x) -> x end)
 
     params = Enum.map(attributes, fn({x,_y}) -> x end)
     defaults = Enum.map(attributes, fn({_x,y}) -> y end)
 
-    make_constructor(params, defaults)
+    make_class_body(params, defaults)
   end
 
   defp do_translation({:defstruct, _, attributes}) do
     params = Enum.map(attributes, fn(x) -> x end)
     defaults = []
 
-    make_constructor(params, defaults)
+    make_class_body(params, defaults)
   end
 
-  defp make_constructor(params, defaults) do
+  defp make_class_body(params, defaults) do
 
     body = Enum.map(params, fn(x) -> 
       Builder.expression_statement(
@@ -138,51 +162,67 @@ defmodule ExToJS.Translator do
       )
     end)
 
-    Builder.method_definition(
-      Builder.identifier("constructor"),
-      Builder.function_expression(
-        Enum.map(params, fn(x) -> Builder.identifier(x) end),
-        Enum.map(defaults, fn(x) -> Builder.literal(x) end),
-        Builder.block_statement(body)
-      )
+    Builder.class_body([
+      Builder.method_definition(
+        Builder.identifier("constructor"),
+        Builder.function_expression(
+          Enum.map(params, fn(x) -> Builder.identifier(x) end),
+          Enum.map(defaults, fn(x) -> Builder.literal(x) end),
+          Builder.block_statement(body)
+        )
+      )]
     )
   end
 
+  defp do_translation({:defmodule, _, [{:__aliases__, _, _}, [do: nil]]}) do
+    Builder.program([])
+  end
 
   defp do_translation({:defmodule, _, [{:__aliases__, _, module_name_list}, [do: body]]}) do
     parsed_body = do_translation(body)
-    {imports, body} = case parsed_body do
-      %{ type: "Literal", value: nil } ->
-        {[], Builder.literal(nil)}
-      %{ type: "MethodDefinition" } ->
+
+    {imports, body} = cond do
+      !is_list(parsed_body) ->
         {[], [parsed_body]}
-      _ ->
-      Enum.partition(parsed_body.body, fn(x) -> x.type == "ImportDeclaration" end)
+      true ->
+        Enum.partition(parsed_body.body, fn(x) -> x.type == "ImportDeclaration" end)
     end
 
-    name = Builder.identifier(Enum.map(module_name_list, fn(x) -> Atom.to_string(x) end) |> Enum.join("."))
-    body = Builder.class_body(body)
-    class_declaration = Builder.class_declaration(name, body)
-    export_declaration = Builder.export_declaration(class_declaration)
+    body = Enum.map(body, fn(x) -> 
+      if x.type == "ClassBody" do
+        Builder.export_declaration(
+          Builder.class_declaration(
+            Builder.identifier(List.last(module_name_list)),
+            x
+          )
+        )
+      else
+        x
+      end
+    end)
 
-    imports ++ [export_declaration]
+    if length(body) == 1 and hd(body).type == "BlockStatement" do
+      body = hd(body).body
+    end
+
+    Builder.program(imports ++ body)
   end
 
   defp do_translation({:alias, _, alias_info}) do
     {_, _, name} = hd(alias_info)
 
-    alt = if length(alias_info) > 1 do
+    import_id = if length(alias_info) > 1 do
       {_, _, alt} = List.last(alias_info)[:as]
       Builder.identifier(alt)
     else
-      nil
+      List.last(name) |> Builder.identifier
     end
 
-    import_id = List.last(name)
+
     source = Enum.map(name, fn(x) -> Atom.to_string(x) |> String.downcase end) |> Enum.join("/")
     source = "'#{source}'"
 
-    import_specifier = Builder.import_specifier(Builder.identifier(import_id), alt)
+    import_specifier = Builder.import_namespace_specifier(import_id)
     Builder.import_declaration([import_specifier], Builder.identifier(source))
   end
 
@@ -225,14 +265,5 @@ defmodule ExToJS.Translator do
     Tuple.to_list(ast)
     |> Enum.map(&do_translation(&1))
     |> Builder.array_expression
-  end
-
-  def js_ast_to_js(js_ast) do
-    case System.cmd(System.cwd() <> "/escodegen", [js_ast]) do
-      {js_code, 0} ->
-        {:ok, js_code }
-      {error, _} ->
-        {:error, error}
-    end
   end
 end
