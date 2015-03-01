@@ -56,3 +56,23 @@ $ mix ex2js -h
 ```
 
 Alternatively, you can clone the repo, do `mix escript.build` and use the created `ex2js` escript without mix
+
+
+TODO (high level list of todos)
+======
+* [ ] case
+* [ ] cond
+* [ ] for
+* [ ] try
+* [ ] bitstring
+* [ ] string interpolation
+* [ ] return from a function
+* [ ] pattern matching
+* [ ] defexception
+* [ ] types and specs
+* [ ] pipe operator
+* [ ] data structures
+* [ ] figure out how using external js modules will work
+* [ ] spawn
+* [ ] actors
+* [ ] optimize converted javascript

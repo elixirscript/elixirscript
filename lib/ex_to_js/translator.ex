@@ -2,6 +2,9 @@ defmodule ExToJS.Translator do
   require Logger
   alias ESTree.Builder
 
+  @doc """
+  Translates Elixir AST to JavaScript AST
+  """
   def translate(ex_ast) do
     do_translation(ex_ast)
   end
@@ -237,10 +240,6 @@ defmodule ExToJS.Translator do
     end
 
     Builder.if_statement(test, consequent, alternate)
-  end
-
-  defp do_translation({:defexception, _, [[message: _message]]}) do
-    Builder.literal(nil)
   end
 
   defp do_translation({:__block__, _, expressions }) do
