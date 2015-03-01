@@ -9,6 +9,30 @@ This is still very early and is no where near complete. But it does convert some
 
 It also includes an escript cli named ex2js which takes files or Elixir code strings as input and outputs Spider Monkey AST or JavaScript code to output or files depending on the options
 
+Development
+===========
+
+Clone the repo
+  
+    git clone git@github.com:bryanjos/ex_to_js.git
+
+Get dependencies
+
+    mix deps.get
+    npm install
+
+Compile
+
+    mix compile
+
+Test
+
+    mix test
+    
+To build the escript
+
+    mix escript.build
+
 
 Usage
 ===
