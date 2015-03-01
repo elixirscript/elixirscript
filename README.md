@@ -8,3 +8,27 @@ The goal is to convert a subset (or full set) of Elixir code to ES6 JavaScript. 
 This is still very early and is no where near complete. But it does convert some Elixir code to JavaScript already.
 
 It also includes an escript cli named ex2js which takes files or Elixir code strings as input and outputs Spider Monkey AST or JavaScript code to output or files depending on the options
+
+
+Usage
+===
+
+Add the following to your dependencies:
+
+    { :ex_to_js, github: "bryanjos/ex_to_js"}
+    
+You can use the included mix task to convert Elixir to JavaScript
+
+```
+$ mix ex2js -h
+  usage: ex2js <input> [options]
+
+  options:
+
+  -o  --output [path]   places output in the given directory or file
+  -t  --ast             shows only produced spider monkey ast
+  -ex --elixir          read input as elixir code string
+  -h  --help            this message
+```
+
+Alternatively, you can clone the repo, do `mix escript.build` and use the created `ex2js` escript without mix

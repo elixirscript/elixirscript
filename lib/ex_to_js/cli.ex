@@ -88,9 +88,10 @@ defmodule ExToJS.CLI do
 
       options:
 
-      -o  --output   places output in the given directory or file
-      -t  --ast      shows only produced spider monkey ast
-      -ex --elixir  read input as elixir code string
+      -o  --output [path]   places output in the given directory or file
+      -t  --ast             shows only produced spider monkey ast
+      -ex --elixir          read input as elixir code string
+      -h  --help            this message
     """
   end
 end
