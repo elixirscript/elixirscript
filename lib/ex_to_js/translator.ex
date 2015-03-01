@@ -249,10 +249,7 @@ defmodule ExToJS.Translator do
 
   defp do_translation({name, _, params}) when is_list(params) do
     Builder.call_expression(
-      Builder.member_expression(
-        Builder.this_expression(),
-        Builder.identifier(name)
-      ),
+      Builder.identifier(name),
       Enum.map(params, &do_translation(&1))
     )
   end

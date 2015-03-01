@@ -92,12 +92,12 @@ defmodule ExToJS.Translator.Test do
     ex_ast = quote do
       test1()
     end
-    assert ex_ast_to_js(ex_ast) |> strip_spaces == "this.test1()"
+    assert ex_ast_to_js(ex_ast) |> strip_spaces == "test1()"
 
     ex_ast = quote do
       test1(3, 2)
     end
-    assert ex_ast_to_js(ex_ast) |> strip_spaces == "this.test1(3,2)"
+    assert ex_ast_to_js(ex_ast) |> strip_spaces == "test1(3,2)"
 
     ex_ast = quote do
       Taco.test1(3, 2)
