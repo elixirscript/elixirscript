@@ -11,6 +11,9 @@ defmodule ExToJS.Translator.Test do
     ex_ast = quote do: 1
     assert ex_ast_to_js(ex_ast) == "1"
 
+    ex_ast = quote do: 1_000
+    assert ex_ast_to_js(ex_ast) == "1000"
+
     ex_ast = quote do: 1.1
     assert ex_ast_to_js(ex_ast) == "1.1"
 
