@@ -46,11 +46,12 @@ defmodule ExToJS.Translator do
         )
         Builder.variable_declaration([declarator], :let)
     else
-        Builder.assignment_expression(
-          :=,
+        declarator = Builder.variable_declarator(
           Builder.array_pattern(Enum.map(identifiers, &do_translation(&1))),
           do_translation(right)
         )
+
+        Builder.variable_declaration([declarator], :let)
     end
   end
 
@@ -92,6 +93,8 @@ defmodule ExToJS.Translator do
         [do_translation(body)]
     end
 
+    body = return_last_expression(body)
+
     function_declaration = Builder.function_declaration(
         Builder.identifier(def_name),
         Enum.map(params, &do_translation(&1)),
@@ -115,23 +118,28 @@ defmodule ExToJS.Translator do
     )
   end
 
-  defp do_translation(:import, _, attributes) do
-    {_,_,name} = hd(attributes)
+  defp do_translation({:import, _, [{:__aliases__, _, module_name_list}]}) do
+    mod = List.last(module_name_list) |> Builder.identifier
 
-    {_,_,importees} = List.last(attributes)
-
-    if is_list(hd(importees)) do
-      importees = Enum.flat_map(importees, fn({x,y}) -> x end)
-    end
-
-    specifiers = Enum.map(importees, fn(x) ->
-      Builder.import_specifier(Builder.identifier(x))
-    end)
-
-    source = Enum.map(name, fn(x) -> Atom.to_string(x) |> String.downcase end) |> Enum.join("/")
+    source = Enum.map(module_name_list, fn(x) -> Atom.to_string(x) |> String.downcase end) |> Enum.join("/")
     source = "'#{source}'"
 
-    Builder.import_declaration([specifiers], Builder.identifier(source))
+    import_specifier = Builder.import_namespace_specifier(mod)
+    Builder.import_declaration([import_specifier], Builder.identifier(source))
+  end
+
+  defp do_translation({:import, _, [{:__aliases__, _, module_name_list}, [only: function_list] ]}) do
+
+    source = Enum.map(module_name_list, fn(x) -> Atom.to_string(x) |> String.downcase end) |> Enum.join("/")
+    source = "'#{source}'"
+
+    identifiers = Enum.map(function_list, fn({name, _arity}) -> 
+      Builder.import_specifier(
+        Builder.identifier(name)
+      )
+    end)
+
+    Builder.import_declaration(identifiers, Builder.identifier(source))
   end
 
   defp do_translation({:defstruct, _, attributes}) when length(attributes) == 1 do
@@ -148,33 +156,6 @@ defmodule ExToJS.Translator do
     defaults = []
 
     make_class_body(params, defaults)
-  end
-
-  defp make_class_body(params, defaults) do
-
-    body = Enum.map(params, fn(x) -> 
-      Builder.expression_statement(
-        Builder.assignment_expression(
-          :=,
-          Builder.member_expression(
-            Builder.this_expression(),
-            Builder.identifier(x)
-          ),
-          Builder.identifier(x)       
-        )
-      )
-    end)
-
-    Builder.class_body([
-      Builder.method_definition(
-        Builder.identifier("constructor"),
-        Builder.function_expression(
-          Enum.map(params, fn(x) -> Builder.identifier(x) end),
-          Enum.map(defaults, fn(x) -> Builder.literal(x) end),
-          Builder.block_statement(body)
-        )
-      )]
-    )
   end
 
   defp do_translation({:defmodule, _, [{:__aliases__, _, _}, [do: nil]]}) do
@@ -261,5 +242,90 @@ defmodule ExToJS.Translator do
     Tuple.to_list(ast)
     |> Enum.map(&do_translation(&1))
     |> Builder.array_expression
+  end
+
+  defp make_class_body(params, defaults) do
+
+    body = Enum.map(params, fn(x) -> 
+      Builder.expression_statement(
+        Builder.assignment_expression(
+          :=,
+          Builder.member_expression(
+            Builder.this_expression(),
+            Builder.identifier(x)
+          ),
+          Builder.identifier(x)       
+        )
+      )
+    end)
+
+    Builder.class_body([
+      Builder.method_definition(
+        Builder.identifier("constructor"),
+        Builder.function_expression(
+          Enum.map(params, fn(x) -> Builder.identifier(x) end),
+          Enum.map(defaults, fn(x) -> Builder.literal(x) end),
+          Builder.block_statement(body)
+        )
+      )]
+    )
+  end
+
+  defp return_last_expression([]) do
+    [Builder.return_statement(Builder.literal(nil))]
+  end
+
+  defp return_last_expression(%ESTree.BlockStatement{} = block) do
+    %ESTree.BlockStatement{ block | body: return_last_expression(block.body) }
+  end
+
+  defp return_last_expression(list) when is_list(list) do
+    last_item = List.last(list)
+
+    last_item = case last_item do
+      %ESTree.Literal{} ->
+        Builder.return_statement(last_item) 
+      %ESTree.Identifier{} ->
+        Builder.return_statement(last_item) 
+      %ESTree.VariableDeclaration{} ->
+        declaration = hd(last_item.declarations).id
+
+        return_statement = case declaration do
+          %ESTree.ArrayPattern{} ->
+            Builder.return_statement(Builder.array_expression(declaration.elements))
+          _ ->
+            Builder.return_statement(declaration)  
+        end
+
+        [last_item, return_statement]
+      %ESTree.IfStatement{} ->
+
+        consequent = return_last_expression(last_item.consequent)
+
+        alternate = if last_item.alternate do
+          return_last_expression(last_item.alternate)
+        else
+          nil
+        end
+
+        last_item = %ESTree.IfStatement{ last_item | consequent: consequent, alternate: alternate }
+      %ESTree.BlockStatement{} ->
+        last_item = %ESTree.BlockStatement{ last_item | body: return_last_expression(last_item.body) }
+      _ ->
+        if String.contains?(last_item.type, "Expression") do
+          Builder.return_statement(last_item) 
+        else
+          [last_item, Builder.return_statement(Builder.literal(nil))]
+        end    
+    end
+
+
+    list = Enum.take(list, length(list)-1)
+
+    if is_list(last_item) do
+      list ++ last_item
+    else
+      list ++ [last_item]
+    end
   end
 end

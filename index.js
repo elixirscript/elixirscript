@@ -1,7 +1,7 @@
 var acorn = require('acorn');
 var escodegen = require('escodegen');
 
-var options = { ecmaVersion: 6}
+var options = { ecmaVersion: 6, locations: true }
 
 function parse(code){
   var ast = acorn.parse(code, options);
@@ -58,7 +58,7 @@ function parse_import(){
 }
 
 function parse_star_import(){
-  return parse("import * as lib from 'lib'");
+  return parse("import * as World from 'hello/world'");
 }
 
 function parse_alias_import(){
@@ -74,7 +74,7 @@ function parse_if(){
 }
 
 function parse_array_destructing(){
-  return parse('[a, b] = [1, 2]');
+  return parse('var [a, b] = [1, 2]');
 }
 
 function parse_arrow_function(){
@@ -93,5 +93,13 @@ function parse_template_string(){
   return parse('`Hello`')
 }
 
-var g = escodegen.generate(parse_template_string());
+function parse_another_import(){
+  return parse("import la from 'us'");
+}
+
+function parse_new_class(){
+  return parse("let user = new User('John', 27)");
+}
+
+var g = escodegen.generate(parse_new_class());
 console.log(g);
