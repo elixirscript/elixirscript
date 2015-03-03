@@ -66,7 +66,7 @@ TODO (high level list of todos)
 * [ ] try
 * [ ] bitstring
 * [ ] string interpolation
-* [ ] return from a function
+* [x] return from a function
 * [ ] pattern matching
 * [ ] defexception
 * [ ] types and specs
