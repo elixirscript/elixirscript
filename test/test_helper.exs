@@ -1,6 +1,8 @@
 ExUnit.start()
 
 defmodule ExToJS.TestHelper do
+  use ExUnit.Case
+  
   def ex_ast_to_js(ex_ast) do
 
     js_ast = ExToJS.Translator.translate(ex_ast)
@@ -20,5 +22,10 @@ defmodule ExToJS.TestHelper do
 
   def strip_new_lines(js) do
     js |> String.replace("\n", "")
+  end
+
+
+  def assert_translation(ex_ast, js_code) do
+    assert ex_ast_to_js(ex_ast) |> strip_spaces == strip_spaces(js_code)
   end
 end

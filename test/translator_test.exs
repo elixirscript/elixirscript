@@ -4,70 +4,95 @@ defmodule ExToJS.Translator.Test do
 
   test "translate nil" do
     ex_ast = quote do: nil
-    assert ex_ast_to_js(ex_ast) == "null"
+    assert_translation(ex_ast, "null")
   end
 
   test "translate numbers" do
     ex_ast = quote do: 1
-    assert ex_ast_to_js(ex_ast) == "1"
+    assert_translation(ex_ast, "1")
 
     ex_ast = quote do: 1_000
-    assert ex_ast_to_js(ex_ast) == "1000"
+    assert_translation(ex_ast, "1000")
 
     ex_ast = quote do: 1.1
-    assert ex_ast_to_js(ex_ast) == "1.1"
+    assert_translation(ex_ast, "1.1")
 
     ex_ast = quote do: -1.1
-    assert ex_ast_to_js(ex_ast) == "-1.1"
+    assert_translation(ex_ast, "-1.1")
   end
 
   test "translate string" do
     ex_ast = quote do: "Hello"
-    assert ex_ast_to_js(ex_ast) == "'Hello'"
+    assert_translation(ex_ast, "'Hello'")
+
+    ex_ast = quote do: "Hello" <> "World"
+    assert_translation(ex_ast, "'Hello' + 'World'")
   end
 
   test "translate atom" do
     ex_ast = quote do: :atom
-    assert ex_ast_to_js(ex_ast) == "Symbol('atom')"
+    assert_translation(ex_ast, "Symbol('atom')")
   end
 
   test "translate list" do
     ex_ast = quote do: [1, 2, 3]
-    assert ex_ast_to_js(ex_ast) |> strip_spaces == "[1,2,3]"
+    js_code = "[1, 2, 3]"
+
+    assert_translation(ex_ast, js_code)
 
     ex_ast = quote do: ["a", "b", "c"]
-    assert ex_ast_to_js(ex_ast) |> strip_spaces == "['a','b','c']"
+    js_code = "['a', 'b', 'c']"
+
+    assert_translation(ex_ast, js_code)
 
     ex_ast = quote do: [:a, :b, :c]
-    assert ex_ast_to_js(ex_ast) |> strip_spaces == "[Symbol('a'),Symbol('b'),Symbol('c')]"
+    js_code = "[Symbol('a'), Symbol('b'), Symbol('c')]" 
+    
+    assert_translation(ex_ast, js_code)
 
     ex_ast = quote do: [:a, 2, "c"]
-    assert ex_ast_to_js(ex_ast) |> strip_spaces == "[Symbol('a'),2,'c']"
+    js_code = "[Symbol('a'), 2, 'c']"
+
+    assert_translation(ex_ast, js_code)
   end
 
   test "translate tuple" do
     ex_ast = quote do: {1, 2, 3}
-    assert ex_ast_to_js(ex_ast) |> strip_spaces == "[1,2,3]"
+    js_code = "[1, 2, 3]"
+
+    assert_translation(ex_ast, js_code)
 
     ex_ast = quote do: {"a", "b", "c"}
-    assert ex_ast_to_js(ex_ast) |> strip_spaces == "['a','b','c']"
+    js_code = "['a', 'b', 'c']"
+
+    assert_translation(ex_ast, js_code)
 
     ex_ast = quote do: {:a, :b, :c}
-    assert ex_ast_to_js(ex_ast) |> strip_spaces == "[Symbol('a'),Symbol('b'),Symbol('c')]"
+    js_code = "[Symbol('a'), Symbol('b'), Symbol('c')]" 
+    
+    assert_translation(ex_ast, js_code)
 
     ex_ast = quote do: {:a, 2, "c"}
-    assert ex_ast_to_js(ex_ast) |> strip_spaces == "[Symbol('a'),2,'c']"
+    js_code = "[Symbol('a'), 2, 'c']"
+
+    assert_translation(ex_ast, js_code)
   end
 
   test "translate assignment" do
     ex_ast = quote do: a = 1
-    assert ex_ast_to_js(ex_ast) == "let a = 1;"
+    js_code = "let a = 1;"
+
+    assert_translation(ex_ast, js_code)
 
     ex_ast = quote do: a = :atom
-    assert ex_ast_to_js(ex_ast) == "let a = Symbol('atom');"
+    js_code = "let a = Symbol('atom');"
+
+    assert_translation(ex_ast, js_code)
 
     ex_ast = quote do: {a, b} = {1, 2}
-    assert ex_ast_to_js(ex_ast) |> strip_new_lines == "let [    a,    b] = [    1,    2];"
+    js_code = "let [a,b] = [1,2];"
+
+    assert_translation(ex_ast, js_code)
   end
 
   test "translate functions" do
@@ -75,13 +100,27 @@ defmodule ExToJS.Translator.Test do
       def test1() do
       end
     end
-    assert ex_ast_to_js(ex_ast) |> strip_new_lines  == "export function test1() {    return null;}"
+
+    js_code = """
+      export function test1(){
+        return null;
+      }
+    """
+
+    assert_translation(ex_ast, js_code)
 
     ex_ast = quote do
       def test1(alpha, beta) do
       end
     end
-    assert ex_ast_to_js(ex_ast) |> strip_new_lines == "export function test1(alpha, beta) {    return null;}"
+
+    js_code = """
+      export function test1(alpha, beta){
+        return null;
+      }
+    """
+
+    assert_translation(ex_ast, js_code)
 
     ex_ast = quote do
       def test1(alpha, beta) do
@@ -89,7 +128,14 @@ defmodule ExToJS.Translator.Test do
       end
     end
 
-    assert ex_ast_to_js(ex_ast) |> strip_new_lines == "export function test1(alpha, beta) {    let a = alpha;    return a;}"
+    js_code = """
+      export function test1(alpha, beta){
+        let a = alpha;
+        return a;
+      }
+    """
+
+    assert_translation(ex_ast, js_code)
 
     ex_ast = quote do
       def test1(alpha, beta) do
@@ -101,7 +147,17 @@ defmodule ExToJS.Translator.Test do
       end
     end
 
-    assert ex_ast_to_js(ex_ast) |> strip_new_lines == "export function test1(alpha, beta) {    if (1 == 1) {        return 1;    } else {        return 2;    }}"
+    js_code = """
+      export function test1(alpha, beta){
+        if(1 == 1){
+          return 1;
+        }else{
+          return 2;
+        }
+      }
+    """
+
+    assert_translation(ex_ast, js_code)
 
     ex_ast = quote do
       def test1(alpha, beta) do
@@ -117,7 +173,22 @@ defmodule ExToJS.Translator.Test do
       end
     end
 
-    assert ex_ast_to_js(ex_ast) |> strip_new_lines == "export function test1(alpha, beta) {    if (1 == 1) {        if (2 == 2) {            return 4;        } else {            let a = 1;            return a;        }    } else {        return 2;    }}"
+    js_code = """
+      export function test1(alpha, beta){
+        if(1 == 1){
+          if(2 == 2){
+            return 4;
+          }else{
+            let a = 1;
+            return a;
+          }
+        }else{
+          return 2;
+        }
+      }
+    """
+
+    assert_translation(ex_ast, js_code)
 
     ex_ast = quote do
       def test1(alpha, beta) do
@@ -125,29 +196,48 @@ defmodule ExToJS.Translator.Test do
       end
     end
 
-    assert ex_ast_to_js(ex_ast) |> strip_new_lines == "export function test1(alpha, beta) {    let [        a,        b    ] = [        1,        2    ];    return [        a,        b    ];}"
+    js_code = """
+      export function test1(alpha, beta){
+        let [a,b] = [1,2];
+        return [a,b];
+      }
+    """
+
+    assert_translation(ex_ast, js_code)
   end
 
   test "translate function calls" do
     ex_ast = quote do
       test1()
     end
-    assert ex_ast_to_js(ex_ast) |> strip_spaces == "test1()"
+
+    js_code = "test1()"
+
+    assert_translation(ex_ast, js_code)
 
     ex_ast = quote do
       test1(3, 2)
     end
-    assert ex_ast_to_js(ex_ast) |> strip_spaces == "test1(3,2)"
+
+    js_code = "test1(3,2)"
+
+    assert_translation(ex_ast, js_code)
 
     ex_ast = quote do
       Taco.test1(3, 2)
     end
-    assert ex_ast_to_js(ex_ast) |> strip_spaces == "Taco.test1(3,2)"
+
+    js_code = "Taco.test1(3,2)"   
+
+    assert_translation(ex_ast, js_code)
 
     ex_ast = quote do
       Taco.test1(Taco.test2(), 2)
     end
-    assert ex_ast_to_js(ex_ast) |> strip_spaces == "Taco.test1(Taco.test2(),2)"
+
+    js_code = "Taco.test1(Taco.test2(),2)"   
+
+    assert_translation(ex_ast, js_code)
   end
 
   test "translate defmodules" do
@@ -156,7 +246,7 @@ defmodule ExToJS.Translator.Test do
       end
     end
 
-    assert ex_ast_to_js(ex_ast) |> strip_new_lines == ""
+    assert_translation(ex_ast, "")
 
     ex_ast = quote do
       defmodule Elephant do
@@ -168,7 +258,17 @@ defmodule ExToJS.Translator.Test do
       end
     end
 
-    assert ex_ast_to_js(ex_ast) |> strip_new_lines == "export function something() {    return null;}function something_else() {    return null;}"
+    js_code = """
+      export function something(){
+        return null;
+      }
+
+      function something_else(){
+        return null;
+      }
+    """
+
+    assert_translation(ex_ast, js_code)
 
     ex_ast = quote do
       defmodule Elephant do
@@ -182,7 +282,19 @@ defmodule ExToJS.Translator.Test do
       end
     end
 
-    assert ex_ast_to_js(ex_ast) |> strip_new_lines == "import * as Crane from 'icabod/crane';export function something() {    return null;}function something_else() {    return null;}"
+    js_code = """
+      import * as Crane from 'icabod/crane';
+
+      export function something(){
+        return null;
+      }
+
+      function something_else(){
+        return null;
+      }
+    """
+
+    assert_translation(ex_ast, js_code)
   end
 
   test "translate anonymous functions" do
@@ -190,7 +302,9 @@ defmodule ExToJS.Translator.Test do
       Enum.map(list, fn(x) -> x * 2 end)
     end
 
-    assert ex_ast_to_js(ex_ast) |> strip_new_lines == "Enum.map(list, x =>    x * 2)"
+    js_code = "Enum.map(list, x => x * 2)"
+
+    assert_translation(ex_ast, js_code)
   end
 
   test "translate if statement" do
@@ -200,7 +314,13 @@ defmodule ExToJS.Translator.Test do
       end
     end
 
-    assert ex_ast_to_js(ex_ast) |> strip_new_lines == "if (1 == 1) {    let a = 1;}"
+    js_code = """
+      if(1 == 1){
+        let a = 1;
+      }
+    """
+
+    assert_translation(ex_ast, js_code)
 
     ex_ast = quote do
       if 1 == 1 do
@@ -210,7 +330,15 @@ defmodule ExToJS.Translator.Test do
       end
     end
 
-    assert ex_ast_to_js(ex_ast) |> strip_new_lines == "if (1 == 1) {    let a = 1;} else {    let a = 2;}"
+    js_code = """
+      if(1 == 1){
+        let a = 1;
+      }else{
+        let a = 2;
+      }
+    """
+
+    assert_translation(ex_ast, js_code)
   end
 
   test "translate struct" do
@@ -220,7 +348,16 @@ defmodule ExToJS.Translator.Test do
       end
     end
 
-    assert ex_ast_to_js(ex_ast) |> strip_new_lines == "export class User {    constructor(name = 'john', age = 27) {        this.name = name;        this.age = age;    }}"
+    js_code = """
+      export class User {
+        constructor(name = 'john', age = 27){
+          this.name = name;
+          this.age = age;
+        }
+      }
+    """
+
+    assert_translation(ex_ast, js_code)
 
     ex_ast = quote do
       defmodule User do
@@ -228,7 +365,16 @@ defmodule ExToJS.Translator.Test do
       end
     end
 
-    assert ex_ast_to_js(ex_ast) |> strip_new_lines == "export class User {    constructor(name, age) {        this.name = name;        this.age = age;    }}"
+    js_code = """
+      export class User {
+        constructor(name, age){
+          this.name = name;
+          this.age = age;
+        }
+      }
+    """
+
+    assert_translation(ex_ast, js_code)
 
   end
 
@@ -239,7 +385,11 @@ defmodule ExToJS.Translator.Test do
       end
     end
 
-    assert ex_ast_to_js(ex_ast) |> strip_new_lines == "import * as World from 'hello/world';"
+    js_code = """
+      import * as World from 'hello/world';
+    """
+
+    assert_translation(ex_ast, js_code)
 
     ex_ast = quote do
       defmodule User do
@@ -247,7 +397,24 @@ defmodule ExToJS.Translator.Test do
       end
     end
 
-    assert ex_ast_to_js(ex_ast) |> strip_new_lines == "import {    la,    al} from 'us';"
+    js_code = """
+      import { la, al } from 'us';
+    """
+
+    assert_translation(ex_ast, js_code)
+
+
+    ex_ast = quote do
+      defmodule User do
+        alias Hello.World
+      end
+    end
+
+    js_code = """
+      import * as World from 'hello/world';
+    """
+
+    assert_translation(ex_ast, js_code)
 
   end
 

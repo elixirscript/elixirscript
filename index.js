@@ -5,7 +5,7 @@ var options = { ecmaVersion: 6, locations: true }
 
 function parse(code){
   var ast = acorn.parse(code, options);
-  console.log(JSON.stringify(ast));
+  console.log(JSON.stringify(ast, null, 4));
   return ast; 
 }
 

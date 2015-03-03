@@ -16,23 +16,19 @@ defmodule ExToJS.Translator do
   defp do_translation({:-, _, [number]}) when is_number(number) do
     Builder.unary_expression(:-, true, Builder.literal(number))
   end
-
+ 
   defp do_translation(ast) when is_list(ast) do
-    ast
-    |> Enum.map(&do_translation(&1))
-    |> Builder.array_expression
+    make_array(ast)
   end
 
   defp do_translation({:{}, _, elements}) do
-    elements
-    |> Enum.map(&do_translation(&1))
-    |> Builder.array_expression
+    make_array(elements)
   end
 
   defp do_translation(ast) when is_atom(ast) do
     Builder.call_expression(
       Builder.identifier("Symbol"), 
-      [Builder.literal(Atom.to_string(ast))]
+      [Builder.literal(ast)]
     )
   end
 
@@ -62,7 +58,7 @@ defmodule ExToJS.Translator do
   end
 
   defp do_translation({:__aliases__, _params, aliases}) do
-    Builder.literal(aliases)
+    Builder.identifier(aliases)
   end
 
   defp do_translation({ {:., [], [{:__aliases__, _, module_name}, function_name]}, [], params }) do
@@ -327,5 +323,11 @@ defmodule ExToJS.Translator do
     else
       list ++ [last_item]
     end
+  end
+
+  defp make_array(elements) do
+    elements
+    |> Enum.map(&do_translation(&1))
+    |> Builder.array_expression
   end
 end
