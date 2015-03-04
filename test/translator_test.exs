@@ -57,6 +57,11 @@ defmodule ExToJS.Translator.Test do
   end
 
   test "translate tuple" do
+    ex_ast = quote do: {1, 2}
+    js_code = "[1, 2]"
+
+    assert_translation(ex_ast, js_code)
+
     ex_ast = quote do: {1, 2, 3}
     js_code = "[1, 2, 3]"
 

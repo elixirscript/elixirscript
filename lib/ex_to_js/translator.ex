@@ -6,23 +6,23 @@ defmodule ExToJS.Translator do
   Translates Elixir AST to JavaScript AST
   """
   def translate(ex_ast) do
-    do_translation(ex_ast)
+    case ex_ast do
+      ast when is_number(ast) or is_binary(ast) or is_boolean(ast) or is_nil(ast) or is_list(ast) or is_atom(ast) ->
+        do_translation(ast)
+      {one, two} ->
+        do_translation({one, two})
+      _ ->
+        {atom, metadata, args} = ex_ast
+        do_translation({atom, metadata, args}) 
+    end
   end
 
   defp do_translation(ast) when is_number(ast) or is_binary(ast) or is_boolean(ast) or is_nil(ast) do
     Builder.literal(ast)
   end
 
-  defp do_translation({:-, _, [number]}) when is_number(number) do
-    Builder.unary_expression(:-, true, Builder.literal(number))
-  end
- 
   defp do_translation(ast) when is_list(ast) do
     make_array(ast)
-  end
-
-  defp do_translation({:{}, _, elements}) do
-    make_array(elements)
   end
 
   defp do_translation(ast) when is_atom(ast) do
@@ -30,6 +30,18 @@ defmodule ExToJS.Translator do
       Builder.identifier("Symbol"), 
       [Builder.literal(ast)]
     )
+  end
+
+  defp do_translation({ one, two }) do
+    make_array([one, two])
+  end
+
+  defp do_translation({:-, _, [number]}) when is_number(number) do
+    Builder.unary_expression(:-, true, Builder.literal(number))
+  end
+
+  defp do_translation({:{}, _, elements}) do
+    make_array(elements)
   end
 
   defp do_translation({:=, _, [left, right]}) do
@@ -51,13 +63,13 @@ defmodule ExToJS.Translator do
     end
   end
 
-  defp do_translation({:%{}, _params, properties}) do
+  defp do_translation({:%{}, _, properties}) do
     properties
     |> Enum.map(fn({x, y}) -> Builder.property(Builder.literal(x), do_translation(y)) end)
     |> Builder.object_expression
   end
 
-  defp do_translation({:__aliases__, _params, aliases}) do
+  defp do_translation({:__aliases__, _, aliases}) do
     Builder.identifier(aliases)
   end
 
@@ -208,6 +220,7 @@ defmodule ExToJS.Translator do
 
   defp do_translation({:if, _, [test, blocks]}) do
     test = do_translation(test)
+    
     consequent = Builder.block_statement([do_translation(blocks[:do])])
 
     alternate = if blocks[:else] != nil do
@@ -240,12 +253,6 @@ defmodule ExToJS.Translator do
 
   defp do_translation({name, _, _}) do
     Builder.identifier(name)
-  end
-
-  defp do_translation(ast) do
-    Tuple.to_list(ast)
-    |> Enum.map(&do_translation(&1))
-    |> Builder.array_expression
   end
 
   defp make_class_body(params, defaults) do
@@ -369,7 +376,7 @@ defmodule ExToJS.Translator do
     ast
   end
 
-  defp process_case(predicate, clauses, ast) do
+  defp process_case(condition, clauses, ast) do
     {:->, _, [clause, clause_body]} = hd(clauses)
 
     translated_body = do_translation(clause_body)
@@ -386,14 +393,14 @@ defmodule ExToJS.Translator do
       ast = Builder.if_statement(
         Builder.binary_expression(
           :==,
-          do_translation(predicate),
+          do_translation(condition),
           translated_clause
         ),
         translated_body,
         nil
       )
 
-      %ESTree.IfStatement{ ast |  alternate: process_case(predicate, tl(clauses), nil) }
+      %ESTree.IfStatement{ ast |  alternate: process_case(condition, tl(clauses), nil) }
     end  
   end
 end
