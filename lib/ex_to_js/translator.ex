@@ -75,7 +75,7 @@ defmodule ExToJS.Translator do
     Builder.binary_expression(:+, do_translation(left),do_translation(right))
   end
 
-  defp do_translation({operator, _, [left, right]}) when operator == :+ or operator == :- or operator == :/ or operator == :* or operator == :== do
+  defp do_translation({operator, _, [left, right]}) when operator == :+ or operator == :- or operator == :/ or operator == :* or operator == :== or operator == :!= do
     Builder.binary_expression(operator, do_translation(left), do_translation(right))
   end
 
@@ -219,6 +219,14 @@ defmodule ExToJS.Translator do
     Builder.if_statement(test, consequent, alternate)
   end
 
+  defp do_translation({:case, _, [condition, [do: clauses]]}) do
+    process_case(condition, clauses, nil)
+  end
+
+  defp do_translation({:cond, _, [[do: clauses]]}) do
+    process_cond(clauses, nil)
+  end
+
   defp do_translation({:__block__, _, expressions }) do
     Builder.block_statement(Enum.map(expressions, &do_translation(&1)))
   end
@@ -329,5 +337,63 @@ defmodule ExToJS.Translator do
     elements
     |> Enum.map(&do_translation(&1))
     |> Builder.array_expression
+  end
+
+  defp process_cond([], ast) do
+    ast
+  end
+
+  defp process_cond(clauses, ast) do
+    {:->, _, [clause, clause_body]} = hd(clauses)
+
+    translated_body = do_translation(clause_body)
+
+    if translated_body.type != "BlockStatement" do
+      translated_body = Builder.block_statement([translated_body])
+    end
+
+    if hd(clause) == true do
+      translated_body   
+    else
+      ast = Builder.if_statement(
+        do_translation(hd(clause)),
+        translated_body,
+        nil
+      )
+
+      %ESTree.IfStatement{ ast |  alternate: process_cond(tl(clauses), nil) }
+    end
+  end
+
+  defp process_case(_predicate, [], ast) do
+    ast
+  end
+
+  defp process_case(predicate, clauses, ast) do
+    {:->, _, [clause, clause_body]} = hd(clauses)
+
+    translated_body = do_translation(clause_body)
+
+    if translated_body.type != "BlockStatement" do
+      translated_body = Builder.block_statement([translated_body])
+    end
+
+    translated_clause = do_translation(hd(clause))
+
+    if translated_clause.type == "Identifier" && translated_clause.name == :_ do
+      translated_body
+    else
+      ast = Builder.if_statement(
+        Builder.binary_expression(
+          :==,
+          do_translation(predicate),
+          translated_clause
+        ),
+        translated_body,
+        nil
+      )
+
+      %ESTree.IfStatement{ ast |  alternate: process_case(predicate, tl(clauses), nil) }
+    end  
   end
 end

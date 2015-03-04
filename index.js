@@ -101,5 +101,9 @@ function parse_new_class(){
   return parse("let user = new User('John', 27)");
 }
 
-var g = escodegen.generate(parse_new_class());
+function parse_regular_expression(){
+  return parse("/ab+c/");
+}
+
+var g = escodegen.generate(parse_regular_expression());
 console.log(g);

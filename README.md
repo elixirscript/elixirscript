@@ -76,3 +76,4 @@ TODO (high level list of todos)
 * [ ] spawn
 * [ ] actors
 * [ ] optimize converted javascript
+* [ ] regular expression
