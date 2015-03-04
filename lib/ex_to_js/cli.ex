@@ -86,9 +86,12 @@ defmodule ExToJS.CLI do
     IO.puts """
       usage: ex2js <input> [options]
 
+      <input> path to elixir files or 
+              the elixir code string if the -ex flag is used
+
       options:
 
-      -o  --output [path]   places output in the given directory or file
+      -o  --output [path]   places output at the given path
       -t  --ast             shows only produced spider monkey ast
       -ex --elixir          read input as elixir code string
       -h  --help            this message
