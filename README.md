@@ -60,8 +60,8 @@ Alternatively, you can clone the repo, do `mix escript.build` and use the create
 
 TODO (high level list of todos)
 ======
-* [ ] case
-* [ ] cond
+* [x] case (currently works sans pattern matching support)
+* [x] cond (currently works sans pattern matching support)
 * [ ] for
 * [ ] try
 * [ ] bitstring
