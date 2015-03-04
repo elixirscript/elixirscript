@@ -14,6 +14,7 @@ defmodule ExToJS.CLI do
     case parse do
       { [ output: output, ast: true, elixir: true], [input], _ } -> { input, output, :ast, :elixir}
       { [ output: output, ast: true], [input], _ } -> { input, output, :ast }
+      { [ast: true, elixir: true] , [input], _ } -> { input, :ast, :elixir }
       { [ ast: true ] , [input], _ } -> { input, :ast }
 
       { [ output: output, elixir: true], [input], _ } -> { input, output, :elixir}
@@ -48,20 +49,27 @@ defmodule ExToJS.CLI do
     end)
   end
 
+  def process({ input, :ast, :elixir }) do
+    {_path, ast} = input 
+    |> ExToJS.parse_elixir
+
+    ast
+    |> Poison.encode!
+    |> IO.puts   
+  end
+
+  def process({ input, :elixir }) do
+    {_path, js} = input 
+    |> ExToJS.parse_elixir
+    |> ExToJS.javascript_ast_to_code 
+
+    IO.puts(js)
+  end
+
   def process({ input, output, :elixir }) do
     input 
     |> ExToJS.parse_elixir
     |> ExToJS.write_to_files(output)
-  end
-
-  def process({ input, :elixir }) do
-    input 
-    |> ExToJS.parse_elixir
-    |> Enum.map(fn({_path, ast})-> 
-      ast
-      |> Poison.encode!
-      |> IO.puts
-    end)
   end
 
   def process({ input, output }) do
