@@ -11,8 +11,7 @@ defmodule ExToJS.Translator do
         do_translation(ast)
       {one, two} ->
         do_translation({one, two})
-      _ ->
-        {atom, metadata, args} = ex_ast
+      {atom, metadata, args} ->
         do_translation({atom, metadata, args}) 
     end
   end
@@ -220,7 +219,7 @@ defmodule ExToJS.Translator do
 
   defp do_translation({:if, _, [test, blocks]}) do
     test = do_translation(test)
-    
+
     consequent = Builder.block_statement([do_translation(blocks[:do])])
 
     alternate = if blocks[:else] != nil do
