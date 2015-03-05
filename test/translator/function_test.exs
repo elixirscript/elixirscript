@@ -191,5 +191,13 @@ defmodule ExToJS.Translator.Function.Test do
 
     assert_translation(ex_ast, js_code)
   end
+
+  test "translate length function" do
+    ex_ast = quote do: length(args)
+
+    js_code = "args.length"
+
+    assert_translation(ex_ast, js_code)
+  end
   
 end

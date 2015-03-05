@@ -105,5 +105,17 @@ function parse_regular_expression(){
   return parse("/ab+c/");
 }
 
-var g = escodegen.generate(parse_regular_expression());
+function parse_rest_parameter(){
+  return parse("function hello(...theArgs) {}")
+}
+
+function parse_apply(){
+  return parse("f.apply(null, args);");
+}
+
+function parse_length(){
+  return parse("args.length");
+}
+
+var g = escodegen.generate(parse_length());
 console.log(g);

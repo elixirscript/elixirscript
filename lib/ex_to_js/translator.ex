@@ -90,6 +90,13 @@ defmodule ExToJS.Translator do
     Builder.binary_expression(operator, do_translation(left), do_translation(right))
   end
 
+  defp do_translation({:length, _, [arg]}) do
+      Builder.member_expression(
+        do_translation(arg),
+        Builder.identifier(:length)
+      )
+  end
+
   defp do_translation({function, _, [{def_name, _, params}, [do: body]]}) when function == :def or function == :defp do
     body = cond do
       body == nil ->
@@ -191,6 +198,22 @@ defmodule ExToJS.Translator do
         x
       end
     end)
+
+#    {body, functionDict} = Enum.map_reduce(body, HashDict.new(), fn(x, acc) ->
+#      case x do
+#        %ESTree.FunctionDeclaration{} ->
+#          name = x.id.name
+#          acc = if HashDict.has_key?(acc, name) do
+#            HashDict.put(acc, HashDict.get(acc, name) ++ [x])
+#          else
+#            HashDict.put(acc, [x])
+#          end
+#
+#          {x, acc}
+#        _ ->
+#          {x, acc}
+#      end
+#    end)
 
     if length(body) == 1 and hd(body).type == "BlockStatement" do
       body = hd(body).body
@@ -401,5 +424,39 @@ defmodule ExToJS.Translator do
 
       %ESTree.IfStatement{ ast |  alternate: process_case(condition, tl(clauses), nil) }
     end  
+  end
+
+  defp process_function(_name, [function]) do
+    function
+  end
+
+  defp process_function(name, functions) do
+    processed_functions = Enum.map(functions, 1, fn(x) ->
+      name = String.to_atom("#{x.id.name}__#{length(x.params)}")
+      { %ESTree.FunctionDeclaration{ x | id: Builder.identifier(name)}, name, length(x.params) }
+    end)
+
+    case_statements = Enum.map(process_functions, fn({function, name, arity}) -> 
+      Builder.switch_case(
+        do_translation(quote do: unquote(arity)),
+        do_translation(quote do: unquote(name).apply(nil, args.slice(0, unquote(arity) - 1)))
+      )
+    end)
+
+    switch_statement = Builder.switch_statement(
+      do_translation(quote do: length(:args)),
+      case_statements
+    )
+
+
+    master_function = Builder.function_declaration(
+      Builder.identifier(name),
+      [],
+      [],
+      Builder.block_statement([switch_statement]),
+      Builder.identifier(:args)
+    )
+
+    Enum.map(process_functions, fn({function, _, _}) -> function end) ++ [master_function]
   end
 end
