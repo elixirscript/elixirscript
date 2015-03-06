@@ -3,7 +3,7 @@ defmodule ExToJS.Mixfile do
 
   def project do
     [app: :ex_to_js,
-     version: "0.0.1",
+     version: "0.1.0",
      elixir: "~> 1.0",
      escript: escript_config,
      deps: deps,

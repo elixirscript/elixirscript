@@ -63,6 +63,7 @@ Alternatively, you can clone the repo, do `mix escript.build` and use the create
 
 TODO (high level list of todos)
 ======
+* [ ] better todo list
 * [x] case (currently works sans pattern matching support)
 * [x] cond (currently works sans pattern matching support)
 * [ ] for
@@ -80,3 +81,4 @@ TODO (high level list of todos)
 * [ ] actors
 * [ ] optimize converted javascript
 * [ ] regular expression
+* [x] multiple arity functions
