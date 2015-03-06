@@ -20,15 +20,15 @@ defmodule ExToJS.Translator do
     Builder.literal(ast)
   end
 
-  defp do_translation(ast) when is_list(ast) do
-    make_array(ast)
-  end
-
   defp do_translation(ast) when is_atom(ast) do
     Builder.call_expression(
       Builder.identifier("Symbol"), 
       [Builder.literal(ast)]
     )
+  end
+
+  defp do_translation(ast) when is_list(ast) do
+    make_array(ast)
   end
 
   defp do_translation({ one, two }) do

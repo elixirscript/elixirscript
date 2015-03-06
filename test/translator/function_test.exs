@@ -148,54 +148,12 @@ defmodule ExToJS.Translator.Function.Test do
   end
 
 
-    test "translate anonymous functions" do
+  test "translate anonymous functions" do
     ex_ast = quote do
       Enum.map(list, fn(x) -> x * 2 end)
     end
 
     js_code = "Enum.map(list, x => x * 2)"
-
-    assert_translation(ex_ast, js_code)
-  end
-
-  test "translate if statement" do
-    ex_ast = quote do
-      if 1 == 1 do
-        a = 1
-      end
-    end
-
-    js_code = """
-      if(1 == 1){
-        let a = 1;
-      }
-    """
-
-    assert_translation(ex_ast, js_code)
-
-    ex_ast = quote do
-      if 1 == 1 do
-        a = 1
-      else
-        a = 2
-      end
-    end
-
-    js_code = """
-      if(1 == 1){
-        let a = 1;
-      }else{
-        let a = 2;
-      }
-    """
-
-    assert_translation(ex_ast, js_code)
-  end
-
-  test "translate length function" do
-    ex_ast = quote do: length(args)
-
-    js_code = "args.length"
 
     assert_translation(ex_ast, js_code)
   end
