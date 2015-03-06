@@ -72,10 +72,19 @@ defmodule ExToJS.Translator do
     Builder.identifier(aliases)
   end
 
-  defp do_translation({ {:., [], [{:__aliases__, _, module_name}, function_name]}, [], params }) do
+  defp do_translation({ {:., [], [module_name, function_name]}, [], params }) do
+    the_name = case module_name do
+      {:__aliases__, _, name} ->
+        name
+      {name, _, _} ->
+        name
+      name ->
+        name
+    end
+
     Builder.call_expression(
       Builder.member_expression(
-        Builder.identifier(module_name),
+        Builder.identifier(the_name),
         Builder.identifier(function_name)
       ),
       Enum.map(params, &do_translation(&1))
@@ -92,7 +101,7 @@ defmodule ExToJS.Translator do
 
   defp do_translation({:length, _, [arg]}) do
       Builder.member_expression(
-        do_translation(arg),
+        Builder.identifier(arg),
         Builder.identifier(:length)
       )
   end
@@ -199,27 +208,54 @@ defmodule ExToJS.Translator do
       end
     end)
 
-#    {body, functionDict} = Enum.map_reduce(body, HashDict.new(), fn(x, acc) ->
-#      case x do
-#        %ESTree.FunctionDeclaration{} ->
-#          name = x.id.name
-#          acc = if HashDict.has_key?(acc, name) do
-#            HashDict.put(acc, HashDict.get(acc, name) ++ [x])
-#          else
-#            HashDict.put(acc, [x])
-#          end
-#
-#          {x, acc}
-#        _ ->
-#          {x, acc}
-#      end
-#    end)
-
     if length(body) == 1 and hd(body).type == "BlockStatement" do
       body = hd(body).body
     end
 
-    Builder.program(imports ++ body)
+    {body, functionDict} = Enum.map_reduce(body, HashDict.new(), fn(x, acc) ->
+      case x do
+        %ESTree.FunctionDeclaration{} ->
+          name = x.id.name
+          acc = if HashDict.has_key?(acc, name) do
+            current_state = HashDict.get(acc, name)
+            new_state = %{current_state | functions: current_state.functions ++ [x]}
+            HashDict.put(acc, name, new_state)
+          else
+            HashDict.put(acc, name, %{name: name, access: :private, functions: [x]})
+          end
+
+          {x, acc}
+        %ESTree.ExportDeclaration{ declaration: %ESTree.FunctionDeclaration{} = declaration } ->
+          x = declaration
+          name = x.id.name
+          acc = if HashDict.has_key?(acc, name) do
+            current_state = HashDict.get(acc, name)
+            new_state = %{current_state | functions: current_state.functions ++ [x]}
+            HashDict.put(acc, name, new_state)
+          else
+            HashDict.put(acc, name, %{name: name, access: :export, functions: [x]})
+          end
+
+          {x, acc}
+        _ ->
+          {x, acc}
+      end
+    end)
+
+    final_functions = Enum.flat_map(functionDict, fn({_name, data})-> process_function(data) end)
+
+    body = Enum.filter(body, fn(x) -> 
+      case x do 
+        %ESTree.FunctionDeclaration{} ->
+          false
+        %ESTree.ExportDeclaration{ declaration: %ESTree.FunctionDeclaration{} } ->
+          false
+        _ ->
+          true
+      end
+    end)
+
+    Builder.program(imports ++ body ++ final_functions)
   end
 
   defp do_translation({:alias, _, alias_info}) do
@@ -426,28 +462,46 @@ defmodule ExToJS.Translator do
     end  
   end
 
-  defp process_function(_name, [function]) do
-    function
+  defp process_function(%{name: _name, access: access, functions: [function]}) do
+    case access do
+      :export ->
+        [Builder.export_declaration(function)]
+      :private ->
+        [function]
+    end
   end
 
-  defp process_function(name, functions) do
-    processed_functions = Enum.map(functions, 1, fn(x) ->
+  defp process_function(%{name: name, access: access, functions: functions}) do
+    processed_functions = Enum.map(functions, fn(x) ->
       name = String.to_atom("#{x.id.name}__#{length(x.params)}")
+      arity = length(x.params)
       { %ESTree.FunctionDeclaration{ x | id: Builder.identifier(name)}, name, length(x.params) }
     end)
+    |> Enum.sort(fn({_,_, arityOne}, {_,_,arityTwo})-> arityOne < arityTwo end)
 
-    case_statements = Enum.map(process_functions, fn({function, name, arity}) -> 
-      Builder.switch_case(
-        do_translation(quote do: unquote(arity)),
-        do_translation(quote do: unquote(name).apply(nil, args.slice(0, unquote(arity) - 1)))
-      )
+    last_function_index = length(processed_functions) - 1
+
+    { case_statements, _} = Enum.map_reduce(processed_functions, 0, fn({_function, name, arity}, acc) -> 
+      
+      switch_case = if acc == last_function_index do
+        Builder.switch_case(
+          nil,
+          [Builder.return_statement(do_translation(quote do: unquote(name).apply(nil, args)))]
+        )
+      else
+        Builder.switch_case(
+          do_translation(quote do: unquote(arity)),
+          [Builder.return_statement(do_translation(quote do: unquote(name).apply(nil, args.slice(0, unquote(arity) - 1))))]
+        )
+      end
+
+      {switch_case, acc + 1}
     end)
 
     switch_statement = Builder.switch_statement(
       do_translation(quote do: length(:args)),
       case_statements
     )
-
 
     master_function = Builder.function_declaration(
       Builder.identifier(name),
@@ -457,6 +511,10 @@ defmodule ExToJS.Translator do
       Builder.identifier(:args)
     )
 
-    Enum.map(process_functions, fn({function, _, _}) -> function end) ++ [master_function]
+    if access == :export do
+      master_function = Builder.export_declaration(master_function)
+    end
+
+    Enum.map(processed_functions, fn({function, _, _}) -> function end) ++ [master_function]
   end
 end

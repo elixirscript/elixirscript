@@ -157,5 +157,110 @@ defmodule ExToJS.Translator.Function.Test do
 
     assert_translation(ex_ast, js_code)
   end
+
+  test "translate function arity" do
+    ex_ast = quote do
+      defmodule Example do
+        defp example() do
+        end
+
+        defp example(oneArg) do
+        end
+
+        defp example(oneArg, twoArg) do
+        end
+
+        defp example(oneArg, twoArg, redArg) do
+        end
+
+        defp example(oneArg, twoArg, redArg, blueArg) do
+        end
+      end
+    end 
+
+    js_code = """
+      function example__0(){ return null; }
+      function example__1(oneArg){ return null; }
+      function example__2(oneArg, twoArg){ return null; }
+      function example__3(oneArg, twoArg, redArg){ return null; }
+      function example__4(oneArg, twoArg, redArg, blueArg){ return null; }
+
+      function example(...args){
+        switch(args.length){
+          case 0:
+            return example__0.apply(null, args.slice(0, 0 - 1));
+          case 1:
+            return example__1.apply(null, args.slice(0, 1 - 1));
+          case 2:
+            return example__2.apply(null, args.slice(0, 2 - 1));
+          case 3:
+            return example__3.apply(null, args.slice(0, 3 - 1));
+          default:
+            return example__4.apply(null, args);
+        }
+      }
+    """  
+    assert_translation(ex_ast, js_code)
+
+
+    ex_ast = quote do
+      defmodule Example do
+        def example() do
+        end
+
+        def example(oneArg) do
+        end
+
+        def example(oneArg, twoArg) do
+        end
+
+        def example(oneArg, twoArg, redArg) do
+        end
+
+        def example(oneArg, twoArg, redArg, blueArg) do
+        end
+      end
+    end 
+
+    js_code = """
+      function example__0(){ return null; }
+      function example__1(oneArg){ return null; }
+      function example__2(oneArg, twoArg){ return null; }
+      function example__3(oneArg, twoArg, redArg){ return null; }
+      function example__4(oneArg, twoArg, redArg, blueArg){ return null; }
+
+      export function example(...args){
+        switch(args.length){
+          case 0:
+            return example__0.apply(null, args.slice(0, 0 - 1));
+          case 1:
+            return example__1.apply(null, args.slice(0, 1 - 1));
+          case 2:
+            return example__2.apply(null, args.slice(0, 2 - 1));
+          case 3:
+            return example__3.apply(null, args.slice(0, 3 - 1));
+          default:
+            return example__4.apply(null, args);
+        }
+      }
+    """  
+    assert_translation(ex_ast, js_code)
+
+
+    ex_ast = quote do
+      defmodule Example do
+        def example(oneArg) do
+        end
+      end
+    end 
+
+    js_code = """
+      export function example(oneArg){
+        return null;
+      }
+    """  
+    assert_translation(ex_ast, js_code)
+
+  end
   
 end

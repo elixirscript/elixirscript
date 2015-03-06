@@ -117,5 +117,9 @@ function parse_length(){
   return parse("args.length");
 }
 
-var g = escodegen.generate(parse_length());
+function parse_switch(){
+  return parse("switch (args.length) { default: example__4.apply(null, args) }")
+}
+
+var g = escodegen.generate(parse_switch());
 console.log(g);
