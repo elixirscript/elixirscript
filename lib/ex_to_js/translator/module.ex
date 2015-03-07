@@ -121,7 +121,10 @@ defmodule ExToJS.Translator.Module do
     end)
 
     switch_statement = Builder.switch_statement(
-      Translator.translate(quote do: length(:args)),
+      Builder.member_expression(
+        Builder.identifier(:args),
+        Builder.identifier(:length)
+      ),
       case_statements
     )
 

@@ -73,13 +73,6 @@ defmodule ExToJS.Translator do
     Primative.make_tuple(elements)
   end
 
-  def translate({:length, _, [arg]}) do
-      Builder.member_expression(
-        Builder.identifier(arg),
-        Builder.identifier(:length)
-      )
-  end
-
   def translate({:-, _, [number]}) when is_number(number) do
     Expression.make_negative_number(number)
   end
