@@ -92,7 +92,7 @@ defmodule ExToJS.Translator do
     Expression.make_binary_expression(:+, left, right)
   end
 
-  def translate({operator, _, [left, right]}) when operator == :+ or operator == :- or operator == :/ or operator == :* or operator == :== or operator == :!= do
+  def translate({operator, _, [left, right]}) when operator in [:+,:-,:/,:*,:==,:!=] do
     Expression.make_binary_expression(operator, left, right)
   end
 

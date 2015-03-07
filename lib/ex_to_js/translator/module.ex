@@ -3,14 +3,16 @@ defmodule ExToJS.Translator.Module do
   alias ESTree.Builder
   alias ExToJS.Translator
 
-
   def make_module(_module_name_list, nil) do
     Builder.program([])
   end
 
   def make_module(module_name_list, body) do
+    #Translate body
     parsed_body = Translator.translate(body)
 
+    #Partition imports from body. 
+    #We will place these at the top of body later
     {imports, body} = cond do
       !is_list(parsed_body) ->
         {[], [parsed_body]}
@@ -18,57 +20,38 @@ defmodule ExToJS.Translator.Module do
         Enum.partition(parsed_body.body, fn(x) -> x.type == "ImportDeclaration" end)
     end
 
-    body = Enum.map(body, fn(x) ->
+    if length(body) == 1 and hd(body).type == "BlockStatement" do
+      body = hd(body).body
+    end
+
+    #Collect all the functions so that we can process their arity
+    {body, functions_dict} = Enum.map_reduce(body, HashDict.new(), fn(x, acc) ->
       case x do
         %ESTree.ClassBody{} ->
-          Builder.export_declaration(
+          # We built a ClassBody for structs.
+          # Here we will make it into a class declaration and then
+          # export it.
+          export_class = Builder.export_declaration(
             Builder.class_declaration(
               Builder.identifier(List.last(module_name_list)),
               x
             )
           )
 
-        _ ->
-          x          
-      end
-    end)
+          {export_class, acc}
 
-    if length(body) == 1 and hd(body).type == "BlockStatement" do
-      body = hd(body).body
-    end
-
-    {body, functionDict} = Enum.map_reduce(body, HashDict.new(), fn(x, acc) ->
-      case x do
         %ESTree.FunctionDeclaration{} ->
-          name = x.id.name
-          acc = if HashDict.has_key?(acc, name) do
-            current_state = HashDict.get(acc, name)
-            new_state = %{current_state | functions: current_state.functions ++ [x]}
-            HashDict.put(acc, name, new_state)
-          else
-            HashDict.put(acc, name, %{name: name, access: :private, functions: [x]})
-          end
-
-          {x, acc}
-        %ESTree.ExportDeclaration{ declaration: %ESTree.FunctionDeclaration{} = declaration } ->
-          x = declaration
-          name = x.id.name
-          acc = if HashDict.has_key?(acc, name) do
-            current_state = HashDict.get(acc, name)
-            new_state = %{current_state | functions: current_state.functions ++ [x]}
-            HashDict.put(acc, name, new_state)
-          else
-            HashDict.put(acc, name, %{name: name, access: :export, functions: [x]})
-          end
-
-          {x, acc}
+          add_function_to_dict(acc, x, :private)
+        %ESTree.ExportDeclaration{ declaration: %ESTree.FunctionDeclaration{} = function } ->
+          add_function_to_dict(acc, function, :export)
         _ ->
           {x, acc}
       end
     end)
 
-    final_functions = Enum.flat_map(functionDict, fn({_name, data})-> process_function_arity(data) end)
+    functions = Enum.flat_map(functions_dict, fn({_, data})-> process_function_arity(data) end)
 
+    #Filter out original functions from the body
     body = Enum.filter(body, fn(x) -> 
       case x do 
         %ESTree.FunctionDeclaration{} ->
@@ -80,7 +63,21 @@ defmodule ExToJS.Translator.Module do
       end
     end)
 
-    Builder.program(imports ++ body ++ final_functions)
+    #Build everything back together again
+    Builder.program(imports ++ body ++ functions)
+  end
+
+  defp add_function_to_dict(dict, function, access) do
+    name = function.id.name
+    dict = if HashDict.has_key?(dict, name) do
+      current_state = HashDict.get(dict, name)
+      new_state = %{current_state | functions: current_state.functions ++ [function]}
+      HashDict.put(dict, name, new_state)
+    else
+      HashDict.put(dict, name, %{name: name, access: access, functions: [function]})
+    end
+
+    {function, dict}
   end
 
   defp process_function_arity(%{name: _name, access: access, functions: [function]}) do
@@ -93,30 +90,34 @@ defmodule ExToJS.Translator.Module do
   end
 
   defp process_function_arity(%{name: name, access: access, functions: functions}) do
+
     processed_functions = Enum.map(functions, fn(x) ->
-      name = String.to_atom("#{x.id.name}__#{length(x.params)}")
       arity = length(x.params)
-      { %ESTree.FunctionDeclaration{ x | id: Builder.identifier(name)}, name, arity }
+      new_function_name = String.to_atom("#{x.id.name}__#{arity}")
+      new_function = %ESTree.FunctionDeclaration{ x | id: Builder.identifier(new_function_name)}
+      { new_function, new_function_name, arity }
     end)
     |> Enum.sort(fn({_,_, arityOne}, {_,_,arityTwo})-> arityOne < arityTwo end)
 
     last_function_index = length(processed_functions) - 1
 
-    { case_statements, _} = Enum.map_reduce(processed_functions, 0, fn({_function, name, arity}, acc) -> 
+    { case_statements, _} = Enum.map_reduce(processed_functions, 0, fn({_function, name, arity}, index) -> 
       
-      switch_case = if acc == last_function_index do
+      switch_case = if index == last_function_index do
+        function_call = Translator.translate(quote do: unquote(name).apply(nil, args))
         Builder.switch_case(
-          nil,
-          [Builder.return_statement(Translator.translate(quote do: unquote(name).apply(nil, args)))]
+          nil, 
+          [Builder.return_statement(function_call)]
         )
       else
+        function_call = Translator.translate(quote do: unquote(name).apply(nil, args.slice(0, unquote(arity) - 1)))
         Builder.switch_case(
           Translator.translate(quote do: unquote(arity)),
-          [Builder.return_statement(Translator.translate(quote do: unquote(name).apply(nil, args.slice(0, unquote(arity) - 1))))]
+          [Builder.return_statement(function_call)]
         )
       end
 
-      {switch_case, acc + 1}
+      {switch_case, index + 1}
     end)
 
     switch_statement = Builder.switch_statement(
