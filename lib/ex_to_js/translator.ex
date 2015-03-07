@@ -85,16 +85,16 @@ defmodule ExToJS.Translator do
     Expression.make_binary_expression(:+, left, right)
   end
 
-  def translate({operator, _, [left, right]}) when operator in [:+,:-,:/,:*,:==,:!=] do
+  def translate({operator, _, [left, right]}) when operator in [:+, :-, :/, :*, :==, :!=] do
     Expression.make_binary_expression(operator, left, right)
   end
 
-  def translate({:def, _, [{def_name, _, params}, [do: body]]}) do
-    Function.make_export_function(def_name, params, body)
+  def translate({:def, _, [{name, _, params}, [do: body]]}) do
+    Function.make_export_function(name, params, body)
   end
 
-  def translate({:defp, _, [{def_name, _, params}, [do: body]]}) do
-    Function.make_function(def_name, params, body)
+  def translate({:defp, _, [{name, _, params}, [do: body]]}) do
+    Function.make_function(name, params, body)
   end
 
   def translate({:defstruct, _, attributes}) do
