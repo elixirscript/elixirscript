@@ -82,3 +82,4 @@ TODO (high level list of todos)
 * [ ] optimize converted javascript
 * [ ] regular expression
 * [x] multiple arity functions
+* [ ] make example project

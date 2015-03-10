@@ -36,7 +36,7 @@ defmodule ExToJS.Mixfile do
 
   defp package do
     [ # These are the default files included in the package
-      files: ["lib", "mix.exs", "README*", "readme*", "LICENSE*", "license*", "CHANGELOG*"],
+      files: ["lib", "mix.exs", "README*", "readme*", "LICENSE*", "license*", "CHANGELOG*", "escodegen"],
       contributors: ["Bryan Joseph"],
       licenses: ["MIT"],
       links: %{ 
