@@ -126,7 +126,7 @@ function parse_generator(){
 }
 
 function parse_thingy(){
-  return parse('_results.push(x)');
+  return parse('(function(){let _results = [];for(let n of [1,2,3,4]){_results.push(n * 2);}return _results;}) ();');
 }
 
 var g = escodegen.generate(parse_thingy());

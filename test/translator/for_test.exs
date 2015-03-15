@@ -15,7 +15,7 @@ defmodule ExToJS.Translator.For.Test do
           _results.push(n * 2);
         
         return _results;
-      });
+      }());
     """
 
     assert_translation(ex_ast, js_code)
@@ -34,7 +34,7 @@ defmodule ExToJS.Translator.For.Test do
           _results.push(n);
         
         return _results;
-      });
+      }());
     """
 
     assert_translation(ex_ast, js_code)
@@ -53,10 +53,8 @@ defmodule ExToJS.Translator.For.Test do
           for(let y of [2,3])
             _results.push(x * y);
           
-        
-
         return _results;
-      });
+      }());
     """
 
     assert_translation(ex_ast, js_code)
@@ -78,7 +76,7 @@ defmodule ExToJS.Translator.For.Test do
             _results.push(x * y);
           
         return _results;
-      });;
+      }());;
     """
 
     assert_translation(ex_ast, js_code)
@@ -98,7 +96,7 @@ defmodule ExToJS.Translator.For.Test do
             _results.push(n);
 
         return _results;
-      });
+      }());
     """
 
     assert_translation(ex_ast, js_code)

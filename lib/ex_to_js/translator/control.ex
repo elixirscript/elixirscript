@@ -96,8 +96,10 @@ defmodule ExToJS.Translator.Control do
     block_statement = [variable_declaration] ++ [handle_generators(generators)] ++ [Builder.return_statement(_results)]
 
     Builder.expression_statement(
-      Builder.function_expression([], [], 
-        Builder.block_statement(block_statement))
+      Builder.call_expression(
+        Builder.function_expression([], [], Builder.block_statement(block_statement)),
+        []
+      )
     )
   end
 
