@@ -121,5 +121,13 @@ function parse_switch(){
   return parse("switch (args.length) { default: example__4.apply(null, args) }")
 }
 
-var g = escodegen.generate(parse_switch());
+function parse_generator(){
+  return parse("for(let n of [1,2,3,4]){ }")
+}
+
+function parse_thingy(){
+  return parse('_results.push(x)');
+}
+
+var g = escodegen.generate(parse_thingy());
 console.log(g);

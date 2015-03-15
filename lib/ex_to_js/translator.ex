@@ -65,6 +65,10 @@ defmodule ExToJS.Translator do
     Control.make_cond(clauses)
   end
 
+  def translate({:for, _, generators}) do
+    Control.make_for(generators)
+  end
+
   def translate({:fn, _, [{:->, _, [params, body]}]}) do
     Function.make_anonymous_function(params, body)
   end
