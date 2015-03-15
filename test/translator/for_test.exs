@@ -21,6 +21,25 @@ defmodule ExToJS.Translator.For.Test do
     assert_translation(ex_ast, js_code)
   end
 
+  test "translate for with string" do
+    ex_ast = quote do
+      for n <- "Opera", do: n
+    end
+
+    js_code = """
+      (function(){
+        let _results = [];
+
+        for(let n of 'Opera')
+          _results.push(n);
+        
+        return _results;
+      });
+    """
+
+    assert_translation(ex_ast, js_code)
+  end
+
   test "translate multiple generator for" do
     ex_ast = quote do
       for x <- [1, 2], y <- [2, 3], do: x*y

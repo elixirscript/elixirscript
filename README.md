@@ -66,7 +66,7 @@ TODO (high level list of todos)
 * [ ] better todo list
 * [x] case (currently works sans pattern matching support)
 * [x] cond (currently works sans pattern matching support)
-* [ ] for
+* [x] for (currently does not support keyword list matching or into yet)
 * [ ] try
 * [ ] bitstring
 * [ ] string interpolation
