@@ -67,7 +67,7 @@ defmodule ExToJS do
   @spec javascript_ast_to_code(ESTree.Node.t) :: {:ok, binary} | {:error, binary}
   def javascript_ast_to_code(js_ast) do
     js_ast = Poison.encode!(js_ast)    
-    case System.cmd(System.cwd() <> "/escodegen", [js_ast]) do
+    case System.cmd(Mix.Project.app_path <> "/priv/escodegen", [js_ast]) do
       {js_code, 0} ->
         {:ok, js_code }
       {error, _} ->
