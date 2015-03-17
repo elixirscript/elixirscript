@@ -5,6 +5,7 @@ defmodule ExToJS.Mixfile do
     [app: :ex_to_js,
      version: "0.1.0",
      elixir: "~> 1.0",
+     compilers: Mix.compilers ++ [:npm],
      escript: escript_config,
      deps: deps,
      description: description,
@@ -13,13 +14,12 @@ defmodule ExToJS.Mixfile do
   end
 
   def application do
-    [applications: [:logger, :poison, :inflex]]
+    [applications: [:logger, :poison]]
   end
 
   defp deps do
     [
       { :poison, "~> 1.3" },
-      { :inflex, "~> 0.2.5" },
       { :estree, github: "bryanjos/elixir-estree"}
     ]
   end

@@ -1,6 +1,5 @@
 defmodule ExToJS.Translator do
   require Logger
-  alias ESTree.Builder
   alias ExToJS.Translator.Primative
   alias ExToJS.Translator.PatternMatching
   alias ExToJS.Translator.Data
