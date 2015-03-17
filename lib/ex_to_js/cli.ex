@@ -43,9 +43,11 @@ defmodule ExToJS.CLI do
     input 
     |> ExToJS.parse_elixir_files 
     |> Enum.map(fn({_path, ast})-> 
-      ast
+      output = ast
       |> Poison.encode!
-      |> IO.puts
+      
+
+      IO.puts(:stdio, output)
     end)
   end
 
@@ -53,9 +55,10 @@ defmodule ExToJS.CLI do
     {_path, ast} = input 
     |> ExToJS.parse_elixir
 
-    ast
+    output = ast
     |> Poison.encode!
-    |> IO.puts   
+    
+    IO.puts(:stdio, output) 
   end
 
   def process({ input, :elixir }) do
@@ -63,7 +66,7 @@ defmodule ExToJS.CLI do
     |> ExToJS.parse_elixir
     |> ExToJS.javascript_ast_to_code 
 
-    IO.puts(js)
+    IO.puts(:stdio, js)
   end
 
   def process({ input, output, :elixir }) do
@@ -84,9 +87,10 @@ defmodule ExToJS.CLI do
     |> ExToJS.parse_elixir_files 
     |> ExToJS.javascript_ast_to_code 
     |> Enum.map(fn({_path, ast})-> 
-      ast
+      output = ast
       |> Poison.encode!
-      |> IO.puts
+      
+      IO.puts(:stdio, output)
     end)
   end
 
