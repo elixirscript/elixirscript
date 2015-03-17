@@ -9,6 +9,12 @@ This is still very early and is no where near complete. But it does convert some
 
 It also includes an escript cli named ex2js which takes files or Elixir code strings as input and outputs Spider Monkey AST or JavaScript code to output or files depending on the options
 
+Requirements
+===========
+* Elixir
+* Node or io.js
+
+
 Development
 ===========
 
@@ -19,11 +25,10 @@ Clone the repo
 Get dependencies
 
     mix deps.get
-    npm install
 
 Compile
 
-    mix compile
+    mix compile (runs npm install if node_modules/escodegen is not present)
 
 Test
 
