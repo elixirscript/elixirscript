@@ -66,8 +66,16 @@ defmodule ExToJS do
   """
   @spec javascript_ast_to_code(ESTree.Node.t) :: {:ok, binary} | {:error, binary}
   def javascript_ast_to_code(js_ast) do
-    js_ast = Poison.encode!(js_ast)    
-    case System.cmd(Mix.Project.build_path <> "/lib/ex_to_js/priv/escodegen", [js_ast]) do
+    js_ast = Poison.encode!(js_ast)
+
+    path = try do
+      Mix.Project.build_path <> "/lib/ex_to_js/priv/escodegen"
+    rescue
+      UndefinedFunctionError ->
+        System.cwd() <> "/priv/escodegen"
+    end
+
+    case System.cmd(path, [js_ast]) do
       {js_code, 0} ->
         {:ok, js_code }
       {error, _} ->
