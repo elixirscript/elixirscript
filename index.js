@@ -129,5 +129,9 @@ function parse_thingy(){
   return parse('(function(){let _results = [];for(let n of [1,2,3,4]){_results.push(n * 2);}return _results;}) ();');
 }
 
-var g = escodegen.generate(parse_thingy());
+function parse_boolean(){
+  return parse("1 == 1 && 2 == 2")
+}
+
+var g = escodegen.generate(parse_boolean());
 console.log(g);

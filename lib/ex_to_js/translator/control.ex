@@ -68,23 +68,45 @@ defmodule ExToJS.Translator.Control do
       translated_body = Builder.block_statement([translated_body])
     end
 
-    translated_clause = Translator.translate(hd(clause))
+    case hd(clause) do
+      {:when, _, [the_clause, guard]} ->
+        #TODO: Make it so the clause check is the subject of the guard
 
-    if translated_clause.type == "Identifier" && translated_clause.name == :_ do
-      translated_body
-    else
-      ast = Builder.if_statement(
-        Builder.binary_expression(
-          :==,
-          Translator.translate(condition),
-          translated_clause
-        ),
-        translated_body,
-        nil
-      )
+        {:in , _, [_left, right]} = guard
 
-      %ESTree.IfStatement{ ast |  alternate: process_case(condition, tl(clauses), nil) }
-    end  
+        translated_clause = Translator.translate(the_clause)
+        ast = Builder.if_statement(
+          Builder.call_expression(
+            Builder.member_expression(
+              Translator.translate(right),
+              Builder.identifier(:includes)
+            ),
+            [Translator.translate(condition)]
+          ),
+          translated_body,
+          nil
+        )
+
+        %ESTree.IfStatement{ ast |  alternate: process_case(condition, tl(clauses), nil) }        
+      _ ->
+        translated_clause = Translator.translate(hd(clause))
+
+        if translated_clause.type == "Identifier" && translated_clause.name == :_ do
+          translated_body
+        else
+          ast = Builder.if_statement(
+            Builder.binary_expression(
+              :==,
+              Translator.translate(condition),
+              translated_clause
+            ),
+            translated_body,
+            nil
+          )
+
+          %ESTree.IfStatement{ ast |  alternate: process_case(condition, tl(clauses), nil) }
+        end 
+    end 
   end
 
 

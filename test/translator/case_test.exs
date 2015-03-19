@@ -56,4 +56,25 @@ defmodule ExToJS.Translator.Case.Test do
 
     assert_translation(ex_ast, js_code)
   end
+
+  test "translate case with guard" do
+    ex_ast = quote do
+      case data do
+        number when number in [1,2,3,4] -> 
+          value = 13
+        _  -> 
+          true
+      end
+    end
+
+    js_code = """
+      if([1,2,3,4].includes(data)){
+          let value = 13;
+        }else{
+          true
+        }
+    """
+
+    assert_translation(ex_ast, js_code)
+  end
 end

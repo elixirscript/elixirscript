@@ -8,6 +8,7 @@ defmodule ExToJS.Translator do
   alias ExToJS.Translator.Import
   alias ExToJS.Translator.Control
   alias ExToJS.Translator.Module
+  alias ExToJS.Translator.Kernel, as: ExKernel
 
   @doc """
   Translates Elixir AST to JavaScript AST
@@ -30,6 +31,14 @@ defmodule ExToJS.Translator do
 
   def translate({:%{}, _, properties}) do
     Data.make_object(properties)
+  end
+
+  def translate({:<<>>, _, [left, right]}) do
+    Expression.make_binary_expression(:+, left, right)
+  end
+
+  def translate({:in, _, [left, right]}) do
+    ExKernel.make_in(left, right)
   end
 
   def translate({{:., [], [module_name, function_name]}, [], params }) do
@@ -104,7 +113,8 @@ defmodule ExToJS.Translator do
     Data.make_struct(attributes)
   end
 
-  def translate({:if, _, [test, blocks]}) do
+
+  def translate({:if, _, [test, blocks]} = ast) do
     Control.make_if(test, blocks)
   end
 
