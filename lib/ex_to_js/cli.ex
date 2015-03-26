@@ -1,22 +1,18 @@
 defmodule ExToJS.CLI do
   def main(argv) do
-    case argv do
-      [] ->
-        Enum.each IO.stream(:stdio, :line), &process({&1, :elixir})
-      _ ->
-        argv
-        |> parse_args
-        |> process
-    end
+    argv
+    |> parse_args
+    |> process
   end
 
   def parse_args(args) do
-    switches = [ output: :binary, ast: :boolean, elixir: :boolean ]
-    aliases = [ o: :output, t: :ast, ex: :elixir ]
+    switches = [ output: :binary, ast: :boolean, elixir: :boolean, stdio: :boolean ]
+    aliases = [ o: :output, t: :ast, ex: :elixir, st: :stdio ]
     
     parse = OptionParser.parse(args, switches: switches, aliases: aliases)
 
     case parse do
+      { [stdio: true] , _ , _ } -> {:stdio}
       { [ output: output, ast: true, elixir: true], [input], _ } -> { input, output, :ast, :elixir}
       { [ output: output, ast: true], [input], _ } -> { input, output, :ast }
       { [ast: true, elixir: true] , [input], _ } -> { input, :ast, :elixir }
@@ -84,6 +80,12 @@ defmodule ExToJS.CLI do
     |> ExToJS.write_to_files(output)
   end
 
+  def process({ :stdio }) do
+    Enum.each(IO.stream(:stdio, 5000), fn(x) ->
+      process({x, :elixir})
+    end)
+  end
+
   def process({ input }) do
     input 
     |> ExToJS.parse_elixir_files 
@@ -94,7 +96,7 @@ defmodule ExToJS.CLI do
   end
 
   def process(:help) do
-    IO.puts """
+    IO.write """
       usage: ex2js <input> [options]
 
       <input> path to elixir files or 
@@ -105,6 +107,7 @@ defmodule ExToJS.CLI do
       -o  --output [path]   places output at the given path
       -t  --ast             shows only produced spider monkey ast
       -ex --elixir          read input as elixir code string
+      -st --stdio           reads from stdio
       -h  --help            this message
     """
   end
