@@ -44,6 +44,8 @@ defmodule ExToJS.Translator.Module do
           add_function_to_dict(acc, x, :private)
         %ESTree.ExportDeclaration{ declaration: %ESTree.FunctionDeclaration{} = function } ->
           add_function_to_dict(acc, function, :export)
+        %ESTree.CallExpression{} ->
+          {Builder.expression_statement(x), acc}
         _ ->
           {x, acc}
       end

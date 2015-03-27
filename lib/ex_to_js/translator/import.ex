@@ -15,6 +15,15 @@ defmodule ExToJS.Translator.Import do
     make_namespace_import(import_id, make_source(name))
   end
 
+  def make_default_import(module_name_list) do
+    mod = List.last(module_name_list) |> Builder.identifier
+
+    Builder.import_declaration(
+      [Builder.import_default_specifier(mod)], 
+      Builder.identifier(make_source(module_name_list))
+    )
+  end
+
   def make_import(module_name_list) do
     mod = List.last(module_name_list) |> Builder.identifier
     make_namespace_import(mod, make_source(module_name_list))

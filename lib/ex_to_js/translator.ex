@@ -47,7 +47,7 @@ defmodule ExToJS.Translator do
     ExKernel.make_in(left, right)
   end
 
-  def do_translate({{:., [], [module_name, function_name]}, [], params }) do
+  def do_translate({{:., _, [module_name, function_name]}, _, params }) do
     Function.make_function_call(module_name, function_name, params)
   end
 
@@ -69,6 +69,10 @@ defmodule ExToJS.Translator do
 
   def do_translate({:alias, _, alias_info}) do
     Import.make_alias_import(alias_info)
+  end
+
+  def do_translate({:require, _, [{:__aliases__, _, module_name_list}]}) do
+    Import.make_default_import(module_name_list)
   end
 
   def do_translate({:case, _, [condition, [do: clauses]]}) do

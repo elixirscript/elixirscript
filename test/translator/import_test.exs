@@ -27,7 +27,9 @@ defmodule ExToJS.Translator.Import.Test do
 
     assert_translation(ex_ast, js_code)
 
+  end
 
+  test "translate alias" do
     ex_ast = quote do
       defmodule User do
         alias Hello.World
@@ -39,6 +41,32 @@ defmodule ExToJS.Translator.Import.Test do
     """
 
     assert_translation(ex_ast, js_code)
+  end
 
+  test "translate require" do
+    ex_ast = quote do
+      defmodule User do
+        require World
+      end
+    end
+
+    js_code = """
+      import World from 'world';
+    """
+
+    assert_translation(ex_ast, js_code)
+
+
+    ex_ast = quote do
+      defmodule User do
+        require Hello.World
+      end
+    end
+
+    js_code = """
+      import World from 'hello/world';
+    """
+
+    assert_translation(ex_ast, js_code)
   end
 end
