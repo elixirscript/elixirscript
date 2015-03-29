@@ -65,10 +65,29 @@ $ mix ex2js -h
 
 Alternatively, you can clone the repo, do `mix escript.build` and use the created `ex2js` escript without mix
 
+#Current Limitations (Most if not all of these will be lifted as development goes on)
+
+  * No pattern matching
+  * Very limited destructing (only works currently for binding variables)
+  * No bitstring
+  * No string interpolation
+  * No defmacro
+  * No try
+  * No ^
+  * limited for (can't do into yet)
+  * No receive
+  * No quote
+  * No unquote
+  * No super
+  * No &
+  * No support for standard library yet
+  * No regular expressions
+
+
 
 TODO (high level list of todos)
 ======
-* [ ] better todo list
+* [ ] pattern matching
 * [x] case (currently works sans pattern matching support)
 * [x] cond (currently works sans pattern matching support)
 * [x] for (currently does not support keyword list matching or into yet)
@@ -76,15 +95,15 @@ TODO (high level list of todos)
 * [ ] bitstring
 * [ ] string interpolation
 * [x] return from a function
-* [ ] pattern matching
 * [ ] defexception
 * [ ] types and specs
 * [ ] pipe operator
 * [ ] data structures
-* [ ] figure out how using external js modules will work
+* [x] figure out how using external js modules will work
 * [ ] spawn
 * [ ] actors
 * [ ] optimize converted javascript
 * [ ] regular expression
 * [x] multiple arity functions
-* [ ] make example project
+* [x] make example project [bryanjos/example](https://github.com/bryanjos/example)
+* [ ] hopefully use of erlang_js and remove node.js dependency
