@@ -22,10 +22,21 @@ defmodule ExToJS.Translator.Primative do
   end
 
   def make_tuple({ one, two }) do
-    make_array_expression([one, two])
+    make_tuple([one, two])
   end
 
   def make_tuple(elements) do
+    {elems, _} = Enum.map_reduce(elements, 0, fn(x, index) ->
+      {
+        Builder.property(Builder.literal(to_string(index)), ExToJS.Translator.translate(x)),
+        index + 1
+      }
+    end)
+
+    Builder.object_expression(elems)
+  end
+
+  def make_bitstring(elements) do
     make_array_expression(elements)
   end
 

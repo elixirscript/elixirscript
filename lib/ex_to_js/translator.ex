@@ -39,8 +39,8 @@ defmodule ExToJS.Translator do
     Data.make_object(properties)
   end
 
-  def do_translate({:<<>>, _, [left, right]}) do
-    Expression.make_binary_expression(:+, left, right)
+  def do_translate({:<<>>, _, elements} = bitstring) do
+    Primative.make_array(elements)
   end
 
   def do_translate({:in, _, [left, right]}) do
@@ -100,7 +100,7 @@ defmodule ExToJS.Translator do
   end
 
   def do_translate({:=, _, [left, right]}) do
-    PatternMatching.make_assignment(left, right)
+    PatternMatching.bind(left, right)
   end
 
   def do_translate({:<>, _, [left, right]}) do

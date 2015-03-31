@@ -14,7 +14,7 @@ defmodule ExToJS.Translator.Assignment.Test do
     assert_translation(ex_ast, js_code)
 
     ex_ast = quote do: {a, b} = {1, 2}
-    js_code = "let [a,b] = [1,2];"
+    js_code = "let {'0':a,'1':b} = {'0':1,'1':2};"
 
     assert_translation(ex_ast, js_code)
   end

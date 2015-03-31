@@ -3,17 +3,43 @@ defmodule ExToJS.Translator.PatternMatching do
   alias ESTree.Builder
   alias ExToJS.Translator
 
-  def make_assignment(left, right) do
-    identifiers = Tuple.to_list(left)
-
-    id = if is_atom(hd(identifiers)) do
-      Builder.identifier(hd(identifiers))
-    else
-      Builder.array_pattern(Enum.map(identifiers, &Translator.translate(&1)))
-    end
+  def bind({left1, left2}, right) do
+    id = Builder.object_pattern(
+      [
+        Builder.object_pattern_property(Builder.literal("0"), ExToJS.Translator.translate(left1)),
+        Builder.object_pattern_property(Builder.literal("1"), ExToJS.Translator.translate(left2)),
+      ]
+    )
 
     declarator = Builder.variable_declarator(
       id,
+      Translator.translate(right)
+    )
+
+    Builder.variable_declaration([declarator], :let)
+  end
+
+  def bind({:{}, _, elements}, right) do
+    {elems, _} = Enum.map_reduce(elements, 0, fn(x, index) ->
+      {
+        Builder.object_pattern_property(Builder.literal(to_string(index)), ExToJS.Translator.translate(x)),
+        index + 1
+      }
+    end)
+
+    declarator = Builder.variable_declarator(
+      Builder.object_pattern(elems),
+      Translator.translate(right)
+    )
+
+    Builder.variable_declaration([declarator], :let)
+  end
+
+  def bind(left, right) do
+    identifiers = Tuple.to_list(left)
+    
+    declarator = Builder.variable_declarator(
+      Builder.identifier(hd(identifiers)),
       Translator.translate(right)
     )
 
