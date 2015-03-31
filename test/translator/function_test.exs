@@ -105,8 +105,8 @@ defmodule ExToJS.Translator.Function.Test do
 
     js_code = """
       export function test1(alpha, beta){
-        let {'0':a,'1':b} = {'0':1,'1':2};
-        return {'0':a,'1':b};
+        let {'_0':a,'_1':b} = {'_0':1,'_1':2};
+        return {'_0':a,'_1':b};
       }
     """
 

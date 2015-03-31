@@ -6,8 +6,8 @@ defmodule ExToJS.Translator.PatternMatching do
   def bind({left1, left2}, right) do
     id = Builder.object_pattern(
       [
-        Builder.object_pattern_property(Builder.literal("0"), ExToJS.Translator.translate(left1)),
-        Builder.object_pattern_property(Builder.literal("1"), ExToJS.Translator.translate(left2)),
+        Builder.object_pattern_property(Builder.literal("_0"), ExToJS.Translator.translate(left1)),
+        Builder.object_pattern_property(Builder.literal("_1"), ExToJS.Translator.translate(left2)),
       ]
     )
 
@@ -22,7 +22,7 @@ defmodule ExToJS.Translator.PatternMatching do
   def bind({:{}, _, elements}, right) do
     {elems, _} = Enum.map_reduce(elements, 0, fn(x, index) ->
       {
-        Builder.object_pattern_property(Builder.literal(to_string(index)), ExToJS.Translator.translate(x)),
+        Builder.object_pattern_property(Builder.literal("_#{index}"), ExToJS.Translator.translate(x)),
         index + 1
       }
     end)
@@ -37,7 +37,7 @@ defmodule ExToJS.Translator.PatternMatching do
 
   def bind(left, right) do
     identifiers = Tuple.to_list(left)
-    
+
     declarator = Builder.variable_declarator(
       Builder.identifier(hd(identifiers)),
       Translator.translate(right)

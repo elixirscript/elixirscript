@@ -28,7 +28,7 @@ defmodule ExToJS.Translator.Primative do
   def make_tuple(elements) do
     {elems, _} = Enum.map_reduce(elements, 0, fn(x, index) ->
       {
-        Builder.property(Builder.literal(to_string(index)), ExToJS.Translator.translate(x)),
+        Builder.property(Builder.literal("_#{index}"), ExToJS.Translator.translate(x)),
         index + 1
       }
     end)
