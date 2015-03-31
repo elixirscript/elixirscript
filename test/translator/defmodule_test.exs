@@ -8,7 +8,7 @@ defmodule ExToJS.Translator.Defmodule.Test do
       end
     end
 
-    assert_translation(ex_ast, "")
+    assert_translation(ex_ast, "const __MODULE__ = Symbol('Elephant');")
 
     ex_ast = quote do
       defmodule Elephant do
@@ -21,6 +21,8 @@ defmodule ExToJS.Translator.Defmodule.Test do
     end
 
     js_code = """
+      const __MODULE__ = Symbol('Elephant');
+
       export function something(){
         return null;
       }
@@ -45,6 +47,8 @@ defmodule ExToJS.Translator.Defmodule.Test do
     end
 
     js_code = """
+      const __MODULE__ = Symbol('Elephant');
+
       import * as Crane from 'icabod/crane';
 
       export function something(){

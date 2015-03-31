@@ -3,8 +3,8 @@ defmodule ExToJS.Translator.Module do
   alias ESTree.Builder
   alias ExToJS.Translator
 
-  def make_module(_module_name_list, nil) do
-    Builder.program([])
+  def make_module(module_name_list, nil) do
+    Builder.program([create__module__(module_name_list)])
   end
 
   def make_module(module_name_list, body) do
@@ -66,7 +66,7 @@ defmodule ExToJS.Translator.Module do
     end)
 
     #Build everything back together again
-    Builder.program(imports ++ body ++ functions)
+    Builder.program([create__module__(module_name_list)] ++ imports ++ body ++ functions)
   end
 
   defp add_function_to_dict(dict, function, access) do
@@ -143,6 +143,19 @@ defmodule ExToJS.Translator.Module do
     end
 
     Enum.map(processed_functions, fn({function, _, _}) -> function end) ++ [master_function]
+  end
+
+  defp create__module__(module_name_list) do
+    module_name = Enum.map(module_name_list, fn(x) -> to_string(x) end) 
+    |> Enum.join(".") 
+    |> String.to_atom
+
+    declarator = Builder.variable_declarator(
+      Builder.identifier(:__MODULE__),
+      ExToJS.Translator.translate(module_name)
+    )
+
+    Builder.variable_declaration([declarator], :const)
   end
 
 end

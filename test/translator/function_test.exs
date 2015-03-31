@@ -179,6 +179,8 @@ defmodule ExToJS.Translator.Function.Test do
     end 
 
     js_code = """
+      const __MODULE__ = Symbol('Example');
+
       function example__0(){ return null; }
       function example__1(oneArg){ return null; }
       function example__2(oneArg, twoArg){ return null; }
@@ -223,6 +225,8 @@ defmodule ExToJS.Translator.Function.Test do
     end 
 
     js_code = """
+      const __MODULE__ = Symbol('Example');
+
       function example__0(){ return null; }
       function example__1(oneArg){ return null; }
       function example__2(oneArg, twoArg){ return null; }
@@ -255,6 +259,8 @@ defmodule ExToJS.Translator.Function.Test do
     end 
 
     js_code = """
+      const __MODULE__ = Symbol('Example');
+
       export function example(oneArg){
         return null;
       }

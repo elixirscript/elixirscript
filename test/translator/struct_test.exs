@@ -10,6 +10,8 @@ defmodule ExToJS.Translator.Struct.Test do
     end
 
     js_code = """
+      const __MODULE__ = Symbol('User');
+
       export class User {
         constructor(name = 'john', age = 27){
           this.name = name;
@@ -27,6 +29,8 @@ defmodule ExToJS.Translator.Struct.Test do
     end
 
     js_code = """
+      const __MODULE__ = Symbol('User');
+
       export class User {
         constructor(name, age){
           this.name = name;

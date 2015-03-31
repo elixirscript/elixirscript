@@ -133,5 +133,9 @@ function parse_boolean(){
   return parse("1 == 1 && 2 == 2")
 }
 
-var g = escodegen.generate(parse_boolean());
+function parse_const(){
+  return parse("const __MODULE__ = Symbol('User')");
+}
+
+var g = escodegen.generate(parse_const());
 console.log(g);
