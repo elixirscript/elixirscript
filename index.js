@@ -137,5 +137,9 @@ function parse_const(){
   return parse("const __MODULE__ = Symbol('User')");
 }
 
-var g = escodegen.generate(parse_const());
+function parse_x(){
+  return parse("User.defstruct(name=\"John\");");
+}
+
+var g = escodegen.generate(parse_x());
 console.log(g);

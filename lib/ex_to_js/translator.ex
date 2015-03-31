@@ -35,6 +35,12 @@ defmodule ExToJS.Translator do
     Primative.make_tuple({one, two})
   end
 
+  def do_translate({:%, _, [alias_info, data]}) do
+    {_, _, name} = alias_info
+    {_, _, data} = data
+    Data.make_struct(name, data)
+  end
+
   def do_translate({:%{}, _, properties}) do
     Data.make_object(properties)
   end
@@ -120,7 +126,7 @@ defmodule ExToJS.Translator do
   end
 
   def do_translate({:defstruct, _, attributes}) do
-    Data.make_struct(attributes)
+    Data.make_defstruct(attributes)
   end
 
   def do_translate({:if, _, [test, blocks]} = ast) do
