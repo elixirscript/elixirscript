@@ -141,6 +141,10 @@ defmodule ExToJS.Translator do
     Module.make_module(module_name_list, body)
   end
 
+  def do_translate({:@, _, [{name, [], [value]}]}) do
+    Module.make_attribute(name, value)
+  end
+
   def do_translate({name, _, params}) when is_list(params) do
     Function.make_function_call(name, params)
   end

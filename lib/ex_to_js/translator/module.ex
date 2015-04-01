@@ -158,4 +158,13 @@ defmodule ExToJS.Translator.Module do
     Builder.variable_declaration([declarator], :const)
   end
 
+  def make_attribute(name, value) do
+    declarator = Builder.variable_declarator(
+      Builder.identifier(name),
+      ExToJS.Translator.translate(value)
+    )
+
+    Builder.variable_declaration([declarator], :const)
+  end
+
 end

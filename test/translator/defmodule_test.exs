@@ -12,6 +12,8 @@ defmodule ExToJS.Translator.Defmodule.Test do
 
     ex_ast = quote do
       defmodule Elephant do
+        @something "Hello"
+
         def something() do
         end
 
@@ -22,6 +24,8 @@ defmodule ExToJS.Translator.Defmodule.Test do
 
     js_code = """
       const __MODULE__ = Symbol('Elephant');
+
+      const something = 'Hello';
 
       export function something(){
         return null;
