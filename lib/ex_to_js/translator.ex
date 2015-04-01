@@ -41,6 +41,10 @@ defmodule ExToJS.Translator do
     Data.make_struct(name, data)
   end
 
+  def do_translate({:%{}, _, [{:|, _, [map, data]}]}) do
+    Data.make_map_update(map, data);
+  end
+
   def do_translate({:%{}, _, properties}) do
     Data.make_object(properties)
   end

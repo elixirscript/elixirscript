@@ -58,4 +58,40 @@ defmodule ExToJS.Translator.Struct.Test do
 
     assert_translation(ex_ast, js_code)
   end
+
+  test "translate struct update" do
+    ex_ast = quote do
+      user = %{ map | key: value }
+    end
+
+    js_code = """
+      let user = (function(){
+          let _results = JSON.parse(JSON.stringify(map));
+
+          _results.key = value;
+
+          return _results;
+        }());;
+    """
+
+    assert_translation(ex_ast, js_code)
+
+
+    ex_ast = quote do
+      user = %{ map | key: value, key1: value1 }
+    end
+
+    js_code = """
+      let user = (function(){
+          let _results = JSON.parse(JSON.stringify(map));
+
+          _results.key = value;
+          _results.key1 = value1;
+
+          return _results;
+        }());;
+    """
+
+    assert_translation(ex_ast, js_code)
+  end
 end

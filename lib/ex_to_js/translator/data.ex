@@ -73,4 +73,52 @@ defmodule ExToJS.Translator.Data do
     )
   end
 
+
+  def make_map_update(map, data) do
+    _results = Builder.identifier("_results")
+
+    cloning = Builder.call_expression(
+      Builder.member_expression(
+        Builder.identifier(:JSON),
+        Builder.identifier(:parse)
+      ),
+      [
+        Builder.call_expression(
+          Builder.member_expression(
+            Builder.identifier(:JSON),
+            Builder.identifier(:stringify)
+          ),
+          [
+            Translator.translate(map)
+          ]
+        )      
+      ]
+    )
+
+    variable_declarator = Builder.variable_declarator(_results, cloning)
+    variable_declaration = Builder.variable_declaration([variable_declarator], :let)
+
+    block_statement = Enum.map(data, fn({key, value}) ->
+      Builder.expression_statement(
+        Builder.assignment_expression(
+          :=,
+          Builder.member_expression(
+            Builder.identifier("_results"),
+            Builder.identifier(key)
+          ),
+          Translator.translate(value)
+        )
+      )
+    end)
+
+    block_statement = [variable_declaration] ++ block_statement ++ [Builder.return_statement(_results)]
+
+    Builder.expression_statement(
+      Builder.call_expression(
+        Builder.function_expression([], [], Builder.block_statement(block_statement)),
+        []
+      )
+    )
+  end
+
 end
