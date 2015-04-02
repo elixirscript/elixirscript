@@ -14,9 +14,7 @@ defmodule ExToJS.Translator do
   Translates Elixir AST to JavaScript AST
   """
   def translate(ast) do
-    js_ast = do_translate(ast)
-    #Logger.debug "Elixir AST: #{inspect ast}, JavaScript AST: #{inspect js_ast}"
-    js_ast
+    do_translate(ast)
   end
 
   def do_translate(ast) when is_number(ast) or is_binary(ast) or is_boolean(ast) or is_nil(ast) do
@@ -131,6 +129,10 @@ defmodule ExToJS.Translator do
 
   def do_translate({:defstruct, _, attributes}) do
     Data.make_defstruct(attributes)
+  end
+
+  def do_translate({:defexception, _, attributes}) do
+    Data.make_defexception(attributes)
   end
 
   def do_translate({:if, _, [test, blocks]} = ast) do

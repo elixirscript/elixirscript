@@ -34,33 +34,57 @@ defmodule ExToJS.Translator.Data do
     params = Enum.map(attributes, fn({x,_y}) -> x end)
     defaults = Enum.map(attributes, fn({_x,y}) -> y end)
 
-    Builder.export_declaration(
-      Builder.function_declaration(
-        Builder.identifier(:defstruct),
-        Enum.map(params, &Builder.identifier(&1)),
-        Enum.map(defaults, &Translator.translate(&1)),
-        Builder.block_statement([
-          Builder.return_statement(
-            Builder.object_expression(
-              [Builder.property(Builder.identifier(:__struct__), Builder.identifier(:__MODULE__))] ++
-              Enum.map(params, fn(x) -> Builder.property(Builder.identifier(x), Builder.identifier(x)) end)
-            )
-          )
-        ])
-      )
-    )
-
+    do_make_defstruct(:defstruct, params, defaults)
   end
 
   def make_defstruct(attributes) do
     params = Enum.map(attributes, fn(x) -> x end)
     defaults = []
 
+    do_make_defstruct(:defstruct, params, defaults)
+  end
+
+  def make_defexception(attributes) when length(attributes) == 1 do
+    attributes = Enum.flat_map(attributes, fn(x) -> x end)
+
+    params = Enum.map(attributes, fn(x) ->
+
+      case x do
+        a when is_tuple(a) ->
+          elem(a, 0)
+        _ ->
+          x
+      end
+
+     end)
+
+    defaults = Enum.map(attributes, fn(x) ->
+
+      case x do
+        a when is_tuple(a) ->
+          elem(a, 1)
+        _ ->
+          nil
+      end
+
+     end)
+
+    do_make_defstruct(:defexception, params, defaults)
+  end
+
+  def make_defexceptions(attributes) do
+    params = Enum.map(attributes, fn(x) -> x end)
+    defaults = []
+
+    do_make_defstruct(:defexception, params, defaults)
+  end
+
+  defp do_make_defstruct(name, params, defaults) do
     Builder.export_declaration(
       Builder.function_declaration(
-        Builder.identifier(:defstruct),
+        Builder.identifier(name),
         Enum.map(params, &Builder.identifier(&1)),
-        [],
+        Enum.map(defaults, &Translator.translate(&1)),
         Builder.block_statement([
           Builder.return_statement(
             Builder.object_expression(

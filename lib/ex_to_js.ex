@@ -72,7 +72,7 @@ defmodule ExToJS do
       Mix.Project.build_path <> "/lib/ex_to_js/priv/escodegen"
     rescue
       UndefinedFunctionError ->
-        "priv/escodegen"
+        System.cwd <> "/_build/dev/lib/ex_to_js/priv/escodegen"
     end
 
     case System.cmd(path, [js_ast]) do

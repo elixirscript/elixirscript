@@ -94,4 +94,39 @@ defmodule ExToJS.Translator.Struct.Test do
 
     assert_translation(ex_ast, js_code)
   end
+
+  test "translate defexception" do
+    ex_ast = quote do
+      defmodule MyAppError do
+        defexception message: "This is a message"
+      end
+    end
+
+    js_code = """
+      const __MODULE__ = Symbol('MyAppError');
+
+      export function defexception(message = 'This is a message'){
+        return {__struct__: __MODULE__, message: message};
+      }
+    """
+
+    assert_translation(ex_ast, js_code)
+
+    ex_ast = quote do
+      defmodule MyAppError do
+        defexception [:message]
+      end
+    end
+
+    js_code = """
+      const __MODULE__ = Symbol('MyAppError');
+
+      export function defexception(message = null){
+        return {__struct__: __MODULE__, message: message};
+      }
+    """
+
+    assert_translation(ex_ast, js_code)
+
+  end
 end

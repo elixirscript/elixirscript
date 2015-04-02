@@ -5,7 +5,7 @@ defmodule ExToJS.Mixfile do
     [app: :ex_to_js,
      version: "0.1.0",
      elixir: "~> 1.0",
-     compilers: Mix.compilers ++ [:npm],
+     compilers: Mix.compilers ++ [:ex2js],
      escript: escript_config,
      deps: deps,
      description: description,
@@ -25,7 +25,7 @@ defmodule ExToJS.Mixfile do
   end
 
   defp escript_config do
-    [main_module: ExToJS.CLI, name: "ex2js"]
+    [main_module: ExToJS.CLI, name: "ex2js", path: "priv/ex2js"]
   end
 
   defp description do
