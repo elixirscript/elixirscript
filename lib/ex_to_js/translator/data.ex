@@ -79,6 +79,29 @@ defmodule ExToJS.Translator.Data do
     do_make_defstruct(:defexception, params, defaults)
   end
 
+  def throw_error(module_name, data) do
+    Builder.throw_statement(
+      Builder.new_expression(
+        Builder.identifier("Error"),
+        [
+          Builder.call_expression(
+            Builder.member_expression(
+              Builder.identifier(module_name),
+              Builder.identifier(:defexception)
+            ),
+            Enum.map(data, fn({k, v})->
+              Builder.assignment_expression(
+                :=,
+                Builder.identifier(k),
+                Translator.translate(v)
+              )
+            end)
+          )
+        ]
+      )
+    )
+  end
+
   defp do_make_defstruct(name, params, defaults) do
     Builder.export_declaration(
       Builder.function_declaration(
