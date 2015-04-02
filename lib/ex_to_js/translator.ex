@@ -141,6 +141,10 @@ defmodule ExToJS.Translator do
     Data.throw_error(name, attributes)
   end
 
+  def do_translate({:raise, _, [message]}) do
+    Data.throw_error(message)
+  end
+
   def do_translate({:if, _, [test, blocks]} = ast) do
     Control.make_if(test, blocks)
   end

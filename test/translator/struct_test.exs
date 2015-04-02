@@ -136,7 +136,18 @@ defmodule ExToJS.Translator.Struct.Test do
     end
 
     js_code = """
-      throw new Error(MyAppError.defexception(message='did not get what was expected'));
+      throw new MyAppError(MyAppError.defexception(message='did not get what was expected'));
+    """
+
+    assert_translation(ex_ast, js_code)
+
+
+    ex_ast = quote do
+      raise "did not get what was expected"
+    end
+
+    js_code = """
+      throw new RuntimeError({__struct__: Symbol('RuntimeError'), message: 'did not get what was expected'});
     """
 
     assert_translation(ex_ast, js_code)

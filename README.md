@@ -95,7 +95,7 @@ TODO (high level list of todos)
 * [ ] bitstring
 * [ ] string interpolation
 * [x] return from a function
-* [ ] defexception
+* [x] defexception and raising errors
 * [ ] types and specs
 * [ ] pipe operator
 * [ ] data structures

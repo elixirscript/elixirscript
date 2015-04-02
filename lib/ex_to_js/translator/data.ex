@@ -82,7 +82,7 @@ defmodule ExToJS.Translator.Data do
   def throw_error(module_name, data) do
     Builder.throw_statement(
       Builder.new_expression(
-        Builder.identifier("Error"),
+        Builder.identifier(module_name),
         [
           Builder.call_expression(
             Builder.member_expression(
@@ -98,6 +98,23 @@ defmodule ExToJS.Translator.Data do
             end)
           )
         ]
+      )
+    )
+  end
+
+  def throw_error(message) do
+    Builder.throw_statement(
+      Builder.new_expression(
+        Builder.identifier("RuntimeError"),
+        [
+          Builder.object_expression(
+            [
+              Builder.property(Builder.identifier(:__struct__), Translator.translate(:RuntimeError)),
+              Builder.property(Builder.identifier("message"), Builder.literal(message))
+            ]
+          )
+        ]
+
       )
     )
   end
