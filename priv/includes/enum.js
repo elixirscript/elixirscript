@@ -1,5 +1,8 @@
-const __MODULE_ = Symbol('Enum');
+let Enum = {
+  __MODULE__: Symbol('Enum'),
 
-export function map(iterable, func){
-  return iterable.map(func);
+  map: function(iterable, func){
+    return iterable.map(func);
+  }
+
 }

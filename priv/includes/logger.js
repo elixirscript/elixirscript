@@ -1,21 +1,23 @@
-const __MODULE_ = Symbol('Logger');
+let Logger = {
+  __MODULE_: Symbol('Logger'),
 
-export function debug(message){
-  console.debug(message);
-}
+  debug: function(message){
+    console.debug(message);
+  },
 
-export function warn(message){
-  console.warn(message);
-}
+  warn: function(message){
+    console.warn(message);
+  },
 
-export function info(message){
-  console.info(message);
-}
+  info: function(message){
+    console.info(message);
+  },
 
-export function error(message){
-  console.error(message);
-}
+  error: function(message){
+    console.error(message);
+  },
 
-export function log(type, message){
-  console.log(message);
+  log: function(type, message){
+    console.log(message);
+  }
 }

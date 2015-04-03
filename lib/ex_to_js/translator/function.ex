@@ -62,7 +62,7 @@ defmodule ExToJS.Translator.Function do
     Builder.arrow_function_expression(
       Enum.map(params, &Translator.translate(&1)),
       [],
-      Translator.translate(body)
+      Builder.block_statement([Translator.translate(body)])
     )
   end
 
