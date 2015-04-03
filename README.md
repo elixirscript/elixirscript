@@ -34,10 +34,6 @@ Compile
 Test
 
     mix test
-    
-To build the escript
-
-    mix escript.build
 
 To build distributable tarball
 
