@@ -108,6 +108,7 @@ defmodule ExToJS do
       UndefinedFunctionError ->
         split_path = Path.split(Application.app_dir(:ex2js))
         replaced_path = List.delete_at(split_path, length(split_path) - 1)
+        replaced_path = List.delete_at(replaced_path, length(replaced_path) - 1)
         Path.join(replaced_path)
     end
   end

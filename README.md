@@ -45,7 +45,7 @@ Installation
 ==============
 
 * uncompress `ex2js.tar.gz`.
-* use `ex2js` executable found in the uncompressed folder
+* use `ex2js` executable found in the ex2js/bin folder
 
 
 Usage
