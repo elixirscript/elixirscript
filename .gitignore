@@ -5,3 +5,5 @@ erl_crash.dump
 ex2js
 node_modules
 priv/test_project/dest
+/dist
+deploy.sh

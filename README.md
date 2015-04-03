@@ -25,10 +25,11 @@ Clone the repo
 Get dependencies
 
     mix deps.get
+    npm install
 
 Compile
 
-    mix compile (runs npm install if node_modules/escodegen is not present)
+    mix compile
 
 Test
 
@@ -38,18 +39,24 @@ To build the escript
 
     mix escript.build
 
+To build distributable tarball
+
+    mix ex2js.dist
+
+    `ex2js-version-tar.gz` will be in the `dist` folder
+
+Installation
+==============
+
+* uncompress `ex2js.tar.gz`.
+* use `ex2js` executable found in the uncompressed folder
+
 
 Usage
 ===
 
-Add the following to your dependencies:
-
-    { :ex_to_js, github: "bryanjos/ex_to_js"}
-    
-You can use the included mix task to convert Elixir to JavaScript
-
 ```
-$ mix ex2js -h
+$ ex2js -h
   usage: ex2js <input> [options]
 
   <input> path to elixir files or 
@@ -60,10 +67,10 @@ $ mix ex2js -h
   -o  --output [path]   places output at the given path
   -t  --ast             shows only produced spider monkey ast
   -ex --elixir          read input as elixir code string
+  -st --stdio           reads from stdio
+      --lib             writes the standard lib js to standard out
   -h  --help            this message
 ```
-
-Alternatively, you can clone the repo, do `mix escript.build` and use the created `ex2js` escript without mix
 
 #Current Limitations (Most if not all of these will be lifted as development goes on)
 

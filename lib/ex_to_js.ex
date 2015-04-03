@@ -68,14 +68,9 @@ defmodule ExToJS do
   def javascript_ast_to_code(js_ast) do
     js_ast = Poison.encode!(js_ast)
 
-    path = try do
-      Mix.Project.build_path <> "/lib/ex_to_js/priv/escodegen"
-    rescue
-      UndefinedFunctionError ->
-        System.cwd <> "/_build/dev/lib/ex_to_js/priv/escodegen"
-    end
+    path = "#{operating_path}/alphonse.js"
 
-    case System.cmd(path, [js_ast]) do
+    case System.cmd("node", [path, js_ast]) do
       {js_code, 0} ->
         {:ok, js_code }
       {error, _} ->
@@ -103,5 +98,17 @@ defmodule ExToJS do
     end
 
     File.write!(file_name, js)
+  end
+
+
+  def operating_path() do
+    try do
+      Mix.Project.build_path <> "/lib/ex_to_js/priv"
+    rescue
+      UndefinedFunctionError ->
+        split_path = Path.split(Application.app_dir(:ex2js))
+        replaced_path = List.delete_at(split_path, length(split_path) - 1)
+        Path.join(replaced_path)
+    end
   end
 end

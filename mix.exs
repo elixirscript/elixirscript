@@ -5,7 +5,7 @@ defmodule ExToJS.Mixfile do
     [app: :ex_to_js,
      version: "0.1.0",
      elixir: "~> 1.0",
-     compilers: Mix.compilers ++ [:ex2js],
+     compilers: Mix.compilers,
      escript: escript_config,
      deps: deps,
      description: description,

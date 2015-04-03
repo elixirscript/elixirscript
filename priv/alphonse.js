@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 var escodegen = require('escodegen');
 var args = process.argv.slice(2);
 

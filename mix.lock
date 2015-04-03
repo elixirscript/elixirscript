@@ -1,4 +1,5 @@
 %{"elixir_v8": {:git, "git://github.com/le0pard/elixir_v8.git", "2817de7179e247c279d0fb76a00e976c8d0bcdad", []},
+  "erlang_js": {:git, "git://github.com/basho/erlang_js.git", "07467d899ab90a2b719ad19ab0be0048c1c8d873", [tag: "1.3.0"]},
   "erlang_v8": {:git, "git://github.com/strange/erlang-v8.git", "1ca13321d5746f3ec20f0c0bfd2bcc8293db71da", []},
   "estree": {:git, "git://github.com/bryanjos/elixir-estree.git", "c69dc94d23c41647cf33a6236638abd845cf1c48", []},
   "exjsx": {:git, "git://github.com/talentdeficit/jsex.git", "d3572b488f10e3b83fadb1fc595fc87f84c35809", []},

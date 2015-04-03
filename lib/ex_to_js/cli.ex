@@ -6,13 +6,14 @@ defmodule ExToJS.CLI do
   end
 
   def parse_args(args) do
-    switches = [ output: :binary, ast: :boolean, elixir: :boolean, stdio: :boolean ]
+    switches = [ output: :binary, ast: :boolean, elixir: :boolean, stdio: :boolean, lib: :boolean]
     aliases = [ o: :output, t: :ast, ex: :elixir, st: :stdio ]
     
     parse = OptionParser.parse(args, switches: switches, aliases: aliases)
 
     case parse do
       { [stdio: true] , _ , _ } -> {:stdio}
+      { [lib: true] , _ , _ } -> {:lib}
       { [ output: output, ast: true, elixir: true], [input], _ } -> { input, output, :ast, :elixir}
       { [ output: output, ast: true], [input], _ } -> { input, output, :ast }
       { [ast: true, elixir: true] , [input], _ } -> { input, :ast, :elixir }
@@ -86,6 +87,13 @@ defmodule ExToJS.CLI do
     end)
   end
 
+  def process({ :lib }) do
+    path = ExToJS.operating_path
+
+    file = File.read!("#{path}/elixir.js")
+    IO.write(file)
+  end
+
   def process({ input }) do
     input 
     |> ExToJS.parse_elixir_files 
@@ -108,6 +116,7 @@ defmodule ExToJS.CLI do
       -t  --ast             shows only produced spider monkey ast
       -ex --elixir          read input as elixir code string
       -st --stdio           reads from stdio
+          --lib             writes the standard lib js to standard out
       -h  --help            this message
     """
   end
