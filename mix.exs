@@ -20,7 +20,7 @@ defmodule ExToJS.Mixfile do
   defp deps do
     [
       { :poison, "~> 1.3" },
-      { :estree, github: "bryanjos/elixir-estree"}
+      { :estree, "~> 1.0.1"}
     ]
   end
 
