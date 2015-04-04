@@ -110,3 +110,4 @@ TODO (high level list of todos)
 * [x] multiple arity functions
 * [x] make example project [bryanjos/example](https://github.com/bryanjos/example)
 * [ ] hopefully use of erlang_js and remove node.js dependency
+* [ ] Prototype rich frontend framework using elixir design patterns
