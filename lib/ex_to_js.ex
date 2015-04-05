@@ -103,7 +103,7 @@ defmodule ExToJS do
 
   def operating_path() do
     try do
-      Mix.Project.build_path <> "/lib/ex_to_js/priv"
+      Mix.Project.build_path <> "/lib/ex_to_js/priv/alphonse"
     rescue
       UndefinedFunctionError ->
         split_path = Path.split(Application.app_dir(:ex2js))
