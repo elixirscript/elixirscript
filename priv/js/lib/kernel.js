@@ -111,7 +111,7 @@ let Kernel = {
   },
 
   apply: function(module, fun, args){
-    if(args.length === 3){
+    if(arguments.length === 3){
       return module[fun].apply(null, args);
     }else{
       return module.apply(null, fun);  
