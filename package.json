@@ -19,7 +19,6 @@
     "escodegen": "^1.6.1"
   },
   "devDependencies": {
-    "acorn": "^0.11.0",
-    "esprima": "^1.2.3"
+    "acorn": "^0.11.0"
   }
 }

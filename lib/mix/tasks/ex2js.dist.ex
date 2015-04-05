@@ -24,7 +24,7 @@ defmodule Mix.Tasks.Ex2js.Dist do
     File.cp_r!("node_modules", "#{folder_name}/node_modules")
     File.cp!("package.json", "#{folder_name}/package.json")
 
-    elixirjs_std_lib = Enum.reduce(Path.wildcard("priv/includes/*.js"), "", fn(x, concat) ->
+    elixirjs_std_lib = Enum.reduce(Path.wildcard("priv/js/lib/*.js"), "", fn(x, concat) ->
       concat <> "\n" <> File.read!(x)
     end)
 

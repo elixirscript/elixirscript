@@ -3,6 +3,50 @@ defmodule ExToJS.Translator.Function do
   alias ESTree.Builder
   alias ExToJS.Translator
 
+  def make_function_or_property_call(module_name, function_name) do
+    Builder.expression_statement(
+      Builder.call_expression(
+        Builder.function_expression(
+          [],
+          [],
+          Builder.block_statement([
+            Builder.if_statement(
+              Builder.binary_expression(
+                :instanceof,
+                Builder.member_expression(
+                  Translator.translate(module_name),
+                  Builder.literal(to_string(function_name)),
+                  true
+                ),
+                Builder.identifier("Function")
+              ),
+              Builder.block_statement([
+                Builder.return_statement(
+                  Builder.call_expression(
+                    Builder.member_expression(
+                      Translator.translate(module_name),
+                      Builder.identifier(function_name)
+                    ),
+                  [])
+                )
+              ]),
+              Builder.block_statement([
+                Builder.return_statement(
+                  Builder.member_expression(
+                    Translator.translate(module_name),
+                    Builder.literal(to_string(function_name)),
+                    true
+                  )
+                )
+              ])            
+            )
+          ])
+        ),
+        []
+      )
+    )
+  end
+
   def make_function_call(function_name, params) do
     Builder.call_expression(
       Builder.identifier(function_name),

@@ -131,6 +131,20 @@ defmodule ExToJS.Translator.Function.Test do
     assert_translation(ex_ast, js_code)
 
     ex_ast = quote do
+      Taco.test1()
+    end
+
+    js_code = "(function(){
+      if(Taco['test1'] instanceof Function){
+        return Taco.test1();
+      }else{
+        return Taco['test1'];
+      }
+    }());"   
+
+    assert_translation(ex_ast, js_code)
+
+    ex_ast = quote do
       Taco.test1(3, 2)
     end
 
@@ -139,10 +153,10 @@ defmodule ExToJS.Translator.Function.Test do
     assert_translation(ex_ast, js_code)
 
     ex_ast = quote do
-      Taco.test1(Taco.test2(), 2)
+      Taco.test1(Taco.test2(1), 2)
     end
 
-    js_code = "Taco.test1(Taco.test2(),2)"   
+    js_code = "Taco.test1(Taco.test2(1),2)"   
 
     assert_translation(ex_ast, js_code)
   end
@@ -268,5 +282,24 @@ defmodule ExToJS.Translator.Function.Test do
     assert_translation(ex_ast, js_code)
 
   end
+
+  test "test |> operator" do
+    ex_ast = quote do
+      1 |> Taco.test
+    end
+
+    js_code = "Taco.test(1)"
+
+    assert_translation(ex_ast, js_code)
+
+    ex_ast = quote do
+      1 |> Taco.test |> Home.hello("hi")
+    end
+
+    js_code = "Home.hello(Taco.test(1), 'hi')"
+
+    assert_translation(ex_ast, js_code)
+  end
+
   
 end

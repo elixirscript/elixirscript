@@ -55,6 +55,10 @@ defmodule ExToJS.Translator do
     ExKernel.make_in(left, right)
   end
 
+  def do_translate({{:., _, [module_name, function_name]}, _, [] }) do
+    Function.make_function_or_property_call(module_name, function_name)
+  end
+
   def do_translate({{:., _, [module_name, function_name]}, _, params }) do
     Function.make_function_call(module_name, function_name, params)
   end
@@ -155,6 +159,15 @@ defmodule ExToJS.Translator do
 
   def do_translate({:@, _, [{name, [], [value]}]}) do
     Module.make_attribute(name, value)
+  end
+
+  def do_translate({:|>, _, [left, right]}) do
+    case right do
+      {fun, meta, params} ->
+        translate({fun, meta, [left] ++ params})
+      {{:., meta, [module, fun]}, meta2, params} ->
+        translate({{:., meta, [module, fun]}, meta2, [left] ++ params})       
+    end
   end
 
   def do_translate({name, _, params}) when is_list(params) do
