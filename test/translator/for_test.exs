@@ -92,7 +92,7 @@ defmodule ExToJS.Translator.For.Test do
         let _results = [];
 
         for(let n of [1, 2, 3, 4, 5, 6])
-          if(rem(n, 2) == 0)
+          if(Kernel.rem(n, 2) == 0)
             _results.push(n);
 
         return _results;

@@ -7,7 +7,7 @@ defmodule ExToJS.Translator.Function do
       Builder.call_expression(
         Builder.member_expression(
           Builder.identifier("ElixirScript"),
-          Builder.identifier("__prop_or_function_call")
+          Builder.identifier("get_property_or_call_function")
         ),        
         [
           Translator.translate(module_name),

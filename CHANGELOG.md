@@ -1,6 +1,7 @@
 # v0.2.0-dev
   * Enhancements
     * Adding more functions to the Kernel module
+    * Now checking to see if a function is a Kernel function and prepending Kernel to it
     * Pipe operator
     * Can now call properties and zero parameter functions correctly
     * case, cond, and if are now turned into if statements wrapped in function closures

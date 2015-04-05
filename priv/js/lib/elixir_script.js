@@ -1,7 +1,7 @@
 let ElixirScript = {
   __MODULE__: Symbol('ElixirScript'),
 
-  __prop_or_function_call: function(item, property){
+  get_property_or_call_function: function(item, property){
     if(item[property] instanceof Function){
       return item[property]();
     }else{
