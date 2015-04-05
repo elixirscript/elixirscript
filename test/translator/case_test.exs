@@ -11,11 +11,13 @@ defmodule ExToJS.Translator.Case.Test do
     end
 
     js_code = """
-      if(data == Symbol('ok')){
-          value
+      (function(){
+        if(data == Symbol('ok')){
+          return value;
         }else if(data == Symbol('error')){
-          null
+          return null;
         }
+      }());
     """
 
     assert_translation(ex_ast, js_code)
@@ -28,11 +30,14 @@ defmodule ExToJS.Translator.Case.Test do
     end
 
     js_code = """
-      if(data == false){
+      (function(){
+        if(data == false){
           let value = 13;
+          return value;
         }else if(data == true){
-          true
+          return true;
         }
+      }());    
     """
 
     assert_translation(ex_ast, js_code)
@@ -47,11 +52,14 @@ defmodule ExToJS.Translator.Case.Test do
     end
 
     js_code = """
-      if(data == false){
+      (function(){
+        if(data == false){
           let value = 13;
+          return value;
         }else{
-          true
+          return true;
         }
+      }());      
     """
 
     assert_translation(ex_ast, js_code)
@@ -68,11 +76,39 @@ defmodule ExToJS.Translator.Case.Test do
     end
 
     js_code = """
-      if([1,2,3,4].includes(data)){
+      (function(){
+        if([1,2,3,4].includes(data)){
           let value = 13;
+          return value;
         }else{
-          true
+          return true;
         }
+      }());
+    """
+
+    assert_translation(ex_ast, js_code)
+  end
+
+  test "translate case with multiple statements in body" do
+    ex_ast = quote do
+      case data do
+        :ok -> 
+          Logger.info("info")
+          Todo.add(data)
+        :error -> 
+          nil
+      end
+    end
+
+    js_code = """
+      (function(){
+        if(data == Symbol('ok')){
+          Logger.info('info');
+          return Todo.add(data);
+        }else if(data == Symbol('error')){
+          return null;
+        }
+      }());
     """
 
     assert_translation(ex_ast, js_code)

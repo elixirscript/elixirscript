@@ -10,9 +10,12 @@ defmodule ExToJS.Translator.If.Test do
     end
 
     js_code = """
-      if(1 == 1){
-        let a = 1;
-      }
+      (function(){
+        if(1 == 1){
+          let a = 1;
+          return a;
+        }
+      }());
     """
 
     assert_translation(ex_ast, js_code)
@@ -26,11 +29,15 @@ defmodule ExToJS.Translator.If.Test do
     end
 
     js_code = """
-      if(1 == 1){
-        let a = 1;
-      }else{
-        let a = 2;
-      }
+      (function(){
+        if(1 == 1){
+          let a = 1;
+          return a;
+        }else{
+          let a = 2;
+          return a;
+        }
+      }());
     """
 
     assert_translation(ex_ast, js_code)

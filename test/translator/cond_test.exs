@@ -15,13 +15,15 @@ defmodule ExToJS.Translator.Cond.Test do
     end
 
     js_code = """
+    (function(){
       if(1 + 1 == 1){
-        'This will never match'
+        return 'This will never match';
       }else if(2 * 2 != 4){
-        'Nor this'
+        return 'Nor this';
       }else{
-        'This will'
+        return 'This will';
       }
+    }());
     """
 
     assert_translation(ex_ast, js_code)
@@ -41,16 +43,18 @@ defmodule ExToJS.Translator.Cond.Test do
     end
 
     js_code = """
+    (function(){
       if(1 + 1 == 1){
         let a = 1;
-        'This will never match'
+        return 'This will never match';
       }else if(2 * 2 != 4){
         let a = 2;
-        'Nor this'
+        return 'Nor this';
       }else{
         let a = 3;
-        'This will'
+        return 'This will';
       }
+    }());
     """
 
     assert_translation(ex_ast, js_code)

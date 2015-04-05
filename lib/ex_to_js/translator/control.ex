@@ -2,6 +2,7 @@ defmodule ExToJS.Translator.Control do
   require Logger
   alias ESTree.Builder
   alias ExToJS.Translator
+  alias ExToJS.Translator.Function
 
   def make_block(expressions) do
     Builder.block_statement(Enum.map(expressions, &Translator.translate(&1)))
@@ -12,21 +13,52 @@ defmodule ExToJS.Translator.Control do
 
     consequent = Builder.block_statement([Translator.translate(blocks[:do])])
 
+    consequent = Function.return_last_expression(consequent)
+
     alternate = if blocks[:else] != nil do
       Builder.block_statement([Translator.translate(blocks[:else])])
+      |> Function.return_last_expression
     else
       nil
     end
 
-    Builder.if_statement(test, consequent, alternate)
+    Builder.expression_statement(
+      Builder.call_expression(
+        Builder.function_expression([],[],
+          Builder.block_statement([
+            Builder.if_statement(test, consequent, alternate)
+          ])
+        ),
+        []
+      )
+    )
+
   end
 
   def make_cond(clauses) do
-    process_cond(clauses, nil)
+    Builder.expression_statement(
+      Builder.call_expression(
+        Builder.function_expression([],[],
+          Builder.block_statement([
+            process_cond(clauses, nil)
+          ])
+        ),
+        []
+      )
+    )
   end
 
   def make_case(condition, clauses) do
-    process_case(condition, clauses, nil)
+    Builder.expression_statement(
+      Builder.call_expression(
+        Builder.function_expression([],[],
+          Builder.block_statement([
+            process_case(condition, clauses, nil)
+          ])
+        ),
+        []
+      )
+    )
   end
 
   defp process_cond([], ast) do
@@ -41,6 +73,8 @@ defmodule ExToJS.Translator.Control do
     if translated_body.type != "BlockStatement" do
       translated_body = Builder.block_statement([translated_body])
     end
+
+    translated_body = Function.return_last_expression(translated_body)
 
     if hd(clause) == true do
       translated_body   
@@ -67,6 +101,8 @@ defmodule ExToJS.Translator.Control do
     if translated_body.type != "BlockStatement" do
       translated_body = Builder.block_statement([translated_body])
     end
+
+    translated_body = Function.return_last_expression(translated_body)
 
     case hd(clause) do
       {:when, _, [the_clause, guard]} ->

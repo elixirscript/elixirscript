@@ -4,47 +4,13 @@ defmodule ExToJS.Translator.Function do
   alias ExToJS.Translator
 
   def make_function_or_property_call(module_name, function_name) do
-    Builder.expression_statement(
       Builder.call_expression(
-        Builder.function_expression(
-          [],
-          [],
-          Builder.block_statement([
-            Builder.if_statement(
-              Builder.binary_expression(
-                :instanceof,
-                Builder.member_expression(
-                  Translator.translate(module_name),
-                  Builder.literal(to_string(function_name)),
-                  true
-                ),
-                Builder.identifier("Function")
-              ),
-              Builder.block_statement([
-                Builder.return_statement(
-                  Builder.call_expression(
-                    Builder.member_expression(
-                      Translator.translate(module_name),
-                      Builder.identifier(function_name)
-                    ),
-                  [])
-                )
-              ]),
-              Builder.block_statement([
-                Builder.return_statement(
-                  Builder.member_expression(
-                    Translator.translate(module_name),
-                    Builder.literal(to_string(function_name)),
-                    true
-                  )
-                )
-              ])            
-            )
-          ])
-        ),
-        []
+        Builder.identifier("__prop_or_function_call"),
+        [
+          Translator.translate(module_name),
+          Builder.literal(to_string(function_name))
+        ]
       )
-    )
   end
 
   def make_function_call(function_name, params) do
@@ -110,15 +76,15 @@ defmodule ExToJS.Translator.Function do
     )
   end
 
-  defp return_last_expression([]) do
+  def return_last_expression([]) do
     [Builder.return_statement(Builder.literal(nil))]
   end
 
-  defp return_last_expression(%ESTree.BlockStatement{} = block) do
+  def return_last_expression(%ESTree.BlockStatement{} = block) do
     %ESTree.BlockStatement{ block | body: return_last_expression(block.body) }
   end
 
-  defp return_last_expression(list) when is_list(list) do
+  def return_last_expression(list) when is_list(list) do
     last_item = List.last(list)
 
     last_item = case last_item do
@@ -137,17 +103,6 @@ defmodule ExToJS.Translator.Function do
         end
 
         [last_item, return_statement]
-      %ESTree.IfStatement{} ->
-
-        consequent = return_last_expression(last_item.consequent)
-
-        alternate = if last_item.alternate do
-          return_last_expression(last_item.alternate)
-        else
-          nil
-        end
-
-        last_item = %ESTree.IfStatement{ last_item | consequent: consequent, alternate: alternate }
       %ESTree.BlockStatement{} ->
         last_item = %ESTree.BlockStatement{ last_item | body: return_last_expression(last_item.body) }
       _ ->
@@ -159,7 +114,17 @@ defmodule ExToJS.Translator.Function do
     end
 
 
-    list = Enum.take(list, length(list)-1)
+    list = Enum.take(list, length(list)-1) 
+    |> Enum.map(fn(x) ->
+      case x do
+        %ESTree.MemberExpression{} ->
+          Builder.expression_statement(x)
+        %ESTree.CallExpression{} ->
+          Builder.expression_statement(x)
+        _ ->
+          x
+      end
+    end)
 
     if is_list(last_item) do
       list ++ last_item

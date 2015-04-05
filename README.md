@@ -83,7 +83,7 @@ $ ex2js -h
   * No unquote
   * No super
   * No &
-  * No support for standard library yet
+  * Limited support for standard library
   * No regular expressions
 
 
@@ -91,8 +91,8 @@ $ ex2js -h
 TODO (high level list of todos)
 ======
 * [ ] pattern matching
-* [x] case (currently works sans pattern matching support)
-* [x] cond (currently works sans pattern matching support)
+* [x] case (currently works without pattern matching support)
+* [x] cond (currently works without pattern matching support)
 * [x] for (currently does not support keyword list matching or into yet)
 * [ ] try
 * [ ] bitstring
@@ -100,7 +100,7 @@ TODO (high level list of todos)
 * [x] return from a function
 * [x] defexception and raising errors
 * [ ] types and specs
-* [ ] pipe operator
+* [x] pipe operator
 * [ ] data structures
 * [x] figure out how using external js modules will work
 * [ ] spawn
@@ -109,5 +109,5 @@ TODO (high level list of todos)
 * [ ] regular expression
 * [x] multiple arity functions
 * [x] make example project [bryanjos/example](https://github.com/bryanjos/example)
-* [ ] hopefully use of erlang_js and remove node.js dependency
+* [ ] use erlang_js and remove node.js dependency
 * [ ] Prototype rich frontend framework using elixir design patterns

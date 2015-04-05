@@ -126,7 +126,7 @@ function parse_generator(){
 }
 
 function parse_thingy(){
-  return parse('(function(){let _results = [];for(let n of [1,2,3,4]){_results.push(n * 2);}return _results;}) ();');
+  return parse("(function(){ if(Taco['test1'] instanceof Function){ return Taco.test1(); }else{ return Taco['test1']; } }())");
 }
 
 function parse_boolean(){
@@ -141,5 +141,5 @@ function parse_x(){
   return parse("User.defstruct(name=\"John\");");
 }
 
-var g = escodegen.generate(parse_x());
+var g = escodegen.generate(parse_thingy());
 console.log(g);

@@ -1,5 +1,3 @@
-let _ = undefined;
-
 function tl(list){
   return list.slice(1);
 }
@@ -73,7 +71,7 @@ function is_bitstring(x){
 
 }
 
-function in(left, right){
+function _in(left, right){
   return Enum.member_qm(right, left);
 }
 
@@ -119,5 +117,13 @@ function apply(module, fun, args){
 
 function to_string(arg){
   return arg.toString();
+}
+
+function __prop_or_function_call(item, property){
+  if(item[property] instanceof Function){
+    return item[property]();
+  }else{
+    return item[property];
+  }
 }
 

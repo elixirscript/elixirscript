@@ -56,11 +56,13 @@ defmodule ExToJS.Translator.Function.Test do
 
     js_code = """
       export function test1(alpha, beta){
-        if(1 == 1){
-          return 1;
-        }else{
-          return 2;
-        }
+        return (function(){
+          if(1 == 1){
+            return 1;
+          }else{
+            return 2;
+          }
+        }());;
       }
     """
 
@@ -82,16 +84,20 @@ defmodule ExToJS.Translator.Function.Test do
 
     js_code = """
       export function test1(alpha, beta){
-        if(1 == 1){
-          if(2 == 2){
-            return 4;
+        return (function(){
+          if(1 == 1){
+            return (function(){
+              if(2 == 2){
+                return 4;
+              }else{
+                let a = 1;
+                return a;
+              }
+            }());;
           }else{
-            let a = 1;
-            return a;
+            return 2;
           }
-        }else{
-          return 2;
-        }
+        }());;
       }
     """
 
@@ -134,13 +140,7 @@ defmodule ExToJS.Translator.Function.Test do
       Taco.test1()
     end
 
-    js_code = "(function(){
-      if(Taco['test1'] instanceof Function){
-        return Taco.test1();
-      }else{
-        return Taco['test1'];
-      }
-    }());"   
+    js_code = "__prop_or_function_call(Taco, 'test1')"   
 
     assert_translation(ex_ast, js_code)
 
