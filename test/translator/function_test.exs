@@ -140,7 +140,7 @@ defmodule ExToJS.Translator.Function.Test do
       Taco.test1()
     end
 
-    js_code = "__prop_or_function_call(Taco, 'test1')"   
+    js_code = "ElixirScript.__prop_or_function_call(Taco, 'test1')"   
 
     assert_translation(ex_ast, js_code)
 
@@ -297,6 +297,17 @@ defmodule ExToJS.Translator.Function.Test do
     end
 
     js_code = "Home.hello(Taco.test(1), 'hi')"
+
+    assert_translation(ex_ast, js_code)
+  end
+
+
+  test "test Kernel function" do
+    ex_ast = quote do
+      is_atom(:atom)
+    end
+
+    js_code = "Kernel.is_atom(Symbol('atom'))"
 
     assert_translation(ex_ast, js_code)
   end

@@ -1,129 +1,126 @@
-function tl(list){
-  return list.slice(1);
-}
+let Kernel = {
+  __MODULE_: Symbol('Logger'),
 
-function hd(list){
-  return list.slice(0,1)[0];
-}
+  tl: function(list){
+    return list.slice(1);
+  },
 
-function is_nil(x){
-  return x == null;
-}
+  hd: function(list){
+    return list.slice(0,1)[0];
+  },
 
-function is_atom(x){
-  return x instanceof Symbol;
-}
+  is_nil: function(x){
+    return x == null;
+  },
 
-function is_binary(x){
-  return typeof(x) === 'string' || x instanceof String;
-}
+  is_atom: function(x){
+    return x instanceof Symbol;
+  },
 
-function is_boolean(x){
-  return typeof(x) === 'boolean' || x instanceof Boolean; 
-}
+  is_binary: function (x){
+    return typeof(x) === 'string' || x instanceof String;
+  },
 
-function is_function(x, arity = -1){
-  return x instanceof Function;
-}
+  is_boolean: function (x){
+    return typeof(x) === 'boolean' || x instanceof Boolean; 
+  },
 
-// from: http://stackoverflow.com/a/3885844
-function is_float(x){
-  return n === +n && n !== (n|0);
-}
+  is_function: function(x, arity = -1){
+    return x instanceof Function;
+  },
 
-function is_integer(x){
-  return n === +n && n === (n|0);
-}
+  // from: http://stackoverflow.com/a/3885844
+  is_float: function(x){
+    return n === +n && n !== (n|0);
+  },
 
-function is_list(x){
-  return x instanceof Array;
-}
+  is_integer: function(x){
+    return n === +n && n === (n|0);
+  },
 
-function is_map(x){
-  return x instanceof Object;
-}
+  is_list: function(x){
+    return x instanceof Array;
+  },
 
-function is_number(x){
-  return is_integer(x) || is_float(x);
-}
+  is_map: function(x){
+    return x instanceof Object;
+  },
 
-function is_tuple(x){
-  return x instanceof Object && (length(x) == 0 || x['_0'] != null);
-}
+  is_number: function(x){
+    return is_integer(x) || is_float(x);
+  },
 
-function length(x){
-  x.length;
-}
+  is_tuple: function(x){
+    return x instanceof Object && (length(x) == 0 || x['_0'] != null);
+  },
 
-function is_pid(x){
+  length: function(x){
+    return x.length;
+  },
 
-}
+  is_pid: function(x){
 
-function is_port(x){
-  
-}
+  },
 
-function is_reference(x){
+  is_port: function(x){
+    
+  },
 
-}
+  is_reference: function(x){
 
-function is_bitstring(x){
+  },
 
-}
+  is_bitstring: function(x){
 
-function _in(left, right){
-  return Enum.member_qm(right, left);
-}
+  },
 
-function abs(number){
-  return Math.abs(number);
-}
+  _in: function(left, right){
+    return Enum.member_qm(right, left);
+  },
 
-function round(number){
-  return Math.round(number);
-}
+  abs: function(number){
+    return Math.abs(number);
+  },
 
-function elem(tuple, index){
-  return tuple['_' + index];
-}
+  round: function(number){
+    return Math.round(number);
+  },
 
-function rem(left, right){
-  return left % right;
-}
+  elem: function(tuple, index){
+    return tuple['_' + index];
+  },
 
-function div(left, right){
-  return left / right;
-}
+  rem: function(left, right){
+    return left % right;
+  },
 
-function and(left, right){
-  return left && right;
-}
+  div: function(left, right){
+    return left / right;
+  },
 
-function or(left, right){
-  return left || right;
-}
+  and: function(left, right){
+    return left && right;
+  },
 
-function not(arg){
-  return !arg;
-}
+  or: function(left, right){
+    return left || right;
+  },
 
-function apply(module, fun, args){
-  if(args.length === 3){
-    return module[fun].apply(null, args);
-  }else{
-    return module.apply(null, fun);  
+  not: function(arg){
+    return !arg;
+  },
+
+  apply: function(module, fun, args){
+    if(args.length === 3){
+      return module[fun].apply(null, args);
+    }else{
+      return module.apply(null, fun);  
+    }
+  },
+
+  to_string: function(arg){
+    return arg.toString();
   }
 }
 
-function to_string(arg){
-  return arg.toString();
-}
-
-function __prop_or_function_call(item, property){
-  if(item[property] instanceof Function){
-    return item[property]();
-  }else{
-    return item[property];
-  }
-}
 

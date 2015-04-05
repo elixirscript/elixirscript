@@ -66,5 +66,4 @@ let Enum = {
 
     return the_acc;
   }
-
 }

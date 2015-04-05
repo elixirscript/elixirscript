@@ -5,7 +5,10 @@ defmodule ExToJS.Translator.Function do
 
   def make_function_or_property_call(module_name, function_name) do
       Builder.call_expression(
-        Builder.identifier("__prop_or_function_call"),
+        Builder.member_expression(
+          Builder.identifier("ElixirScript"),
+          Builder.identifier("__prop_or_function_call")
+        ),        
         [
           Translator.translate(module_name),
           Builder.literal(to_string(function_name))

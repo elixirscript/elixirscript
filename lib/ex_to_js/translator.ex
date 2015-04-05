@@ -170,8 +170,13 @@ defmodule ExToJS.Translator do
     end
   end
 
-  def do_translate({name, _, params}) when is_list(params) do
-    Function.make_function_call(name, params)
+  def do_translate({name, metadata, params}) when is_list(params) do
+    case metadata[:import] do
+      Kernel ->
+        Function.make_function_call(:Kernel, name, params)
+      _ ->
+        Function.make_function_call(name, params)        
+    end
   end
 
   def do_translate({name, _, _}) do
