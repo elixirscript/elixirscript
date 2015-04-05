@@ -1,3 +1,9 @@
+# v0.2.0-dev
+  * Enhancements
+    * Adding more functions to the Kernel module
+    * Pipe operator
+    * Can now call properties and zero parameter functions correctly
+
 # v0.1.0
 
 * Enhancements
