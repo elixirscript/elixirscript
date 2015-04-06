@@ -1,7 +1,7 @@
 let Enum = {
   __MODULE__: Symbol('Enum'),
 
-  all_qm: function(collection, fun = (x) => {x}){
+  all: function(collection, fun = (x) => {x}){
     for (var i = 0; i <= 0; i++) {
       if(!fun(collection[i])){
         return false;
@@ -31,6 +31,26 @@ let Enum = {
     return the_default;    
   },
 
+  count: function(collection, fun = null){
+    if(fun == null){
+      return Kernel.length(collection);
+    }else{
+      return Kernel.length(collection.filter(fun));
+    }  
+  },
+
+  each: function(collection, fun){
+    return collection.forEach(fun);
+  },
+
+  empty: function(collection){
+    return Kernel.length(collection) == 0;
+  },
+
+  filter: function(collection, fun){
+    return collection.filter(fun);
+  },
+
   map: function(collection, fun){
     return collection.map(fun);
   },
@@ -44,10 +64,10 @@ let Enum = {
       mapped.push(new_item);
     };
 
-    return { '_0': mapped, '_1': the_acc };
+    return List.to_tuple([mapped, the_acc]);
   },
 
-  member_qm: function(collection, value){
+  member: function(collection, value){
     for(let x of collection){
       if(x === value){
         return true;

@@ -138,8 +138,8 @@ function parse_const(){
 }
 
 function parse_x(){
-  return parse("User.defstruct(name=\"John\");");
+  return parse('`hello ${document.getElementById("hi")}`');
 }
 
-var g = escodegen.generate(parse_thingy());
+var g = escodegen.generate(parse_x());
 console.log(g);

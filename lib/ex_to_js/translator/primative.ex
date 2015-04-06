@@ -46,4 +46,19 @@ defmodule ExToJS.Translator.Primative do
     |> Builder.array_expression
   end
 
+  def make_interpolated_string(elements) do
+    {strings, expressions} = Enum.partition(elements, fn(x) -> is_binary(x) end)
+
+    Builder.template_literal(
+      Enum.map(strings, fn(x) ->
+        Builder.template_element(x, x, false)
+      end),
+      Enum.map(expressions, fn({:::, _, data}) ->
+        hd(data) 
+        |> elem(0) 
+        |> ExToJS.Translator.translate
+      end)
+    )
+  end
+
 end

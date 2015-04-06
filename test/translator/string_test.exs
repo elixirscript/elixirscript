@@ -9,4 +9,10 @@ defmodule ExToJS.Translator.String.Test do
     ex_ast = quote do: "Hello" <> "World"
     assert_translation(ex_ast, "'Hello' + 'World'")
   end
+
+  @tag :skip
+  test "translate string interpolation" do
+    ex_ast = quote do: "Hello #{"world"}"
+    assert_translation(ex_ast, "`Hello ${'world'}`")
+  end
 end

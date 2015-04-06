@@ -59,7 +59,7 @@ let Kernel = {
   },
 
   is_pid: function(x){
-
+    return x instanceof ElixirScript.PID;
   },
 
   is_port: function(x){
@@ -75,7 +75,7 @@ let Kernel = {
   },
 
   _in: function(left, right){
-    return Enum.member_qm(right, left);
+    return Enum.member(right, left);
   },
 
   abs: function(number){

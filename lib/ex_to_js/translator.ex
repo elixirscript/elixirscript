@@ -48,11 +48,29 @@ defmodule ExToJS.Translator do
   end
 
   def do_translate({:<<>>, _, elements} = bitstring) do
-    Primative.make_array(elements)
+    is_interpolated_string = Enum.any?(elements, fn(x) -> 
+      case x do
+        {:::, _, _} ->
+          true
+        _ ->
+          false
+      end
+    end)
+
+    case is_interpolated_string do
+      true ->
+        Primative.make_interpolated_string(elements)
+      _ ->
+        Primative.make_array(elements)
+    end
   end
 
   def do_translate({:in, _, [left, right]}) do
     ExKernel.make_in(left, right)
+  end
+
+  def do_translate({:., _, [module_name, function_name]}) do
+    Function.make_function_or_property_call(module_name, function_name)
   end
 
   def do_translate({{:., _, [module_name, function_name]}, _, [] }) do
