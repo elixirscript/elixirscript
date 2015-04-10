@@ -7,10 +7,7 @@ let ElixirScript = {
     }else{
       return item[property];
     }
-  },
-
-  PID: function(value) {
-    if (!(this instanceof ElixirScript.PID)) return new ElixirScript.PID(value);
-    this.value = value;
   }
 }
+
+export default ElixirScript;

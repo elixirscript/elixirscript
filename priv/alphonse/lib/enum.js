@@ -64,7 +64,7 @@ let Enum = {
       mapped.push(new_item);
     };
 
-    return List.to_tuple([mapped, the_acc]);
+    return Tuple(mapped, the_acc);
   },
 
   member: function(collection, value){
@@ -87,3 +87,5 @@ let Enum = {
     return the_acc;
   }
 }
+
+export default Enum;

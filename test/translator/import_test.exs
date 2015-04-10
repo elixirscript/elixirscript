@@ -10,7 +10,7 @@ defmodule ExToJS.Translator.Import.Test do
     end
 
     js_code = """
-      const __MODULE__ = Symbol('User');
+      const __MODULE__ = Atom('User');
 
       import * as World from 'hello/world';
     """
@@ -24,7 +24,7 @@ defmodule ExToJS.Translator.Import.Test do
     end
 
     js_code = """
-      const __MODULE__ = Symbol('User');
+      const __MODULE__ = Atom('User');
 
       import { la, al } from 'us';
     """
@@ -41,7 +41,7 @@ defmodule ExToJS.Translator.Import.Test do
     end
 
     js_code = """
-      const __MODULE__ = Symbol('User');
+      const __MODULE__ = Atom('User');
 
       import * as World from 'hello/world';
     """
@@ -57,7 +57,7 @@ defmodule ExToJS.Translator.Import.Test do
     end
 
     js_code = """
-      const __MODULE__ = Symbol('User');
+      const __MODULE__ = Atom('User');
 
       import World from 'world';
     """
@@ -72,7 +72,7 @@ defmodule ExToJS.Translator.Import.Test do
     end
 
     js_code = """
-      const __MODULE__ = Symbol('User');
+      const __MODULE__ = Atom('User');
 
       import World from 'hello/world';
     """

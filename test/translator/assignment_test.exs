@@ -9,12 +9,16 @@ defmodule ExToJS.Translator.Assignment.Test do
     assert_translation(ex_ast, js_code)
 
     ex_ast = quote do: a = :atom
-    js_code = "let a = Symbol('atom');"
+    js_code = "let a = Atom('atom');"
 
     assert_translation(ex_ast, js_code)
 
     ex_ast = quote do: {a, b} = {1, 2}
-    js_code = "let {'_0':a,'_1':b} = {'_0':1,'_1':2};"
+    js_code = """
+      let _ref = Tuple(1, 2);
+      let a = _ref[0];
+      let b = _ref[1];
+    """
 
     assert_translation(ex_ast, js_code)
   end

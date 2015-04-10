@@ -19,6 +19,11 @@
     "escodegen": "^1.6.1"
   },
   "devDependencies": {
-    "acorn": "^0.11.0"
+    "acorn": "^0.11.0",
+    "chai": "^2.2.0",
+    "gulp": "^3.8.11",
+    "gulp-babel": "^5.0.0",
+    "gulp-concat": "^2.5.2",
+    "gulp-mocha": "^2.0.1"
   }
 }

@@ -18,6 +18,18 @@ let Logger = {
   },
 
   log: function(type, message){
-    console.log(message);
+    if(type.value === "warn"){
+      console.warn(message);
+    }else if(type.value === "debug"){
+      console.debug(message);
+    }else if(type.value === "info"){
+      console.info(message);
+    }else if(type.value === "error"){
+      console.error(message);
+    }else{
+      throw new ArgumentError("invalid type");
+    }
   }
 }
+
+export default Logger;

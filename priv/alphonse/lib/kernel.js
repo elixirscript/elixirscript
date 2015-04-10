@@ -1,5 +1,8 @@
+import Atom from './atom';
+import Tuple from './tuple';
+
 let Kernel = {
-  __MODULE_: Symbol('Logger'),
+  __MODULE_: Symbol('Kernel'),
 
   tl: function(list){
     return list.slice(1);
@@ -14,7 +17,7 @@ let Kernel = {
   },
 
   is_atom: function(x){
-    return x instanceof Symbol;
+    return x instanceof Atom;
   },
 
   is_binary: function (x){
@@ -51,7 +54,7 @@ let Kernel = {
   },
 
   is_tuple: function(x){
-    return x instanceof Object && (length(x) == 0 || x['_0'] != null);
+    return x instanceof Tuple;
   },
 
   length: function(x){
@@ -59,7 +62,7 @@ let Kernel = {
   },
 
   is_pid: function(x){
-    return x instanceof ElixirScript.PID;
+    return false;
   },
 
   is_port: function(x){
@@ -71,7 +74,7 @@ let Kernel = {
   },
 
   is_bitstring: function(x){
-
+    return typeof(x) === 'string' || x instanceof String;
   },
 
   _in: function(left, right){
@@ -122,5 +125,7 @@ let Kernel = {
     return arg.toString();
   }
 }
+
+export default Kernel;
 
 

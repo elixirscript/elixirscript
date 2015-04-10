@@ -4,6 +4,6 @@ defmodule ExToJS.Translator.Atom.Test do
 
   test "translate atom" do
     ex_ast = quote do: :atom
-    assert_translation(ex_ast, "Symbol('atom')")
+    assert_translation(ex_ast, "Atom('atom')")
   end
 end

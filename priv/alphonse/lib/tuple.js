@@ -1,53 +1,75 @@
-let Tuple = {
-  __MODULE_: Symbol('Tuple'),
+import List from './list';
+import Atom from './atom';
 
-  delete_at: function(tuple, index){
-    let new_tuple = {};
+let Tuple = function(...args){
+  if (!(this instanceof Tuple)) return new Tuple(...args);
 
-    for (var i = tuple.length - 1; i >= 0; i--) {
-      if(i == index){
-        continue;    
-      }else{
-        new_tuple['_' + i] = tuple['_' + i];         
-      }
-    };
+  this.value = args;
+  this.length = args.length;
 
-    return new_tuple;
-  },
-
-  duplicate: function(data, size){
-    let array = [];
-
-    for (var i = size - 1; i >= 0; i--) {
-      array.push(data)
-    };
-
-    List.to_tuple(array);
-  },
-
-  insert_at: function(tuple, index, term){
-    let new_tuple = {};
-
-    for (var i = 0; i <= tuple.length; i++) {
-      if(i == index){
-        new_tuple['_' + i] = term;
-        i++;
-        new_tuple['_' + i] = tuple['_' + i];        
-      }else{
-        new_tuple['_' + i] = tuple['_' + i];         
-      }
-    };
-
-    return new_tuple;
-  },
-
-  to_list: function(tuple){
-    let list = [];
-
-    for(let x in tuple){
-      list.push(x);
-    }
-
-    return list;
+  for (var i = 0; i < args.length; i++) {
+    this[i] = args[i];
   }
 }
+
+Tuple.prototype.__MODULE_ = Atom('Tuple');
+
+Tuple.toString = function(tuple){
+  var i, s = "";
+  for (i = 0; i < tuple.length; i++) {
+    if (s !== "") {
+      s += ", ";
+    }
+    s += tuple[i].toString();
+  }
+
+  return "{" + s + "}";
+}
+
+Tuple.delete_at = function(tuple, index){
+  let new_list = [];
+
+  for (var i = 0; i < tuple.value.length; i++) {
+    if(i != index){
+      new_list.push(tuple.value[i]);
+    }
+  };
+
+  return Tuple.from_list(new_list);
+};
+
+Tuple.duplicate = function(data, size){
+  let array = [];
+
+  for (var i = size - 1; i >= 0; i--) {
+    array.push(data)
+  };
+
+  return Tuple.from_list(array);
+};
+
+Tuple.insert_at = function(tuple, index, term){
+  let new_tuple = [];
+
+  for (var i = 0; i <= tuple.value.length; i++) {
+    if(i == index){
+      new_tuple.push(term);
+      i++;
+      new_tuple.push(tuple.value[i]);       
+    }else{
+      new_tuple.push(tuple.value[i]);       
+    }
+  };
+
+  return Tuple.from_list(new_tuple);
+};
+
+Tuple.from_list = function(list){
+  return Tuple.apply(null, list);
+};
+
+Tuple.to_list = function(tuple){
+  return tuple.value.slice(0);
+};
+
+export default Tuple;

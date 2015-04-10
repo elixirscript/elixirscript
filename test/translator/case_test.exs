@@ -12,9 +12,9 @@ defmodule ExToJS.Translator.Case.Test do
 
     js_code = """
       (function(){
-        if(data == Symbol('ok')){
+        if(data == Atom('ok')){
           return value;
-        }else if(data == Symbol('error')){
+        }else if(data == Atom('error')){
           return null;
         }
       }());
@@ -102,10 +102,10 @@ defmodule ExToJS.Translator.Case.Test do
 
     js_code = """
       (function(){
-        if(data == Symbol('ok')){
+        if(data == Atom('ok')){
           Logger.info('info');
           return Todo.add(data);
-        }else if(data == Symbol('error')){
+        }else if(data == Atom('error')){
           return null;
         }
       }());

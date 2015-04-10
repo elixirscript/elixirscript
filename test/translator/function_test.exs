@@ -111,8 +111,10 @@ defmodule ExToJS.Translator.Function.Test do
 
     js_code = """
       export function test1(alpha, beta){
-        let {'_0':a,'_1':b} = {'_0':1,'_1':2};
-        return {'_0':a,'_1':b};
+        let _ref = Tuple(1, 2);
+        let a = _ref[0];
+        let b = _ref[1];
+        return _ref;
       }
     """
 
@@ -193,7 +195,7 @@ defmodule ExToJS.Translator.Function.Test do
     end 
 
     js_code = """
-      const __MODULE__ = Symbol('Example');
+      const __MODULE__ = Atom('Example');
 
       function example__0(){ return null; }
       function example__1(oneArg){ return null; }
@@ -239,7 +241,7 @@ defmodule ExToJS.Translator.Function.Test do
     end 
 
     js_code = """
-      const __MODULE__ = Symbol('Example');
+      const __MODULE__ = Atom('Example');
 
       function example__0(){ return null; }
       function example__1(oneArg){ return null; }
@@ -273,7 +275,7 @@ defmodule ExToJS.Translator.Function.Test do
     end 
 
     js_code = """
-      const __MODULE__ = Symbol('Example');
+      const __MODULE__ = Atom('Example');
 
       export function example(oneArg){
         return null;
@@ -307,9 +309,49 @@ defmodule ExToJS.Translator.Function.Test do
       is_atom(:atom)
     end
 
-    js_code = "Kernel.is_atom(Symbol('atom'))"
+    js_code = "Kernel.is_atom(Atom('atom'))"
 
     assert_translation(ex_ast, js_code)
+  end
+
+  @tag :skip
+  test "guards" do
+    ex_ast = quote do
+      def something(one) when is_number(one) do
+      end
+    end
+
+
+    js_code = """
+      export function something(one){
+        if(Kernel.is_number(one)){
+
+        }else{
+          throw new ArgumentError();
+        }
+      }
+    """
+
+  end
+
+  @tag :skip
+  test "pattern matching" do
+    ex_ast = quote do
+      def something(1) do
+      end
+    end
+
+
+    js_code = """
+      export function something(_ref){
+        if(_ref === 1){
+
+        }else{
+          throw new ArgumentError();
+        }
+      }
+    """
+
   end
 
   

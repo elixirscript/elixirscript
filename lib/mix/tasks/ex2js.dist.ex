@@ -21,14 +21,12 @@ defmodule Mix.Tasks.Ex2js.Dist do
     File.mkdir_p(folder_name <> "/bin")
     File.cp!("priv/ex2js", "#{folder_name}/bin/ex2js")
     File.cp!("priv/alphonse/alphonse.js", "#{folder_name}/alphonse.js")
-    File.cp_r!("priv/alphonse/node_modules", "#{folder_name}/node_modules")
-    File.cp!("priv/alphonse/package.json", "#{folder_name}/package.json")
+    File.cp_r!("node_modules", "#{folder_name}/node_modules")
+    File.cp!("package.json", "#{folder_name}/package.json")
 
-    elixirjs_std_lib = Enum.reduce(Path.wildcard("priv/alphonse/lib/*.js"), "", fn(x, concat) ->
-      concat <> "\n" <> File.read!(x)
-    end)
+    System.cmd("gulp", ["dist"])
 
-    File.write!("#{folder_name}/elixir.js", elixirjs_std_lib)
+    File.cp!("priv/alphonse/dist/elixir.js", "#{folder_name}/elixir.js")
 
     System.cmd("tar", ["czf", archive_file_name, folder_name])
 

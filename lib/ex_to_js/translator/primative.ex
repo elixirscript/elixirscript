@@ -10,9 +10,9 @@ defmodule ExToJS.Translator.Primative do
     Builder.literal(ast)
   end
 
-  def make_symbol(ast) when is_atom(ast) do
+  def make_atom(ast) when is_atom(ast) do
     Builder.call_expression(
-      Builder.identifier("Symbol"), 
+      Builder.identifier("Atom"), 
       [Builder.literal(ast)]
     )
   end
@@ -26,14 +26,10 @@ defmodule ExToJS.Translator.Primative do
   end
 
   def make_tuple(elements) do
-    {elems, _} = Enum.map_reduce(elements, 0, fn(x, index) ->
-      {
-        Builder.property(Builder.literal("_#{index}"), ExToJS.Translator.translate(x)),
-        index + 1
-      }
-    end)
-
-    Builder.object_expression(elems)
+    Builder.call_expression(
+      Builder.identifier("Tuple"), 
+      Enum.map(elements, fn(x) -> ExToJS.Translator.translate(x) end)
+    )
   end
 
   def make_bitstring(elements) do
@@ -47,18 +43,27 @@ defmodule ExToJS.Translator.Primative do
   end
 
   def make_interpolated_string(elements) do
-    {strings, expressions} = Enum.partition(elements, fn(x) -> is_binary(x) end)
+    do_make_interpolated_string(Enum.reverse(elements), nil)
+  end
 
-    Builder.template_literal(
-      Enum.map(strings, fn(x) ->
-        Builder.template_element(x, x, false)
-      end),
-      Enum.map(expressions, fn({:::, _, data}) ->
-        hd(data) 
-        |> elem(0) 
-        |> ExToJS.Translator.translate
-      end)
-    )
+  def do_make_interpolated_string([], ast) do
+    ast
+  end
+
+  def do_make_interpolated_string(elements, ast) do
+    element_ast = case hd(elements) do
+      elem when is_binary(elem) ->
+        ExToJS.Translator.translate(elem)
+      {:::, _, data} ->
+        ExToJS.Translator.translate(hd(data))
+    end
+
+    case ast do
+      nil ->
+        do_make_interpolated_string(tl(elements), element_ast) 
+      _ ->
+        Builder.binary_expression(:+, element_ast, do_make_interpolated_string(tl(elements), ast))
+    end
   end
 
 end

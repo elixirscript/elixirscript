@@ -22,7 +22,7 @@ defmodule ExToJS.Translator do
   end
 
   def do_translate(ast) when is_atom(ast) do
-    Primative.make_symbol(ast)
+    Primative.make_atom(ast)
   end
 
   def do_translate(ast) when is_list(ast) do

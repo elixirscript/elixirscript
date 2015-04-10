@@ -10,7 +10,7 @@ defmodule ExToJS.Translator.Struct.Test do
     end
 
     js_code = """
-      const __MODULE__ = Symbol('User');
+      const __MODULE__ = Atom('User');
 
       export function defstruct(name = 'john', age = 27){
         return {__struct__: __MODULE__, name: name, age: age};
@@ -26,7 +26,7 @@ defmodule ExToJS.Translator.Struct.Test do
     end
 
     js_code = """
-      const __MODULE__ = Symbol('User');
+      const __MODULE__ = Atom('User');
 
       export function defstruct(name, age){
         return {__struct__: __MODULE__, name: name, age: age};
@@ -103,7 +103,7 @@ defmodule ExToJS.Translator.Struct.Test do
     end
 
     js_code = """
-      const __MODULE__ = Symbol('MyAppError');
+      const __MODULE__ = Atom('MyAppError');
 
       export function defexception(message = 'This is a message'){
         return {__struct__: __MODULE__, message: message};
@@ -119,7 +119,7 @@ defmodule ExToJS.Translator.Struct.Test do
     end
 
     js_code = """
-      const __MODULE__ = Symbol('MyAppError');
+      const __MODULE__ = Atom('MyAppError');
 
       export function defexception(message = null){
         return {__struct__: __MODULE__, message: message};
@@ -147,7 +147,7 @@ defmodule ExToJS.Translator.Struct.Test do
     end
 
     js_code = """
-      throw new RuntimeError({__struct__: Symbol('RuntimeError'), message: 'did not get what was expected'});
+      throw new RuntimeError({__struct__: Atom('RuntimeError'), message: 'did not get what was expected'});
     """
 
     assert_translation(ex_ast, js_code)

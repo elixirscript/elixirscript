@@ -14,12 +14,12 @@ defmodule ExToJS.Translator.List.Test do
     assert_translation(ex_ast, js_code)
 
     ex_ast = quote do: [:a, :b, :c]
-    js_code = "[Symbol('a'), Symbol('b'), Symbol('c')]" 
+    js_code = "[Atom('a'), Atom('b'), Atom('c')]" 
     
     assert_translation(ex_ast, js_code)
 
     ex_ast = quote do: [:a, 2, "c"]
-    js_code = "[Symbol('a'), 2, 'c']"
+    js_code = "[Atom('a'), 2, 'c']"
 
     assert_translation(ex_ast, js_code)
   end

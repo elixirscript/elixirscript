@@ -1,13 +1,12 @@
-let List = {
-  __MODULE_: Symbol('List'),
+import Tuple from './tuple';
+import Atom from './atom';
 
-  to_tuple: function(list){
-    let tuple = {};
+let List = {};
 
-    for(let i = 0, i < list.length, i++){
-      tuple['_'+i] = list[i];
-    }
+List.__MODULE_ = Atom('List');
 
-    return tuple;
-  }
-}
+List.to_tuple = function(list){
+  return Tuple.apply(null, list);
+};
+
+export default List;

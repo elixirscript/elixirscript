@@ -30,8 +30,14 @@ defmodule ExToJS.Translator.Function do
       {name, _, _} ->
         name
       name ->
-        name
+        case to_string(name) do
+          "Elixir." <> actual_name ->
+            actual_name
+          _ ->
+            name
+        end
     end
+
 
     Builder.call_expression(
       Builder.member_expression(
