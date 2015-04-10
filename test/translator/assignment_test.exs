@@ -15,9 +15,11 @@ defmodule ExToJS.Translator.Assignment.Test do
 
     ex_ast = quote do: {a, b} = {1, 2}
     js_code = """
-      let _ref = Tuple(1, 2);
-      let a = _ref[0];
-      let b = _ref[1];
+      {
+        let _ref = Tuple(1, 2);
+        let [a, b] = _ref.value;      
+      }
+
     """
 
     assert_translation(ex_ast, js_code)

@@ -108,7 +108,7 @@ defmodule ExToJS.Translator.Module do
       switch_case = if index == last_function_index do
         function_call = Translator.translate(quote do: unquote(name).apply(nil, args))
         Builder.switch_case(
-          nil, 
+          Translator.translate(quote do: unquote(arity)), 
           [Builder.return_statement(function_call)]
         )
       else
@@ -122,12 +122,34 @@ defmodule ExToJS.Translator.Module do
       {switch_case, index + 1}
     end)
 
+    default_statement = Builder.switch_case(
+      nil, 
+      [
+        Builder.throw_statement(
+          Builder.new_expression(
+            Builder.identifier("RuntimeError"),
+            [
+              Builder.binary_expression(
+                :+,
+                Builder.literal("undefined function: #{name}/"),
+                Builder.member_expression(
+                  Builder.identifier(:args),
+                  Builder.identifier(:length)
+                )
+              )
+            ]
+          )
+        ),
+        Builder.break_statement(nil)
+      ]
+    )
+
     switch_statement = Builder.switch_statement(
       Builder.member_expression(
         Builder.identifier(:args),
         Builder.identifier(:length)
       ),
-      case_statements
+      case_statements ++ [default_statement]
     )
 
     master_function = Builder.function_declaration(

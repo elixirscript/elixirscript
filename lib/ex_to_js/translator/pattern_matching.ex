@@ -21,21 +21,19 @@ defmodule ExToJS.Translator.PatternMatching do
 
     declaration = Builder.variable_declaration([declarator], :let)
 
+    pattern_declarator = left
+    |> Enum.map(&ExToJS.Translator.translate(&1))
+    |> Builder.array_pattern()
+    |> Builder.variable_declarator(
+      Builder.member_expression(
+        ref,
+        Builder.identifier("value")
+      )
+    )
 
-    {elems, _} = Enum.map_reduce(left, 0, fn(x, index) ->
-        item = Builder.variable_declarator(
-          ExToJS.Translator.translate(x),
-          Builder.member_expression(
-            ref,
-            Builder.literal(index),
-            true
-          )
-        )
+    pattern_declaration = Builder.variable_declaration([pattern_declarator], :let)
 
-        { Builder.variable_declaration([item], :let), index + 1 }
-    end)
-
-    Builder.block_statement([declaration] ++ elems)
+    Builder.block_statement([declaration] ++ [pattern_declaration])
   end
 
   def bind(left, right) do

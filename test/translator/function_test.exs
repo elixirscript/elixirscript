@@ -111,10 +111,11 @@ defmodule ExToJS.Translator.Function.Test do
 
     js_code = """
       export function test1(alpha, beta){
-        let _ref = Tuple(1, 2);
-        let a = _ref[0];
-        let b = _ref[1];
-        return _ref;
+        {
+          let _ref = Tuple(1, 2);
+          let [a, b] = _ref.value;
+          return [a, b];
+        }
       }
     """
 
@@ -213,8 +214,11 @@ defmodule ExToJS.Translator.Function.Test do
             return example__2.apply(null, args.slice(0, 2 - 1));
           case 3:
             return example__3.apply(null, args.slice(0, 3 - 1));
-          default:
+          case 4:
             return example__4.apply(null, args);
+          default:
+            throw new RuntimeError('undefined function: example/' + args.length);
+            break;
         }
       }
     """  
@@ -259,8 +263,11 @@ defmodule ExToJS.Translator.Function.Test do
             return example__2.apply(null, args.slice(0, 2 - 1));
           case 3:
             return example__3.apply(null, args.slice(0, 3 - 1));
-          default:
+          case 4:
             return example__4.apply(null, args);
+          default:
+            throw new RuntimeError('undefined function: example/' + args.length);
+            break;
         }
       }
     """  
@@ -327,11 +334,12 @@ defmodule ExToJS.Translator.Function.Test do
         if(Kernel.is_number(one)){
 
         }else{
-          throw new ArgumentError();
+          throw new FunctionClauseError('no function clause matching in something/1');
         }
       }
     """
 
+    assert_translation(ex_ast, js_code)
   end
 
   @tag :skip
@@ -343,15 +351,79 @@ defmodule ExToJS.Translator.Function.Test do
 
 
     js_code = """
-      export function something(_ref){
-        if(_ref === 1){
+      export function something(_ref1){
+        if(_ref1 === 1){
 
         }else{
-          throw new ArgumentError();
+          throw new FunctionClauseError('no function clause matching in something/1');
         }
       }
     """
 
+    assert_translation(ex_ast, js_code)
+
+
+    ex_ast = quote do
+      def something(1) do
+      end
+
+      def something(2) do
+      end
+
+      def something(one) when is_binary(one) do
+      end
+
+      def something(one) do
+      end
+    end
+
+
+    js_code = """
+      export function something(_ref1){
+        if(_ref1 === 1){
+
+        }else if(_ref1 === 2){
+
+        }else if(Kernel.is_number(_ref1)){
+
+        }
+        else{
+
+        }
+      }
+    """
+    
+    assert_translation(ex_ast, js_code)
+
+
+    ex_ast = quote do
+      def something(%AStruct{} = a) do
+      end
+
+      def something(%BStruct{} = b) do
+      end
+
+      def something(%CStruct{key: value, key1: 2}) do
+      end
+    end
+
+
+    js_code = """
+      export function something(_ref1){
+        if(_ref1.__struct__ === Atom('AStruct')){
+          let a = _ref1;
+        }else if(_ref1.__struct__ === Atom('BStruct')){
+          let b = _ref1;
+        }else if(_ref1.__struct__ === Atom('CStruct') && _ref1.key2 === 2){
+          let value = ref1.value;
+        }
+        else{
+          throw new FunctionClauseError('no function clause matching in something/1');
+        }
+      }
+    """
+    
+    assert_translation(ex_ast, js_code)
   end
 
   
