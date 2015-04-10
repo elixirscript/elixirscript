@@ -96,7 +96,7 @@ TODO (high level list of todos)
 * [x] for (currently does not support keyword list matching or into yet)
 * [ ] try
 * [ ] bitstring
-* [ ] string interpolation
+* [x] string interpolation
 * [x] return from a function
 * [x] defexception and raising errors
 * [ ] types and specs

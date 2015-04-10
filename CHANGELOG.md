@@ -5,6 +5,7 @@
     * Pipe operator
     * Can now call properties and zero parameter functions correctly
     * case, cond, and if are now turned into if statements wrapped in function closures
+    * String interpolation
 
 # v0.1.0
 
