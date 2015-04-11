@@ -47,7 +47,7 @@ defmodule ExToJS.Translator do
     Data.make_object(properties)
   end
 
-  def do_translate({:<<>>, _, elements} = bitstring) do
+  def do_translate({:<<>>, _, elements}) do
     is_interpolated_string = Enum.any?(elements, fn(x) -> 
       case x do
         {:::, _, _} ->
@@ -167,7 +167,7 @@ defmodule ExToJS.Translator do
     Data.throw_error(message)
   end
 
-  def do_translate({:if, _, [test, blocks]} = ast) do
+  def do_translate({:if, _, [test, blocks]}) do
     Control.make_if(test, blocks)
   end
 
@@ -181,10 +181,10 @@ defmodule ExToJS.Translator do
 
   def do_translate({:|>, _, [left, right]}) do
     case right do
-      {fun, meta, params} ->
-        translate({fun, meta, [left] ++ params})
       {{:., meta, [module, fun]}, meta2, params} ->
-        translate({{:., meta, [module, fun]}, meta2, [left] ++ params})       
+        translate({{:., meta, [module, fun]}, meta2, [left] ++ params})  
+      {fun, meta, params} ->
+        translate({fun, meta, [left] ++ params})     
     end
   end
 
