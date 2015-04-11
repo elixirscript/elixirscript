@@ -170,7 +170,7 @@ defmodule ExToJS.Translator.Function.Test do
       Enum.map(list, fn(x) -> x * 2 end)
     end
 
-    js_code = "Enum.map(list, x => {(x * 2)})"
+    js_code = "Enum.map(list, function(x){ return x * 2; })"
 
     assert_translation(ex_ast, js_code)
   end

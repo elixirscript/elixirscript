@@ -58,16 +58,7 @@ defmodule ExToJS.Translator.Function do
   end
 
   defp do_make_function(name, params, body) do
-    body = cond do
-      body == nil ->
-        []
-      is_list(body) ->
-        Enum.map(body, &Translator.translate(&1))
-      true ->
-        [Translator.translate(body)]
-    end
-
-    body = return_last_expression(body)
+    body = prepare_function_body(body)
 
     Builder.function_declaration(
       Builder.identifier(name),
@@ -78,11 +69,24 @@ defmodule ExToJS.Translator.Function do
   end
 
   def make_anonymous_function(params, body) do
-    Builder.arrow_function_expression(
+    Builder.function_expression(
       Enum.map(params, &Translator.translate(&1)),
       [],
-      Builder.block_statement([Translator.translate(body)])
+      Builder.block_statement(prepare_function_body(body))
     )
+  end
+
+  defp prepare_function_body(body) do
+    body = cond do
+      body == nil ->
+        []
+      is_list(body) ->
+        Enum.map(body, &Translator.translate(&1))
+      true ->
+        [Translator.translate(body)]
+    end
+
+    return_last_expression(body)
   end
 
   def return_last_expression([]) do
