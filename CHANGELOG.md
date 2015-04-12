@@ -1,4 +1,4 @@
-# v0.2.0-dev
+# v0.2.0
   * Enhancements
     * Pipe operator
     * String interpolation
