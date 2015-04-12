@@ -1,3 +1,6 @@
+# v0.3.0-dev
+  * Enhancements 
+
 # v0.2.0
   * Enhancements
     * Pipe operator
