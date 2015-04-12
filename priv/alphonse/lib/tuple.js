@@ -14,16 +14,20 @@ let Tuple = function(...args){
 
 Tuple.prototype.__MODULE_ = Atom('Tuple');
 
-Tuple.toString = function(tuple){
+Tuple.prototype.toString = function(){
   var i, s = "";
-  for (i = 0; i < tuple.length; i++) {
+  for (i = 0; i < this.length; i++) {
     if (s !== "") {
       s += ", ";
     }
-    s += tuple[i].toString();
+    s += this[i].toString();
   }
 
   return "{" + s + "}";
+}
+
+Tuple.to_string = function(tuple){
+  return tuple.toString();
 }
 
 Tuple.delete_at = function(tuple, index){
