@@ -13,4 +13,14 @@ defmodule ExToJS.Translator.Kernel do
     )
   end
 
+  def make_range(first, last) do
+    Builder.call_expression(
+      Builder.identifier("Range"),
+      [
+        Translator.translate(first),
+        Translator.translate(last)
+      ]
+    )
+  end
+
 end

@@ -8,6 +8,7 @@
     * Now turning tuples into a Tuple javascript object
     * Fully implemented Tuple module
     * Fully implemented Atom module
+    * Fully implemented Range module
     * Can now call properties and zero parameter functions correctly
     * case, cond, and if are now turned into if statements wrapped in function closures
     * Anonymous functions are now turned into anonymous functions in javascript insteed of arrow functions

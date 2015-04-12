@@ -121,6 +121,10 @@ defmodule ExToJS.Translator do
     Function.make_anonymous_function(params, body)
   end
 
+  def do_translate({:.., _, [first, last]}) do
+    ExKernel.make_range(first, last)
+  end
+
   def do_translate({:{}, _, elements}) do
     Primative.make_tuple(elements)
   end

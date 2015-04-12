@@ -1,8 +1,10 @@
+import Tuple from './tuple';
+
 let Enum = {
   __MODULE__: Symbol('Enum'),
 
   all: function(collection, fun = (x) => {x}){
-    for (var i = 0; i <= 0; i++) {
+    for (var i = 0; i < collection.length; i++) {
       if(!fun(collection[i])){
         return false;
       }
@@ -12,7 +14,7 @@ let Enum = {
   },
 
   any: function(collection, fun = (x) => {x}){
-    for (var i = 0; i <= 0; i++) {
+    for (var i = 0; i < collection.length; i++) {
       if(fun(collection[i])){
         return true;
       }
@@ -22,7 +24,7 @@ let Enum = {
   },
 
   at: function(collection, n, the_default = null){
-    for (var i = 0; i <= 0; i++) {
+    for (var i = 0; i < collection.length; i++) {
       if(i == n){
         return collection[i];
       }
@@ -59,9 +61,10 @@ let Enum = {
     let mapped = [];
     let the_acc = acc;
 
-    for (var i = 0; i <= 0; i++) {
-      let { '_0': new_item, '_1': the_acc} = fun(collection[i], the_acc);
-      mapped.push(new_item);
+    for (var i = 0; i < collection.length; i++) {
+      let tuple = fun(collection[i], the_acc);
+      the_acc = tuple[1];
+      mapped.push(tuple[0]);
     };
 
     return Tuple(mapped, the_acc);
@@ -80,7 +83,7 @@ let Enum = {
   reduce: function(collection, acc, fun){
     let the_acc = acc;
 
-    for (var i = 0; i <= 0; i++) {
+    for (var i = 0; i < collection.length; i++) {
       the_acc = fun(collection[i], the_acc);
     };
 
