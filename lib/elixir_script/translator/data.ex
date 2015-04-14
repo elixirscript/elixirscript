@@ -1,7 +1,7 @@
-defmodule ExToJS.Translator.Data do
+defmodule ElixirScript.Translator.Data do
   require Logger
   alias ESTree.Builder
-  alias ExToJS.Translator
+  alias ElixirScript.Translator
 
 
   def make_object(properties) do

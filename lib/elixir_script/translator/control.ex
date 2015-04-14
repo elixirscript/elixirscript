@@ -1,8 +1,8 @@
-defmodule ExToJS.Translator.Control do
+defmodule ElixirScript.Translator.Control do
   require Logger
   alias ESTree.Builder
-  alias ExToJS.Translator
-  alias ExToJS.Translator.Function
+  alias ElixirScript.Translator
+  alias ElixirScript.Translator.Function
 
   def make_block(expressions) do
     Builder.block_statement(Enum.map(expressions, &Translator.translate(&1)))

@@ -1,6 +1,6 @@
-defmodule ExToJS.Translator.If.Test do
+defmodule ElixirScript.Translator.If.Test do
   use ExUnit.Case
-  import ExToJS.TestHelper
+  import ElixirScript.TestHelper
 
   test "translate if statement" do
     ex_ast = quote do

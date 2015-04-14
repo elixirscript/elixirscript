@@ -1,5 +1,5 @@
 {
-  "name": "ex_to_js",
+  "name": "elixir_script",
   "version": "1.0.0",
   "description": "Convert Elixir to JavaScript",
   "main": "index.js",

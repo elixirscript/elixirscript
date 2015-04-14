@@ -1,4 +1,4 @@
-defmodule ExToJS do
+defmodule ElixirScript do
 
   @doc """
   Parses Elixir code string into JavaScript AST
@@ -15,7 +15,7 @@ defmodule ExToJS do
   """
   @spec parse_quoted(Macro.t) :: {binary, ESTree.Node.t}
   def parse_quoted(quoted) do
-    js_ast = ExToJS.Translator.translate(quoted)
+    js_ast = ElixirScript.Translator.translate(quoted)
     {"output.json", js_ast}
   end
 
@@ -33,7 +33,7 @@ defmodule ExToJS do
     js_ast = path
     |> File.read!
     |> Code.string_to_quoted!
-    |> ExToJS.Translator.translate
+    |> ElixirScript.Translator.translate
 
     file_name = Path.basename(path, ".ex") <> ".json"
 
@@ -103,7 +103,7 @@ defmodule ExToJS do
 
   def operating_path() do
     try do
-      Mix.Project.build_path <> "/lib/ex_to_js/priv/alphonse"
+      Mix.Project.build_path <> "/lib/elixir_script/priv/alphonse"
     rescue
       UndefinedFunctionError ->
         split_path = Path.split(Application.app_dir(:ex2js))

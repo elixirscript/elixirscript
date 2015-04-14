@@ -1,6 +1,6 @@
-defmodule ExToJS.Translator.Import.Test do
+defmodule ElixirScript.Translator.Import.Test do
   use ExUnit.Case
-  import ExToJS.TestHelper
+  import ElixirScript.TestHelper
 
   test "translate import" do
     ex_ast = quote do

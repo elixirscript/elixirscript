@@ -1,6 +1,6 @@
-defmodule ExToJS.Translator.Struct.Test do
+defmodule ElixirScript.Translator.Struct.Test do
   use ExUnit.Case
-  import ExToJS.TestHelper
+  import ElixirScript.TestHelper
 
   test "translate struct" do
     ex_ast = quote do

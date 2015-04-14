@@ -1,6 +1,6 @@
-defmodule ExToJS.Translator.Nil.Test do
+defmodule ElixirScript.Translator.Nil.Test do
   use ExUnit.Case
-  import ExToJS.TestHelper
+  import ElixirScript.TestHelper
 
   test "translate nil" do
     ex_ast = quote do: nil

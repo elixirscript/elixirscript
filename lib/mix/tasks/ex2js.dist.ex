@@ -19,7 +19,7 @@ defmodule Mix.Tasks.Ex2js.Dist do
     Mix.Tasks.Escript.Build.run([])
 
     File.mkdir_p(folder_name <> "/bin")
-    File.cp!("priv/ex2js", "#{folder_name}/bin/ex2js")
+    File.cp!("ex2js", "#{folder_name}/bin/ex2js")
     File.cp!("priv/alphonse/alphonse.js", "#{folder_name}/alphonse.js")
     File.cp_r!("node_modules", "#{folder_name}/node_modules")
     File.cp!("package.json", "#{folder_name}/package.json")

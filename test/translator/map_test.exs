@@ -1,6 +1,6 @@
-defmodule ExToJS.Translator.Map.Test do
+defmodule ElixirScript.Translator.Map.Test do
   use ExUnit.Case
-  import ExToJS.TestHelper
+  import ElixirScript.TestHelper
 
   test "translate empty map" do
     ex_ast = quote do: %{}

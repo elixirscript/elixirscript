@@ -9,3 +9,4 @@ priv/alphonse/build
 priv/alphonse/dist
 /dist
 deploy.sh
+.DS_Store

@@ -1,4 +1,4 @@
-defmodule ExToJS.Translator.Primative do
+defmodule ElixirScript.Translator.Primative do
   require Logger
   alias ESTree.Builder
 
@@ -28,7 +28,7 @@ defmodule ExToJS.Translator.Primative do
   def make_tuple(elements) do
     Builder.call_expression(
       Builder.identifier("Tuple"), 
-      Enum.map(elements, fn(x) -> ExToJS.Translator.translate(x) end)
+      Enum.map(elements, fn(x) -> ElixirScript.Translator.translate(x) end)
     )
   end
 
@@ -38,7 +38,7 @@ defmodule ExToJS.Translator.Primative do
 
   defp make_array_expression(elements) do
     elements
-    |> Enum.map(&ExToJS.Translator.translate(&1))
+    |> Enum.map(&ElixirScript.Translator.translate(&1))
     |> Builder.array_expression
   end
 
@@ -53,9 +53,9 @@ defmodule ExToJS.Translator.Primative do
   def do_make_interpolated_string(elements, ast) do
     element_ast = case hd(elements) do
       elem when is_binary(elem) ->
-        ExToJS.Translator.translate(elem)
+        ElixirScript.Translator.translate(elem)
       {:::, _, data} ->
-        ExToJS.Translator.translate(hd(data))
+        ElixirScript.Translator.translate(hd(data))
     end
 
     case ast do

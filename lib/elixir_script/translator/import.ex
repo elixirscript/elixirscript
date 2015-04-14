@@ -1,4 +1,4 @@
-defmodule ExToJS.Translator.Import do
+defmodule ElixirScript.Translator.Import do
   require Logger
   alias ESTree.Builder
 

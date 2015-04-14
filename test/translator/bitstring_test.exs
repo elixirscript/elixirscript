@@ -1,6 +1,6 @@
-defmodule ExToJS.Translator.Bitstring.Test do
+defmodule ElixirScript.Translator.Bitstring.Test do
   use ExUnit.Case
-  import ExToJS.TestHelper
+  import ElixirScript.TestHelper
 
   test "translate bitstring" do
     ex_ast = quote do: <<1, 2, 3, 4, 5, 6>>

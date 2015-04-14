@@ -1,7 +1,7 @@
-defmodule ExToJS.Translator.Module do
+defmodule ElixirScript.Translator.Module do
   require Logger
   alias ESTree.Builder
-  alias ExToJS.Translator
+  alias ElixirScript.Translator
 
   def make_module(module_name_list, nil) do
     Builder.program([create__module__(module_name_list)])
@@ -174,7 +174,7 @@ defmodule ExToJS.Translator.Module do
 
     declarator = Builder.variable_declarator(
       Builder.identifier(:__MODULE__),
-      ExToJS.Translator.translate(module_name)
+      ElixirScript.Translator.translate(module_name)
     )
 
     Builder.variable_declaration([declarator], :const)
@@ -183,7 +183,7 @@ defmodule ExToJS.Translator.Module do
   def make_attribute(name, value) do
     declarator = Builder.variable_declarator(
       Builder.identifier(name),
-      ExToJS.Translator.translate(value)
+      ElixirScript.Translator.translate(value)
     )
 
     Builder.variable_declaration([declarator], :const)

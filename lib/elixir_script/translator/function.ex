@@ -1,7 +1,7 @@
-defmodule ExToJS.Translator.Function do
+defmodule ElixirScript.Translator.Function do
   require Logger
   alias ESTree.Builder
-  alias ExToJS.Translator
+  alias ElixirScript.Translator
 
   def make_function_or_property_call(module_name, function_name) do
       Builder.call_expression(

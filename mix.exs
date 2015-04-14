@@ -1,16 +1,18 @@
-defmodule ExToJS.Mixfile do
+defmodule ElixirScript.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :ex_to_js,
-     version: "0.3.0",
-     elixir: "~> 1.0",
-     compilers: Mix.compilers,
-     escript: escript_config,
-     deps: deps,
-     description: description,
-     package: package,
-     source_url: "https://github.com/bryanjos/ex_to_js"]
+    [
+      app: :elixir_script,
+      version: "0.2.1",
+      elixir: "~> 1.0",
+      compilers: Mix.compilers,
+      escript: escript_config,
+      deps: deps,
+      description: description,
+      package: package,
+      source_url: "https://github.com/bryanjos/ex_to_js"
+    ]
   end
 
   def application do
@@ -25,7 +27,7 @@ defmodule ExToJS.Mixfile do
   end
 
   defp escript_config do
-    [main_module: ExToJS.CLI, name: "ex2js", path: "priv/ex2js"]
+    [main_module: ElixirScript.CLI, name: "ex2js"]
   end
 
   defp description do

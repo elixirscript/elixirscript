@@ -1,4 +1,4 @@
-defmodule ExToJS.CLI do
+defmodule ElixirScript.CLI do
   def main(argv) do
     argv
     |> parse_args
@@ -31,19 +31,19 @@ defmodule ExToJS.CLI do
 
   def process({ input, output, :ast, :elixir }) do
     input 
-    |> ExToJS.parse_elixir 
-    |> ExToJS.write_to_files(output)
+    |> ElixirScript.parse_elixir 
+    |> ElixirScript.write_to_files(output)
   end
 
   def process({ input, output, :ast }) do
     input 
-    |> ExToJS.parse_elixir_files 
-    |> ExToJS.write_to_files(output)
+    |> ElixirScript.parse_elixir_files 
+    |> ElixirScript.write_to_files(output)
   end
 
   def process({ input, :ast }) do
     input 
-    |> ExToJS.parse_elixir_files 
+    |> ElixirScript.parse_elixir_files 
     |> Enum.map(fn({_path, ast})-> 
       ast
       |> Poison.encode!
@@ -53,7 +53,7 @@ defmodule ExToJS.CLI do
 
   def process({ input, :ast, :elixir }) do
     {_path, ast} = input 
-    |> ExToJS.parse_elixir
+    |> ElixirScript.parse_elixir
 
     ast
     |> Poison.encode!
@@ -62,23 +62,23 @@ defmodule ExToJS.CLI do
 
   def process({ input, :elixir }) do
     {_path, js} = input 
-    |> ExToJS.parse_elixir
-    |> ExToJS.javascript_ast_to_code 
+    |> ElixirScript.parse_elixir
+    |> ElixirScript.javascript_ast_to_code 
 
     IO.write(js)
   end
 
   def process({ input, output, :elixir }) do
     input 
-    |> ExToJS.parse_elixir
-    |> ExToJS.write_to_files(output)
+    |> ElixirScript.parse_elixir
+    |> ElixirScript.write_to_files(output)
   end
 
   def process({ input, output }) do
     input 
-    |> ExToJS.parse_elixir_files 
-    |> ExToJS.javascript_ast_to_code 
-    |> ExToJS.write_to_files(output)
+    |> ElixirScript.parse_elixir_files 
+    |> ElixirScript.javascript_ast_to_code 
+    |> ElixirScript.write_to_files(output)
   end
 
   def process({ :stdio }) do
@@ -88,7 +88,7 @@ defmodule ExToJS.CLI do
   end
 
   def process({ :lib }) do
-    path = ExToJS.operating_path
+    path = ElixirScript.operating_path
 
     file = File.read!("#{path}/elixir.js")
     IO.write(file)
@@ -96,8 +96,8 @@ defmodule ExToJS.CLI do
 
   def process({ input }) do
     input 
-    |> ExToJS.parse_elixir_files 
-    |> ExToJS.javascript_ast_to_code 
+    |> ElixirScript.parse_elixir_files 
+    |> ElixirScript.javascript_ast_to_code 
     |> Enum.map(fn({_path, code})-> 
       IO.write(code)
     end)

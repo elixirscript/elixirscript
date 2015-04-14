@@ -1,7 +1,7 @@
-defmodule ExToJS.Translator.Kernel do
+defmodule ElixirScript.Translator.Kernel do
   require Logger
   alias ESTree.Builder
-  alias ExToJS.Translator
+  alias ElixirScript.Translator
 
   def make_in(left, right) do
     Builder.call_expression(

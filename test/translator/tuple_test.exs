@@ -1,6 +1,6 @@
-defmodule ExToJS.Translator.Tuple.Test do
+defmodule ElixirScript.Translator.Tuple.Test do
   use ExUnit.Case
-  import ExToJS.TestHelper
+  import ElixirScript.TestHelper
 
   test "translate tuple" do
     ex_ast = quote do: {1, 2}

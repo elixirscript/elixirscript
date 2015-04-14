@@ -1,7 +1,7 @@
-defmodule ExToJS.Translator.Expression do
+defmodule ElixirScript.Translator.Expression do
   require Logger
   alias ESTree.Builder
-  alias ExToJS.Translator
+  alias ElixirScript.Translator
 
   def make_negative_number(number) do
     Builder.unary_expression(:-, true, Builder.literal(number))

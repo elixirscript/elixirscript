@@ -1,7 +1,7 @@
-defmodule ExToJS.Translator.PatternMatching do
+defmodule ElixirScript.Translator.PatternMatching do
   require Logger
   alias ESTree.Builder
-  alias ExToJS.Translator
+  alias ElixirScript.Translator
 
   def bind({_left1, _left2} = two_tuple, right) do
     do_tuple_bind(Tuple.to_list(two_tuple), right)
@@ -33,7 +33,7 @@ defmodule ExToJS.Translator.PatternMatching do
     declaration = Builder.variable_declaration([declarator], :let)
 
     pattern_declarator = left
-    |> Enum.map(&ExToJS.Translator.translate(&1))
+    |> Enum.map(&ElixirScript.Translator.translate(&1))
     |> Builder.array_pattern()
     |> Builder.variable_declarator(
       Builder.member_expression(

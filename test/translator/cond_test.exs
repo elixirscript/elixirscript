@@ -1,6 +1,6 @@
-defmodule ExToJS.Translator.Cond.Test do
+defmodule ElixirScript.Translator.Cond.Test do
   use ExUnit.Case
-  import ExToJS.TestHelper
+  import ElixirScript.TestHelper
 
   test "translate cond" do
     ex_ast = quote do

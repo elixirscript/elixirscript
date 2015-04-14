@@ -1,6 +1,6 @@
-defmodule ExToJS.Translator.Atom.Test do
+defmodule ElixirScript.Translator.Atom.Test do
   use ExUnit.Case
-  import ExToJS.TestHelper
+  import ElixirScript.TestHelper
 
   test "translate atom" do
     ex_ast = quote do: :atom

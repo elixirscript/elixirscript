@@ -5,19 +5,19 @@ ExUnit.start(exclude: exclude)
 
 ExUnit.start()
 
-defmodule ExToJS.TestHelper do
+defmodule ElixirScript.TestHelper do
   use ExUnit.Case
   
   def ex_ast_to_js(ex_ast) do
 
-    js_ast = ExToJS.Translator.translate(ex_ast)
-    result = ExToJS.javascript_ast_to_code(js_ast)
+    js_ast = ElixirScript.Translator.translate(ex_ast)
+    result = ElixirScript.javascript_ast_to_code(js_ast)
 
     case result do
       {:ok, js_code} ->
         js_code
       {:error, error} ->
-        raise ExToJS.ParseError, message: error
+        raise ElixirScript.ParseError, message: error
     end
   end
 

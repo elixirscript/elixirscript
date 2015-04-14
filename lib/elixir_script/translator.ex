@@ -1,14 +1,14 @@
-defmodule ExToJS.Translator do
+defmodule ElixirScript.Translator do
   require Logger
-  alias ExToJS.Translator.Primative
-  alias ExToJS.Translator.PatternMatching
-  alias ExToJS.Translator.Data
-  alias ExToJS.Translator.Function
-  alias ExToJS.Translator.Expression
-  alias ExToJS.Translator.Import
-  alias ExToJS.Translator.Control
-  alias ExToJS.Translator.Module
-  alias ExToJS.Translator.Kernel, as: ExKernel
+  alias ElixirScript.Translator.Primative
+  alias ElixirScript.Translator.PatternMatching
+  alias ElixirScript.Translator.Data
+  alias ElixirScript.Translator.Function
+  alias ElixirScript.Translator.Expression
+  alias ElixirScript.Translator.Import
+  alias ElixirScript.Translator.Control
+  alias ElixirScript.Translator.Module
+  alias ElixirScript.Translator.Kernel, as: ExKernel
 
   @doc """
   Translates Elixir AST to JavaScript AST
