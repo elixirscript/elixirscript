@@ -4,7 +4,7 @@ defmodule ElixirScript.Mixfile do
   def project do
     [
       app: :elixir_script,
-      version: "0.2.1",
+      version: "0.3.0",
       elixir: "~> 1.0",
       compilers: Mix.compilers,
       escript: escript_config,

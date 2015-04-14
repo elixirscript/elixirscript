@@ -1,3 +1,5 @@
+# v0.3.0-dev
+
 # v0.2.1
   * Enhancements
     * Renamed project to ElixirScript
