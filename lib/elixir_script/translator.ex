@@ -65,10 +65,6 @@ defmodule ElixirScript.Translator do
     end
   end
 
-  def do_translate({:in, _, [left, right]}) do
-    ExKernel.make_in(left, right)
-  end
-
   def do_translate({:., _, [module_name, function_name]}) do
     Function.make_function_or_property_call(module_name, function_name)
   end
@@ -145,8 +141,16 @@ defmodule ElixirScript.Translator do
     Expression.make_binary_expression(operator, left, right)
   end
 
+  def do_translate({:def, _, [{:when, _, [{name, _, params} | guards] }, [do: body]] }) do
+    Function.make_export_function(name, params, body, guards)
+  end
+
   def do_translate({:def, _, [{name, _, params}, [do: body]]}) do
     Function.make_export_function(name, params, body)
+  end
+
+  def do_translate({:defp, _, [{:when, _, [{name, _, params} | guards] }, [do: body]] }) do
+    Function.make_function(name, params, body, guards)
   end
 
   def do_translate({:defp, _, [{name, _, params}, [do: body]]}) do
@@ -195,6 +199,13 @@ defmodule ElixirScript.Translator do
   def do_translate({name, metadata, params}) when is_list(params) do
     case metadata[:import] do
       Kernel ->
+        name = case name do
+          :in ->
+            :_in
+          _ ->
+            name
+        end
+
         Function.make_function_call(:Kernel, name, params)
       _ ->
         Function.make_function_call(name, params)        

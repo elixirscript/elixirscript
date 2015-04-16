@@ -106,19 +106,9 @@ defmodule ElixirScript.Translator.Control do
 
     case hd(clause) do
       {:when, _, [the_clause, guard]} ->
-        #TODO: Make it so the clause check is the subject of the guard
-
-        {:in , _, [_left, right]} = guard
-
         translated_clause = Translator.translate(the_clause)
         ast = Builder.if_statement(
-          Builder.call_expression(
-            Builder.member_expression(
-              Translator.translate(right),
-              Builder.identifier(:includes)
-            ),
-            [Translator.translate(condition)]
-          ),
+          Translator.translate(guard),
           translated_body,
           nil
         )

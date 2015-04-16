@@ -48,17 +48,40 @@ defmodule ElixirScript.Translator.Function do
     )
   end
 
-  def make_function(name, params, body) do
-    do_make_function(name, params, body)
+  def make_function(name, params, body, guards \\ nil) do
+    do_make_function(name, params, body, guards)
   end
 
-  def make_export_function(name, params, body) do
-    do_make_function(name, params, body)
+  def make_export_function(name, params, body, guards \\ nil) do
+    do_make_function(name, params, body, guards)
     |> Builder.export_declaration
   end
 
-  defp do_make_function(name, params, body) do
+  defp handle_guards(guards) do
+    Enum.map(guards, &Translator.translate(&1))
+  end
+
+  defp do_make_function(name, params, body, guards \\ nil) do
     body = prepare_function_body(body)
+
+    body = if guards do
+      [Builder.if_statement(
+        hd(handle_guards(guards)),
+        Builder.block_statement(body),
+        Builder.block_statement([
+          Builder.throw_statement(
+            Builder.new_expression(
+              Builder.identifier("FunctionClauseError"),
+              [
+                Builder.literal("no function clause matching in #{name}/#{length(params)}")
+              ]
+            )
+          )
+        ])
+      )]
+    else
+      body
+    end
 
     Builder.function_declaration(
       Builder.identifier(name),

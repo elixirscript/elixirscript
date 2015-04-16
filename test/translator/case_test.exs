@@ -77,7 +77,7 @@ defmodule ElixirScript.Translator.Case.Test do
 
     js_code = """
       (function(){
-        if([1,2,3,4].includes(data)){
+        if(Kernel._in(number, [1, 2, 3, 4])){
           let value = 13;
           return value;
         }else{

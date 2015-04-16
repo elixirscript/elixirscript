@@ -321,7 +321,6 @@ defmodule ElixirScript.Translator.Function.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  @tag :skip
   test "guards" do
     ex_ast = quote do
       def something(one) when is_number(one) do
@@ -332,9 +331,64 @@ defmodule ElixirScript.Translator.Function.Test do
     js_code = """
       export function something(one){
         if(Kernel.is_number(one)){
-
+          return null;
         }else{
           throw new FunctionClauseError('no function clause matching in something/1');
+        }
+      }
+    """
+
+    assert_translation(ex_ast, js_code)
+
+
+    ex_ast = quote do
+      def something(one) when is_number(one) or is_atom(one) do
+      end
+    end
+
+
+    js_code = """
+      export function something(one){
+        if(Kernel.or(Kernel.is_number(one), Kernel.is_atom(one))){
+          return null;
+        }else{
+          throw new FunctionClauseError('no function clause matching in something/1');
+        }
+      }
+    """
+
+    assert_translation(ex_ast, js_code)
+
+    ex_ast = quote do
+      defp something(one) when is_number(one) or is_atom(one) do
+      end
+    end
+
+
+    js_code = """
+      function something(one){
+        if(Kernel.or(Kernel.is_number(one), Kernel.is_atom(one))){
+          return null;
+        }else{
+          throw new FunctionClauseError('no function clause matching in something/1');
+        }
+      }
+    """
+
+    assert_translation(ex_ast, js_code)
+
+    ex_ast = quote do
+      defp something(one, two) when one in [1, 2, 3] do
+      end
+    end
+
+
+    js_code = """
+      function something(one, two){
+        if(Kernel._in(one, [1,2,3])){
+          return null;
+        }else{
+          throw new FunctionClauseError('no function clause matching in something/2');
         }
       }
     """
