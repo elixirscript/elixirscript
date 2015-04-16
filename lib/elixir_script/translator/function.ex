@@ -67,18 +67,9 @@ defmodule ElixirScript.Translator.Function do
     body = if guards do
       [Builder.if_statement(
         hd(handle_guards(guards)),
-        Builder.block_statement(body),
-        Builder.block_statement([
-          Builder.throw_statement(
-            Builder.new_expression(
-              Builder.identifier("FunctionClauseError"),
-              [
-                Builder.literal("no function clause matching in #{name}/#{length(params)}")
-              ]
-            )
-          )
-        ])
-      )]
+        Builder.block_statement(body)
+      )
+    ]
     else
       body
     end

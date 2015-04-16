@@ -103,21 +103,25 @@ defmodule ElixirScript.Translator.Module do
 
     last_function_index = length(processed_functions) - 1
 
+    function_arity_groups = Enum.group_by(processed_functions, fn({_, _, arity}) -> arity end)
+
+    processed_functions = Enum.map(function_arity_groups, fn({arity, functions}) ->
+      process_same_function_arity(name, functions)
+    end)
+
     { case_statements, _} = Enum.map_reduce(processed_functions, 0, fn({_function, name, arity}, index) -> 
       
-      switch_case = if index == last_function_index do
-        function_call = Translator.translate(quote do: unquote(name).apply(nil, args))
-        Builder.switch_case(
-          Translator.translate(quote do: unquote(arity)), 
-          [Builder.return_statement(function_call)]
-        )
-      else
-        function_call = Translator.translate(quote do: unquote(name).apply(nil, args.slice(0, unquote(arity) - 1)))
-        Builder.switch_case(
-          Translator.translate(quote do: unquote(arity)),
-          [Builder.return_statement(function_call)]
-        )
+      function_call = case index == last_function_index do
+        true ->
+          Translator.translate(quote do: unquote(name).apply(nil, args))
+        _ ->
+          Translator.translate(quote do: unquote(name).apply(nil, args.slice(0, unquote(arity) - 1)))
       end
+
+      switch_case = Builder.switch_case(
+        Translator.translate(quote do: unquote(arity)), 
+        [Builder.return_statement(function_call)]
+      )
 
       {switch_case, index + 1}
     end)
@@ -165,6 +169,33 @@ defmodule ElixirScript.Translator.Module do
     end
 
     Enum.map(processed_functions, fn({function, _, _}) -> function end) ++ [master_function]
+  end
+
+  defp process_same_function_arity(function_name, functions) do
+    function_bodies = Enum.flat_map(functions, fn({ new_function, new_function_name, arity }) -> 
+      new_function.body.body
+    end)
+    { nf, new_function_name, arity } = hd(functions)
+
+    function_bodies = function_bodies ++ [
+      Builder.throw_statement(
+        Builder.new_expression(
+          Builder.identifier("FunctionClauseError"),
+          [
+            Builder.literal("no function clause matching in #{function_name}/#{arity}")
+          ]
+        )
+      )
+    ]
+
+    new_function = Builder.function_declaration(
+      nf.id,
+      nf.defaults,
+      nf.params,
+      Builder.block_statement(function_bodies)
+    )
+
+    { new_function, new_function_name, arity }
   end
 
   defp create__module__(module_name_list) do

@@ -198,26 +198,26 @@ defmodule ElixirScript.Translator.Function.Test do
     js_code = """
       const __MODULE__ = Atom('Example');
 
-      function example__0(){ return null; }
-      function example__1(oneArg){ return null; }
-      function example__2(oneArg, twoArg){ return null; }
-      function example__3(oneArg, twoArg, redArg){ return null; }
-      function example__4(oneArg, twoArg, redArg, blueArg){ return null; }
+      function example__0(){ return null; throw new FunctionClauseError('no function clause matching in example/0'); }
+      function example__1(){ return null; throw new FunctionClauseError('no function clause matching in example/1'); }
+      function example__2(){ return null; throw new FunctionClauseError('no function clause matching in example/2'); }
+      function example__3(){ return null; throw new FunctionClauseError('no function clause matching in example/3'); }
+      function example__4(){ return null; throw new FunctionClauseError('no function clause matching in example/4'); }
 
       function example(...args){
         switch(args.length){
           case 0:
-            return example__0.apply(null, args.slice(0, 0 - 1));
+           return example__0.apply(null,args.slice(0,0-1));
           case 1:
-            return example__1.apply(null, args.slice(0, 1 - 1));
+            return example__1.apply(null,args.slice(0,1-1));
           case 2:
-            return example__2.apply(null, args.slice(0, 2 - 1));
+            return example__2.apply(null,args.slice(0,2-1));
           case 3:
-            return example__3.apply(null, args.slice(0, 3 - 1));
+            return example__3.apply(null,args.slice(0,3-1));
           case 4:
-            return example__4.apply(null, args);
+            return example__4.apply(null,args);
           default:
-            throw new RuntimeError('undefined function: example/' + args.length);
+            throw new RuntimeError('undefined function:example/' + args.length);
             break;
         }
       }
@@ -247,26 +247,26 @@ defmodule ElixirScript.Translator.Function.Test do
     js_code = """
       const __MODULE__ = Atom('Example');
 
-      function example__0(){ return null; }
-      function example__1(oneArg){ return null; }
-      function example__2(oneArg, twoArg){ return null; }
-      function example__3(oneArg, twoArg, redArg){ return null; }
-      function example__4(oneArg, twoArg, redArg, blueArg){ return null; }
+      function example__0(){ return null; throw new FunctionClauseError('no function clause matching in example/0'); }
+      function example__1(){ return null; throw new FunctionClauseError('no function clause matching in example/1'); }
+      function example__2(){ return null; throw new FunctionClauseError('no function clause matching in example/2'); }
+      function example__3(){ return null; throw new FunctionClauseError('no function clause matching in example/3'); }
+      function example__4(){ return null; throw new FunctionClauseError('no function clause matching in example/4'); }
 
       export function example(...args){
         switch(args.length){
           case 0:
-            return example__0.apply(null, args.slice(0, 0 - 1));
+           return example__0.apply(null,args.slice(0,0-1));
           case 1:
-            return example__1.apply(null, args.slice(0, 1 - 1));
+            return example__1.apply(null,args.slice(0,1-1));
           case 2:
-            return example__2.apply(null, args.slice(0, 2 - 1));
+            return example__2.apply(null,args.slice(0,2-1));
           case 3:
-            return example__3.apply(null, args.slice(0, 3 - 1));
+            return example__3.apply(null,args.slice(0,3-1));
           case 4:
-            return example__4.apply(null, args);
+            return example__4.apply(null,args);
           default:
-            throw new RuntimeError('undefined function: example/' + args.length);
+            throw new RuntimeError('undefined function:example/' + args.length);
             break;
         }
       }
@@ -332,8 +332,6 @@ defmodule ElixirScript.Translator.Function.Test do
       export function something(one){
         if(Kernel.is_number(one)){
           return null;
-        }else{
-          throw new FunctionClauseError('no function clause matching in something/1');
         }
       }
     """
@@ -351,8 +349,6 @@ defmodule ElixirScript.Translator.Function.Test do
       export function something(one){
         if(Kernel.or(Kernel.is_number(one), Kernel.is_atom(one))){
           return null;
-        }else{
-          throw new FunctionClauseError('no function clause matching in something/1');
         }
       }
     """
@@ -369,8 +365,6 @@ defmodule ElixirScript.Translator.Function.Test do
       function something(one){
         if(Kernel.or(Kernel.is_number(one), Kernel.is_atom(one))){
           return null;
-        }else{
-          throw new FunctionClauseError('no function clause matching in something/1');
         }
       }
     """
@@ -387,13 +381,49 @@ defmodule ElixirScript.Translator.Function.Test do
       function something(one, two){
         if(Kernel._in(one, [1,2,3])){
           return null;
-        }else{
-          throw new FunctionClauseError('no function clause matching in something/2');
         }
       }
     """
 
     assert_translation(ex_ast, js_code)
+
+    ex_ast = quote do
+      defmodule Example do
+        def something(one) when one in [1, 2, 3] do
+        end
+
+        def something(one) when is_number(one) or is_atom(one) do
+        end
+      end
+    end 
+
+    js_code = """
+      const __MODULE__ = Atom('Example');
+
+      function something__1(){
+        if(Kernel._in(one,[1,2,3])){
+          return null;
+        }
+
+        if(Kernel.or(Kernel.is_number(one), Kernel.is_atom(one))){
+          return null;
+        }
+
+        throw new FunctionClauseError('no function clause matching in something/1');
+      }
+
+      export function something(...args){
+        switch(args.length){
+          case 1:
+            return something__1.apply(null,args.slice(0,1-1));
+          default:
+            throw new RuntimeError('undefined function:something/' + args.length);
+            break;
+        }
+      }
+    """  
+    assert_translation(ex_ast, js_code)
+
   end
 
   @tag :skip
@@ -408,9 +438,9 @@ defmodule ElixirScript.Translator.Function.Test do
       export function something(_ref1){
         if(_ref1 === 1){
 
-        }else{
-          throw new FunctionClauseError('no function clause matching in something/1');
         }
+
+        throw new FunctionClauseError('no function clause matching in something/1');
       }
     """
 
@@ -418,17 +448,20 @@ defmodule ElixirScript.Translator.Function.Test do
 
 
     ex_ast = quote do
-      def something(1) do
+      defmodule Example do
+        def something(1) do
+        end
+
+        def something(2) do
+        end
+
+        def something(one) when is_binary(one) do
+        end
+
+        def something(one) do
+        end        
       end
 
-      def something(2) do
-      end
-
-      def something(one) when is_binary(one) do
-      end
-
-      def something(one) do
-      end
     end
 
 
@@ -466,14 +499,17 @@ defmodule ElixirScript.Translator.Function.Test do
       export function something(_ref1){
         if(_ref1.__struct__ === Atom('AStruct')){
           let a = _ref1;
-        }else if(_ref1.__struct__ === Atom('BStruct')){
+        }
+
+        if(_ref1.__struct__ === Atom('BStruct')){
           let b = _ref1;
-        }else if(_ref1.__struct__ === Atom('CStruct') && _ref1.key2 === 2){
+        }
+
+        if(_ref1.__struct__ === Atom('CStruct') && _ref1.key2 === 2){
           let value = ref1.value;
         }
-        else{
-          throw new FunctionClauseError('no function clause matching in something/1');
-        }
+
+        throw new FunctionClauseError('no function clause matching in something/1');
       }
     """
     
