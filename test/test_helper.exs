@@ -31,6 +31,16 @@ defmodule ElixirScript.TestHelper do
 
 
   def assert_translation(ex_ast, js_code) do
-    assert ex_ast_to_js(ex_ast) |> strip_spaces == strip_spaces(js_code)
+    converted_code = ex_ast_to_js(ex_ast)
+
+    assert converted_code |> strip_spaces == strip_spaces(js_code), """
+    **Code Does Not Match **
+
+    ***Expected***
+    #{js_code}
+
+    ***Actual***
+    #{converted_code}
+    """
   end
 end
