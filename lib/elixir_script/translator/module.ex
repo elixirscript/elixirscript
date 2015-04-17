@@ -190,8 +190,8 @@ defmodule ElixirScript.Translator.Module do
 
     new_function = Builder.function_declaration(
       nf.id,
-      nf.defaults,
       nf.params,
+      nf.defaults,
       Builder.block_statement(function_bodies)
     )
 

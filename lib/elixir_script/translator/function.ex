@@ -62,7 +62,7 @@ defmodule ElixirScript.Translator.Function do
   end
 
   defp do_make_function(name, params, body, guards \\ nil) do
-    body = prepare_function_body(body)
+    { body, params } = prepare_function_body(body) |> handle_pattern_matching(name, params)
 
     body = if guards do
       [Builder.if_statement(
@@ -76,7 +76,7 @@ defmodule ElixirScript.Translator.Function do
 
     Builder.function_declaration(
       Builder.identifier(name),
-      Enum.map(params, &Translator.translate(&1)),
+      params,
       [],
       Builder.block_statement(body)
     )
@@ -88,6 +88,46 @@ defmodule ElixirScript.Translator.Function do
       [],
       Builder.block_statement(prepare_function_body(body))
     )
+  end
+
+  defp handle_pattern_matching(body, name, params) do
+    state = %{ index: 0, body: body }
+
+    { params, state } = Enum.map_reduce(params, state, fn(p, current_state) -> 
+      translated = Translator.translate(p)
+
+      case translated do
+        %ESTree.Identifier{} ->
+          { translated, current_state }
+        _ ->
+          index = current_state.index + 1
+          param = Builder.identifier("_ref#{index}")
+          body = [Builder.if_statement(
+            Builder.binary_expression(
+              :===,
+              param,
+              translated
+            ),
+            Builder.block_statement(body)
+          ),
+          Builder.throw_statement(
+            Builder.new_expression(
+              Builder.identifier("FunctionClauseError"),
+              [
+                Builder.literal("no function clause matching in #{name}/#{length(params)}")
+              ]
+            )
+          )
+        ]
+
+          { param, %{ current_state | index: index, body: body } }
+
+          #{ Builder.identifier("_ref#{index}"), translated } 
+
+      end
+    end)
+
+    { state.body, params }
   end
 
   defp prepare_function_body(body) do
