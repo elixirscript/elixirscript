@@ -11,7 +11,8 @@ defmodule ElixirScript.Mixfile do
       deps: deps,
       description: description,
       package: package,
-      source_url: "https://github.com/bryanjos/ex_to_js"
+      source_url: "https://github.com/bryanjos/ex_to_js",
+      test_coverage: [tool: ExCoveralls]
     ]
   end
 
@@ -22,7 +23,9 @@ defmodule ElixirScript.Mixfile do
   defp deps do
     [
       { :poison, "~> 1.3" },
-      { :estree, "~> 1.0.1"}
+      { :estree, "~> 1.0.1"},
+      { :excoveralls, only: [:dev, :test] },
+      { :shouldi, only: :test }
     ]
   end
 

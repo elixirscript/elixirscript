@@ -2,6 +2,7 @@ defmodule ElixirScript.Translator.Module do
   require Logger
   alias ESTree.Builder
   alias ElixirScript.Translator
+  alias ElixirScript.Translator.Utils
 
   def make_module(module_name_list, nil) do
     Builder.program([create__module__(module_name_list)])
@@ -136,10 +137,7 @@ defmodule ElixirScript.Translator.Module do
               Builder.binary_expression(
                 :+,
                 Builder.literal("undefined function: #{name}/"),
-                Builder.member_expression(
-                  Builder.identifier(:args),
-                  Builder.identifier(:length)
-                )
+                Utils.make_member_expression(:args, :length)
               )
             ]
           )
@@ -149,10 +147,7 @@ defmodule ElixirScript.Translator.Module do
     )
 
     switch_statement = Builder.switch_statement(
-      Builder.member_expression(
-        Builder.identifier(:args),
-        Builder.identifier(:length)
-      ),
+      Utils.make_member_expression(:args, :length),
       case_statements ++ [default_statement]
     )
 
@@ -178,13 +173,9 @@ defmodule ElixirScript.Translator.Module do
     { nf, new_function_name, arity } = hd(functions)
 
     function_bodies = function_bodies ++ [
-      Builder.throw_statement(
-        Builder.new_expression(
-          Builder.identifier("FunctionClauseError"),
-          [
-            Builder.literal("no function clause matching in #{function_name}/#{arity}")
-          ]
-        )
+      Utils.make_throw_statement(
+        "FunctionClauseError",
+        "no function clause matching in #{function_name}/#{arity}"
       )
     ]
 

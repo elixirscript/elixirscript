@@ -2,18 +2,15 @@ defmodule ElixirScript.Translator.Function do
   require Logger
   alias ESTree.Builder
   alias ElixirScript.Translator
+  alias ElixirScript.Translator.Utils
 
-  def make_function_or_property_call(module_name, function_name) do
-      Builder.call_expression(
-        Builder.member_expression(
-          Builder.identifier("ElixirScript"),
-          Builder.identifier("get_property_or_call_function")
-        ),        
-        [
-          Translator.translate(module_name),
-          Builder.literal(to_string(function_name))
+  def make_function_or_property_call(module_name, function_name) do        
+        params = [
+          module_name,
+          to_string(function_name)
         ]
-      )
+
+    Utils.make_call_expression("ElixirScript", "get_property_or_call_function", params)
   end
 
   def make_function_call(function_name, params) do
@@ -38,14 +35,7 @@ defmodule ElixirScript.Translator.Function do
         end
     end
 
-
-    Builder.call_expression(
-      Builder.member_expression(
-        Builder.identifier(the_name),
-        Builder.identifier(function_name)
-      ),
-      Enum.map(params, &Translator.translate(&1))
-    )
+    Utils.make_call_expression(the_name, function_name, params)
   end
 
   def make_function(name, params, body, guards \\ nil) do
@@ -57,16 +47,12 @@ defmodule ElixirScript.Translator.Function do
     |> Builder.export_declaration
   end
 
-  defp handle_guards(guards) do
-    Enum.map(guards, &Translator.translate(&1))
-  end
-
   defp do_make_function(name, params, body, guards \\ nil) do
     { body, params } = prepare_function_body(body) |> handle_pattern_matching(name, params)
 
     body = if guards do
       [Builder.if_statement(
-        hd(handle_guards(guards)),
+        guards |> Enum.map(&Translator.translate(&1)) |> hd,
         Builder.block_statement(body)
       )
     ]
@@ -110,20 +96,13 @@ defmodule ElixirScript.Translator.Function do
             ),
             Builder.block_statement(body)
           ),
-          Builder.throw_statement(
-            Builder.new_expression(
-              Builder.identifier("FunctionClauseError"),
-              [
-                Builder.literal("no function clause matching in #{name}/#{length(params)}")
-              ]
-            )
+          Utils.make_throw_statement(
+            "FunctionClauseError",
+            "no function clause matching in #{name}/#{length(params)}"
           )
         ]
 
-          { param, %{ current_state | index: index, body: body } }
-
-          #{ Builder.identifier("_ref#{index}"), translated } 
-
+        { param, %{ current_state | index: index, body: body } }
       end
     end)
 

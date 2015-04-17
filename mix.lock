@@ -2,9 +2,14 @@
   "erlang_js": {:git, "git://github.com/basho/erlang_js.git", "07467d899ab90a2b719ad19ab0be0048c1c8d873", [tag: "1.3.0"]},
   "erlang_v8": {:git, "git://github.com/strange/erlang-v8.git", "1ca13321d5746f3ec20f0c0bfd2bcc8293db71da", []},
   "estree": {:hex, :estree, "1.0.1"},
-  "exjsx": {:git, "git://github.com/talentdeficit/jsex.git", "d3572b488f10e3b83fadb1fc595fc87f84c35809", []},
+  "excoveralls": {:hex, :excoveralls, "0.3.9"},
+  "exjsx": {:hex, :exjsx, "3.1.0"},
+  "hackney": {:hex, :hackney, "1.1.0"},
+  "idna": {:hex, :idna, "1.0.2"},
   "inflex": {:hex, :inflex, "0.2.9"},
   "jsx": {:hex, :jsx, "2.4.0"},
   "poison": {:hex, :poison, "1.3.1"},
   "poolboy": {:git, "git://github.com/devinus/poolboy.git", "b724a71bce1f90d1cd9007427f9dc7b5ea35deb4", []},
-  "spider_monkey": {:git, "git://github.com/bryanjos/spider_monkey.git", "ac164f64455e0ee6e901f77aff77af21610ca29b", []}}
+  "shouldi": {:hex, :shouldi, "0.2.2"},
+  "spider_monkey": {:git, "git://github.com/bryanjos/spider_monkey.git", "ac164f64455e0ee6e901f77aff77af21610ca29b", []},
+  "ssl_verify_hostname": {:hex, :ssl_verify_hostname, "1.0.4"}}
