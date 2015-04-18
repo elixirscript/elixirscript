@@ -1,8 +1,8 @@
 defmodule ElixirScript.Translator.Function.Test do
-  use ExUnit.Case
+  use ShouldI
   import ElixirScript.TestHelper
 
-  test "translate functions" do
+  should "translate functions" do
     ex_ast = quote do
       def test1() do
       end
@@ -122,7 +122,7 @@ defmodule ElixirScript.Translator.Function.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  test "translate function calls" do
+  should "translate function calls" do
     ex_ast = quote do
       test1()
     end
@@ -165,7 +165,7 @@ defmodule ElixirScript.Translator.Function.Test do
   end
 
 
-  test "translate anonymous functions" do
+  should "translate anonymous functions" do
     ex_ast = quote do
       Enum.map(list, fn(x) -> x * 2 end)
     end
@@ -175,7 +175,7 @@ defmodule ElixirScript.Translator.Function.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  test "translate function arity" do
+  should "translate function arity" do
     ex_ast = quote do
       defmodule Example do
         defp example() do
@@ -292,7 +292,7 @@ defmodule ElixirScript.Translator.Function.Test do
 
   end
 
-  test "test |> operator" do
+  should "test |> operator" do
     ex_ast = quote do
       1 |> Taco.test
     end
@@ -311,7 +311,7 @@ defmodule ElixirScript.Translator.Function.Test do
   end
 
 
-  test "test Kernel function" do
+  should "test Kernel function" do
     ex_ast = quote do
       is_atom(:atom)
     end
@@ -321,7 +321,7 @@ defmodule ElixirScript.Translator.Function.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  test "guards" do
+  should "guards" do
     ex_ast = quote do
       def something(one) when is_number(one) do
       end
@@ -426,7 +426,7 @@ defmodule ElixirScript.Translator.Function.Test do
 
   end
 
-  test "pattern matching" do
+  should "pattern matching" do
     ex_ast = quote do
       def something(1) do
       end

@@ -1,8 +1,8 @@
 defmodule ElixirScript.Translator.Struct.Test do
-  use ExUnit.Case
+  use ShouldI
   import ElixirScript.TestHelper
 
-  test "translate struct" do
+  should "translate struct" do
     ex_ast = quote do
       defmodule User do
         defstruct name: "john", age: 27
@@ -37,7 +37,7 @@ defmodule ElixirScript.Translator.Struct.Test do
 
   end
 
-  test "translate struct creation" do
+  should "translate struct creation" do
     ex_ast = quote do
       user = %User{}
     end
@@ -59,7 +59,7 @@ defmodule ElixirScript.Translator.Struct.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  test "translate struct update" do
+  should "translate struct update" do
     ex_ast = quote do
       user = %{ map | key: value }
     end
@@ -95,7 +95,7 @@ defmodule ElixirScript.Translator.Struct.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  test "translate defexception" do
+  should "translate defexception" do
     ex_ast = quote do
       defmodule MyAppError do
         defexception message: "This is a message"
@@ -130,7 +130,7 @@ defmodule ElixirScript.Translator.Struct.Test do
 
   end
 
-  test "translate raise exception" do
+  should "translate raise exception" do
     ex_ast = quote do
       raise MyAppError, message: "did not get what was expected"
     end

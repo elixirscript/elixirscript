@@ -1,8 +1,8 @@
 defmodule ElixirScript.Translator.Case.Test do
-  use ExUnit.Case
+  use ShouldI
   import ElixirScript.TestHelper
 
-  test "translate case" do
+  should "translate case" do
     ex_ast = quote do
       case data do
         :ok -> value
@@ -65,7 +65,7 @@ defmodule ElixirScript.Translator.Case.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  test "translate case with guard" do
+  should "translate case with guard" do
     ex_ast = quote do
       case data do
         number when number in [1,2,3,4] -> 
@@ -89,7 +89,7 @@ defmodule ElixirScript.Translator.Case.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  test "translate case with multiple statements in body" do
+  should "translate case with multiple statements in body" do
     ex_ast = quote do
       case data do
         :ok -> 

@@ -1,8 +1,8 @@
 defmodule ElixirScript.Translator.List.Test do
-  use ExUnit.Case
+  use ShouldI
   import ElixirScript.TestHelper
 
-  test "translate list" do
+  should "translate list" do
     ex_ast = quote do: [1, 2, 3]
     js_code = "[1, 2, 3]"
 

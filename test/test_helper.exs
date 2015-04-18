@@ -1,12 +1,10 @@
 exclude =
   if Node.alive?, do: [], else: [skip: true]
 
-ExUnit.start(exclude: exclude)
-
-ExUnit.start()
+ExUnit.start(exclude: exclude, formatters: [ShouldI.CLIFormatter])
 
 defmodule ElixirScript.TestHelper do
-  use ExUnit.Case
+  use ShouldI
   
   def ex_ast_to_js(ex_ast) do
 

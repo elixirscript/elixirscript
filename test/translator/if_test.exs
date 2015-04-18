@@ -1,8 +1,8 @@
 defmodule ElixirScript.Translator.If.Test do
-  use ExUnit.Case
+  use ShouldI
   import ElixirScript.TestHelper
 
-  test "translate if statement" do
+  should "translate if statement" do
     ex_ast = quote do
       if 1 == 1 do
         a = 1

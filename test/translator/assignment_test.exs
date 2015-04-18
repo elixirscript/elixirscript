@@ -1,8 +1,8 @@
 defmodule ElixirScript.Translator.Assignment.Test do
-  use ExUnit.Case
+  use ShouldI
   import ElixirScript.TestHelper
 
-  test "translate assignment" do
+  should "translate assignment" do
     ex_ast = quote do: a = 1
     js_code = "let a = 1;"
 

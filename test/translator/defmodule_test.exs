@@ -1,8 +1,8 @@
 defmodule ElixirScript.Translator.Defmodule.Test do
-  use ExUnit.Case
+  use ShouldI
   import ElixirScript.TestHelper
 
-  test "translate defmodules" do
+  should "translate defmodules" do
     ex_ast = quote do
       defmodule Elephant do
       end

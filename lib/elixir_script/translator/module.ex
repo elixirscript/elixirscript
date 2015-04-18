@@ -28,19 +28,6 @@ defmodule ElixirScript.Translator.Module do
     #Collect all the functions so that we can process their arity
     {body, functions_dict} = Enum.map_reduce(body, HashDict.new(), fn(x, acc) ->
       case x do
-        %ESTree.ClassBody{} ->
-          # We built a ClassBody for structs.
-          # Here we will make it into a class declaration and then
-          # export it.
-          export_class = Builder.export_declaration(
-            Builder.class_declaration(
-              Builder.identifier(List.last(module_name_list)),
-              x
-            )
-          )
-
-          {export_class, acc}
-
         %ESTree.FunctionDeclaration{} ->
           add_function_to_dict(acc, x, :private)
         %ESTree.ExportDeclaration{ declaration: %ESTree.FunctionDeclaration{} = function } ->

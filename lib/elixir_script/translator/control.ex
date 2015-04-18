@@ -3,6 +3,7 @@ defmodule ElixirScript.Translator.Control do
   alias ESTree.Builder
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Function
+  alias ElixirScript.Translator.Utils
 
   def make_block(expressions) do
     Builder.block_statement(Enum.map(expressions, &Translator.translate(&1)))
@@ -12,8 +13,7 @@ defmodule ElixirScript.Translator.Control do
     test = Translator.translate(test)
 
     consequent = Builder.block_statement([Translator.translate(blocks[:do])])
-
-    consequent = Function.return_last_expression(consequent)
+    |> Function.return_last_expression
 
     alternate = if blocks[:else] != nil do
       Builder.block_statement([Translator.translate(blocks[:else])])
@@ -22,43 +22,19 @@ defmodule ElixirScript.Translator.Control do
       nil
     end
 
-    Builder.expression_statement(
-      Builder.call_expression(
-        Builder.function_expression([],[],
-          Builder.block_statement([
-            Builder.if_statement(test, consequent, alternate)
-          ])
-        ),
-        []
-      )
-    )
+    Builder.if_statement(test, consequent, alternate)
+    |> Utils.wrap_in_function_closure()
 
   end
 
   def make_cond(clauses) do
-    Builder.expression_statement(
-      Builder.call_expression(
-        Builder.function_expression([],[],
-          Builder.block_statement([
-            process_cond(clauses, nil)
-          ])
-        ),
-        []
-      )
-    )
+    process_cond(clauses, nil)
+    |> Utils.wrap_in_function_closure()
   end
 
   def make_case(condition, clauses) do
-    Builder.expression_statement(
-      Builder.call_expression(
-        Builder.function_expression([],[],
-          Builder.block_statement([
-            process_case(condition, clauses, nil)
-          ])
-        ),
-        []
-      )
-    )
+    process_case(condition, clauses, nil)
+    |> Utils.wrap_in_function_closure()
   end
 
   defp process_cond([], ast) do
@@ -167,9 +143,11 @@ defmodule ElixirScript.Translator.Control do
       [do: expression] ->
         push_last_expression(Translator.translate(expression))
       filter ->
-        test = Translator.translate(filter)
-        consequent = handle_generators(tl(generators))
-        Builder.if_statement(test, consequent, nil)
+        Builder.if_statement(
+          Translator.translate(filter), 
+          handle_generators(tl(generators)), 
+          nil
+        )
     end
 
   end

@@ -1,8 +1,8 @@
 defmodule ElixirScript.Translator.Cond.Test do
-  use ExUnit.Case
+  use ShouldI
   import ElixirScript.TestHelper
 
-  test "translate cond" do
+  should "translate cond" do
     ex_ast = quote do
       cond do
         1 + 1 == 1 ->

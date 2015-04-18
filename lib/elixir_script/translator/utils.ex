@@ -21,10 +21,29 @@ defmodule ElixirScript.Translator.Utils do
     )
   end
 
+
   def make_member_expression(module_name, function_name) do
     Builder.member_expression(
       Builder.identifier(module_name),
       Builder.identifier(function_name)
+    )
+  end
+
+  def wrap_in_function_closure(body) do
+    the_body = case body do
+      b when is_list(b) ->
+        b
+      _ ->
+        [body]
+    end
+
+    Builder.expression_statement(
+      Builder.call_expression(
+        Builder.function_expression([],[],
+          Builder.block_statement(the_body)
+        ),
+        []
+      )
     )
   end
 

@@ -43,7 +43,16 @@ defmodule ElixirScript.Translator.Primative do
   end
 
   def make_interpolated_string(elements) do
-    do_make_interpolated_string(Enum.reverse(elements), nil)
+    translated_elements = Enum.map(elements, fn(x)->
+      case x do
+        elem when is_binary(elem) ->
+          ElixirScript.Translator.translate(elem)
+        {:::, _, data} ->
+          ElixirScript.Translator.translate(hd(data))
+      end
+    end)
+
+    do_make_interpolated_string(tl(translated_elements), hd(translated_elements))   
   end
 
   def do_make_interpolated_string([], ast) do
@@ -51,19 +60,11 @@ defmodule ElixirScript.Translator.Primative do
   end
 
   def do_make_interpolated_string(elements, ast) do
-    element_ast = case hd(elements) do
-      elem when is_binary(elem) ->
-        ElixirScript.Translator.translate(elem)
-      {:::, _, data} ->
-        ElixirScript.Translator.translate(hd(data))
-    end
-
-    case ast do
-      nil ->
-        do_make_interpolated_string(tl(elements), element_ast) 
-      _ ->
-        Builder.binary_expression(:+, element_ast, do_make_interpolated_string(tl(elements), ast))
-    end
+    Builder.binary_expression(
+      :+,
+      ast,
+      do_make_interpolated_string(tl(elements), hd(elements))
+    )
   end
 
 end

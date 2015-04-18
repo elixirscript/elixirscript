@@ -1,8 +1,8 @@
 defmodule ElixirScript.Translator.For.Test do
-  use ExUnit.Case
+  use ShouldI
   import ElixirScript.TestHelper
 
-  test "translate simple for" do
+  should "translate simple for" do
     ex_ast = quote do
       for n <- [1, 2, 3, 4], do: n * 2
     end
@@ -21,7 +21,7 @@ defmodule ElixirScript.Translator.For.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  test "translate for with string" do
+  should "translate for with string" do
     ex_ast = quote do
       for n <- "Opera", do: n
     end
@@ -40,7 +40,7 @@ defmodule ElixirScript.Translator.For.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  test "translate multiple generator for" do
+  should "translate multiple generator for" do
     ex_ast = quote do
       for x <- [1, 2], y <- [2, 3], do: x*y
     end
@@ -60,7 +60,7 @@ defmodule ElixirScript.Translator.For.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  test "translate multiple generator for, assignment, and do block" do
+  should "translate multiple generator for, assignment, and do block" do
     ex_ast = quote do
       r = for x <- [1, 2], y <- [2, 3] do 
         x*y
@@ -82,7 +82,7 @@ defmodule ElixirScript.Translator.For.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  test "translate for with filter" do
+  should "translate for with filter" do
     ex_ast = quote do
       for n <- [1, 2, 3, 4, 5, 6], rem(n, 2) == 0, do: n
     end

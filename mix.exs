@@ -25,7 +25,7 @@ defmodule ElixirScript.Mixfile do
       { :poison, "~> 1.3" },
       { :estree, "~> 1.0.1"},
       { :excoveralls, only: [:dev, :test] },
-      { :shouldi, only: :test }
+      { :shouldi, github: "batate/shouldi", only: :test }
     ]
   end
 

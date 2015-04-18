@@ -1,8 +1,8 @@
 defmodule ElixirScript.Translator.Import.Test do
-  use ExUnit.Case
+  use ShouldI
   import ElixirScript.TestHelper
 
-  test "translate import" do
+  should "translate import" do
     ex_ast = quote do
       defmodule User do
         import Hello.World
@@ -33,7 +33,7 @@ defmodule ElixirScript.Translator.Import.Test do
 
   end
 
-  test "translate alias" do
+  should "translate alias" do
     ex_ast = quote do
       defmodule User do
         alias Hello.World
@@ -49,7 +49,7 @@ defmodule ElixirScript.Translator.Import.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  test "translate require" do
+  should "translate require" do
     ex_ast = quote do
       defmodule User do
         require World
