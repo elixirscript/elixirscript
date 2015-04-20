@@ -13,7 +13,7 @@ let Range = function(first, last){
   this.length = this.range.length;
 }
 
-Range.__MODULE_ = Atom('Range');
+Range.__MODULE_ = [Atom('Range')];
 
 Range.new = function (first, last) {
   return Range(first, last);

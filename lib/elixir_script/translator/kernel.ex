@@ -13,4 +13,8 @@ defmodule ElixirScript.Translator.Kernel do
     )
   end
 
+  def make_bound(variable) do
+    Utils.make_call_expression("Kernel", "bound", [variable])
+  end
+
 end

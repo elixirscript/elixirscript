@@ -47,4 +47,17 @@ defmodule ElixirScript.Translator.Utils do
     )
   end
 
+  def make_match(pattern, expr) do
+    Builder.call_expression(
+      Builder.member_expression(
+        Builder.identifier("Kernel"),
+        Builder.identifier("match")
+      ),
+      [
+        pattern,
+        expr
+      ]
+    )
+  end
+
 end

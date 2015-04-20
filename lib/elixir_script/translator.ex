@@ -47,6 +47,10 @@ defmodule ElixirScript.Translator do
     Data.make_object(properties)
   end
 
+  def do_translate({:^, _, [variable]}) do
+    Kernel.make_bound(variable)
+  end
+
   def do_translate({:<<>>, _, elements}) do
     is_interpolated_string = Enum.any?(elements, fn(x) -> 
       case x do
@@ -197,18 +201,24 @@ defmodule ElixirScript.Translator do
   end
 
   def do_translate({name, metadata, params}) when is_list(params) do
+    name = filter_name(name)
+
     case metadata[:import] do
       Kernel ->
-        name = case name do
-          :in ->
-            :_in
-          _ ->
-            name
-        end
-
         Function.make_function_call(:Kernel, name, params)
       _ ->
         Function.make_function_call(name, params)        
+    end
+  end
+
+  defp filter_name(name) do
+    name = case name do
+      :in ->
+        :_in
+      :match? ->
+        :match
+      _ ->
+        name
     end
   end
 

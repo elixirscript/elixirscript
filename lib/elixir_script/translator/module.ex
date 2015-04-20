@@ -157,7 +157,17 @@ defmodule ElixirScript.Translator.Module do
     function_bodies = Enum.flat_map(functions, fn({ new_function, new_function_name, arity }) -> 
       new_function.body.body
     end)
-    { nf, new_function_name, arity } = hd(functions)
+
+    { nf, new_function_name, arity } = Enum.find(functions, hd(functions), fn({ nf, _, _ }) ->
+      Enum.any?(nf.params, fn(x) -> 
+        case x do
+          %ESTree.Identifier{name: "_ref" <> position} ->
+            false
+          _ ->
+            true
+        end
+      end) == true
+    end)
 
     function_bodies = function_bodies ++ [
       Utils.make_throw_statement(
@@ -177,13 +187,9 @@ defmodule ElixirScript.Translator.Module do
   end
 
   defp create__module__(module_name_list) do
-    module_name = Enum.map(module_name_list, fn(x) -> to_string(x) end) 
-    |> Enum.join(".") 
-    |> String.to_atom
-
     declarator = Builder.variable_declarator(
       Builder.identifier(:__MODULE__),
-      ElixirScript.Translator.translate(module_name)
+      ElixirScript.Translator.translate(module_name_list)
     )
 
     Builder.variable_declaration([declarator], :const)

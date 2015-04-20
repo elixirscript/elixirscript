@@ -1,5 +1,7 @@
+import Atom from './atom';
+
 let ElixirScript = {
-  __MODULE__: Symbol('ElixirScript'),
+  __MODULE__: [Atom('ElixirScript')],
 
   get_property_or_call_function: function(item, property){
     if(item[property] instanceof Function){

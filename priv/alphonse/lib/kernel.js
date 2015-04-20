@@ -2,7 +2,7 @@ import Atom from './atom';
 import Tuple from './tuple';
 
 let Kernel = {
-  __MODULE_: Symbol('Kernel'),
+  __MODULE_: [Atom('Kernel')],
 
   tl: function(list){
     return list.slice(1);
@@ -34,11 +34,11 @@ let Kernel = {
 
   // from: http://stackoverflow.com/a/3885844
   is_float: function(x){
-    return n === +n && n !== (n|0);
+    return x === +x && x !== (x|0);
   },
 
   is_integer: function(x){
-    return n === +n && n === (n|0);
+    return x === +x && x === (x|0);
   },
 
   is_list: function(x){
@@ -50,7 +50,7 @@ let Kernel = {
   },
 
   is_number: function(x){
-    return is_integer(x) || is_float(x);
+    return Kernel.is_integer(x) || Kernel.is_float(x);
   },
 
   is_tuple: function(x){
@@ -123,6 +123,52 @@ let Kernel = {
 
   to_string: function(arg){
     return arg.toString();
+  },
+
+  match: function(pattern, expr){
+    if(pattern === undefined){
+      return true;
+    }
+
+    if(Kernel.is_nil(expr) || Kernel.is_number(expr) || Kernel.is_binary(expr) || Kernel.is_boolean(expr)){
+      return pattern === expr;
+    }else if(Kernel.is_atom(expr)){
+      return Kernel.is_atom(pattern) && pattern.value === expr.value;
+    }else if(Kernel.is_tuple(expr)){
+      return Kernel.is_tuple(pattern) && Kernel.match(pattern.value, expr.value);
+    }else if(Kernel.is_list(expr)){     
+      if(Kernel.length(pattern) != Kernel.length(expr)){
+        return false;
+      }
+
+      for (let i=0; i <= pattern.length; i++) {
+        if(Kernel.match(pattern[i], expr[i]) === false){
+          return false;
+        }
+      }
+
+      return true;
+    }else if(Kernel.is_map(expr)){
+      if(!Kernel.is_map(pattern)){
+        return false;
+      }
+
+      for(let key in pattern){
+        if(!(key in expr)){
+          return false;
+        }
+
+        if(Kernel.match(pattern[key], expr[key]) == false){
+          return false;
+        }
+      }
+
+      return true;
+    }
+  },
+
+  bound: function(variable){
+    return variable;
   }
 }
 

@@ -1,7 +1,8 @@
 import Tuple from './tuple';
+import Atom from './atom';
 
 let Enum = {
-  __MODULE__: Symbol('Enum'),
+  __MODULE__: [Atom('Enum')],
 
   all: function(collection, fun = (x) => {x}){
     for (var i = 0; i < collection.length; i++) {

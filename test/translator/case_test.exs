@@ -12,9 +12,9 @@ defmodule ElixirScript.Translator.Case.Test do
 
     js_code = """
       (function(){
-        if(data == Atom('ok')){
+        if(Kernel.match(data, Atom('ok'))){
           return value;
-        }else if(data == Atom('error')){
+        }else if(Kernel.match(data, Atom('error'))){
           return null;
         }
       }());
@@ -31,10 +31,10 @@ defmodule ElixirScript.Translator.Case.Test do
 
     js_code = """
       (function(){
-        if(data == false){
+        if(Kernel.match(data, false)){
           let value = 13;
           return value;
-        }else if(data == true){
+        }else if(Kernel.match(data, true)){
           return true;
         }
       }());    
@@ -53,7 +53,7 @@ defmodule ElixirScript.Translator.Case.Test do
 
     js_code = """
       (function(){
-        if(data == false){
+        if(Kernel.match(data, false)){
           let value = 13;
           return value;
         }else{
@@ -102,10 +102,10 @@ defmodule ElixirScript.Translator.Case.Test do
 
     js_code = """
       (function(){
-        if(data == Atom('ok')){
+        if(Kernel.match(data, Atom('ok'))){
           Logger.info('info');
           return Todo.add(data);
-        }else if(data == Atom('error')){
+        }else if(Kernel.match(data, Atom('error'))){
           return null;
         }
       }());

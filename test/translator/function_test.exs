@@ -196,7 +196,7 @@ defmodule ElixirScript.Translator.Function.Test do
     end 
 
     js_code = """
-      const __MODULE__ = Atom('Example');
+      const __MODULE__ = [Atom('Example')];
 
       function example__0(){ return null; throw new FunctionClauseError('no function clause matching in example/0'); }
       function example__1(oneArg){ return null; throw new FunctionClauseError('no function clause matching in example/1'); }
@@ -245,7 +245,7 @@ defmodule ElixirScript.Translator.Function.Test do
     end 
 
     js_code = """
-      const __MODULE__ = Atom('Example');
+      const __MODULE__ = [Atom('Example')];
 
       function example__0(){ return null; throw new FunctionClauseError('no function clause matching in example/0'); }
       function example__1(oneArg){ return null; throw new FunctionClauseError('no function clause matching in example/1'); }
@@ -282,7 +282,7 @@ defmodule ElixirScript.Translator.Function.Test do
     end 
 
     js_code = """
-      const __MODULE__ = Atom('Example');
+      const __MODULE__ = [Atom('Example')];
 
       export function example(oneArg){
         return null;
@@ -398,7 +398,7 @@ defmodule ElixirScript.Translator.Function.Test do
     end 
 
     js_code = """
-      const __MODULE__ = Atom('Example');
+      const __MODULE__ = [Atom('Example')];
 
       function something__1(one){
         if(Kernel._in(one,[1,2,3])){
@@ -426,7 +426,7 @@ defmodule ElixirScript.Translator.Function.Test do
 
   end
 
-  should "pattern matching" do
+  should "pattern match function with literal" do
     ex_ast = quote do
       def something(1) do
       end
@@ -434,18 +434,90 @@ defmodule ElixirScript.Translator.Function.Test do
 
 
     js_code = """
-      export function something(_ref1){
-        if(_ref1 === 1){
+      export function something(_ref0){
+        if(Kernel.match(1, arguments[0])){
           return null;
         }
-
-        throw new FunctionClauseError('no function clause matching in something/1');
       }
     """
 
     assert_translation(ex_ast, js_code)
+  end
+
+  should "pattern match function with struct" do
+    ex_ast = quote do
+      def something(%AStruct{}) do
+      end
+    end
 
 
+    js_code = """
+      export function something(_ref0){
+        if(Kernel.match({'__struct__': [Atom('AStruct')]}, arguments[0])){
+          return null;
+        }
+      }
+    """
+
+    assert_translation(ex_ast, js_code)
+  end
+
+  should "pattern match function with struct reference" do
+    ex_ast = quote do
+      def something(%AStruct{} = a) do
+      end
+    end
+
+
+    js_code = """
+      export function something(_ref0){
+        if(Kernel.match({'__struct__': [Atom('AStruct')]}, arguments[0])){
+          let a = arguments[0];
+          return null;
+        }
+      }
+    """
+
+    assert_translation(ex_ast, js_code)
+  end
+
+  should "pattern match function with struct decontructed" do
+    ex_ast = quote do
+      def something(%AStruct{key: value, key1: 2}) do
+      end
+    end
+
+
+    js_code = """
+      export function something(_ref0){
+        if(Kernel.match({'__struct__': [Atom('AStruct')], 'key': value, 'key1': 2}), arguments[0])){
+          let value = arguments[0].key;
+        }
+      }
+    """
+
+    assert_translation(ex_ast, js_code)
+  end
+
+  should "pattern match function with binary part" do
+    ex_ast = quote do
+      def something("Bearer " <> token) do
+      end
+    end
+
+
+    js_code = """
+      export function something(_ref0){
+        if(Kernel.match('Bearer ' + token, arguments[0])){
+          return null;
+        }
+      }
+    """
+
+    assert_translation(ex_ast, js_code)
+  end
+
+  should "combine pattern matched functions of same arity" do
     ex_ast = quote do
       defmodule Example do
         def something(1) do
@@ -465,19 +537,19 @@ defmodule ElixirScript.Translator.Function.Test do
 
 
     js_code = """
-      const __MODULE__ = Atom('Example');
+      const __MODULE__ = [Atom('Example')];
 
-      function something__1(_ref1){
-        if(_ref1 === 1){
-
+      function something__1(one){
+        if(Kernel.match(1, arguments[0])){
+          return null;
         }
 
-        if(_ref1 === 2){
-
+        if(Kernel.match(2, arguments[0])){
+          return null;
         }
 
-        if(Kernel.is_binary(_ref1)){
-
+        if(Kernel.is_binary(one)){
+          return null;
         }
 
         return null;
@@ -498,7 +570,9 @@ defmodule ElixirScript.Translator.Function.Test do
     
     assert_translation(ex_ast, js_code)
 
+  end
 
+  should "combine pattern matched struct functions" do
     ex_ast = quote do
       defmodule Example do
         def something(%AStruct{} = a) do
@@ -514,19 +588,19 @@ defmodule ElixirScript.Translator.Function.Test do
 
 
     js_code = """
-      const __MODULE__ = Atom('Example');
+      const __MODULE__ = [Atom('Example')];
 
-      function something__1(_ref1){
-        if(_ref1.__struct__ === Atom('AStruct')){
-          let a = _ref1;
+      function something__1(_ref0){
+        if(Kernel.match({'__struct__': [Atom('AStruct')]}, arguments[0])){
+          let a = arguments[0];
         }
 
-        if(_ref1.__struct__ === Atom('BStruct')){
-          let b = _ref1;
+        if(Kernel.match({'__struct__': [Atom('BStruct')]}, arguments[0])){
+          let b = arguments[0];
         }
 
-        if(_ref1.__struct__ === Atom('CStruct') && _ref1.key2 === 2){
-          let value = ref1.value;
+        if(Kernel.match({'__struct__': [Atom('CStruct')], key: undefined, key1: 2}, arguments[0])){
+          let value = arguments[0].key;
         }
 
         throw new FunctionClauseError('no function clause matching in something/1');

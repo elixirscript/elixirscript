@@ -15,11 +15,12 @@ defmodule ElixirScript.Translator.Control do
     consequent = Builder.block_statement([Translator.translate(blocks[:do])])
     |> Function.return_last_expression
 
-    alternate = if blocks[:else] != nil do
-      Builder.block_statement([Translator.translate(blocks[:else])])
-      |> Function.return_last_expression
-    else
-      nil
+    alternate = case blocks[:else] do
+      nil ->
+        nil
+      _ ->
+        Builder.block_statement([Translator.translate(blocks[:else])])
+        |> Function.return_last_expression        
     end
 
     Builder.if_statement(test, consequent, alternate)
@@ -96,15 +97,10 @@ defmodule ElixirScript.Translator.Control do
         if translated_clause.type == "Identifier" && translated_clause.name == :_ do
           translated_body
         else
-          ast = Builder.if_statement(
-            Builder.binary_expression(
-              :==,
-              Translator.translate(condition),
-              translated_clause
-            ),
-            translated_body,
-            nil
-          )
+            ast = Builder.if_statement(
+              Utils.make_match(Translator.translate(condition), translated_clause),
+              translated_body
+            )
 
           %ESTree.IfStatement{ ast |  alternate: process_case(condition, tl(clauses), nil) }
         end 
