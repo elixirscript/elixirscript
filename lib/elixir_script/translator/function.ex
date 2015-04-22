@@ -137,6 +137,152 @@ defmodule ElixirScript.Translator.Function do
           ]     
 
           { param, %{ current_state | index: current_state.index + 1, body: body } }
+        { :tuple, elements } ->
+          param = Builder.identifier("_ref#{current_state.index}")
+
+
+          { declarations, _ } = Enum.map_reduce(elements, 0, fn({variable, _, _}, index) ->
+            declarator = Builder.variable_declarator(
+              Builder.identifier(variable),
+              Builder.member_expression(
+                Builder.member_expression(
+                  Builder.identifier("arguments"),
+                  Builder.literal(current_state.index),
+                  true
+                ),
+                Builder.literal(index),
+                true
+              )
+
+            )
+
+            { Builder.variable_declaration([declarator], :let), index + 1 }
+          end)
+
+          body = [
+            Builder.if_statement(
+              Builder.call_expression(
+                Builder.member_expression(
+                  Builder.identifier("Kernel"),
+                  Builder.identifier("is_tuple")
+                ),
+                [
+                  Builder.member_expression(
+                    Builder.identifier("arguments"),
+                    Builder.literal(current_state.index),
+                    true
+                  )
+                ]
+              ),
+              Builder.block_statement(declarations ++ current_state.body)
+            )
+          ]  
+
+          { param, %{ current_state | index: current_state.index + 1, body: body } }
+        { :list, elements } when is_list(elements) ->
+          param = Builder.identifier("_ref#{current_state.index}")
+
+
+          { declarations, _ } = Enum.map_reduce(elements, 0, fn(variable, index) ->
+            declarator = Builder.variable_declarator(
+              Builder.identifier(variable),
+              Builder.member_expression(
+                Builder.member_expression(
+                  Builder.identifier("arguments"),
+                  Builder.literal(current_state.index),
+                  true
+                ),
+                Builder.literal(index),
+                true
+              )
+
+            )
+
+            { Builder.variable_declaration([declarator], :let), index + 1 }
+          end)
+
+          body = [
+            Builder.if_statement(
+              Builder.call_expression(
+                Builder.member_expression(
+                  Builder.identifier("Kernel"),
+                  Builder.identifier("is_list")
+                ),
+                [
+                  Builder.member_expression(
+                    Builder.identifier("arguments"),
+                    Builder.literal(current_state.index),
+                    true
+                  )
+                ]
+              ),
+              Builder.block_statement(declarations ++ current_state.body)
+            )
+          ]  
+
+          { param, %{ current_state | index: current_state.index + 1, body: body } }
+        { :list, head, tail } ->
+          param = Builder.identifier("_ref#{current_state.index}")
+
+
+          head_declarator = Builder.variable_declarator(
+            Builder.identifier(head),
+            Builder.call_expression(
+              Builder.member_expression(
+                Builder.identifier("Kernel"),
+                Builder.identifier("hd")
+              ),
+              [
+                Builder.member_expression(
+                  Builder.identifier("arguments"),
+                  Builder.literal(current_state.index),
+                  true
+                )
+              ]
+            )
+          )
+
+          head_declaration = Builder.variable_declaration([head_declarator], :let)
+
+          tail_declarator = Builder.variable_declarator(
+            Builder.identifier(tail),
+            Builder.call_expression(
+              Builder.member_expression(
+                Builder.identifier("Kernel"),
+                Builder.identifier("tl")
+              ),
+              [
+                Builder.member_expression(
+                  Builder.identifier("arguments"),
+                  Builder.literal(current_state.index),
+                  true
+                )
+              ]
+            )
+          )
+
+          tail_declaration = Builder.variable_declaration([tail_declarator], :let)
+
+          body = [
+            Builder.if_statement(
+              Builder.call_expression(
+                Builder.member_expression(
+                  Builder.identifier("Kernel"),
+                  Builder.identifier("is_list")
+                ),
+                [
+                  Builder.member_expression(
+                    Builder.identifier("arguments"),
+                    Builder.literal(current_state.index),
+                    true
+                  )
+                ]
+              ),
+              Builder.block_statement([head_declaration, tail_declaration] ++ current_state.body)
+            )
+          ]  
+
+          { param, %{ current_state | index: current_state.index + 1, body: body } }
         [the_param | variables] ->
           param = Builder.identifier("_ref#{current_state.index}")
 
@@ -210,8 +356,22 @@ defmodule ElixirScript.Translator.Function do
   end
 
   defp process_param(p) do
-
     case p do
+      {one, two} ->
+        process_param({:{}, [], [one, two]})
+      {:{}, _, elements} ->
+        {:tuple, elements}
+      [{:|, _, [head, tail]}] ->
+        {head, _, _} = head
+        {tail, _, _} = tail
+
+        {:list, head, tail}
+      items when is_list(items) ->
+        names = Enum.map(items, fn({name, _, _}) ->
+          name
+        end)
+
+        {:list, names}
       {:%, _, [{:__aliases__, _, name}, {:%{}, _, properties}]} ->
         variables = Enum.filter_map(properties, fn({key, value}) -> 
           case Translator.translate(value) do
@@ -240,10 +400,10 @@ defmodule ElixirScript.Translator.Function do
         result = process_param(value)
 
         if is_list(result) do
-          result ++ [variable_name]
+          result 
         else
-          [result] ++ [variable_name]
-        end
+          [result]
+        end ++ [variable_name]
       {:<>, _, [left, right]} ->
         { :concatenation, left, right }
       _ ->
