@@ -6,7 +6,7 @@ defmodule Mix.Tasks.Ex2js.Dist do
    @folder_name "#{@dist_folder}/ex2js"
    @archive_file_name "#{@dist_folder}/ex2js.tar.gz"
 
-  def run(args) do
+  def run(_args) do
     Mix.Task.run "app.start"
     Mix.Tasks.Escript.Build.run([])
 

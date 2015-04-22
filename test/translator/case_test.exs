@@ -12,9 +12,9 @@ defmodule ElixirScript.Translator.Case.Test do
 
     js_code = """
       (function(){
-        if(Kernel.match(data, Atom('ok'))){
+        if(Kernel.match(Atom('ok'), data)){
           return value;
-        }else if(Kernel.match(data, Atom('error'))){
+        }else if(Kernel.match(Atom('error'), data)){
           return null;
         }
       }());
@@ -31,10 +31,10 @@ defmodule ElixirScript.Translator.Case.Test do
 
     js_code = """
       (function(){
-        if(Kernel.match(data, false)){
+        if(Kernel.match(false, data)){
           let value = 13;
           return value;
-        }else if(Kernel.match(data, true)){
+        }else if(Kernel.match(true, data)){
           return true;
         }
       }());    
@@ -53,7 +53,7 @@ defmodule ElixirScript.Translator.Case.Test do
 
     js_code = """
       (function(){
-        if(Kernel.match(data, false)){
+        if(Kernel.match(false, data)){
           let value = 13;
           return value;
         }else{
@@ -102,10 +102,35 @@ defmodule ElixirScript.Translator.Case.Test do
 
     js_code = """
       (function(){
-        if(Kernel.match(data, Atom('ok'))){
+        if(Kernel.match(Atom('ok'), data)){
           Logger.info('info');
           return Todo.add(data);
-        }else if(Kernel.match(data, Atom('error'))){
+        }else if(Kernel.match(Atom('error'), data)){
+          return null;
+        }
+      }());
+    """
+
+    assert_translation(ex_ast, js_code)
+  end
+
+  should "translate case with destructing" do
+    ex_ast = quote do
+      case data do
+        { one, two } -> 
+          Logger.info(one)
+        :error -> 
+          nil
+      end
+    end
+
+    js_code = """
+      (function(){
+        if(Kernel.is_tuple(data)){
+          let one = data[0];
+          let two = data[1];
+          return Logger.info(one);
+        }else if(Kernel.match(Atom('error'), data)){
           return null;
         }
       }());

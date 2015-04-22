@@ -48,8 +48,12 @@ defmodule ElixirScript.Translator.Function do
     |> Builder.export_declaration
   end
 
-  defp do_make_function(name, params, body, guards \\ nil) do
-    { body, params } = prepare_function_body(body) |> PatternMatching.handle_pattern_matching(params)
+  def pattern_match_identifier(index) do
+    Utils.make_array_accessor_call("arguments", index)
+  end
+
+  defp do_make_function(name, params, body, guards) do
+    { body, params } = prepare_function_body(body) |> PatternMatching.build_pattern_matched_body(params, &pattern_match_identifier/1)
 
     body = if guards do
       [Builder.if_statement(

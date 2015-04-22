@@ -72,7 +72,7 @@ defmodule ElixirScript.Translator.PatternMatching do
   end
 
   def process_match({:%, _, [{:__aliases__, _, name}, {:%{}, _, properties}]}) do
-    variables = Enum.filter_map(properties, fn({key, value}) -> 
+    variables = Enum.filter_map(properties, fn({_key, value}) -> 
       case Translator.translate(value) do
         %ESTree.Identifier{} ->
           true
@@ -111,16 +111,20 @@ defmodule ElixirScript.Translator.PatternMatching do
     { :concatenation, left, right }
   end
 
-  def process_match(item) do
-    Translator.translate(item)
+  def process_match({identifier, _, _}) do
+    {:identifier, identifier}
   end
 
-  def handle_pattern_matching(body, params) do
+  def process_match(item) do
+    {:other, item }
+  end
+
+  def build_pattern_matched_body(body, params, identifier_fn) do
     state = %{ index: 0, body: body }
 
     { params, state } = Enum.map_reduce(params, state, fn(p, current_state) ->
 
-      { param, new_body } = do_handle_pattern_matching(process_match(p), current_state.body, current_state.index)
+      { param, new_body } = do_build_pattern_matched_body(process_match(p), current_state.body, current_state.index, identifier_fn)
       { param, %{ current_state | index: current_state.index + 1, body: new_body } }
 
     end)
@@ -128,11 +132,11 @@ defmodule ElixirScript.Translator.PatternMatching do
     { state.body, params }
   end
 
-  defp do_handle_pattern_matching(%ESTree.Identifier{} = param, body, index) do
-    { param, body }
+  defp do_build_pattern_matched_body({:identifier, param}, body, _index, _identifier_fn) do
+    { Builder.identifier(param), body }
   end
 
-  defp do_handle_pattern_matching({ :concatenation, left, right }, body, index) do
+  defp do_build_pattern_matched_body({ :concatenation, left, right }, body, index, identifier_fn) do
     param = Builder.identifier("_ref#{index}")
     {ident, _, _ } = right 
 
@@ -140,11 +144,7 @@ defmodule ElixirScript.Translator.PatternMatching do
       Builder.identifier(ident),
       Builder.call_expression(
         Builder.member_expression(
-          Builder.member_expression(
-            Builder.identifier("arguments"),
-            Builder.literal(index),
-            true                  
-          ),
+                    identifier_fn.(index),
           Builder.identifier(:slice)
         ),
         [
@@ -167,11 +167,7 @@ defmodule ElixirScript.Translator.PatternMatching do
       Builder.if_statement(
         Builder.call_expression(
           Builder.member_expression(
-            Builder.member_expression(
-              Builder.identifier("arguments"),
-              Builder.literal(index),
-              true
-            ),
+            Utils.make_array_accessor_call("arguments", index),
             Builder.identifier(:startsWith) 
           ),
           [
@@ -185,18 +181,14 @@ defmodule ElixirScript.Translator.PatternMatching do
     { param, body }
   end
 
-  defp do_handle_pattern_matching({ :tuple, elements }, body, index) do
+  defp do_build_pattern_matched_body({ :tuple, elements }, body, index, identifier_fn) do
     param = Builder.identifier("_ref#{index}")
 
     { declarations, _ } = Enum.map_reduce(elements, 0, fn({variable, _, _}, arguments_index) ->
       declarator = Builder.variable_declarator(
         Builder.identifier(variable),
         Builder.member_expression(
-          Builder.member_expression(
-            Builder.identifier("arguments"),
-            Builder.literal(index),
-            true
-          ),
+                    identifier_fn.(index),
           Builder.literal(arguments_index),
           true
         )
@@ -209,16 +201,9 @@ defmodule ElixirScript.Translator.PatternMatching do
     body = [
       Builder.if_statement(
         Builder.call_expression(
-          Builder.member_expression(
-            Builder.identifier("Kernel"),
-            Builder.identifier("is_tuple")
-          ),
+          Utils.make_member_expression("Kernel", "is_tuple"),
           [
-            Builder.member_expression(
-              Builder.identifier("arguments"),
-              Builder.literal(index),
-              true
-            )
+                      identifier_fn.(index),
           ]
         ),
         Builder.block_statement(declarations ++ body)
@@ -228,18 +213,14 @@ defmodule ElixirScript.Translator.PatternMatching do
     { param, body }
   end
 
-  defp do_handle_pattern_matching({ :list, elements }, body, index) when is_list(elements) do
+  defp do_build_pattern_matched_body({ :list, elements }, body, index, identifier_fn) when is_list(elements) do
     param = Builder.identifier("_ref#{index}")
 
     { declarations, _ } = Enum.map_reduce(elements, 0, fn(variable, arguments_index) ->
       declarator = Builder.variable_declarator(
         Builder.identifier(variable),
         Builder.member_expression(
-          Builder.member_expression(
-            Builder.identifier("arguments"),
-            Builder.literal(index),
-            true
-          ),
+                    identifier_fn.(index),
           Builder.literal(arguments_index),
           true
         )
@@ -252,16 +233,9 @@ defmodule ElixirScript.Translator.PatternMatching do
     body = [
       Builder.if_statement(
         Builder.call_expression(
-          Builder.member_expression(
-            Builder.identifier("Kernel"),
-            Builder.identifier("is_list")
-          ),
+          Utils.make_member_expression("Kernel", "is_list"),
           [
-            Builder.member_expression(
-              Builder.identifier("arguments"),
-              Builder.literal(index),
-              true
-            )
+                      identifier_fn.(index)
           ]
         ),
         Builder.block_statement(declarations ++ body)
@@ -273,23 +247,16 @@ defmodule ElixirScript.Translator.PatternMatching do
   end
 
 
-  defp do_handle_pattern_matching({ :list, head, tail } , body, index) do
+  defp do_build_pattern_matched_body({ :list, head, tail } , body, index, identifier_fn) do
 
     param = Builder.identifier("_ref#{index}")
 
     head_declarator = Builder.variable_declarator(
       Builder.identifier(head),
       Builder.call_expression(
-        Builder.member_expression(
-          Builder.identifier("Kernel"),
-          Builder.identifier("hd")
-        ),
+        Utils.make_member_expression("Kernel", "hd"),
         [
-          Builder.member_expression(
-            Builder.identifier("arguments"),
-            Builder.literal(index),
-            true
-          )
+                    identifier_fn.(index)
         ]
       )
     )
@@ -299,16 +266,9 @@ defmodule ElixirScript.Translator.PatternMatching do
     tail_declarator = Builder.variable_declarator(
       Builder.identifier(tail),
       Builder.call_expression(
-        Builder.member_expression(
-          Builder.identifier("Kernel"),
-          Builder.identifier("tl")
-        ),
+        Utils.make_member_expression("Kernel", "tl"),
         [
-          Builder.member_expression(
-            Builder.identifier("arguments"),
-            Builder.literal(index),
-            true
-          )
+                    identifier_fn.(index)
         ]
       )
     )
@@ -318,16 +278,9 @@ defmodule ElixirScript.Translator.PatternMatching do
     body = [
       Builder.if_statement(
         Builder.call_expression(
-          Builder.member_expression(
-            Builder.identifier("Kernel"),
-            Builder.identifier("is_list")
-          ),
+          Utils.make_member_expression("Kernel", "is_list"),
           [
-            Builder.member_expression(
-              Builder.identifier("arguments"),
-              Builder.literal(index),
-              true
-            )
+                      identifier_fn.(index)
           ]
         ),
         Builder.block_statement([head_declaration, tail_declaration] ++ body)
@@ -337,7 +290,7 @@ defmodule ElixirScript.Translator.PatternMatching do
     { param, body }
   end
 
-  defp do_handle_pattern_matching([the_param | variables], body, index) do
+  defp do_build_pattern_matched_body([the_param | variables], body, index, identifier_fn) do
     param = Builder.identifier("_ref#{index}")
 
     variables = Enum.map(variables, fn(x) ->
@@ -346,11 +299,7 @@ defmodule ElixirScript.Translator.PatternMatching do
           declarator = Builder.variable_declarator(
             Builder.identifier(variable_name),
             Builder.member_expression(
-              Builder.member_expression(
-                Builder.identifier("arguments"),
-                Builder.literal(index),
-                true
-              ),
+              identifier_fn.(index),
               Builder.identifier(key),
               false                   
             )
@@ -360,11 +309,7 @@ defmodule ElixirScript.Translator.PatternMatching do
         _ ->
         declarator = Builder.variable_declarator(
           Builder.identifier(x),
-          Builder.member_expression(
-            Builder.identifier("arguments"),
-            Builder.literal(index),
-            true
-          )
+          identifier_fn.(index)
         )
 
         Builder.variable_declaration([declarator], :let)             
@@ -375,11 +320,7 @@ defmodule ElixirScript.Translator.PatternMatching do
       Builder.if_statement(
         Utils.make_match(
           the_param, 
-          Builder.member_expression(
-            Builder.identifier("arguments"),
-            Builder.literal(index),
-            true
-          )
+          identifier_fn.(index)
         ),
         Builder.block_statement(variables ++ body)
       )
@@ -388,17 +329,13 @@ defmodule ElixirScript.Translator.PatternMatching do
     { param, body }
   end
 
-  defp do_handle_pattern_matching(translated, body, index) do
+  defp do_build_pattern_matched_body({:other, item }, body, index, identifier_fn) do
     param = Builder.identifier("_ref#{index}")
     body = [
       Builder.if_statement(
         Utils.make_match(
-          translated, 
-          Builder.member_expression(
-            Builder.identifier("arguments"),
-            Builder.literal(index),
-            true
-          )
+          Translator.translate(item),
+          identifier_fn.(index)
         ),
         Builder.block_statement(body)
       )

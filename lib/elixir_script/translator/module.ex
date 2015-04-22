@@ -93,7 +93,7 @@ defmodule ElixirScript.Translator.Module do
 
     function_arity_groups = Enum.group_by(processed_functions, fn({_, _, arity}) -> arity end)
 
-    processed_functions = Enum.map(function_arity_groups, fn({arity, functions}) ->
+    processed_functions = Enum.map(function_arity_groups, fn({_arity, functions}) ->
       process_same_function_arity(name, functions)
     end)
 
@@ -154,14 +154,14 @@ defmodule ElixirScript.Translator.Module do
   end
 
   defp process_same_function_arity(function_name, functions) do
-    function_bodies = Enum.flat_map(functions, fn({ new_function, new_function_name, arity }) -> 
+    function_bodies = Enum.flat_map(functions, fn({ new_function, _new_function_name, _arity }) -> 
       new_function.body.body
     end)
 
     { nf, new_function_name, arity } = Enum.find(functions, hd(functions), fn({ nf, _, _ }) ->
       Enum.any?(nf.params, fn(x) -> 
         case x do
-          %ESTree.Identifier{name: "_ref" <> position} ->
+          %ESTree.Identifier{name: "_ref" <> _position} ->
             false
           _ ->
             true
