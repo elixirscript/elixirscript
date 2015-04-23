@@ -137,9 +137,9 @@ function parse_const(){
   return parse("const __MODULE__ = Symbol('User')");
 }
 
-function parse_x(){
-  return parse('`hello ${document.getElementById("hi")}`');
+function parse_z(){
+  return parse('undefined');
 }
 
-var g = escodegen.generate(parse_x());
+var g = escodegen.generate(parse_z());
 console.log(g);

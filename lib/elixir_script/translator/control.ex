@@ -95,7 +95,7 @@ defmodule ElixirScript.Translator.Control do
       _ ->
         translated_clause = Translator.translate(hd(clause))
 
-        if translated_clause.type == "Identifier" && translated_clause.name == :_ do
+        if translated_clause.type == "Identifier" && translated_clause.name == :undefined do
           translated_body
         else
           result = PatternMatching.build_pattern_matched_body(translated_body.body, [hd(clause)],
