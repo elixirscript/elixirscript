@@ -1,7 +1,8 @@
-# v0.3.0-dev
+# v0.3.0
   * Enhancements
     * function and case guards
     * function and case pattern matching
+    * Can now use ^ on a variable during assignment
 
 # v0.2.1
   * Enhancements
