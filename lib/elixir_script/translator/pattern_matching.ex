@@ -80,6 +80,10 @@ defmodule ElixirScript.Translator.PatternMatching do
   end
 
   def process_pattern({:%, _, [{:__aliases__, _, name}, {:%{}, _, properties}]}) do
+    process_pattern({:%{}, [], [__struct__: name] ++ properties})
+  end
+
+  def process_pattern({:%{}, _, properties}) do
     variables = Enum.filter_map(properties, fn({_key, value}) -> 
       case Translator.translate(value) do
         %ESTree.Identifier{} ->
@@ -110,7 +114,7 @@ defmodule ElixirScript.Translator.PatternMatching do
       end
     end)
 
-    [{:%{}, [], [__struct__: name] ++ new_properties}] ++ variables
+    [{:%{}, [], new_properties}] ++ variables
   end
 
   def process_pattern({:=, _, [value, {variable_name, _, _}]}) do
