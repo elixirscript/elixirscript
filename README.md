@@ -68,10 +68,8 @@ $ ex2js -h
 
 #Current Limitations (Most if not all of these will be lifted as development goes on)
 
-  * No pattern matching
-  * Very limited destructing (only works currently for binding variables)
+  * Limited destructing (only works currently for binding variables)
   * No bitstring
-  * No string interpolation
   * No defmacro
   * No try
   * No ^
@@ -88,9 +86,9 @@ $ ex2js -h
 
 TODO (high level list of todos)
 ======
-* [ ] pattern matching
-* [x] case (currently works without pattern matching support)
-* [x] cond (currently works without pattern matching support)
+* [x] pattern matching (still rough) 
+* [x] case
+* [x] cond
 * [x] for (currently does not support keyword list matching or into yet)
 * [ ] try
 * [ ] bitstring

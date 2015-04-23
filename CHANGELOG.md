@@ -1,7 +1,7 @@
 # v0.3.0-dev
   * Enhancements
     * function and case guards
-    * function pattern matching
+    * function and case pattern matching
 
 # v0.2.1
   * Enhancements
