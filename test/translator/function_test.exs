@@ -552,7 +552,7 @@ defmodule ElixirScript.Translator.Function.Test do
     js_code = """
       export function something(_ref0){
         if(Kernel.match({'__struct__': [Atom('AStruct')], 'key': undefined, 'key1': 2}, arguments[0])){
-          let value = arguments[0].key;
+          let value = arguments[0]['key'];
           return null;
         }
       }
@@ -705,7 +705,7 @@ defmodule ElixirScript.Translator.Function.Test do
                  'key': undefined,
                  'key1': 2
              }, arguments[0])) {
-             let value = arguments[0].key;
+             let value = arguments[0]['key'];
              return null;
          }
 
