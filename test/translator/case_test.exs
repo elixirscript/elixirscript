@@ -225,5 +225,39 @@ defmodule ElixirScript.Translator.Case.Test do
     """
 
     assert_translation(ex_ast, js_code)
+
+
+    ex_ast = quote do
+      case data do
+        %AStruct{key: %BStruct{ key2: value, key3: %CStruct{ key4: value2 } }} -> 
+          Logger.info(value)
+        :error -> 
+          nil
+      end
+    end
+
+    js_code = """
+     (function () {
+         if (Kernel.match({ 
+              '__struct__': [Atom('AStruct')], 
+              'key': { 
+                '__struct__': [Atom('BStruct')], 
+                'key2': undefined,
+                'key3': {
+                  '__struct__': [Atom('CStruct')],
+                  'key4': undefined
+                }
+              } 
+            }, data)) {
+              let value = data['key']['key2'];
+              let value2 = data['key']['key3']['key4'];
+              return Logger.info(value);
+         } else if (Kernel.match(Atom('error'), data)) {
+             return null;
+         }
+     }());
+    """
+
+    assert_translation(ex_ast, js_code)
   end
 end

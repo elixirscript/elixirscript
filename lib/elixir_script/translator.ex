@@ -81,6 +81,10 @@ defmodule ElixirScript.Translator do
     Function.make_function_call(module_name, function_name, params)
   end
 
+  def do_translate({:_, _, _}) do
+    Primative.make_identifier(:undefined)
+  end
+
   def do_translate({:__aliases__, _, aliases}) do
     Primative.make_identifier(aliases)
   end
@@ -219,10 +223,11 @@ defmodule ElixirScript.Translator do
     case name do
       :in ->
         :_in
-      :match? ->
-        :match
       _ ->
         name
+        |> Atom.to_string
+        |> String.replace(~r/(\?|!)/, "")
+        |> String.to_atom
     end
   end
 

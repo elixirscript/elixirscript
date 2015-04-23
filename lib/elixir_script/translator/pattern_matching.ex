@@ -80,6 +80,10 @@ defmodule ElixirScript.Translator.PatternMatching do
   end
 
   def process_pattern({:%, _, [{:__aliases__, _, name}, {:%{}, _, properties}]}) do
+    process_pattern({:%{}, [], [__struct__: name] ++ properties})
+  end
+
+  def process_pattern({:%{}, _, properties}) do
     variables = Enum.filter_map(properties, fn({_key, value}) -> 
       case Translator.translate(value) do
         %ESTree.Identifier{} ->
@@ -110,7 +114,7 @@ defmodule ElixirScript.Translator.PatternMatching do
       end
     end)
 
-    [{:%{}, [], [__struct__: name] ++ new_properties}] ++ variables
+    [{:%{}, [], new_properties}] ++ variables
   end
 
   def process_pattern({:=, _, [value, {variable_name, _, _}]}) do
@@ -321,36 +325,12 @@ defmodule ElixirScript.Translator.PatternMatching do
 
           {declaration, %{current_state | body: current_state.body, state_index: current_state.state_index + 1 }}
         { key, { :identifier, item } } ->
-          declarator = Builder.variable_declarator(
-            Builder.identifier(item),
-            Builder.member_expression(
-              identifier_fn.(index),
-              Builder.literal(to_string(key)),
-              true
-            )
-          )
 
-          declaration = Builder.variable_declaration([declarator], :let)
+          declarations = do_build_map_variables({ key, [{ :identifier, item }] }, [key], identifier_fn.(index))
 
-          {declaration, %{current_state | body: current_state.body, state_index: current_state.state_index + 1 }}
-        { key, items } when is_list(items) ->
-          declarations = Enum.map(items, fn({sub_key, {:identifier, variable }}) ->
-            declarator = Builder.variable_declarator(
-              Builder.identifier(variable),
-              Builder.member_expression(
-                Builder.member_expression(
-                  identifier_fn.(index),
-                  Builder.literal(to_string(key)),
-                  true
-                ),
-                Builder.literal(to_string(sub_key)),
-                true
-              )
-
-            )
-
-            Builder.variable_declaration([declarator], :let)       
-          end)
+          {declarations, %{current_state | body: current_state.body, state_index: current_state.state_index + 1 }}
+        { key, items }->
+          declarations = do_build_map_variables({ key, items }, [key], identifier_fn.(index))
           {declarations, %{current_state | body: current_state.body, state_index: current_state.state_index + 1 }}
         params ->
           params = case x do
@@ -387,6 +367,44 @@ defmodule ElixirScript.Translator.PatternMatching do
     ] 
 
     { Builder.identifier("_ref#{index}"), body }
+  end
+
+  def do_build_map_variables({ key, items }, keys, identifier) do
+      declarations = Enum.map(items, fn(x) ->
+        case x do
+          {:identifier, value} ->
+            declarator = Builder.variable_declarator(
+              Builder.identifier(value),
+              build_member_expression_tree(keys, identifier)
+            )
+
+            Builder.variable_declaration([declarator], :let) 
+          {key, {:identifier, value} }->
+            declarator = Builder.variable_declarator(
+              Builder.identifier(value),
+              build_member_expression_tree(keys ++ [key], identifier)
+            )
+
+            Builder.variable_declaration([declarator], :let) 
+          {key, items }->
+            do_build_map_variables({key, items }, keys ++ [key], identifier)        
+          items when is_list(items) ->
+            do_build_map_variables(x, keys ++ [key], identifier)
+        end
+
+      end)
+
+      List.flatten(declarations)
+  end
+
+  def build_member_expression_tree(keys, ast) do
+    Enum.reduce(keys, ast, fn(x, current_ast) -> 
+      Builder.member_expression(
+        current_ast,
+        Builder.literal(to_string(x)),
+        true
+      )
+    end)
   end
 
   defp do_build_pattern_matched_body({:other, item }, body, index, identifier_fn) do
