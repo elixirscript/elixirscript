@@ -3,6 +3,7 @@ defmodule ElixirScript.Translator.Function do
   alias ESTree.Builder
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Utils
+  alias ElixirScript.Translator.PatternMatching
 
   def make_function_or_property_call(module_name, function_name) do        
         params = [
@@ -47,8 +48,12 @@ defmodule ElixirScript.Translator.Function do
     |> Builder.export_declaration
   end
 
-  defp do_make_function(name, params, body, guards \\ nil) do
-    { body, params } = prepare_function_body(body) |> handle_pattern_matching(name, params)
+  def pattern_match_identifier(index) do
+    Utils.make_array_accessor_call("arguments", index)
+  end
+
+  defp do_make_function(name, params, body, guards) do
+    { body, params } = prepare_function_body(body) |> PatternMatching.build_pattern_matched_body(params, &pattern_match_identifier/1)
 
     body = if guards do
       [Builder.if_statement(
@@ -74,81 +79,6 @@ defmodule ElixirScript.Translator.Function do
       [],
       Builder.block_statement(prepare_function_body(body))
     )
-  end
-
-  defp handle_pattern_matching(body, name, params) do
-    state = %{ index: 0, body: body }
-
-    { params, state } = Enum.map_reduce(params, state, fn(p, current_state) ->
-
-      translated = process_param(p)
-
-      case translated do
-        %ESTree.Identifier{} ->
-          { translated, %{ current_state | index: current_state.index + 1 } }
-        [the_param, variable_name] ->
-          param = Builder.identifier("_ref#{current_state.index}")
-          declarator = Builder.variable_declarator(
-            Builder.identifier(variable_name),
-            Builder.member_expression(
-              Builder.identifier("arguments"),
-              Builder.literal(current_state.index),
-              true
-            )
-          )
-
-          declaration = Builder.variable_declaration([declarator], :let)
-
-          body = [
-            Builder.if_statement(
-              Utils.make_match(
-                the_param, 
-                Builder.member_expression(
-                  Builder.identifier("arguments"),
-                  Builder.literal(current_state.index),
-                  true
-                )
-              ),
-              Builder.block_statement([declaration] ++ body)
-            )
-          ]
-
-        { param, %{ current_state | index: current_state.index + 1, body: body } }
-        _ ->
-          param = Builder.identifier("_ref#{current_state.index}")
-          body = [
-            Builder.if_statement(
-              Utils.make_match(
-                translated, 
-                Builder.member_expression(
-                  Builder.identifier("arguments"),
-                  Builder.literal(current_state.index),
-                  true
-                )
-              ),
-              Builder.block_statement(body)
-            )
-          ]
-
-        { param, %{ current_state | index: current_state.index + 1, body: body } }
-      end
-    end)
-
-    { state.body, params }
-  end
-
-  defp process_param(p) do
-    case p do
-      {:%, _, [{:__aliases__, _, name}, {:%{}, _, properties}]} ->
-        Translator.translate({:%{}, [], [__struct__: name] ++ properties})
-      {:=, _, [value, {variable_name, _, _}]} ->
-        [
-          process_param(value),
-          variable_name
-        ]
-      _ ->
-        Translator.translate(p)
-    end
   end
 
   defp prepare_function_body(body) do

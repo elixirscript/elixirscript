@@ -29,6 +29,14 @@ defmodule ElixirScript.Translator.Utils do
     )
   end
 
+  def make_array_accessor_call(name, index) do
+    Builder.member_expression(
+      Builder.identifier(name),
+      Builder.literal(index),
+      true                  
+    )
+  end
+
   def wrap_in_function_closure(body) do
     the_body = case body do
       b when is_list(b) ->

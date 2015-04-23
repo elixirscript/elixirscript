@@ -444,6 +444,67 @@ defmodule ElixirScript.Translator.Function.Test do
     assert_translation(ex_ast, js_code)
   end
 
+  should "pattern match function with list" do
+    ex_ast = quote do
+      def something([apple | fruits]) do
+      end
+    end
+
+
+    js_code = """
+      export function something(_ref0){
+        if(Kernel.is_list(arguments[0])){
+          let apple = Kernel.hd(arguments[0]);
+          let fruits = Kernel.tl(arguments[0]);
+          return null;
+        }
+      }
+    """
+
+    assert_translation(ex_ast, js_code)
+  end
+
+  should "pattern match function with multiple items in list" do
+    ex_ast = quote do
+      def something([apple, pear, banana]) do
+      end
+    end
+
+
+    js_code = """
+      export function something(_ref0){
+        if(Kernel.is_list(arguments[0])){
+          let apple = arguments[0][0];
+          let pear = arguments[0][1];
+          let banana = arguments[0][2];
+          return null;
+        }
+      }
+    """
+
+    assert_translation(ex_ast, js_code)
+  end
+
+  should "pattern match function with tuple" do
+    ex_ast = quote do
+      def something({ apple , fruits }) do
+      end
+    end
+
+
+    js_code = """
+      export function something(_ref0){
+        if(Kernel.is_tuple(arguments[0])){
+          let apple = arguments[0][0];
+          let fruits = arguments[0][1];
+          return null;
+        }
+      }
+    """
+
+    assert_translation(ex_ast, js_code)
+  end
+
   should "pattern match function with struct" do
     ex_ast = quote do
       def something(%AStruct{}) do
@@ -490,8 +551,9 @@ defmodule ElixirScript.Translator.Function.Test do
 
     js_code = """
       export function something(_ref0){
-        if(Kernel.match({'__struct__': [Atom('AStruct')], 'key': value, 'key1': 2}), arguments[0])){
-          let value = arguments[0].key;
+        if(Kernel.match({'__struct__': [Atom('AStruct')], 'key': undefined, 'key1': 2}, arguments[0])){
+          let value = arguments[0]['key'];
+          return null;
         }
       }
     """
@@ -508,8 +570,45 @@ defmodule ElixirScript.Translator.Function.Test do
 
     js_code = """
       export function something(_ref0){
-        if(Kernel.match('Bearer ' + token, arguments[0])){
+        if(arguments[0].startsWith('Bearer ')){
+          let token = arguments[0].slice('Bearer '.length-1);
           return null;
+        }
+      }
+    """
+
+    assert_translation(ex_ast, js_code)
+
+    ex_ast = quote do
+      def something("Bearer " <> token, hotel) do
+      end
+    end
+
+
+    js_code = """
+      export function something(_ref0, hotel){
+        if(arguments[0].startsWith('Bearer ')){
+          let token = arguments[0].slice('Bearer '.length-1);
+          return null;
+        }
+      }
+    """
+
+    assert_translation(ex_ast, js_code)
+
+    ex_ast = quote do
+      def something("Bearer " <> token, hotel, 1) do
+      end
+    end
+
+
+    js_code = """
+      export function something(_ref0, hotel, _ref2){
+        if(Kernel.match(1, arguments[2])){
+          if(arguments[0].startsWith('Bearer ')){
+            let token = arguments[0].slice('Bearer '.length-1);
+            return null; 
+          }           
         }
       }
     """
@@ -588,33 +687,40 @@ defmodule ElixirScript.Translator.Function.Test do
 
 
     js_code = """
-      const __MODULE__ = [Atom('Example')];
+     const __MODULE__ = [Atom('Example')];
 
-      function something__1(_ref0){
-        if(Kernel.match({'__struct__': [Atom('AStruct')]}, arguments[0])){
-          let a = arguments[0];
-        }
+     function something__1(_ref0) {
+         if (Kernel.match({ '__struct__': [Atom('AStruct')] }, arguments[0])) {
+             let a = arguments[0];
+             return null;
+         }
 
-        if(Kernel.match({'__struct__': [Atom('BStruct')]}, arguments[0])){
-          let b = arguments[0];
-        }
+         if (Kernel.match({ '__struct__': [Atom('BStruct')] }, arguments[0])) {
+             let b = arguments[0];
+             return null;
+         }
 
-        if(Kernel.match({'__struct__': [Atom('CStruct')], key: undefined, key1: 2}, arguments[0])){
-          let value = arguments[0].key;
-        }
+         if (Kernel.match({
+                 '__struct__': [Atom('CStruct')],
+                 'key': undefined,
+                 'key1': 2
+             }, arguments[0])) {
+             let value = arguments[0]['key'];
+             return null;
+         }
 
-        throw new FunctionClauseError('no function clause matching in something/1');
-      }
+         throw new FunctionClauseError('no function clause matching in something/1');
+     }
 
-      export function something(...args){
-        switch(args.length){
-          case 1:
-            return something__1.apply(null,args.slice(0,1-1));
-          default:
-            throw new RuntimeError('undefined function:something/' + args.length);
-            break;
-        }
-      }
+     export function something(...args) {
+         switch (args.length) {
+         case 1:
+             return something__1.apply(null, args.slice(0, 1 - 1));
+         default:
+             throw new RuntimeError('undefined function: something/' + args.length);
+             break;
+         }
+     }
     """
     
     assert_translation(ex_ast, js_code)

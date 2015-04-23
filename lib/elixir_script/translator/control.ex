@@ -4,6 +4,7 @@ defmodule ElixirScript.Translator.Control do
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Function
   alias ElixirScript.Translator.Utils
+  alias ElixirScript.Translator.PatternMatching
 
   def make_block(expressions) do
     Builder.block_statement(Enum.map(expressions, &Translator.translate(&1)))
@@ -97,13 +98,15 @@ defmodule ElixirScript.Translator.Control do
         if translated_clause.type == "Identifier" && translated_clause.name == :_ do
           translated_body
         else
-            ast = Builder.if_statement(
-              Utils.make_match(Translator.translate(condition), translated_clause),
-              translated_body
-            )
+          result = PatternMatching.build_pattern_matched_body(translated_body.body, [hd(clause)],
+          fn(index) ->
+            Translator.translate(condition)
+          end)
+          { ast, _params } = result
+          ast = hd(ast)
 
           %ESTree.IfStatement{ ast |  alternate: process_case(condition, tl(clauses), nil) }
-        end 
+        end
     end 
   end
 

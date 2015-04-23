@@ -211,8 +211,12 @@ defmodule ElixirScript.Translator do
     end
   end
 
+  def do_translate({name, _, _}) do
+    Primative.make_identifier(name)
+  end
+
   defp filter_name(name) do
-    name = case name do
+    case name do
       :in ->
         :_in
       :match? ->
@@ -220,10 +224,6 @@ defmodule ElixirScript.Translator do
       _ ->
         name
     end
-  end
-
-  def do_translate({name, _, _}) do
-    Primative.make_identifier(name)
   end
 
 end
