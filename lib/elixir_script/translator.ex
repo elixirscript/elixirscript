@@ -47,10 +47,6 @@ defmodule ElixirScript.Translator do
     Data.make_object(properties)
   end
 
-  def do_translate({:^, _, [variable]}) do
-    Kernel.make_bound(variable)
-  end
-
   def do_translate({:<<>>, _, elements}) do
     is_interpolated_string = Enum.any?(elements, fn(x) -> 
       case x do
@@ -75,6 +71,10 @@ defmodule ElixirScript.Translator do
 
   def do_translate({{:., _, [module_name, function_name]}, _, [] }) do
     Function.make_function_or_property_call(module_name, function_name)
+  end
+
+  def do_translate({{:., _, [{:__aliases__, _, module_name}]}, _, params}) do
+    Function.make_function_call(hd(module_name), params)
   end
 
   def do_translate({{:., _, [module_name, function_name]}, _, params }) do

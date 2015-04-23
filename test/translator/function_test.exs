@@ -113,8 +113,11 @@ defmodule ElixirScript.Translator.Function.Test do
       export function test1(alpha, beta){
         {
           let _ref = Tuple(1, 2);
-          let [a, b] = _ref.value;
-          return [a, b];
+
+          let a = _ref[0];
+          let b = _ref[1];
+
+          return b;
         }
       }
     """

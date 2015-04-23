@@ -13,39 +13,100 @@ defmodule ElixirScript.Translator.PatternMatching do
   end
 
   def bind(left, right) do
-    identifiers = Tuple.to_list(left)
+    case left do
+      {:^, _, [{variable, _, _}]} ->
+        Builder.if_statement(
+          Builder.unary_expression(:!, true,
+            Builder.call_expression(
+              Builder.member_expression(
+                Builder.identifier("Kernel"),
+                Builder.identifier("match")
+              ),
+              [
+                Builder.identifier(variable),
+                Translator.translate(right)            
+              ]
+            )
+          ),
+          Builder.throw_statement(
+            Builder.new_expression(
+              Builder.identifier("MatchError"),
+              [
+                Builder.literal("no match of right hand side value")
+              ]
+            )
+          )
+        )
+      _ ->
+        declarator = Builder.variable_declarator(
+          Translator.translate(left),
+          Translator.translate(right)
+        )
 
-    declarator = Builder.variable_declarator(
-      Builder.identifier(hd(identifiers)),
-      Translator.translate(right)
-    )
-
-    Builder.variable_declaration([declarator], :let)
+        Builder.variable_declaration([declarator], :let)
+    end
   end
 
   defp do_tuple_bind(left, right) do
     ref = Builder.identifier("_ref")
 
-    declarator = Builder.variable_declarator(
+    ref_declarator = Builder.variable_declarator(
       ref,
       Translator.translate(right)
     )
 
-    declaration = Builder.variable_declaration([declarator], :let)
+    ref_declaration = Builder.variable_declaration([ref_declarator], :let)
 
-    pattern_declarator = left
-    |> Enum.map(&ElixirScript.Translator.translate(&1))
-    |> Builder.array_pattern()
-    |> Builder.variable_declarator(
-      Builder.member_expression(
-        ref,
-        Builder.identifier("value")
-      )
-    )
+    {declarations, _} = Enum.map_reduce(left, 0, fn(x, index) -> 
 
-    pattern_declaration = Builder.variable_declaration([pattern_declarator], :let)
+      declaration = case x do
+        {:^, _, [{variable, _, _}]} ->
+          bound = Builder.if_statement(
+            Builder.unary_expression(:!, true,
+              Builder.call_expression(
+                Builder.member_expression(
+                  Builder.identifier("Kernel"),
+                  Builder.identifier("match")
+                ),
+                [
+                  Builder.identifier(variable),
+                  Builder.member_expression(
+                    ref,
+                    Builder.literal(index),
+                    true
+                  )               
+                ]
+              )
+            ),
+            Builder.throw_statement(
+              Builder.new_expression(
+                Builder.identifier("MatchError"),
+                [
+                  Builder.literal("no match of right hand side value")
+                ]
+              )
+            )
+          )
+          bound
+        _ ->
+        declarator = Builder.variable_declarator(
+          Translator.translate(x),
+          Builder.member_expression(
+            ref,
+            Builder.literal(index),
+            true
+          )
+        )
 
-    Builder.block_statement([declaration] ++ [pattern_declaration])
+        Builder.variable_declaration([declarator], :let)
+      end
+
+
+
+      {declaration, index + 1}      
+    end)
+
+    Builder.block_statement([ref_declaration] ++ declarations)
   end
 
   def process_pattern({type, item}) when type in [:tuple, :list, :identifier, :other, :listhdtail] do
