@@ -71,7 +71,6 @@ $ ex2js -h
   * No bitstring
   * No defmacro
   * No try
-  * No ^
   * limited for (can't do into yet)
   * No receive
   * No quote
