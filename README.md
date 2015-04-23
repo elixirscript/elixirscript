@@ -68,7 +68,6 @@ $ ex2js -h
 
 #Current Limitations (Most if not all of these will be lifted as development goes on)
 
-  * Limited destructing (only works currently for binding variables)
   * No bitstring
   * No defmacro
   * No try
