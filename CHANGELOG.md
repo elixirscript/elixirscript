@@ -1,3 +1,6 @@
+# v0.4.0-dev
+  * Enhancements
+
 # v0.3.0
   * Enhancements
     * function and case guards
