@@ -48,9 +48,11 @@ defmodule ElixirScript.Translator do
   end
 
   def do_translate({:<<>>, _, elements}) do
-    is_interpolated_string = Enum.any?(elements, fn(x) -> 
+    is_interpolated_string = Enum.all?(elements, fn(x) -> 
       case x do
-        {:::, _, _} ->
+        b when is_binary(b) ->
+          true
+        {:::, _, [_target, {:binary, _, _}]} ->
           true
         _ ->
           false
@@ -61,7 +63,7 @@ defmodule ElixirScript.Translator do
       true ->
         Primative.make_interpolated_string(elements)
       _ ->
-        Primative.make_array(elements)
+        Primative.make_bitstring(elements)
     end
   end
 

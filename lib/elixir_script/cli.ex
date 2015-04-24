@@ -77,7 +77,7 @@ defmodule ElixirScript.CLI do
   def process({ input, output }) do
     input 
     |> ElixirScript.parse_elixir_files 
-    |> ElixirScript.javascript_ast_to_code 
+    |> Enum.map(&ElixirScript.javascript_ast_to_code(&1))
     |> ElixirScript.write_to_files(output)
   end
 
@@ -97,7 +97,7 @@ defmodule ElixirScript.CLI do
   def process({ input }) do
     input 
     |> ElixirScript.parse_elixir_files 
-    |> ElixirScript.javascript_ast_to_code 
+    |> Enum.map(&ElixirScript.javascript_ast_to_code(&1))
     |> Enum.map(fn({_path, code})-> 
       IO.write(code)
     end)

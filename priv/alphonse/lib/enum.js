@@ -5,23 +5,19 @@ let Enum = {
   __MODULE__: [Atom('Enum')],
 
   all: function(collection, fun = (x) => {x}){
-    for (var i = 0; i < collection.length; i++) {
-      if(!fun(collection[i])){
-        return false;
-      }
-    };
+    let result = Enum.filter(collection, function(x){
+      return !fun(x);
+    });
 
-    return true;    
+    return result == [];
   },
 
   any: function(collection, fun = (x) => {x}){
-    for (var i = 0; i < collection.length; i++) {
-      if(fun(collection[i])){
-        return true;
-      }
-    };
+    let result = Enum.filter(collection, function(x){
+      return fun(x);
+    });
 
-    return false;    
+    return result != [];   
   },
 
   at: function(collection, n, the_default = null){
@@ -43,7 +39,7 @@ let Enum = {
   },
 
   each: function(collection, fun){
-    return collection.forEach(fun);
+    [].forEach.call(collection, fun);
   },
 
   empty: function(collection){
@@ -51,11 +47,11 @@ let Enum = {
   },
 
   filter: function(collection, fun){
-    return collection.filter(fun);
+    [].filter.call(collection, fun);
   },
 
   map: function(collection, fun){
-    return collection.map(fun);
+    [].map.call(collection, fun);
   },
 
   map_reduce: function(collection, acc, fun){

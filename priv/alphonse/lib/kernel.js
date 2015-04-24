@@ -74,7 +74,7 @@ let Kernel = {
   },
 
   is_bitstring: function(x){
-    return typeof(x) === 'string' || x instanceof String;
+    return Kernel.is_binary(x) || x instanceof BitString;
   },
 
   _in: function(left, right){

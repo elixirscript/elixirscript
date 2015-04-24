@@ -43,14 +43,6 @@ defmodule ElixirScript do
   @doc """
   Converts JavaScript AST into JavaScript code
   """
-  @spec javascript_ast_to_code([{binary, ESTree.Node.t}]) :: [{binary, binary} | {:error, binary}]
-  def javascript_ast_to_code(js_ast) when is_list(js_ast) do
-    Enum.map(js_ast, &javascript_ast_to_code(&1))
-  end
-
-  @doc """
-  Converts JavaScript AST into JavaScript code
-  """
   @spec javascript_ast_to_code({binary, ESTree.Node.t}) :: {binary, binary} | {:error, binary}
   def javascript_ast_to_code({ path, js_ast }) do
     case javascript_ast_to_code(js_ast) do
@@ -66,6 +58,13 @@ defmodule ElixirScript do
   """
   @spec javascript_ast_to_code(ESTree.Node.t) :: {:ok, binary} | {:error, binary}
   def javascript_ast_to_code(js_ast) do
+    js_ast = case js_ast do
+      %ElixirScript.Translator.Group{body: body} ->
+        js_ast = ESTree.Builder.program(body)
+      _ ->
+        js_ast
+    end
+
     js_ast = Poison.encode!(js_ast)
 
     path = "#{operating_path}/alphonse.js"

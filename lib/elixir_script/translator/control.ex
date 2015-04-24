@@ -189,6 +189,8 @@ defmodule ElixirScript.Translator.Control do
         end
 
         last_item = %ESTree.IfStatement{ last_item | consequent: consequent, alternate: alternate }
+      %ElixirScript.Translator.Group{body: body} ->
+        last_item = push_last_expression(body)
       %ESTree.BlockStatement{} ->
         last_item = %ESTree.BlockStatement{ last_item | body: push_last_expression(last_item.body) }
       _ ->

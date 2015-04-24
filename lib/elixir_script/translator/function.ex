@@ -121,6 +121,8 @@ defmodule ElixirScript.Translator.Function do
         end
 
         [last_item, return_statement]
+      %ElixirScript.Translator.Group{body: body} ->
+        last_item = return_last_expression(body)
       %ESTree.BlockStatement{} ->
         last_item = %ESTree.BlockStatement{ last_item | body: return_last_expression(last_item.body) }
       _ ->

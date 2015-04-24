@@ -111,14 +111,12 @@ defmodule ElixirScript.Translator.Function.Test do
 
     js_code = """
       export function test1(alpha, beta){
-        {
-          let _ref = Tuple(1, 2);
+        let _ref = Tuple(1, 2);
 
-          let a = _ref[0];
-          let b = _ref[1];
+        let a = _ref[0];
+        let b = _ref[1];
 
-          return b;
-        }
+        return b;
       }
     """
 
@@ -181,6 +179,7 @@ defmodule ElixirScript.Translator.Function.Test do
   should "translate function arity" do
     ex_ast = quote do
       defmodule Example do
+
         defp example() do
         end
 
