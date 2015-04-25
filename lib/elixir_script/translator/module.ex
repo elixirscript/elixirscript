@@ -39,6 +39,8 @@ defmodule ElixirScript.Translator.Module do
       end
     end)
 
+    body = Utils.inflate_groups(body)
+
     functions = Enum.flat_map(functions_dict, fn({_, data})-> process_function_arity(data) end)
 
     #Filter out original functions from the body

@@ -12,9 +12,10 @@ defmodule ElixirScript.Translator.Defmodule.Test do
 
     ex_ast = quote do
       defmodule Elephant do
-        @something "Hello"
+        @ul JQuery.("#todo-list")
 
         def something() do
+          @ul
         end
 
         defp something_else() do
@@ -25,10 +26,10 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     js_code = """
       const __MODULE__ = [Atom('Elephant')];
 
-      const something = 'Hello';
+      const ul = JQuery('#todo-list');
 
       export function something(){
-        return null;
+        return ul;
       }
 
       function something_else(){

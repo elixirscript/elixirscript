@@ -2,6 +2,19 @@ defmodule ElixirScript.Translator.Utils do
   alias ESTree.Builder
   alias ElixirScript.Translator
 
+  def inflate_groups(body) do
+    Enum.map(body, fn(x) -> 
+      case x do
+        %ElixirScript.Translator.Group{body: group_body} ->
+          group_body
+        %ESTree.BlockStatement{} ->
+          %ESTree.BlockStatement{ body: inflate_groups(x.body) } 
+        _ ->
+          x
+      end
+    end)
+    |> List.flatten
+  end
 
   def make_throw_statement(error_name, message) do
     Builder.throw_statement(

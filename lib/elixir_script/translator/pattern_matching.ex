@@ -105,8 +105,8 @@ defmodule ElixirScript.Translator.PatternMatching do
 
       {declaration, index + 1}      
     end)
-
-    Builder.block_statement([ref_declaration] ++ declarations)
+    
+    %ElixirScript.Translator.Group{ body: [ref_declaration] ++ declarations }
   end
 
   def process_pattern({type, item}) when type in [:tuple, :list, :identifier, :other, :listhdtail] do

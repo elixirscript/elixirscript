@@ -111,14 +111,12 @@ defmodule ElixirScript.Translator.Function.Test do
 
     js_code = """
       export function test1(alpha, beta){
-        {
-          let _ref = Tuple(1, 2);
+        let _ref = Tuple(1, 2);
 
-          let a = _ref[0];
-          let b = _ref[1];
+        let a = _ref[0];
+        let b = _ref[1];
 
-          return b;
-        }
+        return b;
       }
     """
 
@@ -181,6 +179,7 @@ defmodule ElixirScript.Translator.Function.Test do
   should "translate function arity" do
     ex_ast = quote do
       defmodule Example do
+
         defp example() do
         end
 
@@ -729,5 +728,76 @@ defmodule ElixirScript.Translator.Function.Test do
     assert_translation(ex_ast, js_code)
   end
 
+  should "translate capture operator" do
+    ex_ast = quote do
+      fun = &Kernel.is_atom/1
+    end
+
+    js_code = """
+      let fun = Kernel.is_atom;
+    """
+
+    assert_translation(ex_ast, js_code)
+
+
+    ex_ast = quote do
+      fun = &is_atom(&1)
+    end
+
+    js_code = """
+     let fun = function () {
+         return Kernel.is_atom(arguments[0]);
+     };
+    """
+
+    assert_translation(ex_ast, js_code)
+
+
+    ex_ast = quote do
+      fun = &local_function/1
+    end
+
+    js_code = """
+      let fun = local_function;
+    """
+
+    assert_translation(ex_ast, js_code)
+
+    ex_ast = quote do
+      fun = &(&1 * 2)
+    end
+
+    js_code = """
+     let fun = function () {
+         return arguments[0] * 2;
+     };
+    """
+
+    assert_translation(ex_ast, js_code)
+
+    ex_ast = quote do
+      fun = &{&1, &2}
+    end
+
+    js_code = """
+     let fun = function () {
+         return Tuple(arguments[0], arguments[1]);
+     };
+    """
+
+    assert_translation(ex_ast, js_code)
+
+    ex_ast = quote do
+      fun = &{&1, &2, &3}
+    end
+
+    js_code = """
+     let fun = function () {
+         return Tuple(arguments[0], arguments[1], arguments[2]);
+     };
+    """
+
+    assert_translation(ex_ast, js_code)
+  end
   
 end

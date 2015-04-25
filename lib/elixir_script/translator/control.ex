@@ -52,6 +52,7 @@ defmodule ElixirScript.Translator.Control do
       translated_body = Builder.block_statement([translated_body])
     end
 
+    translated_body = Builder.block_statement(Utils.inflate_groups(translated_body.body))
     translated_body = Function.return_last_expression(translated_body)
 
     if hd(clause) == true do
@@ -79,6 +80,8 @@ defmodule ElixirScript.Translator.Control do
     if translated_body.type != "BlockStatement" do
       translated_body = Builder.block_statement([translated_body])
     end
+
+    translated_body = Builder.block_statement(Utils.inflate_groups(translated_body.body))
 
     translated_body = Function.return_last_expression(translated_body)
 
@@ -189,6 +192,8 @@ defmodule ElixirScript.Translator.Control do
         end
 
         last_item = %ESTree.IfStatement{ last_item | consequent: consequent, alternate: alternate }
+      %ElixirScript.Translator.Group{body: body} ->
+        last_item = push_last_expression(body)
       %ESTree.BlockStatement{} ->
         last_item = %ESTree.BlockStatement{ last_item | body: push_last_expression(last_item.body) }
       _ ->
