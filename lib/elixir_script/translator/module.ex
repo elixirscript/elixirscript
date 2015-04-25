@@ -34,14 +34,12 @@ defmodule ElixirScript.Translator.Module do
           add_function_to_dict(acc, function, :export)
         %ESTree.CallExpression{} ->
           {Builder.expression_statement(x), acc}
-        %ElixirScript.Translator.Group{body: body}->
-          {body, acc}
         _ ->
           {x, acc}
       end
     end)
 
-    body = List.flatten(body)
+    body = Utils.inflate_groups(body)
 
     functions = Enum.flat_map(functions_dict, fn({_, data})-> process_function_arity(data) end)
 

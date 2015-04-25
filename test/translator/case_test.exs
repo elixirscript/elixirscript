@@ -3,6 +3,7 @@ defmodule ElixirScript.Translator.Case.Test do
   import ElixirScript.TestHelper
 
   should "translate case" do
+
     ex_ast = quote do
       case data do
         :ok -> value

@@ -82,16 +82,16 @@ defmodule ElixirScript.Translator.Function do
   end
 
   defp prepare_function_body(body) do
-    body = cond do
-      body == nil ->
+    case body do
+      nil ->
         []
-      is_list(body) ->
-        Enum.map(body, &Translator.translate(&1))
-      true ->
+      list when is_list(list) ->
+        Enum.map(list, &Translator.translate(&1))
+      _ ->
         [Translator.translate(body)]
     end
-
-    return_last_expression(body)
+    |> Utils.inflate_groups
+    |> return_last_expression
   end
 
   def return_last_expression([]) do
@@ -121,8 +121,6 @@ defmodule ElixirScript.Translator.Function do
         end
 
         [last_item, return_statement]
-      %ElixirScript.Translator.Group{body: body} ->
-        last_item = return_last_expression(body)
       %ESTree.BlockStatement{} ->
         last_item = %ESTree.BlockStatement{ last_item | body: return_last_expression(last_item.body) }
       _ ->

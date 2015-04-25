@@ -68,7 +68,6 @@ $ ex2js -h
 
 #Current Limitations (Most if not all of these will be lifted as development goes on)
 
-  * No bitstring
   * No defmacro
   * No try
   * limited for (can't do into yet)
@@ -76,7 +75,6 @@ $ ex2js -h
   * No quote
   * No unquote
   * No super
-  * No &
   * Limited support for standard library
   * No regular expressions
 
@@ -84,12 +82,12 @@ $ ex2js -h
 
 TODO (high level list of todos)
 ======
-* [x] pattern matching (still rough) 
+* [x] pattern matching (still rough, missing bitstring pattern matching) 
 * [x] case
 * [x] cond
 * [x] for (currently does not support keyword list matching or into yet)
 * [ ] try
-* [ ] bitstring
+* [x] bitstring
 * [x] string interpolation
 * [x] return from a function
 * [x] defexception and raising errors

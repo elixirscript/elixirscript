@@ -39,4 +39,20 @@ defmodule ElixirScript.Translator.Bitstring.Test do
     ex_ast = quote do: << 1, <<2>> >>
     assert_translation(ex_ast, "BitString(BitString.integer(1), BitString(BitString.integer(2)))")
   end
+
+
+  should "translate bitstring pattern match" do
+    ex_ast = quote do: <<102, _rest :: size(16)>> = "foo"
+    js_code = """
+      let _rest;
+
+      if(Kernel.match(BitString(BitString.integer(102), BitString.size(_rest, 16)), BitString(BitString.binary("foo")).value)){
+        _rest = BitString(BitString.binary("foo")).value.slice(1, 3);
+      }else{
+        throw new MatchError(no match of right hand side value)
+      }
+
+    """
+    assert_translation(ex_ast, js_code)
+  end
 end
