@@ -1,6 +1,6 @@
 # v0.4.0-dev
   * Enhancements
-    * BitStrings
+    * Bitstrings
     * Capture Operator
 
 # v0.3.0

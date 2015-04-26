@@ -8,7 +8,9 @@ defmodule ElixirScript.Translator.Utils do
         %ElixirScript.Translator.Group{body: group_body} ->
           group_body
         %ESTree.BlockStatement{} ->
-          %ESTree.BlockStatement{ body: inflate_groups(x.body) } 
+          %ESTree.BlockStatement{ body: inflate_groups(x.body) }
+        %ESTree.IfStatement{} ->
+          %{x | consequent: inflate_groups(x.consequent), alternate: inflate_groups(x.alternate) }
         _ ->
           x
       end
@@ -34,20 +36,23 @@ defmodule ElixirScript.Translator.Utils do
     )
   end
 
+  def make_call_expression(function_name, params) do
+    Builder.call_expression(
+      Builder.identifier(function_name),
+      Enum.map(params, &Translator.translate(&1))
+    )
+  end
 
-  def make_member_expression(module_name, function_name) do
+  def make_member_expression(module_name, function_name, computed \\ false) do
     Builder.member_expression(
       Builder.identifier(module_name),
-      Builder.identifier(function_name)
+      Builder.identifier(function_name),
+      computed
     )
   end
 
   def make_array_accessor_call(name, index) do
-    Builder.member_expression(
-      Builder.identifier(name),
-      Builder.literal(index),
-      true                  
-    )
+    make_member_expression(name, index, true)
   end
 
   def wrap_in_function_closure(body) do
@@ -70,10 +75,7 @@ defmodule ElixirScript.Translator.Utils do
 
   def make_match(pattern, expr) do
     Builder.call_expression(
-      Builder.member_expression(
-        Builder.identifier("Kernel"),
-        Builder.identifier("match")
-      ),
+      make_member_expression("Kernel", "match"),
       [
         pattern,
         expr

@@ -15,10 +15,7 @@ defmodule ElixirScript.Translator.Function do
   end
 
   def make_function_call(function_name, params) do
-    Builder.call_expression(
-      Builder.identifier(function_name),
-      Enum.map(params, &Translator.translate(&1))
-    )
+    Utils.make_call_expression(function_name, params)
   end
 
   def make_function_call(module_name, function_name, params) do

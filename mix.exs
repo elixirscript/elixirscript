@@ -22,10 +22,11 @@ defmodule ElixirScript.Mixfile do
 
   defp deps do
     [
-      { :poison, "~> 1.3" },
+      { :poison, "~> 1.4" },
       { :estree, "~> 1.0.1"},
       { :excoveralls, only: [:dev, :test] },
-      { :shouldi, github: "batate/shouldi", only: :test }
+      { :shouldi, github: "batate/shouldi", only: :test },
+      { :mix_test_watch, github: "lpil/mix-test.watch" }
     ]
   end
 
