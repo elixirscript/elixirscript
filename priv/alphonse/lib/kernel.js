@@ -165,10 +165,6 @@ let Kernel = {
 
       return true;
     }
-  },
-
-  bound: function(variable){
-    return variable;
   }
 }
 

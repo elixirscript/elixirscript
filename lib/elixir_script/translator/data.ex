@@ -3,6 +3,14 @@ defmodule ElixirScript.Translator.Data do
   alias ESTree.Builder
   alias ElixirScript.Translator
 
+  def make_get_property(target, property) do
+    Builder.member_expression(
+      Translator.translate(target),
+      Translator.translate(property),
+      true
+    )
+  end
+
 
   def make_object(properties) do
     properties
