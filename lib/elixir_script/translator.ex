@@ -92,6 +92,10 @@ defmodule ElixirScript.Translator do
     end
   end
 
+  defp do_translate({{:., _, [Access, :get]}, _, [target, property]}) do
+    Data.make_get_property(target, property)
+  end
+
   defp do_translate({:., _, [module_name, function_name]}) do
     Function.make_function_or_property_call(module_name, function_name)
   end

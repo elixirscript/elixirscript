@@ -42,6 +42,36 @@ defmodule ElixirScript.Translator.Bitstring.Test do
 
 
   should "translate bitstring pattern match" do
+    ex_ast = quote do: <<-100 :: signed, _rest :: binary>> = <<-100, "foo">>
+    js_code = """
+      let _rest;
+
+      //check if sizes match. if so then 
+      if(Kernel.match(BitString(BitString.signed(-100)), 
+        BitString(BitString.integer(-100), BitString.binary("foo")))){
+        _rest = BitString(BitString.integer(-100), BitString.binary("foo"))).value.slice(1, 3);
+      }else{
+        throw new MatchError(no match of right hand side value)
+      }
+
+    """
+
+    ex_ast = quote do: <<val, _rest :: binary>> = <<-100, "foo">>
+    js_code = """
+      let _rest;
+
+      if(Kernel.match(BitString(BitString.signed(-100)), 
+        BitString(BitString.integer(-100), BitString.binary("foo")))){
+        _rest = BitString(BitString.integer(-100), BitString.binary("foo"))).value.slice(1, 3);
+      }else{
+        throw new MatchError(no match of right hand side value)
+      }
+
+    """
+
+
+    
+
     ex_ast = quote do: <<102, _rest :: size(16)>> = "foo"
     js_code = """
       let _rest;
@@ -54,5 +84,15 @@ defmodule ElixirScript.Translator.Bitstring.Test do
 
     """
     assert_translation(ex_ast, js_code)
+
+    #<<102, _rest :: size(2)-unit(8)>> = "foo"
+
+    #<<102, _rest :: size(32)>> = "foo"
+
+    #<< x :: 8 >> == << x :: size(8) >>
+
+    #<< x :: 8 * 4 >> == << x :: size(8)-unit(4) >>
+
+    #<< x :: _ * 4 >> == << x :: unit(4) >>
   end
 end

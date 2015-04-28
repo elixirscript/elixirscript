@@ -87,7 +87,6 @@ defmodule ElixirScript.Translator.Control do
 
     case hd(clause) do
       {:when, _, [the_clause, guard]} ->
-        translated_clause = Translator.translate(the_clause)
         ast = Builder.if_statement(
           Translator.translate(guard),
           translated_body,
@@ -96,19 +95,18 @@ defmodule ElixirScript.Translator.Control do
 
         %ESTree.IfStatement{ ast |  alternate: process_case(condition, tl(clauses), nil) }        
       _ ->
-        translated_clause = Translator.translate(hd(clause))
+        case Translator.translate(hd(clause)) do
+          %ESTree.Identifier{name: :undefined} ->
+            translated_body
+          _ ->
+            result = PatternMatching.build_pattern_matched_body(translated_body.body, [hd(clause)],
+            fn(index) ->
+              Translator.translate(condition)
+            end)
+            { ast, _params } = result
+            ast = hd(ast)
 
-        if translated_clause.type == "Identifier" && translated_clause.name == :undefined do
-          translated_body
-        else
-          result = PatternMatching.build_pattern_matched_body(translated_body.body, [hd(clause)],
-          fn(index) ->
-            Translator.translate(condition)
-          end)
-          { ast, _params } = result
-          ast = hd(ast)
-
-          %ESTree.IfStatement{ ast |  alternate: process_case(condition, tl(clauses), nil) }
+            %ESTree.IfStatement{ ast |  alternate: process_case(condition, tl(clauses), nil) }          
         end
     end 
   end
