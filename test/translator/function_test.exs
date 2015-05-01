@@ -209,13 +209,13 @@ defmodule ElixirScript.Translator.Function.Test do
       function example(...args){
         switch(args.length){
           case 0:
-           return example__0.apply(null,args.slice(0,0-1));
+           return example__0.apply(null, args.slice(0, 0 + 1));
           case 1:
-            return example__1.apply(null,args.slice(0,1-1));
+            return example__1.apply(null, args.slice(0, 1 + 1));
           case 2:
-            return example__2.apply(null,args.slice(0,2-1));
+            return example__2.apply(null, args.slice(0, 2 + 1));
           case 3:
-            return example__3.apply(null,args.slice(0,3-1));
+            return example__3.apply(null, args.slice(0, 3 + 1));
           case 4:
             return example__4.apply(null,args);
           default:
@@ -258,13 +258,13 @@ defmodule ElixirScript.Translator.Function.Test do
       export function example(...args){
         switch(args.length){
           case 0:
-           return example__0.apply(null,args.slice(0,0-1));
+           return example__0.apply(null,args.slice(0, 0+1));
           case 1:
-            return example__1.apply(null,args.slice(0,1-1));
+            return example__1.apply(null,args.slice(0, 1+1));
           case 2:
-            return example__2.apply(null,args.slice(0,2-1));
+            return example__2.apply(null,args.slice(0, 2+1));
           case 3:
-            return example__3.apply(null,args.slice(0,3-1));
+            return example__3.apply(null,args.slice(0, 3+1));
           case 4:
             return example__4.apply(null,args);
           default:
@@ -417,7 +417,7 @@ defmodule ElixirScript.Translator.Function.Test do
       export function something(...args){
         switch(args.length){
           case 1:
-            return something__1.apply(null,args.slice(0,1-1));
+            return something__1.apply(null,args.slice(0,1+1));
           default:
             throw new RuntimeError('undefined function:something/' + args.length);
             break;
@@ -661,7 +661,7 @@ defmodule ElixirScript.Translator.Function.Test do
       export function something(...args){
         switch(args.length){
           case 1:
-            return something__1.apply(null,args.slice(0,1-1));
+            return something__1.apply(null,args.slice(0,1+1));
           default:
             throw new RuntimeError('undefined function:something/' + args.length);
             break;
@@ -717,7 +717,7 @@ defmodule ElixirScript.Translator.Function.Test do
      export function something(...args) {
          switch (args.length) {
          case 1:
-             return something__1.apply(null, args.slice(0, 1 - 1));
+             return something__1.apply(null, args.slice(0, 1 + 1));
          default:
              throw new RuntimeError('undefined function: something/' + args.length);
              break;
