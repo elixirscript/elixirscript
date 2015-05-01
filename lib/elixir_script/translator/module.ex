@@ -105,7 +105,7 @@ defmodule ElixirScript.Translator.Module do
         true ->
           Translator.translate(quote do: unquote(name).apply(nil, args))
         _ ->
-          Translator.translate(quote do: unquote(name).apply(nil, args.slice(0, unquote(arity) - 1)))
+          Translator.translate(quote do: unquote(name).apply(nil, args.slice(0, unquote(arity) + 1)))
       end
 
       switch_case = Builder.switch_case(

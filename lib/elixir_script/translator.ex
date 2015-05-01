@@ -92,6 +92,18 @@ defmodule ElixirScript.Translator do
     end
   end
 
+  defp do_translate({:unquote, [], [expr]}) do
+    ExKernel.make_unquote(expr)
+  end
+
+  defp do_translate({:quote, [], [[do: block]]}) do
+    translate(block)
+  end
+
+  defp do_translate({:quote, [], [opts, [do: block]]}) do
+    translate(block)
+  end
+
   defp do_translate({{:., _, [Access, :get]}, _, [target, property]}) do
     Data.make_get_property(target, property)
   end

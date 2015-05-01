@@ -18,4 +18,17 @@ defmodule ElixirScript.Translator.Kernel do
     Utils.make_call_expression("Kernel", "bound", [variable])
   end
 
+  def make_unquote(expr) do
+      Builder.call_expression(
+        Builder.function_expression([],[],
+          Builder.block_statement([
+            Builder.return_statement(
+              Translator.translate(expr)
+            )
+          ])
+        ),
+        []
+      )
+  end
+
 end
