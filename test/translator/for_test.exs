@@ -9,9 +9,9 @@ defmodule ElixirScript.Translator.For.Test do
 
     js_code = """
       (function(){
-        let _results = [];
+        var _results = [];
 
-        for(let n of [1,2,3,4])
+        for(var n of [1,2,3,4])
           _results.push(n * 2);
         
         return _results;
@@ -28,9 +28,9 @@ defmodule ElixirScript.Translator.For.Test do
 
     js_code = """
       (function(){
-        let _results = [];
+        var _results = [];
 
-        for(let n of 'Opera')
+        for(var n of 'Opera')
           _results.push(n);
         
         return _results;
@@ -47,10 +47,10 @@ defmodule ElixirScript.Translator.For.Test do
 
     js_code = """
       (function(){
-        let _results = [];
+        var _results = [];
 
-        for(let x of [1,2])
-          for(let y of [2,3])
+        for(var x of [1,2])
+          for(var y of [2,3])
             _results.push(x * y);
           
         return _results;
@@ -68,11 +68,11 @@ defmodule ElixirScript.Translator.For.Test do
     end
 
     js_code = """
-      let r = (function(){
-        let _results = [];
+      var r = (function(){
+        var _results = [];
 
-        for(let x of [1,2])
-          for(let y of [2,3])
+        for(var x of [1,2])
+          for(var y of [2,3])
             _results.push(x * y);
           
         return _results;
@@ -89,9 +89,9 @@ defmodule ElixirScript.Translator.For.Test do
 
     js_code = """
       (function(){
-        let _results = [];
+        var _results = [];
 
-        for(let n of [1, 2, 3, 4, 5, 6])
+        for(var n of [1, 2, 3, 4, 5, 6])
           if(Kernel.rem(n, 2) == 0)
             _results.push(n);
 

@@ -12,7 +12,7 @@ defmodule ElixirScript.Translator.If.Test do
     js_code = """
       (function(){
         if(1 == 1){
-          let a = 1;
+          var a = 1;
           return a;
         }
       }());
@@ -31,10 +31,10 @@ defmodule ElixirScript.Translator.If.Test do
     js_code = """
       (function(){
         if(1 == 1){
-          let a = 1;
+          var a = 1;
           return a;
         }else{
-          let a = 2;
+          var a = 2;
           return a;
         }
       }());

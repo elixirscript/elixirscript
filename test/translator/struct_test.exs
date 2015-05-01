@@ -43,7 +43,7 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-      let user = User.defstruct();
+      var user = User.defstruct();
     """
 
     assert_translation(ex_ast, js_code)
@@ -53,7 +53,7 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-      let user = User.defstruct(name='John');
+      var user = User.defstruct(name='John');
     """
 
     assert_translation(ex_ast, js_code)
@@ -65,8 +65,8 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-      let user = (function(){
-          let _results = JSON.parse(JSON.stringify(map));
+      var user = (function(){
+          var _results = JSON.parse(JSON.stringify(map));
 
           _results.key = value;
 
@@ -82,8 +82,8 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-      let user = (function(){
-          let _results = JSON.parse(JSON.stringify(map));
+      var user = (function(){
+          var _results = JSON.parse(JSON.stringify(map));
 
           _results.key = value;
           _results.key1 = value1;

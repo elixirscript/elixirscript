@@ -37,7 +37,7 @@ defmodule ElixirScript.Translator.Function.Test do
 
     js_code = """
       export function test1(alpha, beta){
-        let a = alpha;
+        var a = alpha;
         return a;
       }
     """
@@ -90,7 +90,7 @@ defmodule ElixirScript.Translator.Function.Test do
               if(2 == 2){
                 return 4;
               }else{
-                let a = 1;
+                var a = 1;
                 return a;
               }
             }());;
@@ -111,10 +111,10 @@ defmodule ElixirScript.Translator.Function.Test do
 
     js_code = """
       export function test1(alpha, beta){
-        let _ref = Tuple(1, 2);
+        var _ref = Tuple(1, 2);
 
-        let a = _ref[0];
-        let b = _ref[1];
+        var a = _ref[0];
+        var b = _ref[1];
 
         return b;
       }
@@ -456,8 +456,8 @@ defmodule ElixirScript.Translator.Function.Test do
     js_code = """
       export function something(_ref0){
         if(Kernel.is_list(arguments[0])){
-          let apple = Kernel.hd(arguments[0]);
-          let fruits = Kernel.tl(arguments[0]);
+          var apple = Kernel.hd(arguments[0]);
+          var fruits = Kernel.tl(arguments[0]);
           return null;
         }
       }
@@ -476,9 +476,9 @@ defmodule ElixirScript.Translator.Function.Test do
     js_code = """
       export function something(_ref0){
         if(Kernel.is_list(arguments[0])){
-          let apple = arguments[0][0];
-          let pear = arguments[0][1];
-          let banana = arguments[0][2];
+          var apple = arguments[0][0];
+          var pear = arguments[0][1];
+          var banana = arguments[0][2];
           return null;
         }
       }
@@ -497,8 +497,8 @@ defmodule ElixirScript.Translator.Function.Test do
     js_code = """
       export function something(_ref0){
         if(Kernel.is_tuple(arguments[0])){
-          let apple = arguments[0][0];
-          let fruits = arguments[0][1];
+          var apple = arguments[0][0];
+          var fruits = arguments[0][1];
           return null;
         }
       }
@@ -535,7 +535,7 @@ defmodule ElixirScript.Translator.Function.Test do
     js_code = """
       export function something(_ref0){
         if(Kernel.match({'__struct__': [Atom('AStruct')]}, arguments[0])){
-          let a = arguments[0];
+          var a = arguments[0];
           return null;
         }
       }
@@ -554,7 +554,7 @@ defmodule ElixirScript.Translator.Function.Test do
     js_code = """
       export function something(_ref0){
         if(Kernel.match({'__struct__': [Atom('AStruct')], 'key': undefined, 'key1': 2}, arguments[0])){
-          let value = arguments[0]['key'];
+          var value = arguments[0]['key'];
           return null;
         }
       }
@@ -573,7 +573,7 @@ defmodule ElixirScript.Translator.Function.Test do
     js_code = """
       export function something(_ref0){
         if(arguments[0].startsWith('Bearer ')){
-          let token = arguments[0].slice('Bearer '.length-1);
+          var token = arguments[0].slice('Bearer '.length-1);
           return null;
         }
       }
@@ -590,7 +590,7 @@ defmodule ElixirScript.Translator.Function.Test do
     js_code = """
       export function something(_ref0, hotel){
         if(arguments[0].startsWith('Bearer ')){
-          let token = arguments[0].slice('Bearer '.length-1);
+          var token = arguments[0].slice('Bearer '.length-1);
           return null;
         }
       }
@@ -608,7 +608,7 @@ defmodule ElixirScript.Translator.Function.Test do
       export function something(_ref0, hotel, _ref2){
         if(Kernel.match(1, arguments[2])){
           if(arguments[0].startsWith('Bearer ')){
-            let token = arguments[0].slice('Bearer '.length-1);
+            var token = arguments[0].slice('Bearer '.length-1);
             return null; 
           }           
         }
@@ -693,12 +693,12 @@ defmodule ElixirScript.Translator.Function.Test do
 
      function something__1(_ref0) {
          if (Kernel.match({ '__struct__': [Atom('AStruct')] }, arguments[0])) {
-             let a = arguments[0];
+             var a = arguments[0];
              return null;
          }
 
          if (Kernel.match({ '__struct__': [Atom('BStruct')] }, arguments[0])) {
-             let b = arguments[0];
+             var b = arguments[0];
              return null;
          }
 
@@ -707,7 +707,7 @@ defmodule ElixirScript.Translator.Function.Test do
                  'key': undefined,
                  'key1': 2
              }, arguments[0])) {
-             let value = arguments[0]['key'];
+             var value = arguments[0]['key'];
              return null;
          }
 
@@ -734,7 +734,7 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-      let fun = Kernel.is_atom;
+      var fun = Kernel.is_atom;
     """
 
     assert_translation(ex_ast, js_code)
@@ -745,7 +745,7 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-     let fun = function () {
+     var fun = function () {
          return Kernel.is_atom(arguments[0]);
      };
     """
@@ -758,7 +758,7 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-      let fun = local_function;
+      var fun = local_function;
     """
 
     assert_translation(ex_ast, js_code)
@@ -768,7 +768,7 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-     let fun = function () {
+     var fun = function () {
          return arguments[0] * 2;
      };
     """
@@ -780,7 +780,7 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-     let fun = function () {
+     var fun = function () {
          return Tuple(arguments[0], arguments[1]);
      };
     """
@@ -792,9 +792,34 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-     let fun = function () {
+     var fun = function () {
          return Tuple(arguments[0], arguments[1], arguments[2]);
      };
+    """
+
+    assert_translation(ex_ast, js_code)
+
+    ex_ast = quote do
+      Enum.map(items, &process(&1))
+    end
+
+    js_code = """
+      Enum.map(items, function(){
+        return process(arguments[0]);
+      })
+    """
+
+    assert_translation(ex_ast, js_code)
+
+
+    ex_ast = quote do
+      elem.keypress(&process_event(&1))
+    end
+
+    js_code = """
+      elem.keypress(function(){
+        return process_event(arguments[0]);
+      })
     """
 
     assert_translation(ex_ast, js_code)

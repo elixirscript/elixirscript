@@ -45,13 +45,13 @@ defmodule ElixirScript.Translator.Cond.Test do
     js_code = """
     (function(){
       if(1 + 1 == 1){
-        let a = 1;
+        var a = 1;
         return 'This will never match';
       }else if(2 * 2 != 4){
-        let a = 2;
+        var a = 2;
         return 'Nor this';
       }else{
-        let a = 3;
+        var a = 3;
         return 'This will';
       }
     }());

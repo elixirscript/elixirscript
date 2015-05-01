@@ -44,7 +44,7 @@ defmodule ElixirScript.Translator.Bitstring.Test do
   should "translate bitstring pattern match" do
     ex_ast = quote do: <<-100 :: signed, _rest :: binary>> = <<-100, "foo">>
     js_code = """
-      let _rest;
+      var _rest;
 
       //check if sizes match. if so then 
       if(Kernel.match(BitString(BitString.signed(-100)), 
@@ -58,7 +58,7 @@ defmodule ElixirScript.Translator.Bitstring.Test do
 
     ex_ast = quote do: <<val, _rest :: binary>> = <<-100, "foo">>
     js_code = """
-      let _rest;
+      var _rest;
 
       if(Kernel.match(BitString(BitString.signed(-100)), 
         BitString(BitString.integer(-100), BitString.binary("foo")))){
@@ -74,7 +74,7 @@ defmodule ElixirScript.Translator.Bitstring.Test do
 
     ex_ast = quote do: <<102, _rest :: size(16)>> = "foo"
     js_code = """
-      let _rest;
+      var _rest;
 
       if(Kernel.match(BitString(BitString.integer(102), BitString.size(_rest, 16)), BitString(BitString.binary("foo")).value)){
         _rest = BitString(BitString.binary("foo")).value.slice(1, 3);

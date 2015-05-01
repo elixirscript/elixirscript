@@ -4,7 +4,7 @@ defmodule ElixirScript.Translator.Assignment.Test do
 
   should "translate assignment" do
     ex_ast = quote do: a = 1
-    js_code = "let a = 1;"
+    js_code = "var a = 1;"
 
     assert_translation(ex_ast, js_code)
 
@@ -17,26 +17,26 @@ defmodule ElixirScript.Translator.Assignment.Test do
     assert_translation(ex_ast, js_code)
 
     ex_ast = quote do: a = :atom
-    js_code = "let a = Atom('atom');"
+    js_code = "var a = Atom('atom');"
 
     assert_translation(ex_ast, js_code)
 
     ex_ast = quote do: {a, b} = {1, 2}
     js_code = """
-        let _ref = Tuple(1, 2);
-        let a = _ref[0];  
-        let b = _ref[1];
+        var _ref = Tuple(1, 2);
+        var a = _ref[0];  
+        var b = _ref[1];
     """
 
     assert_translation(ex_ast, js_code)
 
     ex_ast = quote do: {a, _, c} = {1, 2, 3}
     js_code = """
-        let _ref = Tuple(1, 2, 3);
+        var _ref = Tuple(1, 2, 3);
 
-        let a = _ref[0];  
-        let undefined = _ref[1];  
-        let c = _ref[2];
+        var a = _ref[0];  
+        var undefined = _ref[1];  
+        var c = _ref[2];
     """
 
     assert_translation(ex_ast, js_code)
@@ -44,13 +44,13 @@ defmodule ElixirScript.Translator.Assignment.Test do
 
     ex_ast = quote do: {^a, _, c} = {1, 2, 3}
     js_code = """
-        let _ref = Tuple(1, 2, 3);
+        var _ref = Tuple(1, 2, 3);
 
         if(!Kernel.match(a, _ref[0]))
           throw new MatchError('no match of right hand side value');
 
-        let undefined = _ref[1];
-        let c = _ref[2];
+        var undefined = _ref[1];
+        var c = _ref[2];
     """
 
     assert_translation(ex_ast, js_code)

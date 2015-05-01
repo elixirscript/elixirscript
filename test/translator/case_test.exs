@@ -33,7 +33,7 @@ defmodule ElixirScript.Translator.Case.Test do
     js_code = """
       (function(){
         if(Kernel.match(false, data)){
-          let value = 13;
+          var value = 13;
           return value;
         }else if(Kernel.match(true, data)){
           return true;
@@ -55,7 +55,7 @@ defmodule ElixirScript.Translator.Case.Test do
     js_code = """
       (function(){
         if(Kernel.match(false, data)){
-          let value = 13;
+          var value = 13;
           return value;
         }else{
           return true;
@@ -79,7 +79,7 @@ defmodule ElixirScript.Translator.Case.Test do
     js_code = """
       (function(){
         if(Kernel._in(number, [1, 2, 3, 4])){
-          let value = 13;
+          var value = 13;
           return value;
         }else{
           return true;
@@ -128,8 +128,8 @@ defmodule ElixirScript.Translator.Case.Test do
     js_code = """
       (function(){
         if(Kernel.is_tuple(data)){
-          let one = data[0];
-          let two = data[1];
+          var one = data[0];
+          var two = data[1];
           return Logger.info(one);
         }else if(Kernel.match(Atom('error'), data)){
           return null;
@@ -153,11 +153,11 @@ defmodule ElixirScript.Translator.Case.Test do
     js_code = """
       (function(){
         if(Kernel.is_tuple(data)){
-          let three = data[1];
+          var three = data[1];
 
           if(Kernel.is_tuple(data[0])){
-            let one = data[0][0];
-            let two = data[0][1];
+            var one = data[0][0];
+            var two = data[0][1];
             
             return Logger.info(one);
           }
@@ -181,11 +181,11 @@ defmodule ElixirScript.Translator.Case.Test do
     js_code = """
       (function(){
         if(Kernel.is_tuple(data)){
-          let one = data[0];
+          var one = data[0];
 
           if(Kernel.is_tuple(data[1])){
-            let two = data[1][0];
-            let three = data[1][1];
+            var two = data[1][0];
+            var three = data[1][1];
 
             return Logger.info(one);
           }
@@ -217,7 +217,7 @@ defmodule ElixirScript.Translator.Case.Test do
                 'key2': undefined 
               } 
             }, data)) {
-              let value = data['key']['key2'];
+              var value = data['key']['key2'];
               return Logger.info(value);
          } else if (Kernel.match(Atom('error'), data)) {
              return null;
@@ -250,8 +250,8 @@ defmodule ElixirScript.Translator.Case.Test do
                 }
               } 
             }, data)) {
-              let value = data['key']['key2'];
-              let value2 = data['key']['key3']['key4'];
+              var value = data['key']['key2'];
+              var value2 = data['key']['key3']['key4'];
               return Logger.info(value);
          } else if (Kernel.match(Atom('error'), data)) {
              return null;
