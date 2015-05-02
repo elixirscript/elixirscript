@@ -16,6 +16,7 @@ defmodule Mix.Tasks.Ex2js.Dist do
 
     build_standard_library
     copy_artifacts
+    npm_install
     build_tarball
 
     File.rm_rf(@folder_name)
@@ -30,9 +31,11 @@ defmodule Mix.Tasks.Ex2js.Dist do
     File.cp!("ex2js", "#{@folder_name}/bin/ex2js")
     File.cp!("priv/alphonse/alphonse.js", "#{@folder_name}/alphonse.js")
     File.cp!("priv/alphonse/dist/elixir.js", "#{@folder_name}/elixir.js")
+    File.cp!("priv/alphonse/release.package.json", "#{@folder_name}/package.json")
+  end
 
-    File.cp_r!("node_modules", "#{@folder_name}/node_modules")
-    File.cp!("package.json", "#{@folder_name}/package.json")
+  defp npm_install() do
+    System.cmd("npm", ["install"], [cd: @folder_name])   
   end
 
   defp build_tarball() do
