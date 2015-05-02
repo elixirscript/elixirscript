@@ -84,6 +84,8 @@ defmodule ElixirScript.Translator.Function do
         []
       list when is_list(list) ->
         Enum.map(list, &Translator.translate(&1))
+      {:__block__, _, list} ->
+        Enum.map(list, &Translator.translate(&1))
       _ ->
         [Translator.translate(body)]
     end

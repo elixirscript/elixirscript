@@ -7,7 +7,6 @@ defmodule ElixirScript.TestHelper do
   use ShouldI
   
   def ex_ast_to_js(ex_ast) do
-
     js_ast = ElixirScript.Translator.translate(ex_ast)
     result = ElixirScript.javascript_ast_to_code(js_ast)
 

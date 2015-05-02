@@ -60,7 +60,7 @@ defmodule ElixirScript do
   def javascript_ast_to_code(js_ast) do
     js_ast = case js_ast do
       %ElixirScript.Translator.Group{body: body} ->
-        js_ast = ESTree.Builder.program(body)
+        ESTree.Builder.program(body)
       _ ->
         js_ast
     end

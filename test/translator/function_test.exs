@@ -37,8 +37,8 @@ defmodule ElixirScript.Translator.Function.Test do
 
     js_code = """
       export function test1(alpha, beta){
-        let a = alpha;
-        return a;
+        let a0 = alpha;
+        return a0;
       }
     """
 
@@ -90,8 +90,8 @@ defmodule ElixirScript.Translator.Function.Test do
               if(2 == 2){
                 return 4;
               }else{
-                let a = 1;
-                return a;
+                let a0 = 1;
+                return a0;
               }
             }());;
           }else{
@@ -113,10 +113,10 @@ defmodule ElixirScript.Translator.Function.Test do
       export function test1(alpha, beta){
         let _ref = Tuple(1, 2);
 
-        let a = _ref[0];
-        let b = _ref[1];
+        let a0 = _ref[0];
+        let b0 = _ref[1];
 
-        return b;
+        return b0;
       }
     """
 
@@ -795,6 +795,86 @@ defmodule ElixirScript.Translator.Function.Test do
      let fun = function () {
          return Tuple(arguments[0], arguments[1], arguments[2]);
      };
+    """
+
+    assert_translation(ex_ast, js_code)
+
+    ex_ast = quote do
+      Enum.map(items, &process(&1))
+    end
+
+    js_code = """
+      Enum.map(items, function(){
+        return process(arguments[0]);
+      })
+    """
+
+    assert_translation(ex_ast, js_code)
+
+
+    ex_ast = quote do
+      elem.keypress(&process_event(&1))
+    end
+
+    js_code = """
+      elem.keypress(function(){
+        return process_event(arguments[0]);
+      })
+    """
+
+    assert_translation(ex_ast, js_code)
+  end
+
+  should "translate varible declaration correctly" do
+    ex_ast = quote do
+      def test1(alpha, beta) do
+        a = 1
+        a = 2
+      end
+    end
+
+    js_code = """
+      export function test1(alpha, beta){
+        let a0 = 1;
+        let a1 = 2;
+        return a1;
+      }
+    """
+
+    assert_translation(ex_ast, js_code)
+
+    ex_ast = quote do
+      def test1(alpha, beta) do
+        a = 1
+        a = a
+        a = 2
+      end
+    end
+
+    js_code = """
+      export function test1(alpha, beta){
+        let a0 = 1;
+        let a1 = a0;
+        let a2 = 2;
+        return a2;
+      }
+    """
+
+    assert_translation(ex_ast, js_code)
+
+    ex_ast = quote do
+      def test1(alpha, beta) do
+        a = 1
+        [a, b, c] = [a, 2, 3]
+      end
+    end
+
+    js_code = """
+      export function test1(alpha, beta){
+        let a0 = 1;
+        let [a1, b0, c0] = [a0, 2, 3];
+        return [a1, b0, c0];
+      }
     """
 
     assert_translation(ex_ast, js_code)
