@@ -734,7 +734,7 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-      let fun0 = Kernel.is_atom;
+      let fun = Kernel.is_atom;
     """
 
     assert_translation(ex_ast, js_code)
@@ -745,7 +745,7 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-     let fun0 = function () {
+     let fun = function () {
          return Kernel.is_atom(arguments[0]);
      };
     """
@@ -758,7 +758,7 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-      let fun0 = local_function;
+      let fun = local_function;
     """
 
     assert_translation(ex_ast, js_code)
@@ -768,7 +768,7 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-     let fun0 = function () {
+     let fun = function () {
          return arguments[0] * 2;
      };
     """
@@ -780,7 +780,7 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-     let fun0 = function () {
+     let fun = function () {
          return Tuple(arguments[0], arguments[1]);
      };
     """
@@ -792,7 +792,7 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-     let fun0 = function () {
+     let fun = function () {
          return Tuple(arguments[0], arguments[1], arguments[2]);
      };
     """
@@ -854,8 +854,26 @@ defmodule ElixirScript.Translator.Function.Test do
     js_code = """
       export function test1(alpha, beta){
         let a0 = 1;
-        let a1 = 2;
-        return a1;
+        let a1 = a0;
+        let a2 = 2;
+        return a2;
+      }
+    """
+
+    assert_translation(ex_ast, js_code)
+
+    ex_ast = quote do
+      def test1(alpha, beta) do
+        a = 1
+        [a, b, c] = [a, 2, 3]
+      end
+    end
+
+    js_code = """
+      export function test1(alpha, beta){
+        let a0 = 1;
+        let [a1, b0, c0] = [a0, 2, 3];
+        return [a1, b0, c0];
       }
     """
 

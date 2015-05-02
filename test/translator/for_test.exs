@@ -68,7 +68,7 @@ defmodule ElixirScript.Translator.For.Test do
     end
 
     js_code = """
-      let r0 = (function(){
+      let r = (function(){
         let _results = [];
 
         for(let x of [1,2])

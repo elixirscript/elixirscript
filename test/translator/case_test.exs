@@ -33,8 +33,8 @@ defmodule ElixirScript.Translator.Case.Test do
     js_code = """
       (function(){
         if(Kernel.match(false, data)){
-          let value0 = 13;
-          return value0;
+          let value = 13;
+          return value;
         }else if(Kernel.match(true, data)){
           return true;
         }
@@ -55,8 +55,8 @@ defmodule ElixirScript.Translator.Case.Test do
     js_code = """
       (function(){
         if(Kernel.match(false, data)){
-          let value0 = 13;
-          return value0;
+          let value = 13;
+          return value;
         }else{
           return true;
         }
@@ -79,8 +79,8 @@ defmodule ElixirScript.Translator.Case.Test do
     js_code = """
       (function(){
         if(Kernel._in(number, [1, 2, 3, 4])){
-          let value0 = 13;
-          return value0;
+          let value = 13;
+          return value;
         }else{
           return true;
         }

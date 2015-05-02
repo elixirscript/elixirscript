@@ -1,5 +1,6 @@
 defmodule ElixirScript.Translator do
   require Logger
+  alias ElixirScript.Preparer
   alias ElixirScript.Translator.Primative
   alias ElixirScript.Translator.PatternMatching
   alias ElixirScript.Translator.Data
@@ -10,77 +11,6 @@ defmodule ElixirScript.Translator do
   alias ElixirScript.Translator.Module
   alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.Kernel, as: ExKernel
-
-  @doc """
-    Handles any changes to ast before translate starts.
-  """
-  def prepare_ast(ast) do
-    #TODO: Check Assignment for former previous value
-    # ie: a = a -> let a1 = a0
-
-    {new_ast, _ } = Macro.prewalk(ast, %{}, fn(x, acc) ->
-      prepare_variables(x, acc)
-    end)
-
-    new_ast
-  end
-
-  def prepare_variables({:=, meta, [{var1, var2}, value]}, state) do
-
-    { [var1, var2], state } = Enum.map_reduce([var1, var2], state, fn(x, current_state) ->
-      case x do
-        {variable_name, meta2, context} when not(variable_name in [:%, :{}, :^, :&]) ->
-          {new_variable_name, new_state} = get_new_variable_name(variable_name, state)
-          { {new_variable_name, meta2, context} , new_state }
-        _ ->
-          {x, current_state}
-      end
-    end)
-
-    { {:=, meta, [{var1, var2}, value]}, state }
-  end
-
-  def prepare_variables({:=, meta, [{:{}, meta2, variables}, value]}, state) do
-
-    { variables, state } = Enum.map_reduce(variables, state, fn(x, current_state) ->
-      case x do
-        {variable_name, meta3, context} when not(variable_name in [:%, :{}, :^, :&, :_]) ->
-          {new_variable_name, new_state} = get_new_variable_name(variable_name, state)
-          { {new_variable_name, meta3, context} , new_state }
-        _ ->
-          {x, current_state}
-      end
-    end)
-
-    { {:=, meta, [{:{}, meta2, variables}, value]}, state }
-  end
-
-  def prepare_variables({:=, meta, [{variable_name, meta2, context}, value]}, state) when not(variable_name in [:%, :{}, :^, :&]) do
-    {new_variable_name, new_state} = get_new_variable_name(variable_name, state)
-    { {:=, meta, [{new_variable_name, meta2, context}, value]}, new_state }
-  end
-
-  def prepare_variables({variable_name, meta, context}, state) do
-    if Map.has_key?(state, variable_name) do
-      new_variable_name = String.to_atom("#{variable_name}#{Map.get(state, variable_name)}")
-    else
-      new_variable_name = variable_name
-    end
-
-    { {new_variable_name, meta, context}, state }
-  end
-
-  def prepare_variables(ast, state) do
-    { ast, state }
-  end
-
-  defp get_new_variable_name(variable_name, state) do
-    current = Map.get(state, variable_name, -1) + 1
-    new_variable_name = String.to_atom("#{variable_name}#{current}")
-    new_state = Map.put(state, variable_name, current)
-
-    { new_variable_name, new_state }
-  end
 
   @doc """
   Translates Elixir AST to JavaScript AST
@@ -263,19 +193,23 @@ defmodule ElixirScript.Translator do
     Expression.make_binary_expression(operator, left, right)
   end
 
-  defp do_translate({:def, _, [{:when, _, [{name, _, params} | guards] }, [do: body]] }) do
+  defp do_translate({:def, _, [{:when, _, [{name, _, params} | guards] }, [do: body]] } = ast) do
+    {:def, _, [{:when, _, [{name, _, params} | guards] }, [do: body]] } = Preparer.prepare(ast)
     Function.make_export_function(name, params, body, guards)
   end
 
-  defp do_translate({:def, _, [{name, _, params}, [do: body]]}) do
+  defp do_translate({:def, _, [{name, _, params}, [do: body]]} = ast) do
+    {:def, _, [{name, _, params}, [do: body]]} = Preparer.prepare(ast)
     Function.make_export_function(name, params, body)
   end
 
-  defp do_translate({:defp, _, [{:when, _, [{name, _, params} | guards] }, [do: body]] }) do
+  defp do_translate({:defp, _, [{:when, _, [{name, _, params} | guards] }, [do: body]] } = ast) do
+    {:defp, _, [{:when, _, [{name, _, params} | guards] }, [do: body]] } = Preparer.prepare(ast)
     Function.make_function(name, params, body, guards)
   end
 
-  defp do_translate({:defp, _, [{name, _, params}, [do: body]]}) do
+  defp do_translate({:defp, _, [{name, _, params}, [do: body]]} = ast) do
+    {:defp, _, [{name, _, params}, [do: body]]} = Preparer.prepare(ast)
     Function.make_function(name, params, body)
   end
 
