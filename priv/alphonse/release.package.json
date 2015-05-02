@@ -1,0 +1,21 @@
+{
+  "name": "elixir_script",
+  "version": "1.0.0",
+  "description": "Convert Elixir to JavaScript",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:bryanjos/ex_to_js.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "escodegen": "^1.6.1"
+  }
+}
