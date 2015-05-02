@@ -43,7 +43,7 @@ defmodule ElixirScript.Translator.PatternMatching do
           Translator.translate(right)
         )
 
-        Builder.variable_declaration([declarator], :var)
+        Builder.variable_declaration([declarator], :let)
     end
   end
 
@@ -55,7 +55,7 @@ defmodule ElixirScript.Translator.PatternMatching do
       Translator.translate(right)
     )
 
-    ref_declaration = Builder.variable_declaration([ref_declarator], :var)
+    ref_declaration = Builder.variable_declaration([ref_declarator], :let)
 
     {declarations, _} = Enum.map_reduce(left, 0, fn(x, index) -> 
 
@@ -98,7 +98,7 @@ defmodule ElixirScript.Translator.PatternMatching do
           )
         )
 
-        Builder.variable_declaration([declarator], :var)
+        Builder.variable_declaration([declarator], :let)
       end
 
 
@@ -242,7 +242,7 @@ defmodule ElixirScript.Translator.PatternMatching do
       )
     )
 
-    declaration = Builder.variable_declaration([declarator], :var)   
+    declaration = Builder.variable_declaration([declarator], :let)   
 
     body = [
       Builder.if_statement(
@@ -280,7 +280,7 @@ defmodule ElixirScript.Translator.PatternMatching do
             )
           )
 
-          declaration = Builder.variable_declaration([declarator], :var)
+          declaration = Builder.variable_declaration([declarator], :let)
 
           {declaration, %{current_state | body: current_state.body, state_index: current_state.state_index + 1 }}
         params ->
@@ -328,7 +328,7 @@ defmodule ElixirScript.Translator.PatternMatching do
       )
     )
 
-    head_declaration = Builder.variable_declaration([head_declarator], :var)
+    head_declaration = Builder.variable_declaration([head_declarator], :let)
 
     tail_declarator = Builder.variable_declarator(
       Builder.identifier(elem(tail, 1)),
@@ -340,7 +340,7 @@ defmodule ElixirScript.Translator.PatternMatching do
       )
     )
 
-    tail_declaration = Builder.variable_declaration([tail_declarator], :var)
+    tail_declaration = Builder.variable_declaration([tail_declarator], :let)
 
     body = [
       Builder.if_statement(
@@ -373,7 +373,7 @@ defmodule ElixirScript.Translator.PatternMatching do
             )
           )
 
-          declaration = Builder.variable_declaration([declarator], :var)
+          declaration = Builder.variable_declaration([declarator], :let)
 
           {declaration, %{current_state | body: current_state.body, state_index: current_state.state_index + 1 }}
         { :item_identifier, item } ->
@@ -382,7 +382,7 @@ defmodule ElixirScript.Translator.PatternMatching do
             identifier_fn.(index)
           )
 
-          declaration = Builder.variable_declaration([declarator], :var)
+          declaration = Builder.variable_declaration([declarator], :let)
 
           {declaration, %{current_state | body: current_state.body, state_index: current_state.state_index + 1 }}
         { key, { :identifier, item } } ->
@@ -439,14 +439,14 @@ defmodule ElixirScript.Translator.PatternMatching do
               build_member_expression_tree(keys, identifier)
             )
 
-            Builder.variable_declaration([declarator], :var) 
+            Builder.variable_declaration([declarator], :let) 
           {key, {:identifier, value} }->
             declarator = Builder.variable_declarator(
               Builder.identifier(value),
               build_member_expression_tree(keys ++ [key], identifier)
             )
 
-            Builder.variable_declaration([declarator], :var) 
+            Builder.variable_declaration([declarator], :let) 
           {key, items }->
             do_build_map_variables({key, items }, keys ++ [key], identifier)        
           items when is_list(items) ->

@@ -168,7 +168,7 @@ defmodule ElixirScript.Translator.Data do
     )
 
     variable_declarator = Builder.variable_declarator(_results, cloning)
-    variable_declaration = Builder.variable_declaration([variable_declarator], :var)
+    variable_declaration = Builder.variable_declaration([variable_declarator], :let)
 
     block_statement = Enum.map(data, fn({key, value}) ->
       Builder.expression_statement(

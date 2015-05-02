@@ -2,6 +2,7 @@
   * Enhancements
     * Bitstrings
     * Capture Operator
+    * Fixed multi arity implementation
 
 # v0.3.0
   * Enhancements

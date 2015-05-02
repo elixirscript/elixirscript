@@ -37,8 +37,8 @@ defmodule ElixirScript.Translator.Function.Test do
 
     js_code = """
       export function test1(alpha, beta){
-        var a = alpha;
-        return a;
+        let a0 = alpha;
+        return a0;
       }
     """
 
@@ -90,8 +90,8 @@ defmodule ElixirScript.Translator.Function.Test do
               if(2 == 2){
                 return 4;
               }else{
-                var a = 1;
-                return a;
+                let a0 = 1;
+                return a0;
               }
             }());;
           }else{
@@ -111,12 +111,12 @@ defmodule ElixirScript.Translator.Function.Test do
 
     js_code = """
       export function test1(alpha, beta){
-        var _ref = Tuple(1, 2);
+        let _ref = Tuple(1, 2);
 
-        var a = _ref[0];
-        var b = _ref[1];
+        let a0 = _ref[0];
+        let b0 = _ref[1];
 
-        return b;
+        return b0;
       }
     """
 
@@ -456,8 +456,8 @@ defmodule ElixirScript.Translator.Function.Test do
     js_code = """
       export function something(_ref0){
         if(Kernel.is_list(arguments[0])){
-          var apple = Kernel.hd(arguments[0]);
-          var fruits = Kernel.tl(arguments[0]);
+          let apple = Kernel.hd(arguments[0]);
+          let fruits = Kernel.tl(arguments[0]);
           return null;
         }
       }
@@ -476,9 +476,9 @@ defmodule ElixirScript.Translator.Function.Test do
     js_code = """
       export function something(_ref0){
         if(Kernel.is_list(arguments[0])){
-          var apple = arguments[0][0];
-          var pear = arguments[0][1];
-          var banana = arguments[0][2];
+          let apple = arguments[0][0];
+          let pear = arguments[0][1];
+          let banana = arguments[0][2];
           return null;
         }
       }
@@ -497,8 +497,8 @@ defmodule ElixirScript.Translator.Function.Test do
     js_code = """
       export function something(_ref0){
         if(Kernel.is_tuple(arguments[0])){
-          var apple = arguments[0][0];
-          var fruits = arguments[0][1];
+          let apple = arguments[0][0];
+          let fruits = arguments[0][1];
           return null;
         }
       }
@@ -535,7 +535,7 @@ defmodule ElixirScript.Translator.Function.Test do
     js_code = """
       export function something(_ref0){
         if(Kernel.match({'__struct__': [Atom('AStruct')]}, arguments[0])){
-          var a = arguments[0];
+          let a = arguments[0];
           return null;
         }
       }
@@ -554,7 +554,7 @@ defmodule ElixirScript.Translator.Function.Test do
     js_code = """
       export function something(_ref0){
         if(Kernel.match({'__struct__': [Atom('AStruct')], 'key': undefined, 'key1': 2}, arguments[0])){
-          var value = arguments[0]['key'];
+          let value = arguments[0]['key'];
           return null;
         }
       }
@@ -573,7 +573,7 @@ defmodule ElixirScript.Translator.Function.Test do
     js_code = """
       export function something(_ref0){
         if(arguments[0].startsWith('Bearer ')){
-          var token = arguments[0].slice('Bearer '.length-1);
+          let token = arguments[0].slice('Bearer '.length-1);
           return null;
         }
       }
@@ -590,7 +590,7 @@ defmodule ElixirScript.Translator.Function.Test do
     js_code = """
       export function something(_ref0, hotel){
         if(arguments[0].startsWith('Bearer ')){
-          var token = arguments[0].slice('Bearer '.length-1);
+          let token = arguments[0].slice('Bearer '.length-1);
           return null;
         }
       }
@@ -608,7 +608,7 @@ defmodule ElixirScript.Translator.Function.Test do
       export function something(_ref0, hotel, _ref2){
         if(Kernel.match(1, arguments[2])){
           if(arguments[0].startsWith('Bearer ')){
-            var token = arguments[0].slice('Bearer '.length-1);
+            let token = arguments[0].slice('Bearer '.length-1);
             return null; 
           }           
         }
@@ -693,12 +693,12 @@ defmodule ElixirScript.Translator.Function.Test do
 
      function something__1(_ref0) {
          if (Kernel.match({ '__struct__': [Atom('AStruct')] }, arguments[0])) {
-             var a = arguments[0];
+             let a = arguments[0];
              return null;
          }
 
          if (Kernel.match({ '__struct__': [Atom('BStruct')] }, arguments[0])) {
-             var b = arguments[0];
+             let b = arguments[0];
              return null;
          }
 
@@ -707,7 +707,7 @@ defmodule ElixirScript.Translator.Function.Test do
                  'key': undefined,
                  'key1': 2
              }, arguments[0])) {
-             var value = arguments[0]['key'];
+             let value = arguments[0]['key'];
              return null;
          }
 
@@ -734,7 +734,7 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-      var fun = Kernel.is_atom;
+      let fun0 = Kernel.is_atom;
     """
 
     assert_translation(ex_ast, js_code)
@@ -745,7 +745,7 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-     var fun = function () {
+     let fun0 = function () {
          return Kernel.is_atom(arguments[0]);
      };
     """
@@ -758,7 +758,7 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-      var fun = local_function;
+      let fun0 = local_function;
     """
 
     assert_translation(ex_ast, js_code)
@@ -768,7 +768,7 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-     var fun = function () {
+     let fun0 = function () {
          return arguments[0] * 2;
      };
     """
@@ -780,7 +780,7 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-     var fun = function () {
+     let fun0 = function () {
          return Tuple(arguments[0], arguments[1]);
      };
     """
@@ -792,7 +792,7 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-     var fun = function () {
+     let fun0 = function () {
          return Tuple(arguments[0], arguments[1], arguments[2]);
      };
     """
@@ -820,6 +820,43 @@ defmodule ElixirScript.Translator.Function.Test do
       elem.keypress(function(){
         return process_event(arguments[0]);
       })
+    """
+
+    assert_translation(ex_ast, js_code)
+  end
+
+  should "translate varible declaration correctly" do
+    ex_ast = quote do
+      def test1(alpha, beta) do
+        a = 1
+        a = 2
+      end
+    end
+
+    js_code = """
+      export function test1(alpha, beta){
+        let a0 = 1;
+        let a1 = 2;
+        return a1;
+      }
+    """
+
+    assert_translation(ex_ast, js_code)
+
+    ex_ast = quote do
+      def test1(alpha, beta) do
+        a = 1
+        a = a
+        a = 2
+      end
+    end
+
+    js_code = """
+      export function test1(alpha, beta){
+        let a0 = 1;
+        let a1 = 2;
+        return a1;
+      }
     """
 
     assert_translation(ex_ast, js_code)

@@ -115,7 +115,7 @@ defmodule ElixirScript.Translator.Control do
   def make_for(generators) do
     _results = Builder.identifier("_results")
     variable_declarator = Builder.variable_declarator(_results, Builder.array_expression([]))
-    variable_declaration = Builder.variable_declaration([variable_declarator], :var)
+    variable_declaration = Builder.variable_declaration([variable_declarator], :let)
 
     block_statement = [variable_declaration] ++ [handle_generators(generators)] ++ [Builder.return_statement(_results)]
 
@@ -133,7 +133,7 @@ defmodule ElixirScript.Translator.Control do
       {:<-, [], [identifier, enum]} ->
         i =  Translator.translate(identifier)
         variable_declarator = Builder.variable_declarator(i)
-        variable_declaration = Builder.variable_declaration([variable_declarator], :var)
+        variable_declaration = Builder.variable_declaration([variable_declarator], :let)
 
         Builder.for_of_statement(
           variable_declaration,

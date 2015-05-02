@@ -15,6 +15,7 @@ defmodule ElixirScript do
   """
   @spec parse_quoted(Macro.t) :: {binary, ESTree.Node.t}
   def parse_quoted(quoted) do
+    quoted = ElixirScript.Translator.prepare_ast(quoted)
     js_ast = ElixirScript.Translator.translate(quoted)
     {"output.json", js_ast}
   end
@@ -33,6 +34,7 @@ defmodule ElixirScript do
     js_ast = path
     |> File.read!
     |> Code.string_to_quoted!
+    |> ElixirScript.Translator.prepare_ast
     |> ElixirScript.Translator.translate
 
     file_name = Path.basename(path, ".ex") <> ".json"
@@ -60,7 +62,7 @@ defmodule ElixirScript do
   def javascript_ast_to_code(js_ast) do
     js_ast = case js_ast do
       %ElixirScript.Translator.Group{body: body} ->
-        js_ast = ESTree.Builder.program(body)
+        ESTree.Builder.program(body)
       _ ->
         js_ast
     end
