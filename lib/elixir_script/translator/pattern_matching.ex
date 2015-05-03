@@ -14,28 +14,10 @@ defmodule ElixirScript.Translator.PatternMatching do
 
   def bind(left, right) do
     case left do
-      {:^, _, [{variable, _, _}]} ->
+      {:^, _, [{variable, meta, context}]} ->
         Builder.if_statement(
-          Builder.unary_expression(:!, true,
-            Builder.call_expression(
-              Builder.member_expression(
-                Builder.identifier("Kernel"),
-                Builder.identifier("match")
-              ),
-              [
-                Builder.identifier(variable),
-                Translator.translate(right)            
-              ]
-            )
-          ),
-          Builder.throw_statement(
-            Builder.new_expression(
-              Builder.identifier("MatchError"),
-              [
-                Builder.literal("no match of right hand side value")
-              ]
-            )
-          )
+          Translator.translate(quote do: !Kernel.match(unquote({variable, meta, context}), unquote(right))),
+          Utils.make_throw_statement("MatchError", "no match of right hand side value")
         )
       _ ->
         declarator = Builder.variable_declarator(
@@ -60,32 +42,10 @@ defmodule ElixirScript.Translator.PatternMatching do
     {declarations, _} = Enum.map_reduce(left, 0, fn(x, index) -> 
 
       declaration = case x do
-        {:^, _, [{variable, _, _}]} ->
+        {:^, _, [{variable, meta, context}]} ->
           bound = Builder.if_statement(
-            Builder.unary_expression(:!, true,
-              Builder.call_expression(
-                Builder.member_expression(
-                  Builder.identifier("Kernel"),
-                  Builder.identifier("match")
-                ),
-                [
-                  Builder.identifier(variable),
-                  Builder.member_expression(
-                    ref,
-                    Builder.literal(index),
-                    true
-                  )               
-                ]
-              )
-            ),
-            Builder.throw_statement(
-              Builder.new_expression(
-                Builder.identifier("MatchError"),
-                [
-                  Builder.literal("no match of right hand side value")
-                ]
-              )
-            )
+            Translator.translate(quote do: !Kernel.match(unquote({variable, meta, context}), _ref[unquote(index)])),
+            Utils.make_throw_statement("MatchError", "no match of right hand side value")
           )
           bound
         _ ->
@@ -430,6 +390,21 @@ defmodule ElixirScript.Translator.PatternMatching do
     { Builder.identifier("_ref#{index}"), body }
   end
 
+  defp do_build_pattern_matched_body({:other, item }, body, index, identifier_fn) do
+    param = Builder.identifier("_ref#{index}")
+    body = [
+      Builder.if_statement(
+        Utils.make_match(
+          Translator.translate(item),
+          identifier_fn.(index)
+        ),
+        Builder.block_statement(body)
+      )
+    ]
+
+    { param, body }
+  end
+
   def do_build_map_variables({ key, items }, keys, identifier) do
       declarations = Enum.map(items, fn(x) ->
         case x do
@@ -468,19 +443,6 @@ defmodule ElixirScript.Translator.PatternMatching do
     end)
   end
 
-  defp do_build_pattern_matched_body({:other, item }, body, index, identifier_fn) do
-    param = Builder.identifier("_ref#{index}")
-    body = [
-      Builder.if_statement(
-        Utils.make_match(
-          Translator.translate(item),
-          identifier_fn.(index)
-        ),
-        Builder.block_statement(body)
-      )
-    ]
 
-    { param, body }
-  end
 
 end

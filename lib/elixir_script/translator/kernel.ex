@@ -2,20 +2,10 @@ defmodule ElixirScript.Translator.Kernel do
   require Logger
   alias ESTree.Builder
   alias ElixirScript.Translator
-  alias ElixirScript.Translator.Utils
+  alias ElixirScript.Utils
 
   def make_range(first, last) do
-    Builder.call_expression(
-      Builder.identifier("Range"),
-      [
-        Translator.translate(first),
-        Translator.translate(last)
-      ]
-    )
-  end
-
-  def make_bound(variable) do
-    Utils.make_call_expression("Kernel", "bound", [variable])
+    Translator.translate(quote do: Range.(unquote(first), unquote(last)))
   end
 
   def make_unquote(expr) do
@@ -29,6 +19,21 @@ defmodule ElixirScript.Translator.Kernel do
         ),
         []
       )
+  end
+
+
+  def make___DIR__() do
+    Utils.wrap_in_function_closure(
+      Builder.if_statement(
+        Builder.identifier(:__dirname),
+        Builder.block_statement([
+          Builder.return_statement(Builder.identifier(:__dirname))
+        ]),
+        Builder.block_statement([
+          Builder.return_statement(Builder.literal(nil))
+        ])      
+      )
+    )
   end
 
 end

@@ -3,8 +3,8 @@ defmodule ElixirScript.Translator.Expression do
   alias ESTree.Builder
   alias ElixirScript.Translator
 
-  def make_negative_number(number) do
-    Builder.unary_expression(:-, true, Builder.literal(number))
+  def make_unary_expression(operator, expr) do
+    Builder.unary_expression(operator, true, Translator.translate(expr))
   end
 
   def make_binary_expression(operator, left, right) do

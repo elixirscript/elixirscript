@@ -109,13 +109,13 @@ defmodule ElixirScript.Translator.Primative do
       case type do
         {:-, _, sub_types} ->
           handle_type_adjectives({:-, [], sub_types}, current_ast)
+        {:*, _, [size, unit]} ->
+          size_ast = do_make_bitstring_element({:size, current_ast, [Translator.translate(size)]})
+          do_make_bitstring_element({:unit, size_ast, [Translator.translate(unit)]})
         {the_type, _, params} when is_list(params) ->
           do_make_bitstring_element({the_type, current_ast, Enum.map(params, &Translator.translate(&1))})
         {the_type, _, _} ->
           do_make_bitstring_element({the_type, current_ast})
-        {:*, _, [size, unit]} ->
-          size_ast = do_make_bitstring_element({:size, current_ast, [Translator.translate(size)]})
-          do_make_bitstring_element({:unit, size_ast, [Translator.translate(unit)]})  
       end
     end)
   end
