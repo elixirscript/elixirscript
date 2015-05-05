@@ -28,7 +28,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate(ast) when is_list(ast) do
-    Primative.make_array(ast)
+    Primative.make_list(ast)
   end
 
   defp do_translate({ one, two }) do

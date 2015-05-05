@@ -160,12 +160,22 @@ defmodule ElixirScript.Translator.PatternMatching do
     {:other, item }
   end
 
-  def build_pattern_matched_body(body, params, identifier_fn) do
+  def build_pattern_matched_body(body, params, identifier_fn, guards) do
+    body = if guards do
+      [Builder.if_statement(
+        guards |> Enum.map(&Translator.translate(&1)) |> hd,
+        Builder.block_statement(body)
+      )
+    ]
+    else
+      body
+    end
+    
     state = %{ index: 0, body: body }
 
     { params, state } = Enum.map_reduce(params, state, fn(p, current_state) ->
 
-      { param, new_body } = do_build_pattern_matched_body(process_pattern(p), current_state.body, current_state.index, identifier_fn)
+      { param, new_body } = do_build_pattern_matched_body(process_pattern(p), current_state.body, current_state.index, identifier_fn, guards)
       { param, %{ current_state | index: current_state.index + 1, body: new_body } }
 
     end)
@@ -173,11 +183,11 @@ defmodule ElixirScript.Translator.PatternMatching do
     { state.body, params }
   end
 
-  defp do_build_pattern_matched_body({:identifier, param}, body, _index, _identifier_fn) do
+  defp do_build_pattern_matched_body({:identifier, param}, body, _index, _identifier_fn, guards) do
     { Builder.identifier(param), body }
   end
 
-  defp do_build_pattern_matched_body({ :concatenation, left, right }, body, index, identifier_fn) do
+  defp do_build_pattern_matched_body({ :concatenation, left, right }, body, index, identifier_fn, guards) do
     param = Builder.identifier("_ref#{index}")
     {ident, _, _ } = right 
 
@@ -222,7 +232,7 @@ defmodule ElixirScript.Translator.PatternMatching do
     { param, body }
   end
 
-  defp do_build_pattern_matched_body({ type, elements }, body, index, identifier_fn) when type in [:tuple, :list] do
+  defp do_build_pattern_matched_body({ type, elements }, body, index, identifier_fn, guards) when type in [:tuple, :list] do
     state = %{ body: body, state_index: 0 }
 
     func = if type == :tuple, do: "is_tuple", else: "is_list"
@@ -251,7 +261,7 @@ defmodule ElixirScript.Translator.PatternMatching do
                 Builder.literal(current_state.state_index + new_index),
                 true
               )
-          end)
+          end, guards)
 
           {nil, %{current_state | body: new_body, state_index: current_state.state_index + 1 }}   
       end
@@ -275,7 +285,7 @@ defmodule ElixirScript.Translator.PatternMatching do
   end
 
 
-  defp do_build_pattern_matched_body({ :listhdtail, [head, tail] } , body, index, identifier_fn) do
+  defp do_build_pattern_matched_body({ :listhdtail, [head, tail] } , body, index, identifier_fn, guards) do
     param = Builder.identifier("_ref#{index}")
 
     head_declarator = Builder.variable_declarator(
@@ -317,7 +327,7 @@ defmodule ElixirScript.Translator.PatternMatching do
     { param, body }
   end
 
-  defp do_build_pattern_matched_body([the_param | variables], body, index, identifier_fn) do
+  defp do_build_pattern_matched_body([the_param | variables], body, index, identifier_fn, guards) do
 
     state = %{ body: body, state_index: 0 }
 
@@ -368,7 +378,7 @@ defmodule ElixirScript.Translator.PatternMatching do
                 Builder.literal(current_state.state_index + new_index),
                 true
               )
-          end)
+          end, guards)
 
           {nil, %{current_state | body: new_body, state_index: current_state.state_index + 1 }}   
       end
@@ -390,7 +400,7 @@ defmodule ElixirScript.Translator.PatternMatching do
     { Builder.identifier("_ref#{index}"), body }
   end
 
-  defp do_build_pattern_matched_body({:other, item }, body, index, identifier_fn) do
+  defp do_build_pattern_matched_body({:other, item }, body, index, identifier_fn, guards) do
     param = Builder.identifier("_ref#{index}")
     body = [
       Builder.if_statement(

@@ -18,7 +18,7 @@ defmodule ElixirScript.Translator.Primative do
     )
   end
 
-  def make_array(ast) when is_list(ast) do
+  def make_list(ast) when is_list(ast) do
     make_array_expression(ast)
   end
 

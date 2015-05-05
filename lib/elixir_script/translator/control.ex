@@ -87,11 +87,13 @@ defmodule ElixirScript.Translator.Control do
 
     case hd(clause) do
       {:when, _, [_the_clause, guard]} ->
-        ast = Builder.if_statement(
-          Translator.translate(guard),
-          translated_body,
-          nil
-        )
+        result = PatternMatching.build_pattern_matched_body(translated_body.body, [hd(clause)],
+        fn(_index) ->
+          Translator.translate(condition)
+        end, List.wrap(guard))
+
+        { ast, _params } = result
+        ast = hd(ast)
 
         %ESTree.IfStatement{ ast |  alternate: process_case(condition, tl(clauses), nil) }        
       _ ->
@@ -102,7 +104,7 @@ defmodule ElixirScript.Translator.Control do
             result = PatternMatching.build_pattern_matched_body(translated_body.body, [hd(clause)],
             fn(_index) ->
               Translator.translate(condition)
-            end)
+            end, nil)
             { ast, _params } = result
             ast = hd(ast)
 

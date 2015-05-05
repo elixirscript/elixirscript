@@ -1,4 +1,6 @@
-let Atom = function(value){
+let Atom;
+
+Atom = function(value){
   if (!(this instanceof Atom)) return new Atom(value);
   this.value = value;
 }

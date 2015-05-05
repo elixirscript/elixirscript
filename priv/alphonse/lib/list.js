@@ -16,9 +16,9 @@ let List = function(...args){
 
 List.__MODULE_ = [Atom('List')];
 
-List.prototype[Symbol.iterator] = function*() {
-  yield* this.value;
-}
+List.prototype[Symbol.iterator] = function() {
+  return this.value[Symbol.iterator]();
+};
 
 List.prototype.toString = function(){
   var i, s = "";
@@ -30,7 +30,7 @@ List.prototype.toString = function(){
   }
 
   return "[" + s + "]";
-}
+};
 
 List.delete = function(list, item){
   let new_value = [];

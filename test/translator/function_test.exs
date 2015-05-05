@@ -561,6 +561,25 @@ defmodule ElixirScript.Translator.Function.Test do
     """
 
     assert_translation(ex_ast, js_code)
+
+    ex_ast = quote do
+      def something(%AStruct{key: value, key1: 2}) when is_number(value) do
+      end
+    end
+
+
+    js_code = """
+      export function something(_ref0){
+        if(Kernel.match({'__struct__': [Atom('AStruct')], 'key': undefined, 'key1': 2}, arguments[0])){
+          let value = arguments[0]['key'];
+          if(Kernel.is_number(value)){
+            return null;
+          }
+        }
+      }
+    """
+
+    assert_translation(ex_ast, js_code)
   end
 
   should "pattern match function with binary part" do

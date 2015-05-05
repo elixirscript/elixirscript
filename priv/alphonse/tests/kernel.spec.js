@@ -48,6 +48,10 @@ describe('Kernel', function(){
       expect(Kernel.match({c: 1}, {a: 1, b: 2})).to.equal(false);
       expect(Kernel.match({c: undefined}, {a: 1, b: 2})).to.equal(false);
     })
+
+    it('match numbers with guards', function(){
+      expect(Kernel.match(1, 1, () => Kernel.is_number(1))).to.equal(true);
+    })
   })
 })
 

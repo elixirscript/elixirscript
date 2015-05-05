@@ -126,7 +126,11 @@ let Kernel = {
     return arg.toString();
   },
 
-  match: function(pattern, expr){
+  match: function(pattern, expr, guard = () => true){
+    if(!guard()){
+      return false;
+    }
+
     if(pattern === undefined){
       return true;
     }
