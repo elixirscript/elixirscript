@@ -18,7 +18,7 @@ describe('List', function(){
 
   describe('delete_at', function(){
     it('must delete first item', function(){
-      let t = List(1, 2, 3);
+      let t = [1, 2, 3];
       t = List.delete_at(t, 0);
       expect(t[0]).to.equal(2);
     })
@@ -26,7 +26,7 @@ describe('List', function(){
 
   describe('flatten', function(){
     it('must flatten a list into one list', function(){
-      let t = List(1, List(2), 3);
+      let t = [1, [2], 3];
 
       t = List.flatten(t);
 
@@ -36,7 +36,7 @@ describe('List', function(){
     })
 
     it('must flatten a deeply nested list into one list', function(){
-      let t = List(1, List(2, List(4)), 3);
+      let t = [1, [2, [4]], 3];
 
       t = List.flatten(t);
 
@@ -49,8 +49,8 @@ describe('List', function(){
 
   describe('toString', function(){
     it('must display correctly', function(){
-      let t = List(1, 2, 3);
-      expect(t.toString()).to.equal("[1, 2, 3]");
+      let t = [1, 2, 3];
+      expect(t.toString()).to.equal("1,2,3");
     })
   })
 })

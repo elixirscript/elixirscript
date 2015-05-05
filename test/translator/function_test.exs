@@ -198,7 +198,7 @@ defmodule ElixirScript.Translator.Function.Test do
     end 
 
     js_code = """
-      const __MODULE__ = [Atom('Example')];
+      const __MODULE__ = Atom('Example');
 
       function example__0(){ return null; throw new FunctionClauseError('no function clause matching in example/0'); }
       function example__1(oneArg){ return null; throw new FunctionClauseError('no function clause matching in example/1'); }
@@ -247,7 +247,7 @@ defmodule ElixirScript.Translator.Function.Test do
     end 
 
     js_code = """
-      const __MODULE__ = [Atom('Example')];
+      const __MODULE__ = Atom('Example');
 
       function example__0(){ return null; throw new FunctionClauseError('no function clause matching in example/0'); }
       function example__1(oneArg){ return null; throw new FunctionClauseError('no function clause matching in example/1'); }
@@ -284,7 +284,7 @@ defmodule ElixirScript.Translator.Function.Test do
     end 
 
     js_code = """
-      const __MODULE__ = [Atom('Example')];
+      const __MODULE__ = Atom('Example');
 
       export function example(oneArg){
         return null;
@@ -400,7 +400,7 @@ defmodule ElixirScript.Translator.Function.Test do
     end 
 
     js_code = """
-      const __MODULE__ = [Atom('Example')];
+      const __MODULE__ = Atom('Example');
 
       function something__1(one){
         if(Kernel._in(one,[1,2,3])){
@@ -657,7 +657,7 @@ defmodule ElixirScript.Translator.Function.Test do
 
 
     js_code = """
-      const __MODULE__ = [Atom('Example')];
+      const __MODULE__ = Atom('Example');
 
       function something__1(one){
         if(Kernel.match(1, arguments[0])){
@@ -708,7 +708,7 @@ defmodule ElixirScript.Translator.Function.Test do
 
 
     js_code = """
-     const __MODULE__ = [Atom('Example')];
+     const __MODULE__ = Atom('Example');
 
      function something__1(_ref0) {
          if (Kernel.match({ '__struct__': [Atom('AStruct')] }, arguments[0])) {

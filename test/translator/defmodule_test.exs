@@ -8,7 +8,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
       end
     end
 
-    assert_translation(ex_ast, "const __MODULE__ = [Atom('Elephant')];")
+    assert_translation(ex_ast, "const __MODULE__ = Atom('Elephant');")
 
     ex_ast = quote do
       defmodule Elephant do
@@ -24,7 +24,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
-      const __MODULE__ = [Atom('Elephant')];
+      const __MODULE__ = Atom('Elephant');
 
       const ul = JQuery('#todo-list');
 
@@ -52,7 +52,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
-      const __MODULE__ = [Atom('Elephant')];
+      const __MODULE__ = Atom('Elephant');
 
       import * as Crane from 'icabod/crane';
 

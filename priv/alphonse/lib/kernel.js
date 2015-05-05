@@ -43,7 +43,7 @@ let Kernel = {
   },
 
   is_list: function(x){
-    return x instanceof List;
+    return x instanceof Array;
   },
 
   is_map: function(x){

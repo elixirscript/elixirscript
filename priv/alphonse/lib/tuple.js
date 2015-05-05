@@ -69,11 +69,11 @@ Tuple.insert_at = function(tuple, index, term){
 };
 
 Tuple.from_list = function(list){
-  return Tuple.apply(null, list.value);
+  return Tuple.apply(null, list);
 };
 
 Tuple.to_list = function(tuple){
-  return List(...tuple.value);
+  return tuple.value;
 };
 
 export default Tuple;

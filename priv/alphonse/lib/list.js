@@ -3,34 +3,10 @@ import Atom from './atom';
 import Kernel from './kernel';
 import ElixirScript from './elixir_script';
 
-let List = function(...args){
-  if (!(this instanceof List)) return new List(...args);
+let List = {};
 
-  this.value = args;
-  this.length = args.length;
+List.__MODULE__ = Atom('List');
 
-  for (var i = 0; i < args.length; i++) {
-    this[i] = args[i];
-  }
-}
-
-List.__MODULE_ = [Atom('List')];
-
-List.prototype[Symbol.iterator] = function() {
-  return this.value[Symbol.iterator]();
-};
-
-List.prototype.toString = function(){
-  var i, s = "";
-  for (i = 0; i < this.length; i++) {
-    if (s !== "") {
-      s += ", ";
-    }
-    s += this[i].toString();
-  }
-
-  return "[" + s + "]";
-};
 
 List.delete = function(list, item){
   let new_value = [];
@@ -44,7 +20,7 @@ List.delete = function(list, item){
     }
   }
 
-  return List(...new_value);
+  return new_value;
 };
 
 List.delete_at = function(list, index){
@@ -52,11 +28,11 @@ List.delete_at = function(list, index){
 
   for(let i = 0; i < list.length; i++){
     if(i !== index){
-      new_value.push(ElixirScript.clone(list.value[i]));
+      new_value.push(ElixirScript.clone(list[i]));
     }    
   }
 
-  return List(...new_value);
+  return new_value;
 };
 
 List.duplicate = function(elem, n){
@@ -66,7 +42,7 @@ List.duplicate = function(elem, n){
     new_value.push(ElixirScript.clone(elem));
   };
 
-  return List(...new_value);
+  return new_value;
 };
 
 List.first = function(list){
@@ -82,7 +58,7 @@ List.flatten = function(list, tail = []){
 
   for(let x of list){
     if(Kernel.is_list(x)){
-      new_value = new_value.concat(List.flatten(x).value)
+      new_value = new_value.concat(List.flatten(x))
     }else{
       new_value.push(ElixirScript.clone(x));    
     }
@@ -90,7 +66,7 @@ List.flatten = function(list, tail = []){
 
   new_value = new_value.concat(ElixirScript.clone(tail));
 
-  return List(...new_value);  
+  return new_value;  
 };
 
 List.foldl = function(list, acc, func){
@@ -125,7 +101,7 @@ List.insert_at = function(list, index, value){
     }    
   }
 
-  return List(...new_value);
+  return new_value;
 };
 
 List.last = function(list){
@@ -147,7 +123,7 @@ List.replace_at = function(list, index, value){
     }    
   }
 
-  return List(...new_value);
+  return new_value;
 };
 
 List.update_at = function(list, index, fun){
@@ -161,11 +137,11 @@ List.update_at = function(list, index, fun){
     }    
   }
 
-  return List(...new_value);
+  return new_value;
 };
 
 List.wrap = function(list){
-  if(list instanceof List){
+  if(Kernel.is_list(list)){
     return list;
   }else if(list == null){
     return List();
@@ -197,11 +173,11 @@ List.zip = function(list_of_lists){
     new_value.push(Tuple(...current_value));
   }
 
-  return List(...new_value);
+  return new_value;
 };
 
 List.to_tuple = function(list){
-  return Tuple.apply(null, ElixirScript.clone(list.value));
+  return Tuple.apply(null, ElixirScript.clone(list));
 };
 
 export default List;
