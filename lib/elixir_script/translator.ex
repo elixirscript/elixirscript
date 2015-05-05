@@ -28,7 +28,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate(ast) when is_list(ast) do
-    Primative.make_array(ast)
+    Primative.make_list(ast)
   end
 
   defp do_translate({ one, two }) do
@@ -93,18 +93,6 @@ defmodule ElixirScript.Translator do
     end
   end
 
-  defp do_translate({:unquote, [], [expr]}) do
-    ExKernel.make_unquote(expr)
-  end
-
-  defp do_translate({:quote, [], [[do: block]]}) do
-    translate(block)
-  end
-
-  defp do_translate({:quote, [], [opts, [do: block]]}) do
-    translate(block)
-  end
-
   defp do_translate({{:., _, [Access, :get]}, _, [target, property]}) do
     Data.make_get_property(target, property)
   end
@@ -135,6 +123,42 @@ defmodule ElixirScript.Translator do
 
   defp do_translate({:__block__, _, expressions }) do
     Control.make_block(expressions)
+  end
+
+  defp do_translate({:__DIR__, _, _expressions }) do
+    ExKernel.make___DIR__()
+  end
+
+  defp do_translate({:receive, _, _expressions }) do
+    raise ElixirScript.ParseError, :receive
+  end
+
+  defp do_translate({:super, _, _expressions }) do
+    raise ElixirScript.ParseError, :super
+  end
+
+  defp do_translate({:try, _, _expressions }) do
+    raise ElixirScript.ParseError, :try
+  end
+
+  defp do_translate({:__CALLER__, _, _expressions }) do
+    raise ElixirScript.ParseError, :__CALLER__
+  end
+
+  defp do_translate({:__ENV__, _, _expressions }) do
+    raise ElixirScript.ParseError, :__ENV__
+  end
+
+  defp do_translate({:quote, [], _expr}) do
+    raise ElixirScript.ParseError, :quote
+  end
+
+  defp do_translate({:unquote, [], _expr}) do
+    raise ElixirScript.ParseError, :unquote
+  end
+
+  defp do_translate({:unquote_splicing, _, _expressions }) do
+    raise ElixirScript.ParseError, :unquote_splicing
   end
 
   defp do_translate({:import, _, [{:__aliases__, _, module_name_list}]}) do
@@ -177,8 +201,8 @@ defmodule ElixirScript.Translator do
     Primative.make_tuple(elements)
   end
 
-  defp do_translate({:-, _, [number]}) when is_number(number) do
-    Expression.make_negative_number(number)
+  defp do_translate({operator, _, [value]}) when operator in [:-, :!] do
+    Expression.make_unary_expression(operator, value)
   end
 
   defp do_translate({:=, _, [left, right]}) do
@@ -193,22 +217,22 @@ defmodule ElixirScript.Translator do
     Expression.make_binary_expression(operator, left, right)
   end
 
-  defp do_translate({:def, _, [{:when, _, [{name, _, params} | guards] }, [do: body]] } = ast) do
+  defp do_translate({:def, _, [{:when, _, [{_name, _, _params} | _guards] }, [do: _body]] } = ast) do
     {:def, _, [{:when, _, [{name, _, params} | guards] }, [do: body]] } = Preparer.prepare(ast)
     Function.make_export_function(name, params, body, guards)
   end
 
-  defp do_translate({:def, _, [{name, _, params}, [do: body]]} = ast) do
+  defp do_translate({:def, _, [{_name, _, _params}, [do: _body]]} = ast) do
     {:def, _, [{name, _, params}, [do: body]]} = Preparer.prepare(ast)
     Function.make_export_function(name, params, body)
   end
 
-  defp do_translate({:defp, _, [{:when, _, [{name, _, params} | guards] }, [do: body]] } = ast) do
+  defp do_translate({:defp, _, [{:when, _, [{_name, _, _params} | _guards] }, [do: _body]] } = ast) do
     {:defp, _, [{:when, _, [{name, _, params} | guards] }, [do: body]] } = Preparer.prepare(ast)
     Function.make_function(name, params, body, guards)
   end
 
-  defp do_translate({:defp, _, [{name, _, params}, [do: body]]} = ast) do
+  defp do_translate({:defp, _, [{_name, _, _params}, [do: _body]]} = ast) do
     {:defp, _, [{name, _, params}, [do: body]]} = Preparer.prepare(ast)
     Function.make_function(name, params, body)
   end

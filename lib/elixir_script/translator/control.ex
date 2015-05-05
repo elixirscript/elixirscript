@@ -86,12 +86,14 @@ defmodule ElixirScript.Translator.Control do
     translated_body = Function.return_last_expression(translated_body)
 
     case hd(clause) do
-      {:when, _, [the_clause, guard]} ->
-        ast = Builder.if_statement(
-          Translator.translate(guard),
-          translated_body,
-          nil
-        )
+      {:when, _, [_the_clause, guard]} ->
+        result = PatternMatching.build_pattern_matched_body(translated_body.body, [hd(clause)],
+        fn(_index) ->
+          Translator.translate(condition)
+        end, List.wrap(guard))
+
+        { ast, _params } = result
+        ast = hd(ast)
 
         %ESTree.IfStatement{ ast |  alternate: process_case(condition, tl(clauses), nil) }        
       _ ->
@@ -100,9 +102,9 @@ defmodule ElixirScript.Translator.Control do
             translated_body
           _ ->
             result = PatternMatching.build_pattern_matched_body(translated_body.body, [hd(clause)],
-            fn(index) ->
+            fn(_index) ->
               Translator.translate(condition)
-            end)
+            end, nil)
             { ast, _params } = result
             ast = hd(ast)
 
@@ -113,9 +115,8 @@ defmodule ElixirScript.Translator.Control do
 
 
   def make_for(generators) do
-    _results = Builder.identifier("_results")
-    variable_declarator = Builder.variable_declarator(_results, Builder.array_expression([]))
-    variable_declaration = Builder.variable_declaration([variable_declarator], :let)
+    _results = Translator.translate(quote do: _results)
+    variable_declaration = Translator.translate(quote do: _results = [])
 
     block_statement = [variable_declaration] ++ [handle_generators(generators)] ++ [Builder.return_statement(_results)]
 
@@ -131,7 +132,7 @@ defmodule ElixirScript.Translator.Control do
 
     case hd(generators) do
       {:<-, [], [identifier, enum]} ->
-        i =  Translator.translate(identifier)
+        i = Translator.translate(identifier)
         variable_declarator = Builder.variable_declarator(i)
         variable_declaration = Builder.variable_declaration([variable_declarator], :let)
 

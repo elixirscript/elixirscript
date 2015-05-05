@@ -50,17 +50,7 @@ defmodule ElixirScript.Translator.Function do
   end
 
   defp do_make_function(name, params, body, guards) do
-    { body, params } = prepare_function_body(body) |> PatternMatching.build_pattern_matched_body(params, &pattern_match_identifier/1)
-
-    body = if guards do
-      [Builder.if_statement(
-        guards |> Enum.map(&Translator.translate(&1)) |> hd,
-        Builder.block_statement(body)
-      )
-    ]
-    else
-      body
-    end
+    { body, params } = prepare_function_body(body) |> PatternMatching.build_pattern_matched_body(params, &pattern_match_identifier/1, guards)
 
     Builder.function_declaration(
       Builder.identifier(name),

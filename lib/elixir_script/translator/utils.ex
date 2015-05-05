@@ -83,4 +83,15 @@ defmodule ElixirScript.Translator.Utils do
     )
   end
 
+  def make_match(pattern, expr, guard) do
+    Builder.call_expression(
+      make_member_expression("Kernel", "match"),
+      [
+        pattern,
+        expr,
+        guard
+      ]
+    )
+  end
+
 end

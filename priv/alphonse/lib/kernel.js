@@ -1,15 +1,16 @@
 import Atom from './atom';
 import Tuple from './tuple';
+import List from './list';
 
 let Kernel = {
   __MODULE_: [Atom('Kernel')],
 
   tl: function(list){
-    return list.slice(1);
+    return List.delete_at(list, 0);
   },
 
   hd: function(list){
-    return list.slice(0,1)[0];
+    return List.first(list);
   },
 
   is_nil: function(x){
@@ -125,7 +126,11 @@ let Kernel = {
     return arg.toString();
   },
 
-  match: function(pattern, expr){
+  match: function(pattern, expr, guard = () => true){
+    if(!guard()){
+      return false;
+    }
+
     if(pattern === undefined){
       return true;
     }

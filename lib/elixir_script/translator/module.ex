@@ -191,7 +191,7 @@ defmodule ElixirScript.Translator.Module do
   defp create__module__(module_name_list) do
     declarator = Builder.variable_declarator(
       Builder.identifier(:__MODULE__),
-      ElixirScript.Translator.translate(module_name_list)
+      ElixirScript.Translator.translate(List.last(module_name_list))
     )
 
     Builder.variable_declaration([declarator], :const)
