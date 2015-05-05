@@ -70,11 +70,14 @@ $ ex2js -h
 
   * No defmacro
   * No try
-  * limited for (can't do into yet)
   * No receive
   * No quote
   * No unquote
   * No super
+  * No GenEvent
+  * No GenServer
+  * No Behaviour
+  * limited for (can't do into yet)
   * Limited support for standard library
   * No regular expressions
 
@@ -82,11 +85,20 @@ $ ex2js -h
 
 TODO (high level list of todos)
 ======
-* [x] pattern matching (still rough, missing bitstring pattern matching) 
+* [x] pattern matching (missing bitstring pattern matching) 
 * [x] case
 * [x] cond
 * [x] for (currently does not support keyword list matching or into yet)
 * [ ] try
+* [ ] receive
+* [ ] quote
+* [ ] unquote
+* [ ] defmacro
+* [ ] super
+* [ ] defoverridable
+* [ ] GenServer
+* [ ] GenEvent
+* [ ] Behaviour
 * [x] bitstring
 * [x] string interpolation
 * [x] return from a function
@@ -97,9 +109,8 @@ TODO (high level list of todos)
 * [x] figure out how using external js modules will work
 * [ ] spawn
 * [ ] actors
-* [ ] optimize converted javascript
 * [ ] regular expression
 * [x] multiple arity functions
 * [x] make example project [bryanjos/example](https://github.com/bryanjos/example)
-* [ ] use erlang_js and remove node.js dependency
+* [ ] optimize converted javascript
 * [ ] Prototype rich frontend framework using elixir design patterns

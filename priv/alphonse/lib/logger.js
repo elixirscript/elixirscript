@@ -1,7 +1,7 @@
 import Atom from './atom';
 
 let Logger = {
-  __MODULE_: [Atom('Logger')],
+  __MODULE_: Atom('Logger'),
 
   debug: function(message){
     console.debug(message);

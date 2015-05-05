@@ -9,7 +9,7 @@ Atom.prototype.toString = function () {
   return this.value;
 };
 
-Atom.__MODULE_ = [Atom('Atom')];
+Atom.__MODULE_ = Atom('Atom');
 
 Atom.to_string = function (atom) {
   return atom.toString();

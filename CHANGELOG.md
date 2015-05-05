@@ -1,10 +1,12 @@
-# v0.4.0-dev
+# v0.4.0
   * Enhancements
-    * Bitstrings
+    * bitstrings
+    * Better Pattern Matching (Does not support bitstrings yet)
     * Capture Operator
     * Fixed multi arity implementation
     * Updated variable implementation to match Elixir's (i.e. Reusing the same variable name creates a new one in the background)
     * Throwing ParseError for SpecialForms currently not supported
+    * Added more functions from the list standard library
 
 # v0.3.0
   * Enhancements

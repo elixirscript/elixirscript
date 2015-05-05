@@ -3,7 +3,7 @@ import Tuple from './tuple';
 import List from './list';
 
 let Kernel = {
-  __MODULE_: [Atom('Kernel')],
+  __MODULE_: Atom('Kernel'),
 
   tl: function(list){
     return List.delete_at(list, 0);

@@ -91,7 +91,7 @@ let BitString = function(...args){
   }
 }
 
-BitString.prototype.__MODULE_ = [Atom('BitString')];
+BitString.prototype.__MODULE_ = Atom('BitString');
 
 BitString.prototype.toString = function(){
   var i, s = "";
