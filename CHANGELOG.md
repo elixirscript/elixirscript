@@ -4,6 +4,7 @@
     * Capture Operator
     * Fixed multi arity implementation
     * Updated variable implementation to match Elixir's (i.e. Reusing the same variable name creates a new one in the background)
+    * Throwing ParseError for SpecialForms currently not supported
 
 # v0.3.0
   * Enhancements

@@ -39,7 +39,7 @@ Tuple.delete_at = function(tuple, index){
     }
   };
 
-  return Tuple.from_list(new_list);
+  return Tuple.apply(null, new_list);
 };
 
 Tuple.duplicate = function(data, size){
@@ -49,7 +49,7 @@ Tuple.duplicate = function(data, size){
     array.push(data)
   };
 
-  return Tuple.from_list(array);
+  return Tuple.apply(null, array);
 };
 
 Tuple.insert_at = function(tuple, index, term){
@@ -65,15 +65,15 @@ Tuple.insert_at = function(tuple, index, term){
     }
   };
 
-  return Tuple.from_list(new_tuple);
+  return Tuple.apply(null, new_tuple);
 };
 
 Tuple.from_list = function(list){
-  return Tuple.apply(null, list);
+  return Tuple.apply(null, list.value);
 };
 
 Tuple.to_list = function(tuple){
-  return tuple.value.slice(0);
+  return List(...tuple.value);
 };
 
 export default Tuple;

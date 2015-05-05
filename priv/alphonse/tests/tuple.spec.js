@@ -1,4 +1,5 @@
 var Tuple = require('../lib/tuple');
+var List = require('../lib/list');
 var expect = require('chai').expect;
 
 describe('Tuple', function(){
@@ -35,7 +36,7 @@ describe('Tuple', function(){
 
   describe('from_list', function(){
     it('must create a tuple from a list', function(){
-      let list = [1, 2, 3];
+      let list = List(1, 2, 3);
       expect(Tuple.from_list(list).toString()).to.equal("{1, 2, 3}");
     })
   })
