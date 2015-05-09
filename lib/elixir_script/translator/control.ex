@@ -132,15 +132,23 @@ defmodule ElixirScript.Translator.Control do
 
     case hd(generators) do
       {:<-, [], [identifier, enum]} ->
-        i = Translator.translate(identifier)
-        variable_declarator = Builder.variable_declarator(i)
-        variable_declaration = Builder.variable_declaration([variable_declarator], :let)
+        case identifier do
+          {value_one, value_two} ->
+            elements = [value_one, value_two]
+            make_tuple_for(elements, enum, generators)
+          {:{}, _, elements} ->
+            make_tuple_for(elements, enum, generators)
+          _ ->
+            i = Translator.translate(identifier)
+            variable_declarator = Builder.variable_declarator(i)
+            variable_declaration = Builder.variable_declaration([variable_declarator], :let)
 
-        Builder.for_of_statement(
-          variable_declaration,
-          Translator.translate(enum),
-          handle_generators(tl(generators))
-        )
+            Builder.for_of_statement(
+              variable_declaration,
+              Translator.translate(enum),
+              Builder.block_statement(List.wrap(handle_generators(tl(generators))))
+            )
+        end
       [do: expression] ->
         push_last_expression(Translator.translate(expression))
       filter ->
@@ -151,6 +159,56 @@ defmodule ElixirScript.Translator.Control do
         )
     end
 
+  end
+
+  defp make_tuple_for(elements, enum, generators) do
+    i = Builder.identifier("_ref")
+    variable_declarator = Builder.variable_declarator(i)
+    variable_declaration = Builder.variable_declaration([variable_declarator], :let)
+
+    { variables, _ } = Enum.map_reduce(elements, 0, 
+      fn(x, index) -> 
+        case Translator.translate(x) do
+          %ESTree.Identifier{} ->
+            variable_declarator = Builder.variable_declarator(Translator.translate(x), 
+              Utils.make_array_accessor_call("_ref", index)
+            )
+            variable_declaration = Builder.variable_declaration([variable_declarator], :let)
+
+            {variable_declaration, index + 1}
+          _ ->
+            {nil, index + 1}
+        end
+      end)
+
+    variables = Enum.filter(variables, fn(x) -> x != nil end)
+
+    new_identifier = Enum.map(elements, fn(x) ->
+        case Translator.translate(x) do
+          %ESTree.Identifier{} ->
+            Builder.identifier(:undefined)
+          _ ->
+            Translator.translate(x)
+        end
+    end) 
+    
+    new_identifier = Builder.call_expression(
+      Builder.identifier("Tuple"), 
+      new_identifier
+    )
+
+    Builder.for_of_statement(
+      variable_declaration,
+      Translator.translate(enum),
+      Builder.block_statement(
+        [
+          Builder.if_statement(
+            Utils.make_match(i, new_identifier),
+            Builder.block_statement(variables ++ List.wrap(handle_generators(tl(generators))))
+          )
+        ]
+      )
+    )
   end
 
   defp push_last_expression(%ESTree.BlockStatement{} = block) do

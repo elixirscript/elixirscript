@@ -11,8 +11,9 @@ defmodule ElixirScript.Translator.For.Test do
       (function(){
         let _results = [];
 
-        for(let n of [1,2,3,4])
+        for(let n of [1,2,3,4]){
           _results.push(n * 2);
+        }
         
         return _results;
       }());
@@ -30,8 +31,9 @@ defmodule ElixirScript.Translator.For.Test do
       (function(){
         let _results = [];
 
-        for(let n of 'Opera')
+        for(let n of 'Opera'){
           _results.push(n);
+        }
         
         return _results;
       }());
@@ -49,9 +51,11 @@ defmodule ElixirScript.Translator.For.Test do
       (function(){
         let _results = [];
 
-        for(let x of [1,2])
-          for(let y of [2,3])
+        for(let x of [1,2]){
+          for(let y of [2,3]){
             _results.push(x * y);
+          }
+        }
           
         return _results;
       }());
@@ -71,9 +75,11 @@ defmodule ElixirScript.Translator.For.Test do
       let r = (function(){
         let _results = [];
 
-        for(let x of [1,2])
-          for(let y of [2,3])
+        for(let x of [1,2]){
+          for(let y of [2,3]){
             _results.push(x * y);
+          }
+        }
           
         return _results;
       }());;
@@ -91,9 +97,35 @@ defmodule ElixirScript.Translator.For.Test do
       (function(){
         let _results = [];
 
-        for(let n of [1, 2, 3, 4, 5, 6])
-          if(Kernel.rem(n, 2) == 0)
-            _results.push(n);
+        for(let n of [1, 2, 3, 4, 5, 6]){
+            if(Kernel.rem(n, 2) == 0)
+              _results.push(n);
+        }
+
+        return _results;
+      }());
+    """
+
+    assert_translation(ex_ast, js_code)
+  end
+
+  should "translate for with pattern matched input" do
+    ex_ast = quote do
+      for {:user, name} <- [user: "john", admin: "john", user: "meg"] do
+        String.upcase(name)
+      end
+    end
+
+    js_code = """
+      (function(){
+        let _results = [];
+
+        for(let _ref of [Tuple(Atom('user'), 'john'), Tuple(Atom('admin'), 'john'), Tuple(Atom('user'), 'meg')]){
+          if(Kernel.match(_ref, Tuple(Atom('user'), undefined))){
+            let name = _ref[1];
+            _results.push(String.upcase(name));
+          }
+        }
 
         return _results;
       }());
