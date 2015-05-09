@@ -149,6 +149,8 @@ defmodule ElixirScript.Translator.Control do
               Builder.block_statement(List.wrap(handle_generators(tl(generators))))
             )
         end
+      [into: expression] ->
+        raise ElixirScript.ParseError, :into
       [do: expression] ->
         push_last_expression(Translator.translate(expression))
       filter ->

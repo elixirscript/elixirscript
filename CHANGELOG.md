@@ -1,4 +1,6 @@
 # v0.5.0-dev
+  * Enhancements
+    * For statements now work with pattern matching tuples
 
 # v0.4.0
   * Enhancements
