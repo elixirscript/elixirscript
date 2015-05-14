@@ -44,11 +44,54 @@ defmodule ElixirScript.Translator.Utils do
   end
 
   def make_member_expression(module_name, function_name, computed \\ false) do
-    Builder.member_expression(
-      Builder.identifier(module_name),
-      Builder.identifier(function_name),
-      computed
-    )
+    case module_name do
+      modules when is_list(modules) and length(modules) > 1 ->
+        ast = Enum.chunk(modules, 2)
+        |> Enum.reduce(nil, fn(x, ast) ->
+          case x do
+            [one] ->
+              if is_nil(ast) do
+                Builder.identifier(one)
+              else
+                Builder.member_expression(
+                  ast,
+                  Builder.identifier(one),
+                  computed
+                )
+              end
+            [one, two] ->
+              if is_nil(ast) do
+                Builder.member_expression(
+                  Builder.identifier(one),
+                  Builder.identifier(two),
+                  computed
+                )
+              else
+                Builder.member_expression(
+                  ast,
+                  Builder.member_expression(
+                    Builder.identifier(one),
+                    Builder.identifier(two),
+                    computed
+                  ),
+                  computed
+                )
+              end
+          end
+        end)
+
+        Builder.member_expression(
+          ast,
+          Builder.identifier(function_name),
+          computed
+        )        
+      _ ->
+        Builder.member_expression(
+          Builder.identifier(module_name),
+          Builder.identifier(function_name),
+          computed
+        )              
+    end
   end
 
   def make_array_accessor_call(name, index) do

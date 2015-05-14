@@ -129,36 +129,45 @@ defmodule ElixirScript.Translator do
     ExKernel.make___DIR__()
   end
 
+
+#  defp do_translate({:try, _, [ [do: do_block, rescue: clauses, after: after_block] ]}) do
+#    Control.make_try(do_block, clauses, after_block)
+#  end
+#
+#  defp do_translate({:try, _, [ [do: do_block, rescue: clauses] ]}) do
+#    Control.make_try(do_block, clauses)
+#  end
+
+  defp do_translate({:try, _, _expressions}) do
+    raise ElixirScript.UnsupportedError, ":try"
+  end
+
   defp do_translate({:receive, _, _expressions }) do
-    raise ElixirScript.ParseError, :receive
+    raise ElixirScript.UnsupportedError, :receive
   end
 
   defp do_translate({:super, _, _expressions }) do
-    raise ElixirScript.ParseError, :super
-  end
-
-  defp do_translate({:try, _, _expressions }) do
-    raise ElixirScript.ParseError, :try
+    raise ElixirScript.UnsupportedError, :super
   end
 
   defp do_translate({:__CALLER__, _, _expressions }) do
-    raise ElixirScript.ParseError, :__CALLER__
+    raise ElixirScript.UnsupportedError, :__CALLER__
   end
 
   defp do_translate({:__ENV__, _, _expressions }) do
-    raise ElixirScript.ParseError, :__ENV__
+    raise ElixirScript.UnsupportedError, :__ENV__
   end
 
   defp do_translate({:quote, [], _expr}) do
-    raise ElixirScript.ParseError, :quote
+    raise ElixirScript.UnsupportedError, :quote
   end
 
   defp do_translate({:unquote, [], _expr}) do
-    raise ElixirScript.ParseError, :unquote
+    raise ElixirScript.UnsupportedError, :unquote
   end
 
   defp do_translate({:unquote_splicing, _, _expressions }) do
-    raise ElixirScript.ParseError, :unquote_splicing
+    raise ElixirScript.UnsupportedError, :unquote_splicing
   end
 
   defp do_translate({:import, _, [{:__aliases__, _, module_name_list}]}) do

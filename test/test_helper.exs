@@ -14,7 +14,7 @@ defmodule ElixirScript.TestHelper do
       {:ok, js_code} ->
         js_code
       {:error, error} ->
-        raise ElixirScript.ParseError, message: error
+        raise ElixirScript.ParseError, message: Poison.encode!(js_ast)
     end
   end
 
