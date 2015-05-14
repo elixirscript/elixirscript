@@ -42,7 +42,7 @@ defmodule ElixirScript.Translator.Import do
   end
 
   defp make_source(name) do
-    source = Enum.map(name, fn(x) -> Atom.to_string(x) |> String.downcase end) |> Enum.join("/")
+    source = Enum.map(name, fn(x) -> Atom.to_string(x) |> Inflex.underscore |> String.downcase end) |> Enum.join("/")
     "'#{source}'"
   end
 

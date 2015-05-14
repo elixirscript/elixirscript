@@ -2,6 +2,29 @@ defmodule ElixirScript.Translator.Bug.Test do
   use ShouldI
   import ElixirScript.TestHelper
 
+  should "correctly handle casing module imports" do
+    ex_ast = quote do
+      alias Stores.GraphicStore
+    end
+
+    js_code = """
+      import * as GraphicStore from 'stores/graphic_store';
+    """
+
+    assert_translation(ex_ast, js_code)
+  end
+
+  should "correctly handle local default module importing" do
+    ex_ast = quote do
+      require Stores.GraphicStore
+    end
+
+    js_code = """
+      import GraphicStore from 'stores/graphic_store';
+    """
+
+    assert_translation(ex_ast, js_code)
+  end
 
   should "correctly call multi-module functions" do
     ex_ast = quote do
