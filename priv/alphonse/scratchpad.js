@@ -141,5 +141,13 @@ function parse_z(){
   return parse('undefined');
 }
 
-var g = escodegen.generate(parse_z());
+function parse_default_import(){
+  return parse("import { default as foo } from 'lib';");
+}
+
+function parse_export_statement(){
+  return parse("export default Elephant;");
+}
+
+var g = escodegen.generate(parse_export_statement());
 console.log(g);

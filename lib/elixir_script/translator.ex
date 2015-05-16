@@ -171,19 +171,27 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:import, _, [{:__aliases__, _, module_name_list}]}) do
-    Import.make_import(module_name_list)
+    Import.make_import(module_name_list, [])
   end
 
-  defp do_translate({:import, _, [{:__aliases__, _, module_name_list}, [only: function_list] ]}) do
-    Import.make_import(module_name_list, function_list)
+  defp do_translate({:import, _, [{:__aliases__, _, module_name_list}, options ]}) do
+    Import.make_import(module_name_list, options)
   end
 
-  defp do_translate({:alias, _, alias_info}) do
-    Import.make_alias_import(alias_info)
+  defp do_translate({:alias, _, [alias_info, options]}) do
+    Import.make_alias_import(alias_info, options)
   end
 
-  defp do_translate({:require, _, [{:__aliases__, _, module_name_list}]}) do
-    Import.make_default_import(module_name_list)
+  defp do_translate({:alias, _, [alias_info]}) do
+    Import.make_alias_import(alias_info, [])
+  end
+
+  defp do_translate({:require, _, [alias_info, options]}) do
+    Import.make_alias_import(alias_info, options)
+  end
+
+  defp do_translate({:require, _, [alias_info]}) do
+    Import.make_alias_import(alias_info, [])
   end
 
   defp do_translate({:case, _, [condition, [do: clauses]]}) do

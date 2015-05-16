@@ -8,7 +8,7 @@ defmodule ElixirScript.Translator.Bug.Test do
     end
 
     js_code = """
-      import * as GraphicStore from 'stores/graphic_store';
+      import GraphicStore from 'stores/graphic_store';
     """
 
     assert_translation(ex_ast, js_code)
