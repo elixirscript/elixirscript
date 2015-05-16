@@ -111,12 +111,4 @@ defmodule ElixirScript do
         Path.join(replaced_path)
     end
   end
-
-  defmacro js_import(_opts) do
-    
-  end
-
-  defmacro js_export(_opts) do
-    
-  end
 end
