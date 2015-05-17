@@ -111,6 +111,6 @@ TODO (high level list of todos)
 * [ ] actors
 * [ ] regular expression
 * [x] multiple arity functions
-* [x] make example project [bryanjos/example](https://github.com/bryanjos/example)
+* [x] make example projects [todo-elixirscript](https://github.com/bryanjos/example), [color_bar_spike](https://github.com/bryanjos/color_bar_spike)
 * [ ] optimize converted javascript
 * [ ] Prototype rich frontend framework using elixir design patterns
