@@ -29,6 +29,61 @@ defmodule ElixirScript.Translator.Utils do
     )
   end
 
+  def make_module_expression_tree([module], computed) do
+    make_module_expression_tree(module, computed)
+  end
+
+  def make_module_expression_tree(modules, computed) when is_list(modules) do
+    Enum.chunk(modules, 2)
+    |> Enum.reduce(nil, fn(x, ast) ->
+      case x do
+        [one] ->
+          if is_nil(ast) do
+            make_module_expression_tree(one, computed)
+          else
+            Builder.member_expression(
+              ast,
+              make_module_expression_tree(one, computed),
+              computed
+            )
+          end
+        [one, two] ->
+          if is_nil(ast) do
+            Builder.member_expression(
+              make_module_expression_tree(one, computed),
+              make_module_expression_tree(two, computed),
+              computed
+            )
+          else
+            Builder.member_expression(
+              ast,
+              Builder.member_expression(
+                make_module_expression_tree(one, computed),
+                make_module_expression_tree(two, computed),
+                computed
+              ),
+              computed
+            )
+          end
+      end
+    end)
+  end
+
+  def make_module_expression_tree(module, computed) when is_binary(module) or is_atom(module) do
+    Builder.identifier(module)
+  end
+
+  def make_module_expression_tree(module, computed) do
+    Translator.translate(module)
+  end
+
+  def make_call_expression_with_ast_params(module_name, function_name, params) do
+    Builder.call_expression(
+      make_member_expression(module_name, function_name),
+      params
+    )
+  end
+
   def make_call_expression(module_name, function_name, params) do
     Builder.call_expression(
       make_member_expression(module_name, function_name),
@@ -46,45 +101,24 @@ defmodule ElixirScript.Translator.Utils do
   def make_member_expression(module_name, function_name, computed \\ false) do
     case module_name do
       modules when is_list(modules) and length(modules) > 1 ->
-        ast = Enum.chunk(modules, 2)
-        |> Enum.reduce(nil, fn(x, ast) ->
-          case x do
-            [one] ->
-              if is_nil(ast) do
-                Builder.identifier(one)
-              else
-                Builder.member_expression(
-                  ast,
-                  Builder.identifier(one),
-                  computed
-                )
-              end
-            [one, two] ->
-              if is_nil(ast) do
-                Builder.member_expression(
-                  Builder.identifier(one),
-                  Builder.identifier(two),
-                  computed
-                )
-              else
-                Builder.member_expression(
-                  ast,
-                  Builder.member_expression(
-                    Builder.identifier(one),
-                    Builder.identifier(two),
-                    computed
-                  ),
-                  computed
-                )
-              end
-          end
-        end)
-
+        ast = make_module_expression_tree(modules, computed)
         Builder.member_expression(
           ast,
           Builder.identifier(function_name),
           computed
-        )        
+        )
+      {{:., _, [_module_name, _function_name]}, _, _params } = ast ->
+        Builder.member_expression(
+          Translator.translate(ast),
+          Builder.identifier(function_name),
+          computed                 
+        )
+      {:., _, _} = ast ->
+        Builder.member_expression(
+          Translator.translate(ast),
+          Builder.identifier(function_name),
+          computed                 
+        )
       _ ->
         Builder.member_expression(
           Builder.identifier(module_name),

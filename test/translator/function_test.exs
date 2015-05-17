@@ -223,6 +223,9 @@ defmodule ElixirScript.Translator.Function.Test do
             break;
         }
       }
+
+     let Example = {};
+     export default Example;
     """  
     assert_translation(ex_ast, js_code)
 
@@ -255,7 +258,7 @@ defmodule ElixirScript.Translator.Function.Test do
       function example__3(oneArg, twoArg, redArg){ return null; throw new FunctionClauseError('no function clause matching in example/3'); }
       function example__4(oneArg, twoArg, redArg, blueArg){ return null; throw new FunctionClauseError('no function clause matching in example/4'); }
 
-      export function example(...args){
+      function example(...args){
         switch(args.length){
           case 0:
            return example__0.apply(null,args.slice(0, 0+1));
@@ -272,6 +275,9 @@ defmodule ElixirScript.Translator.Function.Test do
             break;
         }
       }
+
+     let Example = {example: example};
+     export default Example;
     """  
     assert_translation(ex_ast, js_code)
 
@@ -286,9 +292,12 @@ defmodule ElixirScript.Translator.Function.Test do
     js_code = """
       const __MODULE__ = Atom('Example');
 
-      export function example(oneArg){
+      function example(oneArg){
         return null;
       }
+
+     let Example = {example: example};
+     export default Example;
     """  
     assert_translation(ex_ast, js_code)
 
@@ -414,7 +423,7 @@ defmodule ElixirScript.Translator.Function.Test do
         throw new FunctionClauseError('no function clause matching in something/1');
       }
 
-      export function something(...args){
+      function something(...args){
         switch(args.length){
           case 1:
             return something__1.apply(null,args.slice(0,1+1));
@@ -423,6 +432,9 @@ defmodule ElixirScript.Translator.Function.Test do
             break;
         }
       }
+
+     let Example = {something: something};
+     export default Example;
     """  
     assert_translation(ex_ast, js_code)
 
@@ -677,7 +689,7 @@ defmodule ElixirScript.Translator.Function.Test do
         throw new FunctionClauseError('no function clause matching in something/1');
       }
 
-      export function something(...args){
+      function something(...args){
         switch(args.length){
           case 1:
             return something__1.apply(null,args.slice(0,1+1));
@@ -686,6 +698,9 @@ defmodule ElixirScript.Translator.Function.Test do
             break;
         }
       }
+
+     let Example = { something: something };
+     export default Example;
     """
     
     assert_translation(ex_ast, js_code)
@@ -733,7 +748,7 @@ defmodule ElixirScript.Translator.Function.Test do
          throw new FunctionClauseError('no function clause matching in something/1');
      }
 
-     export function something(...args) {
+    function something(...args) {
          switch (args.length) {
          case 1:
              return something__1.apply(null, args.slice(0, 1 + 1));
@@ -742,6 +757,9 @@ defmodule ElixirScript.Translator.Function.Test do
              break;
          }
      }
+
+     let Example = { something: something };
+     export default Example;
     """
     
     assert_translation(ex_ast, js_code)

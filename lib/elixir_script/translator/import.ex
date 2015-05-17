@@ -2,53 +2,74 @@ defmodule ElixirScript.Translator.Import do
   require Logger
   alias ESTree.Builder
 
-  def make_alias_import(alias_info) do
-    {_, _, name} = hd(alias_info)
+  def make_alias_import(alias_info, options) do
+    {_, _, name} = alias_info
 
-    import_id = if length(alias_info) > 1 do
-      {_, _, alt} = List.last(alias_info)[:as]
+    import_specifier = if options[:as] do
+      {_, _, alt} = options[:as]
       Builder.identifier(alt)
+      Builder.import_specifier(
+        Builder.identifier("default"),
+        Builder.identifier(alt)
+      )
     else
-      List.last(name) |> Builder.identifier
+      List.last(name) 
+      |> Builder.identifier
+      |> Builder.import_default_specifier()  
     end
 
-    make_namespace_import(import_id, make_source(name))
-  end
-
-  def make_default_import(module_name_list) do
-    mod = List.last(module_name_list) |> Builder.identifier
+    import_path = if options[:from] do
+      "'#{options[:from]}'"
+    else
+      make_source(name)
+    end
 
     Builder.import_declaration(
-      [Builder.import_default_specifier(mod)], 
-      Builder.identifier(make_source(module_name_list))
+      [import_specifier], 
+      Builder.identifier(import_path)
     )
   end
 
-  def make_import(module_name_list) do
+  def make_import(module_name_list, options) do
     mod = List.last(module_name_list) |> Builder.identifier
-    make_namespace_import(mod, make_source(module_name_list))
-  end
 
-  def make_import(module_name_list, function_list) do
-    source = make_source(module_name_list)
+    specifiers = if options[:only] do
+      Enum.map(options[:only], fn({name, _arity}) -> 
+        Builder.import_specifier(
+          Builder.identifier(name)
+        )
+      end)
+    else
+      List.wrap(Builder.import_namespace_specifier(mod))
+    end
 
-    identifiers = Enum.map(function_list, fn({name, _arity}) -> 
-      Builder.import_specifier(
-        Builder.identifier(name)
-      )
-    end)
+    import_path = if options[:from] do
+      "'#{options[:from]}'"
+    else
+      make_source(module_name_list)
+    end
 
-    Builder.import_declaration(identifiers, Builder.identifier(source))
+    Builder.import_declaration(specifiers, Builder.identifier(import_path))
   end
 
   defp make_source(name) do
-    source = Enum.map(name, fn(x) -> Atom.to_string(x) |> Inflex.underscore |> String.downcase end) |> Enum.join("/")
-    "'#{source}'"
+    "'#{do_make_source(name)}'"
   end
 
-  defp make_namespace_import(id, source) do
-    import_specifier = Builder.import_namespace_specifier(id)
-    Builder.import_declaration([import_specifier], Builder.identifier(source))
+  defp do_make_source([:Parent | name]) do
+    "../#{do_make_source(name)}"
+  end
+
+  defp do_make_source(name) do
+    source = Enum.map(name, fn(x) -> 
+      x
+      |> Atom.to_string 
+      |> Inflex.underscore 
+      |> String.downcase 
+    end) 
+    |> Enum.join("/")
+
+    source
   end
 
 end

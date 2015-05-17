@@ -5,13 +5,33 @@ defmodule ElixirScript.Translator.Function do
   alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.PatternMatching
 
-  def make_function_or_property_call(module_name, function_name) do        
-        params = [
-          module_name,
-          to_string(function_name)
-        ]
+  def make_function_or_property_call(module_name, function_name) do  
+    the_name = case module_name do
+      {:__aliases__, _, name} ->
+        name
+      {name, _, _} when is_atom(name) ->
+        name
+      {{:., _, [module_name, function_name]}, _, params } = ast ->
+        ast
+      name ->
+        case to_string(name) do
+          "Elixir." <> actual_name ->
+            actual_name
+          _ ->
+            name
+        end
+    end
 
-    Utils.make_call_expression("ElixirScript", "get_property_or_call_function", params)
+    Builder.call_expression(
+      Builder.member_expression(
+        Builder.identifier("ElixirScript"),
+        Builder.identifier("get_property_or_call_function")
+      ),
+      [
+        Utils.make_module_expression_tree(the_name, false),
+        Translator.translate(to_string(function_name))
+      ]
+    )
   end
 
   def make_function_call(function_name, params) do
@@ -22,8 +42,10 @@ defmodule ElixirScript.Translator.Function do
     the_name = case module_name do
       {:__aliases__, _, name} ->
         name
-      {name, _, _} ->
+      {name, _, _} when is_atom(name) ->
         name
+      {{:., _, [module_name, function_name]}, _, params } = ast ->
+        ast
       name ->
         case to_string(name) do
           "Elixir." <> actual_name ->
@@ -32,7 +54,6 @@ defmodule ElixirScript.Translator.Function do
             name
         end
     end
-
     Utils.make_call_expression(the_name, function_name, params)
   end
 

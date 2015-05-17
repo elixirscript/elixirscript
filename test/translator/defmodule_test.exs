@@ -28,13 +28,19 @@ defmodule ElixirScript.Translator.Defmodule.Test do
 
       const ul = JQuery('#todo-list');
 
-      export function something(){
+      function something(){
         return ul;
       }
 
       function something_else(){
         return null;
       }
+
+      let Elephant = {
+        something: something
+      };
+
+      export default Elephant;
     """
 
     assert_translation(ex_ast, js_code)
@@ -54,15 +60,18 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     js_code = """
       const __MODULE__ = Atom('Elephant');
 
-      import * as Crane from 'icabod/crane';
+      import Crane from 'icabod/crane';
 
-      export function something(){
+      function something(){
         return null;
       }
 
       function something_else(){
         return null;
       }
+
+      let Elephant = { something: something };
+      export default Elephant;
     """
 
     assert_translation(ex_ast, js_code)

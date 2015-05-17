@@ -43,6 +43,23 @@ defmodule ElixirScript.Translator.Module do
 
     functions = Enum.flat_map(functions_dict, fn({_, data})-> process_function_arity(data) end)
 
+    the_module_name = Builder.identifier(List.last(module_name_list))
+
+    declarator = Builder.variable_declarator(
+      the_module_name,
+      Builder.object_expression(
+        Enum.filter_map(functions_dict, fn({key, value}) -> 
+          value.access == :export
+        end, fn({key, _value}) -> 
+          Builder.property(Builder.identifier(key), Builder.identifier(key))
+        end)
+      )
+    )
+
+    exported_object = Builder.variable_declaration([declarator], :let)
+
+    default = Builder.export_declaration(the_module_name, [], true)
+
     #Filter out original functions from the body
     body = Enum.filter(body, fn(x) -> 
       case x do 
@@ -56,7 +73,7 @@ defmodule ElixirScript.Translator.Module do
     end)
 
     #Build everything back together again
-    Builder.program([create__module__(module_name_list)] ++ imports ++ body ++ functions)
+    Builder.program([create__module__(module_name_list)] ++ imports ++ body ++ functions ++ [exported_object, default])
   end
 
   defp add_function_to_dict(dict, function, access) do
@@ -73,12 +90,7 @@ defmodule ElixirScript.Translator.Module do
   end
 
   defp process_function_arity(%{name: _name, access: access, functions: [function]}) do
-    case access do
-      :export ->
-        [Builder.export_declaration(function)]
-      :private ->
-        [function]
-    end
+    [function]
   end
 
   defp process_function_arity(%{name: name, access: access, functions: functions}) do
@@ -147,10 +159,6 @@ defmodule ElixirScript.Translator.Module do
       Builder.block_statement([switch_statement]),
       Builder.identifier(:args)
     )
-
-    if access == :export do
-      master_function = Builder.export_declaration(master_function)
-    end
 
     Enum.map(processed_functions, fn({function, _, _}) -> function end) ++ [master_function]
   end

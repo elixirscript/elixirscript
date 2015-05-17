@@ -12,9 +12,12 @@ defmodule ElixirScript.Translator.Struct.Test do
     js_code = """
       const __MODULE__ = Atom('User');
 
-      export function defstruct(name = 'john', age = 27){
+      function defstruct(name = 'john', age = 27){
         return {__struct__: __MODULE__, name: name, age: age};
       }
+
+     let User = { defstruct: defstruct };
+     export default User;
     """
 
     assert_translation(ex_ast, js_code)
@@ -28,9 +31,12 @@ defmodule ElixirScript.Translator.Struct.Test do
     js_code = """
       const __MODULE__ = Atom('User');
 
-      export function defstruct(name, age){
+      function defstruct(name, age){
         return {__struct__: __MODULE__, name: name, age: age};
       }
+
+     let User = { defstruct: defstruct };
+     export default User;
     """
 
     assert_translation(ex_ast, js_code)
@@ -105,9 +111,12 @@ defmodule ElixirScript.Translator.Struct.Test do
     js_code = """
       const __MODULE__ = Atom('MyAppError');
 
-      export function defexception(message = 'This is a message'){
+      function defexception(message = 'This is a message'){
         return {__struct__: __MODULE__, message: message};
       }
+
+     let MyAppError = { defexception: defexception };
+     export default MyAppError;
     """
 
     assert_translation(ex_ast, js_code)
@@ -121,9 +130,12 @@ defmodule ElixirScript.Translator.Struct.Test do
     js_code = """
       const __MODULE__ = Atom('MyAppError');
 
-      export function defexception(message = null){
+      function defexception(message = null){
         return {__struct__: __MODULE__, message: message};
       }
+
+      let MyAppError = { defexception: defexception };
+      export default MyAppError;
     """
 
     assert_translation(ex_ast, js_code)

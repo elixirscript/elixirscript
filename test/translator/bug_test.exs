@@ -2,13 +2,36 @@ defmodule ElixirScript.Translator.Bug.Test do
   use ShouldI
   import ElixirScript.TestHelper
 
+  should "chain calls correctly" do
+    ex_ast = quote do
+      :this.getRawCanvas().getContext("2d")
+    end
+
+    js_code = """
+      ElixirScript.get_property_or_call_function(this, 'getRawCanvas').getContext('2d')
+    """
+
+    assert_translation(ex_ast, js_code) 
+
+
+    ex_ast = quote do
+      :this.getRawCanvas(one).get("fg").getContext("2d")
+    end
+
+    js_code = """
+      this.getRawCanvas(one).get('fg').getContext('2d')
+    """
+
+    assert_translation(ex_ast, js_code)   
+  end
+
   should "correctly handle casing module imports" do
     ex_ast = quote do
       alias Stores.GraphicStore
     end
 
     js_code = """
-      import * as GraphicStore from 'stores/graphic_store';
+      import GraphicStore from 'stores/graphic_store';
     """
 
     assert_translation(ex_ast, js_code)
