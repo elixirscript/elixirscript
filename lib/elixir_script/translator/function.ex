@@ -9,8 +9,10 @@ defmodule ElixirScript.Translator.Function do
     the_name = case module_name do
       {:__aliases__, _, name} ->
         name
-      {name, _, _} ->
+      {name, _, _} when is_atom(name) ->
         name
+      {{:., _, [module_name, function_name]}, _, params } = ast ->
+        ast
       name ->
         case to_string(name) do
           "Elixir." <> actual_name ->
@@ -40,8 +42,10 @@ defmodule ElixirScript.Translator.Function do
     the_name = case module_name do
       {:__aliases__, _, name} ->
         name
-      {name, _, _} ->
+      {name, _, _} when is_atom(name) ->
         name
+      {{:., _, [module_name, function_name]}, _, params } = ast ->
+        ast
       name ->
         case to_string(name) do
           "Elixir." <> actual_name ->
@@ -50,7 +54,6 @@ defmodule ElixirScript.Translator.Function do
             name
         end
     end
-
     Utils.make_call_expression(the_name, function_name, params)
   end
 

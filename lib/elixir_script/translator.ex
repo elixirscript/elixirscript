@@ -230,7 +230,7 @@ defmodule ElixirScript.Translator do
     Expression.make_binary_expression(:+, left, right)
   end
 
-  defp do_translate({operator, _, [left, right]}) when operator in [:+, :-, :/, :*, :==, :!=] do
+  defp do_translate({operator, _, [left, right]}) when operator in [:+, :-, :/, :*, :==, :!=, :&&, :||] do
     Expression.make_binary_expression(operator, left, right)
   end
 

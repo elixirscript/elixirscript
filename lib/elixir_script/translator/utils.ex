@@ -30,7 +30,7 @@ defmodule ElixirScript.Translator.Utils do
   end
 
   def make_module_expression_tree([module], computed) do
-    Builder.identifier(module)
+    make_module_expression_tree(module, computed)
   end
 
   def make_module_expression_tree(modules, computed) when is_list(modules) do
@@ -39,27 +39,27 @@ defmodule ElixirScript.Translator.Utils do
       case x do
         [one] ->
           if is_nil(ast) do
-            Builder.identifier(one)
+            make_module_expression_tree(one, computed)
           else
             Builder.member_expression(
               ast,
-              Builder.identifier(one),
+              make_module_expression_tree(one, computed),
               computed
             )
           end
         [one, two] ->
           if is_nil(ast) do
             Builder.member_expression(
-              Builder.identifier(one),
-              Builder.identifier(two),
+              make_module_expression_tree(one, computed),
+              make_module_expression_tree(two, computed),
               computed
             )
           else
             Builder.member_expression(
               ast,
               Builder.member_expression(
-                Builder.identifier(one),
-                Builder.identifier(two),
+                make_module_expression_tree(one, computed),
+                make_module_expression_tree(two, computed),
                 computed
               ),
               computed
@@ -69,8 +69,12 @@ defmodule ElixirScript.Translator.Utils do
     end)
   end
 
-  def make_module_expression_tree(module, computed) do
+  def make_module_expression_tree(module, computed) when is_binary(module) or is_atom(module) do
     Builder.identifier(module)
+  end
+
+  def make_module_expression_tree(module, computed) do
+    Translator.translate(module)
   end
 
   def make_call_expression_with_ast_params(module_name, function_name, params) do
@@ -98,12 +102,23 @@ defmodule ElixirScript.Translator.Utils do
     case module_name do
       modules when is_list(modules) and length(modules) > 1 ->
         ast = make_module_expression_tree(modules, computed)
-
         Builder.member_expression(
           ast,
           Builder.identifier(function_name),
           computed
-        )        
+        )
+      {{:., _, [_module_name, _function_name]}, _, _params } = ast ->
+        Builder.member_expression(
+          Translator.translate(ast),
+          Builder.identifier(function_name),
+          computed                 
+        )
+      {:., _, _} = ast ->
+        Builder.member_expression(
+          Translator.translate(ast),
+          Builder.identifier(function_name),
+          computed                 
+        )
       _ ->
         Builder.member_expression(
           Builder.identifier(module_name),
