@@ -5,6 +5,7 @@
     * added `from` clause to `import`, `alias`, and `require` so that the import path can be overridden
     * `alias` now acts like `require` in that it is translated into an import default statement
     * modules now export a default object with def functions added as properties on it. 
+    * for function closures, now calling by using `.call(this)` so that `this` is available inside of it
 
 # v0.4.0
   * Enhancements
