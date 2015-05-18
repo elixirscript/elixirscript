@@ -1,6 +1,10 @@
 # v0.5.0-dev
   * Enhancements
     * For statements now work with pattern matching tuples
+    * Improved function chaining
+    * added `from` clause to `import`, `alias`, and `require` so that the import path can be overridden
+    * `alias` now acts like `require` in that it is translated into an import default statement
+    * modules now export a default object with def functions added as properties on it. 
 
 # v0.4.0
   * Enhancements
