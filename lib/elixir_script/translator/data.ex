@@ -2,6 +2,7 @@ defmodule ElixirScript.Translator.Data do
   require Logger
   alias ESTree.Builder
   alias ElixirScript.Translator
+  alias ElixirScript.Translator.Utils
 
   def make_get_property(target, property) do
     Builder.member_expression(
@@ -185,12 +186,7 @@ defmodule ElixirScript.Translator.Data do
 
     block_statement = [variable_declaration] ++ block_statement ++ [Builder.return_statement(_results)]
 
-    Builder.expression_statement(
-      Builder.call_expression(
-        Builder.function_expression([], [], Builder.block_statement(block_statement)),
-        []
-      )
-    )
+    Utils.wrap_in_function_closure(block_statement)
   end
 
 end

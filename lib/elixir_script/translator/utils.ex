@@ -142,10 +142,13 @@ defmodule ElixirScript.Translator.Utils do
 
     Builder.expression_statement(
       Builder.call_expression(
-        Builder.function_expression([],[],
-          Builder.block_statement(the_body)
+        Builder.member_expression(
+          Builder.function_expression([],[],
+            Builder.block_statement(the_body)
+          ),
+          Builder.identifier("call")
         ),
-        []
+        [Builder.identifier("this")]
       )
     )
   end

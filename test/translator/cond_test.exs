@@ -23,7 +23,7 @@ defmodule ElixirScript.Translator.Cond.Test do
       }else{
         return 'This will';
       }
-    }());
+    }.call(this));
     """
 
     assert_translation(ex_ast, js_code)
@@ -54,7 +54,7 @@ defmodule ElixirScript.Translator.Cond.Test do
         let a = 3;
         return 'This will';
       }
-    }());
+    }.call(this));
     """
 
     assert_translation(ex_ast, js_code)

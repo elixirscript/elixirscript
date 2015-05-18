@@ -18,7 +18,7 @@ defmodule ElixirScript.Translator.Case.Test do
         }else if(Kernel.match(Atom('error'), data)){
           return null;
         }
-      }());
+      }.call(this));
     """
 
     assert_translation(ex_ast, js_code)
@@ -38,7 +38,7 @@ defmodule ElixirScript.Translator.Case.Test do
         }else if(Kernel.match(true, data)){
           return true;
         }
-      }());    
+      }.call(this));    
     """
 
     assert_translation(ex_ast, js_code)
@@ -60,7 +60,7 @@ defmodule ElixirScript.Translator.Case.Test do
         }else{
           return true;
         }
-      }());      
+      }.call(this));      
     """
 
     assert_translation(ex_ast, js_code)
@@ -84,7 +84,7 @@ defmodule ElixirScript.Translator.Case.Test do
         }else{
           return true;
         }
-      }());
+      }.call(this));
     """
 
     assert_translation(ex_ast, js_code)
@@ -109,7 +109,7 @@ defmodule ElixirScript.Translator.Case.Test do
         }else if(Kernel.match(Atom('error'), data)){
           return null;
         }
-      }());
+      }.call(this));
     """
 
     assert_translation(ex_ast, js_code)
@@ -134,7 +134,7 @@ defmodule ElixirScript.Translator.Case.Test do
         }else if(Kernel.match(Atom('error'), data)){
           return null;
         }
-      }());
+      }.call(this));
     """
 
     assert_translation(ex_ast, js_code)
@@ -164,7 +164,7 @@ defmodule ElixirScript.Translator.Case.Test do
         }else if(Kernel.match(Atom('error'), data)){
           return null;
         }
-      }());
+      }.call(this));
     """
 
     assert_translation(ex_ast, js_code)
@@ -193,7 +193,7 @@ defmodule ElixirScript.Translator.Case.Test do
         }else if(Kernel.match(Atom('error'), data)){
           return null;
         }
-      }());
+      }.call(this));
     """
 
     assert_translation(ex_ast, js_code)
@@ -222,7 +222,7 @@ defmodule ElixirScript.Translator.Case.Test do
          } else if (Kernel.match(Atom('error'), data)) {
              return null;
          }
-     }());
+     }.call(this));
     """
 
     assert_translation(ex_ast, js_code)
@@ -256,7 +256,7 @@ defmodule ElixirScript.Translator.Case.Test do
          } else if (Kernel.match(Atom('error'), data)) {
              return null;
          }
-     }());
+     }.call(this));
     """
 
     assert_translation(ex_ast, js_code)

@@ -62,7 +62,7 @@ defmodule ElixirScript.Translator.Function.Test do
           }else{
             return 2;
           }
-        }());;
+        }.call(this));;
       }
     """
 
@@ -93,11 +93,11 @@ defmodule ElixirScript.Translator.Function.Test do
                 let a0 = 1;
                 return a0;
               }
-            }());;
+            }.call(this));;
           }else{
             return 2;
           }
-        }());;
+        }.call(this));;
       }
     """
 

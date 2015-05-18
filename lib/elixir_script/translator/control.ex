@@ -120,12 +120,7 @@ defmodule ElixirScript.Translator.Control do
 
     block_statement = [variable_declaration] ++ [handle_generators(generators)] ++ [Builder.return_statement(_results)]
 
-    Builder.expression_statement(
-      Builder.call_expression(
-        Builder.function_expression([], [], Builder.block_statement(block_statement)),
-        []
-      )
-    )
+    Utils.wrap_in_function_closure(block_statement)
   end
 
   defp handle_generators(generators) do
