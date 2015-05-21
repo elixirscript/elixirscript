@@ -3,8 +3,6 @@ ElixirScript
 
 The goal is to convert a subset (or full set) of Elixir code to JavaScript. Allowing the ability to write JavaScript in Elixir. This is done by taking the Elixir AST, converting it into [Spider Monkey AST](https://developer.mozilla.org/en-US/docs/Mozilla/Projects/SpiderMonkey/Parser_API). From there it uses [escodegen](https://github.com/estools/escodegen) to convert the Spider Monkey AST to JavaScript.
 
-This is still very early and is no where near complete. But it does convert some Elixir code to JavaScript already.
-
 It also includes an escript cli named ex2js which takes files or Elixir code strings as input and outputs Spider Monkey AST or JavaScript code to output or files depending on the options
 
 Requirements
@@ -66,51 +64,69 @@ $ ex2js -h
   -h  --help            this message
 ```
 
-#Current Limitations (Most if not all of these will be lifted as development goes on)
+#Limitations
 
-  * No defmacro
-  * No try
-  * No receive
-  * No quote
-  * No unquote
-  * No super
-  * No GenEvent
-  * No GenServer
-  * No Behaviour
-  * limited for (can't do into yet)
-  * Limited support for standard library
-  * No regular expressions
+#### Must define each module you are going to use upfront
+  
+    In Elixir, you can use Modules in your code like so
 
+    ```elixir
+    defmodule MyModule do
+    
+        def my_function() do
+            Another.Module.their_function()
+        end
+        
+    end
+    ```
+    
+    But in ElixirScript, you must explicitly say you are using the module
+    
+    ```elixir
+    defmodule MyModule do
+        alias Another.Module
+        
+        def my_function() do
+            Module.their_function()
+        end
+        
+    end
+    
+    ```
+    
+    This is because each module is converted into an ES6 module and `import`, `alias`, and `require` are turned into ES6 import statements. This would also be how you would import third-party javascript modules. The only exception is that the standard library or any javascript that is global in scope. For instance, the standard library currently is expected to be in the global scope so that you can use it without importing it.
 
+#### Not all of the Kernel.SpecialForms module is defined
 
-TODO (high level list of todos)
-======
-* [x] pattern matching (missing bitstring pattern matching) 
-* [x] case
-* [x] cond
-* [x] for (currently does not support keyword list matching or into yet)
-* [ ] try
-* [ ] receive
-* [ ] quote
-* [ ] unquote
-* [ ] defmacro
-* [ ] super
-* [ ] defoverridable
-* [ ] GenServer
-* [ ] GenEvent
-* [ ] Behaviour
-* [x] bitstring
-* [x] string interpolation
-* [x] return from a function
-* [x] defexception and raising errors
-* [ ] types and specs
-* [x] pipe operator
-* [ ] data structures
-* [x] figure out how using external js modules will work
-* [ ] spawn
-* [ ] actors
-* [ ] regular expression
-* [x] multiple arity functions
-* [x] make example projects [todo-elixirscript](https://github.com/bryanjos/example), [color_bar_spike](https://github.com/bryanjos/color_bar_spike)
-* [ ] optimize converted javascript
-* [ ] Prototype rich frontend framework using elixir design patterns
+    The following aren't defined (yet):
+    
+    * try
+    * __CALLER__
+    * __DIR__
+    * __ENV__
+    * quote
+    * unquote
+    * unquote_slicing
+    * receive
+    * super
+
+#### Most of the Standard Library isn't defined yet
+A lot of functions in the Kernel module are implemented. The Enum, Atom, List, Tuple, Logger, and Range modules are either fully defined are not complete. The rest still need to be implemented. Most may not be useful or function in the browser and may end up being only useful when using ElixirScript in Node.
+
+#### No Macro support
+Not sure how this would be implemented right now, but looking for ideas.
+
+#### Pattern matching works but is still limited
+Pattern matching does work quite well now, but the implementation still needs to be thoroughly tested in a number of situations. 
+
+Currently pattern matching on bitstrings isn't supported, but for every other case that one would use pattern matching, it should work.
+
+There are probably more that I'm forgetting. Check the issues for what's implemented and what still is needed.
+
+### Example projects
+
+    * [todo-elixirscript](https://github.com/bryanjos/example)
+        The TodoMVC app using ElixirScript and Phoenix.
+        
+    * [color_bar_spike](https://github.com/bryanjos/color_bar_spike)
+        A canvas drawing example using ElixirScript, React and Delorean
