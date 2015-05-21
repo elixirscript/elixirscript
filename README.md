@@ -125,8 +125,6 @@ There are probably more that I'm forgetting. Check the issues for what's impleme
 
 ### Example projects
 
-    * [todo-elixirscript](https://github.com/bryanjos/example)
-        The TodoMVC app using ElixirScript and Phoenix.
-        
-    * [color_bar_spike](https://github.com/bryanjos/color_bar_spike)
-        A canvas drawing example using ElixirScript, React and Delorean
+* [todo-elixirscript](https://github.com/bryanjos/example) The TodoMVC app using ElixirScript and Phoenix.
+    
+* [color_bar_spike](https://github.com/bryanjos/color_bar_spike) A canvas drawing example using ElixirScript, React and Delorean
