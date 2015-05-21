@@ -98,17 +98,17 @@ $ ex2js -h
 
 #### Not all of the Kernel.SpecialForms module is defined
 
-    The following aren't defined (yet):
+The following aren't defined (yet):
     
-    * try
-    * __CALLER__
-    * __DIR__
-    * __ENV__
-    * quote
-    * unquote
-    * unquote_slicing
-    * receive
-    * super
+* try
+* `__CALLER__`
+* `__DIR__`
+* `__ENV__`
+* quote
+* unquote
+* unquote_slicing
+* receive
+* super
 
 #### Most of the Standard Library isn't defined yet
 A lot of functions in the Kernel module are implemented. The Enum, Atom, List, Tuple, Logger, and Range modules are either fully defined are not complete. The rest still need to be implemented. Most may not be useful or function in the browser and may end up being only useful when using ElixirScript in Node.
