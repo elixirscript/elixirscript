@@ -4,14 +4,14 @@ defmodule ElixirScript.Mixfile do
   def project do
     [
       app: :elixir_script,
-      version: "0.5.0",
+      version: "0.6.0-dev",
       elixir: "~> 1.0",
       compilers: Mix.compilers,
       escript: escript_config,
       deps: deps,
       description: description,
       package: package,
-      source_url: "https://github.com/bryanjos/ex_to_js",
+      source_url: "https://github.com/bryanjos/elixirscript",
       test_coverage: [tool: ExCoveralls]
     ]
   end
@@ -47,7 +47,7 @@ defmodule ElixirScript.Mixfile do
       contributors: ["Bryan Joseph"],
       licenses: ["MIT"],
       links: %{ 
-        "GitHub" => "https://github.com/bryanjos/ex_to_js"
+        "GitHub" => "https://github.com/bryanjos/elixirscript"
       }
     ]
   end
