@@ -1,4 +1,4 @@
-# v0.5.0-dev
+# v0.5.0
   * Enhancements
     * For statements now work with pattern matching tuples
     * Improved function chaining
