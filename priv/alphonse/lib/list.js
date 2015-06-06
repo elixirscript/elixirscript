@@ -29,7 +29,7 @@ List.delete_at = function(list, index){
   for(let i = 0; i < list.length; i++){
     if(i !== index){
       new_value.push(ElixirScript.clone(list[i]));
-    }    
+    }
   }
 
   return new_value;
@@ -40,13 +40,13 @@ List.duplicate = function(elem, n){
 
   for (var i = 0; i < n; i++) {
     new_value.push(ElixirScript.clone(elem));
-  };
+  }
 
   return new_value;
 };
 
 List.first = function(list){
-  if(list.length == 0){
+  if(list.length === 0){
     return null;
   }
 
@@ -58,15 +58,15 @@ List.flatten = function(list, tail = []){
 
   for(let x of list){
     if(Kernel.is_list(x)){
-      new_value = new_value.concat(List.flatten(x))
+      new_value = new_value.concat(List.flatten(x));
     }else{
-      new_value.push(ElixirScript.clone(x));    
+      new_value.push(ElixirScript.clone(x));
     }
   }
 
   new_value = new_value.concat(ElixirScript.clone(tail));
 
-  return new_value;  
+  return new_value;
 };
 
 List.foldl = function(list, acc, func){
@@ -84,7 +84,7 @@ List.foldr = function(list, acc, func){
 
   for (var i = list.length - 1; i >= 0; i--) {
     new_acc = func(list[i], new_acc);
-  };
+  }
 
   return new_acc;
 };
@@ -95,21 +95,21 @@ List.insert_at = function(list, index, value){
   for(let i = 0; i < list.length; i++){
     if(i === index){
       new_value.push(ElixirScript.clone(value));
-      new_value.push(ElixirScript.clone(list[i]));   
+      new_value.push(ElixirScript.clone(list[i]));
     }else{
-      new_value.push(ElixirScript.clone(list[i]));      
-    }    
+      new_value.push(ElixirScript.clone(list[i]));
+    }
   }
 
   return new_value;
 };
 
 List.last = function(list){
-  if(list.length == 0){
+  if(list.length === 0){
     return null;
   }
 
-  return ElixirScript.clone(list[list.length-1]);
+  return ElixirScript.clone(list[list.length - 1]);
 };
 
 List.replace_at = function(list, index, value){
@@ -117,10 +117,10 @@ List.replace_at = function(list, index, value){
 
   for(let i = 0; i < list.length; i++){
     if(i === index){
-      new_value.push(ElixirScript.clone(value)); 
+      new_value.push(ElixirScript.clone(value));
     }else{
-      new_value.push(ElixirScript.clone(list[i]));      
-    }    
+      new_value.push(ElixirScript.clone(list[i]));
+    }
   }
 
   return new_value;
@@ -131,10 +131,10 @@ List.update_at = function(list, index, fun){
 
   for(let i = 0; i < list.length; i++){
     if(i === index){
-      new_value.push(ElixirScript.clone(fun(list[i]))); 
+      new_value.push(ElixirScript.clone(fun(list[i])));
     }else{
-      new_value.push(ElixirScript.clone(list[i]));      
-    }    
+      new_value.push(ElixirScript.clone(list[i]));
+    }
   }
 
   return new_value;
@@ -151,7 +151,7 @@ List.wrap = function(list){
 };
 
 List.zip = function(list_of_lists){
-  if(list_of_lists.length == 0){
+  if(list_of_lists.length === 0){
     return List();
   }
 
@@ -166,7 +166,7 @@ List.zip = function(list_of_lists){
 
   for(let i = 0; i < smallest_length; i++){
     let current_value = [];
-    for(let j = 0; j < list_of_lists; j ++){
+    for(let j = 0; j < list_of_lists; j++){
       current_value.push(list_of_lists[j][i]);
     }
 

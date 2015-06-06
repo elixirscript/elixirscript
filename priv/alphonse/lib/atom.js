@@ -1,15 +1,18 @@
 let Atom;
 
 Atom = function(value){
-  if (!(this instanceof Atom)) return new Atom(value);
+  if (!(this instanceof Atom)){
+    return new Atom(value);
+  }
+
   this.value = value;
-}
+};
 
 Atom.prototype.toString = function () {
   return this.value;
 };
 
-Atom.__MODULE_ = Atom('Atom');
+Atom.__MODULE__ = Atom("Atom");
 
 Atom.to_string = function (atom) {
   return atom.toString();

@@ -1,5 +1,6 @@
+"use strict"
+
 var Tuple = require('../lib/tuple');
-var List = require('../lib/list');
 var expect = require('chai').expect;
 
 describe('Tuple', function(){
