@@ -80,7 +80,7 @@ let Kernel = {
     return Kernel.is_binary(x) || x instanceof BitString;
   },
 
-  "in": function(left, right){
+  __in__: function(left, right){
     return Enum.member(right, left);
   },
 
@@ -128,7 +128,7 @@ let Kernel = {
     return arg.toString();
   },
 
-  "match?": function(pattern, expr, guard = () => true){
+  match__qmark__: function(pattern, expr, guard = () => true){
     if(!guard()){
       return false;
     }
@@ -142,14 +142,14 @@ let Kernel = {
     }else if(Kernel.is_atom(expr)){
       return Kernel.is_atom(pattern) && pattern.value === expr.value;
     }else if(Kernel.is_tuple(expr)){
-      return Kernel.is_tuple(pattern) && Kernel.match(pattern.value, expr.value);
+      return Kernel.is_tuple(pattern) && Kernel["match?"](pattern.value, expr.value);
     }else if(Kernel.is_list(expr)){
       if(Kernel.length(pattern) !== Kernel.length(expr)){
         return false;
       }
 
       for (let i = 0; i <= pattern.length; i++) {
-        if(Kernel.match(pattern[i], expr[i]) === false){
+        if(Kernel["match?"](pattern[i], expr[i]) === false){
           return false;
         }
       }
@@ -165,7 +165,7 @@ let Kernel = {
           return false;
         }
 
-        if(Kernel.match(pattern[key], expr[key]) === false){
+        if(Kernel["match?"](pattern[key], expr[key]) === false){
           return false;
         }
       }

@@ -16,7 +16,7 @@ defmodule ElixirScript.Translator.PatternMatching do
     case left do
       {:^, _, [{variable, meta, context}]} ->
         Builder.if_statement(
-          Translator.translate(quote do: !Kernel.match(unquote({variable, meta, context}), unquote(right))),
+          Translator.translate(quote do: !Kernel.match__qmark__(unquote({variable, meta, context}), unquote(right))),
           Utils.make_throw_statement("MatchError", "no match of right hand side value")
         )
       _ ->
@@ -44,7 +44,7 @@ defmodule ElixirScript.Translator.PatternMatching do
       declaration = case x do
         {:^, _, [{variable, meta, context}]} ->
           bound = Builder.if_statement(
-            Translator.translate(quote do: !Kernel.match(unquote({variable, meta, context}), _ref[unquote(index)])),
+            Translator.translate(quote do: !Kernel.match__qmark__(unquote({variable, meta, context}), _ref[unquote(index)])),
             Utils.make_throw_statement("MatchError", "no match of right hand side value")
           )
           bound
@@ -87,7 +87,10 @@ defmodule ElixirScript.Translator.PatternMatching do
 
   def process_pattern([{:|, _, [head, tail]}]) do
     {head, _, _} = head
+    head = Utils.filter_name(head)
+
     {tail, _, _} = tail
+    tail = Utils.filter_name(tail)
 
     { :listhdtail, [ process_pattern(head), process_pattern(tail) ] }
   end
@@ -141,6 +144,8 @@ defmodule ElixirScript.Translator.PatternMatching do
   def process_pattern({:=, _, [value, {variable_name, _, _}]}) do
     result = process_pattern(value)
 
+    variable_name = Utils.filter_name(variable_name)
+
     if is_list(result) do
       result 
     else
@@ -153,6 +158,7 @@ defmodule ElixirScript.Translator.PatternMatching do
   end
 
   def process_pattern({identifier, _, _}) do
+    identifier = Utils.filter_name(identifier)
     {:identifier, identifier}
   end
 

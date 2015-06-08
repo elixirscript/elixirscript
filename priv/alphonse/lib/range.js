@@ -22,7 +22,7 @@ Range.new = function (first, last) {
   return Range(first, last);
 };
 
-Range["range?"] = function (range) {
+Range.range__qmark__ = function (range) {
   return range instanceof Range;
 };
 

@@ -121,7 +121,7 @@ defmodule ElixirScript.Translator.For.Test do
         let _results = [];
 
         for(let _ref of [Tuple(Atom('user'), 'john'), Tuple(Atom('admin'), 'john'), Tuple(Atom('user'), 'meg')]){
-          if(Kernel.match(_ref, Tuple(Atom('user'), undefined))){
+          if(Kernel.match__qmark__(_ref, Tuple(Atom('user'), undefined))){
             let name = _ref[1];
             _results.push(String.upcase(name));
           }

@@ -390,7 +390,7 @@ defmodule ElixirScript.Translator.Function.Test do
 
     js_code = """
       function something(one, two){
-        if(Kernel._in(one, [1,2,3])){
+        if(Kernel.__in__(one, [1,2,3])){
           return null;
         }
       }
@@ -412,7 +412,7 @@ defmodule ElixirScript.Translator.Function.Test do
       const __MODULE__ = Atom('Example');
 
       function something__1(one){
-        if(Kernel._in(one,[1,2,3])){
+        if(Kernel.__in__(one,[1,2,3])){
           return null;
         }
 
@@ -449,7 +449,7 @@ defmodule ElixirScript.Translator.Function.Test do
 
     js_code = """
       export function something(_ref0){
-        if(Kernel.match(1, arguments[0])){
+        if(Kernel.match__qmark__(1, arguments[0])){
           return null;
         }
       }
@@ -528,7 +528,7 @@ defmodule ElixirScript.Translator.Function.Test do
 
     js_code = """
       export function something(_ref0){
-        if(Kernel.match({'__struct__': [Atom('AStruct')]}, arguments[0])){
+        if(Kernel.match__qmark__({'__struct__': [Atom('AStruct')]}, arguments[0])){
           return null;
         }
       }
@@ -546,7 +546,7 @@ defmodule ElixirScript.Translator.Function.Test do
 
     js_code = """
       export function something(_ref0){
-        if(Kernel.match({'__struct__': [Atom('AStruct')]}, arguments[0])){
+        if(Kernel.match__qmark__({'__struct__': [Atom('AStruct')]}, arguments[0])){
           let a = arguments[0];
           return null;
         }
@@ -565,7 +565,7 @@ defmodule ElixirScript.Translator.Function.Test do
 
     js_code = """
       export function something(_ref0){
-        if(Kernel.match({'__struct__': [Atom('AStruct')], 'key': undefined, 'key1': 2}, arguments[0])){
+        if(Kernel.match__qmark__({'__struct__': [Atom('AStruct')], 'key': undefined, 'key1': 2}, arguments[0])){
           let value = arguments[0]['key'];
           return null;
         }
@@ -582,7 +582,7 @@ defmodule ElixirScript.Translator.Function.Test do
 
     js_code = """
       export function something(_ref0){
-        if(Kernel.match({'__struct__': [Atom('AStruct')], 'key': undefined, 'key1': 2}, arguments[0])){
+        if(Kernel.match__qmark__({'__struct__': [Atom('AStruct')], 'key': undefined, 'key1': 2}, arguments[0])){
           let value = arguments[0]['key'];
           if(Kernel.is_number(value)){
             return null;
@@ -637,7 +637,7 @@ defmodule ElixirScript.Translator.Function.Test do
 
     js_code = """
       export function something(_ref0, hotel, _ref2){
-        if(Kernel.match(1, arguments[2])){
+        if(Kernel.match__qmark__(1, arguments[2])){
           if(arguments[0].startsWith('Bearer ')){
             let token = arguments[0].slice('Bearer '.length-1);
             return null; 
@@ -672,11 +672,11 @@ defmodule ElixirScript.Translator.Function.Test do
       const __MODULE__ = Atom('Example');
 
       function something__1(one){
-        if(Kernel.match(1, arguments[0])){
+        if(Kernel.match__qmark__(1, arguments[0])){
           return null;
         }
 
-        if(Kernel.match(2, arguments[0])){
+        if(Kernel.match__qmark__(2, arguments[0])){
           return null;
         }
 
@@ -726,17 +726,17 @@ defmodule ElixirScript.Translator.Function.Test do
      const __MODULE__ = Atom('Example');
 
      function something__1(_ref0) {
-         if (Kernel.match({ '__struct__': [Atom('AStruct')] }, arguments[0])) {
+         if (Kernel.match__qmark__({ '__struct__': [Atom('AStruct')] }, arguments[0])) {
              let a = arguments[0];
              return null;
          }
 
-         if (Kernel.match({ '__struct__': [Atom('BStruct')] }, arguments[0])) {
+         if (Kernel.match__qmark__({ '__struct__': [Atom('BStruct')] }, arguments[0])) {
              let b = arguments[0];
              return null;
          }
 
-         if (Kernel.match({
+         if (Kernel.match__qmark__({
                  '__struct__': [Atom('CStruct')],
                  'key': undefined,
                  'key1': 2
@@ -911,6 +911,26 @@ defmodule ElixirScript.Translator.Function.Test do
         let a0 = 1;
         let [a1, b0, c0] = [a0, 2, 3];
         return [a1, b0, c0];
+      }
+    """
+
+    assert_translation(ex_ast, js_code)
+  end
+
+
+  should "translate function variables with ? or !" do
+    ex_ast = quote do
+      def test1(alpha?, beta!) do
+        a? = 1
+        b! = 2
+      end
+    end
+
+    js_code = """
+      export function test1(alpha__qmark__, beta__emark__){
+        let a__qmark__0 = 1;
+        let b__emark__0 = 2;
+        return b__emark__0;
       }
     """
 

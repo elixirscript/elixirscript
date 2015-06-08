@@ -144,7 +144,7 @@ defmodule ElixirScript.Translator.Control do
               Builder.block_statement(List.wrap(handle_generators(tl(generators))))
             )
         end
-      [into: expression] ->
+      [into: _expression] ->
         raise ElixirScript.UnsupportedError, :into
       [do: expression] ->
         push_last_expression(Translator.translate(expression))
@@ -285,7 +285,7 @@ defmodule ElixirScript.Translator.Control do
   end
 
 
-  def make_try(try_block, rescue_clauses, after_block) do
+  def make_try(try_block, _rescue_clauses, after_block) do
     IO.inspect(try_block)
     Builder.try_statement(
       Builder.block_statement(List.wrap(

@@ -5,7 +5,7 @@ import Kernel from './kernel';
 let Enum = {
   __MODULE__: Atom('Enum'),
 
-  "all?": function(collection, fun = (x) => x){
+  all__qmark__: function(collection, fun = (x) => x){
     let result = Enum.filter(collection, function(x){
       return !fun(x);
     });
@@ -13,7 +13,7 @@ let Enum = {
     return result === [];
   },
 
-  "any?": function(collection, fun = (x) => x){
+  any__qmark__: function(collection, fun = (x) => x){
     let result = Enum.filter(collection, function(x){
       return fun(x);
     });
@@ -43,7 +43,7 @@ let Enum = {
     [].forEach.call(collection, fun);
   },
 
-  "empty?": function(collection){
+  empty__qmark__: function(collection){
     return Kernel.length(collection) === 0;
   },
 

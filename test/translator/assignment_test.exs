@@ -10,7 +10,7 @@ defmodule ElixirScript.Translator.Assignment.Test do
 
     ex_ast = quote do: ^a = 1
     js_code = """ 
-        if(!Kernel.match(a, 1))
+        if(!Kernel.match__qmark__(a, 1))
           throw new MatchError('no match of right hand side value');
     """
 
@@ -46,7 +46,7 @@ defmodule ElixirScript.Translator.Assignment.Test do
     js_code = """
         let _ref = Tuple(1, 2, 3);
 
-        if(!Kernel.match(a, _ref[0]))
+        if(!Kernel.match__qmark__(a, _ref[0]))
           throw new MatchError('no match of right hand side value');
 
         let undefined = _ref[1];

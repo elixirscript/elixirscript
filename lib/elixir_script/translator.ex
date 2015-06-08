@@ -40,10 +40,12 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:&, _, [{:/, _, [{{:., _, [{:__aliases__, _, module_name}, function_name]}, _, []}, _arity]}]}) do
+    function_name = Utils.filter_name(function_name)
     Utils.make_member_expression(List.last(module_name), function_name)
   end
 
   defp do_translate({:&, _, [{:/, _, [{function_name, _, _}, _arity]}]}) do
+    function_name = Utils.filter_name(function_name)
     Primative.make_identifier(function_name)
   end
 
@@ -52,10 +54,12 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:@, _, [{name, _, [value]}]}) do
+    name = Utils.filter_name(name)
     Module.make_attribute(name, value)
   end
 
   defp do_translate({:@, _, [{name, _, _}]}) do
+    name = Utils.filter_name(name)
     Primative.make_identifier(name)
   end
 
@@ -236,21 +240,29 @@ defmodule ElixirScript.Translator do
 
   defp do_translate({:def, _, [{:when, _, [{_name, _, _params} | _guards] }, [do: _body]] } = ast) do
     {:def, _, [{:when, _, [{name, _, params} | guards] }, [do: body]] } = Preparer.prepare(ast)
+
+    name = Utils.filter_name(name)
     Function.make_export_function(name, params, body, guards)
   end
 
   defp do_translate({:def, _, [{_name, _, _params}, [do: _body]]} = ast) do
     {:def, _, [{name, _, params}, [do: body]]} = Preparer.prepare(ast)
+
+    name = Utils.filter_name(name)
     Function.make_export_function(name, params, body)
   end
 
   defp do_translate({:defp, _, [{:when, _, [{_name, _, _params} | _guards] }, [do: _body]] } = ast) do
     {:defp, _, [{:when, _, [{name, _, params} | guards] }, [do: body]] } = Preparer.prepare(ast)
+
+    name = Utils.filter_name(name)
     Function.make_function(name, params, body, guards)
   end
 
   defp do_translate({:defp, _, [{_name, _, _params}, [do: _body]]} = ast) do
     {:defp, _, [{name, _, params}, [do: body]]} = Preparer.prepare(ast)
+
+    name = Utils.filter_name(name)
     Function.make_function(name, params, body)
   end
 
@@ -290,7 +302,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({name, metadata, params}) when is_list(params) do
-    name = filter_name(name)
+    name = Utils.filter_name(name)
 
     case metadata[:import] do
       Kernel ->
@@ -300,20 +312,9 @@ defmodule ElixirScript.Translator do
     end
   end
 
-  defp do_translate({name, _, _}) do
+  defp do_translate({ name, _, _ }) do
+    name = Utils.filter_name(name)   
     Primative.make_identifier(name)
-  end
-
-  defp filter_name(name) do
-    case name do
-      :in ->
-        :_in
-      _ ->
-        name
-        |> Atom.to_string
-        |> String.replace(~r/(\?|!)/, "")
-        |> String.to_atom
-    end
   end
 
 end
