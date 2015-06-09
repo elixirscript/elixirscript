@@ -11,7 +11,7 @@ defmodule ElixirScript.Translator.Function do
         name
       {name, _, _} when is_atom(name) ->
         name
-      {{:., _, [module_name, function_name]}, _, params } = ast ->
+      {{:., _, [_module_name, _function_name]}, _, _params } = ast ->
         ast
       name ->
         case to_string(name) do
@@ -44,7 +44,7 @@ defmodule ElixirScript.Translator.Function do
         name
       {name, _, _} when is_atom(name) ->
         name
-      {{:., _, [module_name, function_name]}, _, params } = ast ->
+      {{:., _, [_module_name, _function_name]}, _, _params } = ast ->
         ast
       name ->
         case to_string(name) do
@@ -54,6 +54,7 @@ defmodule ElixirScript.Translator.Function do
             name
         end
     end
+
     Utils.make_call_expression(the_name, function_name, params)
   end
 

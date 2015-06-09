@@ -10,3 +10,4 @@ priv/alphonse/dist
 /dist
 deploy.sh
 .DS_Store
+priv/alphonse/scratchpad.js

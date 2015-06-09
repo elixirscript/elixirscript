@@ -1,7 +1,7 @@
 import Atom from './atom';
 
 let Logger = {
-  __MODULE_: Atom('Logger'),
+  __MODULE__: Atom('Logger'),
 
   debug: function(message){
     console.debug(message);
@@ -29,9 +29,9 @@ let Logger = {
     }else if(type.value === "error"){
       console.error(message);
     }else{
-      throw new ArgumentError("invalid type");
+      throw new Error("invalid type");
     }
   }
-}
+};
 
 export default Logger;

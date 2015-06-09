@@ -1,0 +1,46 @@
+{
+    "ecmaFeatures":{
+       "modules": true
+    },
+    "rules": {
+        "indent": [
+            2,
+            2
+        ],
+        "quotes": [
+            0,
+            "double"
+        ],
+        "linebreak-style": [
+            2,
+            "unix"
+        ],
+        "semi": [
+            2,
+            "always"
+        ],
+        "no-var": true,
+        "camelcase": [
+            0, 
+            {
+                "properties": "never"
+            }
+        ],
+        "no-underscore-dangle": false,
+        "new-cap": [
+            1, 
+            {
+                "capIsNew": false
+            }
+        ],
+        "no-extend-native": [2, {"exceptions": ["Object", "String"]}],
+        "no-unused-vars": [2, {"vars": "all", "args": "none"}],
+        "space-infix-ops": [2, {"int32Hint": true}]
+    },
+    "env": {
+        "es6": true,
+        "browser": true,
+        "mocha": true,
+        "node": true
+    }
+}

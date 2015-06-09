@@ -1,9 +1,11 @@
 import Atom from './atom';
 import Tuple from './tuple';
 import List from './list';
+import Enum from './enum';
+import BitString from './bit_string';
 
 let Kernel = {
-  __MODULE_: Atom('Kernel'),
+  __MODULE__: Atom('Kernel'),
 
   tl: function(list){
     return List.delete_at(list, 0);
@@ -22,11 +24,11 @@ let Kernel = {
   },
 
   is_binary: function (x){
-    return typeof(x) === 'string' || x instanceof String;
+    return typeof x === 'string' || x instanceof String;
   },
 
   is_boolean: function (x){
-    return typeof(x) === 'boolean' || x instanceof Boolean; 
+    return typeof x === 'boolean' || x instanceof Boolean;
   },
 
   is_function: function(x, arity = -1){
@@ -67,7 +69,7 @@ let Kernel = {
   },
 
   is_port: function(x){
-    
+
   },
 
   is_reference: function(x){
@@ -78,7 +80,7 @@ let Kernel = {
     return Kernel.is_binary(x) || x instanceof BitString;
   },
 
-  _in: function(left, right){
+  __in__: function(left, right){
     return Enum.member(right, left);
   },
 
@@ -118,7 +120,7 @@ let Kernel = {
     if(arguments.length === 3){
       return module[fun].apply(null, args);
     }else{
-      return module.apply(null, fun);  
+      return module.apply(null, fun);
     }
   },
 
@@ -126,7 +128,7 @@ let Kernel = {
     return arg.toString();
   },
 
-  match: function(pattern, expr, guard = () => true){
+  match__qmark__: function(pattern, expr, guard = () => true){
     if(!guard()){
       return false;
     }
@@ -140,14 +142,14 @@ let Kernel = {
     }else if(Kernel.is_atom(expr)){
       return Kernel.is_atom(pattern) && pattern.value === expr.value;
     }else if(Kernel.is_tuple(expr)){
-      return Kernel.is_tuple(pattern) && Kernel.match(pattern.value, expr.value);
-    }else if(Kernel.is_list(expr)){     
-      if(Kernel.length(pattern) != Kernel.length(expr)){
+      return Kernel.is_tuple(pattern) && Kernel["match?"](pattern.value, expr.value);
+    }else if(Kernel.is_list(expr)){
+      if(Kernel.length(pattern) !== Kernel.length(expr)){
         return false;
       }
 
-      for (let i=0; i <= pattern.length; i++) {
-        if(Kernel.match(pattern[i], expr[i]) === false){
+      for (let i = 0; i <= pattern.length; i++) {
+        if(Kernel["match?"](pattern[i], expr[i]) === false){
           return false;
         }
       }
@@ -163,7 +165,7 @@ let Kernel = {
           return false;
         }
 
-        if(Kernel.match(pattern[key], expr[key]) == false){
+        if(Kernel["match?"](pattern[key], expr[key]) === false){
           return false;
         }
       }
@@ -171,7 +173,7 @@ let Kernel = {
       return true;
     }
   }
-}
+};
 
 export default Kernel;
 
