@@ -5,6 +5,7 @@ var babel = require('gulp-babel');
 var eslint = require('gulp-eslint');
 
 var stdLibPath = './priv/alphonse/lib/**/*.js';
+
 var testPath = './priv/alphonse/build/tests/**/*.spec.js';
 
 gulp.task('dist', function() {
@@ -17,10 +18,16 @@ gulp.task('dist', function() {
 gulp.task('build', function() {
   return gulp.src([stdLibPath, '!./priv/alphonse/build/**/*.js', '!./priv/alphonse/*.js'])
       .pipe(babel({sourceMap: false, modules:'common'}))
-      .pipe(gulp.dest('./priv/alphonse/build'));
+      .pipe(gulp.dest('./priv/alphonse/build/lib'));
 });
 
-gulp.task('test',['build'], function () {
+gulp.task('build_test', function() {
+  return gulp.src(['./priv/alphonse/tests/**/*.spec.js'])
+      .pipe(babel({sourceMap: false, modules:'common'}))
+      .pipe(gulp.dest('./priv/alphonse/build/tests'));
+});
+
+gulp.task('test',['build', 'build_test'], function () {
   return gulp.src(testPath, {read: false})
     .pipe(mocha({reporter: 'nyan'}));
 });
@@ -33,6 +40,4 @@ gulp.task('lint', function () {
 });
 
 
-
-
-gulp.task('default', ['lint', 'build', 'test']);
+gulp.task('default', ['lint', 'test']);

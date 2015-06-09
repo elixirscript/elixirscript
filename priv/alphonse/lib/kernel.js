@@ -142,14 +142,14 @@ let Kernel = {
     }else if(Kernel.is_atom(expr)){
       return Kernel.is_atom(pattern) && pattern.value === expr.value;
     }else if(Kernel.is_tuple(expr)){
-      return Kernel.is_tuple(pattern) && Kernel["match?"](pattern.value, expr.value);
+      return Kernel.is_tuple(pattern) && Kernel.match__qmark__(pattern.value, expr.value);
     }else if(Kernel.is_list(expr)){
       if(Kernel.length(pattern) !== Kernel.length(expr)){
         return false;
       }
 
       for (let i = 0; i <= pattern.length; i++) {
-        if(Kernel["match?"](pattern[i], expr[i]) === false){
+        if(Kernel.match__qmark__(pattern[i], expr[i]) === false){
           return false;
         }
       }
@@ -165,7 +165,7 @@ let Kernel = {
           return false;
         }
 
-        if(Kernel["match?"](pattern[key], expr[key]) === false){
+        if(Kernel.match__qmark__(pattern[key], expr[key]) === false){
           return false;
         }
       }
