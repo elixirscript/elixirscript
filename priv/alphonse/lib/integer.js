@@ -26,7 +26,14 @@ let Integer = {
     }
 
     return Tuple(result, "");
+  },
 
+  to_char_list: function(number, base = 10){
+    return number.toString(base).split('');
+  },
+
+  to_string: function(number, base = 10){
+    return number.toString(base);
   }
 };
 

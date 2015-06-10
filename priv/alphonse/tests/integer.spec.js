@@ -20,5 +20,16 @@ describe('Integer', function(){
     let result = Integer.parse("three");
     expect(Kernel.match__qmark__(result[0], Atom('error'))).to.equal(true);
   })
+
+  it('converts base 10 integer to char_list', function(){
+    let result = Integer.to_char_list(7);
+    expect(Kernel.match__qmark__(result, ["7"])).to.equal(true);
+  })
+
+  it('converts base 16 integer to char_list', function(){
+    let result = Integer.to_char_list(1023, 16);
+    expect(Kernel.match__qmark__(result, ["3","f","f"])).to.equal(true);
+  })
+
 })
 
