@@ -1,4 +1,4 @@
-defmodule ElixirScript.Translator.Primative do
+defmodule ElixirScript.Translator.Primitive do
   require Logger
   alias ESTree.Builder
   alias ElixirScript.Translator

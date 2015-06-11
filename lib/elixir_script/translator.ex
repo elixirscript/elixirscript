@@ -1,7 +1,7 @@
 defmodule ElixirScript.Translator do
   require Logger
   alias ElixirScript.Preparer
-  alias ElixirScript.Translator.Primative
+  alias ElixirScript.Translator.Primitive
   alias ElixirScript.Translator.PatternMatching
   alias ElixirScript.Translator.Data
   alias ElixirScript.Translator.Function
@@ -20,19 +20,19 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate(ast) when is_number(ast) or is_binary(ast) or is_boolean(ast) or is_nil(ast) do
-    Primative.make_literal(ast)
+    Primitive.make_literal(ast)
   end
 
   defp do_translate(ast) when is_atom(ast) do
-    Primative.make_atom(ast)
+    Primitive.make_atom(ast)
   end
 
   defp do_translate(ast) when is_list(ast) do
-    Primative.make_list(ast)
+    Primitive.make_list(ast)
   end
 
   defp do_translate({ one, two }) do
-    Primative.make_tuple({one, two})
+    Primitive.make_tuple({one, two})
   end
 
   defp do_translate({:&, [], [number]}) when is_number(number) do
@@ -46,7 +46,7 @@ defmodule ElixirScript.Translator do
 
   defp do_translate({:&, _, [{:/, _, [{function_name, _, _}, _arity]}]}) do
     function_name = Utils.filter_name(function_name)
-    Primative.make_identifier(function_name)
+    Primitive.make_identifier(function_name)
   end
 
   defp do_translate({:&, _, body}) do
@@ -60,7 +60,7 @@ defmodule ElixirScript.Translator do
 
   defp do_translate({:@, _, [{name, _, _}]}) do
     name = Utils.filter_name(name)
-    Primative.make_identifier(name)
+    Primitive.make_identifier(name)
   end
 
   defp do_translate({:%, _, [alias_info, data]}) do
@@ -91,9 +91,9 @@ defmodule ElixirScript.Translator do
 
     case is_interpolated_string do
       true ->
-        Primative.make_interpolated_string(elements)
+        Primitive.make_interpolated_string(elements)
       _ ->
-        Primative.make_bitstring(elements)
+        Primitive.make_bitstring(elements)
     end
   end
 
@@ -118,11 +118,11 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:_, _, _}) do
-    Primative.make_identifier(:undefined)
+    Primitive.make_identifier(:undefined)
   end
 
   defp do_translate({:__aliases__, _, aliases}) do
-    Primative.make_identifier(aliases)
+    Primitive.make_identifier(aliases)
   end
 
   defp do_translate({:__block__, _, expressions }) do
@@ -219,7 +219,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:{}, _, elements}) do
-    Primative.make_tuple(elements)
+    Primitive.make_tuple(elements)
   end
 
   defp do_translate({operator, _, [value]}) when operator in [:-, :!] do
@@ -314,7 +314,7 @@ defmodule ElixirScript.Translator do
 
   defp do_translate({ name, _, _ }) do
     name = Utils.filter_name(name)   
-    Primative.make_identifier(name)
+    Primitive.make_identifier(name)
   end
 
 end
