@@ -167,8 +167,14 @@ defmodule ElixirScript.Translator.Control do
       fn(x, index) -> 
         case Translator.translate(x) do
           %ESTree.Identifier{} ->
-            variable_declarator = Builder.variable_declarator(Translator.translate(x), 
-              Utils.make_array_accessor_call("_ref", index)
+            variable_declarator = Builder.variable_declarator(Translator.translate(x),
+              Builder.call_expression(
+                Builder.member_expression(
+                  i,
+                  Builder.identifier(:get)
+                ),
+                [Builder.literal(index)]
+              )
             )
             variable_declaration = Builder.variable_declaration([variable_declarator], :let)
 

@@ -122,7 +122,7 @@ defmodule ElixirScript.Translator.For.Test do
 
         for(let _ref of [Tuple(Atom('user'), 'john'), Tuple(Atom('admin'), 'john'), Tuple(Atom('user'), 'meg')]){
           if(Kernel.match__qmark__(_ref, Tuple(Atom('user'), undefined))){
-            let name = _ref[1];
+            let name = _ref.get(1);
             _results.push(String.upcase(name));
           }
         }

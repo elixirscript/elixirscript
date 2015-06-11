@@ -128,8 +128,8 @@ defmodule ElixirScript.Translator.Case.Test do
     js_code = """
       (function(){
         if(Kernel.is_tuple(data)){
-          let one = data[0];
-          let two = data[1];
+          let one = data.get(0);
+          let two = data.get(1);
           return Logger.info(one);
         }else if(Kernel.match__qmark__(Atom('error'), data)){
           return null;
@@ -153,11 +153,11 @@ defmodule ElixirScript.Translator.Case.Test do
     js_code = """
       (function(){
         if(Kernel.is_tuple(data)){
-          let three = data[1];
+          let three = data.get(1);
 
-          if(Kernel.is_tuple(data[0])){
-            let one = data[0][0];
-            let two = data[0][1];
+          if(Kernel.is_tuple(data.get(0))){
+            let one = data.get(0).get(0);
+            let two = data.get(0).get(1);
             
             return Logger.info(one);
           }
@@ -181,11 +181,11 @@ defmodule ElixirScript.Translator.Case.Test do
     js_code = """
       (function(){
         if(Kernel.is_tuple(data)){
-          let one = data[0];
+          let one = data.get(0);
 
-          if(Kernel.is_tuple(data[1])){
-            let two = data[1][0];
-            let three = data[1][1];
+          if(Kernel.is_tuple(data.get(1))){
+            let two = data.get(1).get(0);
+            let three = data.get(1).get(1);
 
             return Logger.info(one);
           }

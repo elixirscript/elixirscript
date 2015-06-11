@@ -44,17 +44,19 @@ defmodule ElixirScript.Translator.PatternMatching do
       declaration = case x do
         {:^, _, [{variable, meta, context}]} ->
           bound = Builder.if_statement(
-            Translator.translate(quote do: !Kernel.match__qmark__(unquote({variable, meta, context}), _ref[unquote(index)])),
+            Translator.translate(quote do: !Kernel.match__qmark__(unquote({variable, meta, context}), _ref.get(unquote(index)))),
             Utils.make_throw_statement("MatchError", "no match of right hand side value")
           )
           bound
         _ ->
         declarator = Builder.variable_declarator(
           Translator.translate(x),
-          Builder.member_expression(
-            ref,
-            Builder.literal(index),
-            true
+          Builder.call_expression(
+            Builder.member_expression(
+              ref,
+              Builder.identifier(:get)
+            ),
+            [Builder.literal(index)]
           )
         )
 
@@ -247,14 +249,30 @@ defmodule ElixirScript.Translator.PatternMatching do
 
       case x do
         { :identifier, item } ->
-          declarator = Builder.variable_declarator(
-            Builder.identifier(item),
-            Builder.member_expression(
-              identifier_fn.(index),
-              Builder.literal(current_state.state_index),
-              true
-            )
-          )
+
+
+          declarator = case type do
+            :list ->
+              Builder.variable_declarator(
+                Builder.identifier(item),
+                Builder.member_expression(
+                  identifier_fn.(index),
+                  Builder.literal(current_state.state_index),
+                  true
+                )
+              )
+            :tuple ->
+              Builder.variable_declarator(
+                Builder.identifier(item),
+                Builder.call_expression(
+                  Builder.member_expression(
+                    identifier_fn.(index),
+                    Builder.identifier(:get)
+                  ),
+                  [Builder.literal(current_state.state_index)]
+                )
+              )
+          end            
 
           declaration = Builder.variable_declaration([declarator], :let)
 
@@ -262,11 +280,22 @@ defmodule ElixirScript.Translator.PatternMatching do
         params ->
           {new_body, _params} = build_pattern_matched_body(current_state.body, [params], 
             fn(new_index) ->
-              Builder.member_expression(
-                identifier_fn.(index),
-                Builder.literal(current_state.state_index + new_index),
-                true
-              )
+              case type do
+                :list ->
+                    Builder.member_expression(
+                      identifier_fn.(index),
+                      Builder.literal(current_state.state_index + new_index),
+                      true
+                    )
+                :tuple ->
+                    Builder.call_expression(
+                      Builder.member_expression(
+                        identifier_fn.(index),
+                        Builder.identifier(:get)
+                      ),
+                      [Builder.literal(current_state.state_index + new_index)]
+                    )
+              end 
           end, nil)
 
           {nil, %{current_state | body: new_body, state_index: current_state.state_index + 1 }}   

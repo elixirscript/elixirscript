@@ -113,8 +113,8 @@ defmodule ElixirScript.Translator.Function.Test do
       export function test1(alpha, beta){
         let _ref = Tuple(1, 2);
 
-        let a0 = _ref[0];
-        let b0 = _ref[1];
+        let a0 = _ref.get(0);
+        let b0 = _ref.get(1);
 
         return b0;
       }
@@ -509,8 +509,8 @@ defmodule ElixirScript.Translator.Function.Test do
     js_code = """
       export function something(_ref0){
         if(Kernel.is_tuple(arguments[0])){
-          let apple = arguments[0][0];
-          let fruits = arguments[0][1];
+          let apple = arguments[0].get(0);
+          let fruits = arguments[0].get(1);
           return null;
         }
       }
