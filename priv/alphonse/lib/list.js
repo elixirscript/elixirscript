@@ -3,7 +3,24 @@ import Atom from './atom';
 import Kernel from './kernel';
 import ElixirScript from './elixir_script';
 
-let List = {};
+let List;
+
+List = function(...args){
+  if (!(this instanceof List)){
+    return new List(args);
+  }
+
+  let _value = Object.freeze(args);
+
+  this.length = function(){
+    return _value.length;
+  };
+
+  this.get = function(i){
+    return _value[i];
+  };
+
+};
 
 List.__MODULE__ = Atom('List');
 
