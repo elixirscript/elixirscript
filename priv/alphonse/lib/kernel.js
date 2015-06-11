@@ -93,7 +93,7 @@ let Kernel = {
   },
 
   elem: function(tuple, index){
-    return tuple['_' + index];
+    return tuple.get(index);
   },
 
   rem: function(left, right){
@@ -140,9 +140,9 @@ let Kernel = {
     if(Kernel.is_nil(expr) || Kernel.is_number(expr) || Kernel.is_binary(expr) || Kernel.is_boolean(expr)){
       return pattern === expr;
     }else if(Kernel.is_atom(expr)){
-      return Kernel.is_atom(pattern) && pattern.value === expr.value;
+      return Kernel.is_atom(pattern) && pattern.toString() === expr.toString();
     }else if(Kernel.is_tuple(expr)){
-      return Kernel.is_tuple(pattern) && Kernel.match__qmark__(pattern.value, expr.value);
+      return Kernel.is_tuple(pattern) && Kernel.match__qmark__(pattern.value(), expr.value());
     }else if(Kernel.is_list(expr)){
       if(Kernel.length(pattern) !== Kernel.length(expr)){
         return false;

@@ -5,23 +5,30 @@ let Tuple = function(...args){
     return new Tuple(...args);
   }
 
-  this.value = args;
-  this.length = args.length;
+  let _value = Object.freeze(args);
 
-  for (var i = 0; i < args.length; i++) {
-    this[i] = args[i];
-  }
+  this.value = function(){
+    return _value;
+  };
+
+  this.length = function(){
+    return _value.length;
+  };
+
+  this.get = function(i){
+    return _value[i];
+  };
 };
 
 Tuple.prototype.__MODULE__ = Atom('Tuple');
 
 Tuple.prototype.toString = function(){
   var i, s = "";
-  for (i = 0; i < this.length; i++) {
+  for (i = 0; i < this.length(); i++) {
     if (s !== "") {
       s += ", ";
     }
-    s += this[i].toString();
+    s += this.get(i).toString();
   }
 
   return "{" + s + "}";
@@ -34,9 +41,9 @@ Tuple.to_string = function(tuple){
 Tuple.delete_at = function(tuple, index){
   let new_list = [];
 
-  for (var i = 0; i < tuple.value.length; i++) {
+  for (var i = 0; i < tuple.length(); i++) {
     if(i !== index){
-      new_list.push(tuple.value[i]);
+      new_list.push(tuple.get(i));
     }
   }
 
@@ -56,13 +63,13 @@ Tuple.duplicate = function(data, size){
 Tuple.insert_at = function(tuple, index, term){
   let new_tuple = [];
 
-  for (var i = 0; i <= tuple.value.length; i++) {
+  for (var i = 0; i <= tuple.length(); i++) {
     if(i === index){
       new_tuple.push(term);
       i++;
-      new_tuple.push(tuple.value[i]);
+      new_tuple.push(tuple.get(i));
     }else{
-      new_tuple.push(tuple.value[i]);
+      new_tuple.push(tuple.get(i));
     }
   }
 
@@ -74,7 +81,13 @@ Tuple.from_list = function(list){
 };
 
 Tuple.to_list = function(tuple){
-  return tuple.value;
+  let new_list = [];
+
+  for (var i = 0; i < tuple.length(); i++) {
+    new_list.push(tuple.get(i));
+  }
+
+  return new_list;
 };
 
 export default Tuple;

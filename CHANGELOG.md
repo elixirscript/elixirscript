@@ -1,4 +1,8 @@
 # v0.6.0-dev
+  * Enhancements
+    * Made the Atom, Tuple, and BitString data structures more immutable
+    * Now replacing characters that can't be used in variable and function names in JavaScript with
+      something that it (i.e. `match?` -> `match__qmark__`)
 
 # v0.5.0
   * Enhancements

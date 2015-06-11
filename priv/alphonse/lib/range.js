@@ -1,19 +1,33 @@
 import Atom from './atom';
 
-let Range = function(first, last){
+let Range = function(_first, _last){
   if (!(this instanceof Range)){
-    return new Range(first, last);
+    return new Range(_first, _last);
   }
 
-  this.first = first;
-  this.last = last;
-  this.range = [];
+  this.first = function(){
+    return _first;
+  };
 
-  for(let i = first; i <= last; i++){
-    this.range.push(i);
+  this.last = function(){
+    return _last;
+  };
+
+  let _range = [];
+
+  for(let i = _first; i <= _last; i++){
+    _range.push(i);
   }
 
-  this.length = this.range.length;
+  _range = Object.freeze(_range);
+
+  this.range = function(){
+    return _range;
+  };
+
+  this.length = function(){
+    return _range.length;
+  };
 };
 
 Range.__MODULE__ = Atom('Range');

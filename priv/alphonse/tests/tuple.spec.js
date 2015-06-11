@@ -8,13 +8,13 @@ describe('Tuple', function(){
   describe('duplicate', function(){
     it('must make a tuple with the value duplicated the specified amount of times', function(){
       let t = Tuple.duplicate("value", 3);
-      expect(t.length).to.equal(3);
-      expect(t[0]).to.equal("value");
-      expect(t[1]).to.equal("value");
-      expect(t[2]).to.equal("value");
+      expect(t.length()).to.equal(3);
+      expect(t.get(0)).to.equal("value");
+      expect(t.get(1)).to.equal("value");
+      expect(t.get(2)).to.equal("value");
 
       t = Tuple.duplicate("value", 0);
-      expect(t.length).to.equal(0);
+      expect(t.length()).to.equal(0);
     })
   })
 
@@ -24,7 +24,7 @@ describe('Tuple', function(){
 
       t = Tuple.delete_at(t, 0);
 
-      expect(t[0]).to.equal(2);
+      expect(t.get(0)).to.equal(2);
     })
   })
 

@@ -104,6 +104,106 @@ List.insert_at = function(list, index, value){
   return new_value;
 };
 
+List.keydelete = function(list, key, position){
+  let new_list = [];
+
+  for(let i = 0; i < list.length; i++){
+    if(!Kernel.match__qmark__(list[i][position], key)){
+      new_list.push(list[i]);
+    }
+  }
+
+  return new_list;
+};
+
+List.keyfind = function(list, key, position, _default = null){
+
+  for(let i = 0; i < list.length; i++){
+    if(Kernel.match__qmark__(list[i][position], key)){
+      return list[i];
+    }
+  }
+
+  return _default;
+};
+
+List.keymember__qmark__ = function(list, key, position){
+
+  for(let i = 0; i < list.length; i++){
+    if(Kernel.match__qmark__(list[i][position], key)){
+      return true;
+    }
+  }
+
+  return false;
+};
+
+List.keyreplace = function(list, key, position, new_tuple){
+  let new_list = [];
+
+  for(let i = 0; i < list.length; i++){
+    if(!Kernel.match__qmark__(list[i][position], key)){
+      new_list.push(list[i]);
+    }else{
+      new_list.push(new_tuple);
+    }
+  }
+
+  return new_list;
+};
+
+
+List.keysort = function(list, position){
+  let new_list = ElixirScript.clone(list);
+
+  new_list.sort(function(a, b){
+    if(position === 0){
+      if(a[position].value < b[position].value){
+        return -1;
+      }
+
+      if(a[position].value > b[position].value){
+        return 1;
+      }
+
+      return 0;
+    }else{
+      if(a[position] < b[position]){
+        return -1;
+      }
+
+      if(a[position] > b[position]){
+        return 1;
+      }
+
+      return 0;
+    }
+
+  });
+
+  return new_list;
+};
+
+List.keystore = function(list, key, position, new_tuple){
+  let new_list = [];
+  let replaced = false;
+
+  for(let i = 0; i < list.length; i++){
+    if(!Kernel.match__qmark__(list[i][position], key)){
+      new_list.push(list[i]);
+    }else{
+      new_list.push(new_tuple);
+      replaced = true;
+    }
+  }
+
+  if(!replaced){
+    new_list.push(new_tuple);
+  }
+
+  return new_list;
+};
+
 List.last = function(list){
   if(list.length === 0){
     return null;
