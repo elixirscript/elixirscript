@@ -132,17 +132,31 @@ defmodule ElixirScript.Translator.Control do
             elements = [value_one, value_two]
             make_tuple_for(elements, enum, generators)
           {:{}, _, elements} ->
-            make_tuple_for(elements, enum, generators)
+            make_tuple_for(elements, enum, generators)         
           _ ->
             i = Translator.translate(identifier)
             variable_declarator = Builder.variable_declarator(i)
             variable_declaration = Builder.variable_declaration([variable_declarator], :let)
 
-            Builder.for_of_statement(
-              variable_declaration,
-              Translator.translate(enum),
-              Builder.block_statement(List.wrap(handle_generators(tl(generators))))
-            )
+            if !is_binary(enum) do
+              Builder.for_of_statement(
+                variable_declaration,
+                Builder.call_expression(
+                  Builder.member_expression(
+                    Translator.translate(enum),
+                    Builder.identifier(:value)
+                  ),
+                  []
+                ),
+                Builder.block_statement(List.wrap(handle_generators(tl(generators))))
+              )
+            else
+              Builder.for_of_statement(
+                variable_declaration,
+                Translator.translate(enum),
+                Builder.block_statement(List.wrap(handle_generators(tl(generators))))
+              )
+            end
         end
       [into: _expression] ->
         raise ElixirScript.UnsupportedError, :into
@@ -279,15 +293,21 @@ defmodule ElixirScript.Translator.Control do
   end
 
   defp build_push_ast(param) do
+
     Builder.expression_statement(
-      Builder.call_expression(
-        Builder.member_expression(
-          Builder.identifier("_results"),
-          Builder.identifier("push")
-        ),
-        [param]
+      Builder.assignment_expression(
+        :=,
+        Builder.identifier(:_results),
+          Builder.call_expression(
+            Builder.member_expression(
+              Builder.identifier("List"),
+              Builder.identifier("append")
+            ),
+            [Builder.identifier(:_results), param]
+          )
       )
     )
+
   end
 
 

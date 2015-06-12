@@ -20,10 +20,23 @@ defmodule ElixirScript.Translator.PatternMatching do
           Utils.make_throw_statement("MatchError", "no match of right hand side value")
         )
       _ ->
-        declarator = Builder.variable_declarator(
-          Translator.translate(left),
-          Translator.translate(right)
-        )
+        declarator = case is_list(left) do
+          true ->
+            array = left
+            |> Enum.map(&Translator.translate(&1))
+            |> Builder.array_expression
+
+            Builder.variable_declarator(
+              array,
+              Translator.translate(right)
+            )
+
+          false ->
+            Builder.variable_declarator(
+              Translator.translate(left),
+              Translator.translate(right)
+            )
+        end
 
         Builder.variable_declaration([declarator], :let)
     end
@@ -114,6 +127,8 @@ defmodule ElixirScript.Translator.PatternMatching do
       case Translator.translate(value) do
         %ESTree.Identifier{} ->
           true
+        %ESTree.CallExpression{ callee: %ESTree.Identifier{ name: "List" } } ->
+          false
         %ESTree.CallExpression{} ->
           true
         _ ->
@@ -133,6 +148,8 @@ defmodule ElixirScript.Translator.PatternMatching do
       case Translator.translate(value) do
         %ESTree.Identifier{} ->
           {key, {:__aliases__, [], [:undefined]} }
+        %ESTree.CallExpression{ callee: %ESTree.Identifier{ name: "List" } } ->
+          {key, value}
         %ESTree.CallExpression{} ->
           {key, hd(process_pattern(value)) }
         _ ->
@@ -251,18 +268,8 @@ defmodule ElixirScript.Translator.PatternMatching do
         { :identifier, item } ->
 
 
-          declarator = case type do
-            :list ->
-              Builder.variable_declarator(
-                Builder.identifier(item),
-                Builder.member_expression(
-                  identifier_fn.(index),
-                  Builder.literal(current_state.state_index),
-                  true
-                )
-              )
-            :tuple ->
-              Builder.variable_declarator(
+          
+          declarator = Builder.variable_declarator(
                 Builder.identifier(item),
                 Builder.call_expression(
                   Builder.member_expression(
@@ -272,30 +279,19 @@ defmodule ElixirScript.Translator.PatternMatching do
                   [Builder.literal(current_state.state_index)]
                 )
               )
-          end            
-
           declaration = Builder.variable_declaration([declarator], :let)
 
           {declaration, %{current_state | body: current_state.body, state_index: current_state.state_index + 1 }}
         params ->
           {new_body, _params} = build_pattern_matched_body(current_state.body, [params], 
             fn(new_index) ->
-              case type do
-                :list ->
-                    Builder.member_expression(
-                      identifier_fn.(index),
-                      Builder.literal(current_state.state_index + new_index),
-                      true
-                    )
-                :tuple ->
-                    Builder.call_expression(
-                      Builder.member_expression(
-                        identifier_fn.(index),
-                        Builder.identifier(:get)
-                      ),
-                      [Builder.literal(current_state.state_index + new_index)]
-                    )
-              end 
+              Builder.call_expression(
+                Builder.member_expression(
+                  identifier_fn.(index),
+                  Builder.identifier(:get)
+                ),
+                [Builder.literal(current_state.state_index + new_index)]
+              )
           end, nil)
 
           {nil, %{current_state | body: new_body, state_index: current_state.state_index + 1 }}   
@@ -459,7 +455,7 @@ defmodule ElixirScript.Translator.PatternMatching do
               build_member_expression_tree(keys, identifier)
             )
 
-            Builder.variable_declaration([declarator], :let) 
+            Builder.variable_declaration([declarator], :let)
           {key, {:identifier, value} }->
             declarator = Builder.variable_declarator(
               Builder.identifier(value),

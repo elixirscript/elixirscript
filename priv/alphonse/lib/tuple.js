@@ -1,4 +1,5 @@
 import Atom from './atom';
+import List from './list';
 
 let Tuple = function(...args){
   if (!(this instanceof Tuple)){
@@ -77,7 +78,7 @@ Tuple.insert_at = function(tuple, index, term){
 };
 
 Tuple.from_list = function(list){
-  return Tuple.apply(null, list);
+  return Tuple.apply(null, list.value());
 };
 
 Tuple.to_list = function(tuple){
@@ -87,7 +88,7 @@ Tuple.to_list = function(tuple){
     new_list.push(tuple.get(i));
   }
 
-  return new_list;
+  return List(...new_list);
 };
 
 export default Tuple;

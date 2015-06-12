@@ -45,7 +45,7 @@ let Kernel = {
   },
 
   is_list: function(x){
-    return x instanceof Array;
+    return x instanceof List;
   },
 
   is_map: function(x){
@@ -61,6 +61,10 @@ let Kernel = {
   },
 
   length: function(x){
+    if(Kernel.is_list(x) || Kernel.is_tuple(x)){
+      return x.length();
+    }
+
     return x.length;
   },
 

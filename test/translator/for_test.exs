@@ -8,15 +8,13 @@ defmodule ElixirScript.Translator.For.Test do
     end
 
     js_code = """
-      (function(){
-        let _results = [];
-
-        for(let n of [1,2,3,4]){
-          _results.push(n * 2);
-        }
-        
-        return _results;
-      }.call(this));
+     (function () {
+         let _results = List();
+         for (let n of List(1, 2, 3, 4).value()) {
+             _results = List.append(_results, n * 2);
+         }
+         return _results;
+     }.call(this));
     """
 
     assert_translation(ex_ast, js_code)
@@ -28,15 +26,13 @@ defmodule ElixirScript.Translator.For.Test do
     end
 
     js_code = """
-      (function(){
-        let _results = [];
-
-        for(let n of 'Opera'){
-          _results.push(n);
-        }
-        
-        return _results;
-      }.call(this));
+     (function () {
+         let _results = List();
+         for (let n of 'Opera') {
+             _results = List.append(_results, n);
+         }
+         return _results;
+     }.call(this));
     """
 
     assert_translation(ex_ast, js_code)
@@ -48,17 +44,15 @@ defmodule ElixirScript.Translator.For.Test do
     end
 
     js_code = """
-      (function(){
-        let _results = [];
-
-        for(let x of [1,2]){
-          for(let y of [2,3]){
-            _results.push(x * y);
-          }
-        }
-          
-        return _results;
-      }.call(this));
+     (function () {
+         let _results = List();
+         for (let x of List(1, 2).value()) {
+             for (let y of List(2, 3).value()) {
+                 _results = List.append(_results, x * y);
+             }
+         }
+         return _results;
+     }.call(this));
     """
 
     assert_translation(ex_ast, js_code)
@@ -72,17 +66,15 @@ defmodule ElixirScript.Translator.For.Test do
     end
 
     js_code = """
-      let r = (function(){
-        let _results = [];
-
-        for(let x of [1,2]){
-          for(let y of [2,3]){
-            _results.push(x * y);
-          }
-        }
-          
-        return _results;
-      }.call(this));;
+     let r = (function () {
+         let _results = List();
+         for (let x of List(1, 2).value()) {
+             for (let y of List(2, 3).value()) {
+                 _results = List.append(_results, x * y);
+             }
+         }
+         return _results;
+     }.call(this));;
     """
 
     assert_translation(ex_ast, js_code)
@@ -94,16 +86,14 @@ defmodule ElixirScript.Translator.For.Test do
     end
 
     js_code = """
-      (function(){
-        let _results = [];
-
-        for(let n of [1, 2, 3, 4, 5, 6]){
-            if(Kernel.rem(n, 2) == 0)
-              _results.push(n);
-        }
-
-        return _results;
-      }.call(this));
+     (function () {
+         let _results = List();
+         for (let n of List(1, 2, 3, 4, 5, 6).value()) {
+             if (Kernel.rem(n, 2) == 0)
+                 _results = List.append(_results, n);
+         }
+         return _results;
+     }.call(this));
     """
 
     assert_translation(ex_ast, js_code)
@@ -117,18 +107,16 @@ defmodule ElixirScript.Translator.For.Test do
     end
 
     js_code = """
-      (function(){
-        let _results = [];
-
-        for(let _ref of [Tuple(Atom('user'), 'john'), Tuple(Atom('admin'), 'john'), Tuple(Atom('user'), 'meg')]){
-          if(Kernel.match__qmark__(_ref, Tuple(Atom('user'), undefined))){
-            let name = _ref.get(1);
-            _results.push(String.upcase(name));
-          }
-        }
-
-        return _results;
-      }.call(this));
+     (function () {
+         let _results = List();
+         for (let _ref of List(Tuple(Atom('user'), 'john'), Tuple(Atom('admin'), 'john'), Tuple(Atom('user'), 'meg'))) {
+             if (Kernel.match__qmark__(_ref, Tuple(Atom('user'), undefined))) {
+                 let name = _ref.get(1);
+                 _results = List.append(_results, String.upcase(name));
+             }
+         }
+         return _results;
+     }.call(this));
     """
 
     assert_translation(ex_ast, js_code)

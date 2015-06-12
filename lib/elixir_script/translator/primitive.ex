@@ -34,9 +34,14 @@ defmodule ElixirScript.Translator.Primitive do
   end
 
   defp make_array_expression(elements) do
-    elements
-    |> Enum.map(&Translator.translate(&1))
-    |> Builder.array_expression
+    #elements
+    #|> Enum.map(&Translator.translate(&1))
+    #|> Builder.array_expression
+
+    Builder.call_expression(
+      Builder.identifier("List"), 
+      Enum.map(elements, fn(x) -> Translator.translate(x) end)
+    )
   end
 
   def make_interpolated_string(elements) do

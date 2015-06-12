@@ -390,7 +390,7 @@ defmodule ElixirScript.Translator.Function.Test do
 
     js_code = """
       function something(one, two){
-        if(Kernel.__in__(one, [1,2,3])){
+        if(Kernel.__in__(one, List(1,2,3))){
           return null;
         }
       }
@@ -412,7 +412,7 @@ defmodule ElixirScript.Translator.Function.Test do
       const __MODULE__ = Atom('Example');
 
       function something__1(one){
-        if(Kernel.__in__(one,[1,2,3])){
+        if(Kernel.__in__(one,List(1,2,3))){
           return null;
         }
 
@@ -488,9 +488,9 @@ defmodule ElixirScript.Translator.Function.Test do
     js_code = """
       export function something(_ref0){
         if(Kernel.is_list(arguments[0])){
-          let apple = arguments[0][0];
-          let pear = arguments[0][1];
-          let banana = arguments[0][2];
+          let apple = arguments[0].get(0);
+          let pear = arguments[0].get(1);
+          let banana = arguments[0].get(2);
           return null;
         }
       }
@@ -528,7 +528,7 @@ defmodule ElixirScript.Translator.Function.Test do
 
     js_code = """
       export function something(_ref0){
-        if(Kernel.match__qmark__({'__struct__': [Atom('AStruct')]}, arguments[0])){
+        if(Kernel.match__qmark__({'__struct__': List(Atom('AStruct'))}, arguments[0])){
           return null;
         }
       }
@@ -546,7 +546,7 @@ defmodule ElixirScript.Translator.Function.Test do
 
     js_code = """
       export function something(_ref0){
-        if(Kernel.match__qmark__({'__struct__': [Atom('AStruct')]}, arguments[0])){
+        if(Kernel.match__qmark__({'__struct__': List(Atom('AStruct'))}, arguments[0])){
           let a = arguments[0];
           return null;
         }
@@ -565,7 +565,7 @@ defmodule ElixirScript.Translator.Function.Test do
 
     js_code = """
       export function something(_ref0){
-        if(Kernel.match__qmark__({'__struct__': [Atom('AStruct')], 'key': undefined, 'key1': 2}, arguments[0])){
+        if(Kernel.match__qmark__({'__struct__': List(Atom('AStruct')), 'key': undefined, 'key1': 2}, arguments[0])){
           let value = arguments[0]['key'];
           return null;
         }
@@ -582,7 +582,7 @@ defmodule ElixirScript.Translator.Function.Test do
 
     js_code = """
       export function something(_ref0){
-        if(Kernel.match__qmark__({'__struct__': [Atom('AStruct')], 'key': undefined, 'key1': 2}, arguments[0])){
+        if(Kernel.match__qmark__({'__struct__': List(Atom('AStruct')), 'key': undefined, 'key1': 2}, arguments[0])){
           let value = arguments[0]['key'];
           if(Kernel.is_number(value)){
             return null;
@@ -726,29 +726,26 @@ defmodule ElixirScript.Translator.Function.Test do
      const __MODULE__ = Atom('Example');
 
      function something__1(_ref0) {
-         if (Kernel.match__qmark__({ '__struct__': [Atom('AStruct')] }, arguments[0])) {
+         if (Kernel.match__qmark__({ '__struct__': List(Atom('AStruct')) }, arguments[0])) {
              let a = arguments[0];
              return null;
          }
-
-         if (Kernel.match__qmark__({ '__struct__': [Atom('BStruct')] }, arguments[0])) {
+         if (Kernel.match__qmark__({ '__struct__': List(Atom('BStruct')) }, arguments[0])) {
              let b = arguments[0];
              return null;
          }
-
          if (Kernel.match__qmark__({
-                 '__struct__': [Atom('CStruct')],
+                 '__struct__': List(Atom('CStruct')),
                  'key': undefined,
                  'key1': 2
              }, arguments[0])) {
              let value = arguments[0]['key'];
              return null;
          }
-
          throw new FunctionClauseError('no function clause matching in something/1');
      }
 
-    function something(...args) {
+     function something(...args) {
          switch (args.length) {
          case 1:
              return something__1.apply(null, args.slice(0, 1 + 1));
@@ -909,7 +906,7 @@ defmodule ElixirScript.Translator.Function.Test do
     js_code = """
       export function test1(alpha, beta){
         let a0 = 1;
-        let [a1, b0, c0] = [a0, 2, 3];
+        let [a1, b0, c0] = List(a0, 2, 3);
         return [a1, b0, c0];
       }
     """

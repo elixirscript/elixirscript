@@ -78,7 +78,7 @@ defmodule ElixirScript.Translator.Case.Test do
 
     js_code = """
       (function(){
-        if(Kernel.__in__(number, [1, 2, 3, 4])){
+        if(Kernel.__in__(number, List(1, 2, 3, 4))){
           let value = 13;
           return value;
         }else{
@@ -211,9 +211,9 @@ defmodule ElixirScript.Translator.Case.Test do
     js_code = """
      (function () {
          if (Kernel.match__qmark__({ 
-              '__struct__': [Atom('AStruct')], 
+              '__struct__': List(Atom('AStruct')), 
               'key': { 
-                '__struct__': [Atom('BStruct')], 
+                '__struct__': List(Atom('BStruct')), 
                 'key2': undefined 
               } 
             }, data)) {
@@ -240,12 +240,12 @@ defmodule ElixirScript.Translator.Case.Test do
     js_code = """
      (function () {
          if (Kernel.match__qmark__({ 
-              '__struct__': [Atom('AStruct')], 
+              '__struct__': List(Atom('AStruct')), 
               'key': { 
-                '__struct__': [Atom('BStruct')], 
+                '__struct__': List(Atom('BStruct')), 
                 'key2': undefined,
                 'key3': {
-                  '__struct__': [Atom('CStruct')],
+                  '__struct__': List(Atom('CStruct')),
                   'key4': undefined
                 }
               } 

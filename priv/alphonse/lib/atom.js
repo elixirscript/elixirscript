@@ -1,3 +1,6 @@
+//TODO: evaluate using Symbol here (i.e Symbol.for("atomName"))
+//      this would rid the need of using a custom Atom object
+
 let Atom;
 
 Atom = function(_value){
@@ -13,6 +16,11 @@ Atom = function(_value){
 Atom.__MODULE__ = Atom("Atom");
 
 Atom.to_string = function (atom) {
+  //let atomString = atom.toString();
+  //let indexOfOpenParen = atomString.indexOf("(");
+  //let indexOfCloseParen = atomString.lastIndexOf(")");
+  //return atomString.substring(indexOfOpenParen+1, indexOfCloseParen);
+
   return atom.toString();
 };
 
