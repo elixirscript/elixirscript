@@ -137,26 +137,12 @@ defmodule ElixirScript.Translator.Control do
             i = Translator.translate(identifier)
             variable_declarator = Builder.variable_declarator(i)
             variable_declaration = Builder.variable_declaration([variable_declarator], :let)
-
-            if !is_binary(enum) do
-              Builder.for_of_statement(
-                variable_declaration,
-                Builder.call_expression(
-                  Builder.member_expression(
-                    Translator.translate(enum),
-                    Builder.identifier(:value)
-                  ),
-                  []
-                ),
-                Builder.block_statement(List.wrap(handle_generators(tl(generators))))
-              )
-            else
-              Builder.for_of_statement(
-                variable_declaration,
-                Translator.translate(enum),
-                Builder.block_statement(List.wrap(handle_generators(tl(generators))))
-              )
-            end
+            
+            Builder.for_of_statement(
+              variable_declaration,
+              Translator.translate(enum),
+              Builder.block_statement(List.wrap(handle_generators(tl(generators))))
+            )
         end
       [into: _expression] ->
         raise ElixirScript.UnsupportedError, :into

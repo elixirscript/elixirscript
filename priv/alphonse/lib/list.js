@@ -31,16 +31,20 @@ List = function(...args){
 
 List.__MODULE__ = Atom('List');
 
+List.prototype[Symbol.iterator] = function(){
+  return this.value()[Symbol.iterator]();
+};
 
 List.delete = function(list, item){
   let new_value = [];
   let value_found = false;
 
   for(let x of list){
-    if(x !== item && !value_found){
+    if(x === item && value_found !== false){
       new_value.push(x);
-    }else{
       value_found = true;
+    }else if(x !== item){
+      new_value.push(x);
     }
   }
 
@@ -80,7 +84,7 @@ List.first = function(list){
 List.flatten = function(list, tail = List()){
   let new_value = [];
 
-  for(let x of list.value()){
+  for(let x of list){
     if(Kernel.is_list(x)){
       new_value = new_value.concat(List.flatten(x).value());
     }else{
@@ -96,7 +100,7 @@ List.flatten = function(list, tail = List()){
 List.foldl = function(list, acc, func){
   let new_acc = acc;
 
-  for(let x of list.value()){
+  for(let x of list){
     new_acc = func(x, new_acc);
   }
 
@@ -282,7 +286,7 @@ List.zip = function(list_of_lists){
   let new_value = [];
   let smallest_length = list_of_lists.get(0);
 
-  for(let x of list_of_lists.value()){
+  for(let x of list_of_lists){
     if(x.length() < smallest_length){
       smallest_length = x.length();
     }

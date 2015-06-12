@@ -10,7 +10,7 @@ defmodule ElixirScript.Translator.For.Test do
     js_code = """
      (function () {
          let _results = List();
-         for (let n of List(1, 2, 3, 4).value()) {
+         for (let n of List(1, 2, 3, 4)) {
              _results = List.append(_results, n * 2);
          }
          return _results;
@@ -46,8 +46,8 @@ defmodule ElixirScript.Translator.For.Test do
     js_code = """
      (function () {
          let _results = List();
-         for (let x of List(1, 2).value()) {
-             for (let y of List(2, 3).value()) {
+         for (let x of List(1, 2)) {
+             for (let y of List(2, 3)) {
                  _results = List.append(_results, x * y);
              }
          }
@@ -68,8 +68,8 @@ defmodule ElixirScript.Translator.For.Test do
     js_code = """
      let r = (function () {
          let _results = List();
-         for (let x of List(1, 2).value()) {
-             for (let y of List(2, 3).value()) {
+         for (let x of List(1, 2)) {
+             for (let y of List(2, 3)) {
                  _results = List.append(_results, x * y);
              }
          }
@@ -88,7 +88,7 @@ defmodule ElixirScript.Translator.For.Test do
     js_code = """
      (function () {
          let _results = List();
-         for (let n of List(1, 2, 3, 4, 5, 6).value()) {
+         for (let n of List(1, 2, 3, 4, 5, 6)) {
              if (Kernel.rem(n, 2) == 0)
                  _results = List.append(_results, n);
          }

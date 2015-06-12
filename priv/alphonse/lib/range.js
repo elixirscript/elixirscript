@@ -21,7 +21,7 @@ let Range = function(_first, _last){
 
   _range = Object.freeze(_range);
 
-  this.range = function(){
+  this.value = function(){
     return _range;
   };
 
@@ -31,6 +31,10 @@ let Range = function(_first, _last){
 };
 
 Range.__MODULE__ = Atom('Range');
+
+Range.prototype[Symbol.iterator] = function(){
+  return this.value()[Symbol.iterator]();
+};
 
 Range.new = function (first, last) {
   return Range(first, last);

@@ -104,6 +104,10 @@ let BitString = function(...args){
 
 BitString.prototype.__MODULE__ = Atom('BitString');
 
+BitString.prototype[Symbol.iterator] = function () {
+  return this.value()[Symbol.iterator]();
+};
+
 BitString.prototype.toString = function(){
   var i, s = "";
   for (i = 0; i < this.length(); i++) {

@@ -21,7 +21,7 @@ let Tuple = function(...args){
   };
 };
 
-Tuple.prototype.__MODULE__ = Atom('Tuple');
+Tuple.__MODULE__ = Atom('Tuple');
 
 Tuple.prototype.toString = function(){
   var i, s = "";

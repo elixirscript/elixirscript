@@ -5,6 +5,7 @@
     * Now replacing characters that can't be used in variable and function names in JavaScript with
       something that it (i.e. `match?` -> `match__qmark__`)
     * Implemented Integer module
+    * Atom now converts to an ES6 Symbol
 
 # v0.5.0
   * Enhancements

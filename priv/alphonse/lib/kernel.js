@@ -20,7 +20,7 @@ let Kernel = {
   },
 
   is_atom: function(x){
-    return x instanceof Atom;
+    return typeof x === 'symbol';
   },
 
   is_binary: function (x){
@@ -32,7 +32,7 @@ let Kernel = {
   },
 
   is_function: function(x, arity = -1){
-    return x instanceof Function;
+    return typeof x === 'function' || x instanceof Function;
   },
 
   // from: http://stackoverflow.com/a/3885844
@@ -49,7 +49,7 @@ let Kernel = {
   },
 
   is_map: function(x){
-    return x instanceof Object;
+    return typeof x === 'object' || x instanceof Object;
   },
 
   is_number: function(x){
@@ -141,10 +141,10 @@ let Kernel = {
       return true;
     }
 
-    if(Kernel.is_nil(expr) || Kernel.is_number(expr) || Kernel.is_binary(expr) || Kernel.is_boolean(expr)){
+    if(Kernel.is_atom(expr)){
+      return Kernel.is_atom(pattern) && pattern === expr;
+    }else if(Kernel.is_nil(expr) || Kernel.is_number(expr) || Kernel.is_binary(expr) || Kernel.is_boolean(expr)){
       return pattern === expr;
-    }else if(Kernel.is_atom(expr)){
-      return Kernel.is_atom(pattern) && pattern.toString() === expr.toString();
     }else if(Kernel.is_tuple(expr)){
       return Kernel.is_tuple(pattern) && Kernel.match__qmark__(pattern.value(), expr.value());
     }else if(Kernel.is_list(expr)){

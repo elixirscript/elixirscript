@@ -1,4 +1,6 @@
 let Mutable = {
+  __MODULE__ = Atom('Mutable'),
+
   update: function(obj, prop, value){
     obj[prop] = value;
   }

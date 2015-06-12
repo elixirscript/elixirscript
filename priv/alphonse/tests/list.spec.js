@@ -1,4 +1,5 @@
 var List = require('../lib/list');
+var Atom = require('../lib/atom');
 var expect = require('chai').expect;
 
 describe('List', function(){
@@ -22,6 +23,14 @@ describe('List', function(){
       let t = List(1, 2, 3);
       t = List.delete_at(t, 0);
       expect(t.get(0)).to.equal(2);
+    })
+  })
+
+  describe('delete', function(){
+    it('delete item in list', function(){
+      let t = List(Atom("a"), Atom("b"), Atom("c"));
+      t = List.delete(t, Atom("b"));
+      expect(t.get(1)).to.equal(Atom("c"));
     })
   })
 
