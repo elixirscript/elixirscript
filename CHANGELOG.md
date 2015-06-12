@@ -4,6 +4,7 @@
     * Added List data structure
     * Now replacing characters that can't be used in variable and function names in JavaScript with
       something that it (i.e. `match?` -> `match__qmark__`)
+    * Implemented Integer module
 
 # v0.5.0
   * Enhancements
