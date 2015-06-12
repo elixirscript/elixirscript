@@ -906,7 +906,7 @@ defmodule ElixirScript.Translator.Function.Test do
     js_code = """
       export function test1(alpha, beta){
         let a0 = 1;
-        let [a1, b0, c0] = List(a0, 2, 3);
+        let [a1, b0, c0] = [a0, 2, 3];
         return [a1, b0, c0];
       }
     """

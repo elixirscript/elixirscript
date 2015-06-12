@@ -26,11 +26,17 @@ defmodule ElixirScript.Translator.PatternMatching do
             |> Enum.map(&Translator.translate(&1))
             |> Builder.array_expression
 
-            Builder.variable_declarator(
-              array,
-              Translator.translate(right)
-            )
-
+            if is_list(right) do
+              Builder.variable_declarator(
+                array,
+                right |> Enum.map(&Translator.translate(&1)) |> Builder.array_expression
+              )
+            else
+              Builder.variable_declarator(
+                array,
+                Translator.translate(right)
+              )
+            end
           false ->
             Builder.variable_declarator(
               Translator.translate(left),
