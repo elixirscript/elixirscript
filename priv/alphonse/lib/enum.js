@@ -49,11 +49,11 @@ let Enum = {
   },
 
   filter: function(collection, fun){
-    [].filter.call(collection.value(), fun);
+    return [].filter.call(collection.value(), fun);
   },
 
   map: function(collection, fun){
-    [].map.call(collection.value(), fun);
+    return [].map.call(collection.value(), fun);
   },
 
   map_reduce: function(collection, acc, fun){
