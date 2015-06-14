@@ -20,7 +20,7 @@ let Kernel = {
   },
 
   is_atom: function(x){
-    return x instanceof Atom;
+    return typeof x === 'symbol';
   },
 
   is_binary: function (x){
@@ -32,7 +32,7 @@ let Kernel = {
   },
 
   is_function: function(x, arity = -1){
-    return x instanceof Function;
+    return typeof x === 'function' || x instanceof Function;
   },
 
   // from: http://stackoverflow.com/a/3885844
@@ -45,11 +45,11 @@ let Kernel = {
   },
 
   is_list: function(x){
-    return x instanceof Array;
+    return x instanceof List;
   },
 
   is_map: function(x){
-    return x instanceof Object;
+    return typeof x === 'object' || x instanceof Object;
   },
 
   is_number: function(x){
@@ -61,6 +61,10 @@ let Kernel = {
   },
 
   length: function(x){
+    if(Kernel.is_list(x) || Kernel.is_tuple(x)){
+      return x.length();
+    }
+
     return x.length;
   },
 
@@ -93,7 +97,7 @@ let Kernel = {
   },
 
   elem: function(tuple, index){
-    return tuple['_' + index];
+    return tuple.get(index);
   },
 
   rem: function(left, right){
@@ -137,12 +141,12 @@ let Kernel = {
       return true;
     }
 
-    if(Kernel.is_nil(expr) || Kernel.is_number(expr) || Kernel.is_binary(expr) || Kernel.is_boolean(expr)){
+    if(Kernel.is_atom(expr)){
+      return Kernel.is_atom(pattern) && pattern === expr;
+    }else if(Kernel.is_nil(expr) || Kernel.is_number(expr) || Kernel.is_binary(expr) || Kernel.is_boolean(expr)){
       return pattern === expr;
-    }else if(Kernel.is_atom(expr)){
-      return Kernel.is_atom(pattern) && pattern.value === expr.value;
     }else if(Kernel.is_tuple(expr)){
-      return Kernel.is_tuple(pattern) && Kernel.match__qmark__(pattern.value, expr.value);
+      return Kernel.is_tuple(pattern) && Kernel.match__qmark__(pattern.value(), expr.value());
     }else if(Kernel.is_list(expr)){
       if(Kernel.length(pattern) !== Kernel.length(expr)){
         return false;

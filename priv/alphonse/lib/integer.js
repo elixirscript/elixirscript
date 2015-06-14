@@ -16,7 +16,7 @@ let Integer = {
     let result = parseInt(bin);
 
     if(isNaN(result)){
-      return Atom('error');
+      return Atom("error");
     }
 
     let indexOfDot = bin.indexOf(".");

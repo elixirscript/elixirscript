@@ -19,7 +19,10 @@ defmodule ElixirScript.Translator.Primitive do
   end
 
   def make_list(ast) when is_list(ast) do
-    make_array_expression(ast)
+    Builder.call_expression(
+      Builder.identifier("List"), 
+      Enum.map(ast, fn(x) -> Translator.translate(x) end)
+    )
   end
 
   def make_tuple({ one, two }) do
@@ -31,12 +34,6 @@ defmodule ElixirScript.Translator.Primitive do
       Builder.identifier("Tuple"), 
       Enum.map(elements, fn(x) -> Translator.translate(x) end)
     )
-  end
-
-  defp make_array_expression(elements) do
-    elements
-    |> Enum.map(&Translator.translate(&1))
-    |> Builder.array_expression
   end
 
   def make_interpolated_string(elements) do

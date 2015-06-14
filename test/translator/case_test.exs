@@ -78,7 +78,7 @@ defmodule ElixirScript.Translator.Case.Test do
 
     js_code = """
       (function(){
-        if(Kernel.__in__(number, [1, 2, 3, 4])){
+        if(Kernel.__in__(number, List(1, 2, 3, 4))){
           let value = 13;
           return value;
         }else{
@@ -128,8 +128,8 @@ defmodule ElixirScript.Translator.Case.Test do
     js_code = """
       (function(){
         if(Kernel.is_tuple(data)){
-          let one = data[0];
-          let two = data[1];
+          let one = data.get(0);
+          let two = data.get(1);
           return Logger.info(one);
         }else if(Kernel.match__qmark__(Atom('error'), data)){
           return null;
@@ -153,11 +153,11 @@ defmodule ElixirScript.Translator.Case.Test do
     js_code = """
       (function(){
         if(Kernel.is_tuple(data)){
-          let three = data[1];
+          let three = data.get(1);
 
-          if(Kernel.is_tuple(data[0])){
-            let one = data[0][0];
-            let two = data[0][1];
+          if(Kernel.is_tuple(data.get(0))){
+            let one = data.get(0).get(0);
+            let two = data.get(0).get(1);
             
             return Logger.info(one);
           }
@@ -181,11 +181,11 @@ defmodule ElixirScript.Translator.Case.Test do
     js_code = """
       (function(){
         if(Kernel.is_tuple(data)){
-          let one = data[0];
+          let one = data.get(0);
 
-          if(Kernel.is_tuple(data[1])){
-            let two = data[1][0];
-            let three = data[1][1];
+          if(Kernel.is_tuple(data.get(1))){
+            let two = data.get(1).get(0);
+            let three = data.get(1).get(1);
 
             return Logger.info(one);
           }
@@ -211,9 +211,9 @@ defmodule ElixirScript.Translator.Case.Test do
     js_code = """
      (function () {
          if (Kernel.match__qmark__({ 
-              '__struct__': [Atom('AStruct')], 
+              '__struct__': List(Atom('AStruct')), 
               'key': { 
-                '__struct__': [Atom('BStruct')], 
+                '__struct__': List(Atom('BStruct')), 
                 'key2': undefined 
               } 
             }, data)) {
@@ -240,12 +240,12 @@ defmodule ElixirScript.Translator.Case.Test do
     js_code = """
      (function () {
          if (Kernel.match__qmark__({ 
-              '__struct__': [Atom('AStruct')], 
+              '__struct__': List(Atom('AStruct')), 
               'key': { 
-                '__struct__': [Atom('BStruct')], 
+                '__struct__': List(Atom('BStruct')), 
                 'key2': undefined,
                 'key3': {
-                  '__struct__': [Atom('CStruct')],
+                  '__struct__': List(Atom('CStruct')),
                   'key4': undefined
                 }
               } 

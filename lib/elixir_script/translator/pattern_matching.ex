@@ -3,6 +3,7 @@ defmodule ElixirScript.Translator.PatternMatching do
   alias ESTree.Builder
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Utils
+  alias ElixirScript.Translator.Primitive
 
   def bind({_left1, _left2} = two_tuple, right) do
     do_tuple_bind(Tuple.to_list(two_tuple), right)
@@ -12,24 +13,74 @@ defmodule ElixirScript.Translator.PatternMatching do
     do_tuple_bind(elements, right)
   end
 
-  def bind(left, right) do
-    case left do
-      {:^, _, [{variable, meta, context}]} ->
-        Builder.if_statement(
-          Translator.translate(quote do: !Kernel.match__qmark__(unquote({variable, meta, context}), unquote(right))),
-          Utils.make_throw_statement("MatchError", "no match of right hand side value")
-        )
-      _ ->
-        declarator = Builder.variable_declarator(
-          Translator.translate(left),
-          Translator.translate(right)
-        )
+  def bind({:^, _, [{variable, meta, context}]}, right) do
+     Builder.if_statement(
+      Translator.translate(quote do: !Kernel.match__qmark__(unquote({variable, meta, context}), unquote(right))),
+      Utils.make_throw_statement("MatchError", "no match of right hand side value")
+    )
+  end
 
-        Builder.variable_declaration([declarator], :let)
+  def bind(left, right) do
+    if is_equality_bind?(List.wrap(left)) do
+      do_equality_bind(left, right)
+    else
+      cond do
+        is_list(left) ->
+          do_tuple_or_list_bind(left, right, &Primitive.make_list/1)   
+        true ->
+          declarator = Builder.variable_declarator(
+            Translator.translate(left),
+            Translator.translate(right)
+          )
+
+          Builder.variable_declaration([declarator], :let)                    
+      end
     end
   end
 
   defp do_tuple_bind(left, right) do
+    if is_equality_bind?(left) do
+      do_equality_bind(left, right)
+    else
+      do_tuple_or_list_bind(left, right, &Primitive.make_tuple/1) 
+    end
+  end
+
+  def is_equality_bind?(left) do
+    Enum.any?(left, fn(x) ->
+      case x do
+        {:^, _, [{_variable, _meta, _context}]} ->
+          true
+        _ ->
+          false
+      end
+    end)
+  end
+
+  def do_tuple_or_list_bind(left, right, ds_func) do
+    array = left
+    |> Enum.map(&Translator.translate(&1))
+    |> Builder.array_expression
+
+    declarator = Builder.variable_declarator(
+      array,
+      Translator.translate(right)
+    )
+
+    array_pattern = Builder.variable_declaration([declarator], :let)
+
+    ref = Builder.identifier("_ref")
+
+    ref_declarator = Builder.variable_declarator(
+      ref,
+      ds_func.(left)
+    )
+
+    ref_declaration = Builder.variable_declaration([ref_declarator], :let)
+    %ElixirScript.Translator.Group{ body: [array_pattern, ref_declaration] }  
+  end
+
+  defp do_equality_bind(left, right) do
     ref = Builder.identifier("_ref")
 
     ref_declarator = Builder.variable_declarator(
@@ -39,33 +90,32 @@ defmodule ElixirScript.Translator.PatternMatching do
 
     ref_declaration = Builder.variable_declaration([ref_declarator], :let)
 
-    {declarations, _} = Enum.map_reduce(left, 0, fn(x, index) -> 
-
+    {declarations, _} = Enum.map_reduce(left, 0, fn(x, index) ->
       declaration = case x do
         {:^, _, [{variable, meta, context}]} ->
-          bound = Builder.if_statement(
-            Translator.translate(quote do: !Kernel.match__qmark__(unquote({variable, meta, context}), _ref[unquote(index)])),
-            Utils.make_throw_statement("MatchError", "no match of right hand side value")
-          )
-          bound
-        _ ->
-        declarator = Builder.variable_declarator(
-          Translator.translate(x),
-          Builder.member_expression(
-            ref,
-            Builder.literal(index),
-            true
-          )
+         Builder.if_statement(
+          Translator.translate(quote do: !Kernel.match__qmark__(unquote({variable, meta, context}), _ref.get(unquote(index)))),
+          Utils.make_throw_statement("MatchError", "no match of right hand side value")
         )
+        _ ->
+          declarator = Builder.variable_declarator(
+            Translator.translate(x),
+            Builder.call_expression(
+              Builder.member_expression(
+                ref,
+                Builder.identifier(:get)
+              ),
+              [Builder.literal(index)]
+            )
+          )
 
-        Builder.variable_declaration([declarator], :let)
+          Builder.variable_declaration([declarator], :let)
       end
 
+      {declaration, index + 1} 
 
-
-      {declaration, index + 1}      
     end)
-    
+
     %ElixirScript.Translator.Group{ body: [ref_declaration] ++ declarations }
   end
 
@@ -112,6 +162,8 @@ defmodule ElixirScript.Translator.PatternMatching do
       case Translator.translate(value) do
         %ESTree.Identifier{} ->
           true
+        %ESTree.CallExpression{ callee: %ESTree.Identifier{ name: "List" } } ->
+          false
         %ESTree.CallExpression{} ->
           true
         _ ->
@@ -131,6 +183,8 @@ defmodule ElixirScript.Translator.PatternMatching do
       case Translator.translate(value) do
         %ESTree.Identifier{} ->
           {key, {:__aliases__, [], [:undefined]} }
+        %ESTree.CallExpression{ callee: %ESTree.Identifier{ name: "List" } } ->
+          {key, value}
         %ESTree.CallExpression{} ->
           {key, hd(process_pattern(value)) }
         _ ->
@@ -247,25 +301,31 @@ defmodule ElixirScript.Translator.PatternMatching do
 
       case x do
         { :identifier, item } ->
-          declarator = Builder.variable_declarator(
-            Builder.identifier(item),
-            Builder.member_expression(
-              identifier_fn.(index),
-              Builder.literal(current_state.state_index),
-              true
-            )
-          )
 
+
+          
+          declarator = Builder.variable_declarator(
+                Builder.identifier(item),
+                Builder.call_expression(
+                  Builder.member_expression(
+                    identifier_fn.(index),
+                    Builder.identifier(:get)
+                  ),
+                  [Builder.literal(current_state.state_index)]
+                )
+              )
           declaration = Builder.variable_declaration([declarator], :let)
 
           {declaration, %{current_state | body: current_state.body, state_index: current_state.state_index + 1 }}
         params ->
           {new_body, _params} = build_pattern_matched_body(current_state.body, [params], 
             fn(new_index) ->
-              Builder.member_expression(
-                identifier_fn.(index),
-                Builder.literal(current_state.state_index + new_index),
-                true
+              Builder.call_expression(
+                Builder.member_expression(
+                  identifier_fn.(index),
+                  Builder.identifier(:get)
+                ),
+                [Builder.literal(current_state.state_index + new_index)]
               )
           end, nil)
 
@@ -430,7 +490,7 @@ defmodule ElixirScript.Translator.PatternMatching do
               build_member_expression_tree(keys, identifier)
             )
 
-            Builder.variable_declaration([declarator], :let) 
+            Builder.variable_declaration([declarator], :let)
           {key, {:identifier, value} }->
             declarator = Builder.variable_declarator(
               Builder.identifier(value),

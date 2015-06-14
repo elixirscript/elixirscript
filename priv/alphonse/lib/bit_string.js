@@ -83,24 +83,38 @@ let BitString = function(...args){
     return new BitString(...args);
   }
 
-  this.raw_value = args;
-  this.value = this.process(args);
-  this.length = this.value.length;
+  this.raw_value = function(){
+    return Object.freeze(args);
+  };
 
-  for (var i = 0; i < this.value.length; i++) {
-    this[i] = this.value[i];
-  }
+  let _value = Object.freeze(this.process(args));
+
+  this.value = function(){
+    return _value;
+  };
+
+  this.length = function(){
+    return _value.length;
+  };
+
+  this.get = function(i){
+    return _value[i];
+  };
 };
 
 BitString.prototype.__MODULE__ = Atom('BitString');
 
+BitString.prototype[Symbol.iterator] = function () {
+  return this.value()[Symbol.iterator]();
+};
+
 BitString.prototype.toString = function(){
   var i, s = "";
-  for (i = 0; i < this.length; i++) {
+  for (i = 0; i < this.length(); i++) {
     if (s !== "") {
       s += ", ";
     }
-    s += this[i].toString();
+    s += this.get(i).toString();
   }
 
   return "<<" + s + ">>";
@@ -110,10 +124,10 @@ BitString.prototype.process = function(){
   let processed_values = [];
 
   var i;
-  for (i = 0; i < this.raw_value.length; i++) {
-    let processed_value = this['process_' + this.raw_value[i].type](this.raw_value[i]);
+  for (i = 0; i < this.raw_value().length; i++) {
+    let processed_value = this['process_' + this.raw_value()[i].type](this.raw_value()[i]);
 
-    for(let attr of this.raw_value[i].attributes){
+    for(let attr of this.raw_value()[i].attributes){
       processed_value = this['process_' + attr](processed_value);
     }
 

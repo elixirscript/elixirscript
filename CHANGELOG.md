@@ -1,4 +1,13 @@
 # v0.6.0-dev
+  * Enhancements
+    * Made the Atom, Tuple, Range and BitString data structures more immutable
+    * Added List data structure
+    * Now replacing characters that can't be used in variable and function names in JavaScript with
+      something that it (i.e. `match?` -> `match__qmark__`)
+    * Implemented Integer module
+    * Atom now translates to an ES6 Symbol
+    * Added iterators for Range, List, and BitString
+    * Updated the pattern match binding to use ES6 destructuring for lists and tuples
 
 # v0.5.0
   * Enhancements

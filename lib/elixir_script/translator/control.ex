@@ -132,12 +132,12 @@ defmodule ElixirScript.Translator.Control do
             elements = [value_one, value_two]
             make_tuple_for(elements, enum, generators)
           {:{}, _, elements} ->
-            make_tuple_for(elements, enum, generators)
+            make_tuple_for(elements, enum, generators)         
           _ ->
             i = Translator.translate(identifier)
             variable_declarator = Builder.variable_declarator(i)
             variable_declaration = Builder.variable_declaration([variable_declarator], :let)
-
+            
             Builder.for_of_statement(
               variable_declaration,
               Translator.translate(enum),
@@ -167,8 +167,14 @@ defmodule ElixirScript.Translator.Control do
       fn(x, index) -> 
         case Translator.translate(x) do
           %ESTree.Identifier{} ->
-            variable_declarator = Builder.variable_declarator(Translator.translate(x), 
-              Utils.make_array_accessor_call("_ref", index)
+            variable_declarator = Builder.variable_declarator(Translator.translate(x),
+              Builder.call_expression(
+                Builder.member_expression(
+                  i,
+                  Builder.identifier(:get)
+                ),
+                [Builder.literal(index)]
+              )
             )
             variable_declaration = Builder.variable_declaration([variable_declarator], :let)
 
@@ -273,15 +279,21 @@ defmodule ElixirScript.Translator.Control do
   end
 
   defp build_push_ast(param) do
+
     Builder.expression_statement(
-      Builder.call_expression(
-        Builder.member_expression(
-          Builder.identifier("_results"),
-          Builder.identifier("push")
-        ),
-        [param]
+      Builder.assignment_expression(
+        :=,
+        Builder.identifier(:_results),
+          Builder.call_expression(
+            Builder.member_expression(
+              Builder.identifier("List"),
+              Builder.identifier("append")
+            ),
+            [Builder.identifier(:_results), param]
+          )
       )
     )
+
   end
 
 
