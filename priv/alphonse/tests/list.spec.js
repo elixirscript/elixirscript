@@ -63,5 +63,15 @@ describe('List', function(){
       expect(t.toString()).to.equal("1,2,3");
     })
   })
+
+  describe('destructuring', function(){
+    it('destructure into an array', function(){
+      let t = List(1, 2, 3);
+      let [a, b, c] = t;
+      expect(a).to.equal(1);
+      expect(b).to.equal(2);
+      expect(c).to.equal(3);
+    })
+  })
 })
 

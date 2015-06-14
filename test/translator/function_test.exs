@@ -111,12 +111,11 @@ defmodule ElixirScript.Translator.Function.Test do
 
     js_code = """
       export function test1(alpha, beta){
-        let _ref = Tuple(1, 2);
+        let [a0, b0] = Tuple(1, 2);
 
-        let a0 = _ref.get(0);
-        let b0 = _ref.get(1);
+        let _ref = Tuple(a0, b0);
 
-        return b0;
+        return _ref;
       }
     """
 
@@ -904,11 +903,12 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-      export function test1(alpha, beta){
-        let a0 = 1;
-        let [a1, b0, c0] = [a0, 2, 3];
-        return [a1, b0, c0];
-      }
+     export function test1(alpha, beta) {
+         let a0 = 1;
+         let [a1, b0, c0] = List(a0, 2, 3);
+         let _ref = List(a1, b0, c0);
+         return _ref;
+     }
     """
 
     assert_translation(ex_ast, js_code)

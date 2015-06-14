@@ -3,6 +3,7 @@ defmodule ElixirScript.Translator.PatternMatching do
   alias ESTree.Builder
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Utils
+  alias ElixirScript.Translator.Primitive
 
   def bind({_left1, _left2} = two_tuple, right) do
     do_tuple_bind(Tuple.to_list(two_tuple), right)
@@ -12,43 +13,74 @@ defmodule ElixirScript.Translator.PatternMatching do
     do_tuple_bind(elements, right)
   end
 
+  def bind({:^, _, [{variable, meta, context}]}, right) do
+     Builder.if_statement(
+      Translator.translate(quote do: !Kernel.match__qmark__(unquote({variable, meta, context}), unquote(right))),
+      Utils.make_throw_statement("MatchError", "no match of right hand side value")
+    )
+  end
+
   def bind(left, right) do
-    case left do
-      {:^, _, [{variable, meta, context}]} ->
-        Builder.if_statement(
-          Translator.translate(quote do: !Kernel.match__qmark__(unquote({variable, meta, context}), unquote(right))),
-          Utils.make_throw_statement("MatchError", "no match of right hand side value")
-        )
-      _ ->
-        declarator = case is_list(left) do
-          true ->
-            array = left
-            |> Enum.map(&Translator.translate(&1))
-            |> Builder.array_expression
+    if is_equality_bind?(List.wrap(left)) do
+      do_equality_bind(left, right)
+    else
+      cond do
+        is_list(left) ->
+          do_tuple_or_list_bind(left, right, &Primitive.make_list/1)   
+        true ->
+          declarator = Builder.variable_declarator(
+            Translator.translate(left),
+            Translator.translate(right)
+          )
 
-            if is_list(right) do
-              Builder.variable_declarator(
-                array,
-                right |> Enum.map(&Translator.translate(&1)) |> Builder.array_expression
-              )
-            else
-              Builder.variable_declarator(
-                array,
-                Translator.translate(right)
-              )
-            end
-          false ->
-            Builder.variable_declarator(
-              Translator.translate(left),
-              Translator.translate(right)
-            )
-        end
-
-        Builder.variable_declaration([declarator], :let)
+          Builder.variable_declaration([declarator], :let)                    
+      end
     end
   end
 
   defp do_tuple_bind(left, right) do
+    if is_equality_bind?(left) do
+      do_equality_bind(left, right)
+    else
+      do_tuple_or_list_bind(left, right, &Primitive.make_tuple/1) 
+    end
+  end
+
+  def is_equality_bind?(left) do
+    Enum.any?(left, fn(x) ->
+      case x do
+        {:^, _, [{_variable, _meta, _context}]} ->
+          true
+        _ ->
+          false
+      end
+    end)
+  end
+
+  def do_tuple_or_list_bind(left, right, ds_func) do
+    array = left
+    |> Enum.map(&Translator.translate(&1))
+    |> Builder.array_expression
+
+    declarator = Builder.variable_declarator(
+      array,
+      Translator.translate(right)
+    )
+
+    array_pattern = Builder.variable_declaration([declarator], :let)
+
+    ref = Builder.identifier("_ref")
+
+    ref_declarator = Builder.variable_declarator(
+      ref,
+      ds_func.(left)
+    )
+
+    ref_declaration = Builder.variable_declaration([ref_declarator], :let)
+    %ElixirScript.Translator.Group{ body: [array_pattern, ref_declaration] }  
+  end
+
+  defp do_equality_bind(left, right) do
     ref = Builder.identifier("_ref")
 
     ref_declarator = Builder.variable_declarator(
@@ -58,35 +90,32 @@ defmodule ElixirScript.Translator.PatternMatching do
 
     ref_declaration = Builder.variable_declaration([ref_declarator], :let)
 
-    {declarations, _} = Enum.map_reduce(left, 0, fn(x, index) -> 
-
+    {declarations, _} = Enum.map_reduce(left, 0, fn(x, index) ->
       declaration = case x do
         {:^, _, [{variable, meta, context}]} ->
-          bound = Builder.if_statement(
-            Translator.translate(quote do: !Kernel.match__qmark__(unquote({variable, meta, context}), _ref.get(unquote(index)))),
-            Utils.make_throw_statement("MatchError", "no match of right hand side value")
-          )
-          bound
-        _ ->
-        declarator = Builder.variable_declarator(
-          Translator.translate(x),
-          Builder.call_expression(
-            Builder.member_expression(
-              ref,
-              Builder.identifier(:get)
-            ),
-            [Builder.literal(index)]
-          )
+         Builder.if_statement(
+          Translator.translate(quote do: !Kernel.match__qmark__(unquote({variable, meta, context}), _ref.get(unquote(index)))),
+          Utils.make_throw_statement("MatchError", "no match of right hand side value")
         )
+        _ ->
+          declarator = Builder.variable_declarator(
+            Translator.translate(x),
+            Builder.call_expression(
+              Builder.member_expression(
+                ref,
+                Builder.identifier(:get)
+              ),
+              [Builder.literal(index)]
+            )
+          )
 
-        Builder.variable_declaration([declarator], :let)
+          Builder.variable_declaration([declarator], :let)
       end
 
+      {declaration, index + 1} 
 
-
-      {declaration, index + 1}      
     end)
-    
+
     %ElixirScript.Translator.Group{ body: [ref_declaration] ++ declarations }
   end
 

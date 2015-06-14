@@ -7,6 +7,7 @@
     * Implemented Integer module
     * Atom now translates to an ES6 Symbol
     * Added iterators for Range, List, and BitString
+    * Updated the pattern match binding to use ES6 destructuring for lists and tuples
 
 # v0.5.0
   * Enhancements

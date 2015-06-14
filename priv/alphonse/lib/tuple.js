@@ -23,6 +23,10 @@ let Tuple = function(...args){
 
 Tuple.__MODULE__ = Atom('Tuple');
 
+Tuple.prototype[Symbol.iterator] = function(){
+  return this.value()[Symbol.iterator]();
+};
+
 Tuple.prototype.toString = function(){
   var i, s = "";
   for (i = 0; i < this.length(); i++) {
