@@ -132,6 +132,14 @@ defmodule ElixirScript.Translator.Function.Test do
     assert_translation(ex_ast, js_code)
 
     ex_ast = quote do
+      test?()
+    end
+
+    js_code = "test__qmark__()"
+
+    assert_translation(ex_ast, js_code)
+
+    ex_ast = quote do
       test1(3, 2)
     end
 

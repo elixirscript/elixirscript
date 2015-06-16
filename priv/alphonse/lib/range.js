@@ -28,6 +28,8 @@ let Range = function(_first, _last){
   this.length = function(){
     return _range.length;
   };
+
+  return this;
 };
 
 Range.__MODULE__ = Atom('Range');

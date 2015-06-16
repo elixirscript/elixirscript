@@ -23,4 +23,12 @@ defmodule ElixirScript.Translator.List.Test do
 
     assert_translation(ex_ast, js_code)
   end
+
+  should "concatenate lists" do
+    ex_ast = quote do: [1, 2, 3] ++ [4, 5, 6]
+    js_code = "List.concat(List(1, 2, 3), List(4, 5, 6));"  
+
+    ex_ast = quote do: this.list ++ [4, 5, 6]
+    js_code = "List.concat(this.list, List(4, 5, 6));"    
+  end
 end

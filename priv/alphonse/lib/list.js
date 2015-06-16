@@ -2,9 +2,7 @@ import Tuple from './tuple';
 import Atom from './atom';
 import Kernel from './kernel';
 
-let List;
-
-List = function(...args){
+let List = function(...args){
   if (!(this instanceof List)){
     return new List(...args);
   }
@@ -27,6 +25,7 @@ List = function(...args){
     return _value.toString();
   };
 
+  return this;
 };
 
 List.__MODULE__ = Atom('List');
@@ -309,7 +308,11 @@ List.to_tuple = function(list){
 };
 
 List.append = function(list, value){
-  return List(...list.value.slice().push(value));
+  return List(...list.value().concat([value]));
+};
+
+List.concat = function(left, right){
+  return List(...left.value().concat(right.value()));
 };
 
 export default List;

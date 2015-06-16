@@ -234,8 +234,20 @@ defmodule ElixirScript.Translator do
     Expression.make_binary_expression(:+, left, right)
   end
 
-  defp do_translate({operator, _, [left, right]}) when operator in [:+, :-, :/, :*, :==, :!=, :&&, :||] do
+  defp do_translate({:++, _, [left, right]}) do
+    ExKernel.concat_lists(left, right)
+  end
+
+  defp do_translate({operator, _, [left, right]}) when operator in [:+, :-, :/, :*, :==, :!=, :&&, :||, :>, :<, :>=, :<=, :===] do
     Expression.make_binary_expression(operator, left, right)
+  end
+
+  defp do_translate({:and, _, [left, right]}) do
+    Expression.make_binary_expression(:&&, left, right)
+  end
+
+  defp do_translate({:or, _, [left, right]}) do
+    Expression.make_binary_expression(:||, left, right)
   end
 
   defp do_translate({:def, _, [{:when, _, [{_name, _, _params} | _guards] }, [do: _body]] } = ast) do

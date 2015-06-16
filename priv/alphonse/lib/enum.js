@@ -48,6 +48,30 @@ let Enum = {
     return Kernel.length(collection) === 0;
   },
 
+  fetch: function(collection, n){
+    if(Kernel.is_list(collection)){
+      if(n < collection.length() && n >= 0){
+        return Tuple(Atom("ok"), collection.get(n));
+      }else{
+        return Atom("error");
+      }
+    }
+
+    throw new Error("collection is not an Enumerable");
+  },
+
+  fetch__emark__: function(collection, n){
+    if(Kernel.is_list(collection)){
+      if(n < collection.length() && n >= 0){
+        return collection.get(n);
+      }else{
+        throw new Error("out of bounds error");
+      }
+    }
+
+    throw new Error("collection is not an Enumerable");
+  },
+
   filter: function(collection, fun){
     return [].filter.call(collection.value(), fun);
   },
@@ -57,16 +81,17 @@ let Enum = {
   },
 
   map_reduce: function(collection, acc, fun){
-    let mapped = [];
+    let mapped = List();
     let the_acc = acc;
 
     for (var i = 0; i < collection.length(); i++) {
       let tuple = fun(collection.get(i), the_acc);
-      the_acc = tuple[1];
-      mapped.push(tuple[0]);
-    }
 
-    return Tuple(List(...mapped), the_acc);
+      the_acc = tuple.get(1);
+      mapped = List.append(mapped, tuple.get(0))
+    };
+
+    return Tuple(mapped, the_acc);
   },
 
   member: function(collection, value){

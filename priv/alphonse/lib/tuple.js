@@ -19,6 +19,8 @@ let Tuple = function(...args){
   this.get = function(i){
     return _value[i];
   };
+
+  return this;
 };
 
 Tuple.__MODULE__ = Atom('Tuple');

@@ -100,6 +100,8 @@ let BitString = function(...args){
   this.get = function(i){
     return _value[i];
   };
+
+  return this;
 };
 
 BitString.prototype.__MODULE__ = Atom('BitString');
