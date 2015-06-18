@@ -72,7 +72,13 @@ defmodule ElixirScript.Translator.Struct.Test do
 
     js_code = """
       let user = (function(){
-          let _results = JSON.parse(JSON.stringify(map));
+          let _results = {};
+
+          for(let prop in map){
+            if(map.hasOwnProperty(prop)){
+              _results[prop] = map[prop];
+            }
+          }
 
           _results.key = value;
 
@@ -89,7 +95,13 @@ defmodule ElixirScript.Translator.Struct.Test do
 
     js_code = """
       let user = (function(){
-          let _results = JSON.parse(JSON.stringify(map));
+          let _results = {};
+
+          for(let prop in map){
+            if(map.hasOwnProperty(prop)){
+              _results[prop] = map[prop];
+            }
+          }
 
           _results.key = value;
           _results.key1 = value1;
