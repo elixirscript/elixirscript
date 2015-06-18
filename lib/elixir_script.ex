@@ -67,7 +67,7 @@ defmodule ElixirScript do
 
     js_ast = Poison.encode!(js_ast)
 
-    path = "#{operating_path}/alphonse.js"
+    path = "#{operating_path}/code_generator.js"
 
     case System.cmd("node", [path, js_ast]) do
       {js_code, 0} ->
@@ -102,7 +102,7 @@ defmodule ElixirScript do
 
   def operating_path() do
     try do
-      Mix.Project.build_path <> "/lib/elixir_script/priv/alphonse"
+      Mix.Project.build_path <> "/lib/elixir_script/priv/javascript"
     rescue
       UndefinedFunctionError ->
         split_path = Path.split(Application.app_dir(:ex2js))
