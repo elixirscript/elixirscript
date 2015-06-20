@@ -7,9 +7,15 @@ defmodule ElixirScript.Translator do
   alias ElixirScript.Translator.Function
   alias ElixirScript.Translator.Expression
   alias ElixirScript.Translator.Import
-  alias ElixirScript.Translator.Control
+  alias ElixirScript.Translator.If
+  alias ElixirScript.Translator.Cond
+  alias ElixirScript.Translator.Case
+  alias ElixirScript.Translator.For
+  alias ElixirScript.Translator.Try
+  alias ElixirScript.Translator.Block
   alias ElixirScript.Translator.Module
   alias ElixirScript.Translator.Utils
+  alias ElixirScript.Translator.Bitstring
   alias ElixirScript.Translator.Kernel, as: ExKernel
 
   @doc """
@@ -91,9 +97,9 @@ defmodule ElixirScript.Translator do
 
     case is_interpolated_string do
       true ->
-        Primitive.make_interpolated_string(elements)
+        Bitstring.make_interpolated_string(elements)
       _ ->
-        Primitive.make_bitstring(elements)
+        Bitstring.make_bitstring(elements)
     end
   end
 
@@ -126,7 +132,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:__block__, _, expressions }) do
-    Control.make_block(expressions)
+    Block.make_block(expressions)
   end
 
   defp do_translate({:__DIR__, _, _expressions }) do
@@ -199,15 +205,15 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:case, _, [condition, [do: clauses]]}) do
-    Control.make_case(condition, clauses)
+    Case.make_case(condition, clauses)
   end
 
   defp do_translate({:cond, _, [[do: clauses]]}) do
-    Control.make_cond(clauses)
+    Cond.make_cond(clauses)
   end
 
   defp do_translate({:for, _, generators}) do
-    Control.make_for(generators)
+    For.make_for(generators)
   end
 
   defp do_translate({:fn, _, [{:->, _, [params, body]}]}) do
@@ -297,7 +303,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:if, _, [test, blocks]}) do
-    Control.make_if(test, blocks)
+    If.make_if(test, blocks)
   end
 
   defp do_translate({:defmodule, _, [{:__aliases__, _, module_name_list}, [do: body]]}) do
