@@ -11,7 +11,7 @@ defmodule ElixirScript.Translator.Function do
         name
       {name, _, _} when is_atom(name) ->
         name
-      {{:., _, [module_name, function_name]}, _, params } = ast ->
+      {{:., _, [_module_name, _function_name]}, _, _params } = ast ->
         ast
       name ->
         case to_string(name) do
@@ -35,7 +35,7 @@ defmodule ElixirScript.Translator.Function do
   end
 
   def make_function_call(function_name, params) do
-    Utils.make_call_expression(function_name, params)
+    Utils.make_call_expression(Utils.filter_name(function_name), params)
   end
 
   def make_function_call(module_name, function_name, params) do
@@ -44,7 +44,7 @@ defmodule ElixirScript.Translator.Function do
         name
       {name, _, _} when is_atom(name) ->
         name
-      {{:., _, [module_name, function_name]}, _, params } = ast ->
+      {{:., _, [_module_name, _function_name]}, _, _params } = ast ->
         ast
       name ->
         case to_string(name) do
@@ -54,15 +54,16 @@ defmodule ElixirScript.Translator.Function do
             name
         end
     end
-    Utils.make_call_expression(the_name, function_name, params)
+
+    Utils.make_call_expression(the_name, Utils.filter_name(function_name), params)
   end
 
   def make_function(name, params, body, guards \\ nil) do
-    do_make_function(name, params, body, guards)
+    do_make_function(Utils.filter_name(name), params, body, guards)
   end
 
   def make_export_function(name, params, body, guards \\ nil) do
-    do_make_function(name, params, body, guards)
+    do_make_function(Utils.filter_name(name), params, body, guards)
     |> Builder.export_declaration
   end
 

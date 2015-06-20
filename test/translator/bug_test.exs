@@ -2,6 +2,18 @@ defmodule ElixirScript.Translator.Bug.Test do
   use ShouldI
   import ElixirScript.TestHelper
 
+  should "replace !" do
+    ex_ast = quote do
+      Enum.fetch!(data, i)
+    end
+
+    js_code = """
+      Enum.fetch__emark__(data, i)
+    """
+
+    assert_translation(ex_ast, js_code) 
+  end
+
   should "chain calls correctly" do
     ex_ast = quote do
       :this.getRawCanvas().getContext("2d")

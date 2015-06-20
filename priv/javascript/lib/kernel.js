@@ -1,9 +1,11 @@
 import Atom from './atom';
 import Tuple from './tuple';
 import List from './list';
+import Enum from './enum';
+import BitString from './bit_string';
 
 let Kernel = {
-  __MODULE_: Atom('Kernel'),
+  __MODULE__: Atom('Kernel'),
 
   tl: function(list){
     return List.delete_at(list, 0);
@@ -18,19 +20,19 @@ let Kernel = {
   },
 
   is_atom: function(x){
-    return x instanceof Atom;
+    return typeof x === 'symbol';
   },
 
   is_binary: function (x){
-    return typeof(x) === 'string' || x instanceof String;
+    return typeof x === 'string' || x instanceof String;
   },
 
   is_boolean: function (x){
-    return typeof(x) === 'boolean' || x instanceof Boolean; 
+    return typeof x === 'boolean' || x instanceof Boolean;
   },
 
   is_function: function(x, arity = -1){
-    return x instanceof Function;
+    return typeof x === 'function' || x instanceof Function;
   },
 
   // from: http://stackoverflow.com/a/3885844
@@ -43,11 +45,11 @@ let Kernel = {
   },
 
   is_list: function(x){
-    return x instanceof Array;
+    return x instanceof List;
   },
 
   is_map: function(x){
-    return x instanceof Object;
+    return typeof x === 'object' || x instanceof Object;
   },
 
   is_number: function(x){
@@ -59,6 +61,10 @@ let Kernel = {
   },
 
   length: function(x){
+    if(Kernel.is_list(x) || Kernel.is_tuple(x)){
+      return x.length();
+    }
+
     return x.length;
   },
 
@@ -67,7 +73,7 @@ let Kernel = {
   },
 
   is_port: function(x){
-    
+
   },
 
   is_reference: function(x){
@@ -78,7 +84,7 @@ let Kernel = {
     return Kernel.is_binary(x) || x instanceof BitString;
   },
 
-  _in: function(left, right){
+  __in__: function(left, right){
     return Enum.member(right, left);
   },
 
@@ -91,7 +97,7 @@ let Kernel = {
   },
 
   elem: function(tuple, index){
-    return tuple['_' + index];
+    return tuple.get(index);
   },
 
   rem: function(left, right){
@@ -118,7 +124,7 @@ let Kernel = {
     if(arguments.length === 3){
       return module[fun].apply(null, args);
     }else{
-      return module.apply(null, fun);  
+      return module.apply(null, fun);
     }
   },
 
@@ -126,7 +132,7 @@ let Kernel = {
     return arg.toString();
   },
 
-  match: function(pattern, expr, guard = () => true){
+  match__qmark__: function(pattern, expr, guard = () => true){
     if(!guard()){
       return false;
     }
@@ -135,19 +141,19 @@ let Kernel = {
       return true;
     }
 
-    if(Kernel.is_nil(expr) || Kernel.is_number(expr) || Kernel.is_binary(expr) || Kernel.is_boolean(expr)){
+    if(Kernel.is_atom(expr)){
+      return Kernel.is_atom(pattern) && pattern === expr;
+    }else if(Kernel.is_nil(expr) || Kernel.is_number(expr) || Kernel.is_binary(expr) || Kernel.is_boolean(expr)){
       return pattern === expr;
-    }else if(Kernel.is_atom(expr)){
-      return Kernel.is_atom(pattern) && pattern.value === expr.value;
     }else if(Kernel.is_tuple(expr)){
-      return Kernel.is_tuple(pattern) && Kernel.match(pattern.value, expr.value);
-    }else if(Kernel.is_list(expr)){     
-      if(Kernel.length(pattern) != Kernel.length(expr)){
+      return Kernel.is_tuple(pattern) && Kernel.match__qmark__(pattern.value(), expr.value());
+    }else if(Kernel.is_list(expr)){
+      if(Kernel.length(pattern) !== Kernel.length(expr)){
         return false;
       }
 
-      for (let i=0; i <= pattern.length; i++) {
-        if(Kernel.match(pattern[i], expr[i]) === false){
+      for (let i = 0; i <= pattern.length; i++) {
+        if(Kernel.match__qmark__(pattern[i], expr[i]) === false){
           return false;
         }
       }
@@ -163,7 +169,7 @@ let Kernel = {
           return false;
         }
 
-        if(Kernel.match(pattern[key], expr[key]) == false){
+        if(Kernel.match__qmark__(pattern[key], expr[key]) === false){
           return false;
         }
       }
@@ -171,7 +177,7 @@ let Kernel = {
       return true;
     }
   }
-}
+};
 
 export default Kernel;
 

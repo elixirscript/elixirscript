@@ -5,8 +5,9 @@ erl_crash.dump
 ex2js
 node_modules
 priv/test_project/dest
-priv/alphonse/build
-priv/alphonse/dist
+priv/javascript/build
+priv/javascript/dist
 /dist
 deploy.sh
 .DS_Store
+priv/javascript/scratchpad.js

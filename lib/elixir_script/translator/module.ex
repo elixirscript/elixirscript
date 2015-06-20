@@ -48,7 +48,7 @@ defmodule ElixirScript.Translator.Module do
     declarator = Builder.variable_declarator(
       the_module_name,
       Builder.object_expression(
-        Enum.filter_map(functions_dict, fn({key, value}) -> 
+        Enum.filter_map(functions_dict, fn({_key, value}) -> 
           value.access == :export
         end, fn({key, _value}) -> 
           Builder.property(Builder.identifier(key), Builder.identifier(key))
@@ -89,11 +89,11 @@ defmodule ElixirScript.Translator.Module do
     {function, dict}
   end
 
-  defp process_function_arity(%{name: _name, access: access, functions: [function]}) do
+  defp process_function_arity(%{name: _name, access: _access, functions: [function]}) do
     [function]
   end
 
-  defp process_function_arity(%{name: name, access: access, functions: functions}) do
+  defp process_function_arity(%{name: name, access: _access, functions: functions}) do
 
     processed_functions = Enum.map(functions, fn(x) ->
       arity = length(x.params)

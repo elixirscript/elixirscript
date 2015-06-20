@@ -1,9 +1,9 @@
 ElixirScript
 ============
 
-The goal is to convert a subset (or full set) of Elixir code to JavaScript. Allowing the ability to write JavaScript in Elixir. This is done by taking the Elixir AST, converting it into [Spider Monkey AST](https://developer.mozilla.org/en-US/docs/Mozilla/Projects/SpiderMonkey/Parser_API). From there it uses [escodegen](https://github.com/estools/escodegen) to convert the Spider Monkey AST to JavaScript.
+The goal is to convert a subset (or full set) of Elixir code to JavaScript, providing the ability to write JavaScript in Elixir. This is done by taking the Elixir AST and converting it into [Spider Monkey AST](https://developer.mozilla.org/en-US/docs/Mozilla/Projects/SpiderMonkey/Parser_API). From there, it uses [escodegen](https://github.com/estools/escodegen) to convert the Spider Monkey AST to JavaScript.
 
-It also includes an escript cli named ex2js which takes files or Elixir code strings as input and outputs Spider Monkey AST or JavaScript code to output or files depending on the options
+It also includes an escript CLI utility named ex2js. This takes files or Elixir code strings as input and emits Spider Monkey AST or JavaScript code. The results may be sent to standard output or files, based on the options selected.
 
 Requirements
 ===========
@@ -94,7 +94,7 @@ $ ex2js -h
     
     ```
     
-    This is because each module is converted into an ES6 module and `import`, `alias`, and `require` are turned into ES6 import statements. This would also be how you would import third-party javascript modules. The only exception is that the standard library or any javascript that is global in scope. For instance, the standard library currently is expected to be in the global scope so that you can use it without importing it.
+    This is because each module is converted into an ES6 module and `import`, `alias`, and `require` are turned into ES6 import statements. This would also be how you would import third-party JavaScript modules. The only exception is that the standard library or any JavaScript that is global in scope. For instance, the standard library currently is expected to be in the global scope so that you can use it without importing it.
 
 #### Not all of the Kernel.SpecialForms module is defined
 
@@ -111,7 +111,7 @@ The following aren't defined (yet):
 * super
 
 #### Most of the Standard Library isn't defined yet
-A lot of functions in the Kernel module are implemented. The Enum, Atom, List, Tuple, Logger, and Range modules are either fully defined are not complete. The rest still need to be implemented. Most may not be useful or function in the browser and may end up being only useful when using ElixirScript in Node.
+A lot of functions in the Kernel module are implemented. The Enum, Atom, List, Tuple, Logger, and Range modules are either fully defined are not complete. The rest still need to be implemented. Some modules like System or File may not be useful or function in the browser and may end up being only useful when using ElixirScript outside of the browser.
 
 #### No Macro support
 Not sure how this would be implemented right now, but looking for ideas.

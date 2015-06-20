@@ -69,11 +69,11 @@ defmodule ElixirScript.Translator.Utils do
     end)
   end
 
-  def make_module_expression_tree(module, computed) when is_binary(module) or is_atom(module) do
+  def make_module_expression_tree(module, _computed) when is_binary(module) or is_atom(module) do
     Builder.identifier(module)
   end
 
-  def make_module_expression_tree(module, computed) do
+  def make_module_expression_tree(module, _computed) do
     Translator.translate(module)
   end
 
@@ -104,28 +104,32 @@ defmodule ElixirScript.Translator.Utils do
         ast = make_module_expression_tree(modules, computed)
         Builder.member_expression(
           ast,
-          Builder.identifier(function_name),
+          build_function_name_ast(function_name),
           computed
         )
       {{:., _, [_module_name, _function_name]}, _, _params } = ast ->
         Builder.member_expression(
           Translator.translate(ast),
-          Builder.identifier(function_name),
+          build_function_name_ast(function_name),
           computed                 
         )
       {:., _, _} = ast ->
         Builder.member_expression(
           Translator.translate(ast),
-          Builder.identifier(function_name),
+          build_function_name_ast(function_name),
           computed                 
         )
       _ ->
         Builder.member_expression(
           Builder.identifier(module_name),
-          Builder.identifier(function_name),
+          build_function_name_ast(function_name),
           computed
         )              
     end
+  end
+
+  def build_function_name_ast(function_name) do
+    Builder.identifier(function_name)
   end
 
   def make_array_accessor_call(name, index) do
@@ -155,7 +159,7 @@ defmodule ElixirScript.Translator.Utils do
 
   def make_match(pattern, expr) do
     Builder.call_expression(
-      make_member_expression("Kernel", "match"),
+      make_member_expression("Kernel", "match__qmark__"),
       [
         pattern,
         expr
@@ -165,13 +169,23 @@ defmodule ElixirScript.Translator.Utils do
 
   def make_match(pattern, expr, guard) do
     Builder.call_expression(
-      make_member_expression("Kernel", "match"),
+      make_member_expression("Kernel", "match__qmark__"),
       [
         pattern,
         expr,
         guard
       ]
     )
+  end
+
+  def filter_name(:in) do
+    "__in__"
+  end
+
+  def filter_name(name) do
+    to_string(name)
+    |> String.replace("?", "__qmark__")
+    |> String.replace("!", "__emark__")
   end
 
 end

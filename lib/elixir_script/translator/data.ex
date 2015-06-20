@@ -149,27 +149,49 @@ defmodule ElixirScript.Translator.Data do
 
   def make_map_update(map, data) do
     _results = Builder.identifier("_results")
+    prop = Builder.identifier(:prop)
+    _map = Translator.translate(map)
 
-    cloning = Builder.call_expression(
-      Builder.member_expression(
-        Builder.identifier(:JSON),
-        Builder.identifier(:parse)
-      ),
-      [
-        Builder.call_expression(
-          Builder.member_expression(
-            Builder.identifier(:JSON),
-            Builder.identifier(:stringify)
-          ),
-          [
-            Translator.translate(map)
-          ]
-        )      
-      ]
-    )
-
-    variable_declarator = Builder.variable_declarator(_results, cloning)
+    variable_declarator = Builder.variable_declarator(_results, Builder.object_expression([]))
     variable_declaration = Builder.variable_declaration([variable_declarator], :let)
+
+    assignment = Builder.for_in_statement(
+      Builder.variable_declaration([
+        Builder.variable_declarator(prop)
+      ], :let),
+      _map,
+      Builder.block_statement([
+        Builder.if_statement(
+          Builder.call_expression(
+            Builder.member_expression(
+              _map,
+              Builder.identifier(:hasOwnProperty)
+            ),
+            [
+              prop
+            ]
+          ),
+          Builder.block_statement([
+            Builder.expression_statement(
+              Builder.assignment_expression(
+                :=,
+                Builder.member_expression(
+                  _results,
+                  prop,
+                  true
+                ),
+                Builder.member_expression(
+                  _map,
+                  prop,
+                  true
+                )          
+              )
+            )
+
+          ])
+        )
+      ])
+    )
 
     block_statement = Enum.map(data, fn({key, value}) ->
       Builder.expression_statement(
@@ -184,7 +206,7 @@ defmodule ElixirScript.Translator.Data do
       )
     end)
 
-    block_statement = [variable_declaration] ++ block_statement ++ [Builder.return_statement(_results)]
+    block_statement = [variable_declaration] ++ [assignment] ++ block_statement ++ [Builder.return_statement(_results)]
 
     Utils.wrap_in_function_closure(block_statement)
   end

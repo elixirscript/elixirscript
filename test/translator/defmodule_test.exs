@@ -28,12 +28,12 @@ defmodule ElixirScript.Translator.Defmodule.Test do
 
       const ul = JQuery('#todo-list');
 
-      function something(){
-        return ul;
-      }
-
       function something_else(){
         return null;
+      }
+
+      function something(){
+        return ul;
       }
 
       let Elephant = {
@@ -62,11 +62,11 @@ defmodule ElixirScript.Translator.Defmodule.Test do
 
       import Crane from 'icabod/crane';
 
-      function something(){
+      function something_else(){
         return null;
       }
 
-      function something_else(){
+      function something(){
         return null;
       }
 

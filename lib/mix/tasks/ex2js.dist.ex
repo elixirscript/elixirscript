@@ -29,9 +29,9 @@ defmodule Mix.Tasks.Ex2js.Dist do
   defp copy_artifacts() do
     File.mkdir_p(@folder_name <> "/bin")
     File.cp!("ex2js", "#{@folder_name}/bin/ex2js")
-    File.cp!("priv/alphonse/alphonse.js", "#{@folder_name}/alphonse.js")
-    File.cp!("priv/alphonse/dist/elixir.js", "#{@folder_name}/elixir.js")
-    File.cp!("priv/alphonse/release.package.json", "#{@folder_name}/package.json")
+    File.cp!("priv/javascript/code_generator.js", "#{@folder_name}/code_generator.js")
+    File.cp!("priv/javascript/dist/elixir.js", "#{@folder_name}/elixir.js")
+    File.cp!("priv/javascript/release.package.json", "#{@folder_name}/package.json")
   end
 
   defp npm_install() do

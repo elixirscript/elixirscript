@@ -36,4 +36,17 @@ defmodule ElixirScript.Translator.Kernel do
     )
   end
 
+  def concat_lists(list1, list2) do
+    Builder.call_expression(
+      Builder.member_expression(
+        Builder.identifier(:List),
+        Builder.identifier(:concat)
+      ),
+      [
+        Translator.translate(list1),
+        Translator.translate(list2)
+      ]
+    )
+  end
+
 end
