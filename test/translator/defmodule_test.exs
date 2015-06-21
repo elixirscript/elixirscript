@@ -80,22 +80,23 @@ defmodule ElixirScript.Translator.Defmodule.Test do
   should "translate modules with inner modules" do
     ex_ast = quote do
       defmodule Animals do
+
         defmodule Elephant do
           defstruct trunk: true
         end
 
 
         def something() do
+          %Elephant{}
         end
 
         defp something_else() do
         end
+
       end
     end
 
     js_code = """
-      const __MODULE__ = Atom('Animals');
-
       const __MODULE__ = Atom('Elephant');
       function defstruct(trunk = true) {
          return {
@@ -104,9 +105,14 @@ defmodule ElixirScript.Translator.Defmodule.Test do
          };
       }
       let Elephant = { defstruct: defstruct };
+      export default Elephant;
 
+
+      import Elephant from 'animals/elephant';
+
+      const __MODULE__ = Atom('Animals');
       function something(){
-        return ul;
+        return Elephant.defstruct();
       }
 
       function something_else(){
@@ -114,8 +120,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
       }
 
       let Animals = {
-        something: something,
-        Elephant: Elephant
+        something: something
       };
 
       export default Animals;

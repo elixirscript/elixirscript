@@ -73,15 +73,5 @@ describe('List', function(){
       expect(c).to.equal(3);
     })
   })
-
-  describe('Object.freeze', function(){
-    it('does not allow changing array', function(){
-      let t = Object.freeze([1, 2, 3]);
-
-      t[0] = 3;
-
-      expect(t[0]).to.equal(1);
-    })
-  })
 })
 
