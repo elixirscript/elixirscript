@@ -76,4 +76,56 @@ defmodule ElixirScript.Translator.Defmodule.Test do
 
     assert_translation(ex_ast, js_code)
   end
+
+  should "translate modules with inner modules" do
+    ex_ast = quote do
+      defmodule Animals do
+
+        defmodule Elephant do
+          defstruct trunk: true
+        end
+
+
+        def something() do
+          %Elephant{}
+        end
+
+        defp something_else() do
+        end
+
+      end
+    end
+
+    js_code = """
+      const __MODULE__ = Atom('Elephant');
+      function defstruct(trunk = true) {
+         return {
+             __struct__: __MODULE__,
+             trunk: trunk
+         };
+      }
+      let Elephant = { defstruct: defstruct };
+      export default Elephant;
+
+
+      import Elephant from 'animals/elephant';
+
+      const __MODULE__ = Atom('Animals');
+      function something(){
+        return Elephant.defstruct();
+      }
+
+      function something_else(){
+        return null;
+      }
+
+      let Animals = {
+        something: something
+      };
+
+      export default Animals;
+    """
+
+    assert_translation(ex_ast, js_code)
+  end
 end

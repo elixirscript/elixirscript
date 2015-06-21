@@ -88,8 +88,8 @@ let Enum = {
       let tuple = fun(collection.get(i), the_acc);
 
       the_acc = tuple.get(1);
-      mapped = List.append(mapped, tuple.get(0))
-    };
+      mapped = List.append(mapped, tuple.get(0));
+    }
 
     return Tuple(mapped, the_acc);
   },

@@ -1,3 +1,9 @@
+/**
+ Takes in SpiderMonkey AST in JSON format and returns JavaScript code
+ represented by the passed in AST.
+
+ Usage: node code_generator.js <ast>
+**/
 var escodegen = require('escodegen');
 var args = process.argv.slice(2);
 

@@ -4,27 +4,27 @@ var concat = require('gulp-concat');
 var babel = require('gulp-babel');
 var eslint = require('gulp-eslint');
 
-var stdLibPath = './priv/alphonse/lib/**/*.js';
+var stdLibPath = './priv/javascript/lib/**/*.js';
 
-var testPath = './priv/alphonse/build/tests/**/*.spec.js';
+var testPath = './priv/javascript/build/tests/**/*.spec.js';
 
 gulp.task('dist', function() {
   return gulp.src([stdLibPath])
       .pipe(babel({sourceMap: false, modules:'ignore'}))
       .pipe(concat('elixir.js'))
-      .pipe(gulp.dest('./priv/alphonse/dist'));
+      .pipe(gulp.dest('./priv/javascript/dist'));
 });
 
 gulp.task('build', function() {
-  return gulp.src([stdLibPath, '!./priv/alphonse/build/**/*.js', '!./priv/alphonse/*.js'])
+  return gulp.src([stdLibPath, '!./priv/javascript/build/**/*.js', '!./priv/javascript/*.js'])
       .pipe(babel({sourceMap: false, modules:'common'}))
-      .pipe(gulp.dest('./priv/alphonse/build/lib'));
+      .pipe(gulp.dest('./priv/javascript/build/lib'));
 });
 
 gulp.task('build_test', function() {
-  return gulp.src(['./priv/alphonse/tests/**/*.spec.js'])
+  return gulp.src(['./priv/javascript/tests/**/*.spec.js'])
       .pipe(babel({sourceMap: false, modules:'common'}))
-      .pipe(gulp.dest('./priv/alphonse/build/tests'));
+      .pipe(gulp.dest('./priv/javascript/build/tests'));
 });
 
 gulp.task('test',['build', 'build_test'], function () {
@@ -33,7 +33,7 @@ gulp.task('test',['build', 'build_test'], function () {
 });
 
 gulp.task('lint', function () {
-    return gulp.src([stdLibPath, testPath, '!./priv/alphonse/build/**/*.js'])
+    return gulp.src([stdLibPath, testPath, '!./priv/javascript/build/**/*.js'])
         .pipe(eslint())
         .pipe(eslint.format())
         .pipe(eslint.failOnError());
