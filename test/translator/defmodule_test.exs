@@ -8,7 +8,13 @@ defmodule ElixirScript.Translator.Defmodule.Test do
       end
     end
 
-    assert_translation(ex_ast, "const __MODULE__ = Atom('Elephant');")
+    js_code = """
+    Kernel.defmodule(List(Atom('Elephant')), function (__MODULE__) {
+      return { };
+    });
+    """
+
+    assert_translation(ex_ast, js_code)
 
     ex_ast = quote do
       defmodule Elephant do
@@ -24,23 +30,19 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
-      defmodule([Atom("Elephant")], function(__MODULE__){
+    Kernel.defmodule(List(Atom('Elephant')), function (__MODULE__) {
+      const ul = JQuery('#todo-list');
+      
+      function something_else() {
+        return null;
+      }
 
-        const ul = JQuery('#todo-list');
+      function something() {
+        return ul;
+      }
 
-        function something_else(){
-          return null;
-        }
-
-        function something(){
-          return ul;
-        }
-
-        return {
-          something: something
-        }   
-
-      });
+      return { something: something };
+    });
     """
 
     assert_translation(ex_ast, js_code)
@@ -58,20 +60,19 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
-      const __MODULE__ = Atom('Elephant');
+     Kernel.defmodule(List(Atom('Elephant')), function (__MODULE__) {
+         let Crane = Icabod.Crane;
 
-      import Crane from 'icabod/crane';
+         function something_else() {
+             return null;
+         }
 
-      function something_else(){
-        return null;
-      }
+         function something() {
+             return null;
+         }
 
-      function something(){
-        return null;
-      }
-
-      let Elephant = { something: something };
-      export default Elephant;
+         return { something: something };
+     });
     """
 
     assert_translation(ex_ast, js_code)
@@ -97,35 +98,29 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
-      defmodule([Atom("Animals")], function(__MODULE__){
-
-        defmodule([Atom("Animals"), Atom("Elephant")], function(__MODULE__){
-
+      Kernel.defmodule(List(Atom('Animals')), function (__MODULE__) {
+        Kernel.defmodule(List(Atom('Animals'), Atom('Elephant')), function (__MODULE__) {
           function defstruct(trunk = true) {
-             return {
-                 __struct__: __MODULE__,
-                 trunk: trunk
-             };
+            return {
+              __struct__: __MODULE__,
+              trunk: trunk
+            };
           }
-
-          return {
-            defstruct: defstruct
-          }
-
+        
+          return { defstruct: defstruct };
         });
 
-        function something_else(){
+        let Elephant = Animals.Elephant;
+
+        function something_else() {
           return null;
         }
 
-        function something(){
-          return ul;
+        function something() {
+          return Elephant.defstruct();
         }
 
-        return {
-          something: something
-        }   
-
+        return { something: something };
       });
     """
 

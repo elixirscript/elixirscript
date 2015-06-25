@@ -5,10 +5,56 @@ defmodule ElixirScript.Translator.Module do
   alias ElixirScript.Translator.Utils
 
   def make_module(module_name_list, nil) do
-    Builder.program([create__module__(module_name_list)])
+    default = Builder.return_statement(
+      Builder.object_expression([])
+    )
+
+    module = Builder.call_expression(
+      Builder.member_expression(
+        Builder.identifier(:Kernel),
+        Builder.identifier(:defmodule)
+      ),
+      [
+        Translator.translate(module_name_list),
+        Builder.function_expression(
+          [Builder.identifier(:__MODULE__)],
+          [],
+          Builder.block_statement([default])
+        )
+      ]
+    )
+
+    Builder.expression_statement(module)
   end
 
   def make_module(module_name_list, body) do
+
+    body = case body do
+      {:__block__, meta2, list2} ->
+        list2 = Enum.map(list2, fn(x) ->
+          case x do
+            {:defmodule, meta1, [{:__aliases__, meta2, module_name_list2}, [do: body2]]} ->
+              [
+                {:defmodule, meta1, [{:__aliases__, meta2, module_name_list ++ module_name_list2}, [do: body2]]},
+                {:alias, meta1, [{:__aliases__, [alias: false], module_name_list ++ module_name_list2}]}
+              ]    
+            _ ->
+              x
+          end
+        end)
+        |> List.flatten
+
+        {:__block__, meta2, list2}
+      {:defmodule, meta1, [{:__aliases__, meta2, module_name_list2}, [do: body2]]} ->
+        {:__block__, meta2, [
+            {:defmodule, meta1, [{:__aliases__, meta2, module_name_list ++ module_name_list2}, [do: body2]]},
+            {:alias, meta1, [{:__aliases__, [alias: false], module_name_list ++ module_name_list2}]}
+          ]
+        }
+      _ ->
+        body 
+    end
+
     #Translate body
     parsed_body = Translator.translate(body)
 
@@ -43,10 +89,7 @@ defmodule ElixirScript.Translator.Module do
 
     functions = Enum.flat_map(functions_dict, fn({_, data})-> process_function_arity(data) end)
 
-    the_module_name = Builder.identifier(List.last(module_name_list))
-
-    declarator = Builder.variable_declarator(
-      the_module_name,
+    default = Builder.return_statement(
       Builder.object_expression(
         Enum.filter_map(functions_dict, fn({_key, value}) -> 
           value.access == :export
@@ -55,10 +98,6 @@ defmodule ElixirScript.Translator.Module do
         end)
       )
     )
-
-    exported_object = Builder.variable_declaration([declarator], :let)
-
-    default = Builder.export_declaration(the_module_name, [], true)
 
     #Filter out original functions from the body
     body = Enum.filter(body, fn(x) -> 
@@ -72,8 +111,22 @@ defmodule ElixirScript.Translator.Module do
       end
     end)
 
-    #Build everything back together again
-    Builder.program([create__module__(module_name_list)] ++ imports ++ body ++ functions ++ [exported_object, default])
+    module = Builder.call_expression(
+      Builder.member_expression(
+        Builder.identifier(:Kernel),
+        Builder.identifier(:defmodule)
+      ),
+      [
+        Translator.translate(module_name_list),
+        Builder.function_expression(
+          [Builder.identifier(:__MODULE__)],
+          [],
+          Builder.block_statement(imports ++ body ++ functions ++ [default])
+        )
+      ]
+    )
+
+    Builder.expression_statement(module)
   end
 
   defp add_function_to_dict(dict, function, access) do
