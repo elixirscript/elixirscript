@@ -1,7 +1,7 @@
-import Atom from './atom';
+import Atom from '../atom';
 
-let ElixirScript = {
-  __MODULE__: Atom('ElixirScript'),
+let JS = {
+  __MODULE__: Atom('JS'),
 
   get_property_or_call_function: function(item, property){
     if(item[property] instanceof Function){
@@ -12,4 +12,4 @@ let ElixirScript = {
   }
 };
 
-export default ElixirScript;
+export default JS;

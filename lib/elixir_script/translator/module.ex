@@ -6,7 +6,9 @@ defmodule ElixirScript.Translator.Module do
 
   def make_module(module_name_list, nil) do
     default = Builder.return_statement(
-      Builder.object_expression([])
+      Builder.object_expression([
+        Builder.property(Builder.identifier(:__MODULE__), ElixirScript.Translator.translate(List.last(module_name_list)))
+      ])
     )
 
     module = Builder.call_expression(
@@ -89,14 +91,14 @@ defmodule ElixirScript.Translator.Module do
 
     functions = Enum.flat_map(functions_dict, fn({_, data})-> process_function_arity(data) end)
 
+    properties = Enum.filter_map(functions_dict, fn({_key, value}) -> 
+      value.access == :export
+    end, fn({key, _value}) -> 
+      Builder.property(Builder.identifier(key), Builder.identifier(key))
+    end) ++ [Builder.property(Builder.identifier(:__MODULE__), ElixirScript.Translator.translate(List.last(module_name_list))]
+
     default = Builder.return_statement(
-      Builder.object_expression(
-        Enum.filter_map(functions_dict, fn({_key, value}) -> 
-          value.access == :export
-        end, fn({key, _value}) -> 
-          Builder.property(Builder.identifier(key), Builder.identifier(key))
-        end)
-      )
+      Builder.object_expression(properties)
     )
 
     #Filter out original functions from the body

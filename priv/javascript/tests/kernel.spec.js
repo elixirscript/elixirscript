@@ -1,5 +1,6 @@
 var Kernel = require('../lib/kernel');
 var Atom = require('../lib/atom');
+var List = require('../lib/list');
 var Tuple = require('../lib/tuple');
 var expect = require('chai').expect;
 
@@ -56,7 +57,7 @@ describe('Kernel', function(){
 
   describe('defmodule', function(){
     it('must create a global module', function(){
-      let hello = Kernel.defmodule([Atom("Hello")], function(__MODULE__){
+      let hello = Kernel.defmodule(List(Atom("Hello")), function(__MODULE__){
         return {
           world: function(){ return 0; }
         }
@@ -67,9 +68,9 @@ describe('Kernel', function(){
     })
 
     it('must create inner modules correctly', function(){
-      Kernel.defmodule([Atom("Foo")], function(__MODULE__){
+      Kernel.defmodule(List(Atom("Foo")), function(__MODULE__){
 
-        Kernel.defmodule([Atom("Foo"), Atom("Bar")], function(__MODULE__){
+        Kernel.defmodule(List(Atom("Foo"), Atom("Bar")), function(__MODULE__){
           return {
             baz: function(){ return 0; }
           }

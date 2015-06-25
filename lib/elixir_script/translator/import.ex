@@ -7,42 +7,37 @@ defmodule ElixirScript.Translator.Import do
   def make_alias_import(alias_info, options) do
     {_, _, name} = alias_info
 
-    import_specifier = if options[:as] do
-      {_, _, alt} = options[:as]
-      Builder.identifier(alt)
-    else
-      List.last(name) 
-      |> Builder.identifier 
-    end
-
-    declarator = Builder.variable_declarator(
-      import_specifier,
-      Utils.make_module_expression_tree(name, false)
+    Builder.call_expression(
+      Builder.member_expression(
+        Builder.member_expression(
+          Builder.identifier("Kernel"),
+          Builder.identifier("SpecialForms")
+        ),
+        Builder.identifier("alias")
+      ),
+      [
+        Utils.make_module_expression_tree(name, false),
+        Translator.translate(options),
+        Builder.identifier(:this)
+      ]
     )
-
-    Builder.variable_declaration([declarator], :let)
   end
 
   def make_import(module_name_list, options) do
-    mod = List.last(module_name_list) |> Builder.identifier
-
-    specifiers = if options[:only] do
-      Enum.map(options[:only], fn({name, _arity}) -> 
-        Builder.import_specifier(
-          Builder.identifier(name)
-        )
-      end)
-    else
-      List.wrap(Builder.import_namespace_specifier(mod))
-    end
-
-    import_path = if options[:from] do
-      "'#{options[:from]}'"
-    else
-      make_source(module_name_list)
-    end
-
-    Builder.import_declaration(specifiers, Builder.identifier(import_path))
+    Builder.call_expression(
+      Builder.member_expression(
+        Builder.member_expression(
+          Builder.identifier("Kernel"),
+          Builder.identifier("SpecialForms")
+        ),
+        Builder.identifier("import")
+      ),
+      [
+        Utils.make_module_expression_tree(module_name_list, false),
+        Translator.translate(options),
+        Builder.identifier(:this)
+      ]
+    )
   end
 
   defp make_source(name) do

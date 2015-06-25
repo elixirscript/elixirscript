@@ -3,9 +3,14 @@ import Tuple from './tuple';
 import List from './list';
 import Enum from './enum';
 import BitString from './bit_string';
+import SpecialForms from './kernel/special_forms';
+import JS from './kernel/js';
 
 let Kernel = {
   __MODULE__: Atom('Kernel'),
+
+  SpecialForms: SpecialForms,
+  JS: JS,
 
   defmodule: function(alias, list2){
     let parent = null;
@@ -16,7 +21,7 @@ let Kernel = {
       parent = global;
     }
 
-    let moduleAtom = alias[alias.length - 1];
+    let moduleAtom = List.last(alias);
 
     for(let atom of alias){
       let partname = Atom.to_string(atom);
