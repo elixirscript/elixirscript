@@ -24,23 +24,23 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
-      const __MODULE__ = Atom('Elephant');
+      defmodule([Atom("Elephant")], function(__MODULE__){
 
-      const ul = JQuery('#todo-list');
+        const ul = JQuery('#todo-list');
 
-      function something_else(){
-        return null;
-      }
+        function something_else(){
+          return null;
+        }
 
-      function something(){
-        return ul;
-      }
+        function something(){
+          return ul;
+        }
 
-      let Elephant = {
-        something: something
-      };
+        return {
+          something: something
+        }   
 
-      export default Elephant;
+      });
     """
 
     assert_translation(ex_ast, js_code)
@@ -97,33 +97,36 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
-      const __MODULE__ = Atom('Elephant');
-      function defstruct(trunk = true) {
-         return {
-             __struct__: __MODULE__,
-             trunk: trunk
-         };
-      }
-      let Elephant = { defstruct: defstruct };
-      export default Elephant;
+      defmodule([Atom("Animals")], function(__MODULE__){
 
+        defmodule([Atom("Animals"), Atom("Elephant")], function(__MODULE__){
 
-      import Elephant from 'animals/elephant';
+          function defstruct(trunk = true) {
+             return {
+                 __struct__: __MODULE__,
+                 trunk: trunk
+             };
+          }
 
-      const __MODULE__ = Atom('Animals');
-      function something(){
-        return Elephant.defstruct();
-      }
+          return {
+            defstruct: defstruct
+          }
 
-      function something_else(){
-        return null;
-      }
+        });
 
-      let Animals = {
-        something: something
-      };
+        function something_else(){
+          return null;
+        }
 
-      export default Animals;
+        function something(){
+          return ul;
+        }
+
+        return {
+          something: something
+        }   
+
+      });
     """
 
     assert_translation(ex_ast, js_code)

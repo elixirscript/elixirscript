@@ -7,6 +7,30 @@ import BitString from './bit_string';
 let Kernel = {
   __MODULE__: Atom('Kernel'),
 
+  defmodule: function(alias, list2){
+    let parent = null;
+
+    if(typeof window !== "undefined"){
+      parent = window;
+    }else{
+      parent = global;
+    }
+
+    let moduleAtom = alias[alias.length - 1];
+
+    for(let atom of alias){
+      let partname = Atom.to_string(atom);
+
+      if (typeof parent[partname] === "undefined") {
+        parent[partname] = {};
+      }
+
+      parent = parent[partname];
+    }
+
+    return Object.assign(parent, list2(moduleAtom));
+  },
+
   tl: function(list){
     return List.delete_at(list, 0);
   },

@@ -53,5 +53,36 @@ describe('Kernel', function(){
       expect(Kernel.match__qmark__(1, 1, () => Kernel.is_number(1))).to.equal(true);
     })
   })
+
+  describe('defmodule', function(){
+    it('must create a global module', function(){
+      let hello = Kernel.defmodule([Atom("Hello")], function(__MODULE__){
+        return {
+          world: function(){ return 0; }
+        }
+      });
+
+      expect(global.Hello).to.equal(hello);
+      expect(global.Hello.world()).to.equal(0);
+    })
+
+    it('must create inner modules correctly', function(){
+      Kernel.defmodule([Atom("Foo")], function(__MODULE__){
+
+        Kernel.defmodule([Atom("Foo"), Atom("Bar")], function(__MODULE__){
+          return {
+            baz: function(){ return 0; }
+          }
+        }); 
+
+        return {
+          world: function(){ return 0; }
+        }
+      });
+
+      expect(Foo.Bar.baz()).to.equal(0);
+      expect(Foo.world()).to.equal(0);
+    })
+  })
 })
 
