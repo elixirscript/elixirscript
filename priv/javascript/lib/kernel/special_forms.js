@@ -32,6 +32,14 @@ let SpecialForms = {
     }
 
     context[alias] = module;
+  },
+
+  require: function(module, opts, context = this){
+    if(module === undefined){
+      throw new Error("module is not loaded and could not be found");
+    }
+
+    SpecialForms.alias(module, opts, context);
   }
 };
 

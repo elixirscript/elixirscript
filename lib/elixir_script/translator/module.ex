@@ -7,7 +7,7 @@ defmodule ElixirScript.Translator.Module do
   def make_module(module_name_list, nil) do
     default = Builder.return_statement(
       Builder.object_expression([
-        Builder.property(Builder.identifier(:__MODULE__), ElixirScript.Translator.translate(List.last(module_name_list)))
+        Builder.property(Builder.identifier(:__MODULE__), Builder.identifier(:__MODULE__))
       ])
     )
 
@@ -95,7 +95,7 @@ defmodule ElixirScript.Translator.Module do
       value.access == :export
     end, fn({key, _value}) -> 
       Builder.property(Builder.identifier(key), Builder.identifier(key))
-    end) ++ [Builder.property(Builder.identifier(:__MODULE__), ElixirScript.Translator.translate(List.last(module_name_list))]
+    end) ++ [Builder.property(Builder.identifier(:__MODULE__), Builder.identifier(:__MODULE__))]
 
     default = Builder.return_statement(
       Builder.object_expression(properties)
@@ -249,15 +249,6 @@ defmodule ElixirScript.Translator.Module do
     )
 
     { new_function, new_function_name, arity }
-  end
-
-  defp create__module__(module_name_list) do
-    declarator = Builder.variable_declarator(
-      Builder.identifier(:__MODULE__),
-      ElixirScript.Translator.translate(List.last(module_name_list))
-    )
-
-    Builder.variable_declaration([declarator], :const)
   end
 
   def make_attribute(name, value) do

@@ -10,7 +10,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
 
     js_code = """
     Kernel.defmodule(List(Atom('Elephant')), function (__MODULE__) {
-      return { };
+      return { __MODULE__: __MODULE__ };
     });
     """
 
@@ -41,7 +41,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
         return ul;
       }
 
-      return { something: something };
+      return { something: something, __MODULE__: __MODULE__ };
     });
     """
 
@@ -61,7 +61,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
 
     js_code = """
      Kernel.defmodule(List(Atom('Elephant')), function (__MODULE__) {
-         let Crane = Icabod.Crane;
+         Kernel.SpecialForms.alias(Icabod.Crane, List(), this);
 
          function something_else() {
              return null;
@@ -71,7 +71,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
              return null;
          }
 
-         return { something: something };
+         return { something: something, __MODULE__: __MODULE__ };
      });
     """
 
@@ -107,10 +107,10 @@ defmodule ElixirScript.Translator.Defmodule.Test do
             };
           }
         
-          return { defstruct: defstruct };
+          return { defstruct: defstruct, __MODULE__: __MODULE__ };
         });
 
-        let Elephant = Animals.Elephant;
+        Kernel.SpecialForms.alias(Animals.Elephant, List(), this);
 
         function something_else() {
           return null;
@@ -120,7 +120,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
           return Elephant.defstruct();
         }
 
-        return { something: something };
+        return { something: something, __MODULE__: __MODULE__ };
       });
     """
 

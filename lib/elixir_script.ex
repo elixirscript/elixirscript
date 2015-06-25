@@ -111,4 +111,7 @@ defmodule ElixirScript do
         Path.join(replaced_path)
     end
   end
+
+  def js_import(module, opts \\ []) do
+  end
 end

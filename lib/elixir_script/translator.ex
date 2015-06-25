@@ -7,6 +7,7 @@ defmodule ElixirScript.Translator do
   alias ElixirScript.Translator.Function
   alias ElixirScript.Translator.Expression
   alias ElixirScript.Translator.Import
+  alias ElixirScript.Translator.JSImport
   alias ElixirScript.Translator.If
   alias ElixirScript.Translator.Cond
   alias ElixirScript.Translator.Case
@@ -103,6 +104,14 @@ defmodule ElixirScript.Translator do
     end
   end
 
+  defp do_translate({{:., _, [{:__aliases__, _, [:ElixirScript]}, :js_import]}, _, [{:__aliases__, _, module_name_list}]}) do
+    JSImport.make_js_import(module_name_list, [])
+  end
+
+  defp do_translate({{:., _, [{:__aliases__, _, [:ElixirScript]}, :js_import]}, _, [{:__aliases__, _, module_name_list}, options]}) do
+    JSImport.make_js_import(module_name_list, options)
+  end
+
   defp do_translate({{:., _, [Access, :get]}, _, [target, property]}) do
     Data.make_get_property(target, property)
   end
@@ -189,19 +198,19 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:alias, _, [alias_info, options]}) do
-    Import.make_alias_import(alias_info, options)
+    Import.make_alias(alias_info, options)
   end
 
   defp do_translate({:alias, _, [alias_info]}) do
-    Import.make_alias_import(alias_info, [])
+    Import.make_alias(alias_info, [])
   end
 
   defp do_translate({:require, _, [alias_info, options]}) do
-    Import.make_alias_import(alias_info, options)
+    Import.make_require(alias_info, options)
   end
 
   defp do_translate({:require, _, [alias_info]}) do
-    Import.make_alias_import(alias_info, [])
+    Import.make_require(alias_info, [])
   end
 
   defp do_translate({:case, _, [condition, [do: clauses]]}) do

@@ -4,8 +4,10 @@ defmodule ElixirScript.Translator.Import do
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Utils
 
-  def make_alias_import(alias_info, options) do
+  def make_alias(alias_info, options) do
     {_, _, name} = alias_info
+
+    options = updateOptions(options)
 
     Builder.call_expression(
       Builder.member_expression(
@@ -21,6 +23,35 @@ defmodule ElixirScript.Translator.Import do
         Builder.identifier(:this)
       ]
     )
+  end
+
+  def make_require(alias_info, options) do
+    {_, _, name} = alias_info
+
+    options = updateOptions(options)
+
+    Builder.call_expression(
+      Builder.member_expression(
+        Builder.member_expression(
+          Builder.identifier("Kernel"),
+          Builder.identifier("SpecialForms")
+        ),
+        Builder.identifier("require")
+      ),
+      [
+        Utils.make_module_expression_tree(name, false),
+        Translator.translate(options),
+        Builder.identifier(:this)
+      ]
+    )
+  end
+
+  defp updateOptions([as: {:__aliases__, _, [alias_name]}]) do
+    [as: alias_name]
+  end
+
+  defp updateOptions([]) do
+    []
   end
 
   def make_import(module_name_list, options) do
