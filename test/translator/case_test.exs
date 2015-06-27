@@ -13,9 +13,9 @@ defmodule ElixirScript.Translator.Case.Test do
 
     js_code = """
       (function(){
-        if(Kernel.match__qmark__(Atom('ok'), data)){
+        if(Kernel.match__qmark__(Erlang.atom('ok'), data)){
           return value;
-        }else if(Kernel.match__qmark__(Atom('error'), data)){
+        }else if(Kernel.match__qmark__(Erlang.atom('error'), data)){
           return null;
         }
       }.call(this));
@@ -78,7 +78,7 @@ defmodule ElixirScript.Translator.Case.Test do
 
     js_code = """
       (function(){
-        if(Kernel.__in__(number, List(1, 2, 3, 4))){
+        if(Kernel.__in__(number, Erlang.list(1, 2, 3, 4))){
           let value = 13;
           return value;
         }else{
@@ -103,10 +103,10 @@ defmodule ElixirScript.Translator.Case.Test do
 
     js_code = """
       (function(){
-        if(Kernel.match__qmark__(Atom('ok'), data)){
+        if(Kernel.match__qmark__(Erlang.atom('ok'), data)){
           Logger.info('info');
           return Todo.add(data);
-        }else if(Kernel.match__qmark__(Atom('error'), data)){
+        }else if(Kernel.match__qmark__(Erlang.atom('error'), data)){
           return null;
         }
       }.call(this));
@@ -131,7 +131,7 @@ defmodule ElixirScript.Translator.Case.Test do
           let one = data.get(0);
           let two = data.get(1);
           return Logger.info(one);
-        }else if(Kernel.match__qmark__(Atom('error'), data)){
+        }else if(Kernel.match__qmark__(Erlang.atom('error'), data)){
           return null;
         }
       }.call(this));
@@ -161,7 +161,7 @@ defmodule ElixirScript.Translator.Case.Test do
             
             return Logger.info(one);
           }
-        }else if(Kernel.match__qmark__(Atom('error'), data)){
+        }else if(Kernel.match__qmark__(Erlang.atom('error'), data)){
           return null;
         }
       }.call(this));
@@ -190,7 +190,7 @@ defmodule ElixirScript.Translator.Case.Test do
             return Logger.info(one);
           }
 
-        }else if(Kernel.match__qmark__(Atom('error'), data)){
+        }else if(Kernel.match__qmark__(Erlang.atom('error'), data)){
           return null;
         }
       }.call(this));
@@ -211,15 +211,15 @@ defmodule ElixirScript.Translator.Case.Test do
     js_code = """
      (function () {
          if (Kernel.match__qmark__({ 
-              '__struct__': List(Atom('AStruct')), 
+              '__struct__': Erlang.list(Erlang.atom('AStruct')), 
               'key': { 
-                '__struct__': List(Atom('BStruct')), 
+                '__struct__': Erlang.list(Erlang.atom('BStruct')), 
                 'key2': undefined 
               } 
             }, data)) {
               let value = data['key']['key2'];
               return Logger.info(value);
-         } else if (Kernel.match__qmark__(Atom('error'), data)) {
+         } else if (Kernel.match__qmark__(Erlang.atom('error'), data)) {
              return null;
          }
      }.call(this));
@@ -240,12 +240,12 @@ defmodule ElixirScript.Translator.Case.Test do
     js_code = """
      (function () {
          if (Kernel.match__qmark__({ 
-              '__struct__': List(Atom('AStruct')), 
+              '__struct__': Erlang.list(Erlang.atom('AStruct')), 
               'key': { 
-                '__struct__': List(Atom('BStruct')), 
+                '__struct__': Erlang.list(Erlang.atom('BStruct')), 
                 'key2': undefined,
                 'key3': {
-                  '__struct__': List(Atom('CStruct')),
+                  '__struct__': Erlang.list(Erlang.atom('CStruct')),
                   'key4': undefined
                 }
               } 
@@ -253,7 +253,7 @@ defmodule ElixirScript.Translator.Case.Test do
               let value = data['key']['key2'];
               let value2 = data['key']['key3']['key4'];
               return Logger.info(value);
-         } else if (Kernel.match__qmark__(Atom('error'), data)) {
+         } else if (Kernel.match__qmark__(Erlang.atom('error'), data)) {
              return null;
          }
      }.call(this));

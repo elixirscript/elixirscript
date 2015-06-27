@@ -1,38 +1,9 @@
-import Tuple from './tuple';
-import Atom from './atom';
+import Erlang from './erlang';
 import Kernel from './kernel';
 
-let List = function(...args){
-  if (!(this instanceof List)){
-    return new List(...args);
-  }
+let List = {};
 
-  let _value = Object.freeze(args);
-
-  this.length = function(){
-    return _value.length;
-  };
-
-  this.get = function(i){
-    return _value[i];
-  };
-
-  this.value = function(){
-    return _value;
-  };
-
-  this.toString = function(){
-    return _value.toString();
-  };
-
-  return this;
-};
-
-List.__MODULE__ = Atom('List');
-
-List.prototype[Symbol.iterator] = function(){
-  return this.value()[Symbol.iterator]();
-};
+List.__MODULE__ = Erlang.atom('List');
 
 List.delete = function(list, item){
   let new_value = [];
@@ -47,7 +18,7 @@ List.delete = function(list, item){
     }
   }
 
-  return List(...new_value);
+  return Erlang.list(...new_value);
 };
 
 List.delete_at = function(list, index){
@@ -59,7 +30,7 @@ List.delete_at = function(list, index){
     }
   }
 
-  return List(...new_value);
+  return Erlang.list(...new_value);
 };
 
 List.duplicate = function(elem, n){
@@ -69,7 +40,7 @@ List.duplicate = function(elem, n){
     new_value.push(elem);
   }
 
-  return List(...new_value);
+  return Erlang.list(...new_value);
 };
 
 List.first = function(list){
@@ -80,7 +51,7 @@ List.first = function(list){
   return list.get(0);
 };
 
-List.flatten = function(list, tail = List()){
+List.flatten = function(list, tail = Erlang.list()){
   let new_value = [];
 
   for(let x of list){
@@ -93,7 +64,7 @@ List.flatten = function(list, tail = List()){
 
   new_value = new_value.concat(tail.value());
 
-  return List(...new_value);
+  return Erlang.list(...new_value);
 };
 
 List.foldl = function(list, acc, func){
@@ -128,7 +99,7 @@ List.insert_at = function(list, index, value){
     }
   }
 
-  return List(...new_value);
+  return Erlang.list(...new_value);
 };
 
 List.keydelete = function(list, key, position){
@@ -140,7 +111,7 @@ List.keydelete = function(list, key, position){
     }
   }
 
-  return List(...new_list);
+  return Erlang.list(...new_list);
 };
 
 List.keyfind = function(list, key, position, _default = null){
@@ -176,7 +147,7 @@ List.keyreplace = function(list, key, position, new_tuple){
     }
   }
 
-  return List(...new_list);
+  return Erlang.list(...new_list);
 };
 
 
@@ -208,7 +179,7 @@ List.keysort = function(list, position){
 
   });
 
-  return List(...new_list);
+  return Erlang.list(...new_list);
 };
 
 List.keystore = function(list, key, position, new_tuple){
@@ -228,7 +199,7 @@ List.keystore = function(list, key, position, new_tuple){
     new_list.push(new_tuple);
   }
 
-  return List(...new_list);
+  return Erlang.list(...new_list);
 };
 
 List.last = function(list){
@@ -250,7 +221,7 @@ List.replace_at = function(list, index, value){
     }
   }
 
-  return List(...new_value);
+  return Erlang.list(...new_value);
 };
 
 List.update_at = function(list, index, fun){
@@ -271,15 +242,15 @@ List.wrap = function(list){
   if(Kernel.is_list(list)){
     return list;
   }else if(list == null){
-    return List();
+    return Erlang.list();
   }else{
-    return List(list);
+    return Erlang.list(list);
   }
 };
 
 List.zip = function(list_of_lists){
   if(list_of_lists.length() === 0){
-    return List();
+    return Erlang.list();
   }
 
   let new_value = [];
@@ -297,22 +268,22 @@ List.zip = function(list_of_lists){
       current_value.push(list_of_lists.get(j).get(i));
     }
 
-    new_value.push(Tuple(...current_value));
+    new_value.push(Erlang.tuple(...current_value));
   }
 
-  return List(...new_value);
+  return Erlang.list(...new_value);
 };
 
 List.to_tuple = function(list){
-  return Tuple.apply(null, list.value());
+  return Erlang.tuple.apply(null, list.value());
 };
 
 List.append = function(list, value){
-  return List(...list.value().concat([value]));
+  return Erlang.list(...list.value().concat([value]));
 };
 
 List.concat = function(left, right){
-  return List(...left.value().concat(right.value()));
+  return Erlang.list(...left.value().concat(right.value()));
 };
 
 export default List;

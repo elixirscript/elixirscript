@@ -15,8 +15,7 @@ defmodule ElixirScript do
   """
   @spec parse_quoted(Macro.t) :: {binary, ESTree.Node.t}
   def parse_quoted(quoted) do
-    js_ast = ElixirScript.Translator.translate(quoted)
-    {"output.json", js_ast}
+    ElixirScript.Translator.translate(quoted)
   end
 
   @doc """
@@ -26,31 +25,10 @@ defmodule ElixirScript do
   def parse_elixir_files(path) do
     path
     |> Path.wildcard
-    |> Enum.map(fn(x) -> parse_elixir_file(x) end)     
-  end
-
-  defp parse_elixir_file(path) do
-    js_ast = path
-    |> File.read!
+    |> Enum.map(fn(x) -> File.read!(x) end)
+    |> Enum.join("\n")
     |> Code.string_to_quoted!
-    |> ElixirScript.Translator.translate
-
-    file_name = Path.basename(path, ".ex") <> ".json"
-
-    {file_name, js_ast}
-  end
-
-  @doc """
-  Converts JavaScript AST into JavaScript code
-  """
-  @spec javascript_ast_to_code({binary, ESTree.Node.t}) :: {binary, binary} | {:error, binary}
-  def javascript_ast_to_code({ path, js_ast }) do
-    case javascript_ast_to_code(js_ast) do
-      {:ok, js_code} ->
-        { Path.basename(path, ".json") <> ".js", js_code }
-      {:error, error} ->
-        {:error, error}
-    end
+    |> ElixirScript.Translator.translate    
   end
 
   @doc """
@@ -78,25 +56,29 @@ defmodule ElixirScript do
   end
 
   @doc """
-  Writes output to file
+  Same as javascript_ast_to_code but throws an error
   """
-  @spec write_to_files([{binary, binary}], binary) :: nil
-  def write_to_files(list, destination) when is_list(list) do
-    Enum.each(list, &write_to_files(&1, destination))
+  @spec javascript_ast_to_code!(ESTree.Node.t) :: binary
+  def javascript_ast_to_code!(js_ast) do
+    case javascript_ast_to_code(js_ast) do
+      {:ok, js_code } ->
+        js_code
+      {:error, error } ->
+        raise ElixirScript.ParseError, message: error
+    end
   end
 
   @doc """
   Writes output to file
   """
-  @spec write_to_files({binary, binary}, binary) :: :ok | no_return
-  def write_to_files({file_name, js}, destination) do
-    file_name = Path.join([destination, file_name])
+  def write_to_file(js_code, destination) do
+    file_name = Path.join([destination, "#{app_name()}.js"])
 
     if !File.exists?(destination) do
       File.mkdir_p!(destination)
     end
 
-    File.write!(file_name, js)
+    File.write!(file_name, js_code)
   end
 
 
@@ -112,6 +94,39 @@ defmodule ElixirScript do
     end
   end
 
-  def js_import(module, opts \\ []) do
+  def post_process_js_ast(js_ast) do
+    ESTree.Builder.program(
+      ElixirScript.PostProcessor.create_import_statements() ++
+      List.wrap(ElixirScript.PostProcessor.create_root_object()) ++
+      List.wrap(js_ast) ++
+      List.wrap(ElixirScript.PostProcessor.export_root_object())
+    )
+  end
+
+  def load_config() do
+    load_config("exjs.exs")
+  end
+
+  def load_config(path) do
+    modules = Code.load_file(path)
+
+    Enum.each(modules, fn({ module, _ }) -> 
+      case module do
+        ElixirScript.Config ->
+          config = module.project()
+          Application.put_env(:elixir_script, :app, config[:app])
+          Application.put_env(:elixir_script, :js_deps, config[:js_deps])
+      end
+    end)
+  end
+
+  def capitalize_app_name() do
+    Atom.to_string(app_name())
+    |> String.capitalize
+    |> String.to_atom
+  end
+
+  def app_name() do
+    Application.get_env(:elixir_script, :app)
   end
 end

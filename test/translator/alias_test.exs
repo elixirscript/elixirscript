@@ -8,7 +8,7 @@ defmodule ElixirScript.Translator.Alias.Test do
     end
 
     js_code = """
-      Kernel.SpecialForms.alias(Hello.World, List(), this)
+      Kernel.SpecialForms.alias(Hello.World, Erlang.list(), this)
     """
 
     assert_translation(ex_ast, js_code)
@@ -20,7 +20,7 @@ defmodule ElixirScript.Translator.Alias.Test do
     end
 
     js_code = """
-    Kernel.SpecialForms.alias(Hello.World, List(Tuple(Atom('as'), Atom('Test'))), this)
+    Kernel.SpecialForms.alias(Hello.World, Erlang.list(Erlang.tuple(Erlang.atom('as'), Erlang.atom('Test'))), this)
     """
 
     assert_translation(ex_ast, js_code)

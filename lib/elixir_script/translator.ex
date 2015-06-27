@@ -7,7 +7,6 @@ defmodule ElixirScript.Translator do
   alias ElixirScript.Translator.Function
   alias ElixirScript.Translator.Expression
   alias ElixirScript.Translator.Import
-  alias ElixirScript.Translator.JSImport
   alias ElixirScript.Translator.If
   alias ElixirScript.Translator.Cond
   alias ElixirScript.Translator.Case
@@ -102,14 +101,6 @@ defmodule ElixirScript.Translator do
       _ ->
         Bitstring.make_bitstring(elements)
     end
-  end
-
-  defp do_translate({{:., _, [{:__aliases__, _, [:ElixirScript]}, :js_import]}, _, [{:__aliases__, _, module_name_list}]}) do
-    JSImport.make_js_import(module_name_list, [])
-  end
-
-  defp do_translate({{:., _, [{:__aliases__, _, [:ElixirScript]}, :js_import]}, _, [{:__aliases__, _, module_name_list}, options]}) do
-    JSImport.make_js_import(module_name_list, options)
   end
 
   defp do_translate({{:., _, [Access, :get]}, _, [target, property]}) do

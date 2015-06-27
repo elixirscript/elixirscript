@@ -13,14 +13,20 @@ defmodule ElixirScript.Translator.Primitive do
 
   def make_atom(ast) when is_atom(ast) do
     Builder.call_expression(
-      Builder.identifier("Atom"), 
+      Builder.member_expression(
+        Builder.identifier("Erlang"),
+        Builder.identifier("atom")
+      ),
       [Builder.literal(ast)]
     )
   end
 
   def make_list(ast) when is_list(ast) do
     Builder.call_expression(
-      Builder.identifier("List"), 
+      Builder.member_expression(
+        Builder.identifier("Erlang"),
+        Builder.identifier("list")
+      ),
       Enum.map(ast, fn(x) -> Translator.translate(x) end)
     )
   end
@@ -31,7 +37,10 @@ defmodule ElixirScript.Translator.Primitive do
 
   def make_tuple(elements) do
     Builder.call_expression(
-      Builder.identifier("Tuple"), 
+      Builder.member_expression(
+        Builder.identifier("Erlang"),
+        Builder.identifier("tuple")
+      ),
       Enum.map(elements, fn(x) -> Translator.translate(x) end)
     )
   end

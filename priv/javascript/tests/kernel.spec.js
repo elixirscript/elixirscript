@@ -1,7 +1,5 @@
+var Erlang = require('../lib/erlang');
 var Kernel = require('../lib/kernel');
-var Atom = require('../lib/atom');
-var List = require('../lib/list');
-var Tuple = require('../lib/tuple');
 var expect = require('chai').expect;
 
 describe('Kernel', function(){
@@ -26,14 +24,14 @@ describe('Kernel', function(){
     })
 
     it('match atoms', function(){
-      expect(Kernel.match__qmark__(Atom("test"), Atom("test"))).to.equal(true);
-      expect(Kernel.match__qmark__(Atom("test"), Atom("notest"))).to.equal(false);
+      expect(Kernel.match__qmark__(Erlang.atom("test"), Erlang.atom("test"))).to.equal(true);
+      expect(Kernel.match__qmark__(Erlang.atom("test"), Erlang.atom("notest"))).to.equal(false);
     })
 
     it('match tuples', function(){
-      expect(Kernel.match__qmark__(Tuple(1, 2, 3), Tuple(1, 2, 3))).to.equal(true);
-      expect(Kernel.match__qmark__(Tuple(1, undefined, 3), Tuple(1, 2, 3))).to.equal(true);
-      expect(Kernel.match__qmark__(Tuple(1, 2, 3), Tuple(1, 2))).to.equal(false);
+      expect(Kernel.match__qmark__(Erlang.tuple(1, 2, 3), Erlang.tuple(1, 2, 3))).to.equal(true);
+      expect(Kernel.match__qmark__(Erlang.tuple(1, undefined, 3), Erlang.tuple(1, 2, 3))).to.equal(true);
+      expect(Kernel.match__qmark__(Erlang.tuple(1, 2, 3), Erlang.tuple(1, 2))).to.equal(false);
     })
 
     it('match list', function(){
@@ -56,30 +54,34 @@ describe('Kernel', function(){
   })
 
   describe('defmodule', function(){
-    it('must create a global module', function(){
-      let hello = Kernel.defmodule(List(Atom("Hello")), function(__MODULE__){
+    it('must create a module', function(){
+      let Hello = {}
+
+      let hello = Kernel.defmodule(Erlang.list(Erlang.atom("Hello")), function(__MODULE__){
         return {
           world: function(){ return 0; }
         }
-      });
+      }, Hello);
 
-      expect(global.Hello).to.equal(hello);
-      expect(global.Hello.world()).to.equal(0);
+      expect(Hello).to.equal(hello);
+      expect(Hello.world()).to.equal(0);
     })
 
     it('must create inner modules correctly', function(){
-      Kernel.defmodule(List(Atom("Foo")), function(__MODULE__){
+      let Foo = {}
 
-        Kernel.defmodule(List(Atom("Foo"), Atom("Bar")), function(__MODULE__){
+      Kernel.defmodule(Erlang.list(Erlang.atom("Foo")), function(__MODULE__){
+
+        Kernel.defmodule(Erlang.list(Erlang.atom("Foo"), Erlang.atom("Bar")), function(__MODULE__){
           return {
             baz: function(){ return 0; }
           }
-        }); 
+        }, Foo); 
 
         return {
           world: function(){ return 0; }
         }
-      });
+      }, Foo);
 
       expect(Foo.Bar.baz()).to.equal(0);
       expect(Foo.world()).to.equal(0);

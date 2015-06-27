@@ -20,7 +20,7 @@ defmodule ElixirScript.Translator.Bug.Test do
     end
 
     js_code = """
-      ElixirScript.get_property_or_call_function(this, 'getRawCanvas').getContext('2d')
+      Kernel.JS.get_property_or_call_function(this, 'getRawCanvas').getContext('2d')
     """
 
     assert_translation(ex_ast, js_code) 
@@ -35,30 +35,6 @@ defmodule ElixirScript.Translator.Bug.Test do
     """
 
     assert_translation(ex_ast, js_code)   
-  end
-
-  should "correctly handle casing module imports" do
-    ex_ast = quote do
-      alias Stores.GraphicStore
-    end
-
-    js_code = """
-      import GraphicStore from 'stores/graphic_store';
-    """
-
-    assert_translation(ex_ast, js_code)
-  end
-
-  should "correctly handle local default module importing" do
-    ex_ast = quote do
-      require Stores.GraphicStore
-    end
-
-    js_code = """
-      import GraphicStore from 'stores/graphic_store';
-    """
-
-    assert_translation(ex_ast, js_code)
   end
 
   should "correctly call multi-module functions" do

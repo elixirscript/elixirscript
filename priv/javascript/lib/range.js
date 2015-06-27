@@ -1,4 +1,4 @@
-import Atom from './atom';
+import Erlang from './erlang';
 
 let Range = function(_first, _last){
   if (!(this instanceof Range)){
@@ -32,7 +32,7 @@ let Range = function(_first, _last){
   return this;
 };
 
-Range.__MODULE__ = Atom('Range');
+Range.__MODULE__ = Erlang.atom('Range');
 
 Range.prototype[Symbol.iterator] = function(){
   return this.value()[Symbol.iterator]();

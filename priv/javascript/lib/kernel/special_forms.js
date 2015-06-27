@@ -1,34 +1,36 @@
-import Atom from '../atom';
-import Kernel from '../kernel';
-import List from '../list';
+import Erlang from '../erlang';
 
 let SpecialForms = {
-  __MODULE__: Atom('SpecialForms'),
+  __MODULE__: Erlang.atom('SpecialForms'),
 
   import: function(module, opts, context = this){
     if(opts.length() === 0){
       for(let [key, value] of module){
         context[key] = value;
       }
-    }else if(opts[Atom("only")]){
-      for(let item of opts[Atom("only")]){
-        let key = Atom.to_string(Kernel.elem(item, 0));
+    }else if(opts[Erlang.atom("only")]){
+      for(let item of opts[Erlang.atom("only")]){
+        let key = Symbol.keyFor(item.get(0));
         context[key] = module[key];
       }
-    }else if(opts[Atom("except")]){
+    }else if(opts[Erlang.atom("except")]){
+      let except_list = opts[Erlang.atom("except")];
+
       for(let [key, value] of module){
-        if(!List.keymember__qmark__(opts[Atom("except")], Atom(key))){
-          context[key] = value;
+        for(let i = 0; i < except_list.length(); i++){
+          if(except_list.get(i) === Erlang.atom(key)){
+            context[key] = value;
+          }
         }
       }
     }
   },
 
   alias: function(module, opts, context = this){
-    let alias = Atom.to_string(module.__MODULE__);
+    let alias = Symbol.keyFor(module.__MODULE__);
 
-    if(opts[Atom("as")]){
-      alias = Atom.to_string(opts[Atom("as")]);
+    if(opts[Erlang.atom("as")]){
+      alias = Symbol.keyFor(opts[Erlang.atom("as")]);
     }
 
     context[alias] = module;

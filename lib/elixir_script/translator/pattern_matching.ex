@@ -162,7 +162,11 @@ defmodule ElixirScript.Translator.PatternMatching do
       case Translator.translate(value) do
         %ESTree.Identifier{} ->
           true
-        %ESTree.CallExpression{ callee: %ESTree.Identifier{ name: "List" } } ->
+        %ESTree.CallExpression { 
+          callee: %ESTree.MemberExpression { 
+            object: %ESTree.Identifier{ name: "Erlang"}, property: %ESTree.Identifier{  name: "list" } 
+          } 
+        } ->
           false
         %ESTree.CallExpression{} ->
           true
@@ -183,7 +187,11 @@ defmodule ElixirScript.Translator.PatternMatching do
       case Translator.translate(value) do
         %ESTree.Identifier{} ->
           {key, {:__aliases__, [], [:undefined]} }
-        %ESTree.CallExpression{ callee: %ESTree.Identifier{ name: "List" } } ->
+        %ESTree.CallExpression { 
+          callee: %ESTree.MemberExpression { 
+            object: %ESTree.Identifier{ name: "Erlang"}, property: %ESTree.Identifier{  name: "list" } 
+          } 
+        } ->
           {key, value}
         %ESTree.CallExpression{} ->
           {key, hd(process_pattern(value)) }

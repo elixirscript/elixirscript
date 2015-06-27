@@ -9,9 +9,9 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
-    Kernel.defmodule(List(Atom('Elephant')), function (__MODULE__) {
+    Kernel.defmodule(Erlang.list(Erlang.atom('Elephant')), function (__MODULE__) {
       return { __MODULE__: __MODULE__ };
-    });
+    }, App);
     """
 
     assert_translation(ex_ast, js_code)
@@ -30,7 +30,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
-    Kernel.defmodule(List(Atom('Elephant')), function (__MODULE__) {
+    Kernel.defmodule(Erlang.list(Erlang.atom('Elephant')), function (__MODULE__) {
       const ul = JQuery('#todo-list');
       
       function something_else() {
@@ -42,7 +42,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
       }
 
       return { something: something, __MODULE__: __MODULE__ };
-    });
+    }, App);
     """
 
     assert_translation(ex_ast, js_code)
@@ -60,8 +60,8 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
-     Kernel.defmodule(List(Atom('Elephant')), function (__MODULE__) {
-         Kernel.SpecialForms.alias(Icabod.Crane, List(), this);
+     Kernel.defmodule(Erlang.list(Erlang.atom('Elephant')), function (__MODULE__) {
+         Kernel.SpecialForms.alias(Icabod.Crane, Erlang.list(), this);
 
          function something_else() {
              return null;
@@ -72,7 +72,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
          }
 
          return { something: something, __MODULE__: __MODULE__ };
-     });
+     }, App);
     """
 
     assert_translation(ex_ast, js_code)
@@ -98,8 +98,8 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
-      Kernel.defmodule(List(Atom('Animals')), function (__MODULE__) {
-        Kernel.defmodule(List(Atom('Animals'), Atom('Elephant')), function (__MODULE__) {
+      Kernel.defmodule(Erlang.list(Erlang.atom('Animals')), function (__MODULE__) {
+        Kernel.defmodule(Erlang.list(Erlang.atom('Animals'), Erlang.atom('Elephant')), function (__MODULE__) {
           function defstruct(trunk = true) {
             return {
               __struct__: __MODULE__,
@@ -108,9 +108,9 @@ defmodule ElixirScript.Translator.Defmodule.Test do
           }
         
           return { defstruct: defstruct, __MODULE__: __MODULE__ };
-        });
+        }, App);
 
-        Kernel.SpecialForms.alias(Animals.Elephant, List(), this);
+        Kernel.SpecialForms.alias(Animals.Elephant, Erlang.list(), this);
 
         function something_else() {
           return null;
@@ -121,7 +121,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
         }
 
         return { something: something, __MODULE__: __MODULE__ };
-      });
+      }, App);
     """
 
     assert_translation(ex_ast, js_code)

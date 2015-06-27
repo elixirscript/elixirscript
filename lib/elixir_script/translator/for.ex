@@ -86,7 +86,10 @@ defmodule ElixirScript.Translator.For do
     end) 
     
     new_identifier = Builder.call_expression(
-      Builder.identifier("Tuple"), 
+      Builder.member_expression(
+        Builder.identifier("Erlang"),
+        Builder.identifier("tuple")
+      ),
       new_identifier
     )
 

@@ -8,7 +8,7 @@ defmodule ElixirScript.Translator.Import.Test do
     end
 
     js_code = """
-    Kernel.SpecialForms.import(Hello.World, List(), this)
+    Kernel.SpecialForms.import(Hello.World, Erlang.list(), this)
     """
 
     assert_translation(ex_ast, js_code)
@@ -21,7 +21,7 @@ defmodule ElixirScript.Translator.Import.Test do
     end
 
     js_code = """
-    Kernel.SpecialForms.import(US, List(Tuple(Atom('only'), List(Tuple(Atom('la'), 1), Tuple(Atom('al'), 2)))), this)
+    Kernel.SpecialForms.import(US, Erlang.list(Erlang.tuple(Erlang.atom('only'), Erlang.list(Erlang.tuple(Erlang.atom('la'), 1), Erlang.tuple(Erlang.atom('al'), 2)))), this)
     """
 
     assert_translation(ex_ast, js_code)
@@ -34,7 +34,7 @@ defmodule ElixirScript.Translator.Import.Test do
     end
 
     js_code = """
-    Kernel.SpecialForms.import(US, List(Tuple(Atom('except'), List(Tuple(Atom('la'), 1), Tuple(Atom('al'), 2)))), this)
+    Kernel.SpecialForms.import(US, Erlang.list(Erlang.tuple(Erlang.atom('except'), Erlang.list(Erlang.tuple(Erlang.atom('la'), 1), Erlang.tuple(Erlang.atom('al'), 2)))), this)
     """
 
     assert_translation(ex_ast, js_code)

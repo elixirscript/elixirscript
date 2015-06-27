@@ -1,10 +1,8 @@
-import Tuple from './tuple';
-import List from './list';
-import Atom from './atom';
+import Erlang from './erlang';
 import Kernel from './kernel';
 
 let Enum = {
-  __MODULE__: Atom('Enum'),
+  __MODULE__: Erlang.atom('Enum'),
 
   all__qmark__: function(collection, fun = (x) => x){
     let result = Enum.filter(collection, function(x){
@@ -51,9 +49,9 @@ let Enum = {
   fetch: function(collection, n){
     if(Kernel.is_list(collection)){
       if(n < collection.length() && n >= 0){
-        return Tuple(Atom("ok"), collection.get(n));
+        return Erlang.tuple(Erlang.atom("ok"), collection.get(n));
       }else{
-        return Atom("error");
+        return Erlang.atom("error");
       }
     }
 
@@ -81,21 +79,21 @@ let Enum = {
   },
 
   map_reduce: function(collection, acc, fun){
-    let mapped = List();
+    let mapped = Erlang.list();
     let the_acc = acc;
 
     for (var i = 0; i < collection.length(); i++) {
       let tuple = fun(collection.get(i), the_acc);
 
       the_acc = tuple.get(1);
-      mapped = List.append(mapped, tuple.get(0));
+      mapped = Erlang.list(...mapped.value().concat([tuple.get(0)]))
     }
 
-    return Tuple(mapped, the_acc);
+    return Erlang.tuple(mapped, the_acc);
   },
 
   member: function(collection, value){
-    for(let x of collection.value()){
+    for(let x of collection){
       if(x === value){
         return true;
       }

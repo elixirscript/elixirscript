@@ -4,14 +4,14 @@ defmodule ElixirScript.Translator.JSImport do
   def make_js_import(name, options) do
 
     import_specifier = if options[:as] do
-      {_, _, alt} = options[:as]
+      alt = options[:as]
       Builder.identifier(alt)
       Builder.import_specifier(
         Builder.identifier("default"),
         Builder.identifier(alt)
       )
     else
-      List.last(name) 
+      name
       |> Builder.identifier
       |> Builder.import_default_specifier()  
     end
@@ -26,6 +26,10 @@ defmodule ElixirScript.Translator.JSImport do
       [import_specifier], 
       Builder.identifier(import_path)
     )
+  end
+
+  defp make_source(name) when is_atom(name) do
+    "'#{name}'"
   end
 
   defp make_source(name) do

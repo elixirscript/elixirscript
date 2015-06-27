@@ -22,7 +22,8 @@ defmodule ElixirScript.Translator.Module do
           [Builder.identifier(:__MODULE__)],
           [],
           Builder.block_statement([default])
-        )
+        ),
+        Builder.identifier(ElixirScript.capitalize_app_name())
       ]
     )
 
@@ -113,22 +114,23 @@ defmodule ElixirScript.Translator.Module do
       end
     end)
 
-    module = Builder.call_expression(
-      Builder.member_expression(
-        Builder.identifier(:Kernel),
-        Builder.identifier(:defmodule)
-      ),
-      [
-        Translator.translate(module_name_list),
-        Builder.function_expression(
-          [Builder.identifier(:__MODULE__)],
-          [],
-          Builder.block_statement(imports ++ body ++ functions ++ [default])
-        )
-      ]
+    Builder.expression_statement(
+      Builder.call_expression(
+        Builder.member_expression(
+          Builder.identifier(:Kernel),
+          Builder.identifier(:defmodule)
+        ),
+        [
+          Translator.translate(module_name_list),
+          Builder.function_expression(
+            [Builder.identifier(:__MODULE__)],
+            [],
+            Builder.block_statement(body ++ functions ++ [default])
+          ),
+          Builder.identifier(ElixirScript.capitalize_app_name())
+        ]
+      )
     )
-
-    Builder.expression_statement(module)
   end
 
   defp add_function_to_dict(dict, function, access) do
