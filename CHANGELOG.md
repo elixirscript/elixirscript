@@ -1,13 +1,17 @@
 # v0.6.0-dev
   * Enhancements
-    * Made the Atom, Tuple, Range and BitString data structures more immutable
-    * Added List data structure
+    * Made the Tuple, Range and BitString data structures more immutable
     * Now replacing characters that can't be used in variable and function names in JavaScript with
       something that it (i.e. `match?` -> `match__qmark__`)
     * Implemented Integer module
     * Atom now translates to an ES6 Symbol
-    * Added iterators for Range, List, and BitString
+    * List now translates to a frozen JS Array
+    * Added iterators for Range and BitString
     * Updated the pattern match binding to use ES6 destructuring for lists and tuples
+    * Elixir modules no longer directly map to an ES6 module.
+    * A config file (default is exjs.exs) which lists the app's name and JavaScript ES6 modules used is now required.
+    * No longer need to explicity alias, import, or require dependencies in a module
+    * Functionality of alias, import and require have changed to match closer to Elixir's functionality
 
 # v0.5.0
   * Enhancements

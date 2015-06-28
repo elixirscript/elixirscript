@@ -5,34 +5,9 @@ function atom (_value) {
 }
 
 function list(...args){
-  if (!(this instanceof list)){
-    return new list(...args);
-  }
-
-  let _value = Object.freeze(args);
-
-  this.length = function(){
-    return _value.length;
-  };
-
-  this.get = function(i){
-    return _value[i];
-  };
-
-  this.value = function(){
-    return _value;
-  };
-
-  this.toString = function(){
-    return _value.toString();
-  };
-
-  return this;
+  return Object.freeze(args);
 };
 
-list.prototype[Symbol.iterator] = function(){
-  return this.value()[Symbol.iterator]();
-};
 
 function tuple(...args){
   if (!(this instanceof tuple)){
@@ -45,9 +20,7 @@ function tuple(...args){
     return _value;
   };
 
-  this.length = function(){
-    return _value.length;
-  };
+  this.length = _value.length;
 
   this.get = function(i){
     return _value[i];
@@ -62,7 +35,7 @@ tuple.prototype[Symbol.iterator] = function(){
 
 tuple.prototype.toString = function(){
   var i, s = "";
-  for (i = 0; i < this.length(); i++) {
+  for (i = 0; i < this.length; i++) {
     if (s !== "") {
       s += ", ";
     }
@@ -87,9 +60,7 @@ function bitstring(...args){
     return _value;
   };
 
-  this.length = function(){
-    return _value.length;
-  };
+  this.length = _value.length;
 
   this.get = function(i){
     return _value[i];
@@ -104,7 +75,7 @@ bitstring.prototype[Symbol.iterator] = function () {
 
 bitstring.prototype.toString = function(){
   var i, s = "";
-  for (i = 0; i < this.length(); i++) {
+  for (i = 0; i < this.length; i++) {
     if (s !== "") {
       s += ", ";
     }

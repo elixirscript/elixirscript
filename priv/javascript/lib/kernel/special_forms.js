@@ -4,7 +4,7 @@ let SpecialForms = {
   __MODULE__: Erlang.atom('SpecialForms'),
 
   import: function(module, opts, context = this){
-    if(opts.length() === 0){
+    if(opts.length === 0){
       for(let [key, value] of module){
         context[key] = value;
       }
@@ -17,8 +17,8 @@ let SpecialForms = {
       let except_list = opts[Erlang.atom("except")];
 
       for(let [key, value] of module){
-        for(let i = 0; i < except_list.length(); i++){
-          if(except_list.get(i) === Erlang.atom(key)){
+        for(let i = 0; i < except_list.length; i++){
+          if(except_list[i] === Erlang.atom(key)){
             context[key] = value;
           }
         }

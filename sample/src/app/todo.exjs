@@ -1,0 +1,75 @@
+defmodule App.Todo do
+
+  def bind_events(ul) do
+    ul.on("change", ".toggle", fn(e) ->
+      checkbox = JQuery.(e.target)
+      a = checkbox.closest("li")
+      id = a.data("id")
+
+      update(ul, id, checkbox.prop("checked"))
+    end)
+
+    ul.on("click", ".destroy", fn(e) ->
+      cross = JQuery.(e.target)
+      a = cross.closest("li")
+      id = a.data("id")
+
+      remove(ul, id)
+    end)
+  end
+
+  def list(ul) do    
+    JQuery.get("/api/todo", fn(data) -> 
+      ul.empty()
+
+      Enum.map(data, fn(x)->
+        {the_completed, checked} = if x.completed do
+          {"completed", "checked"}
+        else
+          {"", ""}
+        end
+
+        li = """
+              <li data-id="#{x.id}" class="#{the_completed}">
+                <div class="view">
+                  <input class="toggle" type="checkbox" #{checked}>
+                  <label>#{x.title}</label>
+                  <button class="destroy"></button>
+                </div>
+                <input class="edit" value="#{x.title}">
+              </li>
+            """
+
+        ul.append(li)
+      end)
+    end)
+  end
+
+  def add(ul, the_title) do
+    JQuery.post("/api/todo", %{title: the_title} , fn(x) -> 
+      list(ul)
+    end)
+  end
+
+  def remove(ul, id) do
+    JQuery.ajax(%{
+      url: "/api/todo/" <> id,
+      dataType: "json",
+      method: "DELETE"
+    }).done(fn(data) ->
+      list(ul)
+    end)
+  end
+
+  def update(ul, id, completed) do
+
+    JQuery.ajax(%{
+      url: "/api/todo/" <> id,
+      data: %{ completed: completed },
+      dataType: "json",
+      method: "PUT"
+    }).done(fn(data) ->
+      list(ul)
+    end)
+  end
+end

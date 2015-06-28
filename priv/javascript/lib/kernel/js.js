@@ -14,7 +14,7 @@ let JS = {
   create_namespace: function(module_name_list, root){
     let parent = root;
 
-    let tail = Erlang.list(...module_name_list.value().slice(1));
+    let tail = Erlang.list(...module_name_list.slice(1));
 
     for(let atom of tail){
       let partname = Symbol.keyFor(atom);

@@ -111,7 +111,7 @@ defmodule ElixirScript.Translator.For.Test do
          let _results = Erlang.list();
          for (let _ref of Erlang.list(Erlang.tuple(Erlang.atom('user'), 'john'), Erlang.tuple(Erlang.atom('admin'), 'john'), Erlang.tuple(Erlang.atom('user'), 'meg'))) {
              if (Kernel.match__qmark__(_ref, Erlang.tuple(Erlang.atom('user'), undefined))) {
-                 let name = _ref.get(1);
+                 let name = Kernel.elem(_ref, 1);
                  _results = List.append(_results, String.upcase(name));
              }
          }

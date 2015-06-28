@@ -9,18 +9,18 @@ let Kernel = {
   JS: JS,
 
   defmodule: function(alias, list2, root){
-    let moduleAtom = alias.get(alias.length() - 1);
+    let moduleAtom = alias[alias.length - 1];
     let parent = Kernel.JS.create_namespace(alias, root);
 
     return Object.assign(parent, list2(moduleAtom));
   },
 
   tl: function(list){
-    return Erlang.list(...list.value().slice(1));
+    return Erlang.list(...list.slice(1));
   },
 
   hd: function(list){
-    return list.get(0);
+    return list[0];
   },
 
   is_nil: function(x){
@@ -53,7 +53,7 @@ let Kernel = {
   },
 
   is_list: function(x){
-    return x instanceof Erlang.list;
+    return x instanceof Array;
   },
 
   is_map: function(x){
@@ -69,10 +69,6 @@ let Kernel = {
   },
 
   length: function(x){
-    if(Kernel.is_list(x) || Kernel.is_tuple(x)){
-      return x.length();
-    }
-
     return x.length;
   },
 
@@ -111,6 +107,10 @@ let Kernel = {
   },
 
   elem: function(tuple, index){
+    if(Kernel.is_list(tuple)){
+      return tuple[i];
+    }
+
     return tuple.get(index);
   },
 

@@ -40,13 +40,11 @@ defmodule ElixirScript.Translator.Assignment.Test do
 
     ex_ast = quote do: {^a, _, c} = {1, 2, 3}
     js_code = """
-        let _ref = Erlang.tuple(1, 2, 3);
-
-        if(!Kernel.match__qmark__(a, _ref.get(0)))
-          throw new MatchError('no match of right hand side value');
-
-        let undefined = _ref.get(1);
-        let c = _ref.get(2);
+     let _ref = Erlang.tuple(1, 2, 3);
+     if (!Kernel.match__qmark__(a, _ref.get(0)))
+         throw new MatchError('no match of right hand side value');
+     let undefined = Kernel.elem(_ref, 1);
+     let c = Kernel.elem(_ref, 2);
     """
 
     assert_translation(ex_ast, js_code)

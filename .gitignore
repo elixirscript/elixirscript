@@ -11,3 +11,5 @@ priv/javascript/dist
 deploy.sh
 .DS_Store
 priv/javascript/scratchpad.js
+sample/dest
+fprof.trace

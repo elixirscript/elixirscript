@@ -11,7 +11,7 @@ Tuple.to_string = function(tuple){
 Tuple.delete_at = function(tuple, index){
   let new_list = [];
 
-  for (var i = 0; i < tuple.length(); i++) {
+  for (var i = 0; i < tuple.length; i++) {
     if(i !== index){
       new_list.push(tuple.get(i));
     }
@@ -33,7 +33,7 @@ Tuple.duplicate = function(data, size){
 Tuple.insert_at = function(tuple, index, term){
   let new_tuple = [];
 
-  for (var i = 0; i <= tuple.length(); i++) {
+  for (var i = 0; i <= tuple.length; i++) {
     if(i === index){
       new_tuple.push(term);
       i++;
@@ -47,13 +47,13 @@ Tuple.insert_at = function(tuple, index, term){
 };
 
 Tuple.from_list = function(list){
-  return Erlang.tuple.apply(null, list.value());
+  return Erlang.tuple.apply(null, list);
 };
 
 Tuple.to_list = function(tuple){
   let new_list = [];
 
-  for (var i = 0; i < tuple.length(); i++) {
+  for (var i = 0; i < tuple.length; i++) {
     new_list.push(tuple.get(i));
   }
 

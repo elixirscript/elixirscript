@@ -126,15 +126,15 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-      (function(){
-        if(Kernel.is_tuple(data)){
-          let one = data.get(0);
-          let two = data.get(1);
-          return Logger.info(one);
-        }else if(Kernel.match__qmark__(Erlang.atom('error'), data)){
-          return null;
-        }
-      }.call(this));
+     (function () {
+         if (Kernel.is_tuple(data)) {
+             let one = Kernel.elem(data, 0);
+             let two = Kernel.elem(data, 1);
+             return Logger.info(one);
+         } else if (Kernel.match__qmark__(Erlang.atom('error'), data)) {
+             return null;
+         }
+     }.call(this));
     """
 
     assert_translation(ex_ast, js_code)
@@ -151,20 +151,18 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-      (function(){
-        if(Kernel.is_tuple(data)){
-          let three = data.get(1);
-
-          if(Kernel.is_tuple(data.get(0))){
-            let one = data.get(0).get(0);
-            let two = data.get(0).get(1);
-            
-            return Logger.info(one);
-          }
-        }else if(Kernel.match__qmark__(Erlang.atom('error'), data)){
-          return null;
-        }
-      }.call(this));
+     (function () {
+         if (Kernel.is_tuple(data)) {
+             let three = Kernel.elem(data, 1);
+             if (Kernel.is_tuple(Kernel.elem(data, 0))) {
+                 let one = Kernel.elem(Kernel.elem(data, 0), 0);
+                 let two = Kernel.elem(Kernel.elem(data, 0), 1);
+                 return Logger.info(one);
+             }
+         } else if (Kernel.match__qmark__(Erlang.atom('error'), data)) {
+             return null;
+         }
+     }.call(this));
     """
 
     assert_translation(ex_ast, js_code)
@@ -179,21 +177,18 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-      (function(){
-        if(Kernel.is_tuple(data)){
-          let one = data.get(0);
-
-          if(Kernel.is_tuple(data.get(1))){
-            let two = data.get(1).get(0);
-            let three = data.get(1).get(1);
-
-            return Logger.info(one);
-          }
-
-        }else if(Kernel.match__qmark__(Erlang.atom('error'), data)){
-          return null;
-        }
-      }.call(this));
+     (function () {
+         if (Kernel.is_tuple(data)) {
+             let one = Kernel.elem(data, 0);
+             if (Kernel.is_tuple(Kernel.elem(data, 1))) {
+                 let two = Kernel.elem(Kernel.elem(data, 1), 0);
+                 let three = Kernel.elem(Kernel.elem(data, 1), 1);
+                 return Logger.info(one);
+             }
+         } else if (Kernel.match__qmark__(Erlang.atom('error'), data)) {
+             return null;
+         }
+     }.call(this));
     """
 
     assert_translation(ex_ast, js_code)

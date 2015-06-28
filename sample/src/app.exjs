@@ -1,0 +1,25 @@
+defmodule App do
+
+  @ul JQuery.("#todo-list")
+  @elem JQuery.("#new-todo")
+
+  defp process_event(%{which: 13}) do
+    App.Todo.add(@ul, elem.val)
+    elem.val("")       
+  end
+
+  defp process_event(event) do
+    Logger.debug(event)      
+  end
+
+  defp main() do
+    JQuery.(fn() ->
+      App.Todo.bind_events(@ul)
+      App.Todo.list(@ul)
+
+      elem.keypress(fn(event) -> process_event(event) end)
+    end)
+  end
+
+  main()
+end

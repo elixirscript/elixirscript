@@ -519,14 +519,14 @@ defmodule ElixirScript.Translator.Function.Test do
 
 
     js_code = """
-      export function something(_ref0){
-        if(Kernel.is_list(arguments[0])){
-          let apple = arguments[0].get(0);
-          let pear = arguments[0].get(1);
-          let banana = arguments[0].get(2);
-          return null;
-        }
-      }
+     export function something(_ref0) {
+         if (Kernel.is_list(arguments[0])) {
+             let apple = Kernel.elem(arguments[0], 0);
+             let pear = Kernel.elem(arguments[0], 1);
+             let banana = Kernel.elem(arguments[0], 2);
+             return null;
+         }
+     }
     """
 
     assert_translation(ex_ast, js_code)
@@ -540,13 +540,13 @@ defmodule ElixirScript.Translator.Function.Test do
 
 
     js_code = """
-      export function something(_ref0){
-        if(Kernel.is_tuple(arguments[0])){
-          let apple = arguments[0].get(0);
-          let fruits = arguments[0].get(1);
-          return null;
-        }
-      }
+     export function something(_ref0) {
+         if (Kernel.is_tuple(arguments[0])) {
+             let apple = Kernel.elem(arguments[0], 0);
+             let fruits = Kernel.elem(arguments[0], 1);
+             return null;
+         }
+     }
     """
 
     assert_translation(ex_ast, js_code)

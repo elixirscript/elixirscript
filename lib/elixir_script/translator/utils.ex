@@ -34,37 +34,14 @@ defmodule ElixirScript.Translator.Utils do
   end
 
   def make_module_expression_tree(modules, computed) when is_list(modules) do
-    Enum.chunk(modules, 2)
-    |> Enum.reduce(nil, fn(x, ast) ->
-      case x do
-        [one] ->
-          if is_nil(ast) do
-            make_module_expression_tree(one, computed)
-          else
-            Builder.member_expression(
-              ast,
-              make_module_expression_tree(one, computed),
-              computed
-            )
-          end
-        [one, two] ->
-          if is_nil(ast) do
-            Builder.member_expression(
-              make_module_expression_tree(one, computed),
-              make_module_expression_tree(two, computed),
-              computed
-            )
-          else
-            Builder.member_expression(
-              ast,
-              Builder.member_expression(
-                make_module_expression_tree(one, computed),
-                make_module_expression_tree(two, computed),
-                computed
-              ),
-              computed
-            )
-          end
+    Enum.reduce(modules, nil, fn(x, ast) ->
+      case ast do
+        nil ->
+          Builder.member_expression(Builder.identifier(x), nil, computed)
+        %ESTree.MemberExpression{ property: nil } ->
+          %{ ast | property: Builder.identifier(x) }
+        _ ->
+          Builder.member_expression(ast, Builder.identifier(x), computed)
       end
     end)
   end

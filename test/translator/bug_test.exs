@@ -2,6 +2,19 @@ defmodule ElixirScript.Translator.Bug.Test do
   use ShouldI
   import ElixirScript.TestHelper
 
+  should "correctly translate module names when used" do
+    ex_ast = quote do
+      @graphic_store App.Stores.GraphicStore.create_store()
+    end
+
+    js_code = """
+      const graphic_store = Kernel.JS.get_property_or_call_function(App.Stores.GraphicStore, 'create_store');
+
+    """
+
+    assert_translation(ex_ast, js_code)   
+  end
+  
   should "replace !" do
     ex_ast = quote do
       Enum.fetch!(data, i)

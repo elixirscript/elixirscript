@@ -9,13 +9,13 @@ describe('Tuple', function(){
   describe('duplicate', function(){
     it('must make a tuple with the value duplicated the specified amount of times', function(){
       let t = Tuple.duplicate("value", 3);
-      expect(t.length()).to.equal(3);
+      expect(t.length).to.equal(3);
       expect(t.get(0)).to.equal("value");
       expect(t.get(1)).to.equal("value");
       expect(t.get(2)).to.equal("value");
 
       t = Tuple.duplicate("value", 0);
-      expect(t.length()).to.equal(0);
+      expect(t.length).to.equal(0);
     })
   })
 
@@ -46,7 +46,7 @@ describe('Tuple', function(){
   describe('to_list', function(){
     it('must create a list from a tuple', function(){
       let t = Erlang.tuple(1, 2, 3);
-      expect(Tuple.to_list(t).length()).to.equal(3);
+      expect(Tuple.to_list(t).length).to.equal(3);
     })
   })
 })

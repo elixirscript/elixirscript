@@ -60,10 +60,10 @@ defmodule ElixirScript.Translator.For do
             variable_declarator = Builder.variable_declarator(Translator.translate(x),
               Builder.call_expression(
                 Builder.member_expression(
-                  i,
-                  Builder.identifier(:get)
+                  Builder.identifier(:Kernel),
+                  Builder.identifier(:elem)
                 ),
-                [Builder.literal(index)]
+                [i, Builder.literal(index)]
               )
             )
             variable_declaration = Builder.variable_declaration([variable_declarator], :let)
