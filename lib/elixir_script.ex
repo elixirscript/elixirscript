@@ -37,7 +37,7 @@ defmodule ElixirScript do
   def process_module(module, root) do
     file_path = create_file_name(module)
 
-    program = ElixirScript.Translator.Module.create_standard_lib_imports(root) ++ module.body
+    program = ElixirScript.Translator.Module.create_standard_lib_imports(module.stdlibs, root) ++ module.body
     |> ESTree.Builder.program
     
    { file_path, program }
