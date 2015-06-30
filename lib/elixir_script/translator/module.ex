@@ -3,31 +3,24 @@ defmodule ElixirScript.Translator.Module do
   alias ESTree.Builder
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Utils
+  alias ElixirScript.Translator.JSModule
+
+  @standard_libs [
+    {:Erlang, from: "__lib/erlang" },
+    {:Atom, from: "__lib/atom" },
+    {:BitString, from: "__lib/bit_string" },
+    {:Enum, from: "__lib/enum" },
+    {:Integer, from: "__lib/integer" },
+    {:Kernel, from: "__lib/kernel" },
+    {:List, from: "__lib/list" },
+    {:Logger, from: "__lib/logger" },
+    {:Mutable, from: "__lib/mutable" },
+    {:Range, from: "__lib/range" },
+    {:Tuple, from: "__lib/tuple" },
+  ]
 
   def make_module(module_name_list, nil) do
-    default = Builder.return_statement(
-      Builder.object_expression([
-        Builder.property(Builder.identifier(:__MODULE__), Builder.identifier(:__MODULE__))
-      ])
-    )
-
-    module = Builder.call_expression(
-      Builder.member_expression(
-        Builder.identifier(:Kernel),
-        Builder.identifier(:defmodule)
-      ),
-      [
-        Translator.translate(module_name_list),
-        Builder.function_expression(
-          [Builder.identifier(:__MODULE__)],
-          [],
-          Builder.block_statement([default])
-        ),
-        Builder.identifier(ElixirScript.capitalize_app_name())
-      ]
-    )
-
-    Builder.expression_statement(module)
+    [%JSModule{ name: module_name_list, body: List.wrap(create__module__(module_name_list)) }] 
   end
 
   def make_module(module_name_list, body) do
@@ -96,7 +89,7 @@ defmodule ElixirScript.Translator.Module do
       value.access == :export
     end, fn({key, _value}) -> 
       Builder.property(Builder.identifier(key), Builder.identifier(key))
-    end) ++ [Builder.property(Builder.identifier(:__MODULE__), Builder.identifier(:__MODULE__))]
+    end)
 
     default = Builder.return_statement(
       Builder.object_expression(properties)
@@ -114,23 +107,24 @@ defmodule ElixirScript.Translator.Module do
       end
     end)
 
-    Builder.expression_statement(
-      Builder.call_expression(
-        Builder.member_expression(
-          Builder.identifier(:Kernel),
-          Builder.identifier(:defmodule)
-        ),
-        [
-          Translator.translate(module_name_list),
-          Builder.function_expression(
-            [Builder.identifier(:__MODULE__)],
-            [],
-            Builder.block_statement(body ++ functions ++ [default])
-          ),
-          Builder.identifier(ElixirScript.capitalize_app_name())
-        ]
-      )
-    )
+    {modules, body} = Enum.partition(body, fn(x) ->
+      case x do
+        %JSModule{} ->
+          true
+        _ ->
+          false
+      end
+    end)
+    
+
+    result = [
+      %JSModule{
+        name: module_name_list,
+        body: imports ++ List.wrap(create__module__(module_name_list)) ++ body ++ functions ++ List.wrap(default)
+      }
+    ] ++ List.flatten(modules)
+    
+    result
   end
 
   defp add_function_to_dict(dict, function, access) do
@@ -260,6 +254,21 @@ defmodule ElixirScript.Translator.Module do
     )
 
     Builder.variable_declaration([declarator], :const)
+  end
+
+  defp create__module__(module_name_list) do
+    declarator = Builder.variable_declarator(
+      Builder.identifier(:__MODULE__),
+      ElixirScript.Translator.translate(List.last(module_name_list))
+    )
+
+    Builder.variable_declaration([declarator], :const)
+  end
+
+  def create_standard_lib_imports() do
+    Enum.map(@standard_libs, fn({name, options}) ->
+      ElixirScript.Translator.Import.make_alias_import({ nil, nil, [name] }, options)
+    end)
   end
 
 end

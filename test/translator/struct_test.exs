@@ -2,7 +2,7 @@ defmodule ElixirScript.Translator.Struct.Test do
   use ShouldI
   import ElixirScript.TestHelper
 
-  should "translate struct" do
+  should "translate struct with default values" do
     ex_ast = quote do
       defmodule User do
         defstruct name: "john", age: 27
@@ -10,22 +10,21 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-     Kernel.defmodule(Erlang.list(Erlang.atom('User')), function (__MODULE__) {
-         function defstruct(name = 'john', age = 27) {
-             return {
-                 __struct__: __MODULE__,
-                 name: name,
-                 age: age
-             };
-         }
+     const __MODULE__ = Erlang.atom('User');
+     function defstruct(name = 'john', age = 27) {
          return {
-             defstruct: defstruct,
-             __MODULE__: __MODULE__
+             __struct__: __MODULE__,
+             name: name,
+             age: age
          };
-     }, App);
+     }
+     return { defstruct: defstruct };
     """
 
     assert_translation(ex_ast, js_code)
+  end
+
+  should "translate struct without default values" do
 
     ex_ast = quote do
       defmodule User do
@@ -34,19 +33,15 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-     Kernel.defmodule(Erlang.list(Erlang.atom('User')), function (__MODULE__) {
-         function defstruct(name, age) {
-             return {
-                 __struct__: __MODULE__,
-                 name: name,
-                 age: age
-             };
-         }
+     const __MODULE__ = Erlang.atom('User');
+     function defstruct(name, age) {
          return {
-             defstruct: defstruct,
-             __MODULE__: __MODULE__
+             __struct__: __MODULE__,
+             name: name,
+             age: age
          };
-     }, App);
+     }
+     return { defstruct: defstruct };
     """
 
     assert_translation(ex_ast, js_code)
@@ -131,19 +126,15 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-     Kernel.defmodule(Erlang.list(Erlang.atom('MyAppError')), function (__MODULE__) {
-         function defexception(message = 'This is a message') {
-             return {
-                 __struct__: __MODULE__,
-                 message: message
-             };
-         }
+     const __MODULE__ = Erlang.atom('MyAppError');
+     function defexception(message = 'This is a message') {
          return {
-             defexception: defexception,
-             __MODULE__: __MODULE__
+             __struct__: __MODULE__,
+             message: message
          };
-     }, App);
-    """
+     }
+     return { defexception: defexception };
+     """
 
     assert_translation(ex_ast, js_code)
 
@@ -154,18 +145,14 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-     Kernel.defmodule(Erlang.list(Erlang.atom('MyAppError')), function (__MODULE__) {
-         function defexception(message = null) {
-             return {
-                 __struct__: __MODULE__,
-                 message: message
-             };
-         }
+     const __MODULE__ = Erlang.atom('MyAppError');
+     function defexception(message = null) {
          return {
-             defexception: defexception,
-             __MODULE__: __MODULE__
+             __struct__: __MODULE__,
+             message: message
          };
-     }, App);
+     }
+     return { defexception: defexception };
     """
 
     assert_translation(ex_ast, js_code)

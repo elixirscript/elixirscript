@@ -8,10 +8,9 @@
     * List now translates to a frozen JS Array
     * Added iterators for Range and BitString
     * Updated the pattern match binding to use ES6 destructuring for lists and tuples
-    * Elixir modules no longer directly map to an ES6 module.
-    * A config file (default is exjs.exs) which lists the app's name and JavaScript ES6 modules used is now required.
-    * No longer need to explicity alias, import, or require dependencies in a module
-    * Functionality of alias, import and require have changed to match closer to Elixir's functionality
+    * Inner modules are now split out into their own files
+    * Standard lib is now exported with file output from cli
+    * Standard lib modules are now automatically imported
 
 # v0.5.0
   * Enhancements

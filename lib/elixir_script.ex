@@ -1,4 +1,5 @@
 defmodule ElixirScript do
+  alias ElixirScript.Translator.JSModule
 
   @doc """
   Parses Elixir code string into JavaScript AST
@@ -25,10 +26,25 @@ defmodule ElixirScript do
   def parse_elixir_files(path) do
     path
     |> Path.wildcard
-    |> Enum.map(fn(x) -> File.read!(x) end)
-    |> Enum.join("\n")
-    |> Code.string_to_quoted!
-    |> ElixirScript.Translator.translate    
+    |> Enum.map(fn(x) ->
+      File.read!(x)
+      |> Code.string_to_quoted!
+      |>  ElixirScript.Translator.translate
+    end)
+    |> List.flatten
+  end
+
+  def process_module(module) do
+    file_path = create_file_name(module)
+
+    program = ElixirScript.Translator.Module.create_standard_lib_imports() ++ module.body
+    |> ESTree.Builder.program
+    
+   { file_path, program }
+  end
+
+  defp create_file_name(%ElixirScript.Translator.JSModule{ name: module_list }) do
+    "#{ElixirScript.Translator.Import.make_file_path(module_list)}.js"
   end
 
   @doc """
@@ -37,11 +53,14 @@ defmodule ElixirScript do
   @spec javascript_ast_to_code(ESTree.Node.t) :: {:ok, binary} | {:error, binary}
   def javascript_ast_to_code(js_ast) do
     js_ast = case js_ast do
-      %ElixirScript.Translator.Group{body: body} ->
-        ESTree.Builder.program(body)
-      _ ->
-        js_ast
-    end
+               modules when is_list(modules) ->
+                 Enum.reduce(modules, [], fn(x, list) -> list ++ x.body end)
+                 |> ESTree.Builder.program
+               %ElixirScript.Translator.Group{body: body} ->
+                 ESTree.Builder.program(body)      
+               _ ->
+                 js_ast
+             end
 
     js_ast = Poison.encode!(js_ast)
 
@@ -71,16 +90,19 @@ defmodule ElixirScript do
   @doc """
   Writes output to file
   """
-  def write_to_file(js_code, destination) do
-    file_name = Path.join([destination, "#{app_name()}.js"])
+  def write_to_file({ file_path, js_code }, destination) do
+    file_name = Path.join([destination, file_path])
 
-    if !File.exists?(destination) do
-      File.mkdir_p!(destination)
+    if !File.exists?(Path.dirname(file_name)) do
+      File.mkdir_p!(Path.dirname(file_name))
     end
 
     File.write!(file_name, js_code)
   end
 
+  def copy_standard_libs_to_destination(destination) do
+    File.cp_r!(operating_path <> "/lib", destination <> "/__lib")
+  end
 
   def operating_path() do
     try do
@@ -94,39 +116,13 @@ defmodule ElixirScript do
     end
   end
 
+  def post_process_js_ast(modules) when is_list(modules) do
+    Enum.map(modules, &process_module(&1))
+  end
+
   def post_process_js_ast(js_ast) do
-    ESTree.Builder.program(
-      ElixirScript.PostProcessor.create_import_statements() ++
-      List.wrap(ElixirScript.PostProcessor.create_root_object()) ++
-      List.wrap(js_ast) ++
-      List.wrap(ElixirScript.PostProcessor.export_root_object())
-    )
+    js_ast
   end
+  
 
-  def load_config() do
-    load_config("exjs.exs")
-  end
-
-  def load_config(path) do
-    modules = Code.load_file(path)
-
-    Enum.each(modules, fn({ module, _ }) -> 
-      case module do
-        ElixirScript.Config ->
-          config = module.project()
-          Application.put_env(:elixir_script, :app, config[:app])
-          Application.put_env(:elixir_script, :js_deps, config[:js_deps])
-      end
-    end)
-  end
-
-  def capitalize_app_name() do
-    Atom.to_string(app_name())
-    |> String.capitalize
-    |> String.to_atom
-  end
-
-  def app_name() do
-    Application.get_env(:elixir_script, :app)
-  end
 end

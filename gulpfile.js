@@ -29,9 +29,7 @@ var libs = [
 ];
 
 gulp.task('dist', function() {
-  return gulp.src(libs)
-      .pipe(babel({ sourceMap: false, modules:'ignore' }))
-      .pipe(concat('elixir.js'))
+  return gulp.src(stdLibPath)
       .pipe(gulp.dest('./priv/javascript/dist'));
 });
 

@@ -8,7 +8,7 @@ defmodule ElixirScript.Translator.Require.Test do
     end
 
     js_code = """
-      Kernel.SpecialForms.require(Hello.World, Erlang.list(), this)
+    import World from 'hello/world';
     """
 
     assert_translation(ex_ast, js_code)
@@ -20,7 +20,7 @@ defmodule ElixirScript.Translator.Require.Test do
     end
 
     js_code = """
-    Kernel.SpecialForms.require(Hello.World, Erlang.list(Erlang.tuple(Erlang.atom('as'), Erlang.atom('Test'))), this)
+    import { default as Test } from 'hello/world';
     """
 
     assert_translation(ex_ast, js_code)

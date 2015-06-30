@@ -1,74 +1,69 @@
 defmodule ElixirScript.Translator.Import do
   require Logger
   alias ESTree.Builder
-  alias ElixirScript.Translator
-  alias ElixirScript.Translator.Utils
 
-  def make_alias(alias_info, options) do
+  def make_alias_import(alias_info, options) do
     {_, _, name} = alias_info
 
-    options = updateOptions(options)
+    import_specifier = if options[:as] do
+      {_, _, alt} = options[:as]
+      Builder.identifier(alt)
+      Builder.import_specifier(
+        Builder.identifier("default"),
+        Builder.identifier(alt)
+      )
+    else
+      List.last(name) 
+      |> Builder.identifier
+      |> Builder.import_default_specifier()  
+    end
 
-    Builder.call_expression(
-      Builder.member_expression(
-        Builder.member_expression(
-          Builder.identifier("Kernel"),
-          Builder.identifier("SpecialForms")
-        ),
-        Builder.identifier("alias")
-      ),
-      [
-        Utils.make_module_expression_tree(name, false),
-        Translator.translate(options),
-        Builder.identifier(:this)
-      ]
+    import_path = if options[:from] do
+      "'#{options[:from]}'"
+    else
+      make_source(name)
+    end
+
+    Builder.import_declaration(
+      [import_specifier], 
+      Builder.identifier(import_path)
     )
-  end
-
-  def make_require(alias_info, options) do
-    {_, _, name} = alias_info
-
-    options = updateOptions(options)
-
-    Builder.call_expression(
-      Builder.member_expression(
-        Builder.member_expression(
-          Builder.identifier("Kernel"),
-          Builder.identifier("SpecialForms")
-        ),
-        Builder.identifier("require")
-      ),
-      [
-        Utils.make_module_expression_tree(name, false),
-        Translator.translate(options),
-        Builder.identifier(:this)
-      ]
-    )
-  end
-
-  defp updateOptions([as: {:__aliases__, _, [alias_name]}]) do
-    [as: alias_name]
-  end
-
-  defp updateOptions([]) do
-    []
   end
 
   def make_import(module_name_list, options) do
-    Builder.call_expression(
-      Builder.member_expression(
-        Builder.member_expression(
-          Builder.identifier("Kernel"),
-          Builder.identifier("SpecialForms")
-        ),
-        Builder.identifier("import")
-      ),
-      [
-        Utils.make_module_expression_tree(module_name_list, false),
-        Translator.translate(options),
-        Builder.identifier(:this)
-      ]
-    )
+    mod = List.last(module_name_list) |> Builder.identifier
+
+    specifiers = if options[:only] do
+      Enum.map(options[:only], fn({name, _arity}) -> 
+        Builder.import_specifier(
+          Builder.identifier(name)
+        )
+      end)
+    else
+      List.wrap(Builder.import_namespace_specifier(mod))
+    end
+
+    import_path = if options[:from] do
+      "'#{options[:from]}'"
+    else
+      make_source(module_name_list)
+    end
+
+    Builder.import_declaration(specifiers, Builder.identifier(import_path))
+  end
+
+  defp make_source(name) do
+    "'#{make_file_path(name)}'"
+  end
+
+  def make_file_path(name) do
+    Enum.map(name, fn(x) -> 
+      x
+      |> Atom.to_string 
+      |> Inflex.underscore 
+      |> String.downcase 
+    end) 
+    |> Enum.join("/")
   end
 
 end

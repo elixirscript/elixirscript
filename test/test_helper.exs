@@ -4,8 +4,6 @@ ExUnit.start(exclude: exclude, formatters: [ShouldI.CLIFormatter])
 
 defmodule ElixirScript.TestHelper do
   use ShouldI
-
-  ElixirScript.load_config()
   
   def ex_ast_to_js(ex_ast) do
     js_ast = ElixirScript.Translator.translate(ex_ast)
