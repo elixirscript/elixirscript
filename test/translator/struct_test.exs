@@ -2,7 +2,7 @@ defmodule ElixirScript.Translator.Struct.Test do
   use ShouldI
   import ElixirScript.TestHelper
 
-  should "translate struct" do
+  should "translate struct with default values" do
     ex_ast = quote do
       defmodule User do
         defstruct name: "john", age: 27
@@ -10,17 +10,21 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-      const __MODULE__ = Atom('User');
-
-      function defstruct(name = 'john', age = 27){
-        return {__struct__: __MODULE__, name: name, age: age};
-      }
-
-     let User = { defstruct: defstruct };
-     export default User;
+     const __MODULE__ = Erlang.atom('User');
+     function defstruct(name = 'john', age = 27) {
+         return {
+             __struct__: __MODULE__,
+             name: name,
+             age: age
+         };
+     }
+     export default { defstruct: defstruct };
     """
 
     assert_translation(ex_ast, js_code)
+  end
+
+  should "translate struct without default values" do
 
     ex_ast = quote do
       defmodule User do
@@ -29,14 +33,15 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-      const __MODULE__ = Atom('User');
-
-      function defstruct(name, age){
-        return {__struct__: __MODULE__, name: name, age: age};
-      }
-
-     let User = { defstruct: defstruct };
-     export default User;
+     const __MODULE__ = Erlang.atom('User');
+     function defstruct(name, age) {
+         return {
+             __struct__: __MODULE__,
+             name: name,
+             age: age
+         };
+     }
+     export default { defstruct: defstruct };
     """
 
     assert_translation(ex_ast, js_code)
@@ -121,15 +126,15 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-      const __MODULE__ = Atom('MyAppError');
-
-      function defexception(message = 'This is a message'){
-        return {__struct__: __MODULE__, message: message};
-      }
-
-     let MyAppError = { defexception: defexception };
-     export default MyAppError;
-    """
+     const __MODULE__ = Erlang.atom('MyAppError');
+     function defexception(message = 'This is a message') {
+         return {
+             __struct__: __MODULE__,
+             message: message
+         };
+     }
+     export default { defexception: defexception };
+     """
 
     assert_translation(ex_ast, js_code)
 
@@ -140,14 +145,14 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-      const __MODULE__ = Atom('MyAppError');
-
-      function defexception(message = null){
-        return {__struct__: __MODULE__, message: message};
-      }
-
-      let MyAppError = { defexception: defexception };
-      export default MyAppError;
+     const __MODULE__ = Erlang.atom('MyAppError');
+     function defexception(message = null) {
+         return {
+             __struct__: __MODULE__,
+             message: message
+         };
+     }
+     export default { defexception: defexception };
     """
 
     assert_translation(ex_ast, js_code)
@@ -171,7 +176,7 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-      throw new RuntimeError({__struct__: Atom('RuntimeError'), message: 'did not get what was expected'});
+      throw new RuntimeError({__struct__: Erlang.atom('RuntimeError'), message: 'did not get what was expected'});
     """
 
     assert_translation(ex_ast, js_code)

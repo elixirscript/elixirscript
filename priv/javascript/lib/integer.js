@@ -1,8 +1,7 @@
-import Tuple from './tuple';
-import Atom from './atom';
+import Erlang from './erlang';
 
 let Integer = {
-  __MODULE__: Atom('Integer'),
+  __MODULE__: Erlang.atom('Integer'),
 
   is_even: function(n){
     return n % 2 === 0;
@@ -16,16 +15,16 @@ let Integer = {
     let result = parseInt(bin);
 
     if(isNaN(result)){
-      return Atom("error");
+      return Erlang.atom("error");
     }
 
     let indexOfDot = bin.indexOf(".");
 
     if(indexOfDot >= 0){
-      return Tuple(result, bin.substring(indexOfDot));
+      return Erlang.tuple(result, bin.substring(indexOfDot));
     }
 
-    return Tuple(result, "");
+    return Erlang.tuple(result, "");
   },
 
   to_char_list: function(number, base = 10){

@@ -9,8 +9,8 @@ defmodule ElixirScript.Translator.For.Test do
 
     js_code = """
      (function () {
-         let _results = List();
-         for (let n of List(1, 2, 3, 4)) {
+         let _results = Erlang.list();
+         for (let n of Erlang.list(1, 2, 3, 4)) {
              _results = List.append(_results, n * 2);
          }
          return _results;
@@ -27,7 +27,7 @@ defmodule ElixirScript.Translator.For.Test do
 
     js_code = """
      (function () {
-         let _results = List();
+         let _results = Erlang.list();
          for (let n of 'Opera') {
              _results = List.append(_results, n);
          }
@@ -45,9 +45,9 @@ defmodule ElixirScript.Translator.For.Test do
 
     js_code = """
      (function () {
-         let _results = List();
-         for (let x of List(1, 2)) {
-             for (let y of List(2, 3)) {
+         let _results = Erlang.list();
+         for (let x of Erlang.list(1, 2)) {
+             for (let y of Erlang.list(2, 3)) {
                  _results = List.append(_results, x * y);
              }
          }
@@ -67,9 +67,9 @@ defmodule ElixirScript.Translator.For.Test do
 
     js_code = """
      let r = (function () {
-         let _results = List();
-         for (let x of List(1, 2)) {
-             for (let y of List(2, 3)) {
+         let _results = Erlang.list();
+         for (let x of Erlang.list(1, 2)) {
+             for (let y of Erlang.list(2, 3)) {
                  _results = List.append(_results, x * y);
              }
          }
@@ -87,8 +87,8 @@ defmodule ElixirScript.Translator.For.Test do
 
     js_code = """
      (function () {
-         let _results = List();
-         for (let n of List(1, 2, 3, 4, 5, 6)) {
+         let _results = Erlang.list();
+         for (let n of Erlang.list(1, 2, 3, 4, 5, 6)) {
              if (Kernel.rem(n, 2) == 0)
                  _results = List.append(_results, n);
          }
@@ -108,10 +108,10 @@ defmodule ElixirScript.Translator.For.Test do
 
     js_code = """
      (function () {
-         let _results = List();
-         for (let _ref of List(Tuple(Atom('user'), 'john'), Tuple(Atom('admin'), 'john'), Tuple(Atom('user'), 'meg'))) {
-             if (Kernel.match__qmark__(_ref, Tuple(Atom('user'), undefined))) {
-                 let name = _ref.get(1);
+         let _results = Erlang.list();
+         for (let _ref of Erlang.list(Erlang.tuple(Erlang.atom('user'), 'john'), Erlang.tuple(Erlang.atom('admin'), 'john'), Erlang.tuple(Erlang.atom('user'), 'meg'))) {
+             if (Kernel.match__qmark__(_ref, Erlang.tuple(Erlang.atom('user'), undefined))) {
+                 let name = Kernel.elem(_ref, 1);
                  _results = List.append(_results, String.upcase(name));
              }
          }

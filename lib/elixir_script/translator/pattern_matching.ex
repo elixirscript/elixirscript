@@ -102,10 +102,10 @@ defmodule ElixirScript.Translator.PatternMatching do
             Translator.translate(x),
             Builder.call_expression(
               Builder.member_expression(
-                ref,
-                Builder.identifier(:get)
+                Builder.identifier(:Kernel),
+                Builder.identifier(:elem)
               ),
-              [Builder.literal(index)]
+              [ref, Builder.literal(index)]
             )
           )
 
@@ -162,7 +162,11 @@ defmodule ElixirScript.Translator.PatternMatching do
       case Translator.translate(value) do
         %ESTree.Identifier{} ->
           true
-        %ESTree.CallExpression{ callee: %ESTree.Identifier{ name: "List" } } ->
+        %ESTree.CallExpression { 
+          callee: %ESTree.MemberExpression { 
+            object: %ESTree.Identifier{ name: "Erlang"}, property: %ESTree.Identifier{  name: "list" } 
+          } 
+        } ->
           false
         %ESTree.CallExpression{} ->
           true
@@ -183,7 +187,11 @@ defmodule ElixirScript.Translator.PatternMatching do
       case Translator.translate(value) do
         %ESTree.Identifier{} ->
           {key, {:__aliases__, [], [:undefined]} }
-        %ESTree.CallExpression{ callee: %ESTree.Identifier{ name: "List" } } ->
+        %ESTree.CallExpression { 
+          callee: %ESTree.MemberExpression { 
+            object: %ESTree.Identifier{ name: "Erlang"}, property: %ESTree.Identifier{  name: "list" } 
+          } 
+        } ->
           {key, value}
         %ESTree.CallExpression{} ->
           {key, hd(process_pattern(value)) }
@@ -308,10 +316,10 @@ defmodule ElixirScript.Translator.PatternMatching do
                 Builder.identifier(item),
                 Builder.call_expression(
                   Builder.member_expression(
-                    identifier_fn.(index),
-                    Builder.identifier(:get)
+                    Builder.identifier(:Kernel),
+                    Builder.identifier(:elem)
                   ),
-                  [Builder.literal(current_state.state_index)]
+                  [identifier_fn.(index), Builder.literal(current_state.state_index)]
                 )
               )
           declaration = Builder.variable_declaration([declarator], :let)
@@ -322,10 +330,10 @@ defmodule ElixirScript.Translator.PatternMatching do
             fn(new_index) ->
               Builder.call_expression(
                 Builder.member_expression(
-                  identifier_fn.(index),
-                  Builder.identifier(:get)
+                  Builder.identifier(:Kernel),
+                  Builder.identifier(:elem)
                 ),
-                [Builder.literal(current_state.state_index + new_index)]
+                [identifier_fn.(index), Builder.literal(current_state.state_index + new_index)]
               )
           end, nil)
 

@@ -1,5 +1,4 @@
-exclude =
-  if Node.alive?, do: [], else: [skip: true]
+exclude = if Node.alive?, do: [], else: [skip: true]
 
 ExUnit.start(exclude: exclude, formatters: [ShouldI.CLIFormatter])
 
@@ -8,14 +7,7 @@ defmodule ElixirScript.TestHelper do
   
   def ex_ast_to_js(ex_ast) do
     js_ast = ElixirScript.Translator.translate(ex_ast)
-    result = ElixirScript.javascript_ast_to_code(js_ast)
-
-    case result do
-      {:ok, js_code} ->
-        js_code
-      {:error, error} ->
-        raise ElixirScript.ParseError, message: Poison.encode!(js_ast)
-    end
+    ElixirScript.javascript_ast_to_code!(js_ast)
   end
 
   def strip_spaces(js) do

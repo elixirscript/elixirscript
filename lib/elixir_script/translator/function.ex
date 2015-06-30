@@ -24,7 +24,10 @@ defmodule ElixirScript.Translator.Function do
 
     Builder.call_expression(
       Builder.member_expression(
-        Builder.identifier("ElixirScript"),
+        Builder.member_expression(
+          Builder.identifier("Kernel"),
+          Builder.identifier("JS")
+        ),
         Builder.identifier("get_property_or_call_function")
       ),
       [

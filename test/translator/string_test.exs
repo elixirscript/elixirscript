@@ -26,19 +26,19 @@ defmodule ElixirScript.Translator.String.Test do
 
 
     ex_ast = quote do: "Hello #{length([])}"
-    assert_translation(ex_ast, "'Hello ' + Kernel.to_string(Kernel.length(List()))")
+    assert_translation(ex_ast, "'Hello ' + Kernel.to_string(Kernel.length(Erlang.list()))")
   end
 
   should "translate multiline string interpolation" do
     ex_ast = quote do: """
     Hello #{length([])}
     """
-    assert_translation(ex_ast, "'Hello ' + (Kernel.to_string(Kernel.length(List())) + '\\n')")
+    assert_translation(ex_ast, "'Hello ' + (Kernel.to_string(Kernel.length(Erlang.list())) + '\\n')")
 
     ex_ast = quote do: """
     Hello #{length([])}
     How are you, #{length([])}?
     """
-    assert_translation(ex_ast, "'Hello ' + (Kernel.to_string(Kernel.length(List())) + ('\\nHow are you, ' + (Kernel.to_string(Kernel.length(List())) + '?\\n')))")
+    assert_translation(ex_ast, "'Hello ' + (Kernel.to_string(Kernel.length(Erlang.list())) + ('\\nHow are you, ' + (Kernel.to_string(Kernel.length(Erlang.list())) + '?\\n')))")
   end
 end

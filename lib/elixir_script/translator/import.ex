@@ -53,23 +53,17 @@ defmodule ElixirScript.Translator.Import do
   end
 
   defp make_source(name) do
-    "'#{do_make_source(name)}'"
+    "'#{make_file_path(name)}'"
   end
 
-  defp do_make_source([:Parent | name]) do
-    "../#{do_make_source(name)}"
-  end
-
-  defp do_make_source(name) do
-    source = Enum.map(name, fn(x) -> 
+  def make_file_path(name) do
+    Enum.map(name, fn(x) -> 
       x
       |> Atom.to_string 
       |> Inflex.underscore 
       |> String.downcase 
     end) 
     |> Enum.join("/")
-
-    source
   end
 
 end

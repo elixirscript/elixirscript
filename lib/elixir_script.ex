@@ -1,4 +1,5 @@
 defmodule ElixirScript do
+  alias ElixirScript.Translator.JSModule
 
   @doc """
   Parses Elixir code string into JavaScript AST
@@ -15,8 +16,7 @@ defmodule ElixirScript do
   """
   @spec parse_quoted(Macro.t) :: {binary, ESTree.Node.t}
   def parse_quoted(quoted) do
-    js_ast = ElixirScript.Translator.translate(quoted)
-    {"output.json", js_ast}
+    ElixirScript.Translator.translate(quoted)
   end
 
   @doc """
@@ -26,31 +26,25 @@ defmodule ElixirScript do
   def parse_elixir_files(path) do
     path
     |> Path.wildcard
-    |> Enum.map(fn(x) -> parse_elixir_file(x) end)     
+    |> Enum.map(fn(x) ->
+      File.read!(x)
+      |> Code.string_to_quoted!
+      |>  ElixirScript.Translator.translate
+    end)
+    |> List.flatten
   end
 
-  defp parse_elixir_file(path) do
-    js_ast = path
-    |> File.read!
-    |> Code.string_to_quoted!
-    |> ElixirScript.Translator.translate
+  def process_module(module, root) do
+    file_path = create_file_name(module)
 
-    file_name = Path.basename(path, ".ex") <> ".json"
-
-    {file_name, js_ast}
+    program = ElixirScript.Translator.Module.create_standard_lib_imports(root) ++ module.body
+    |> ESTree.Builder.program
+    
+   { file_path, program }
   end
 
-  @doc """
-  Converts JavaScript AST into JavaScript code
-  """
-  @spec javascript_ast_to_code({binary, ESTree.Node.t}) :: {binary, binary} | {:error, binary}
-  def javascript_ast_to_code({ path, js_ast }) do
-    case javascript_ast_to_code(js_ast) do
-      {:ok, js_code} ->
-        { Path.basename(path, ".json") <> ".js", js_code }
-      {:error, error} ->
-        {:error, error}
-    end
+  defp create_file_name(%ElixirScript.Translator.JSModule{ name: module_list }) do
+    "#{ElixirScript.Translator.Import.make_file_path(module_list)}.js"
   end
 
   @doc """
@@ -59,11 +53,14 @@ defmodule ElixirScript do
   @spec javascript_ast_to_code(ESTree.Node.t) :: {:ok, binary} | {:error, binary}
   def javascript_ast_to_code(js_ast) do
     js_ast = case js_ast do
-      %ElixirScript.Translator.Group{body: body} ->
-        ESTree.Builder.program(body)
-      _ ->
-        js_ast
-    end
+               modules when is_list(modules) ->
+                 Enum.reduce(modules, [], fn(x, list) -> list ++ x.body end)
+                 |> ESTree.Builder.program
+               %ElixirScript.Translator.Group{body: body} ->
+                 ESTree.Builder.program(body)      
+               _ ->
+                 js_ast
+             end
 
     js_ast = Poison.encode!(js_ast)
 
@@ -78,27 +75,34 @@ defmodule ElixirScript do
   end
 
   @doc """
-  Writes output to file
+  Same as javascript_ast_to_code but throws an error
   """
-  @spec write_to_files([{binary, binary}], binary) :: nil
-  def write_to_files(list, destination) when is_list(list) do
-    Enum.each(list, &write_to_files(&1, destination))
+  @spec javascript_ast_to_code!(ESTree.Node.t) :: binary
+  def javascript_ast_to_code!(js_ast) do
+    case javascript_ast_to_code(js_ast) do
+      {:ok, js_code } ->
+        js_code
+      {:error, error } ->
+        raise ElixirScript.ParseError, message: error
+    end
   end
 
   @doc """
   Writes output to file
   """
-  @spec write_to_files({binary, binary}, binary) :: :ok | no_return
-  def write_to_files({file_name, js}, destination) do
-    file_name = Path.join([destination, file_name])
+  def write_to_file({ file_path, js_code }, destination) do
+    file_name = Path.join([destination, file_path])
 
-    if !File.exists?(destination) do
-      File.mkdir_p!(destination)
+    if !File.exists?(Path.dirname(file_name)) do
+      File.mkdir_p!(Path.dirname(file_name))
     end
 
-    File.write!(file_name, js)
+    File.write!(file_name, js_code)
   end
 
+  def copy_standard_libs_to_destination(destination) do
+    File.cp_r!(operating_path <> "/lib", destination <> "/__lib")
+  end
 
   def operating_path() do
     try do
@@ -111,4 +115,14 @@ defmodule ElixirScript do
         Path.join(replaced_path)
     end
   end
+
+  def post_process_js_ast(modules, root) when is_list(modules) do
+    Enum.map(modules, &process_module(&1, root))
+  end
+
+  def post_process_js_ast(js_ast) do
+    js_ast
+  end
+  
+
 end

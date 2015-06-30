@@ -1,10 +1,8 @@
-import Tuple from './tuple';
-import List from './list';
-import Atom from './atom';
+import Erlang from './erlang';
 import Kernel from './kernel';
 
 let Enum = {
-  __MODULE__: Atom('Enum'),
+  __MODULE__: Erlang.atom('Enum'),
 
   all__qmark__: function(collection, fun = (x) => x){
     let result = Enum.filter(collection, function(x){
@@ -23,9 +21,9 @@ let Enum = {
   },
 
   at: function(collection, n, the_default = null){
-    for (var i = 0; i < collection.length(); i++) {
+    for (var i = 0; i < collection.length; i++) {
       if(i === n){
-        return collection.get(i);
+        return collection[i];
       }
     }
 
@@ -36,12 +34,12 @@ let Enum = {
     if(fun == null){
       return Kernel.length(collection);
     }else{
-      return Kernel.length(collection.value().filter(fun));
+      return Kernel.length(collection.filter(fun));
     }
   },
 
   each: function(collection, fun){
-    [].forEach.call(collection.value(), fun);
+    [].forEach.call(collection, fun);
   },
 
   empty__qmark__: function(collection){
@@ -50,10 +48,10 @@ let Enum = {
 
   fetch: function(collection, n){
     if(Kernel.is_list(collection)){
-      if(n < collection.length() && n >= 0){
-        return Tuple(Atom("ok"), collection.get(n));
+      if(n < collection.length && n >= 0){
+        return Erlang.tuple(Erlang.atom("ok"), collection[n]);
       }else{
-        return Atom("error");
+        return Erlang.atom("error");
       }
     }
 
@@ -62,8 +60,8 @@ let Enum = {
 
   fetch__emark__: function(collection, n){
     if(Kernel.is_list(collection)){
-      if(n < collection.length() && n >= 0){
-        return collection.get(n);
+      if(n < collection.length && n >= 0){
+        return collection[n];
       }else{
         throw new Error("out of bounds error");
       }
@@ -73,29 +71,29 @@ let Enum = {
   },
 
   filter: function(collection, fun){
-    return [].filter.call(collection.value(), fun);
+    return [].filter.call(collection, fun);
   },
 
   map: function(collection, fun){
-    return [].map.call(collection.value(), fun);
+    return [].map.call(collection, fun);
   },
 
   map_reduce: function(collection, acc, fun){
-    let mapped = List();
+    let mapped = Erlang.list();
     let the_acc = acc;
 
-    for (var i = 0; i < collection.length(); i++) {
-      let tuple = fun(collection.get(i), the_acc);
+    for (var i = 0; i < collection.length; i++) {
+      let tuple = fun(collection[i], the_acc);
 
       the_acc = tuple.get(1);
-      mapped = List.append(mapped, tuple.get(0));
+      mapped = Erlang.list(...mapped.concat([tuple.get(0)]))
     }
 
-    return Tuple(mapped, the_acc);
+    return Erlang.tuple(mapped, the_acc);
   },
 
   member: function(collection, value){
-    for(let x of collection.value()){
+    for(let x of collection){
       if(x === value){
         return true;
       }
@@ -107,8 +105,8 @@ let Enum = {
   reduce: function(collection, acc, fun){
     let the_acc = acc;
 
-    for (var i = 0; i < collection.length(); i++) {
-      the_acc = fun(collection.get(i), the_acc);
+    for (var i = 0; i < collection.length; i++) {
+      the_acc = fun(collection[i], the_acc);
     }
 
     return the_acc;

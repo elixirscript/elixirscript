@@ -30,7 +30,7 @@ defmodule Mix.Tasks.Ex2js.Dist do
     File.mkdir_p(@folder_name <> "/bin")
     File.cp!("ex2js", "#{@folder_name}/bin/ex2js")
     File.cp!("priv/javascript/code_generator.js", "#{@folder_name}/code_generator.js")
-    File.cp!("priv/javascript/dist/elixir.js", "#{@folder_name}/elixir.js")
+    File.cp_r!("priv/javascript/dist", "#{@folder_name}/lib")
     File.cp!("priv/javascript/release.package.json", "#{@folder_name}/package.json")
   end
 

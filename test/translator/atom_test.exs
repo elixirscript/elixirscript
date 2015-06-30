@@ -4,6 +4,6 @@ defmodule ElixirScript.Translator.Atom.Test do
 
   should "translate atom" do
     ex_ast = quote do: :atom
-    assert_translation(ex_ast, "Atom('atom')")
+    assert_translation(ex_ast, "Erlang.atom('atom')")
   end
 end

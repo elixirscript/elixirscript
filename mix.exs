@@ -25,9 +25,10 @@ defmodule ElixirScript.Mixfile do
       { :poison, "~> 1.4" },
       { :inflex, "~> 1.0" },
       { :estree, github: "bryanjos/elixir-estree"},
+      { :exprof, "~> 0.2" },
       { :excoveralls, only: [:dev, :test] },
       { :shouldi, github: "batate/shouldi", only: :test },
-      { :mix_test_watch, github: "lpil/mix-test.watch" }
+      { :mix_test_watch, "~> 0.1.1", only: :test }
     ]
   end
 

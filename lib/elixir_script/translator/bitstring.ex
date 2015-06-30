@@ -5,7 +5,10 @@ defmodule ElixirScript.Translator.Bitstring do
   
   def make_bitstring(elements) do
     Builder.call_expression(
-      Builder.identifier("BitString"), 
+      Builder.member_expression(
+        Builder.identifier("Erlang"),
+        Builder.identifier("bitstring")
+      ),
       Enum.map(elements, &make_bitstring_element(&1))
     )
   end

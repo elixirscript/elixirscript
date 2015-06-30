@@ -3,12 +3,54 @@ defmodule ElixirScript.Translator.Module do
   alias ESTree.Builder
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Utils
+  alias ElixirScript.Translator.JSModule
+
+  @standard_libs [
+    {:Erlang, from: "__lib/erlang" },
+    {:Atom, from: "__lib/atom" },
+    {:BitString, from: "__lib/bit_string" },
+    {:Enum, from: "__lib/enum" },
+    {:Integer, from: "__lib/integer" },
+    {:Kernel, from: "__lib/kernel" },
+    {:List, from: "__lib/list" },
+    {:Logger, from: "__lib/logger" },
+    {:Mutable, from: "__lib/mutable" },
+    {:Range, from: "__lib/range" },
+    {:Tuple, from: "__lib/tuple" },
+  ]
 
   def make_module(module_name_list, nil) do
-    Builder.program([create__module__(module_name_list)])
+    [%JSModule{ name: module_name_list, body: List.wrap(create__module__(module_name_list)) }] 
   end
 
   def make_module(module_name_list, body) do
+
+    body = case body do
+      {:__block__, meta2, list2} ->
+        list2 = Enum.map(list2, fn(x) ->
+          case x do
+            {:defmodule, meta1, [{:__aliases__, meta2, module_name_list2}, [do: body2]]} ->
+              [
+                {:defmodule, meta1, [{:__aliases__, meta2, module_name_list ++ module_name_list2}, [do: body2]]},
+                {:alias, meta1, [{:__aliases__, [alias: false], module_name_list ++ module_name_list2}]}
+              ]    
+            _ ->
+              x
+          end
+        end)
+        |> List.flatten
+
+        {:__block__, meta2, list2}
+      {:defmodule, meta1, [{:__aliases__, meta2, module_name_list2}, [do: body2]]} ->
+        {:__block__, meta2, [
+            {:defmodule, meta1, [{:__aliases__, meta2, module_name_list ++ module_name_list2}, [do: body2]]},
+            {:alias, meta1, [{:__aliases__, [alias: false], module_name_list ++ module_name_list2}]}
+          ]
+        }
+      _ ->
+        body 
+    end
+
     #Translate body
     parsed_body = Translator.translate(body)
 
@@ -43,22 +85,15 @@ defmodule ElixirScript.Translator.Module do
 
     functions = Enum.flat_map(functions_dict, fn({_, data})-> process_function_arity(data) end)
 
-    the_module_name = Builder.identifier(List.last(module_name_list))
-
-    declarator = Builder.variable_declarator(
-      the_module_name,
-      Builder.object_expression(
+    exported_object = Builder.object_expression(
         Enum.filter_map(functions_dict, fn({_key, value}) -> 
           value.access == :export
         end, fn({key, _value}) -> 
           Builder.property(Builder.identifier(key), Builder.identifier(key))
         end)
       )
-    )
 
-    exported_object = Builder.variable_declaration([declarator], :let)
-
-    default = Builder.export_declaration(the_module_name, [], true)
+    default = Builder.export_declaration(exported_object, [], true)
 
     #Filter out original functions from the body
     body = Enum.filter(body, fn(x) -> 
@@ -72,8 +107,24 @@ defmodule ElixirScript.Translator.Module do
       end
     end)
 
-    #Build everything back together again
-    Builder.program([create__module__(module_name_list)] ++ imports ++ body ++ functions ++ [exported_object, default])
+    {modules, body} = Enum.partition(body, fn(x) ->
+      case x do
+        %JSModule{} ->
+          true
+        _ ->
+          false
+      end
+    end)
+    
+
+    result = [
+      %JSModule{
+        name: module_name_list,
+        body: imports ++ List.wrap(create__module__(module_name_list)) ++ body ++ functions ++ [default]
+      }
+    ] ++ List.flatten(modules)
+    
+    result
   end
 
   defp add_function_to_dict(dict, function, access) do
@@ -196,6 +247,15 @@ defmodule ElixirScript.Translator.Module do
     { new_function, new_function_name, arity }
   end
 
+  def make_attribute(name, value) do
+    declarator = Builder.variable_declarator(
+      Builder.identifier(name),
+      ElixirScript.Translator.translate(value)
+    )
+
+    Builder.variable_declaration([declarator], :const)
+  end
+
   defp create__module__(module_name_list) do
     declarator = Builder.variable_declarator(
       Builder.identifier(:__MODULE__),
@@ -205,13 +265,16 @@ defmodule ElixirScript.Translator.Module do
     Builder.variable_declaration([declarator], :const)
   end
 
-  def make_attribute(name, value) do
-    declarator = Builder.variable_declarator(
-      Builder.identifier(name),
-      ElixirScript.Translator.translate(value)
-    )
+  def create_standard_lib_imports(nil) do
+    Enum.map(@standard_libs, fn({name, options}) ->
+      ElixirScript.Translator.Import.make_alias_import({ nil, nil, [name] }, options)
+    end)
+  end
 
-    Builder.variable_declaration([declarator], :const)
+  def create_standard_lib_imports(root) do
+    Enum.map(@standard_libs, fn({name, options}) ->
+      ElixirScript.Translator.Import.make_alias_import({ nil, nil, [name] }, from: root <> "/" <> options[:from])
+    end)
   end
 
 end

@@ -1,7 +1,7 @@
-import Atom from './atom';
+import Erlang from './erlang';
 
 let Logger = {
-  __MODULE__: Atom('Logger'),
+  __MODULE__: Erlang.atom('Logger'),
 
   debug: function(message){
     console.debug(message);

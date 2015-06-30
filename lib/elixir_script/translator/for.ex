@@ -60,10 +60,10 @@ defmodule ElixirScript.Translator.For do
             variable_declarator = Builder.variable_declarator(Translator.translate(x),
               Builder.call_expression(
                 Builder.member_expression(
-                  i,
-                  Builder.identifier(:get)
+                  Builder.identifier(:Kernel),
+                  Builder.identifier(:elem)
                 ),
-                [Builder.literal(index)]
+                [i, Builder.literal(index)]
               )
             )
             variable_declaration = Builder.variable_declaration([variable_declarator], :let)
@@ -86,7 +86,10 @@ defmodule ElixirScript.Translator.For do
     end) 
     
     new_identifier = Builder.call_expression(
-      Builder.identifier("Tuple"), 
+      Builder.member_expression(
+        Builder.identifier("Erlang"),
+        Builder.identifier("tuple")
+      ),
       new_identifier
     )
 

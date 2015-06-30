@@ -1,5 +1,5 @@
 var Integer = require('../lib/integer');
-var Atom = require('../lib/atom');
+var Erlang = require('../lib/erlang');
 var Kernel = require('../lib/kernel');
 var expect = require('chai').expect;
 
@@ -18,7 +18,7 @@ describe('Integer', function(){
 
   it('returns error when invalid', function(){
     let result = Integer.parse("three");
-    expect(Kernel.match__qmark__(result, Atom('error'))).to.equal(true);
+    expect(Kernel.match__qmark__(result, Erlang.atom('error'))).to.equal(true);
   })
 
   it('converts base 10 integer to char_list', function(){

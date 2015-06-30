@@ -1,3 +1,4 @@
+var Erlang = require('../lib/erlang');
 var BitString = require('../lib/bit_string');
 var Kernel = require('../lib/kernel');
 var expect = require('chai').expect;
@@ -6,19 +7,19 @@ describe('BitString', function(){
 
   describe('creation', function(){
     it('create properly', function(){
-      let bs = BitString(BitString.integer(1));
+      let bs = Erlang.bitstring(BitString.integer(1));
       expect(Kernel.match__qmark__(bs.value(), [1])).to.equal(true);
 
-      bs = BitString(BitString.binary("foo"));
+      bs = Erlang.bitstring(BitString.binary("foo"));
       expect(Kernel.match__qmark__(bs.value(), [102, 111, 111])).to.equal(true);
 
-      bs = BitString(BitString.integer(0), BitString.binary("foo"));
+      bs = Erlang.bitstring(BitString.integer(0), BitString.binary("foo"));
       expect(Kernel.match__qmark__(bs.value(), [0, 102, 111, 111])).to.equal(true);
 
-      bs = BitString(BitString.float(3.14));
+      bs = Erlang.bitstring(BitString.float(3.14));
       expect(Kernel.match__qmark__(bs.value(), [64, 9, 30, 184, 81, 235, 133, 31])).to.equal(true);
 
-      bs = BitString(BitString.signed(BitString.integer(-100)));
+      bs = Erlang.bitstring(BitString.signed(BitString.integer(-100)));
       expect(Kernel.match__qmark__(bs.value(), [156])).to.equal(true);
     })
   })

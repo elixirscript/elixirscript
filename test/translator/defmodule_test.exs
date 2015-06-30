@@ -2,14 +2,20 @@ defmodule ElixirScript.Translator.Defmodule.Test do
   use ShouldI
   import ElixirScript.TestHelper
 
-  should "translate defmodules" do
+  should "translate empty module" do
     ex_ast = quote do
       defmodule Elephant do
       end
     end
 
-    assert_translation(ex_ast, "const __MODULE__ = Atom('Elephant');")
+    js_code = """
+    const __MODULE__ = Erlang.atom('Elephant');
+    """
 
+    assert_translation(ex_ast, js_code)
+  end
+
+  should "translate defmodules" do
     ex_ast = quote do
       defmodule Elephant do
         @ul JQuery.("#todo-list")
@@ -24,23 +30,15 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
-      const __MODULE__ = Atom('Elephant');
-
-      const ul = JQuery('#todo-list');
-
-      function something_else(){
-        return null;
-      }
-
-      function something(){
-        return ul;
-      }
-
-      let Elephant = {
-        something: something
-      };
-
-      export default Elephant;
+     const __MODULE__ = Erlang.atom('Elephant');
+     const ul = JQuery('#todo-list');
+     function something_else() {
+         return null;
+     }
+     function something() {
+         return ul;
+     }
+     export default { something: something };
     """
 
     assert_translation(ex_ast, js_code)
@@ -58,20 +56,15 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
-      const __MODULE__ = Atom('Elephant');
-
-      import Crane from 'icabod/crane';
-
-      function something_else(){
-        return null;
-      }
-
-      function something(){
-        return null;
-      }
-
-      let Elephant = { something: something };
-      export default Elephant;
+     const __MODULE__ = Erlang.atom('Elephant');
+     import Crane from 'icabod/crane';
+     function something_else() {
+         return null;
+     }
+     function something() {
+         return null;
+     }
+     export default { something: something };
     """
 
     assert_translation(ex_ast, js_code)
@@ -97,33 +90,146 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
-      const __MODULE__ = Atom('Elephant');
-      function defstruct(trunk = true) {
+     const __MODULE__ = Erlang.atom('Animals');
+
+     import Elephant from 'animals/elephant';
+
+     function something_else() {
+         return null;
+     }
+     function something() {
+         return Elephant.defstruct();
+     }
+     export default { something: something };
+
+     const __MODULE__ = Erlang.atom('Elephant');
+
+     function defstruct(trunk = true) {
          return {
              __struct__: __MODULE__,
              trunk: trunk
          };
-      }
-      let Elephant = { defstruct: defstruct };
-      export default Elephant;
+     }
+     export default { defstruct: defstruct };
+    """
+
+    assert_translation(ex_ast, js_code)
+  end
+
+  should "translate modules with 2 inner modules" do
+    ex_ast = quote do
+      defmodule Animals do
+
+        defmodule Elephant do
+          defstruct trunk: true
+        end
+
+        defmodule Bear do
+          defstruct trunk: true
+        end
 
 
-      import Elephant from 'animals/elephant';
+        def something() do
+          %Elephant{}
+        end
 
-      const __MODULE__ = Atom('Animals');
-      function something(){
-        return Elephant.defstruct();
-      }
+        defp something_else() do
+        end
 
-      function something_else(){
-        return null;
-      }
+      end
+    end
 
-      let Animals = {
-        something: something
-      };
+    js_code = """
+     const __MODULE__ = Erlang.atom('Animals');
 
-      export default Animals;
+     import Elephant from 'animals/elephant';
+     import Bear from 'animals/bear';
+
+     function something_else() {
+         return null;
+     }
+     function something() {
+         return Elephant.defstruct();
+     }
+     export default { something: something };
+
+     const __MODULE__ = Erlang.atom('Elephant');
+
+     function defstruct(trunk = true) {
+         return {
+             __struct__: __MODULE__,
+             trunk: trunk
+         };
+     }
+     export default { defstruct: defstruct };
+
+     const __MODULE__ = Erlang.atom('Bear');
+
+     function defstruct(trunk = true) {
+         return {
+             __struct__: __MODULE__,
+             trunk: trunk
+         };
+     }
+     export default { defstruct: defstruct };
+    """
+
+    assert_translation(ex_ast, js_code)
+  end
+
+
+  should "translate modules with inner module that has inner module" do
+    ex_ast = quote do
+      defmodule Animals do
+
+        defmodule Elephant do
+          defstruct trunk: true
+
+          defmodule Bear do
+            defstruct trunk: true
+          end
+        end
+
+
+        def something() do
+          %Elephant{}
+        end
+
+        defp something_else() do
+        end
+
+      end
+    end
+
+    js_code = """
+     const __MODULE__ = Erlang.atom('Animals');
+     import Elephant from 'animals/elephant';
+     function something_else() {
+         return null;
+     }
+     function something() {
+         return Elephant.defstruct();
+     }
+     export default { something: something };
+
+     const __MODULE__ = Erlang.atom('Elephant');
+     import Bear from 'animals/elephant/bear';
+     function defstruct(trunk = true) {
+         return {
+             __struct__: __MODULE__,
+             trunk: trunk
+         };
+     }
+     export default { defstruct: defstruct };
+
+     const __MODULE__ = Erlang.atom('Bear');
+     function defstruct(trunk = true) {
+         return {
+             __struct__: __MODULE__,
+             trunk: trunk
+         };
+     }
+     export default { defstruct: defstruct };
     """
 
     assert_translation(ex_ast, js_code)

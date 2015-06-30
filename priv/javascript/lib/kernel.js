@@ -1,18 +1,26 @@
-import Atom from './atom';
-import Tuple from './tuple';
-import List from './list';
-import Enum from './enum';
-import BitString from './bit_string';
+import Erlang from './erlang';
+import SpecialForms from './kernel/special_forms';
+import JS from './kernel/js';
 
 let Kernel = {
-  __MODULE__: Atom('Kernel'),
+  __MODULE__: Erlang.atom('Kernel'),
+
+  SpecialForms: SpecialForms,
+  JS: JS,
+
+  defmodule: function(alias, list2, root){
+    let moduleAtom = alias[alias.length - 1];
+    let parent = Kernel.JS.create_namespace(alias, root);
+
+    return Object.assign(parent, list2(moduleAtom));
+  },
 
   tl: function(list){
-    return List.delete_at(list, 0);
+    return Erlang.list(...list.slice(1));
   },
 
   hd: function(list){
-    return List.first(list);
+    return list[0];
   },
 
   is_nil: function(x){
@@ -45,7 +53,7 @@ let Kernel = {
   },
 
   is_list: function(x){
-    return x instanceof List;
+    return x instanceof Array;
   },
 
   is_map: function(x){
@@ -57,14 +65,10 @@ let Kernel = {
   },
 
   is_tuple: function(x){
-    return x instanceof Tuple;
+    return x instanceof Erlang.tuple;
   },
 
   length: function(x){
-    if(Kernel.is_list(x) || Kernel.is_tuple(x)){
-      return x.length();
-    }
-
     return x.length;
   },
 
@@ -81,11 +85,17 @@ let Kernel = {
   },
 
   is_bitstring: function(x){
-    return Kernel.is_binary(x) || x instanceof BitString;
+    return Kernel.is_binary(x) || x instanceof Erlang.bitstring;
   },
 
   __in__: function(left, right){
-    return Enum.member(right, left);
+    for(let x of collection){
+      if(x === value){
+        return true;
+      }
+    }
+
+    return false;
   },
 
   abs: function(number){
@@ -97,6 +107,10 @@ let Kernel = {
   },
 
   elem: function(tuple, index){
+    if(Kernel.is_list(tuple)){
+      return tuple[i];
+    }
+
     return tuple.get(index);
   },
 
