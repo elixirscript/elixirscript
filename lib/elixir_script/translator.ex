@@ -1,5 +1,4 @@
 defmodule ElixirScript.Translator do
-  require Logger
   alias ElixirScript.Preprocess.Variables
   alias ElixirScript.Translator.Primitive
   alias ElixirScript.Translator.PatternMatching

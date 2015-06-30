@@ -4,6 +4,7 @@ defmodule ElixirScript.Translator.Module do
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.JSModule
+  alias ElixirScript.Preprocess.Aliases
 
   @standard_libs [
     {:Erlang, from: "__lib/erlang" },
@@ -51,6 +52,8 @@ defmodule ElixirScript.Translator.Module do
         body 
     end
 
+    { body, aliases } = Aliases.process(body)
+
     #Translate body
     parsed_body = Translator.translate(body)
 
@@ -62,6 +65,12 @@ defmodule ElixirScript.Translator.Module do
       true ->
         Enum.partition(parsed_body.body, fn(x) -> x.type == "ImportDeclaration" end)
     end
+
+    imports = imports ++ make_imports(aliases)
+    |> Enum.reduce(HashSet.new, fn(x, acc)-> 
+      HashSet.put(acc, x) 
+    end)
+    |> HashSet.to_list
 
     if length(body) == 1 and hd(body).type == "BlockStatement" do
       body = hd(body).body
@@ -263,6 +272,12 @@ defmodule ElixirScript.Translator.Module do
     )
 
     Builder.variable_declaration([declarator], :const)
+  end
+
+  def make_imports(enum) do
+    Enum.map(enum, fn(x) ->
+      ElixirScript.Translator.Import.make_alias_import({ nil, nil, x }, [])
+    end)
   end
 
   def create_standard_lib_imports(nil) do

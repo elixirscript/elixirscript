@@ -1,5 +1,5 @@
 defmodule ElixirScript.Preprocess.Variables do
-  @doc """
+  @moduledoc """
     Creates a new variable binding whenever an
     identifier is reused.
 
@@ -12,6 +12,7 @@ defmodule ElixirScript.Preprocess.Variables do
       a0 = 1
       a1 = 2 
   """
+  
   def process(ast) do
     {new_ast, _ } = Macro.prewalk(ast, %{}, fn(x, acc) ->
       process_variables(x, acc)

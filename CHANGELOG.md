@@ -11,6 +11,8 @@
     * Inner modules are now split out into their own files
     * Standard lib is now exported with file output from cli
     * Standard lib modules are now automatically imported
+    * No longer have to define modules via aliases ahead of time. They will be automatically be resolved
+      and made into JavaScript import statements
 
 # v0.5.0
   * Enhancements
