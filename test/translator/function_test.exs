@@ -244,7 +244,7 @@ defmodule ElixirScript.Translator.Function.Test do
              break;
          }
      }
-     return {};
+     export default {};
     """  
     assert_translation(ex_ast, js_code)
 
@@ -307,7 +307,7 @@ defmodule ElixirScript.Translator.Function.Test do
              break;
          }
      }
-     return { example: example };
+     export default { example: example };
     """  
     assert_translation(ex_ast, js_code)
 
@@ -324,7 +324,7 @@ defmodule ElixirScript.Translator.Function.Test do
      function example(oneArg) {
          return null;
      }
-     return { example: example };
+     export default { example: example };
     """  
     assert_translation(ex_ast, js_code)
 
@@ -455,7 +455,7 @@ defmodule ElixirScript.Translator.Function.Test do
              break;
          }
      }
-     return { something: something };
+     export default { something: something };
     """  
     assert_translation(ex_ast, js_code)
 
@@ -713,7 +713,7 @@ defmodule ElixirScript.Translator.Function.Test do
              break;
          }
      }
-     return { something: something };
+     export default { something: something };
     """
     
     assert_translation(ex_ast, js_code)
@@ -765,7 +765,7 @@ defmodule ElixirScript.Translator.Function.Test do
              break;
          }
      }
-     return { something: something };
+     export default { something: something };
     """
     
     assert_translation(ex_ast, js_code)

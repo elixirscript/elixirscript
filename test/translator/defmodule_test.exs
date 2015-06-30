@@ -38,7 +38,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
      function something() {
          return ul;
      }
-     return { something: something };
+     export default { something: something };
     """
 
     assert_translation(ex_ast, js_code)
@@ -64,7 +64,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
      function something() {
          return null;
      }
-     return { something: something };
+     export default { something: something };
     """
 
     assert_translation(ex_ast, js_code)
@@ -100,7 +100,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
      function something() {
          return Elephant.defstruct();
      }
-     return { something: something };
+     export default { something: something };
 
      const __MODULE__ = Erlang.atom('Elephant');
 
@@ -110,7 +110,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
              trunk: trunk
          };
      }
-     return { defstruct: defstruct };
+     export default { defstruct: defstruct };
     """
 
     assert_translation(ex_ast, js_code)
@@ -151,7 +151,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
      function something() {
          return Elephant.defstruct();
      }
-     return { something: something };
+     export default { something: something };
 
      const __MODULE__ = Erlang.atom('Elephant');
 
@@ -161,7 +161,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
              trunk: trunk
          };
      }
-     return { defstruct: defstruct };
+     export default { defstruct: defstruct };
 
      const __MODULE__ = Erlang.atom('Bear');
 
@@ -171,7 +171,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
              trunk: trunk
          };
      }
-     return { defstruct: defstruct };
+     export default { defstruct: defstruct };
     """
 
     assert_translation(ex_ast, js_code)
@@ -210,7 +210,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
      function something() {
          return Elephant.defstruct();
      }
-     return { something: something };
+     export default { something: something };
 
      const __MODULE__ = Erlang.atom('Elephant');
      import Bear from 'animals/elephant/bear';
@@ -220,7 +220,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
              trunk: trunk
          };
      }
-     return { defstruct: defstruct };
+     export default { defstruct: defstruct };
 
      const __MODULE__ = Erlang.atom('Bear');
      function defstruct(trunk = true) {
@@ -229,7 +229,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
              trunk: trunk
          };
      }
-     return { defstruct: defstruct };
+     export default { defstruct: defstruct };
     """
 
     assert_translation(ex_ast, js_code)

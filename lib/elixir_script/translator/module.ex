@@ -85,15 +85,15 @@ defmodule ElixirScript.Translator.Module do
 
     functions = Enum.flat_map(functions_dict, fn({_, data})-> process_function_arity(data) end)
 
-    properties = Enum.filter_map(functions_dict, fn({_key, value}) -> 
-      value.access == :export
-    end, fn({key, _value}) -> 
-      Builder.property(Builder.identifier(key), Builder.identifier(key))
-    end)
+    exported_object = Builder.object_expression(
+        Enum.filter_map(functions_dict, fn({_key, value}) -> 
+          value.access == :export
+        end, fn({key, _value}) -> 
+          Builder.property(Builder.identifier(key), Builder.identifier(key))
+        end)
+      )
 
-    default = Builder.return_statement(
-      Builder.object_expression(properties)
-    )
+    default = Builder.export_declaration(exported_object, [], true)
 
     #Filter out original functions from the body
     body = Enum.filter(body, fn(x) -> 
@@ -120,7 +120,7 @@ defmodule ElixirScript.Translator.Module do
     result = [
       %JSModule{
         name: module_name_list,
-        body: imports ++ List.wrap(create__module__(module_name_list)) ++ body ++ functions ++ List.wrap(default)
+        body: imports ++ List.wrap(create__module__(module_name_list)) ++ body ++ functions ++ [default]
       }
     ] ++ List.flatten(modules)
     
@@ -265,9 +265,15 @@ defmodule ElixirScript.Translator.Module do
     Builder.variable_declaration([declarator], :const)
   end
 
-  def create_standard_lib_imports() do
+  def create_standard_lib_imports(nil) do
     Enum.map(@standard_libs, fn({name, options}) ->
       ElixirScript.Translator.Import.make_alias_import({ nil, nil, [name] }, options)
+    end)
+  end
+
+  def create_standard_lib_imports(root) do
+    Enum.map(@standard_libs, fn({name, options}) ->
+      ElixirScript.Translator.Import.make_alias_import({ nil, nil, [name] }, from: root <> "/" <> options[:from])
     end)
   end
 

@@ -18,7 +18,7 @@ defmodule ElixirScript.Translator.Struct.Test do
              age: age
          };
      }
-     return { defstruct: defstruct };
+     export default { defstruct: defstruct };
     """
 
     assert_translation(ex_ast, js_code)
@@ -41,7 +41,7 @@ defmodule ElixirScript.Translator.Struct.Test do
              age: age
          };
      }
-     return { defstruct: defstruct };
+     export default { defstruct: defstruct };
     """
 
     assert_translation(ex_ast, js_code)
@@ -133,7 +133,7 @@ defmodule ElixirScript.Translator.Struct.Test do
              message: message
          };
      }
-     return { defexception: defexception };
+     export default { defexception: defexception };
      """
 
     assert_translation(ex_ast, js_code)
@@ -152,7 +152,7 @@ defmodule ElixirScript.Translator.Struct.Test do
              message: message
          };
      }
-     return { defexception: defexception };
+     export default { defexception: defexception };
     """
 
     assert_translation(ex_ast, js_code)

@@ -34,10 +34,10 @@ defmodule ElixirScript do
     |> List.flatten
   end
 
-  def process_module(module) do
+  def process_module(module, root) do
     file_path = create_file_name(module)
 
-    program = ElixirScript.Translator.Module.create_standard_lib_imports() ++ module.body
+    program = ElixirScript.Translator.Module.create_standard_lib_imports(root) ++ module.body
     |> ESTree.Builder.program
     
    { file_path, program }
@@ -116,8 +116,8 @@ defmodule ElixirScript do
     end
   end
 
-  def post_process_js_ast(modules) when is_list(modules) do
-    Enum.map(modules, &process_module(&1))
+  def post_process_js_ast(modules, root) when is_list(modules) do
+    Enum.map(modules, &process_module(&1, root))
   end
 
   def post_process_js_ast(js_ast) do
