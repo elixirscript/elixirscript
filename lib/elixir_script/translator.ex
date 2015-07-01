@@ -1,6 +1,5 @@
 defmodule ElixirScript.Translator do
-  require Logger
-  alias ElixirScript.Preprocessor
+  alias ElixirScript.Preprocess.Variables
   alias ElixirScript.Translator.Primitive
   alias ElixirScript.Translator.PatternMatching
   alias ElixirScript.Translator.Data
@@ -257,28 +256,28 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:def, _, [{:when, _, [{_name, _, _params} | _guards] }, [do: _body]] } = ast) do
-    {:def, _, [{:when, _, [{name, _, params} | guards] }, [do: body]] } = Preprocessor.process(ast)
+    {:def, _, [{:when, _, [{name, _, params} | guards] }, [do: body]] } = Variables.process(ast)
 
     name = Utils.filter_name(name)
     Function.make_export_function(name, params, body, guards)
   end
 
   defp do_translate({:def, _, [{_name, _, _params}, [do: _body]]} = ast) do
-    {:def, _, [{name, _, params}, [do: body]]} = Preprocessor.process(ast)
+    {:def, _, [{name, _, params}, [do: body]]} = Variables.process(ast)
 
     name = Utils.filter_name(name)
     Function.make_export_function(name, params, body)
   end
 
   defp do_translate({:defp, _, [{:when, _, [{_name, _, _params} | _guards] }, [do: _body]] } = ast) do
-    {:defp, _, [{:when, _, [{name, _, params} | guards] }, [do: body]] } = Preprocessor.process(ast)
+    {:defp, _, [{:when, _, [{name, _, params} | guards] }, [do: body]] } = Variables.process(ast)
 
     name = Utils.filter_name(name)
     Function.make_function(name, params, body, guards)
   end
 
   defp do_translate({:defp, _, [{_name, _, _params}, [do: _body]]} = ast) do
-    {:defp, _, [{name, _, params}, [do: body]]} = Preprocessor.process(ast)
+    {:defp, _, [{name, _, params}, [do: body]]} = Variables.process(ast)
 
     name = Utils.filter_name(name)
     Function.make_function(name, params, body)

@@ -7,15 +7,15 @@ defmodule ElixirScript.Translator.Import do
 
     import_specifier = if options[:as] do
       {_, _, alt} = options[:as]
-      Builder.identifier(alt)
+      
       Builder.import_specifier(
         Builder.identifier("default"),
         Builder.identifier(alt)
       )
-    else
-      List.last(name) 
-      |> Builder.identifier
-      |> Builder.import_default_specifier()  
+    else      
+      Builder.import_default_specifier(
+        Builder.identifier(List.last(name))
+      )  
     end
 
     import_path = if options[:from] do

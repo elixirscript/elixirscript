@@ -1,11 +1,18 @@
-defmodule ElixirScript.Preprocessor do
+defmodule ElixirScript.Preprocess.Variables do
   @moduledoc """
-  Prepares the AST before translation starts
-  """
+    Creates a new variable binding whenever an
+    identifier is reused.
 
-  @doc """
-    Handles any changes to ast before translate starts.
+    ex.
+      a = 1
+      a = 2
+
+      #becomes
+
+      a0 = 1
+      a1 = 2 
   """
+  
   def process(ast) do
     {new_ast, _ } = Macro.prewalk(ast, %{}, fn(x, acc) ->
       process_variables(x, acc)

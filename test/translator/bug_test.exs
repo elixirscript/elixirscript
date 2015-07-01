@@ -2,6 +2,25 @@ defmodule ElixirScript.Translator.Bug.Test do
   use ShouldI
   import ElixirScript.TestHelper
 
+  should "correctly not create 2 imports" do
+    ex_ast = quote do
+      defmodule App.Todo do
+        alias JQuery, from: "jquery"
+        JQuery.(e.target)
+      end
+    end
+
+    js_code = """
+     import JQuery from 'jquery';
+     const __MODULE__ = Erlang.atom('Todo');
+     
+     JQuery(Kernel.JS.get_property_or_call_function(e, 'target'));
+     export default {};
+    """
+
+    assert_translation(ex_ast, js_code)   
+  end
+
   should "correctly translate module names when used" do
     ex_ast = quote do
       @graphic_store App.Stores.GraphicStore.create_store()

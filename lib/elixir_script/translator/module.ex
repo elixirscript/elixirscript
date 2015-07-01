@@ -4,6 +4,7 @@ defmodule ElixirScript.Translator.Module do
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.JSModule
+  alias ElixirScript.Preprocess.Aliases
 
   @standard_libs [
     {:Erlang, from: "__lib/erlang" },
@@ -51,21 +52,58 @@ defmodule ElixirScript.Translator.Module do
         body 
     end
 
+    { body, aliases, used_stdlibs } = Aliases.process(body)
+
     #Translate body
-    parsed_body = Translator.translate(body)
+    body = Translator.translate(body)
+
+    body = case body do
+      [%ESTree.BlockStatement{ body: body }] ->
+        body
+      %ESTree.BlockStatement{ body: body } ->
+        body
+      _ ->
+        List.wrap(body)
+    end
 
     #Partition imports from body. 
     #We will place these at the top of body later
-    {imports, body} = cond do
-      !is_list(parsed_body) ->
-        {[], [parsed_body]}
-      true ->
-        Enum.partition(parsed_body.body, fn(x) -> x.type == "ImportDeclaration" end)
-    end
+    {imports, body} = Enum.partition(body, fn(x) ->
+      case x do
+        %ESTree.ImportDeclaration{} ->
+          true
+        _ ->
+          false
+      end
+    end)
 
-    if length(body) == 1 and hd(body).type == "BlockStatement" do
-      body = hd(body).body
-    end
+    #Add imports found from walking the ast
+    #and make sure to only put one declaration per alias    
+    imports = imports ++ make_imports(aliases)
+    |> Enum.reduce(HashSet.new, fn(x, acc)-> 
+      HashSet.put(acc, x) 
+    end)
+    |> HashSet.to_list
+    |> Enum.reduce(%{ identifiers: HashSet.new, imports: [] }, fn(x, state) ->
+      case x do
+        %ESTree.ImportDeclaration{ specifiers: [%ESTree.ImportSpecifier{ id: id }] } ->
+          if HashSet.member?(state.identifiers, id.name) do
+            state
+          else
+            %{ state | identifiers: HashSet.put(state.identifiers, id.name), imports: state.imports ++ [x] }
+          end
+        %ESTree.ImportDeclaration{ specifiers: [%ESTree.ImportDefaultSpecifier{ id: id }] } ->
+          if HashSet.member?(state.identifiers, id.name) do
+            state
+          else
+            %{ state | identifiers: HashSet.put(state.identifiers, id.name), imports: state.imports ++ [x] }
+          end
+        _ ->
+          %{ state | imports: state.imports ++ [x] } 
+      end                     
+    end)
+
+    imports = imports.imports
 
     #Collect all the functions so that we can process their arity
     {body, functions_dict} = Enum.map_reduce(body, HashDict.new(), fn(x, acc) ->
@@ -115,12 +153,12 @@ defmodule ElixirScript.Translator.Module do
           false
       end
     end)
-    
 
     result = [
       %JSModule{
         name: module_name_list,
-        body: imports ++ List.wrap(create__module__(module_name_list)) ++ body ++ functions ++ [default]
+        body: imports ++ List.wrap(create__module__(module_name_list)) ++ body ++ functions ++ [default],
+        stdlibs: used_stdlibs |> HashSet.to_list
       }
     ] ++ List.flatten(modules)
     
@@ -265,16 +303,38 @@ defmodule ElixirScript.Translator.Module do
     Builder.variable_declaration([declarator], :const)
   end
 
-  def create_standard_lib_imports(nil) do
-    Enum.map(@standard_libs, fn({name, options}) ->
-      ElixirScript.Translator.Import.make_alias_import({ nil, nil, [name] }, options)
+  def make_imports(enum) do
+    Enum.map(enum, fn(x) ->
+      ElixirScript.Translator.Import.make_alias_import({ nil, nil, x }, [])
     end)
   end
 
-  def create_standard_lib_imports(root) do
-    Enum.map(@standard_libs, fn({name, options}) ->
-      ElixirScript.Translator.Import.make_alias_import({ nil, nil, [name] }, from: root <> "/" <> options[:from])
+  @doc """
+  Takes the given list of used_standard_libs which represent
+  the standard libs used in a module and creates import statements
+  for them
+  """
+  def create_standard_lib_imports(used_standard_libs, root) do
+    Enum.filter_map(@standard_libs,
+      fn({ name, options }) -> name in used_standard_libs or name in [:JS, :SpecialForms]  end,
+      fn({ name, options }) ->
+        options = update_options(options, root) 
+        case name do
+          n when n in [:JS, :SpecialForms] ->
+            ElixirScript.Translator.Import.make_alias_import({ nil, nil, [:Kernel] }, options)    
+          _ ->
+            ElixirScript.Translator.Import.make_alias_import({ nil, nil, [name] }, options) 
+        end
     end)
+  end
+
+
+  defp update_options(options, nil) do
+    options
+  end
+
+  defp update_options(options, root) do
+    [from: root <> "/" <> options[:from]]
   end
 
 end
