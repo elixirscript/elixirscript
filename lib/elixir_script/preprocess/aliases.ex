@@ -46,6 +46,10 @@ defmodule ElixirScript.Preprocess.Aliases do
     { new_ast, state.add, state.stdlib }
   end
 
+  def process_aliases({:alias, _, [{:__aliases__, _, _name}, [as: {:__aliases__, _, alias_name}]]} = ast, state) do
+    { ast, %{state | defined: HashSet.put(state.defined, List.last(alias_name)) } } 
+  end
+
   def process_aliases({:alias, _, [{:__aliases__, _, name}]} = ast, state) do
     { ast, %{state | defined: HashSet.put(state.defined, List.last(name)) } }
   end
