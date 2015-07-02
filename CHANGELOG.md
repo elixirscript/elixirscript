@@ -1,4 +1,4 @@
-# v0.6.0-dev
+# v0.6.0
   * Enhancements
     * Made the Tuple, Range and BitString data structures more immutable
     * Now replacing characters that can't be used in variable and function names in JavaScript with

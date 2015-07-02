@@ -66,35 +66,25 @@ $ ex2js -h
 
 #Limitations
 
-#### Must define each module you are going to use upfront
-  
-    In Elixir, you can use Modules in your code like so
+#### ~~Must define each module you are going to use upfront~~
 
-    ```elixir
-    defmodule MyModule do
-    
-        def my_function() do
-            Another.Module.their_function()
-        end
-        
-    end
-    ```
-    
-    But in ElixirScript, you must explicitly say you are using the module
-    
-    ```elixir
-    defmodule MyModule do
-        alias Another.Module
-        
-        def my_function() do
-            Module.their_function()
-        end
-        
-    end
-    
-    ```
-    
-    This is because each module is converted into an ES6 module and `import`, `alias`, and `require` are turned into ES6 import statements. This would also be how you would import third-party JavaScript modules. The only exception is that the standard library or any JavaScript that is global in scope. For instance, the standard library currently is expected to be in the global scope so that you can use it without importing it.
+Should now be able to use modules without having to alias them upfront. If you reference a module using it's full name, an alias will automatically be created for it. If an alias already exists, then it will use that one instead. It's still early so there may be some bugs.
+
+Ex.
+
+```elixir
+defmodule Hello do
+    Lions.Tigers.Bears.oh_my(true)
+end
+```
+
+will turn into this in JavaScript
+
+```JavaScript
+import Bears from 'lions/tigers/bears';
+Bears.oh_my(true);
+```
+
 
 #### Not all of the Kernel.SpecialForms module is defined
 
