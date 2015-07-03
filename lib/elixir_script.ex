@@ -52,26 +52,10 @@ defmodule ElixirScript do
   """
   @spec javascript_ast_to_code(ESTree.Node.t) :: {:ok, binary} | {:error, binary}
   def javascript_ast_to_code(js_ast) do
-    js_ast = case js_ast do
-               modules when is_list(modules) ->
-                 Enum.reduce(modules, [], fn(x, list) -> list ++ x.body end)
-                 |> ESTree.Builder.program
-               %ElixirScript.Translator.Group{body: body} ->
-                 ESTree.Builder.program(body)      
-               _ ->
-                 js_ast
-             end
+    js_ast = prepare_js_ast(js_ast) 
+    |> Poison.encode!
 
-    js_ast = Poison.encode!(js_ast)
-
-    path = "#{operating_path}/code_generator.js"
-
-    case System.cmd("node", [path, js_ast]) do
-      {js_code, 0} ->
-        {:ok, js_code }
-      {error, _} ->
-        {:error, error}
-    end
+    {:ok, ElixirScript.CodeGenerator.translate(js_ast) }
   end
 
   @doc """
@@ -84,6 +68,18 @@ defmodule ElixirScript do
         js_code
       {:error, error } ->
         raise ElixirScript.ParseError, message: error
+    end
+  end
+
+  defp prepare_js_ast(js_ast) do
+    case js_ast do
+      modules when is_list(modules) ->
+        Enum.reduce(modules, [], fn(x, list) -> list ++ x.body end)
+        |> ESTree.Builder.program
+      %ElixirScript.Translator.Group{body: body} ->
+        ESTree.Builder.program(body)      
+      _ ->
+        js_ast
     end
   end
 

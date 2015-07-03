@@ -17,7 +17,10 @@ defmodule ElixirScript.Mixfile do
   end
 
   def application do
-    [applications: [:logger, :poison]]
+    [
+      applications: [:logger, :poison],
+      mod: { ElixirScript.App, [] }
+    ]
   end
 
   defp deps do
@@ -26,6 +29,7 @@ defmodule ElixirScript.Mixfile do
       { :inflex, "~> 1.0" },
       { :estree, github: "bryanjos/elixir-estree"},
       { :exprof, "~> 0.2" },
+      { :exos, "~> 1.0.0" },
       { :excoveralls, only: [:dev, :test] },
       { :shouldi, github: "batate/shouldi", only: :test },
       { :mix_test_watch, "~> 0.1.1", only: :test }
