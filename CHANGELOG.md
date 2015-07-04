@@ -1,3 +1,7 @@
+# v0.7.0-dev
+* Enhancements
+  * Now using Exos and node_erlastic for communicating between Elixir and Node
+
 # v0.6.0
   * Enhancements
     * Made the Tuple, Range and BitString data structures more immutable
