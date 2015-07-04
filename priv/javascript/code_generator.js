@@ -1,12 +1,16 @@
-/**
- Takes in SpiderMonkey AST in JSON format and returns JavaScript code
- represented by the passed in AST.
-
- Usage: node code_generator.js <ast>
-**/
 var escodegen = require('escodegen');
-var args = process.argv.slice(2);
+var node_erlastic = require('node_erlastic');
 
-var generated = escodegen.generate(JSON.parse(args[0]));
-process.stdout.write(generated);
-process.exit(0);
+node_erlastic.server(function(term, from, state, done){
+    if (term == "get"){
+        return done("reply", state);
+    }
+
+    if (term[0] == "translate"){
+        var ast = JSON.parse(term[1]);
+        var generated = escodegen.generate(ast);
+        return done("noreply", generated);
+    }
+    
+    throw new Error("unexpected request")
+});

@@ -1,6 +1,7 @@
 %{"estree": {:git, "git://github.com/bryanjos/elixir-estree.git", "527fa7005504884359b66da3c9eb53c706dfccb1", []},
   "excoveralls": {:hex, :excoveralls, "0.3.10"},
   "exjsx": {:hex, :exjsx, "3.1.0"},
+  "exos": {:hex, :exos, "1.0.0"},
   "exprintf": {:hex, :exprintf, "0.1.6"},
   "exprof": {:hex, :exprof, "0.2.0"},
   "fs": {:hex, :fs, "0.9.2"},

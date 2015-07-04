@@ -16,6 +16,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "escodegen": "^1.6.1"
+      "escodegen": "^1.6.1",
+      "node_erlastic": "0.0.8"
   }
 }
