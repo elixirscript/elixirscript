@@ -1,5 +1,7 @@
 defmodule ElixirScript do
   alias ElixirScript.Translator.JSModule
+  alias ESTree.Tools.Builder
+  alias ESTree.Tools.Generator
 
   @doc """
   Parses Elixir code string into JavaScript AST
@@ -38,7 +40,7 @@ defmodule ElixirScript do
     file_path = create_file_name(module)
 
     program = ElixirScript.Translator.Module.create_standard_lib_imports(module.stdlibs, root) ++ module.body
-    |> ESTree.Builder.program
+    |> ESTree.Tools.Builder.program
     
    { file_path, program }
   end
@@ -53,9 +55,7 @@ defmodule ElixirScript do
   @spec javascript_ast_to_code(ESTree.Node.t) :: {:ok, binary} | {:error, binary}
   def javascript_ast_to_code(js_ast) do
     js_ast = prepare_js_ast(js_ast) 
-    |> Poison.encode!
-
-    {:ok, ElixirScript.CodeGenerator.translate(js_ast) }
+    {:ok, Generator.generate(js_ast) }
   end
 
   @doc """
@@ -75,9 +75,9 @@ defmodule ElixirScript do
     case js_ast do
       modules when is_list(modules) ->
         Enum.reduce(modules, [], fn(x, list) -> list ++ x.body end)
-        |> ESTree.Builder.program
+        |> Builder.program
       %ElixirScript.Translator.Group{body: body} ->
-        ESTree.Builder.program(body)      
+        Builder.program(body)      
       _ ->
         js_ast
     end

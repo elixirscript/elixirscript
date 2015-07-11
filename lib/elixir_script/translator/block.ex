@@ -1,5 +1,5 @@
 defmodule ElixirScript.Translator.Block do
-  alias ESTree.Builder
+  alias ESTree.Tools.Builder
   alias ElixirScript.Translator
 
   def make_block(expressions) do

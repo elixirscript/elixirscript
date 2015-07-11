@@ -1,6 +1,6 @@
 defmodule ElixirScript.Translator.PatternMatching do
   require Logger
-  alias ESTree.Builder
+  alias ESTree.Tools.Builder
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.Primitive

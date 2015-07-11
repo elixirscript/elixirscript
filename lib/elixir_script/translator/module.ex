@@ -1,6 +1,6 @@
 defmodule ElixirScript.Translator.Module do
   require Logger
-  alias ESTree.Builder
+  alias ESTree.Tools.Builder
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.JSModule
@@ -86,13 +86,13 @@ defmodule ElixirScript.Translator.Module do
     |> HashSet.to_list
     |> Enum.reduce(%{ identifiers: HashSet.new, imports: [] }, fn(x, state) ->
       case x do
-        %ESTree.ImportDeclaration{ specifiers: [%ESTree.ImportSpecifier{ id: id }] } ->
+        %ESTree.ImportDeclaration{ specifiers: [%ESTree.ImportSpecifier{ local: id }] } ->
           if HashSet.member?(state.identifiers, id.name) do
             state
           else
             %{ state | identifiers: HashSet.put(state.identifiers, id.name), imports: state.imports ++ [x] }
           end
-        %ESTree.ImportDeclaration{ specifiers: [%ESTree.ImportDefaultSpecifier{ id: id }] } ->
+        %ESTree.ImportDeclaration{ specifiers: [%ESTree.ImportDefaultSpecifier{ local: id }] } ->
           if HashSet.member?(state.identifiers, id.name) do
             state
           else
@@ -110,7 +110,7 @@ defmodule ElixirScript.Translator.Module do
       case x do
         %ESTree.FunctionDeclaration{} ->
           add_function_to_dict(acc, x, :private)
-        %ESTree.ExportDeclaration{ declaration: %ESTree.FunctionDeclaration{} = function } ->
+        %ESTree.ExportNamedDeclaration{ declaration: %ESTree.FunctionDeclaration{} = function } ->
           add_function_to_dict(acc, function, :export)
         %ESTree.CallExpression{} ->
           {Builder.expression_statement(x), acc}
@@ -131,14 +131,14 @@ defmodule ElixirScript.Translator.Module do
         end)
       )
 
-    default = Builder.export_declaration(exported_object, [], true)
+    default = Builder.export_default_declaration(exported_object)
 
     #Filter out original functions from the body
     body = Enum.filter(body, fn(x) -> 
       case x do 
         %ESTree.FunctionDeclaration{} ->
           false
-        %ESTree.ExportDeclaration{ declaration: %ESTree.FunctionDeclaration{} } ->
+        %ESTree.ExportNamedDeclaration{ declaration: %ESTree.FunctionDeclaration{} } ->
           false
         _ ->
           true
@@ -243,10 +243,9 @@ defmodule ElixirScript.Translator.Module do
 
     master_function = Builder.function_declaration(
       Builder.identifier(name),
+      [Builder.rest_element(Builder.identifier(:args))],
       [],
-      [],
-      Builder.block_statement([switch_statement]),
-      Builder.identifier(:args)
+      Builder.block_statement([switch_statement])
     )
 
     Enum.map(processed_functions, fn({function, _, _}) -> function end) ++ [master_function]

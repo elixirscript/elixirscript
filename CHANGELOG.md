@@ -1,6 +1,6 @@
 # v0.7.0-dev
 * Enhancements
-  * Now using Exos and node_erlastic for communicating between Elixir and Node
+  * Now using the JS code generator from elixir-estree for code generation, improving speed of transpilation
 
 # v0.6.0
   * Enhancements

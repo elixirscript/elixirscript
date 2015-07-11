@@ -1,6 +1,6 @@
 defmodule ElixirScript.Translator.Expression do
   require Logger
-  alias ESTree.Builder
+  alias ESTree.Tools.Builder
   alias ElixirScript.Translator
 
   def make_unary_expression(operator, expr) do

@@ -1,11 +1,10 @@
 defmodule ElixirScript.Translator.Try do
-  alias ESTree.Builder
+  alias ESTree.Tools.Builder
   alias ElixirScript.Translator
   alias ElixirScript.Translator.PatternMatching
 
   
   def make_try(try_block, _rescue_clauses, after_block) do
-    IO.inspect(try_block)
     Builder.try_statement(
       Builder.block_statement(List.wrap(
         Translator.translate(try_block)
@@ -44,7 +43,7 @@ defmodule ElixirScript.Translator.Try do
             nil
           )
 
-          IO.inspect(body)
+
           hd(body)    
       end
     end)

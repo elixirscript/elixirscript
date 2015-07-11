@@ -1,6 +1,6 @@
 defmodule ElixirScript.Translator.Import do
   require Logger
-  alias ESTree.Builder
+  alias ESTree.Tools.Builder
 
   def make_alias_import(alias_info, options) do
     {_, _, name} = alias_info
@@ -10,10 +10,11 @@ defmodule ElixirScript.Translator.Import do
       
       Builder.import_specifier(
         Builder.identifier("default"),
-        Builder.identifier(alt)
+        Builder.identifier(List.last(alt))
       )
     else      
       Builder.import_default_specifier(
+        Builder.identifier(List.last(name)),
         Builder.identifier(List.last(name))
       )  
     end
@@ -36,6 +37,7 @@ defmodule ElixirScript.Translator.Import do
     specifiers = if options[:only] do
       Enum.map(options[:only], fn({name, _arity}) -> 
         Builder.import_specifier(
+          Builder.identifier(name),
           Builder.identifier(name)
         )
       end)

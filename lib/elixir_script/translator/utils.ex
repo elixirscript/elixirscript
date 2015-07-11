@@ -1,5 +1,5 @@
 defmodule ElixirScript.Translator.Utils do
-  alias ESTree.Builder
+  alias ESTree.Tools.Builder
   alias ElixirScript.Translator
 
   def inflate_groups(body) do

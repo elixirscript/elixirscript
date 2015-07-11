@@ -1,5 +1,5 @@
 defmodule ElixirScript.Translator.If do
-  alias ESTree.Builder
+  alias ESTree.Tools.Builder
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Function
   alias ElixirScript.Translator.Utils

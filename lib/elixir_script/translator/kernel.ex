@@ -1,6 +1,6 @@
 defmodule ElixirScript.Translator.Kernel do
   require Logger
-  alias ESTree.Builder
+  alias ESTree.Tools.Builder
   alias ElixirScript.Translator
   alias ElixirScript.Utils
 

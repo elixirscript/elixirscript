@@ -13,3 +13,4 @@ deploy.sh
 priv/javascript/scratchpad.js
 sample/dest
 fprof.trace
+index.js

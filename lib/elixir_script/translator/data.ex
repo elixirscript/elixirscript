@@ -1,6 +1,6 @@
 defmodule ElixirScript.Translator.Data do
   require Logger
-  alias ESTree.Builder
+  alias ESTree.Tools.Builder
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Utils
 
@@ -15,8 +15,9 @@ defmodule ElixirScript.Translator.Data do
 
   def make_object(properties) do
     properties
-    |> Enum.map(fn({x, y}) -> 
-      Builder.property(Builder.literal(x), Translator.translate(y)) 
+    |> Enum.map(fn
+      ({x, {:__aliases__, _, [value]}}) -> Builder.property( Builder.literal(x), Builder.identifier(value)) 
+      ({x, y}) -> Builder.property( Builder.literal(x), Translator.translate(y)) 
     end)
     |> Builder.object_expression
   end
@@ -24,7 +25,7 @@ defmodule ElixirScript.Translator.Data do
   def make_struct(module_name, data) do
     Builder.call_expression(
       Builder.member_expression(
-        Builder.identifier(module_name),
+        Builder.identifier(List.last(module_name)),
         Builder.identifier(:defstruct)
       ),
       Enum.map(data, fn({k, v})->
@@ -91,11 +92,11 @@ defmodule ElixirScript.Translator.Data do
   def throw_error(module_name, data) do
     Builder.throw_statement(
       Builder.new_expression(
-        Builder.identifier(module_name),
+        Builder.identifier(List.last(module_name)),
         [
           Builder.call_expression(
             Builder.member_expression(
-              Builder.identifier(module_name),
+              Builder.identifier(List.last(module_name)),
               Builder.identifier(:defexception)
             ),
             Enum.map(data, fn({k, v})->
@@ -129,7 +130,7 @@ defmodule ElixirScript.Translator.Data do
   end
 
   defp do_make_defstruct(name, params, defaults) do
-    Builder.export_declaration(
+    Builder.export_named_declaration(
       Builder.function_declaration(
         Builder.identifier(name),
         Enum.map(params, &Builder.identifier(&1)),

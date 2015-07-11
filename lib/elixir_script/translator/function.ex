@@ -1,6 +1,6 @@
 defmodule ElixirScript.Translator.Function do
   require Logger
-  alias ESTree.Builder
+  alias ESTree.Tools.Builder
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.PatternMatching
@@ -44,7 +44,7 @@ defmodule ElixirScript.Translator.Function do
   def make_function_call(module_name, function_name, params) do
     the_name = case module_name do
       {:__aliases__, _, name} ->
-        name
+        List.last(name)
       {name, _, _} when is_atom(name) ->
         name
       {{:., _, [_module_name, _function_name]}, _, _params } = ast ->
@@ -66,8 +66,8 @@ defmodule ElixirScript.Translator.Function do
   end
 
   def make_export_function(name, params, body, guards \\ nil) do
-    do_make_function(Utils.filter_name(name), params, body, guards)
-    |> Builder.export_declaration
+    function = do_make_function(Utils.filter_name(name), params, body, guards)
+    Builder.export_named_declaration(function)
   end
 
   def pattern_match_identifier(index) do

@@ -18,8 +18,7 @@ defmodule ElixirScript.Mixfile do
 
   def application do
     [
-      applications: [:logger, :poison],
-      mod: { ElixirScript.App, [] }
+      applications: [:logger, :poison]
     ]
   end
 
@@ -29,7 +28,6 @@ defmodule ElixirScript.Mixfile do
       { :inflex, "~> 1.0" },
       { :estree, github: "bryanjos/elixir-estree"},
       { :exprof, "~> 0.2" },
-      { :exos, "~> 1.0.0" },
       { :excoveralls, only: [:dev, :test] },
       { :shouldi, github: "batate/shouldi", only: :test },
       { :mix_test_watch, "~> 0.1.1", only: :test }
@@ -48,7 +46,7 @@ defmodule ElixirScript.Mixfile do
 
   defp package do
     [ # These are the default files included in the package
-      files: ["lib", "mix.exs", "README*", "readme*", "LICENSE*", "license*", "CHANGELOG*", "escodegen"],
+      files: ["lib", "mix.exs", "README*", "readme*", "LICENSE*", "license*", "CHANGELOG*"],
       contributors: ["Bryan Joseph"],
       licenses: ["MIT"],
       links: %{ 

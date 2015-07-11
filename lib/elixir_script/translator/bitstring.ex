@@ -1,5 +1,5 @@
 defmodule ElixirScript.Translator.Bitstring do
-  alias ESTree.Builder
+  alias ESTree.Tools.Builder
   alias ElixirScript.Translator
 
   

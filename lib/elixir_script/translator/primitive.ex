@@ -1,7 +1,11 @@
 defmodule ElixirScript.Translator.Primitive do
   require Logger
-  alias ESTree.Builder
+  alias ESTree.Tools.Builder
   alias ElixirScript.Translator
+
+  def make_identifier([ast]) do
+    Builder.identifier(ast)
+  end
 
   def make_identifier(ast) do
     Builder.identifier(ast)
