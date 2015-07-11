@@ -11,26 +11,21 @@ defmodule ElixirScript.Mixfile do
       deps: deps,
       description: description,
       package: package,
-      source_url: "https://github.com/bryanjos/elixirscript",
-      test_coverage: [tool: ExCoveralls]
+      source_url: "https://github.com/bryanjos/elixirscript"
     ]
   end
 
   def application do
     [
-      applications: [:logger, :poison]
+      applications: [:logger]
     ]
   end
 
   defp deps do
     [
-      { :poison, "~> 1.4" },
       { :inflex, "~> 1.0" },
       { :estree, github: "bryanjos/elixir-estree"},
-      { :exprof, "~> 0.2" },
-      { :excoveralls, only: [:dev, :test] },
-      { :shouldi, github: "batate/shouldi", only: :test },
-      { :mix_test_watch, "~> 0.1.1", only: :test }
+      { :shouldi, only: :test}
     ]
   end
 
