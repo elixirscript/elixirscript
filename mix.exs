@@ -47,7 +47,8 @@ defmodule ElixirScript.Mixfile do
       licenses: ["MIT"],
       links: %{ 
         "GitHub" => "https://github.com/bryanjos/elixirscript"
-      }
+      },
+      build_tools: ["mix"]
     ]
   end
   
