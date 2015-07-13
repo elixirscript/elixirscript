@@ -1,18 +1,5 @@
 defmodule ElixirScript.Preprocess.Aliases do
-  @moduledoc """
-    Takes the ast, records any uses of outer modules, and updates the calls
-    to make them look like as if using an alias
-
-    ex.
-      Hello.World.hi()
-
-      #would turn into
-      World.hi()
-
-      #the "Hello.World" would be placed in a set and later used for building an alias
-  """
-
-  #NOTE: Scrap out detect modules, but keep detection of stdlibs
+  @moduledoc false
 
   @standard_libs [
     [:Erlang],
@@ -30,6 +17,18 @@ defmodule ElixirScript.Preprocess.Aliases do
     [:Tuple]
   ]
 
+  @doc """
+    Takes the ast, records any uses of outer modules, and updates the calls
+    to make them look like as if using an alias
+
+    ex.
+      Hello.World.hi()
+
+      #would turn into
+      World.hi()
+
+      #the "Hello.World" would be placed in a set and later used for building an alias
+  """
   def process(ast) do
     
     #Erlang and Kernel will always be added
@@ -54,7 +53,7 @@ defmodule ElixirScript.Preprocess.Aliases do
     { ast, %{state | defined: HashSet.put(state.defined, List.last(name)) } }
   end
 
-  def process_aliases({{:., meta1, [{:__aliases__, meta2, aliases}, function]}, meta3, params} = ast, state) when aliases in @standard_libs do
+  def process_aliases({{:., _, [{:__aliases__, _, aliases}, _]}, _, _} = ast, state) when aliases in @standard_libs do
     {ast, %{ state | stdlib: HashSet.put(state.stdlib, List.last(aliases))  }}
   end
 

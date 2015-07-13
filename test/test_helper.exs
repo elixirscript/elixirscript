@@ -6,8 +6,8 @@ defmodule ElixirScript.TestHelper do
   use ShouldI
   
   def ex_ast_to_js(ex_ast) do
-    js_ast = ElixirScript.Translator.translate(ex_ast)
-    ElixirScript.javascript_ast_to_code!(js_ast)
+    ElixirScript.Translator.translate(ex_ast)
+    |> ElixirScript.javascript_ast_to_code
   end
 
   def strip_spaces(js) do
@@ -30,6 +30,18 @@ defmodule ElixirScript.TestHelper do
 
     ***Actual***
     #{converted_code}
+    """
+  end
+
+  def assert_js_matches(expected_js_code, actual_js_code) do
+    assert strip_spaces(expected_js_code) == strip_spaces(actual_js_code), """
+    **Code Does Not Match **
+
+    ***Expected***
+    #{expected_js_code}
+
+    ***Actual***
+    #{actual_js_code}
     """
   end
 end

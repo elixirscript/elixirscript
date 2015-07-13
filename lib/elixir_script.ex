@@ -1,74 +1,129 @@
 defmodule ElixirScript do
+  alias ElixirScript.Translator
   alias ElixirScript.Translator.JSModule
   alias ESTree.Tools.Builder
   alias ESTree.Tools.Generator
 
-  @doc """
-  Parses Elixir code string into JavaScript AST
+  @moduledoc """
+  Transpiles Elixir into JavaScript.
+
+  All transpile functions return a list of
+  transpiled javascript code or a tuple consisting of
+  the file name for the code and the transpiled javascript code.
+
+  All transpile functions also take an optional opts parameter
+  that controls transpiler output.
+
+  Available options are:
+  * include_path: a boolean controlling whether to return just the JavaScript code
+  or a tuple of the file name and the JavaScript code
+
+  * root: a binary path prepended to the path of the standard lib imports if needed
   """
-  @spec parse_elixir(binary) :: {binary, ESTree.Node.t}
-  def parse_elixir(elixir_code) do
+
+  @doc """
+  Transpiles the given Elixir code string
+  """
+  @spec transpile(binary, Dict.t) :: [binary | { binary, binary }]
+  def transpile(elixir_code, opts \\ []) do
     elixir_code
     |> Code.string_to_quoted!
-    |> parse_quoted
+    |> transpile_quoted(opts)
   end
 
   @doc """
-  Parses Elixir code in it's quoted form into JavaScript AST
+  Transpiles the given Elixir code in quoted form
   """
-  @spec parse_quoted(Macro.t) :: {binary, ESTree.Node.t}
-  def parse_quoted(quoted) do
-    ElixirScript.Translator.translate(quoted)
+  @spec transpile_quoted(Macro.t, Dict.t) :: [binary | { binary, binary }]
+  def transpile_quoted(quoted, opts \\ []) do
+    include_path = Dict.get(opts, :include_path, false)
+    root = Dict.get(opts, :root)
+
+    case Translator.translate(quoted) do
+      modules when is_list(modules) ->
+        List.flatten(modules)
+        |> Enum.map(fn(x) ->
+          convert_to_code(x, root, include_path)
+        end)
+      module ->
+        List.wrap(
+          convert_to_code(module, root, include_path)
+        )
+    end
   end
 
   @doc """
-  Parses Elixir code files into JavaScript AST
+  Transpiles the elixir files found at the given path
   """
-  @spec parse_elixir_files(binary) :: [{binary, ESTree.Node.t}]
-  def parse_elixir_files(path) do
+  @spec transpile_path(binary, Dict.t) :: [binary | { binary, binary }]
+  def transpile_path(path, opts \\ []) do
+    include_path = Dict.get(opts, :include_path, false)
+    root = Dict.get(opts, :root)
+
     path
     |> Path.wildcard
-    |> Enum.map(fn(x) ->
+    |> Enum.map(fn(x) -> 
       File.read!(x)
       |> Code.string_to_quoted!
-      |>  ElixirScript.Translator.translate
+      |> Translator.translate
     end)
     |> List.flatten
+    |> Enum.map(fn(x) ->
+      convert_to_code(x, root, include_path)
+    end)
   end
 
-  def process_module(module, root) do
+  @doc """
+  Copies the javascript that makes up the ElixirScript standard libs
+  to the specified location in a "/__lib" folder
+  """
+  def copy_standard_libs_to_destination(destination) do
+    File.cp_r!(operating_path <> "/lib", destination <> "/__lib")
+  end
+
+  defp convert_to_code(js_ast, root, include_path) do
+      js_ast
+      |> process_module(root)
+      |> javascript_ast_to_code
+      |> process_include_path(include_path)
+  end
+
+  defp process_module(%JSModule{} = module, root) do
     file_path = create_file_name(module)
 
     program = ElixirScript.Translator.Module.create_standard_lib_imports(module.stdlibs, root) ++ module.body
     |> ESTree.Tools.Builder.program
-    
-   { file_path, program }
+
+    { file_path, program }
   end
 
-  defp create_file_name(%ElixirScript.Translator.JSModule{ name: module_list }) do
-    "#{ElixirScript.Translator.Import.make_file_path(module_list)}.js"
+  defp process_module(module, _root) do
+    { "", module }
   end
 
-  @doc """
-  Converts JavaScript AST into JavaScript code
-  """
-  @spec javascript_ast_to_code(ESTree.Node.t) :: {:ok, binary} | {:error, binary}
+  defp create_file_name(%JSModule{ name: module_list }) do
+    name = ElixirScript.Translator.Import.make_file_path(module_list)
+    "#{name}.js"
+  end
+
+  defp process_include_path({ path, code } = pair, true) do
+    pair
+  end
+
+  defp process_include_path({ _, code }, false) do
+    code
+  end
+
+  @doc false
+  def javascript_ast_to_code({ path, js_ast }) do
+    js_code = javascript_ast_to_code(js_ast)
+    { path, js_code }
+  end
+
+  @doc false
   def javascript_ast_to_code(js_ast) do
-    js_ast = prepare_js_ast(js_ast) 
-    {:ok, Generator.generate(js_ast) }
-  end
-
-  @doc """
-  Same as javascript_ast_to_code but throws an error
-  """
-  @spec javascript_ast_to_code!(ESTree.Node.t) :: binary
-  def javascript_ast_to_code!(js_ast) do
-    case javascript_ast_to_code(js_ast) do
-      {:ok, js_code } ->
-        js_code
-      {:error, error } ->
-        raise ElixirScript.ParseError, message: error
-    end
+    prepare_js_ast(js_ast)
+    |> Generator.generate
   end
 
   defp prepare_js_ast(js_ast) do
@@ -83,24 +138,7 @@ defmodule ElixirScript do
     end
   end
 
-  @doc """
-  Writes output to file
-  """
-  def write_to_file({ file_path, js_code }, destination) do
-    file_name = Path.join([destination, file_path])
-
-    if !File.exists?(Path.dirname(file_name)) do
-      File.mkdir_p!(Path.dirname(file_name))
-    end
-
-    File.write!(file_name, js_code)
-  end
-
-  def copy_standard_libs_to_destination(destination) do
-    File.cp_r!(operating_path <> "/lib", destination <> "/__lib")
-  end
-
-  def operating_path() do
+  defp operating_path() do
     try do
       Mix.Project.build_path <> "/lib/elixir_script/priv/javascript"
     rescue
@@ -110,14 +148,6 @@ defmodule ElixirScript do
         replaced_path = List.delete_at(replaced_path, length(replaced_path) - 1)
         Path.join(replaced_path)
     end
-  end
-
-  def post_process_js_ast(modules, root) when is_list(modules) do
-    Enum.map(modules, &process_module(&1, root))
-  end
-
-  def post_process_js_ast(js_ast) do
-    js_ast
   end
   
 

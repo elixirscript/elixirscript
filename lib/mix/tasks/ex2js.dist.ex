@@ -1,4 +1,6 @@
 defmodule Mix.Tasks.Ex2js.Dist do
+  @moduledoc false
+
   use Mix.Task
   
    @shortdoc "Builds a release for ex2js"

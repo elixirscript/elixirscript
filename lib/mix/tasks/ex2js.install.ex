@@ -1,4 +1,6 @@
 defmodule Mix.Tasks.Ex2js.Install do
+  @moduledoc false
+
   use Mix.Task
   
    @shortdoc "Installs ex2js from the dist folder to /usr/local/ex2js"

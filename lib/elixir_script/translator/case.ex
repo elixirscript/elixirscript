@@ -1,4 +1,5 @@
 defmodule ElixirScript.Translator.Case do
+  @moduledoc false
   alias ESTree.Tools.Builder
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Function

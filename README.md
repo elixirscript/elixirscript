@@ -1,14 +1,16 @@
 ElixirScript
 ============
 
-The goal is to convert a subset (or full set) of Elixir code to JavaScript, providing the ability to write JavaScript in Elixir. This is done by taking the Elixir AST and converting it into [Spider Monkey AST](https://developer.mozilla.org/en-US/docs/Mozilla/Projects/SpiderMonkey/Parser_API). From there, it uses [escodegen](https://github.com/estools/escodegen) to convert the Spider Monkey AST to JavaScript.
+The goal is to convert a subset (or full set) of Elixir code to JavaScript, providing the ability to write JavaScript in Elixir. This is done by taking the Elixir AST and converting it into JavaScript AST and then to JavaScript code. This is done using the [Elixir-ESTree](https://github.com/bryanjos/elixir-estree) library.
 
 It also includes an escript CLI utility named ex2js. This takes files or Elixir code strings as input and emits Spider Monkey AST or JavaScript code. The results may be sent to standard output or files, based on the options selected.
+
+ElixirScript is now in hex. There are transpile functions in th ElixirScript module. There is also a mix task, `mix ex2js` that works exactly like the cli client.
 
 Requirements
 ===========
 * Elixir
-* Node or io.js
+* Node or io.js (only for development)
 
 
 Development
@@ -37,7 +39,7 @@ To build distributable tarball
 
     `ex2js-version-tar.gz` will be in the `dist` folder
 
-Installation
+Installation of the CLI client
 ==============
 
 * uncompress `ex2js.tar.gz`.
@@ -55,12 +57,9 @@ $ ex2js -h
           the elixir code string if the -ex flag is used
 
   options:
-
   -o  --output [path]   places output at the given path
-  -t  --ast             shows only produced spider monkey ast
   -ex --elixir          read input as elixir code string
-  -st --stdio           reads from stdio
-      --lib             writes the standard lib js to standard out
+  -r  --root [path]     root path for standard libs
   -h  --help            this message
 ```
 

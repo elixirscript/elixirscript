@@ -4,9 +4,8 @@ defmodule ElixirScript.Mixfile do
   def project do
     [
       app: :elixir_script,
-      version: "0.7.0-dev",
+      version: "0.6.5",
       elixir: "~> 1.0",
-      compilers: Mix.compilers,
       escript: escript_config,
       deps: deps,
       description: description,
@@ -24,8 +23,10 @@ defmodule ElixirScript.Mixfile do
   defp deps do
     [
       { :inflex, "~> 1.0" },
-      { :estree, github: "bryanjos/elixir-estree"},
-      { :shouldi, only: :test}
+      { :estree, "~> 2.0" },
+      { :shouldi, only: :test },
+      { :earmark, "~> 0.1", only: :dev },
+      { :ex_doc, "~> 0.7", only: :dev }
     ]
   end
 
@@ -40,8 +41,8 @@ defmodule ElixirScript.Mixfile do
   end
 
   defp package do
-    [ # These are the default files included in the package
-      files: ["lib", "mix.exs", "README*", "readme*", "LICENSE*", "license*", "CHANGELOG*"],
+    [
+      files: ["lib", "priv/javascript/lib", "mix.exs", "README*", "readme*", "LICENSE*", "license*", "CHANGELOG*"],
       contributors: ["Bryan Joseph"],
       licenses: ["MIT"],
       links: %{ 

@@ -1,4 +1,5 @@
 defmodule ElixirScript.Translator.Function do
+  @moduledoc false
   require Logger
   alias ESTree.Tools.Builder
   alias ElixirScript.Translator

@@ -1,4 +1,6 @@
 defmodule ElixirScript.CLI do
+  @moduledoc false
+
   def main(argv) do
     argv
     |> parse_args
@@ -7,11 +9,13 @@ defmodule ElixirScript.CLI do
 
   def parse_args(args) do
     switches = [ 
-      output: :binary, ast: :boolean, elixir: :boolean, 
-      help: :boolean, root: :binary
+      output: :binary, elixir: :boolean, root: :binary, 
+      help: :boolean
     ]
 
-    aliases = [ o: :output, t: :ast, ex: :elixir, h: :help, r: :root ]
+    aliases = [ 
+      o: :output, ex: :elixir, h: :help, r: :root 
+    ]
     
     parse = OptionParser.parse(args, switches: switches, aliases: aliases)
 
@@ -29,9 +33,8 @@ defmodule ElixirScript.CLI do
               the elixir code string if the -ex flag is used
       options:
       -o  --output [path]   places output at the given path
-      -t  --ast             shows only produced spider monkey ast
       -ex --elixir          read input as elixir code string
-      -r  --root            root path for standard libs
+      -r  --root [path]     root path for standard libs
       -h  --help            this message
     """
   end
@@ -45,67 +48,51 @@ defmodule ElixirScript.CLI do
   end
 
   def do_process(input, options) do
-    js_ast = case options[:elixir] do
+    transpile_opts = [ 
+      root: options[:root], 
+      include_path: options[:output] != nil 
+    ]
+
+    transpile_output = case options[:elixir] do
       true ->
-        ElixirScript.parse_elixir(input)
+        ElixirScript.transpile(input, transpile_opts)
       _ ->
-        ElixirScript.parse_elixir_files(input)  
+        ElixirScript.transpile_path(input, transpile_opts)  
     end
-
-    js_ast = ElixirScript.post_process_js_ast(js_ast, options[:root])
-
-    handle_output(js_ast, options)
-  end
-
-  def handle_output(js_ast, options) when is_list(js_ast) do
-    parse_result = case options[:ast] do
-                     true ->
-                       Enum.map(js_ast, fn({path, code}) ->
-                         {path, Poison.encode!(code) }
-                       end)
-                     _ ->
-                       Enum.map(js_ast, fn({path, code}) ->
-                         {path, ElixirScript.javascript_ast_to_code!(code)}
-                       end)
-                   end
-    
 
     case options[:output] do
       nil ->
-        Enum.each(parse_result, fn({path, code})-> IO.write(code) end)
+        Enum.each(transpile_output, 
+          fn
+          ({_path, code})-> IO.write(code) 
+          (code)-> IO.write(code) 
+        end)
       output_path ->
-        Enum.each(parse_result, fn(x) ->
-          ElixirScript.write_to_file(x, output_path) 
+        Enum.each(transpile_output, fn(x) ->
+          write_to_file(x, output_path) 
         end)
 
         ElixirScript.copy_standard_libs_to_destination(output_path)
-        
-    end    
-  end
-
-  def handle_output(js_ast, options) do
-    parse_result = case options[:ast] do
-      true ->
-        Poison.encode!(js_ast)
-      _ ->
-        ElixirScript.javascript_ast_to_code!(js_ast) 
-    end
-
-    case options[:output] do
-      nil ->
-        IO.write(parse_result)
-      output_path ->
-        ElixirScript.write_to_file(parse_result, output_path)
     end
   end
 
-  def options_contains_unknown_values(options) do
-    Enum.any?(options, fn({key, value}) ->
-      if key in [:output, :ast, :elixir, :root] do
+  defp options_contains_unknown_values(options) do
+    Enum.any?(options, fn({key, _value}) ->
+      if key in [:output, :elixir, :root, :help] do
         false
       else
         true
       end
     end)
+  end
+
+  def write_to_file({ file_path, js_code }, destination) do
+    file_name = Path.join([destination, file_path])
+
+    if !File.exists?(Path.dirname(file_name)) do
+      File.mkdir_p!(Path.dirname(file_name))
+    end
+
+    File.write!(file_name, js_code)
   end
 end
