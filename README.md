@@ -10,7 +10,10 @@ Requirements
 Usage
 ========
 
-* As a library, you can add the following to your deps
+ElixirScript can be used in the following ways:
+
+
+* If using as part of a project, you can add the following to your deps
 
   ```elixir
     {:elixir_script, "~> 0.6"}
@@ -18,7 +21,7 @@ Usage
 
   From there you can either use the ElixirScript module directly or the mix command, `mix ex2js`
 
-* As a CLI Client
+* CLI Client
   
     You can download the latest release from the [releases](https://github.com/bryanjos/elixirscript/releases) page and use the included `ex2js` escript.
 
