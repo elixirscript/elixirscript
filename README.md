@@ -1,18 +1,27 @@
-ElixirScript
-============
-
-[Documentation](http://hexdocs.pm/elixir_script/)
+## ElixirScript [![Documentation](https://img.shields.io/badge/docs-hexpm-blue.svg)](http://hexdocs.pm/elixir_script/) [![Downloads](https://img.shields.io/hexpm/dt/elixir_script.svg)](https://hex.pm/packages/elixir_script)
 
 The goal is to convert a subset (or full set) of Elixir code to JavaScript, providing the ability to write JavaScript in Elixir. This is done by taking the Elixir AST and converting it into JavaScript AST and then to JavaScript code. This is done using the [Elixir-ESTree](https://github.com/bryanjos/elixir-estree) library.
-
-It also includes an escript CLI utility named ex2js. This takes files or Elixir code strings as input and emits Spider Monkey AST or JavaScript code. The results may be sent to standard output or files, based on the options selected.
-
-ElixirScript is now in hex. There are transpile functions in th ElixirScript module. There is also a mix task, `mix ex2js` that works exactly like the cli client.
 
 Requirements
 ===========
 * Elixir
 * Node or io.js (only for development)
+
+Usage
+========
+
+* As a library, you can add the following to your deps
+
+  ```elixir
+    {:elixir_script, "~> 0.6"}
+  ```
+
+  From there you can either use the ElixirScript module directly or the mix command, `mix ex2js`
+
+* As a CLI Client
+  
+    You can download the latest release from the [releases](https://github.com/bryanjos/elixirscript/releases) page and use the included `ex2js` escript.
+
 
 
 Development
@@ -20,7 +29,7 @@ Development
 
 Clone the repo
   
-    git clone git@github.com:bryanjos/ex_to_js.git
+    git clone git@github.com:bryanjos/elixirscript.git
 
 Get dependencies
 
@@ -39,20 +48,12 @@ To build distributable tarball
 
     mix ex2js.dist
 
-    `ex2js-version-tar.gz` will be in the `dist` folder
-
-Installation of the CLI client
-==============
-
-* uncompress `ex2js.tar.gz`.
-* use `ex2js` executable found in the ex2js/bin folder
-
+    `ex2js.tar.gz` will be in the `dist` folder
 
 Usage
 ===
 
 ```
-$ ex2js -h
   usage: ex2js <input> [options]
 
   <input> path to elixir files or 
@@ -66,26 +67,6 @@ $ ex2js -h
 ```
 
 #Limitations
-
-#### ~~Must define each module you are going to use upfront~~
-
-Should now be able to use modules without having to alias them upfront. If you reference a module using it's full name, an alias will automatically be created for it. If an alias already exists, then it will use that one instead. It's still early so there may be some bugs.
-
-Ex.
-
-```elixir
-defmodule Hello do
-    Lions.Tigers.Bears.oh_my(true)
-end
-```
-
-will turn into this in JavaScript
-
-```JavaScript
-import Bears from 'lions/tigers/bears';
-Bears.oh_my(true);
-```
-
 
 #### Not all of the Kernel.SpecialForms module is defined
 
