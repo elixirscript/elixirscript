@@ -10,7 +10,8 @@ defmodule ElixirScript.Mixfile do
       deps: deps,
       description: description,
       package: package,
-      source_url: "https://github.com/bryanjos/elixirscript"
+      source_url: "https://github.com/bryanjos/elixirscript",
+      aliases: aliases
     ]
   end
 
@@ -50,6 +51,46 @@ defmodule ElixirScript.Mixfile do
       },
       build_tools: ["mix"]
     ]
+  end
+
+  defp aliases do
+    [dist: &dist/1,
+     install: &install/1]
+  end
+
+  def dist(_) do
+   dist_folder = "dist"
+   folder_name = "#{dist_folder}/ex2js"
+   archive_file_name = "#{dist_folder}/ex2js.tar.gz"
+
+    Mix.Task.run "app.start"
+    Mix.Tasks.Escript.Build.run([])
+
+    if File.exists?(dist_folder) do
+      File.rm_rf(dist_folder)
+    end
+
+    System.cmd("gulp", ["dist"])
+
+    File.mkdir_p(folder_name <> "/bin")
+    File.cp!("ex2js", "#{folder_name}/bin/ex2js")
+    File.cp_r!("priv/javascript/dist", "#{folder_name}/lib")
+
+    System.cmd("tar", ["czf", archive_file_name, folder_name])
+
+    File.rm_rf(folder_name)
+  end
+
+  def install(_) do
+    Mix.Task.run "app.start"
+
+    System.cmd("tar", ["-zxvf", "dist/ex2js.tar.gz"])
+
+    File.rm_rf!("/usr/local/ex2js")
+
+    System.cmd("mv", ["dist/ex2js", "/usr/local/ex2js"])
+
+    IO.puts("installed at /usr/local/ex2js")
   end
   
 end
