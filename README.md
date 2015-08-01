@@ -75,9 +75,7 @@ Usage
 
 The following aren't defined (yet):
     
-* try
 * `__CALLER__`
-* `__DIR__`
 * `__ENV__`
 * quote
 * unquote
@@ -90,6 +88,9 @@ A lot of functions in the Kernel module are implemented. The Enum, Atom, List, T
 
 #### No Macro support
 Not sure how this would be implemented right now, but looking for ideas.
+
+#### Only rescue and after are currently supported on try expressions
+Just because the translation of `catch` and `else` haven't been figured out just yet
 
 #### Pattern matching works but is still limited
 Pattern matching does work quite well now, but the implementation still needs to be thoroughly tested in a number of situations. 
