@@ -154,6 +154,14 @@ defmodule ElixirScript.Translator.PatternMatching do
     {:list, names}
   end
 
+  def process_pattern([{:__aliases__, _, name}]) do
+    process_pattern({:%{}, [], [__struct__: name]})
+  end
+
+  def process_pattern({:__aliases__, _, name}) do
+    process_pattern({:%{}, [], [__struct__: name]})
+  end
+
   def process_pattern({:%, _, [{:__aliases__, _, name}, {:%{}, _, properties}]}) do
     process_pattern({:%{}, [], [__struct__: name] ++ properties})
   end
@@ -243,7 +251,6 @@ defmodule ElixirScript.Translator.PatternMatching do
     state = %{ index: 0, body: body }
 
     { params, state } = Enum.map_reduce(params, state, fn(p, current_state) ->
-
       { param, new_body } = do_build_pattern_matched_body(process_pattern(p), current_state.body, current_state.index, identifier_fn)
       { param, %{ current_state | index: current_state.index + 1, body: new_body } }
 

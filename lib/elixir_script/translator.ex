@@ -142,13 +142,8 @@ defmodule ElixirScript.Translator do
     ExKernel.make___DIR__()
   end
 
-
-  defp do_translate({:try, _, [ [do: do_block, rescue: clauses, after: after_block] ]}) do
-    Try.make_try(do_block, clauses, after_block)
-  end
-
-  defp do_translate({:try, _, [ [do: do_block, rescue: clauses] ]}) do
-    Try.make_try(do_block, clauses)
+  defp do_translate({:try, _, [ blocks ]}) do
+    Try.make_try(blocks)
   end
 
   defp do_translate({:receive, _, _expressions }) do
