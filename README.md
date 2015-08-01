@@ -89,8 +89,8 @@ A lot of functions in the Kernel module are implemented. The Enum, Atom, List, T
 #### No Macro support
 Not sure how this would be implemented right now, but looking for ideas.
 
-#### Only rescue and after are currently supported on try expressions
-Just because the translation of `catch` and `else` haven't been figured out just yet
+#### else blocks are currently not supported on try expressions
+Only because the translation of `else` haven't been figured out yet
 
 #### Pattern matching works but is still limited
 Pattern matching does work quite well now, but the implementation still needs to be thoroughly tested in a number of situations. 

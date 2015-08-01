@@ -183,18 +183,50 @@ defmodule ElixirScript.Translator.Try.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "raise when else or catch block exist" do
+  should "translate else" do
     ex_ast = quote do
       try do
-        do_something_that_may_fail(some_arg)
-      catch
-        :throw, :sample ->
-          IO.puts "This is printed regardless if it failed or succeed"
+        1 / x
+      else
+        y when y < 1 and y > -1 ->
+          :small
+        _ ->
+          :large
       end
     end
 
-    assert_raise ElixirScript.UnsupportedError, "Currently unsupported \"else and catch blocks\"", fn ->
+    assert_raise ElixirScript.UnsupportedError, "Currently unsupported \"try with else block\"", fn ->
       ex_ast_to_js(ex_ast)
     end
+  end
+
+  should "translate catch" do
+    ex_ast = quote do
+      try do
+        do_something_that_may_fail(some_arg)
+      rescue
+        ArgumentError ->
+          IO.puts "Invalid argument given"
+      catch
+        :throw, :Error ->
+          IO.puts "caught error"
+      end
+    end
+
+    js_code = """
+      try{
+        do_something_that_may_fail(some_arg)
+      } catch(e){
+        if(e instanceof Error){
+          IO.puts('caught error')          
+        } else if(Kernel.match__qmark__({'__struct__': Erlang.list(Erlang.atom('ArgumentError'))}, e)){
+          IO.puts('Invalid argument given')
+        }else{
+          throw e;
+        }
+      }
+    """
+
+    assert_translation(ex_ast, js_code)
   end
 end
