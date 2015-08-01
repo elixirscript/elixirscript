@@ -6,7 +6,7 @@ defmodule ElixirScript.Translator.Function do
   alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.PatternMatching
 
-  def make_function_or_property_call(module_name, function_name) do  
+  def make_function_or_property_call(module_name, function_name) do
     the_name = case module_name do
       {:__aliases__, _, name} ->
         name
@@ -45,7 +45,7 @@ defmodule ElixirScript.Translator.Function do
   def make_function_call(module_name, function_name, params) do
     the_name = case module_name do
       {:__aliases__, _, name} ->
-        List.last(name)
+        name
       {name, _, _} when is_atom(name) ->
         name
       {{:., _, [_module_name, _function_name]}, _, _params } = ast ->

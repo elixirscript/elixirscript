@@ -318,7 +318,7 @@ defmodule ElixirScript.Translator.Module do
     Enum.filter_map(@standard_libs,
       fn({ name, options }) -> name in used_standard_libs or name in [:JS, :SpecialForms]  end,
       fn({ name, options }) ->
-        options = update_options(options, root) 
+        options = update_options(options, root)
         case name do
           n when n in [:JS, :SpecialForms] ->
             ElixirScript.Translator.Import.make_alias_import({ nil, nil, [:Kernel] }, options)    

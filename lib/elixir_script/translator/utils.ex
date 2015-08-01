@@ -85,6 +85,12 @@ defmodule ElixirScript.Translator.Utils do
           build_function_name_ast(function_name),
           computed
         )
+      modules when is_list(modules) and length(modules) == 1 ->
+        Builder.member_expression(
+          Builder.identifier(hd(modules)),
+          build_function_name_ast(function_name),
+          computed
+        )
       {{:., _, [_module_name, _function_name]}, _, _params } = ast ->
         Builder.member_expression(
           Translator.translate(ast),
