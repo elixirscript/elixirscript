@@ -1,4 +1,6 @@
 # v0.7.0-dev
+* Enhancements
+  * Can now support rescue and after blocks in try expressions
 
 # v0.6.5
 * Enhancements
