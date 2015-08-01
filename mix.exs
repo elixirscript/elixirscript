@@ -26,8 +26,8 @@ defmodule ElixirScript.Mixfile do
       { :inflex, "~> 1.0" },
       { :estree, "~> 2.0" },
       { :shouldi, only: :test },
-      { :earmark, "~> 0.1", only: :docs },
-      { :ex_doc, "~> 0.7", only: :docs }
+      { :earmark, "~> 0.1", only: :dev },
+      { :ex_doc, "~> 0.7", only: :dev }
     ]
   end
 
