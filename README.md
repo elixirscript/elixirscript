@@ -80,7 +80,6 @@ The following aren't defined (yet):
 * quote
 * unquote
 * unquote_slicing
-* receive
 * super
 
 #### Most of the Standard Library isn't defined yet

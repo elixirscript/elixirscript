@@ -15,18 +15,17 @@ defmodule ElixirScript.Translator.Require.Test do
     end
 
     js_code = """
-      Kernel.SpecialForms.require( 
-        function(message){
-            return (function(){
-              if(Kernel.match__qmark__(Erlang.atom('ok'), message)){
-                return value;
-              }else if(Kernel.match__qmark__(Erlang.atom('error'), message)){
-                return null;
-              }else{
-                return IO.puts('Unexpected message received')
-              }
-            }.call(this));
-        })
+      Kernel.SpecialForms.receive(function(message) {
+        return (function() {
+          if (Kernel.match__qmark__(Erlang.atom('ok'), message)) {
+            return value;
+          } else if (Kernel.match__qmark__(Erlang.atom('error'), message)) {
+            return value;
+          } else {
+            return IO.puts('Unexpected message received');
+          }
+        }.call(this));;
+      })
     """
 
     assert_translation(ex_ast, js_code)
@@ -48,23 +47,19 @@ defmodule ElixirScript.Translator.Require.Test do
     end
 
     js_code = """
-      Kernel.SpecialForms.require( 
-        function(message){
-            return (function(){
-              if(Kernel.match__qmark__(Erlang.atom('ok'), message)){
-                return value;
-              }else if(Kernel.match__qmark__(Erlang.atom('error'), message)){
-                return null;
-              }else{
-                return IO.puts('Unexpected message received')
-              }
-            }.call(this));
-        },
-        5000,
-        function(time){
-          IO.puts('No message in 5 seconds')
-        }
-      )
+      Kernel.SpecialForms.receive(function(message) {
+        return (function() {
+          if (Kernel.match__qmark__(Erlang.atom('ok'), message)) {
+            return value;
+          } else if (Kernel.match__qmark__(Erlang.atom('error'), message)) {
+            return value;
+          } else {
+            return IO.puts('Unexpected message received');
+          }
+        }.call(this));;
+      }, 5000, function(time) {
+        return IO.puts('No message in 5 seconds');
+      })
     """
 
     assert_translation(ex_ast, js_code)

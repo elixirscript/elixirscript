@@ -19,6 +19,7 @@ defmodule ElixirScript.Translator do
   alias ElixirScript.Translator.Module
   alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.Bitstring
+  alias ElixirScript.Translator.Receive
   alias ElixirScript.Translator.Kernel, as: ExKernel
 
   @doc """
@@ -146,8 +147,9 @@ defmodule ElixirScript.Translator do
     Try.make_try(blocks)
   end
 
-  defp do_translate({:receive, _, _expressions }) do
-    raise ElixirScript.UnsupportedError, :receive
+  defp do_translate({:receive, _, [expressions] }) do
+    IO.inspect(expressions)
+    Receive.make_receive(expressions);
   end
 
   defp do_translate({:super, _, _expressions }) do

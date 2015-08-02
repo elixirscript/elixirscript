@@ -1,6 +1,7 @@
 # v0.8.0-dev
 * Enhancements
   * Can now support catch blocks in try expressions
+  * Added receive
 
 # v0.7.0
 * Enhancements
