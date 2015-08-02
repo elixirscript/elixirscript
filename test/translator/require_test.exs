@@ -25,6 +25,4 @@ defmodule ElixirScript.Translator.Require.Test do
 
     assert_translation(ex_ast, js_code)
   end
-
-
 end

@@ -26,22 +26,47 @@ let SpecialForms = {
     }
   },
 
-  alias: function(module, opts, context = this){
-    let alias = Symbol.keyFor(module.__MODULE__);
-
-    if(opts[Erlang.atom("as")]){
-      alias = Symbol.keyFor(opts[Erlang.atom("as")]);
-    }
-
-    context[alias] = module;
+  alias: function(module, opts){
+    return System.import(module.__MODULE__).resolve();
   },
 
-  require: function(module, opts, context = this){
+  require: function(module, opts){
     if(module === undefined){
       throw new Error("module is not loaded and could not be found");
     }
 
-    SpecialForms.alias(module, opts, context);
+    SpecialForms.alias(module, opts);
+  },
+
+  receive: function(receive_fun, timeout_in_ms = null, timeout_fn = (time) => true){
+    if (timeout_in_ms == null || timeout_in_ms === System.for('infinity')) {
+      while(true){
+        if(self.mailbox.length !== 0){
+          let message = self.mailbox[0];
+          self.mailbox = self.mailbox.slice(1);
+          return receive_fun(message);
+        }
+      }
+    }else if(timeout_in_ms === 0){
+      if(self.mailbox.length !== 0){
+        let message = self.mailbox[0];
+        self.mailbox = self.mailbox.slice(1);
+        return receive_fun(message);
+      }else{
+        return null;
+      }
+    }else{
+      let now = Date.now();
+      while(Date.now() < (now + timeout_in_ms)){
+        if(self.mailbox.length !== 0){
+          let message = self.mailbox[0];
+          self.mailbox = self.mailbox.slice(1);
+          return receive_fun(message);
+        }
+      }
+
+      return timeout_fn(timeout_in_ms);
+    }
   }
 };
 

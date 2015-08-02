@@ -8,13 +8,6 @@ let Kernel = {
   SpecialForms: SpecialForms,
   JS: JS,
 
-  defmodule: function(alias, list2, root){
-    let moduleAtom = alias[alias.length - 1];
-    let parent = Kernel.JS.create_namespace(alias, root);
-
-    return Object.assign(parent, list2(moduleAtom));
-  },
-
   tl: function(list){
     return Erlang.list(...list.slice(1));
   },
@@ -89,8 +82,8 @@ let Kernel = {
   },
 
   __in__: function(left, right){
-    for(let x of collection){
-      if(x === value){
+    for(let x of right){
+      if(Kernel.match__qmark__(left, x)){
         return true;
       }
     }
@@ -108,7 +101,7 @@ let Kernel = {
 
   elem: function(tuple, index){
     if(Kernel.is_list(tuple)){
-      return tuple[i];
+      return tuple[index];
     }
 
     return tuple.get(index);
