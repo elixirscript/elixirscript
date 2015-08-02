@@ -1,4 +1,5 @@
-import BitString from './bit_string'
+import BitString from './bit_string';
+self.mailbox = self.mailbox || {};
 
 function atom (_value) {
   return Symbol.for(_value);
@@ -6,7 +7,7 @@ function atom (_value) {
 
 function list(...args){
   return Object.freeze(args);
-};
+}
 
 
 function tuple(...args){
@@ -27,7 +28,7 @@ function tuple(...args){
   };
 
   return this;
-};
+}
 
 tuple.prototype[Symbol.iterator] = function(){
   return this.value()[Symbol.iterator]();
@@ -67,7 +68,7 @@ function bitstring(...args){
   };
 
   return this;
-};
+}
 
 bitstring.prototype[Symbol.iterator] = function () {
   return this.value()[Symbol.iterator]();
@@ -169,7 +170,7 @@ let Erlang = {
   tuple: tuple,
   list: list,
   bitstring: bitstring
-}
+};
 
 export default Erlang;
 
