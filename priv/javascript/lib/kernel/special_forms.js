@@ -3,31 +3,37 @@ import Erlang from '../erlang';
 let SpecialForms = {
   __MODULE__: Erlang.atom('SpecialForms'),
 
-  import: function(module, opts, context = this){
+  import: function(module, opts){
+    let imported_module = SpecialForms.alias(module);
+
     if(opts.length === 0){
-      for(let [key, value] of module){
-        context[key] = value;
-      }
+      return imported_module;
     }else if(opts[Erlang.atom("only")]){
+      let exported = {};
       for(let item of opts[Erlang.atom("only")]){
         let key = Symbol.keyFor(item.get(0));
-        context[key] = module[key];
+        exported[key] = imported_module[key];
       }
+
+      return exported;
     }else if(opts[Erlang.atom("except")]){
+      let exported = {};
       let except_list = opts[Erlang.atom("except")];
 
-      for(let [key, value] of module){
+      for(let [key, value] of imported_module){
         for(let i = 0; i < except_list.length; i++){
           if(except_list[i] === Erlang.atom(key)){
-            context[key] = value;
+            exported[key] = imported_module[key];
           }
         }
       }
+
+      return exported;
     }
   },
 
   alias: function(module, opts){
-    return System.import(module.__MODULE__).resolve();
+    return System.import(module).resolve();
   },
 
   require: function(module, opts){

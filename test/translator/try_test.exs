@@ -13,15 +13,17 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-      try{
-        do_something_that_may_fail(some_arg)
-      } catch(e){
-        if(Kernel.match__qmark__({'__struct__': Erlang.list(Erlang.atom('ArgumentError'))}, e)){
-          IO.puts('Invalid argument given')
-        }else{
-          throw e;
+      (function(){
+        try{
+          return do_something_that_may_fail(some_arg);
+        } catch(e){
+          if(Kernel.match__qmark__({'__struct__': Erlang.list(Erlang.atom('ArgumentError'))}, e)){
+            return IO.puts('Invalid argument given');
+          }else{
+            throw e;
+          }
         }
-      }
+      }.call(this));
     """
 
     assert_translation(ex_ast, js_code)
@@ -38,15 +40,17 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-      try{
-        do_something_that_may_fail(some_arg)
-      } catch(e){
-        if(Kernel.match__qmark__({'__struct__': Erlang.list(Erlang.atom('ArgumentError'))}, e)){
-          IO.puts('Invalid argument given')
-        }else{
-          throw e;
+      (function(){
+        try{
+          return do_something_that_may_fail(some_arg);
+        } catch(e){
+          if(Kernel.match__qmark__({'__struct__': Erlang.list(Erlang.atom('ArgumentError'))}, e)){
+            return IO.puts('Invalid argument given');
+          }else{
+            throw e;
+          }
         }
-      }
+      }.call(this));
     """
 
     assert_translation(ex_ast, js_code)
@@ -63,15 +67,17 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-      try {
-        do_something_that_may_fail(some_arg)
-      } catch (e) {
-        if (Kernel.__in__(x, Erlang.list({'__struct__': Erlang.list(Erlang.atom('ArgumentError'))}))) {
-          IO.puts('Invalid argument given')
-        } else {
-          throw e;
+      (function(){
+        try {
+          return do_something_that_may_fail(some_arg);
+        } catch (e) {
+          if (Kernel.__in__(x, Erlang.list({'__struct__': Erlang.list(Erlang.atom('ArgumentError'))}))) {
+            return IO.puts('Invalid argument given');
+          } else {
+            throw e;
+          }
         }
-      }
+      }.call(this));
     """
 
     assert_translation(ex_ast, js_code)
@@ -88,16 +94,18 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-      try {
-        do_something_that_may_fail(some_arg)
-      } catch (e) {
-        if (true) {
-          let x = e;
-          IO.puts('Invalid argument given')
-        } else {
-          throw e;
+      (function(){
+        try {
+          return do_something_that_may_fail(some_arg);
+        } catch (e) {
+          if (true) {
+            let x = e;
+            return IO.puts('Invalid argument given');
+          } else {
+            throw e;
+          }
         }
-      }
+      }.call(this));
     """
 
     assert_translation(ex_ast, js_code)
@@ -117,18 +125,20 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-      try{
-        do_something_that_may_fail(some_arg)
-      } catch(e){
-        if(Kernel.match__qmark__({'__struct__': Erlang.list(Erlang.atom('ArgumentError'))}, e)){
-          IO.puts('ArgumentError')
-        } else if (true) {
-          let x = e;
-          IO.puts('x')
-        } else{
-          throw e;
+      (function(){
+        try{
+          return do_something_that_may_fail(some_arg);
+        } catch(e){
+          if(Kernel.match__qmark__({'__struct__': Erlang.list(Erlang.atom('ArgumentError'))}, e)){
+            return IO.puts('ArgumentError');
+          } else if (true) {
+            let x = e;
+            return IO.puts('x');
+          } else{
+            throw e;
+          }
         }
-      }
+      }.call(this));
     """
 
     assert_translation(ex_ast, js_code)
@@ -147,17 +157,19 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-      try{
-        do_something_that_may_fail(some_arg)
-      } catch(e){
-        if(Kernel.match__qmark__({'__struct__': Erlang.list(Erlang.atom('ArgumentError'))}, e)){
-          IO.puts('Invalid argument given')
-        }else{
-          throw e;
+      (function(){
+        try{
+          return do_something_that_may_fail(some_arg);
+        } catch(e){
+          if(Kernel.match__qmark__({'__struct__': Erlang.list(Erlang.atom('ArgumentError'))}, e)){
+            return IO.puts('Invalid argument given');
+          }else{
+            throw e;
+          }
+        } finally{
+          return IO.puts('This is printed regardless if it failed or succeed');
         }
-      } finally{
-        IO.puts('This is printed regardless if it failed or succeed')
-      }
+      }.call(this));
     """
 
     assert_translation(ex_ast, js_code)
@@ -173,11 +185,13 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-      try{
-        do_something_that_may_fail(some_arg)
-      } finally{
-        IO.puts('This is printed regardless if it failed or succeed')
-      }
+      (function(){
+        try{
+          return do_something_that_may_fail(some_arg);
+        } finally{
+          return IO.puts('This is printed regardless if it failed or succeed');
+        }
+      }.call(this));
     """
 
     assert_translation(ex_ast, js_code)
@@ -214,17 +228,19 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-      try{
-        do_something_that_may_fail(some_arg)
-      } catch(e){
-        if(e instanceof Error){
-          IO.puts('caught error')          
-        } else if(Kernel.match__qmark__({'__struct__': Erlang.list(Erlang.atom('ArgumentError'))}, e)){
-          IO.puts('Invalid argument given')
-        }else{
-          throw e;
+      (function(){
+        try{
+          return do_something_that_may_fail(some_arg);
+        } catch(e){
+          if(e instanceof Error){
+            return IO.puts('caught error');          
+          } else if(Kernel.match__qmark__({'__struct__': Erlang.list(Erlang.atom('ArgumentError'))}, e)){
+            return IO.puts('Invalid argument given');
+          }else{
+            throw e;
+          }
         }
-      }
+      }.call(this));
     """
 
     assert_translation(ex_ast, js_code)

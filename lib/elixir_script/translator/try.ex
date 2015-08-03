@@ -3,6 +3,8 @@ defmodule ElixirScript.Translator.Try do
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
   alias ElixirScript.Translator.PatternMatching
+  alias ElixirScript.Translator.Function
+  alias ElixirScript.Translator.Utils
 
   @error_identifier JS.identifier(:e)
 
@@ -31,10 +33,14 @@ defmodule ElixirScript.Translator.Try do
         )
     end
 
-    JS.try_statement(
-      JS.block_statement(List.wrap(Translator.translate(try_block))),
-      the_catch,
-      process_after_block(after_block)
+    Utils.wrap_in_function_closure(
+      JS.try_statement(
+        Function.return_last_expression(
+          JS.block_statement(List.wrap(Translator.translate(try_block)))
+        ),
+        the_catch,
+        Function.return_last_expression(process_after_block(after_block))
+      )
     )
   end
 
@@ -132,7 +138,7 @@ defmodule ElixirScript.Translator.Try do
     processed_clauses
     |> Enum.reverse
     |> Enum.reduce(JS.block_statement([JS.throw_statement(@error_identifier)]), fn(x, ast) ->
-        %{x | alternate: ast }
+        %{x | consequent: Function.return_last_expression(x.consequent), alternate: ast }
     end)
     |> List.wrap
   end

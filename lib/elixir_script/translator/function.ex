@@ -109,6 +109,10 @@ defmodule ElixirScript.Translator.Function do
     |> return_last_expression
   end
 
+  def return_last_expression(nil) do
+    nil
+  end
+
   def return_last_expression([]) do
     [Builder.return_statement(Builder.literal(nil))]
   end
