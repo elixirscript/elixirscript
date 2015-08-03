@@ -1,6 +1,7 @@
 # v0.8.0-dev
 * Enhancements
   * Can now support catch blocks in try expressions
+  * Wrapped try's in function closure to make sure they return a value;
   * Added receive
 
 # v0.7.0
