@@ -19,6 +19,7 @@ defmodule ElixirScript.Translator.Module do
     {:Mutable, from: "__lib/mutable" },
     {:Range, from: "__lib/range" },
     {:Tuple, from: "__lib/tuple" },
+    {:Funcy, from: "__lib/funcy" },
   ]
 
   def make_module(module_name_list, nil) do
@@ -26,6 +27,12 @@ defmodule ElixirScript.Translator.Module do
   end
 
   def make_module(module_name_list, body) do
+
+    #TODO: get functions from module, add them by name. Later, create function clauses for them.
+    #%{
+    #  exported: HashSet.new() #set of a list of functions by name
+    #  local: HashSet.new() #set of a list of functions by name
+    #}
 
     body = case body do
       {:__block__, meta2, list2} ->

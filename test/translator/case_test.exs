@@ -12,13 +12,20 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-      (function(){
-        if(Kernel.match__qmark__(Erlang.atom('ok'), data)){
-          return value;
-        }else if(Kernel.match__qmark__(Erlang.atom('error'), data)){
-          return null;
-        }
-      }.call(this));
+      funcy.fun(
+        [
+          [Erlang.atom('ok')],
+          function(){
+            return value;
+          }
+        ],
+        [
+          [Erlang.atom('error')],
+          function(){
+            return nil;
+          }
+        ]
+      ).call(data);
     """
 
     assert_translation(ex_ast, js_code)
@@ -77,14 +84,24 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-      (function(){
-        if(Kernel.__in__(number, Erlang.list(1, 2, 3, 4))){
-          let value = 13;
-          return value;
-        }else{
-          return true;
-        }
-      }.call(this));
+      funcy.fun(
+        [
+          [funcy.parameter],
+          function(number){
+            let value = 13;
+            return value;
+          },
+          function(number){
+            return Kernel.__in__(number, Erlang.list(1, 2, 3, 4));
+          }
+        ],
+        [
+          [funcy.wildcard],
+          function(){
+            return true;
+          }
+        ]
+      ).call(data);
     """
 
     assert_translation(ex_ast, js_code)
