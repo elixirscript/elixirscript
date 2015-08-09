@@ -83,22 +83,24 @@ defmodule ElixirScript.Translator.Bug.Test do
 
 
     js_code = """
-     export function getDispatcher() {
-         return DeLorean.Flux.createDispatcher({
-             'startPainting': function () {
-                 return this.dispatch('startPainting');
-             },
-             'stopPainting': function () {
-                 return this.dispatch('stopPainting');
-             },
-             'addPoint': function (data) {
-                 return this.dispatch('addPoint', data);
-             },
-             'getStores': function () {
-                 return { 'graphic': GraphicStore };
-             }
-         });
-     }
+      let getDispatcher = funcy.fun([[], function() {
+        return DeLorean.Flux.createDispatcher({
+          'startPainting': funcy.fun([[], function() {
+            return this.dispatch('startPainting');
+          }]),
+          'stopPainting': funcy.fun([[], function() {
+            return this.dispatch('stopPainting');
+          }]),
+          'addPoint': funcy.fun([[funcy.parameter], function(data) {
+            return this.dispatch('addPoint', data);
+          }]),
+          'getStores': funcy.fun([[], function() {
+            return {
+              'graphic': GraphicStore
+            };
+          }])
+        });
+      }]);
     """
 
     assert_translation(ex_ast, js_code)

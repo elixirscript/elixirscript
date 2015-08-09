@@ -1,9 +1,7 @@
 import fun from './funcy/fun';
-import unification from './funcy/unification';
 
 export default {
   fun: fun,
-  unify: unification.unify,
   parameter: function(name, orElse) {
     function Parameter(n, o) {
       this.name = n;

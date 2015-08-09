@@ -131,20 +131,18 @@ defmodule ElixirScript.Translator.Data do
   end
 
   defp do_make_defstruct(name, params, defaults) do
-    Builder.export_named_declaration(
-      Builder.function_declaration(
-        Builder.identifier(name),
-        Enum.map(params, &Builder.identifier(&1)),
-        Enum.map(defaults, &Translator.translate(&1)),
-        Builder.block_statement([
-          Builder.return_statement(
-            Builder.object_expression(
-              [Builder.property(Builder.identifier(:__struct__), Builder.identifier(:__MODULE__))] ++
-              Enum.map(params, fn(x) -> Builder.property(Builder.identifier(x), Builder.identifier(x)) end)
-            )
+    Builder.function_declaration(
+      Builder.identifier(name),
+      Enum.map(params, &Builder.identifier(&1)),
+      Enum.map(defaults, &Translator.translate(&1)),
+      Builder.block_statement([
+        Builder.return_statement(
+          Builder.object_expression(
+            [Builder.property(Builder.identifier(:__struct__), Builder.identifier(:__MODULE__))] ++
+            Enum.map(params, fn(x) -> Builder.property(Builder.identifier(x), Builder.identifier(x)) end)
           )
-        ])
-      )
+        )
+      ])
     )
   end
 

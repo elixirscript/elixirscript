@@ -27,7 +27,7 @@ defmodule ElixirScript.Translator.Receive do
     )
   end
 
-  def make_receive([do: clauses, after:   [{:->, _, [[time], body]}]]) do
+  def make_receive([do: clauses, after: [{:->, _, [[time], _body]}] = after_clause]) do
     JS.call_expression(
       JS.member_expression(
         JS.member_expression(
@@ -47,7 +47,7 @@ defmodule ElixirScript.Translator.Receive do
           ])
         ),
         Translator.translate(time),
-        ElixirScript.Translator.Function.make_anonymous_function([{:__aliases__, [], [:time]}], body)    
+        ElixirScript.Translator.Function.make_anonymous_function(after_clause)    
       ]
     ) 
   end

@@ -10,23 +10,8 @@ defmodule ElixirScript.Translator.If.Test do
     end
 
     js_code = """
-      funcy.fun([
-        [false],
-        function(){
-          return null;
-        }
-      ],
-      [
-        [true],
-        function(){
-          let a = 1;
-          return a;
-        }
-      ]
-      ).call(1 == 1);
-
-      (function(){
-        if(1 == 1){
+      (function() {
+        if (1 == 1) {
           let a = 1;
           return a;
         }

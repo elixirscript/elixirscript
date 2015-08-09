@@ -8,6 +8,7 @@ defmodule ElixirScript.Translator do
   alias ElixirScript.Translator.PatternMatching
   alias ElixirScript.Translator.Data
   alias ElixirScript.Translator.Function
+  alias ElixirScript.Translator.Capture
   alias ElixirScript.Translator.Expression
   alias ElixirScript.Translator.Import
   alias ElixirScript.Translator.If
@@ -46,21 +47,22 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:&, [], [number]}) when is_number(number) do
-    Utils.make_array_accessor_call("arguments", number - 1)
+    Primitive.make_identifier(String.to_atom("__#{number}"))
   end
 
-  defp do_translate({:&, _, [{:/, _, [{{:., _, [{:__aliases__, _, module_name}, function_name]}, _, []}, _arity]}]}) do
+  defp do_translate({:&, _, [{:/, _, [{{:., _, [{:__aliases__, _, module_name}, function_name]}, _, []}, arity]}]}) do
     function_name = Utils.filter_name(function_name)
-    Utils.make_member_expression(List.last(module_name), function_name)
+    Capture.make_capture(List.last(module_name), function_name, arity)
   end
 
-  defp do_translate({:&, _, [{:/, _, [{function_name, _, _}, _arity]}]}) do
+  defp do_translate({:&, _, [{:/, _, [{function_name, _, _}, arity]}]}) do
     function_name = Utils.filter_name(function_name)
-    Primitive.make_identifier(function_name)
+    Capture.make_capture(function_name, arity)
   end
 
   defp do_translate({:&, _, body}) do
-    Function.make_anonymous_function([], body)
+    params = Capture.find_value_placeholders(body) |> List.flatten
+    Function.make_anonymous_function([{:->, [], [params, body]}])
   end
 
   defp do_translate({:@, _, [{name, _, [value]}]}) do
@@ -148,7 +150,6 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:receive, _, [expressions] }) do
-    IO.inspect(expressions)
     Receive.make_receive(expressions);
   end
 
@@ -212,8 +213,8 @@ defmodule ElixirScript.Translator do
     For.make_for(generators)
   end
 
-  defp do_translate({:fn, _, [{:->, _, [params, body]}]}) do
-    Function.make_anonymous_function(params, body)
+  defp do_translate({:fn, _, clauses}) do
+    Function.make_anonymous_function(clauses)
   end
 
   defp do_translate({:.., _, [first, last]}) do
@@ -252,32 +253,12 @@ defmodule ElixirScript.Translator do
     Expression.make_binary_expression(:||, left, right)
   end
 
-  defp do_translate({:def, _, [{:when, _, [{_name, _, _params} | _guards] }, [do: _body]] } = ast) do
-    {:def, _, [{:when, _, [{name, _, params} | guards] }, [do: body]] } = Variables.process(ast)
-
-    name = Utils.filter_name(name)
-    Function.make_export_function(name, params, body, guards)
+  defp do_translate({function, _, [{:when, _, [{name, _, _params} | _guards] }, [do: _body]] } = ast) when function in [:def, :defp] do
+    Function.process_function(Utils.filter_name(name), [ast])
   end
 
-  defp do_translate({:def, _, [{_name, _, _params}, [do: _body]]} = ast) do
-    {:def, _, [{name, _, params}, [do: body]]} = Variables.process(ast)
-
-    name = Utils.filter_name(name)
-    Function.make_export_function(name, params, body)
-  end
-
-  defp do_translate({:defp, _, [{:when, _, [{_name, _, _params} | _guards] }, [do: _body]] } = ast) do
-    {:defp, _, [{:when, _, [{name, _, params} | guards] }, [do: body]] } = Variables.process(ast)
-
-    name = Utils.filter_name(name)
-    Function.make_function(name, params, body, guards)
-  end
-
-  defp do_translate({:defp, _, [{_name, _, _params}, [do: _body]]} = ast) do
-    {:defp, _, [{name, _, params}, [do: body]]} = Variables.process(ast)
-
-    name = Utils.filter_name(name)
-    Function.make_function(name, params, body)
+  defp do_translate({function, _, [{name, _, _params}, [do: _body]]} = ast) when function in [:def, :defp] do
+    Function.process_function(Utils.filter_name(name), [ast])
   end
 
   defp do_translate({:defstruct, _, attributes}) do

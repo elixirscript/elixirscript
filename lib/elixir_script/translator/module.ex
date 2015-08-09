@@ -1,11 +1,13 @@
 defmodule ElixirScript.Translator.Module do
   @moduledoc false
   require Logger
-  alias ESTree.Tools.Builder
+  alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.JSModule
   alias ElixirScript.Preprocess.Aliases
+  alias ElixirScript.Translator.PatternMatching.Match
+  alias ElixirScript.Translator.Function
 
   @standard_libs [
     {:Erlang, from: "__lib/erlang" },
@@ -28,13 +30,79 @@ defmodule ElixirScript.Translator.Module do
 
   def make_module(module_name_list, body) do
 
-    #TODO: get functions from module, add them by name. Later, create function clauses for them.
-    #%{
-    #  exported: HashSet.new() #set of a list of functions by name
-    #  local: HashSet.new() #set of a list of functions by name
-    #}
+    body = make_inner_module_aliases(module_name_list, body)
+
+    { body, aliases, used_stdlibs } = Aliases.process(body)
+
+    { body, functions } = extract_functions_from_module(body)
+    { exported_functions, private_functions } = process_functions(functions)
+
+    #Translate body
+    body = Translator.translate(body)
 
     body = case body do
+      [%ESTree.BlockStatement{ body: body }] ->
+        body
+      %ESTree.BlockStatement{ body: body } ->
+        body
+      _ ->
+        List.wrap(body)
+    end
+
+    {imports, body} = extract_imports_from_body(body)
+    {structs, body} = extract_structs_from_body(body)
+
+
+    #Add imports found from walking the ast
+    #and make sure to only put one declaration per alias    
+    imports = process_imports(imports, aliases)
+    imports = imports.imports
+
+    #Collect all the functions so that we can process their arity
+    body = Enum.map(body, fn(x) ->
+      case x do
+        %ESTree.CallExpression{} ->
+          JS.expression_statement(x)
+        _ ->
+          x
+      end     
+    end)
+
+    body = Utils.inflate_groups(body)
+
+    exported_object = JS.object_expression(
+      make_defstruct_property(structs) ++
+      Enum.map(exported_functions, fn({key, _value}) -> 
+        JS.property(JS.identifier(key), JS.identifier(key))
+      end)
+    )
+
+    exported_functions = Enum.map(exported_functions, fn({_key, value}) -> value end)
+    private_functions = Enum.map(private_functions, fn({_key, value}) -> value end)
+
+    default = JS.export_default_declaration(exported_object)
+    {modules, body} = Enum.partition(body, fn(x) ->
+      case x do
+        %JSModule{} ->
+          true
+        _ ->
+          false
+      end
+    end)
+
+    result = [
+      %JSModule{
+        name: module_name_list,
+        body: imports ++ List.wrap(create__module__(module_name_list)) ++ body ++ structs ++ private_functions ++ exported_functions ++ [default],
+        stdlibs: used_stdlibs |> HashSet.to_list
+      }
+    ] ++ List.flatten(modules)
+    
+    result
+  end
+
+  defp make_inner_module_aliases(module_name_list, body) do
+    case body do
       {:__block__, meta2, list2} ->
         list2 = Enum.map(list2, fn(x) ->
           case x do
@@ -59,24 +127,47 @@ defmodule ElixirScript.Translator.Module do
       _ ->
         body 
     end
+  end
 
-    { body, aliases, used_stdlibs } = Aliases.process(body)
+  defp extract_functions_from_module({:__block__, meta, body_list}) do
+    { body_list, functions } = Enum.map_reduce(body_list,
+      %{exported: HashDict.new(), private: HashDict.new()}, fn
+        ({:def, _, [{:when, _, [{name, _, _} | _guards] }, _] } = function, state) ->
+          {
+            nil,
+            %{ state | exported: HashDict.put(state.exported, name, HashDict.get(state.exported, name, []) ++ [function]) }
+          }
+        ({:def, _, [{name, _, _}, _]} = function, state) ->
+          {
+            nil,
+            %{ state | exported: HashDict.put(state.exported, name, HashDict.get(state.exported, name, []) ++ [function]) }
+          }
+        ({:defp, _, [{:when, _, [{name, _, _} | _guards] }, _] } = function, state) ->
+          {
+            nil,
+            %{ state | private: HashDict.put(state.private, name, HashDict.get(state.private, name, []) ++ [function]) }
+          }
+        ({:defp, _, [{name, _, _}, _]} = function, state) ->
+          {
+            nil,
+            %{ state | private: HashDict.put(state.private, name, HashDict.get(state.private, name, []) ++ [function]) }
+          }
+        (x, state) ->
+          { x, state }
+      end)
 
-    #Translate body
-    body = Translator.translate(body)
+    body_list = Enum.filter(body_list, fn(x) -> !is_nil(x) end)
+    body = {:__block__, meta, body_list}
 
-    body = case body do
-      [%ESTree.BlockStatement{ body: body }] ->
-        body
-      %ESTree.BlockStatement{ body: body } ->
-        body
-      _ ->
-        List.wrap(body)
-    end
+    { body, functions }
+  end
 
-    #Partition imports from body. 
-    #We will place these at the top of body later
-    {imports, body} = Enum.partition(body, fn(x) ->
+  defp extract_functions_from_module(body) do
+    extract_functions_from_module({:__block__, [], List.wrap(body)})
+  end
+
+  defp extract_imports_from_body(body) do
+    Enum.partition(body, fn(x) ->
       case x do
         %ESTree.ImportDeclaration{} ->
           true
@@ -84,10 +175,34 @@ defmodule ElixirScript.Translator.Module do
           false
       end
     end)
+  end
 
-    #Add imports found from walking the ast
-    #and make sure to only put one declaration per alias    
-    imports = imports ++ make_imports(aliases)
+  defp extract_structs_from_body(body) do
+    Enum.partition(body, fn(x) ->
+      case x do
+        %ESTree.FunctionDeclaration{} ->
+          true
+        _ ->
+          false
+      end
+    end)
+  end
+
+  defp make_defstruct_property([]) do
+    []
+  end
+
+  defp make_defstruct_property([the_struct]) do
+    case the_struct do
+      %ESTree.FunctionDeclaration{id: %ESTree.Identifier{name: :defstruct}} ->
+        [JS.property(JS.identifier(:defstruct), JS.identifier(:defstruct))]
+      %ESTree.FunctionDeclaration{id: %ESTree.Identifier{name: :defexception}} ->
+        [JS.property(JS.identifier(:defexception), JS.identifier(:defexception))]    
+    end
+  end
+
+  defp process_imports(imports, aliases) do
+    imports ++ make_imports(aliases)
     |> Enum.reduce(HashSet.new, fn(x, acc)-> 
       HashSet.put(acc, x) 
     end)
@@ -110,204 +225,38 @@ defmodule ElixirScript.Translator.Module do
           %{ state | imports: state.imports ++ [x] } 
       end                     
     end)
-
-    imports = imports.imports
-
-    #Collect all the functions so that we can process their arity
-    {body, functions_dict} = Enum.map_reduce(body, HashDict.new(), fn(x, acc) ->
-      case x do
-        %ESTree.FunctionDeclaration{} ->
-          add_function_to_dict(acc, x, :private)
-        %ESTree.ExportNamedDeclaration{ declaration: %ESTree.FunctionDeclaration{} = function } ->
-          add_function_to_dict(acc, function, :export)
-        %ESTree.CallExpression{} ->
-          {Builder.expression_statement(x), acc}
-        _ ->
-          {x, acc}
-      end
-    end)
-
-    body = Utils.inflate_groups(body)
-
-    functions = Enum.flat_map(functions_dict, fn({_, data})-> process_function_arity(data) end)
-
-    exported_object = Builder.object_expression(
-        Enum.filter_map(functions_dict, fn({_key, value}) -> 
-          value.access == :export
-        end, fn({key, _value}) -> 
-          Builder.property(Builder.identifier(key), Builder.identifier(key))
-        end)
-      )
-
-    default = Builder.export_default_declaration(exported_object)
-
-    #Filter out original functions from the body
-    body = Enum.filter(body, fn(x) -> 
-      case x do 
-        %ESTree.FunctionDeclaration{} ->
-          false
-        %ESTree.ExportNamedDeclaration{ declaration: %ESTree.FunctionDeclaration{} } ->
-          false
-        _ ->
-          true
-      end
-    end)
-
-    {modules, body} = Enum.partition(body, fn(x) ->
-      case x do
-        %JSModule{} ->
-          true
-        _ ->
-          false
-      end
-    end)
-
-    result = [
-      %JSModule{
-        name: module_name_list,
-        body: imports ++ List.wrap(create__module__(module_name_list)) ++ body ++ functions ++ [default],
-        stdlibs: used_stdlibs |> HashSet.to_list
-      }
-    ] ++ List.flatten(modules)
-    
-    result
   end
 
-  defp add_function_to_dict(dict, function, access) do
-    name = function.id.name
-    dict = if HashDict.has_key?(dict, name) do
-      current_state = HashDict.get(dict, name)
-      new_state = %{current_state | functions: current_state.functions ++ [function]}
-      HashDict.put(dict, name, new_state)
-    else
-      HashDict.put(dict, name, %{name: name, access: access, functions: [function]})
-    end
-
-    {function, dict}
-  end
-
-  defp process_function_arity(%{name: _name, access: _access, functions: [function]}) do
-    [function]
-  end
-
-  defp process_function_arity(%{name: name, access: _access, functions: functions}) do
-
-    processed_functions = Enum.map(functions, fn(x) ->
-      arity = length(x.params)
-      new_function_name = String.to_atom("#{x.id.name}__#{arity}")
-      new_function = %ESTree.FunctionDeclaration{ x | id: Builder.identifier(new_function_name)}
-      { new_function, new_function_name, arity }
-    end)
-    |> Enum.sort(fn({_,_, arityOne}, {_,_,arityTwo})-> arityOne < arityTwo end)
-
-    last_function_index = length(processed_functions) - 1
-
-    function_arity_groups = Enum.group_by(processed_functions, fn({_, _, arity}) -> arity end)
-
-    processed_functions = Enum.map(function_arity_groups, fn({_arity, functions}) ->
-      process_same_function_arity(name, functions)
+  defp process_functions(%{ exported: exported, private: private }) do
+    exported_functions = Enum.map(Dict.keys(exported), fn(key) ->
+      functions = Dict.get(exported, key)
+      { key, Function.process_function(key, functions) }
     end)
 
-    { case_statements, _} = Enum.map_reduce(processed_functions, 0, fn({_function, name, arity}, index) -> 
-      
-      function_call = case index == last_function_index do
-        true ->
-          Translator.translate(quote do: unquote(name).apply(nil, args))
-        _ ->
-          Translator.translate(quote do: unquote(name).apply(nil, args.slice(0, unquote(arity) + 1)))
-      end
-
-      switch_case = Builder.switch_case(
-        Translator.translate(quote do: unquote(arity)), 
-        [Builder.return_statement(function_call)]
-      )
-
-      {switch_case, index + 1}
+    private_functions = Enum.map(Dict.keys(private), fn(key) ->
+      functions = Dict.get(private, key)
+      { key, Function.process_function(key, functions) }
     end)
 
-    default_statement = Builder.switch_case(
-      nil, 
-      [
-        Builder.throw_statement(
-          Builder.new_expression(
-            Builder.identifier("RuntimeError"),
-            [
-              Builder.binary_expression(
-                :+,
-                Builder.literal("undefined function: #{name}/"),
-                Utils.make_member_expression(:args, :length)
-              )
-            ]
-          )
-        ),
-        Builder.break_statement(nil)
-      ]
-    )
-
-    switch_statement = Builder.switch_statement(
-      Utils.make_member_expression(:args, :length),
-      case_statements ++ [default_statement]
-    )
-
-    master_function = Builder.function_declaration(
-      Builder.identifier(name),
-      [Builder.rest_element(Builder.identifier(:args))],
-      [],
-      Builder.block_statement([switch_statement])
-    )
-
-    Enum.map(processed_functions, fn({function, _, _}) -> function end) ++ [master_function]
-  end
-
-  defp process_same_function_arity(function_name, functions) do
-    function_bodies = Enum.flat_map(functions, fn({ new_function, _new_function_name, _arity }) -> 
-      new_function.body.body
-    end)
-
-    { nf, new_function_name, arity } = Enum.find(functions, hd(functions), fn({ nf, _, _ }) ->
-      Enum.any?(nf.params, fn(x) -> 
-        case x do
-          %ESTree.Identifier{name: "_ref" <> _position} ->
-            false
-          _ ->
-            true
-        end
-      end) == true
-    end)
-
-    function_bodies = function_bodies ++ [
-      Utils.make_throw_statement(
-        "FunctionClauseError",
-        "no function clause matching in #{function_name}/#{arity}"
-      )
-    ]
-
-    new_function = Builder.function_declaration(
-      nf.id,
-      nf.params,
-      nf.defaults,
-      Builder.block_statement(function_bodies)
-    )
-
-    { new_function, new_function_name, arity }
+    { exported_functions, private_functions }
   end
 
   def make_attribute(name, value) do
-    declarator = Builder.variable_declarator(
-      Builder.identifier(name),
+    declarator = JS.variable_declarator(
+      JS.identifier(name),
       ElixirScript.Translator.translate(value)
     )
 
-    Builder.variable_declaration([declarator], :const)
+    JS.variable_declaration([declarator], :const)
   end
 
   defp create__module__(module_name_list) do
-    declarator = Builder.variable_declarator(
-      Builder.identifier(:__MODULE__),
+    declarator = JS.variable_declarator(
+      JS.identifier(:__MODULE__),
       ElixirScript.Translator.translate(List.last(module_name_list))
     )
 
-    Builder.variable_declaration([declarator], :const)
+    JS.variable_declaration([declarator], :const)
   end
 
   def make_imports(enum) do

@@ -30,15 +30,26 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
-     const __MODULE__ = Erlang.atom('Elephant');
-     const ul = JQuery('#todo-list');
-     function something_else() {
-         return null;
-     }
-     function something() {
-         return ul;
-     }
-     export default { something: something };
+      const __MODULE__ = Erlang.atom('Elephant');
+      const ul = JQuery('#todo-list');
+
+      let something_else = funcy.fun([
+        [], 
+        function(){
+          return null;
+        }
+      ]);
+
+
+      let something = funcy.fun([
+        [], 
+        function(){
+          return ul;
+        }
+      ]);
+
+
+      export default { something: something };
     """
 
     assert_translation(ex_ast, js_code)
@@ -59,12 +70,20 @@ defmodule ElixirScript.Translator.Defmodule.Test do
      import Crane from 'icabod/crane';
      const __MODULE__ = Erlang.atom('Elephant');
 
-     function something_else() {
-         return null;
-     }
-     function something() {
-         return null;
-     }
+      let something_else = funcy.fun([
+        [], 
+        function(){
+          return null;
+        }
+      ]);
+
+
+      let something = funcy.fun([
+        [], 
+        function(){
+          return null;
+        }
+      ]);
 
      export default { something: something };
     """
@@ -92,26 +111,30 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
-     import Elephant from 'animals/elephant';
-     const __MODULE__ = Erlang.atom('Animals');
+      import Elephant from 'animals/elephant';
+      const __MODULE__ = Erlang.atom('Animals');
 
-     function something_else() {
-         return null;
-     }
-     function something() {
-         return Elephant.defstruct();
-     }
-     export default { something: something };
+      let something_else = funcy.fun([[], function() {
+        return null;
+      }]);
 
+      let something = funcy.fun([[], function() {
+        return Elephant.defstruct();
+      }]);
 
-     const __MODULE__ = Erlang.atom('Elephant');
-     function defstruct(trunk = true) {
-         return {
-             __struct__: __MODULE__,
-             trunk: trunk
-         };
-     }
-     export default { defstruct: defstruct };
+      export default {
+        something: something
+      };
+
+      const __MODULE__ = Erlang.atom('Elephant');
+      function defstruct(trunk = true) {
+        return {
+          __struct__: __MODULE__,
+          trunk: trunk
+        };
+      }
+
+      export default {defstruct: defstruct};
 
     """
 
@@ -142,39 +165,43 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
-     import Elephant from 'animals/elephant';
-     import Bear from 'animals/bear';
-
-     const __MODULE__ = Erlang.atom('Animals');
-
-     function something_else() {
-         return null;
-     }
-     function something() {
-         return Elephant.defstruct();
-     }
-
-     export default { something: something };
-
-     const __MODULE__ = Erlang.atom('Elephant');
-     function defstruct(trunk = true) {
-         return {
-             __struct__: __MODULE__,
-             trunk: trunk
-         };
-     }
-     export default { defstruct: defstruct };
+      import Elephant from 'animals/elephant';
+      import Bear from 'animals/bear';
+      const __MODULE__ = Erlang.atom('Animals');
 
 
-     const __MODULE__ = Erlang.atom('Bear');
-     function defstruct(trunk = true) {
-         return {
-             __struct__: __MODULE__,
-             trunk: trunk
-         };
-     }
+      let something_else = funcy.fun([[], function() {
+        return null;
+      }]);
 
-     export default { defstruct: defstruct };
+      let something = funcy.fun([[], function() {
+        return Elephant.defstruct();
+      }]);
+
+      export default {
+        something: something
+      };
+
+      const __MODULE__ = Erlang.atom('Elephant');
+
+      function defstruct(trunk = true) {
+        return {
+          __struct__: __MODULE__,
+          trunk: trunk
+        };
+      }
+
+      export default {defstruct: defstruct};
+
+      const __MODULE__ = Erlang.atom('Bear');
+      function defstruct(trunk = true) {
+        return {
+          __struct__: __MODULE__,
+          trunk: trunk
+        };
+      }
+
+      export default {defstruct: defstruct};
     """
 
     assert_translation(ex_ast, js_code)
@@ -206,34 +233,20 @@ defmodule ElixirScript.Translator.Defmodule.Test do
 
     js_code = """
      import Elephant from 'animals/elephant';
-
      const __MODULE__ = Erlang.atom('Animals');
-     function something_else() {
-         return null;
-     }
-     function something() {
-         return Elephant.defstruct();
-     }
-     export default { something: something };
+     let something_else = funcy.fun([[], function(){return null;}]);
+     let something = funcy.fun([[], function(){return Elephant.defstruct();}]);
 
+     export default {something: something};
      import Bear from 'animals/elephant/bear';
+
      const __MODULE__ = Erlang.atom('Elephant');
-     function defstruct(trunk = true) {
-         return {
-             __struct__: __MODULE__,
-             trunk: trunk
-         };
-     }
-     export default { defstruct: defstruct };
+     function defstruct(trunk = true){return {__struct__: __MODULE__, trunk: trunk};}
+     export default {defstruct: defstruct};
 
      const __MODULE__ = Erlang.atom('Bear');
-     function defstruct(trunk = true) {
-         return {
-             __struct__: __MODULE__,
-             trunk: trunk
-         };
-     }
-     export default { defstruct: defstruct };
+     function defstruct(trunk = true){return {__struct__: __MODULE__, trunk: trunk};}
+     export default {defstruct: defstruct};
     """
 
     assert_translation(ex_ast, js_code)
@@ -291,14 +304,16 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end 
 
     js_code = """
-    import Bears from 'lions/tigers/bears';
-    const __MODULE__ = Erlang.atom('Animals');
+      import Bears from 'lions/tigers/bears';
+      const __MODULE__ = Erlang.atom('Animals');
 
-    function hello(){
+      let hello = funcy.fun([[], function() {
         return Kernel.JS.get_property_or_call_function(Bears, 'oh_my');
-    }
-     
-    export default {hello: hello};
+      }]);
+
+      export default {
+        hello: hello
+      };
     """
 
     assert_translation(ex_ast, js_code)
@@ -309,7 +324,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
       defmodule Animals do
         alias Lions.Tigers.Bears
 
-        def hello() do
+        def hello(param) do
             Bears.oh_my()
             Lions.Tigers.Bears.oh_my()
         end
@@ -317,16 +332,20 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end 
 
     js_code = """
-     import Bears from 'lions/tigers/bears';
+      import Bears from 'lions/tigers/bears';
+      const __MODULE__ = Erlang.atom('Animals');
 
-     const __MODULE__ = Erlang.atom('Animals');
+      let hello = funcy.fun([
+        [funcy.parameter], 
+        function(param) {
+          Kernel.JS.get_property_or_call_function(Bears, 'oh_my');
+          return Kernel.JS.get_property_or_call_function(Bears, 'oh_my');
+        }
+      ]);
 
-     function hello() {
-         Kernel.JS.get_property_or_call_function(Bears, 'oh_my');
-         return Kernel.JS.get_property_or_call_function(Bears, 'oh_my');
-     }
-
-     export default { hello: hello };
+      export default {
+        hello: hello
+      };
     """
 
     assert_translation(ex_ast, js_code)

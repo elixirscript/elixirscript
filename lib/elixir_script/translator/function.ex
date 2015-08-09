@@ -1,10 +1,121 @@
 defmodule ElixirScript.Translator.Function do
   @moduledoc false
   require Logger
-  alias ESTree.Tools.Builder
+  alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.PatternMatching
+  alias ElixirScript.Translator.PatternMatching.Match
+  alias ElixirScript.Preprocess.Variables
+
+
+  def process_function(name, functions) do
+    result = make_anonymous_function(functions)
+
+    declarator = JS.variable_declarator(
+      JS.identifier(name),
+      result
+    )
+
+    JS.variable_declaration([declarator], :let)
+  end
+
+  def make_anonymous_function(functions) do
+    clauses = functions
+    |> Stream.map(fn(x) -> Variables.process(x) end)
+    |> Stream.map(fn
+      {:->, _, [ [{:when, _, [params | guards]}], body ]} ->
+        { patterns, params } = Match.build_match(List.wrap(params))
+
+        body = body
+        |> prepare_function_body
+        |> JS.block_statement
+
+        guard_body = hd(List.wrap(guards))
+        |> prepare_function_body
+        |> JS.block_statement
+
+        JS.array_expression([
+          JS.array_expression(patterns),
+          JS.function_expression(
+            params,
+            [],
+            body
+          ),
+          JS.function_expression(
+            params,
+            [],
+            guard_body
+          )
+        ])
+
+      ({:->, _, [params, body]}) ->
+        { patterns, params } = Match.build_match(params)
+
+        body = body
+        |> prepare_function_body
+        |> JS.block_statement
+
+        JS.array_expression([
+          JS.array_expression(patterns),
+          JS.function_expression(
+            params,
+            [],
+            body
+          )
+        ])        
+
+      ({_, _, [{:when, _, [{_, _, params} | guards] }, [do: body]]}) ->
+        { patterns, params } = Match.build_match(params)
+
+        body = body
+        |> prepare_function_body
+        |> JS.block_statement
+
+        guard_body = hd(guards)
+        |> prepare_function_body
+        |> JS.block_statement
+
+        JS.array_expression([
+          JS.array_expression(patterns),
+          JS.function_expression(
+            params,
+            [],
+            body
+          ),
+          JS.function_expression(
+            params,
+            [],
+            guard_body
+          )
+        ])
+
+      ({_, _, [{_, _, params}, [do: body]]}) ->
+        { patterns, params } = Match.build_match(params)
+
+        body = body
+        |> prepare_function_body
+        |> JS.block_statement
+
+        JS.array_expression([
+          JS.array_expression(patterns),
+          JS.function_expression(
+            params,
+            [],
+            body
+          )
+        ])
+    end)
+    |> Enum.to_list
+
+    JS.call_expression(
+      JS.member_expression(
+        JS.identifier("funcy"),
+        JS.identifier("fun")
+      ),
+      clauses
+    )
+  end
 
   def make_function_or_property_call(module_name, function_name) do
     the_name = case module_name do
@@ -23,13 +134,13 @@ defmodule ElixirScript.Translator.Function do
         end
     end
 
-    Builder.call_expression(
-      Builder.member_expression(
-        Builder.member_expression(
-          Builder.identifier("Kernel"),
-          Builder.identifier("JS")
+    JS.call_expression(
+      JS.member_expression(
+        JS.member_expression(
+          JS.identifier("Kernel"),
+          JS.identifier("JS")
         ),
-        Builder.identifier("get_property_or_call_function")
+        JS.identifier("get_property_or_call_function")
       ),
       [
         Utils.make_module_expression_tree(the_name, false),
@@ -62,39 +173,7 @@ defmodule ElixirScript.Translator.Function do
     Utils.make_call_expression(the_name, Utils.filter_name(function_name), params)
   end
 
-  def make_function(name, params, body, guards \\ nil) do
-    do_make_function(Utils.filter_name(name), params, body, guards)
-  end
-
-  def make_export_function(name, params, body, guards \\ nil) do
-    function = do_make_function(Utils.filter_name(name), params, body, guards)
-    Builder.export_named_declaration(function)
-  end
-
-  def pattern_match_identifier(index) do
-    Utils.make_array_accessor_call("arguments", index)
-  end
-
-  defp do_make_function(name, params, body, guards) do
-    { body, params } = prepare_function_body(body) |> PatternMatching.build_pattern_matched_body(params, &pattern_match_identifier/1, guards)
-
-    Builder.function_declaration(
-      Builder.identifier(name),
-      params,
-      [],
-      Builder.block_statement(body)
-    )
-  end
-
-  def make_anonymous_function(params, body) do
-    Builder.function_expression(
-      Enum.map(params, &Translator.translate(&1)),
-      [],
-      Builder.block_statement(prepare_function_body(body))
-    )
-  end
-
-  defp prepare_function_body(body) do
+  def prepare_function_body(body) do
     case body do
       nil ->
         []
@@ -114,7 +193,7 @@ defmodule ElixirScript.Translator.Function do
   end
 
   def return_last_expression([]) do
-    [Builder.return_statement(Builder.literal(nil))]
+    [JS.return_statement(JS.literal(nil))]
   end
 
   def return_last_expression(%ESTree.BlockStatement{} = block) do
@@ -126,17 +205,17 @@ defmodule ElixirScript.Translator.Function do
 
     last_item = case last_item do
       %ESTree.Literal{} ->
-        Builder.return_statement(last_item) 
+        JS.return_statement(last_item) 
       %ESTree.Identifier{} ->
-        Builder.return_statement(last_item) 
+        JS.return_statement(last_item) 
       %ESTree.VariableDeclaration{} ->
         declaration = hd(last_item.declarations).id
 
         return_statement = case declaration do
           %ESTree.ArrayPattern{} ->
-            Builder.return_statement(Builder.array_expression(declaration.elements))
+            JS.return_statement(JS.array_expression(declaration.elements))
           _ ->
-            Builder.return_statement(declaration)  
+            JS.return_statement(declaration)  
         end
 
         [last_item, return_statement]
@@ -144,9 +223,9 @@ defmodule ElixirScript.Translator.Function do
         last_item = %ESTree.BlockStatement{ last_item | body: return_last_expression(last_item.body) }
       _ ->
         if String.contains?(last_item.type, "Expression") do
-          Builder.return_statement(last_item) 
+          JS.return_statement(last_item) 
         else
-          [last_item, Builder.return_statement(Builder.literal(nil))]
+          [last_item, JS.return_statement(JS.literal(nil))]
         end    
     end
 
@@ -155,9 +234,9 @@ defmodule ElixirScript.Translator.Function do
     |> Enum.map(fn(x) ->
       case x do
         %ESTree.MemberExpression{} ->
-          Builder.expression_statement(x)
+          JS.expression_statement(x)
         %ESTree.CallExpression{} ->
-          Builder.expression_statement(x)
+          JS.expression_statement(x)
         _ ->
           x
       end
@@ -169,5 +248,7 @@ defmodule ElixirScript.Translator.Function do
       list ++ [last_item]
     end
   end
+
+  def make_capture
 
 end
