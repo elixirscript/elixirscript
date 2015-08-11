@@ -42,7 +42,6 @@ function matchWildcard(pattern){
 }
 
 function matchHeadTail(patternHeadTail){
-  console.log("here");
   return function(value, bindings) {
     return value.length > 1 &&
     bindings.push(value[0]) > 0 &&
@@ -139,19 +138,28 @@ function matchObject(patternObject) {
   // We then return a function which uses that information
   // to check against the object passed to it.
   return function(valueObject, bindings) {
-    let valueLength = 0;
+    if(valueObject.constructor !== type){
+      return false;
+    }
+
+    let newValueObject = {};
+
+    for(let key of Object.keys(patternObject)){
+      if(key in valueObject){
+        newValueObject[key] = valueObject[key];
+      }else{
+        return false;
+      }
+    }
 
     // Checking the object type is very fast so we do it first.
     // Then we iterate through the value object and check the keys
     // it contains against the hash object we built earlier.
     // We also count the number of keys in the value object,
     // so we can also test against it as a final check.
-    return valueObject.constructor === type &&
-      object.every(valueObject, function(value, key) {
-        valueLength += 1;
-        return (key in subMatches) && subMatches[key](valueObject[key], bindings);
-      }) &&
-      valueLength === patternLength;
+    return object.every(newValueObject, function(value, key) {
+        return ((key in subMatches) && subMatches[key](newValueObject[key], bindings));
+      });
   };
 }
 

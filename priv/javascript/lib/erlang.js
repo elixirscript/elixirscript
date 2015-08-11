@@ -13,6 +13,10 @@ function tuple(...args){
   return Object.freeze({__tuple__: Object.freeze(args) });
 }
 
+function tuple_iterator(_tuple){
+  return _tuple.__tuple__[Symbol.iterator]();
+}
+
 function bitstring(...args){
   if (!(this instanceof bitstring)){
     return new bitstring(...args);
@@ -135,6 +139,7 @@ bitstring.prototype.process_unit = function(value){
 let Erlang = {
   atom: atom,
   tuple: tuple,
+  tuple_iterator: tuple_iterator,
   list: list,
   bitstring: bitstring
 };

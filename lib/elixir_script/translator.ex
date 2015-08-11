@@ -2,10 +2,9 @@ defmodule ElixirScript.Translator do
   @moduledoc """
   Translates the given Elixir AST into JavaScript AST
   """
-
   alias ElixirScript.Preprocess.Variables
   alias ElixirScript.Translator.Primitive
-  alias ElixirScript.Translator.PatternMatching
+  alias ElixirScript.Translator.Assignment
   alias ElixirScript.Translator.Data
   alias ElixirScript.Translator.Function
   alias ElixirScript.Translator.Capture
@@ -230,7 +229,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:=, _, [left, right]}) do
-    PatternMatching.bind(left, right)
+    Assignment.bind(left, right)
   end
 
   defp do_translate({:<>, _, [left, right]}) do

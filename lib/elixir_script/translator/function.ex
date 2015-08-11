@@ -109,10 +109,7 @@ defmodule ElixirScript.Translator.Function do
     |> Enum.to_list
 
     JS.call_expression(
-      JS.member_expression(
-        JS.identifier("funcy"),
-        JS.identifier("fun")
-      ),
+      JS.identifier("fun"),
       clauses
     )
   end

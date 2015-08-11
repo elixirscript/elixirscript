@@ -1,4 +1,4 @@
-import funcy from '../funcy';
+import fun from './fun';
 
 function getInternalType(value) {
   return Object.prototype.toString.apply(value);
@@ -50,7 +50,7 @@ const Type = {
 
   isWildcard: function(value) {
     return value &&
-    value.constructor === funcy.wildcard.constructor;
+    value.constructor === fun.wildcard.constructor;
   },
 
   isVariable: function(value) {
@@ -63,21 +63,21 @@ const Type = {
 
   isParameter: function(value){
     return value &&
-    (value === funcy.parameter || value.constructor.name === funcy.parameter().constructor.name);
+    (value === fun.parameter || value.constructor.name === fun.parameter().constructor.name);
   },
 
   isStartsWith: function(value){
     return value &&
-    value.constructor.name === funcy.startsWith().constructor.name;
+    value.constructor.name === fun.startsWith().constructor.name;
   },
 
   isCapture: function(value) {
     return value &&
-    value.constructor.name === funcy.capture().constructor.name;
+    value.constructor.name === fun.capture().constructor.name;
   },
 
   isHeadTail: function(value) {
-    return value.constructor === funcy.headTail.constructor;
+    return value.constructor === fun.headTail.constructor;
   }
 };
 

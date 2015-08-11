@@ -83,18 +83,18 @@ defmodule ElixirScript.Translator.Bug.Test do
 
 
     js_code = """
-      let getDispatcher = funcy.fun([[], function() {
+      let getDispatcher = fun([[], function() {
         return DeLorean.Flux.createDispatcher({
-          'startPainting': funcy.fun([[], function() {
+          'startPainting': fun([[], function() {
             return this.dispatch('startPainting');
           }]),
-          'stopPainting': funcy.fun([[], function() {
+          'stopPainting': fun([[], function() {
             return this.dispatch('stopPainting');
           }]),
-          'addPoint': funcy.fun([[funcy.parameter], function(data) {
+          'addPoint': fun([[fun.parameter], function(data) {
             return this.dispatch('addPoint', data);
           }]),
-          'getStores': funcy.fun([[], function() {
+          'getStores': fun([[], function() {
             return {
               'graphic': GraphicStore
             };

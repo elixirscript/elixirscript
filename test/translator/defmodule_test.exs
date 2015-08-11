@@ -33,7 +33,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
       const __MODULE__ = Erlang.atom('Elephant');
       const ul = JQuery('#todo-list');
 
-      let something_else = funcy.fun([
+      let something_else = fun([
         [], 
         function(){
           return null;
@@ -41,7 +41,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
       ]);
 
 
-      let something = funcy.fun([
+      let something = fun([
         [], 
         function(){
           return ul;
@@ -70,7 +70,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
      import Crane from 'icabod/crane';
      const __MODULE__ = Erlang.atom('Elephant');
 
-      let something_else = funcy.fun([
+      let something_else = fun([
         [], 
         function(){
           return null;
@@ -78,7 +78,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
       ]);
 
 
-      let something = funcy.fun([
+      let something = fun([
         [], 
         function(){
           return null;
@@ -114,11 +114,11 @@ defmodule ElixirScript.Translator.Defmodule.Test do
       import Elephant from 'animals/elephant';
       const __MODULE__ = Erlang.atom('Animals');
 
-      let something_else = funcy.fun([[], function() {
+      let something_else = fun([[], function() {
         return null;
       }]);
 
-      let something = funcy.fun([[], function() {
+      let something = fun([[], function() {
         return Elephant.defstruct();
       }]);
 
@@ -170,11 +170,11 @@ defmodule ElixirScript.Translator.Defmodule.Test do
       const __MODULE__ = Erlang.atom('Animals');
 
 
-      let something_else = funcy.fun([[], function() {
+      let something_else = fun([[], function() {
         return null;
       }]);
 
-      let something = funcy.fun([[], function() {
+      let something = fun([[], function() {
         return Elephant.defstruct();
       }]);
 
@@ -234,8 +234,8 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     js_code = """
      import Elephant from 'animals/elephant';
      const __MODULE__ = Erlang.atom('Animals');
-     let something_else = funcy.fun([[], function(){return null;}]);
-     let something = funcy.fun([[], function(){return Elephant.defstruct();}]);
+     let something_else = fun([[], function(){return null;}]);
+     let something = fun([[], function(){return Elephant.defstruct();}]);
 
      export default {something: something};
      import Bear from 'animals/elephant/bear';
@@ -307,7 +307,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
       import Bears from 'lions/tigers/bears';
       const __MODULE__ = Erlang.atom('Animals');
 
-      let hello = funcy.fun([[], function() {
+      let hello = fun([[], function() {
         return Kernel.JS.get_property_or_call_function(Bears, 'oh_my');
       }]);
 
@@ -335,8 +335,8 @@ defmodule ElixirScript.Translator.Defmodule.Test do
       import Bears from 'lions/tigers/bears';
       const __MODULE__ = Erlang.atom('Animals');
 
-      let hello = funcy.fun([
-        [funcy.parameter], 
+      let hello = fun([
+        [fun.parameter], 
         function(param) {
           Kernel.JS.get_property_or_call_function(Bears, 'oh_my');
           return Kernel.JS.get_property_or_call_function(Bears, 'oh_my');

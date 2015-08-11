@@ -50,7 +50,7 @@ let Kernel = {
   },
 
   is_map: function(x){
-    return typeof x === 'object' || x instanceof Object;
+    return typeof x === 'object' || x instanceof Object && x.__tuple__ === null;
   },
 
   is_number: function(x){
@@ -58,7 +58,7 @@ let Kernel = {
   },
 
   is_tuple: function(x){
-    return x instanceof Erlang.tuple;
+    return (typeof x === 'object' || x instanceof Object) && x.__tuple__ !== null;
   },
 
   length: function(x){
@@ -137,6 +137,10 @@ let Kernel = {
 
   to_string: function(arg){
     return arg.toString();
+  },
+
+  throw: function(e){
+    throw e;
   },
 
   match__qmark__: function(pattern, expr, guard = () => true){

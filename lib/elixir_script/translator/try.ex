@@ -4,6 +4,7 @@ defmodule ElixirScript.Translator.Try do
   alias ElixirScript.Translator
   alias ElixirScript.Translator.PatternMatching
   alias ElixirScript.Translator.Function
+  alias ElixirScript.Translator.Case
   alias ElixirScript.Translator.Utils
 
   @error_identifier JS.identifier(:e)
@@ -52,45 +53,22 @@ defmodule ElixirScript.Translator.Try do
     Enum.map(rescue_block, fn(x) ->
       case x do
         {:->, _, [[{value, _, module} = ast], block]} when not is_list(module) ->
-          value_declarator = JS.variable_declarator(
-            JS.identifier(value),
-            @error_identifier
-          )
-
-          value_declaration = JS.variable_declaration([value_declarator], :let)
-          block = [value_declaration] ++ List.wrap(Translator.translate(block))
-          JS.if_statement(JS.literal(true), JS.block_statement(block))
+          {:->, [], [[{value, [], convert_to_struct(module)}], block]}
         {:->, _, [[{:in, meta, [value, error_names]}], block]} ->
-          error_names = Enum.map(error_names, fn
-            ({:__aliases__, _, name}) ->
-              {:%{}, [], [__struct__: name]}
-            (ast) ->
-              ast
+          error_names = Enum.map(error_names, fn(x) ->
+            convert_to_struct(x) 
           end)
+          
+          guards = {:in, meta, [value, error_names]}
 
-          {body, _} = PatternMatching.build_pattern_matched_body(
-            List.wrap(Translator.translate(block)), 
-            [],
-            fn(_index) ->
-              @error_identifier
-            end, 
-            [{:in, meta, [value, error_names]}] 
-          )
-
-          hd(body)
-        {:->, _, [[error_name], block]} ->
-          {body, _} = PatternMatching.build_pattern_matched_body(
-            List.wrap(Translator.translate(block)), 
-            List.wrap(error_name),
-            fn(_index) ->
-              @error_identifier
-            end, 
-            nil
-          )
-
-          hd(body)    
+          {:->, [], [ [{:when, [], [value | [guards]]}], block ]}
+        {:->, _, [error_names, block]} ->
+          Enum.map(error_names, fn(x) ->
+            {:->, [], [[convert_to_struct(x)], block]}
+          end)
       end
     end)
+    |> List.flatten
   end
 
   defp process_after_block(nil) do
@@ -98,9 +76,9 @@ defmodule ElixirScript.Translator.Try do
   end
 
   defp process_after_block(after_block) do
-      JS.block_statement(List.wrap(
-        Translator.translate(after_block)
-      ))
+    JS.block_statement(List.wrap(
+      Translator.translate(after_block)
+    ))
   end
 
   defp process_catch_block(nil) do
@@ -108,24 +86,7 @@ defmodule ElixirScript.Translator.Try do
   end
 
   defp process_catch_block(catch_block) do
-    Enum.map(catch_block, fn(x) ->
-      case x do
-        {:->, [], [[:throw, value], block]} ->
-          JS.if_statement(
-            JS.binary_expression(:instanceof, @error_identifier, JS.identifier(value)),
-            JS.block_statement(List.wrap(Translator.translate(block)))
-          )
-        [{:->, [], [[value], block]}] ->
-          value_declarator = JS.variable_declarator(
-            JS.identifier(value),
-            @error_identifier
-          )
-
-          value_declaration = JS.variable_declaration([value_declarator], :let)
-          block = [value_declaration] ++ List.wrap(Translator.translate(block))
-          JS.if_statement(JS.literal(true), JS.block_statement(block))
-      end
-    end)
+    catch_block
   end
 
   def process_rescue_and_catch([], []) do
@@ -134,12 +95,20 @@ defmodule ElixirScript.Translator.Try do
 
   def process_rescue_and_catch(processed_rescue_block, processed_catch_block) do
     processed_clauses = processed_catch_block ++ processed_rescue_block
+    processed_clauses = processed_clauses ++ [{:->, [], [[], [quote do: throw(e)]]}]
+    Case.make_case({:e, [], __MODULE__}, processed_clauses)
+  end
 
-    processed_clauses
-    |> Enum.reverse
-    |> Enum.reduce(JS.block_statement([JS.throw_statement(@error_identifier)]), fn(x, ast) ->
-        %{x | consequent: Function.return_last_expression(x.consequent), alternate: ast }
-    end)
-    |> List.wrap
+  defp convert_to_struct([module]) do
+    convert_to_struct(module)
+  end
+
+  defp convert_to_struct(module) do
+    case module do
+      {:__aliases__, meta, name}  = _alias->
+        {:%, [], [_alias, {:%{}, [], []}]}
+      ast ->
+        ast
+    end
   end
 end

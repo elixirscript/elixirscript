@@ -28,11 +28,11 @@ defmodule ElixirScript.Test do
 
       const ul = JQuery('#todo-list');
 
-      let something_else = funcy.fun([[], function() {
+      let something_else = fun([[], function() {
         return null;
       }]);
 
-      let something = funcy.fun([[], function() {
+      let something = fun([[], function() {
         return ul;
       }]);
 
@@ -67,11 +67,11 @@ defmodule ElixirScript.Test do
       import Elephant from 'animals/elephant';
       const __MODULE__ = Erlang.atom('Animals');
 
-      let something_else = funcy.fun([[], function() {
+      let something_else = fun([[], function() {
         return null;
       }]);
 
-      let something = funcy.fun([[], function() {
+      let something = fun([[], function() {
         return Elephant.defstruct();
       }]);
 

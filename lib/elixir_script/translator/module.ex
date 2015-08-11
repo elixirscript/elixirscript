@@ -21,7 +21,7 @@ defmodule ElixirScript.Translator.Module do
     {:Mutable, from: "__lib/mutable" },
     {:Range, from: "__lib/range" },
     {:Tuple, from: "__lib/tuple" },
-    {:Funcy, from: "__lib/funcy" },
+    {:fun, from: "__lib/funcy/fun" },
   ]
 
   def make_module(module_name_list, nil) do

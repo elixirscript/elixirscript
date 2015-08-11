@@ -12,7 +12,7 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-      funcy.fun([[Erlang.atom('ok')], function() {
+      fun([[Erlang.atom('ok')], function() {
         return value;
       }], [[Erlang.atom('error')], function() {
         return null;
@@ -29,7 +29,7 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-      funcy.fun([[false], function() {
+      fun([[false], function() {
         let value0 = 13;
         return value0;
       }], [[true], function() {
@@ -49,10 +49,10 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-      funcy.fun([[false], function() {
+      fun([[false], function() {
         let value0 = 13;
         return value0;
-      }], [[funcy.wildcard], function() {
+      }], [[fun.wildcard], function() {
         return true;
       }]).call(data);
     """
@@ -71,9 +71,9 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-      funcy.fun(
+      fun(
         [
-          [funcy.parameter], 
+          [fun.parameter], 
           function(number) {
             let value0 = 13;
             return value0;
@@ -83,7 +83,7 @@ defmodule ElixirScript.Translator.Case.Test do
           }
         ], 
         [
-          [funcy.wildcard], 
+          [fun.wildcard], 
           function() {
             return true;
           }
@@ -106,7 +106,7 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-      funcy.fun([[Erlang.atom('ok')], function() {
+      fun([[Erlang.atom('ok')], function() {
         Logger.info('info');
         return Todo.add(data);
       }], [[Erlang.atom('error')], function() {
@@ -128,7 +128,7 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-      funcy.fun([[Erlang.tuple(funcy.parameter, funcy.parameter)], function(one, two) {
+      fun([[Erlang.tuple(fun.parameter, fun.parameter)], function(one, two) {
         return Logger.info(one);
       }], [[Erlang.atom('error')], function() {
         return null;
@@ -149,9 +149,9 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-      funcy.fun(
+      fun(
         [
-          [Erlang.tuple(Erlang.tuple(funcy.parameter, funcy.parameter), funcy.parameter)], 
+          [Erlang.tuple(Erlang.tuple(fun.parameter, fun.parameter), fun.parameter)], 
           function(one, two, three) {
             return Logger.info(one);
           }
@@ -177,7 +177,7 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-      funcy.fun([[Erlang.tuple(funcy.parameter, Erlang.tuple(funcy.parameter, funcy.parameter))], function(one, two, three) {
+      fun([[Erlang.tuple(fun.parameter, Erlang.tuple(fun.parameter, fun.parameter))], function(one, two, three) {
         return Logger.info(one);
       }], [[Erlang.atom('error')], function() {
         return null;
@@ -197,9 +197,9 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-      funcy.fun(
+      fun(
         [
-          [{'__struct__': Erlang.atom('AStruct'), Erlang.atom('key'): {'__struct__': Erlang.atom('BStruct'), Erlang.atom('key2'): funcy.parameter}}], 
+          [{'__struct__': Erlang.atom('AStruct'), Erlang.atom('key'): {'__struct__': Erlang.atom('BStruct'), Erlang.atom('key2'): fun.parameter}}], 
           function(value){
             return Logger.info(value);
           }
@@ -226,9 +226,9 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-    funcy.fun(
+    fun(
       [
-        [{'__struct__': Erlang.atom('AStruct'), Erlang.atom('key'): {'__struct__': Erlang.atom('BStruct'), Erlang.atom('key2'): funcy.parameter, Erlang.atom('key3'): {'__struct__': Erlang.atom('CStruct'), Erlang.atom('key4'): funcy.parameter}}}], 
+        [{'__struct__': Erlang.atom('AStruct'), Erlang.atom('key'): {'__struct__': Erlang.atom('BStruct'), Erlang.atom('key2'): fun.parameter, Erlang.atom('key3'): {'__struct__': Erlang.atom('CStruct'), Erlang.atom('key4'): fun.parameter}}}], 
         function(value,value2){
           return Logger.info(value);
         }

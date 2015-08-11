@@ -4,27 +4,27 @@ defmodule ElixirScript.Translator.PatternMatching.Match do
   alias ElixirScript.Translator.Utils
 
   @wildcard JS.member_expression(
-    JS.identifier(:funcy),
+    JS.identifier(:fun),
     JS.identifier(:wildcard)
   )
 
   @parameter JS.member_expression(
-    JS.identifier(:funcy),
+    JS.identifier(:fun),
     JS.identifier(:parameter)
   )
 
   @head_tail JS.member_expression(
-    JS.identifier(:funcy),
+    JS.identifier(:fun),
     JS.identifier(:headTail)
   )
 
   @starts_with JS.member_expression(
-    JS.identifier(:funcy),
+    JS.identifier(:fun),
     JS.identifier(:startsWith)
   )
 
   @bind JS.member_expression(
-    JS.identifier(:funcy),
+    JS.identifier(:fun),
     JS.identifier(:bind)
   )
 

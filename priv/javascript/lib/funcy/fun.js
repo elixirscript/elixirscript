@@ -36,4 +36,39 @@ let fun = function(...args) {
   };
 };
 
+fun.parameter = function(name, orElse) {
+  function Parameter(n, o) {
+    this.name = n;
+    this.orElse = o;
+  }
+  return new Parameter(name, orElse);
+};
+
+fun.capture = function(pattern) {
+  function Capture(p) {
+    this.pattern = p;
+  }
+  return new Capture(pattern);
+};
+
+fun.startsWith = function(substr) {
+  function StartsWith(s) {
+    this.substr = s;
+  }
+
+  return new StartsWith(substr);
+};
+
+fun.wildcard = (function() {
+  function Wildcard() {
+  }
+  return new Wildcard();
+}());
+
+fun.headTail = (function() {
+  function HeadTail() {
+  }
+  return new HeadTail();
+}());
+
 export default fun;
