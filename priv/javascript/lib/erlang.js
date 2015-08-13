@@ -1,5 +1,6 @@
 import BitString from './bit_string';
-self.mailbox = self.mailbox || {};
+
+//self.mailbox = self.mailbox || {};
 
 function atom (_value) {
   return Symbol.for(_value);
@@ -9,42 +10,9 @@ function list(...args){
   return Object.freeze(args);
 }
 
-
 function tuple(...args){
-  if (!(this instanceof tuple)){
-    return new tuple(...args);
-  }
-
-  let _value = Object.freeze(args);
-
-  this.value = function(){
-    return _value;
-  };
-
-  this.length = _value.length;
-
-  this.get = function(i){
-    return _value[i];
-  };
-
-  return this;
+  return Object.freeze({__tuple__: Object.freeze(args) });
 }
-
-tuple.prototype[Symbol.iterator] = function(){
-  return this.value()[Symbol.iterator]();
-};
-
-tuple.prototype.toString = function(){
-  var i, s = "";
-  for (i = 0; i < this.length; i++) {
-    if (s !== "") {
-      s += ", ";
-    }
-    s += this.get(i).toString();
-  }
-
-  return "{" + s + "}";
-};
 
 function bitstring(...args){
   if (!(this instanceof bitstring)){

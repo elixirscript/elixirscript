@@ -1,4 +1,4 @@
-defmodule ElixirScript.Translator.Require.Test do
+defmodule ElixirScript.Translator.Receive.Test do
   use ShouldI
   import ElixirScript.TestHelper
 
@@ -16,15 +16,13 @@ defmodule ElixirScript.Translator.Require.Test do
 
     js_code = """
       Kernel.SpecialForms.receive(function(message) {
-        return (function() {
-          if (Kernel.match__qmark__(Erlang.atom('ok'), message)) {
-            return value;
-          } else if (Kernel.match__qmark__(Erlang.atom('error'), message)) {
-            return value;
-          } else {
-            return IO.puts('Unexpected message received');
-          }
-        }.call(this));;
+        return fun([[Erlang.atom('ok')], function() {
+          return value;
+        }], [[Erlang.atom('error')], function() {
+          return value;
+        }], [[fun.wildcard], function() {
+          return IO.puts('Unexpected message received');
+        }]).call(message);
       })
     """
 
@@ -48,18 +46,18 @@ defmodule ElixirScript.Translator.Require.Test do
 
     js_code = """
       Kernel.SpecialForms.receive(function(message) {
-        return (function() {
-          if (Kernel.match__qmark__(Erlang.atom('ok'), message)) {
-            return value;
-          } else if (Kernel.match__qmark__(Erlang.atom('error'), message)) {
-            return value;
-          } else {
-            return IO.puts('Unexpected message received');
-          }
-        }.call(this));;
-      }, 5000, function(time) {
+        return fun([[Erlang.atom('ok')], function() {
+          return value;
+        }], [[Erlang.atom('error')], function() {
+          return value;
+        }], [[fun.wildcard], function() {
+          return IO.puts('Unexpected message received');
+        }]).call(message);
+      }, 
+      5000, 
+      fun([[5000], function() {
         return IO.puts('No message in 5 seconds');
-      })
+      }]))
     """
 
     assert_translation(ex_ast, js_code)

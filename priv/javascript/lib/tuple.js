@@ -5,15 +5,23 @@ let Tuple = {};
 Tuple.__MODULE__ = Erlang.atom('Tuple');
 
 Tuple.to_string = function(tuple){
-  return tuple.toString();
+  var i, s = "";
+  for (i = 0; i < tuple.__tuple__.length; i++) {
+    if (s !== "") {
+      s += ", ";
+    }
+    s += tuple.__tuple__[i].toString();
+  }
+
+  return "{" + s + "}";
 };
 
 Tuple.delete_at = function(tuple, index){
   let new_list = [];
 
-  for (var i = 0; i < tuple.length; i++) {
+  for (var i = 0; i < tuple.__tuple__.length; i++) {
     if(i !== index){
-      new_list.push(tuple.get(i));
+      new_list.push(tuple.__tuple__[i]);
     }
   }
 
@@ -33,13 +41,13 @@ Tuple.duplicate = function(data, size){
 Tuple.insert_at = function(tuple, index, term){
   let new_tuple = [];
 
-  for (var i = 0; i <= tuple.length; i++) {
+  for (var i = 0; i <= tuple.__tuple__.length; i++) {
     if(i === index){
       new_tuple.push(term);
       i++;
-      new_tuple.push(tuple.get(i));
+      new_tuple.push(tuple.__tuple__[i]);
     }else{
-      new_tuple.push(tuple.get(i));
+      new_tuple.push(tuple.__tuple__[i]);
     }
   }
 
@@ -53,11 +61,15 @@ Tuple.from_list = function(list){
 Tuple.to_list = function(tuple){
   let new_list = [];
 
-  for (var i = 0; i < tuple.length; i++) {
-    new_list.push(tuple.get(i));
+  for (var i = 0; i < tuple.__tuple__.length; i++) {
+    new_list.push(tuple.__tuple__[i]);
   }
 
   return Erlang.list(...new_list);
+};
+
+Tuple.iterator = function(tuple){
+  return tuple.__tuple__[Symbol.iterator]();
 };
 
 export default Tuple;

@@ -23,16 +23,16 @@ defmodule ElixirScript.Translator.Assignment.Test do
 
     ex_ast = quote do: {a, b} = {1, 2}
     js_code = """
-        let [a, b] = Erlang.tuple(1, 2);
-        let _ref = Erlang.tuple(a, b);
+        let [a, b] = Tuple.iterator(Erlang.tuple(1, 2));
+        let _ref = Erlang.tuple(a,b);
     """
 
     assert_translation(ex_ast, js_code)
 
     ex_ast = quote do: {a, _, c} = {1, 2, 3}
     js_code = """
-        let [a, undefined, c] = Erlang.tuple(1, 2, 3);
-        let _ref = Erlang.tuple(a, undefined, c);
+        let [a, undefined, c] = Tuple.iterator(Erlang.tuple(1, 2, 3));
+        let _ref = Erlang.tuple(a,undefined,c);
     """
 
     assert_translation(ex_ast, js_code)
@@ -43,6 +43,7 @@ defmodule ElixirScript.Translator.Assignment.Test do
      let _ref = Erlang.tuple(1, 2, 3);
      if (!Kernel.match__qmark__(a, _ref.get(0)))
          throw new MatchError('no match of right hand side value');
+
      let undefined = Kernel.elem(_ref, 1);
      let c = Kernel.elem(_ref, 2);
     """

@@ -10,35 +10,33 @@ describe('Kernel', function(){
       expect(Kernel.match__qmark__(1.0, 1)).to.equal(true);
       expect(Kernel.match__qmark__(2, 1)).to.equal(false);
       expect(Kernel.match__qmark__(2, 1 + 1)).to.equal(true);
-
-      let a;
-      expect(Kernel.match__qmark__(a, 1 + 1)).to.equal(true);
       expect(Kernel.match__qmark__(undefined, 1 + 1)).to.equal(true);
-    })
+      expect(Kernel.match__qmark__(undefined, 1 + 1)).to.equal(true);
+    });
 
     it('match strings', function(){
       expect(Kernel.match__qmark__("", "")).to.equal(true);
       expect(Kernel.match__qmark__('', "")).to.equal(true);
       expect(Kernel.match__qmark__("Hello", "Hell")).to.equal(false);
       expect(Kernel.match__qmark__("Hello", "Hell" + "o")).to.equal(true);
-    })
+    });
 
     it('match atoms', function(){
       expect(Kernel.match__qmark__(Erlang.atom("test"), Erlang.atom("test"))).to.equal(true);
       expect(Kernel.match__qmark__(Erlang.atom("test"), Erlang.atom("notest"))).to.equal(false);
-    })
+    });
 
     it('match tuples', function(){
       expect(Kernel.match__qmark__(Erlang.tuple(1, 2, 3), Erlang.tuple(1, 2, 3))).to.equal(true);
       expect(Kernel.match__qmark__(Erlang.tuple(1, undefined, 3), Erlang.tuple(1, 2, 3))).to.equal(true);
       expect(Kernel.match__qmark__(Erlang.tuple(1, 2, 3), Erlang.tuple(1, 2))).to.equal(false);
-    })
+    });
 
     it('match list', function(){
       expect(Kernel.match__qmark__([1, 2, 3], [1, 2, 3])).to.equal(true);
       expect(Kernel.match__qmark__([1, undefined, 3], [1, 2, 3])).to.equal(true);
       expect(Kernel.match__qmark__([1, 2, 3], [1, 2])).to.equal(false);
-    })
+    });
 
     it('match map', function(){
       expect(Kernel.match__qmark__({a: 1, b: 2}, {a: 1, b: 2})).to.equal(true);
@@ -46,46 +44,11 @@ describe('Kernel', function(){
       expect(Kernel.match__qmark__({a: undefined}, {a: 1, b: 2})).to.equal(true);
       expect(Kernel.match__qmark__({c: 1}, {a: 1, b: 2})).to.equal(false);
       expect(Kernel.match__qmark__({c: undefined}, {a: 1, b: 2})).to.equal(false);
-    })
+    });
 
     it('match numbers with guards', function(){
       expect(Kernel.match__qmark__(1, 1, () => Kernel.is_number(1))).to.equal(true);
-    })
-  })
-
-  describe('defmodule', function(){
-    it('must create a module', function(){
-      let Hello = {}
-
-      let hello = Kernel.defmodule(Erlang.list(Erlang.atom("Hello")), function(__MODULE__){
-        return {
-          world: function(){ return 0; }
-        }
-      }, Hello);
-
-      expect(Hello).to.equal(hello);
-      expect(Hello.world()).to.equal(0);
-    })
-
-    it('must create inner modules correctly', function(){
-      let Foo = {}
-
-      Kernel.defmodule(Erlang.list(Erlang.atom("Foo")), function(__MODULE__){
-
-        Kernel.defmodule(Erlang.list(Erlang.atom("Foo"), Erlang.atom("Bar")), function(__MODULE__){
-          return {
-            baz: function(){ return 0; }
-          }
-        }, Foo); 
-
-        return {
-          world: function(){ return 0; }
-        }
-      }, Foo);
-
-      expect(Foo.Bar.baz()).to.equal(0);
-      expect(Foo.world()).to.equal(0);
-    })
-  })
-})
+    });
+  });
+});
 

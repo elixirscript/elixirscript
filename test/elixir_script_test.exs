@@ -22,18 +22,25 @@ defmodule ElixirScript.Test do
     """)
 
     assert_js_matches """
-     import Erlang from '__lib/erlang';
-     import Kernel from '__lib/kernel';
-     const __MODULE__ = Erlang.atom('Elephant');
-     const ul = JQuery('#todo-list');
+      import Erlang from '__lib/erlang';
+      import Kernel from '__lib/kernel';
+      import fun from '__lib/funcy/fun';
+      
+      const __MODULE__ = Erlang.atom('Elephant');
 
-     function something_else() {
-         return null;
-     }
-     function something() {
-         return ul;
-     }
-     export default { something: something };
+      let something_else = fun([[], function() {
+        return null;
+      }]);
+
+      let something = fun([[], function() {
+        return ul;
+      }]);
+
+      const ul = JQuery('#todo-list');
+
+      export default {
+        something: something
+      };
     """, hd(js_code)
   end
 
@@ -57,18 +64,30 @@ defmodule ElixirScript.Test do
     """)
 
     assert_js_matches """
-     import Erlang from '__lib/erlang';
-     import Kernel from '__lib/kernel';
-     import Elephant from 'animals/elephant';
-     const __MODULE__ = Erlang.atom('Animals');
-     function something_else(){return null;}
-     function something(){return Elephant.defstruct();}
-     export default {something: something};
+      import Erlang from '__lib/erlang';
+      import Kernel from '__lib/kernel';
+      import fun from '__lib/funcy/fun';
+      import Elephant from 'animals/elephant';
+      const __MODULE__ = Erlang.atom('Animals');
+
+      let something_else = fun([[], function() {
+        return null;
+      }]);
+
+      let something = fun([[], function() {
+        return Elephant.defstruct();
+      }]);
+
+      export default {
+        something: something
+      };
      """, hd(js_code)
 
      assert_js_matches """
        import Erlang from '__lib/erlang';
        import Kernel from '__lib/kernel';
+       import fun from '__lib/funcy/fun';
+       
        const __MODULE__ = Erlang.atom('Elephant');
        function defstruct(trunk = true){return {__struct__: __MODULE__, trunk: trunk};}
        export default {defstruct: defstruct};     
