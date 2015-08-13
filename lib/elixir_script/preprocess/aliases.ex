@@ -31,10 +31,12 @@ defmodule ElixirScript.Preprocess.Aliases do
   """
   def process(ast) do
     
-    #Erlang and Kernel will always be added
+    #These will always be added
     stdlib = HashSet.new 
     |> HashSet.put(:Erlang)
     |> HashSet.put(:Kernel)
+    |> HashSet.put(:fun)
+    |> HashSet.put(:Tuple)
 
     state = %{ add: HashSet.new, defined: HashSet.new, stdlib: stdlib }
 

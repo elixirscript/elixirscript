@@ -24,9 +24,9 @@ defmodule ElixirScript.Test do
     assert_js_matches """
       import Erlang from '__lib/erlang';
       import Kernel from '__lib/kernel';
+      import fun from '__lib/funcy/fun';
+      
       const __MODULE__ = Erlang.atom('Elephant');
-
-      const ul = JQuery('#todo-list');
 
       let something_else = fun([[], function() {
         return null;
@@ -35,6 +35,8 @@ defmodule ElixirScript.Test do
       let something = fun([[], function() {
         return ul;
       }]);
+
+      const ul = JQuery('#todo-list');
 
       export default {
         something: something
@@ -64,6 +66,7 @@ defmodule ElixirScript.Test do
     assert_js_matches """
       import Erlang from '__lib/erlang';
       import Kernel from '__lib/kernel';
+      import fun from '__lib/funcy/fun';
       import Elephant from 'animals/elephant';
       const __MODULE__ = Erlang.atom('Animals');
 
@@ -83,6 +86,8 @@ defmodule ElixirScript.Test do
      assert_js_matches """
        import Erlang from '__lib/erlang';
        import Kernel from '__lib/kernel';
+       import fun from '__lib/funcy/fun';
+       
        const __MODULE__ = Erlang.atom('Elephant');
        function defstruct(trunk = true){return {__struct__: __MODULE__, trunk: trunk};}
        export default {defstruct: defstruct};     

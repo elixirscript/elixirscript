@@ -48,6 +48,10 @@ const Type = {
     return typeof value !== 'undefined';
   },
 
+  isUndefined: function(value) {
+    return typeof value === 'undefined';
+  },
+
   isWildcard: function(value) {
     return value &&
     value.constructor === fun.wildcard.constructor;

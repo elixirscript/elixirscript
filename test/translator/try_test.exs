@@ -30,9 +30,9 @@ defmodule ElixirScript.Translator.Try.Test do
               function() {
                 return Kernel.throw(e);
               }
-            ]).call(e);
+            ]).call(e)
         }
-      }.call(this));
+      }.call(this))
     """
 
     assert_translation(ex_ast, js_code)
@@ -68,9 +68,9 @@ defmodule ElixirScript.Translator.Try.Test do
                 return Kernel.throw(e);
               }
             ]
-          ).call(e);
+          ).call(e)
         }
-      }.call(this));
+      }.call(this))
     """
 
     assert_translation(ex_ast, js_code)
@@ -97,9 +97,9 @@ defmodule ElixirScript.Translator.Try.Test do
             return Kernel.__in__(x, Erlang.list(ArgumentError.defstruct()));
           }], [[], function() {
             return Kernel.throw(e);
-          }]).call(e);
+          }]).call(e)
         }
-      }.call(this));
+      }.call(this))
     """
 
     assert_translation(ex_ast, js_code)
@@ -133,9 +133,9 @@ defmodule ElixirScript.Translator.Try.Test do
                 return Kernel.throw(e);
               }
             ]
-          ).call(e);
+          ).call(e)
         }
-      }.call(this));
+      }.call(this))
     """
 
     assert_translation(ex_ast, js_code)
@@ -178,9 +178,9 @@ defmodule ElixirScript.Translator.Try.Test do
                 return Kernel.throw(e);
               }
             ]
-          ).call(e);
+          ).call(e)
         }
-      }.call(this));
+      }.call(this))
     """
 
     assert_translation(ex_ast, js_code)
@@ -216,11 +216,11 @@ defmodule ElixirScript.Translator.Try.Test do
                 return Kernel.throw(e);
               }
             ]
-          ).call(e);
+          ).call(e)
         } finally {
           return IO.puts('This is printed regardless if it failed or succeed');
         }
-      }.call(this));
+      }.call(this))
     """
 
     assert_translation(ex_ast, js_code)
@@ -242,7 +242,7 @@ defmodule ElixirScript.Translator.Try.Test do
         } finally{
           return IO.puts('This is printed regardless if it failed or succeed');
         }
-      }.call(this));
+      }.call(this))
     """
 
     assert_translation(ex_ast, js_code)
@@ -302,9 +302,9 @@ defmodule ElixirScript.Translator.Try.Test do
               return Kernel.throw(e);
             }
           ]
-        ).call(e);
+        ).call(e)
       }
-    }.call(this));
+    }.call(this))
     """
 
     assert_translation(ex_ast, js_code)

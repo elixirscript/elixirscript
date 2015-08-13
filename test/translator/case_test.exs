@@ -16,7 +16,7 @@ defmodule ElixirScript.Translator.Case.Test do
         return value;
       }], [[Erlang.atom('error')], function() {
         return null;
-      }]).call(data);
+      }]).call(data)
     """
 
     assert_translation(ex_ast, js_code)
@@ -34,7 +34,7 @@ defmodule ElixirScript.Translator.Case.Test do
         return value0;
       }], [[true], function() {
         return true;
-      }]).call(data);
+      }]).call(data)
     """
 
     assert_translation(ex_ast, js_code)
@@ -54,7 +54,7 @@ defmodule ElixirScript.Translator.Case.Test do
         return value0;
       }], [[fun.wildcard], function() {
         return true;
-      }]).call(data);
+      }]).call(data)
     """
 
     assert_translation(ex_ast, js_code)
@@ -88,7 +88,7 @@ defmodule ElixirScript.Translator.Case.Test do
             return true;
           }
         ]
-      ).call(data);
+      ).call(data)
     """
 
     assert_translation(ex_ast, js_code)
@@ -111,7 +111,7 @@ defmodule ElixirScript.Translator.Case.Test do
         return Todo.add(data);
       }], [[Erlang.atom('error')], function() {
         return null;
-      }]).call(data);
+      }]).call(data)
     """
 
     assert_translation(ex_ast, js_code)
@@ -132,7 +132,7 @@ defmodule ElixirScript.Translator.Case.Test do
         return Logger.info(one);
       }], [[Erlang.atom('error')], function() {
         return null;
-      }]).call(data);
+      }]).call(data)
     """
 
     assert_translation(ex_ast, js_code)
@@ -162,7 +162,7 @@ defmodule ElixirScript.Translator.Case.Test do
             return null;
           }
         ]
-      ).call(data);
+      ).call(data)
     """
 
     assert_translation(ex_ast, js_code)
@@ -181,7 +181,7 @@ defmodule ElixirScript.Translator.Case.Test do
         return Logger.info(one);
       }], [[Erlang.atom('error')], function() {
         return null;
-      }]).call(data);
+      }]).call(data)
     """
 
     assert_translation(ex_ast, js_code)
@@ -199,7 +199,7 @@ defmodule ElixirScript.Translator.Case.Test do
     js_code = """
       fun(
         [
-          [{'__struct__': Erlang.atom('AStruct'), Erlang.atom('key'): {'__struct__': Erlang.atom('BStruct'), Erlang.atom('key2'): fun.parameter}}], 
+          [{'__struct__': Erlang.atom('AStruct'), 'key': {'__struct__': Erlang.atom('BStruct'), 'key2': fun.parameter}}], 
           function(value){
             return Logger.info(value);
           }
@@ -210,7 +210,7 @@ defmodule ElixirScript.Translator.Case.Test do
             return null;
           }
         ]
-      ).call(data);
+      ).call(data)
     """
 
     assert_translation(ex_ast, js_code)
@@ -228,7 +228,7 @@ defmodule ElixirScript.Translator.Case.Test do
     js_code = """
     fun(
       [
-        [{'__struct__': Erlang.atom('AStruct'), Erlang.atom('key'): {'__struct__': Erlang.atom('BStruct'), Erlang.atom('key2'): fun.parameter, Erlang.atom('key3'): {'__struct__': Erlang.atom('CStruct'), Erlang.atom('key4'): fun.parameter}}}], 
+        [{'__struct__': Erlang.atom('AStruct'), 'key': {'__struct__': Erlang.atom('BStruct'), 'key2': fun.parameter, 'key3': {'__struct__': Erlang.atom('CStruct'), 'key4': fun.parameter}}}], 
         function(value,value2){
           return Logger.info(value);
         }
@@ -239,7 +239,7 @@ defmodule ElixirScript.Translator.Case.Test do
           return null;
         }
       ]
-    ).call(data);
+    ).call(data)
     """
 
     assert_translation(ex_ast, js_code)

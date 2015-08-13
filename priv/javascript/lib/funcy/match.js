@@ -4,10 +4,10 @@ import object from './object';
 function buildMatch(pattern) {
   // A parameter can either be a function, or the result of invoking that
   // function so we need to check for both.
-  if (Type.isParameter(pattern)) {
-    return matchParameter(pattern);
-  } else if (Type.isWildcard(pattern)) {
+  if (Type.isUndefined(pattern) || Type.isWildcard(pattern)) {
     return matchWildcard(pattern);
+  } else if (Type.isParameter(pattern)) {
+    return matchParameter(pattern);
   } else if (Type.isHeadTail(pattern)) {
     return matchHeadTail(pattern);
   } else if (Type.isStartsWith(pattern)) {

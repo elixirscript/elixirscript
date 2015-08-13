@@ -15,7 +15,7 @@ defmodule ElixirScript.Translator.If.Test do
           let a = 1;
           return a;
         }
-      }.call(this));
+      }.call(this))
     """
 
     assert_translation(ex_ast, js_code)
@@ -37,7 +37,7 @@ defmodule ElixirScript.Translator.If.Test do
           let a = 2;
           return a;
         }
-      }.call(this));
+      }.call(this))
     """
 
     assert_translation(ex_ast, js_code)

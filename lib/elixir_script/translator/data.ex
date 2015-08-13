@@ -17,7 +17,7 @@ defmodule ElixirScript.Translator.Data do
   def make_object(properties) do
     properties
     |> Enum.map(fn
-      ({x, {:__aliases__, _, [value]}}) -> Builder.property( Builder.literal(x), Builder.identifier(value)) 
+      ({x, {:__aliases__, _, [value]}}) -> Builder.property(Builder.literal(x), Builder.identifier(value)) 
       ({x, y}) -> Builder.property( Builder.literal(x), Translator.translate(y)) 
     end)
     |> Builder.object_expression

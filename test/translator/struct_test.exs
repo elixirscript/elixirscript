@@ -88,7 +88,7 @@ defmodule ElixirScript.Translator.Struct.Test do
           _results.key = value;
 
           return _results;
-        }.call(this));;
+        }.call(this));
     """
 
     assert_translation(ex_ast, js_code)
@@ -112,7 +112,7 @@ defmodule ElixirScript.Translator.Struct.Test do
           _results.key1 = value1;
 
           return _results;
-        }.call(this));;
+        }.call(this));
     """
 
     assert_translation(ex_ast, js_code)

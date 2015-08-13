@@ -93,7 +93,7 @@ defmodule ElixirScript.Translator.Module do
     result = [
       %JSModule{
         name: module_name_list,
-        body: imports ++ List.wrap(create__module__(module_name_list)) ++ body ++ structs ++ private_functions ++ exported_functions ++ [default],
+        body: imports ++ List.wrap(create__module__(module_name_list)) ++ structs ++ private_functions ++ exported_functions ++ body ++ [default],
         stdlibs: used_stdlibs |> HashSet.to_list
       }
     ] ++ List.flatten(modules)

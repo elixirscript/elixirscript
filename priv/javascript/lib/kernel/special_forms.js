@@ -1,15 +1,15 @@
 import Erlang from '../erlang';
-import funcy from '../funcy';
+import fun from '../funcy/fun';
 
 let SpecialForms = {
   __MODULE__: Erlang.atom('SpecialForms'),
 
   case: function(condition, clauses){
-    return funcy.fun(clauses).call(condition);
+    return fun(clauses).call(condition);
   },
 
   fn: function(clauses){
-    return funcy.fun(clauses);
+    return fun(clauses);
   },
 
   cond: function(clauses){

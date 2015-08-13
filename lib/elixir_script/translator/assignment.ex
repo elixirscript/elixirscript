@@ -68,8 +68,8 @@ defmodule ElixirScript.Translator.Assignment do
         array,
         JS.call_expression(
           JS.member_expression(
-            JS.identifier("Erlang"),
-            JS.identifier("tuple_iterator")
+            JS.identifier("Tuple"),
+            JS.identifier("iterator")
           ),
           [Translator.translate(right)]
         )

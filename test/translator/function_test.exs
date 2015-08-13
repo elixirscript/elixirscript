@@ -65,7 +65,7 @@ defmodule ElixirScript.Translator.Function.Test do
               }else{
                 return 2;
               }
-            }.call(this));;
+            }.call(this));
           } 
         ]
       );
@@ -101,11 +101,11 @@ defmodule ElixirScript.Translator.Function.Test do
                     let a0 = 1;
                     return a0;
                   }
-                }.call(this));;
+                }.call(this));
               }else{
                 return 2;
               }
-            }.call(this));;
+            }.call(this));
           } 
         ]
       );
@@ -124,7 +124,7 @@ defmodule ElixirScript.Translator.Function.Test do
         [
           [fun.parameter, fun.parameter], 
           function(alpha, beta){ 
-            let [a0, b0] = Erlang.tuple_iterator(Erlang.tuple(1,2));
+            let [a0, b0] = Tuple.iterator(Erlang.tuple(1,2));
 
             let _ref = Erlang.tuple(a0, b0);
 
@@ -614,7 +614,7 @@ defmodule ElixirScript.Translator.Function.Test do
 
     js_code = """
       let something = fun([
-        [{'__struct__': Erlang.atom('AStruct'), Erlang.atom('key'): fun.parameter, Erlang.atom('key1'): 2}], 
+        [{'__struct__': Erlang.atom('AStruct'), 'key': fun.parameter, 'key1': 2}], 
         function(value){
           return null;
         }
@@ -630,8 +630,9 @@ defmodule ElixirScript.Translator.Function.Test do
 
 
     js_code = """
-      let something = fun([
-        [{'__struct__': Erlang.atom('AStruct'), Erlang.atom('key'): fun.parameter, Erlang.atom('key1'): 2}], 
+     let something = fun(
+      [
+        [{'__struct__': Erlang.atom('AStruct'), 'key': fun.parameter, 'key1': 2}], 
         function(value){
           return null;
         }, 

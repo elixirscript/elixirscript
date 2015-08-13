@@ -127,7 +127,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
     expected_result = { 
       [JS.object_expression([
         JS.property(JS.literal("__struct__"), Translator.translate(:Hello)),
-        JS.property(Translator.translate(:key), Translator.translate(1))
+        JS.property(JS.literal(:key), Translator.translate(1))
       ])],  
       []
     }
@@ -141,7 +141,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
     expected_result = { 
       [JS.object_expression([
         JS.property(JS.literal("__struct__"), Translator.translate(:Hello)),
-        JS.property(Translator.translate(:key), Match.parameter)
+        JS.property(JS.literal(:key), Match.parameter)
       ])],  
       [JS.identifier("key")]
     }
@@ -208,6 +208,20 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
     expected_result = { 
       [make_tuple([JS.literal(1), Match.parameter])],  
       [JS.identifier("b")]
+    }
+
+    assert result == expected_result
+  end
+
+  should "match on map" do
+    params = [{:%{}, [], [which: 13]}]
+    result = Match.build_match(params)
+
+    expected_result = { 
+      [JS.object_expression([
+              JS.property(JS.literal(:which), JS.literal(13))
+            ])],
+      []
     }
 
     assert result == expected_result

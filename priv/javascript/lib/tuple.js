@@ -5,7 +5,15 @@ let Tuple = {};
 Tuple.__MODULE__ = Erlang.atom('Tuple');
 
 Tuple.to_string = function(tuple){
-  return tuple.toString();
+  var i, s = "";
+  for (i = 0; i < tuple.__tuple__.length; i++) {
+    if (s !== "") {
+      s += ", ";
+    }
+    s += tuple.__tuple__[i].toString();
+  }
+
+  return "{" + s + "}";
 };
 
 Tuple.delete_at = function(tuple, index){
@@ -58,6 +66,10 @@ Tuple.to_list = function(tuple){
   }
 
   return Erlang.list(...new_list);
+};
+
+Tuple.iterator = function(tuple){
+  return tuple.__tuple__[Symbol.iterator]();
 };
 
 export default Tuple;

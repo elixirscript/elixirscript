@@ -1,6 +1,8 @@
 import Erlang from './erlang';
 import SpecialForms from './kernel/special_forms';
 import JS from './kernel/js';
+import fun from './funcy/fun';
+import Tuple from './tuple';
 
 let Kernel = {
   __MODULE__: Erlang.atom('Kernel'),
@@ -104,7 +106,7 @@ let Kernel = {
       return tuple[index];
     }
 
-    return tuple.get(index);
+    return tuple.__tuple__[index];
   },
 
   rem: function(left, right){
@@ -127,15 +129,19 @@ let Kernel = {
     return !arg;
   },
 
-  apply: function(module, fun, args){
+  apply: function(module, func, args){
     if(arguments.length === 3){
-      return module[fun].apply(null, args);
+      return module[func].apply(null, args);
     }else{
-      return module.apply(null, fun);
+      return module.apply(null, func);
     }
   },
 
   to_string: function(arg){
+    if(Kernel.is_tuple(arg)){
+      return Tuple.to_string(arg);
+    }
+
     return arg.toString();
   },
 
@@ -144,48 +150,18 @@ let Kernel = {
   },
 
   match__qmark__: function(pattern, expr, guard = () => true){
-    if(!guard()){
+    try{
+      let match = fun([
+        [pattern],
+        function(){
+          return true;
+        },
+        guard
+      ]);
+
+      return match(expr);
+    }catch(e){
       return false;
-    }
-
-    if(pattern === undefined){
-      return true;
-    }
-
-    if(Kernel.is_atom(expr)){
-      return Kernel.is_atom(pattern) && pattern === expr;
-    }else if(Kernel.is_nil(expr) || Kernel.is_number(expr) || Kernel.is_binary(expr) || Kernel.is_boolean(expr)){
-      return pattern === expr;
-    }else if(Kernel.is_tuple(expr)){
-      return Kernel.is_tuple(pattern) && Kernel.match__qmark__(pattern.value(), expr.value());
-    }else if(Kernel.is_list(expr)){
-      if(Kernel.length(pattern) !== Kernel.length(expr)){
-        return false;
-      }
-
-      for (let i = 0; i <= pattern.length; i++) {
-        if(Kernel.match__qmark__(pattern[i], expr[i]) === false){
-          return false;
-        }
-      }
-
-      return true;
-    }else if(Kernel.is_map(expr)){
-      if(!Kernel.is_map(pattern)){
-        return false;
-      }
-
-      for(let key in pattern){
-        if(!(key in expr)){
-          return false;
-        }
-
-        if(Kernel.match__qmark__(pattern[key], expr[key]) === false){
-          return false;
-        }
-      }
-
-      return true;
     }
   }
 };

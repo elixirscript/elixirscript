@@ -23,7 +23,7 @@ defmodule ElixirScript.Translator.Assignment.Test do
 
     ex_ast = quote do: {a, b} = {1, 2}
     js_code = """
-        let [a, b] = Erlang.tuple_iterator(Erlang.tuple(1, 2));
+        let [a, b] = Tuple.iterator(Erlang.tuple(1, 2));
         let _ref = Erlang.tuple(a,b);
     """
 
@@ -31,7 +31,7 @@ defmodule ElixirScript.Translator.Assignment.Test do
 
     ex_ast = quote do: {a, _, c} = {1, 2, 3}
     js_code = """
-        let [a, undefined, c] = Erlang.tuple_iterator(Erlang.tuple(1, 2, 3));
+        let [a, undefined, c] = Tuple.iterator(Erlang.tuple(1, 2, 3));
         let _ref = Erlang.tuple(a,undefined,c);
     """
 

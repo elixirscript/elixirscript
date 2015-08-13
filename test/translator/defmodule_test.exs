@@ -31,7 +31,6 @@ defmodule ElixirScript.Translator.Defmodule.Test do
 
     js_code = """
       const __MODULE__ = Erlang.atom('Elephant');
-      const ul = JQuery('#todo-list');
 
       let something_else = fun([
         [], 
@@ -48,6 +47,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
         }
       ]);
 
+      const ul = JQuery('#todo-list');
 
       export default { something: something };
     """

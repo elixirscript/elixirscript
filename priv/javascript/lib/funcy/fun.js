@@ -32,7 +32,7 @@ let fun = function(...args) {
       result = [];
     }
     // no matches were made so we throw an exception.
-    throw 'No match for: ' + value;
+    throw new Error('No match for: ' + value);
   };
 };
 

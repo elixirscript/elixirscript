@@ -14,7 +14,7 @@ defmodule ElixirScript.Translator.For.Test do
              _results = List.append(_results, n * 2);
          }
          return _results;
-     }.call(this));
+     }.call(this))
     """
 
     assert_translation(ex_ast, js_code)
@@ -32,7 +32,7 @@ defmodule ElixirScript.Translator.For.Test do
              _results = List.append(_results, n);
          }
          return _results;
-     }.call(this));
+     }.call(this))
     """
 
     assert_translation(ex_ast, js_code)
@@ -52,7 +52,7 @@ defmodule ElixirScript.Translator.For.Test do
              }
          }
          return _results;
-     }.call(this));
+     }.call(this))
     """
 
     assert_translation(ex_ast, js_code)
@@ -74,7 +74,7 @@ defmodule ElixirScript.Translator.For.Test do
              }
          }
          return _results;
-     }.call(this));;
+     }.call(this));
     """
 
     assert_translation(ex_ast, js_code)
@@ -93,7 +93,7 @@ defmodule ElixirScript.Translator.For.Test do
                  _results = List.append(_results, n);
          }
          return _results;
-     }.call(this));
+     }.call(this))
     """
 
     assert_translation(ex_ast, js_code)
@@ -116,7 +116,7 @@ defmodule ElixirScript.Translator.For.Test do
              }
          }
          return _results;
-     }.call(this));
+     }.call(this))
     """
 
     assert_translation(ex_ast, js_code)

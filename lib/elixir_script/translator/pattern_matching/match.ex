@@ -91,21 +91,22 @@ defmodule ElixirScript.Translator.PatternMatching.Match do
     { [startsWith(prefix)], [Translator.translate(value)] }
   end
 
-  defp do_build_match({:%, _, [{:__aliases__, _, name}, {:%{}, _, props}]}) do
+  defp do_build_match({:%{}, _, props}) do
     properties = Enum.map(props, fn({key, value}) ->
       {pattern, params} = do_build_match(value)
-      { JS.property(Translator.translate(key), hd(List.wrap(pattern))), params }
+      { JS.property(JS.literal(key), hd(List.wrap(pattern))), params }
     end)
-
-    struct_prop = JS.property(JS.literal("__struct__"), Translator.translate(List.last(name)))
-
-    properties = [{ struct_prop, [] }] ++ properties
 
     {props, params} = Enum.reduce(properties, {[], []}, fn({prop, param}, {props, params}) ->
       { props ++ [prop], params ++ param }
     end)
 
     { JS.object_expression(List.wrap(props)), params }
+  end
+
+  defp do_build_match({:%, _, [{:__aliases__, _, name}, {:%{}, meta, props}]}) do
+    props = [{"__struct__" ,List.last(name)}] ++ props
+    do_build_match({:%{}, meta, props})
   end
 
   defp do_build_match({:=, _, [{name, _, _}, right]}) when not name in [:%, :{}, :__aliases__] do
