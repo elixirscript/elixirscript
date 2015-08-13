@@ -85,8 +85,8 @@ let Enum = {
     for (var i = 0; i < collection.length; i++) {
       let tuple = fun(collection[i], the_acc);
 
-      the_acc = tuple.get(1);
-      mapped = Erlang.list(...mapped.concat([tuple.get(0)]))
+      the_acc = Kernel.elem(tuple, 1);
+      mapped = Erlang.list(...mapped.concat([Kernel.elem(tuple, 0)]));
     }
 
     return Erlang.tuple(mapped, the_acc);
