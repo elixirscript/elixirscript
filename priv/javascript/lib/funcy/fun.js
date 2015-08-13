@@ -1,5 +1,14 @@
 import Match from './match';
 
+function MatchError(message) {
+  this.name = 'MatchError';
+  this.message = message || 'No match for arguments given';
+  this.stack = (new Error()).stack;
+}
+
+MatchError.prototype = Object.create(Error.prototype);
+MatchError.prototype.constructor = MatchError;
+
 /**
  * @preserve jFun - JavaScript Pattern Matching v0.12
  *
@@ -32,7 +41,7 @@ let fun = function(...args) {
       result = [];
     }
     // no matches were made so we throw an exception.
-    throw new Error('No match for: ' + value);
+    throw new MatchError('No match for: ' + value);
   };
 };
 

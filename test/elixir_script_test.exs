@@ -24,7 +24,9 @@ defmodule ElixirScript.Test do
     assert_js_matches """
       import Erlang from '__lib/erlang';
       import Kernel from '__lib/kernel';
+      import Tuple from '__lib/tuple';
       import fun from '__lib/funcy/fun';
+
       
       const __MODULE__ = Erlang.atom('Elephant');
 
@@ -66,6 +68,7 @@ defmodule ElixirScript.Test do
     assert_js_matches """
       import Erlang from '__lib/erlang';
       import Kernel from '__lib/kernel';
+      import Tuple from '__lib/tuple';
       import fun from '__lib/funcy/fun';
       import Elephant from 'animals/elephant';
       const __MODULE__ = Erlang.atom('Animals');
@@ -86,6 +89,7 @@ defmodule ElixirScript.Test do
      assert_js_matches """
        import Erlang from '__lib/erlang';
        import Kernel from '__lib/kernel';
+       import Tuple from '__lib/tuple';
        import fun from '__lib/funcy/fun';
        
        const __MODULE__ = Erlang.atom('Elephant');
