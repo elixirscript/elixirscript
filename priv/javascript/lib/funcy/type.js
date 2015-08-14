@@ -1,9 +1,5 @@
 import fun from './fun';
 
-function getInternalType(value) {
-  return Object.prototype.toString.apply(value);
-}
-
 const Type = {
   isSymbol: function(value) {
     return typeof x === 'symbol';
@@ -37,7 +33,7 @@ const Type = {
   },
 
   isObject: function(value) {
-    return getInternalType(value) === '[object Object]';
+    return Object.prototype.toString.apply(value) === '[object Object]';
   },
 
   isFunction: function(value) {
@@ -82,6 +78,11 @@ const Type = {
 
   isHeadTail: function(value) {
     return value.constructor === fun.headTail.constructor;
+  },
+
+  isBound: function(value) {
+    return value &&
+    value.constructor.name === fun.bound().constructor.name;
   }
 };
 

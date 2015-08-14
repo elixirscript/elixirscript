@@ -6,6 +6,8 @@ function buildMatch(pattern) {
   // function so we need to check for both.
   if (Type.isUndefined(pattern) || Type.isWildcard(pattern)) {
     return matchWildcard(pattern);
+  } else if(Type.isBound(pattern)) {
+    return matchBound(pattern);
   } else if (Type.isParameter(pattern)) {
     return matchParameter(pattern);
   } else if (Type.isHeadTail(pattern)) {
@@ -27,6 +29,34 @@ function buildMatch(pattern) {
   } else if (Type.isSymbol(pattern)) {
     return matchSymbol(pattern);
   }
+}
+
+function equals(one, two){
+  if(typeof one !== typeof two){
+    return false;
+  }
+
+  if(Type.isArray(one) || Type.isObject(one) || Type.isString(one)){
+    if(one.length !== two.length){
+      return false;
+    }
+
+    for(let i in one){
+      if(!equals(one[i], two[i])){
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  return one === two;
+}
+
+function matchBound(pattern){
+  return function(value, bindings){
+    return equals(value, pattern.value) && bindings.push(value) > 0;
+  };
 }
 
 function matchParameter(pattern){

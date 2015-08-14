@@ -30,7 +30,7 @@ defmodule ElixirScript.Translator.Case.Test do
 
     js_code = """
       fun([[false], function() {
-        let value0 = 13;
+        let [value0] = fun.bind(fun.parameter,13);
         return value0;
       }], [[true], function() {
         return true;
@@ -50,7 +50,7 @@ defmodule ElixirScript.Translator.Case.Test do
 
     js_code = """
       fun([[false], function() {
-        let value0 = 13;
+        let [value0] = fun.bind(fun.parameter,13);
         return value0;
       }], [[fun.wildcard], function() {
         return true;
@@ -75,7 +75,7 @@ defmodule ElixirScript.Translator.Case.Test do
         [
           [fun.parameter], 
           function(number) {
-            let value0 = 13;
+            let [value0] = fun.bind(fun.parameter,13);
             return value0;
           }, 
           function(number) {

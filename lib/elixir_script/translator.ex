@@ -229,7 +229,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:=, _, [left, right]}) do
-    Assignment.bind(left, right)
+    Assignment.make_assignment(left, right)
   end
 
   defp do_translate({:<>, _, [left, right]}) do

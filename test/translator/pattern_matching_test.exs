@@ -29,7 +29,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
   should "match wildcard" do
     params = [{:_, [], Test}]
     result = Match.build_match(params)
-    expected_result = { [Match.wildcard],  [] }
+    expected_result = { [Match.wildcard],  [JS.identifier(:undefined)] }
 
     assert result == expected_result
   end
@@ -153,7 +153,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
     params = [{:=, [], [1, {:a, [], Elixir}]}]
     result = Match.build_match(params)
     expected_result = { 
-      [Match.bind(JS.literal(1))],  
+      [Match.capture(JS.literal(1))],  
       [JS.identifier("a")]
     }
 
@@ -163,7 +163,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
     params = [{:=, [], [{:a, [], Elixir}, 1]}]
     result = Match.build_match(params)
     expected_result = { 
-      [Match.bind(JS.literal(1))],  
+      [Match.capture(JS.literal(1))],  
       [JS.identifier("a")]
     }
 
@@ -173,7 +173,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
     params = [{:=, [], [{:%, [], [{:__aliases__, [alias: false], [:AStruct]}, {:%{}, [], []}]}, {:a, [], ElixirScript.Translator.Function.Test}]}]
     result = Match.build_match(params)
     expected_result = { 
-      [Match.bind(JS.object_expression([
+      [Match.capture(JS.object_expression([
         JS.property(JS.literal("__struct__"), Translator.translate(:AStruct)),
       ]))],  
       [JS.identifier("a")]
@@ -186,7 +186,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
     params = [{:=, [], [[{:a, [], Elixir}, {:b, [], Elixir}, {:c, [], Elixir}], {:d, [], Elixir}]}]
     result = Match.build_match(params)
     expected_result = { 
-      [Match.bind(make_list([Match.parameter, Match.parameter, Match.parameter]))],  
+      [Match.capture(make_list([Match.parameter, Match.parameter, Match.parameter]))],  
       [JS.identifier("a"), JS.identifier("b"), JS.identifier("c"), JS.identifier("d")]
     }
 
@@ -222,6 +222,19 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
               JS.property(JS.literal(:which), JS.literal(13))
             ])],
       []
+    }
+
+    assert result == expected_result
+  end
+
+
+  should "match on bound value" do
+    params = [{:^, [], [{:a, [], Elixir}]}]
+    result = Match.build_match(params)
+
+    expected_result = { 
+      [Match.bound(JS.identifier("a"))],
+      [nil]
     }
 
     assert result == expected_result

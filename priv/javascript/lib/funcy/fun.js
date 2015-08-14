@@ -1,13 +1,5 @@
 import Match from './match';
-
-function MatchError(message) {
-  this.name = 'MatchError';
-  this.message = message || 'No match for arguments given';
-  this.stack = (new Error()).stack;
-}
-
-MatchError.prototype = Object.create(Error.prototype);
-MatchError.prototype.constructor = MatchError;
+import MatchError from './match_error';
 
 /**
  * @preserve jFun - JavaScript Pattern Matching v0.12
@@ -45,6 +37,17 @@ let fun = function(...args) {
   };
 };
 
+fun.bind = function(pattern, expr){
+  let result = [];
+  let processedPattern = Match.buildMatch(pattern);
+  if (processedPattern(expr, result)){
+    return result;
+  }else{
+    throw new MatchError('No match for: ' + expr);
+  }
+};
+
+
 fun.parameter = function(name, orElse) {
   function Parameter(n, o) {
     this.name = n;
@@ -79,5 +82,13 @@ fun.headTail = (function() {
   }
   return new HeadTail();
 }());
+
+fun.bound = function(value) {
+  function Bound(v) {
+    this.value = v;
+  }
+
+  return new Bound(value);
+};
 
 export default fun;

@@ -43,18 +43,18 @@ defmodule ElixirScript.Translator.Cond.Test do
     end
 
     js_code = """
-    (function(){
-      if(1 + 1 == 1){
-        let a = 1;
-        return 'This will never match';
-      }else if(2 * 2 != 4){
-        let a = 2;
-        return 'Nor this';
-      }else{
-        let a = 3;
-        return 'This will';
-      }
-    }.call(this))
+     (function()    {
+             if(1 + 1 == 1)     {
+             let [a] = fun.bind(fun.parameter,1);
+             return     'This will never match';
+           } else     if(2 * 2 != 4)         {
+                 let [a] = fun.bind(fun.parameter,2);
+                 return     'Nor this';
+               } else         {
+                 let [a] = fun.bind(fun.parameter,3);
+                 return     'This will';
+               }
+           }.call(this))
     """
 
     assert_translation(ex_ast, js_code)

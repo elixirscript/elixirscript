@@ -54,7 +54,7 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-      let user = User.defstruct();
+      let [user] = fun.bind(fun.parameter,User.defstruct());
     """
 
     assert_translation(ex_ast, js_code)
@@ -64,7 +64,7 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-      let user = User.defstruct(name='John');
+     let [user] = fun.bind(fun.parameter,User.defstruct(name = 'John'));
     """
 
     assert_translation(ex_ast, js_code)
@@ -76,19 +76,16 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-      let user = (function(){
-          let _results = {};
-
-          for(let prop in map){
-            if(map.hasOwnProperty(prop)){
-              _results[prop] = map[prop];
-            }
-          }
-
-          _results.key = value;
-
-          return _results;
-        }.call(this));
+     let [user] = fun.bind(fun.parameter,(function()    {
+             let _results = {};
+             for(let prop in map)     {
+             if(map.hasOwnProperty(prop))     {
+             _results[prop] = map[prop];
+           }
+           }
+             _results.key = value;
+             return     _results;
+           }.call(this)));
     """
 
     assert_translation(ex_ast, js_code)
@@ -99,20 +96,17 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-      let user = (function(){
-          let _results = {};
-
-          for(let prop in map){
-            if(map.hasOwnProperty(prop)){
-              _results[prop] = map[prop];
-            }
-          }
-
-          _results.key = value;
-          _results.key1 = value1;
-
-          return _results;
-        }.call(this));
+     let [user] = fun.bind(fun.parameter,(function()    {
+             let _results = {};
+             for(let prop in map)     {
+             if(map.hasOwnProperty(prop))     {
+             _results[prop] = map[prop];
+           }
+           }
+             _results.key = value;
+             _results.key1 = value1;
+             return     _results;
+           }.call(this)));
     """
 
     assert_translation(ex_ast, js_code)

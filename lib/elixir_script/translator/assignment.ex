@@ -5,131 +5,65 @@ defmodule ElixirScript.Translator.Assignment do
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.Primitive
+  alias ElixirScript.Translator.PatternMatching.Match
 
-  def bind({_left1, _left2} = two_tuple, right) do
-    do_tuple_bind(Tuple.to_list(two_tuple), right)
-  end
+  def make_assignment(left, right) do
+    { patterns, params } = Match.build_match([left])
 
-  def bind({:{}, _, elements}, right) do
-    do_tuple_bind(elements, right)
-  end
-
-  def bind({:^, _, [{variable, meta, context}]}, right) do
-     JS.if_statement(
-      Translator.translate(quote do: !Kernel.match__qmark__(unquote({variable, meta, context}), unquote(right))),
-      Utils.make_throw_statement("MatchError", "no match of right hand side value")
-    )
-  end
-
-  def bind(left, right) do
-    if is_equality_bind?(List.wrap(left)) do
-      do_equality_bind(left, right)
-    else
-      cond do
-        is_list(left) ->
-          do_tuple_or_list_bind(left, right, &Primitive.make_list/1)   
-        true ->
-          declarator = JS.variable_declarator(
-            Translator.translate(left),
-            Translator.translate(right)
-          )
-
-          JS.variable_declaration([declarator], :let)                    
-      end
-    end
-  end
-
-  defp do_tuple_bind(left, right) do
-    if is_equality_bind?(left) do
-      do_equality_bind(left, right)
-    else
-      do_tuple_or_list_bind(left, right, &Primitive.make_tuple/1) 
-    end
-  end
-
-  def is_equality_bind?(left) do
-    Enum.any?(left, fn(x) ->
-      case x do
-        {:^, _, [{_variable, _meta, _context}]} ->
-          true
-        _ ->
-          false
-      end
-    end)
-  end
-
-  def do_tuple_or_list_bind(left, right, ds_func) do
-    array = left
-    |> Enum.map(&Translator.translate(&1))
-    |> JS.array_expression
-
-    declarator = if(is_tuple(right)) do
-       JS.variable_declarator(
-        array,
+      declarator = JS.variable_declarator(
+        JS.array_pattern(params),
         JS.call_expression(
           JS.member_expression(
-            JS.identifier("Tuple"),
-            JS.identifier("iterator")
+            JS.identifier("fun"),
+            JS.identifier("bind")
           ),
-          [Translator.translate(right)]
+          [hd(patterns), Translator.translate(right)]
         )
       )
-    else
-       JS.variable_declarator(
-        array,
-        Translator.translate(right)
-      )            
-    end
 
     array_pattern = JS.variable_declaration([declarator], :let)
 
-    ref = JS.identifier("_ref")
-
-    ref_declarator = JS.variable_declarator(
-      ref,
-      ds_func.(left)
-    )
-
-    ref_declaration = JS.variable_declaration([ref_declarator], :let)
-    %ElixirScript.Translator.Group{ body: [array_pattern, ref_declaration] }  
+    case left do
+      list when is_list(left) ->
+        make_ref(array_pattern, params, "list")
+      {_left1, _left2} ->
+        make_ref(array_pattern, params, "tuple")
+      {:{}, _, elements} ->
+        make_ref(array_pattern, params, "tuple")
+      _ ->
+        array_pattern       
+    end
   end
 
-  defp do_equality_bind(left, right) do
+  defp make_ref(array_pattern, params, type) do
     ref = JS.identifier("_ref")
+
+    params = Enum.map(params, fn
+      (nil) -> JS.identifier(:undefined)
+      (x) -> x
+    end)
 
     ref_declarator = JS.variable_declarator(
       ref,
-      Translator.translate(right)
+      JS.call_expression(
+        JS.member_expression(
+          JS.identifier("Erlang"),
+          JS.identifier(type)
+        ),
+        params
+      )         
     )
 
     ref_declaration = JS.variable_declaration([ref_declarator], :let)
+    %ElixirScript.Translator.Group{ body: [array_pattern, ref_declaration] }    
+  end
 
-    {declarations, _} = Enum.map_reduce(left, 0, fn(x, index) ->
-      declaration = case x do
-        {:^, _, [{variable, meta, context}]} ->
-         JS.if_statement(
-          Translator.translate(quote do: !Kernel.match__qmark__(unquote({variable, meta, context}), _ref.get(unquote(index)))),
-          Utils.make_throw_statement("MatchError", "no match of right hand side value")
-        )
-        _ ->
-          declarator = JS.variable_declarator(
-            Translator.translate(x),
-            JS.call_expression(
-              JS.member_expression(
-                JS.identifier(:Kernel),
-                JS.identifier(:elem)
-              ),
-              [ref, JS.literal(index)]
-            )
-          )
+  defp make_function_assignment(function_name, function) do
+    declarator = JS.variable_declarator(
+      Translator.translate(function_name),
+      Translator.translate(function)
+    )
 
-          JS.variable_declaration([declarator], :let)
-      end
-
-      {declaration, index + 1} 
-
-    end)
-
-    %ElixirScript.Translator.Group{ body: [ref_declaration] ++ declarations }
+    JS.variable_declaration([declarator], :let)   
   end
 end

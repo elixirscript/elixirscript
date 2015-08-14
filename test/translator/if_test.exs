@@ -10,12 +10,12 @@ defmodule ElixirScript.Translator.If.Test do
     end
 
     js_code = """
-      (function() {
-        if (1 == 1) {
-          let a = 1;
-          return a;
-        }
-      }.call(this))
+    (function()    {
+             if(1 == 1)     {
+             let [a] = fun.bind(fun.parameter,1);
+             return     a;
+           }
+           }.call(this))
     """
 
     assert_translation(ex_ast, js_code)
@@ -29,15 +29,15 @@ defmodule ElixirScript.Translator.If.Test do
     end
 
     js_code = """
-      (function(){
-        if(1 == 1){
-          let a = 1;
-          return a;
-        }else{
-          let a = 2;
-          return a;
-        }
-      }.call(this))
+     (function()    {
+             if(1 == 1)     {
+             let [a] = fun.bind(fun.parameter,1);
+             return     a;
+           } else     {
+             let [a] = fun.bind(fun.parameter,2);
+             return     a;
+           }
+           }.call(this))
     """
 
     assert_translation(ex_ast, js_code)

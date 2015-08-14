@@ -23,9 +23,14 @@ defmodule ElixirScript.Translator.PatternMatching.Match do
     JS.identifier(:startsWith)
   )
 
-  @bind JS.member_expression(
+  @capture JS.member_expression(
     JS.identifier(:fun),
-    JS.identifier(:bind)
+    JS.identifier(:capture)
+  )
+
+  @bound JS.member_expression(
+    JS.identifier(:fun),
+    JS.identifier(:bound)
   )
 
   def wildcard() do
@@ -47,12 +52,21 @@ defmodule ElixirScript.Translator.PatternMatching.Match do
     )
   end
 
-  def bind(value) do
+  def capture(value) do
     JS.call_expression(
-      @bind,
+      @capture,
       [value]
     )
   end
+
+  def bound(value) do
+    JS.call_expression(
+      @bound,
+      [value]
+    )
+  end
+
+
 
   def make_list(values) when is_list(values) do
     JS.call_expression(
@@ -79,8 +93,12 @@ defmodule ElixirScript.Translator.PatternMatching.Match do
     |> reduce_patterns
   end
 
+  defp do_build_match({:^, _, [value]}) do
+    { [bound(Translator.translate(value))], [nil] }
+  end
+
   defp do_build_match({:_, _, _}) do
-    { [@wildcard], [] }
+    { [@wildcard], [JS.identifier(:undefined)] }
   end
 
   defp do_build_match([{:|, _, [head, tail]}]) do
@@ -109,11 +127,11 @@ defmodule ElixirScript.Translator.PatternMatching.Match do
     do_build_match({:%{}, meta, props})
   end
 
-  defp do_build_match({:=, _, [{name, _, _}, right]}) when not name in [:%, :{}, :__aliases__] do
+  defp do_build_match({:=, _, [{name, _, _}, right]}) when not name in [:%, :{}, :__aliases__, :^] do
     unify(name, right)
   end
 
-  defp do_build_match({:=, _, [left, {name, _, _}]}) when not name in [:%, :{}, :__aliases__] do
+  defp do_build_match({:=, _, [left, {name, _, _}]}) when not name in [:%, :{}, :__aliases__, :^] do
     unify(name, left)
   end
 
@@ -155,7 +173,7 @@ defmodule ElixirScript.Translator.PatternMatching.Match do
 
   defp unify(target, source) do
     {patterns, params} = build_match([source])
-    { [bind(hd(patterns))], params ++ [JS.identifier(Utils.filter_name(target))] }
+    { [capture(hd(patterns))], params ++ [JS.identifier(Utils.filter_name(target))] }
   end
 
 end

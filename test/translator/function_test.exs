@@ -36,10 +36,10 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-    let test1 = fun([[fun.parameter, fun.parameter], function(alpha, beta) {
-      let a0 = alpha;
-      return a0;
-    }]);
+     let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
+             let [a0] = fun.bind(fun.parameter,alpha);
+             return     a0;
+           }]);
     """
 
     assert_translation(ex_ast, js_code)
@@ -88,27 +88,22 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-      let test1 = fun(
-        [
-          [fun.parameter, fun.parameter], 
-          function(alpha, beta){ 
-            return (function(){
-              if(1 == 1){
-                return (function(){
-                  if(2 == 2){
-                    return 4;
-                  }else{
-                    let a0 = 1;
-                    return a0;
-                  }
-                }.call(this));
-              }else{
-                return 2;
-              }
-            }.call(this));
-          } 
-        ]
-      );
+     let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
+             return     (function()    {
+             if(1 == 1)     {
+             return     (function()    {
+             if(2 == 2)     {
+             return     4;
+           } else     {
+             let [a0] = fun.bind(fun.parameter,1);
+             return     a0;
+           }
+           }.call(this));
+           } else     {
+             return     2;
+           }
+           }.call(this));
+           }]);
     """
 
     assert_translation(ex_ast, js_code)
@@ -120,18 +115,11 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-      let test1 = fun(
-        [
-          [fun.parameter, fun.parameter], 
-          function(alpha, beta){ 
-            let [a0, b0] = Tuple.iterator(Erlang.tuple(1,2));
-
-            let _ref = Erlang.tuple(a0, b0);
-
-            return _ref;
-          } 
-        ]
-      );
+     let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
+             let [a0,b0] = fun.bind(Erlang.tuple(fun.parameter,fun.parameter),Erlang.tuple(1,2));
+             let _ref = Erlang.tuple(a0,b0);
+             return     _ref;
+           }]);
     """
 
     assert_translation(ex_ast, js_code)
@@ -594,7 +582,7 @@ defmodule ElixirScript.Translator.Function.Test do
     js_code = """
       let something = fun(
         [
-          [fun.bind({'__struct__': Erlang.atom('AStruct')})], 
+          [fun.capture({'__struct__': Erlang.atom('AStruct')})], 
           function(a){ 
             return null; 
           }
@@ -756,14 +744,11 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-      let test1 = fun([
-        [fun.parameter, fun.parameter], 
-        function(alpha, beta) {
-          let a0 = 1;
-          let a1 = 2;
-          return a1;
-        }
-      ]);
+     let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
+             let [a0] = fun.bind(fun.parameter,1);
+             let [a1] = fun.bind(fun.parameter,2);
+             return     a1;
+           }]);
     """
 
     assert_translation(ex_ast, js_code)
@@ -777,15 +762,12 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-      let test1 = fun([
-        [fun.parameter, fun.parameter], 
-        function(alpha, beta){
-          let a0 = 1;
-          let a1 = a0;
-          let a2 = 2;
-          return a2;
-        }
-      ]);
+     let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
+             let [a0] = fun.bind(fun.parameter,1);
+             let [a1] = fun.bind(fun.parameter,a0);
+             let [a2] = fun.bind(fun.parameter,2);
+             return     a2;
+           }]);
     """
 
     assert_translation(ex_ast, js_code)
@@ -798,16 +780,12 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-     let test1 = fun(
-      [
-        [fun.parameter, fun.parameter], 
-        function(alpha,beta){
-          let a0 = 1;
-          let [a1, b0, c0] = Erlang.list(a0,2,3);
-          let _ref = Erlang.list(a1,b0,c0);
-          return _ref;
-        }
-      ]);
+     let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
+             let [a0] = fun.bind(fun.parameter,1);
+             let [a1,b0,c0] = fun.bind(Erlang.list(fun.parameter,fun.parameter,fun.parameter),Erlang.list(a0,2,3));
+             let _ref = Erlang.list(a1,b0,c0);
+             return     _ref;
+           }]);
     """
 
     assert_translation(ex_ast, js_code)
@@ -823,14 +801,11 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-    let test1 = fun([
-      [fun.parameter, fun.parameter], 
-      function(alpha__qmark__,beta__emark__){
-        let a__qmark__0 = 1;
-        let b__emark__0 = 2;
-        return b__emark__0;
-      }
-    ]);
+     let test1 = fun([[fun.parameter, fun.parameter], function(alpha__qmark__,beta__emark__)    {
+             let [a__qmark__0] = fun.bind(fun.parameter,1);
+             let [b__emark__0] = fun.bind(fun.parameter,2);
+             return     b__emark__0;
+           }]);
     """
 
     assert_translation(ex_ast, js_code)

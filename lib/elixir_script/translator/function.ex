@@ -27,6 +27,11 @@ defmodule ElixirScript.Translator.Function do
       {:->, _, [ [{:when, _, [params | guards]}], body ]} ->
         { patterns, params } = Match.build_match(List.wrap(params))
 
+        params = Enum.filter(params, fn
+          (%ESTree.Identifier{name: :undefined}) -> false
+          (x) -> true
+        end)
+
         body = body
         |> prepare_function_body
         |> JS.block_statement
@@ -52,6 +57,11 @@ defmodule ElixirScript.Translator.Function do
       ({:->, _, [params, body]}) ->
         { patterns, params } = Match.build_match(params)
 
+        params = Enum.filter(params, fn
+          (%ESTree.Identifier{name: :undefined}) -> false
+          (x) -> true
+        end)
+
         body = body
         |> prepare_function_body
         |> JS.block_statement
@@ -67,6 +77,11 @@ defmodule ElixirScript.Translator.Function do
 
       ({_, _, [{:when, _, [{_, _, params} | guards] }, [do: body]]}) ->
         { patterns, params } = Match.build_match(params)
+
+        params = Enum.filter(params, fn
+          (%ESTree.Identifier{name: :undefined}) -> false
+          (x) -> true
+        end)
 
         body = body
         |> prepare_function_body
@@ -92,6 +107,11 @@ defmodule ElixirScript.Translator.Function do
 
       ({_, _, [{_, _, params}, [do: body]]}) ->
         { patterns, params } = Match.build_match(params)
+
+        params = Enum.filter(params, fn
+          (%ESTree.Identifier{name: :undefined}) -> false
+          (x) -> true
+        end)
 
         body = body
         |> prepare_function_body
@@ -209,8 +229,12 @@ defmodule ElixirScript.Translator.Function do
         declaration = hd(last_item.declarations).id
 
         return_statement = case declaration do
-          %ESTree.ArrayPattern{} ->
-            JS.return_statement(JS.array_expression(declaration.elements))
+          %ESTree.ArrayPattern{elements: elements} ->
+            if(length(elements) == 1) do
+              JS.return_statement(hd(declaration.elements))
+            else
+              JS.return_statement(JS.array_expression(declaration.elements))
+            end
           _ ->
             JS.return_statement(declaration)  
         end

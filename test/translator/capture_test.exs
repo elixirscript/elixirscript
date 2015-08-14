@@ -8,9 +8,9 @@ defmodule ElixirScript.Translator.Capture.Test do
     end
 
     js_code = """
-      let fun = [[fun.parameter], function(__1) {
-        return Kernel.is_atom(__1);
-      }];
+     let [fun] = fun.bind(fun.parameter,[[fun.parameter], function(__1)    {
+             return     Kernel.is_atom(__1);
+           }]);
     """
 
     assert_translation(ex_ast, js_code)
@@ -24,9 +24,9 @@ defmodule ElixirScript.Translator.Capture.Test do
     end
 
     js_code = """
-      let fun = fun([[fun.parameter], function(__1) {
-        return Kernel.is_atom(__1);
-      }]);
+     let [fun] = fun.bind(fun.parameter,fun([[fun.parameter], function(__1)    {
+             return     Kernel.is_atom(__1);
+           }]));
     """
 
     assert_translation(ex_ast, js_code)
@@ -41,9 +41,9 @@ defmodule ElixirScript.Translator.Capture.Test do
     end
 
     js_code = """
-      let fun = [[fun.parameter], function(__1) {
-        return local_function(__1);
-      }];
+     let [fun] = fun.bind(fun.parameter,[[fun.parameter], function(__1)    {
+             return     local_function(__1);
+           }]);
     """
 
     assert_translation(ex_ast, js_code)
@@ -57,9 +57,9 @@ defmodule ElixirScript.Translator.Capture.Test do
     end
 
     js_code = """
-      let fun = fun([[fun.parameter], function(__1) {
-        return __1 * 2;
-      }]);
+     let [fun] = fun.bind(fun.parameter,fun([[fun.parameter], function(__1)    {
+             return     __1 * 2;
+           }]));
     """
 
     assert_translation(ex_ast, js_code)
@@ -73,9 +73,9 @@ defmodule ElixirScript.Translator.Capture.Test do
     end
 
     js_code = """
-      let fun = fun([[fun.parameter, fun.parameter], function(__1, __2) {
-        return Erlang.tuple(__1, __2);
-      }]);
+     let [fun] = fun.bind(fun.parameter,fun([[fun.parameter, fun.parameter], function(__1,__2)    {
+             return     Erlang.tuple(__1,__2);
+           }]));
     """
 
     assert_translation(ex_ast, js_code)
@@ -85,9 +85,9 @@ defmodule ElixirScript.Translator.Capture.Test do
     end
 
     js_code = """
-      let fun = fun([[fun.parameter, fun.parameter, fun.parameter], function(__1, __2, __3) {
-        return Erlang.tuple(__1, __2, __3);
-      }]);
+     let [fun] = fun.bind(fun.parameter,fun([[fun.parameter, fun.parameter, fun.parameter], function(__1,__2,__3)    {
+             return     Erlang.tuple(__1,__2,__3);
+           }]));
     """
 
     assert_translation(ex_ast, js_code)
