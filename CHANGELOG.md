@@ -1,4 +1,4 @@
-# v0.8.0-dev
+# v0.8.0
 * Enhancements
   * Can now support catch blocks in try expressions
   * Wrapped try's in function closure to make sure they return a value;
