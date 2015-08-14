@@ -1,5 +1,5 @@
 %{"earmark": {:hex, :earmark, "0.1.17"},
-  "estree": {:git, "git://github.com/bryanjos/elixir-estree.git", "e31864037272b334c6e5e35c608ab9bd2cba5edb", []},
+  "estree": {:hex, :estree, "2.0.1"},
   "ex_doc": {:hex, :ex_doc, "0.8.3"},
   "inflex": {:hex, :inflex, "1.4.1"},
   "shouldi": {:hex, :shouldi, "0.2.3"}}

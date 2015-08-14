@@ -24,7 +24,7 @@ defmodule ElixirScript.Mixfile do
   defp deps do
     [
       { :inflex, "~> 1.4" },
-      { :estree, github: "bryanjos/elixir-estree" },
+      { :estree, "~> 2.0"},
       { :shouldi, only: :test },
       { :earmark, "~> 0.1", only: :dev },
       { :ex_doc, "~> 0.8", only: :dev }
