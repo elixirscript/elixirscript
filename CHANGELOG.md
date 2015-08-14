@@ -3,6 +3,7 @@
   * Can now support catch blocks in try expressions
   * Wrapped try's in function closure to make sure they return a value;
   * Added receive
+  * Updated pattern matching implementation
 
 # v0.7.0
 * Enhancements

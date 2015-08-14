@@ -16,7 +16,7 @@ ElixirScript can be used in the following ways:
 * If using as part of a project, you can add the following to your deps
 
   ```elixir
-    {:elixir_script, "~> 0.6"}
+    {:elixir_script, "~> 0.7"}
   ```
 
   From there you can either use the ElixirScript module directly or the mix command, `mix ex2js`
@@ -92,8 +92,6 @@ Not sure how this would be implemented right now, but looking for ideas.
 Only because the translation of `else` haven't been figured out yet
 
 #### Pattern matching works but is still limited
-Pattern matching does work quite well now, but the implementation still needs to be thoroughly tested in a number of situations. 
-
 Currently pattern matching on bitstrings isn't supported, but for every other case that one would use pattern matching, it should work.
 
 There are probably more that I'm forgetting. Check the issues for what's implemented and what still is needed.
