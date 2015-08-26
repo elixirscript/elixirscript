@@ -47,11 +47,6 @@ Test
 
     mix test
 
-To build distributable tarball
-
-    mix ex2js.dist
-
-    `ex2js.tar.gz` will be in the `dist` folder
 
 Usage
 ===
