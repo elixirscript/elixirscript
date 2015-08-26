@@ -16,7 +16,7 @@ ElixirScript can be used in the following ways:
 * If using as part of a project, you can add the following to your deps
 
   ```elixir
-    {:elixir_script, "~> 0.7"}
+    {:elixir_script, "~> 0.8"}
   ```
 
   From there you can either use the ElixirScript module directly or the mix command, `mix ex2js`
@@ -64,7 +64,45 @@ Usage
   -h  --help            this message
 ```
 
-#Limitations
+A note on `-r`. The standard lib modules are included in the output inside the `__libs` folder. They are by default included by importing them like so
+
+```javascript
+import Kernel from '__lib/kernel'
+```
+
+Depending on your setup that may not work. With `-r` you can specify the root path that will be prepended to the default path.
+
+Ex.
+```bash
+mix ex2js "my/elixir/dir/**/*.ex" -r "js" -o my/js/dir 
+```
+
+Will make the standard lib imports look like so
+```javascript
+import Kernel from 'js/__lib/kernel'
+```
+
+
+## Examples
+ 
+ * Using the included mix command, converting a folder of elixir files to JavaScript
+    ```bash
+    mix ex2js "my/elixir/dir/**/*.ex" -o my/js/dir
+    ```
+    
+ * Using the included mix command, if you want to give it some elixir code and output JavaScript in the terminal
+    ```bash
+    mix ex2js -ex "[1, 2, 3, 4]"
+    ```
+    
+ * Using the included the ElixirScript module to turn Elixir code into JavaScript
+    ```elixir
+    iex(1)> ElixirScript.transpile("[1, 2, 3, 4]")
+    ["Erlang.list(1,2,3,4)"]
+    ```
+
+
+# Limitations
 
 #### Not all of the Kernel.SpecialForms module is defined
 
