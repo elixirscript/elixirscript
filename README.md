@@ -115,6 +115,8 @@ The following aren't defined (yet):
 The following are defined but incomplete:
 
 * quote - Currently ignores `:location` and `:context` options
+* try - Missing an implementation for the `else` block
+* bitstrings - Implemented, but no pattern matching support yet
 
 #### Most of the Standard Library isn't defined yet
 A lot of functions in the Kernel module are implemented. The Enum, Atom, List, Tuple, Logger, and Range modules are either fully defined are not complete. The rest still need to be implemented. Some modules like System or File may not be useful or function in the browser and may end up being only useful when using ElixirScript outside of the browser.
@@ -122,13 +124,7 @@ A lot of functions in the Kernel module are implemented. The Enum, Atom, List, T
 #### No Macros
 Not sure how this would be implemented right now, but looking for ideas.
 
-#### else blocks are currently not supported on try expressions
-Only because the translation of `else` haven't been figured out yet
-
-#### Pattern matching works but is still limited
-Currently pattern matching on bitstrings isn't supported, but for every other case that one would use pattern matching, it should work.
-
-There are probably more that I'm forgetting. Check the issues for what's implemented and what still is needed.
+Implementations may change depending on what
 
 ### Example projects
 
