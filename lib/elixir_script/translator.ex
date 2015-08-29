@@ -5,7 +5,9 @@ defmodule ElixirScript.Translator do
   alias ElixirScript.Preprocess.Variables
   alias ElixirScript.Translator.Primitive
   alias ElixirScript.Translator.Assignment
-  alias ElixirScript.Translator.Data
+  alias ElixirScript.Translator.Map
+  alias ElixirScript.Translator.Struct
+  alias ElixirScript.Translator.Raise
   alias ElixirScript.Translator.Function
   alias ElixirScript.Translator.Capture
   alias ElixirScript.Translator.Expression
@@ -77,15 +79,15 @@ defmodule ElixirScript.Translator do
   defp do_translate({:%, _, [alias_info, data]}) do
     {_, _, name} = alias_info
     {_, _, data} = data
-    Data.make_struct(name, data)
+    Struct.make_struct(name, data)
   end
 
   defp do_translate({:%{}, _, [{:|, _, [map, data]}]}) do
-    Data.make_map_update(map, data);
+    Map.make_map_update(map, data);
   end
 
   defp do_translate({:%{}, _, properties}) do
-    Data.make_object(properties)
+    Map.make_object(properties)
   end
 
   defp do_translate({:<<>>, _, elements}) do
@@ -109,7 +111,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({{:., _, [Access, :get]}, _, [target, property]}) do
-    Data.make_get_property(target, property)
+    Map.make_get_property(target, property)
   end
 
   defp do_translate({:., _, [module_name, function_name]}) do
@@ -261,21 +263,21 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:defstruct, _, attributes}) do
-    Data.make_defstruct(attributes)
+    Struct.make_defstruct(attributes)
   end
 
   defp do_translate({:defexception, _, attributes}) do
-    Data.make_defexception(attributes)
+    Struct.make_defexception(attributes)
   end
 
   defp do_translate({:raise, _, [alias_info, attributes]}) do
     {_, _, name} = alias_info
 
-    Data.throw_error(name, attributes)
+    Raise.throw_error(name, attributes)
   end
 
   defp do_translate({:raise, _, [message]}) do
-    Data.throw_error(message)
+    Raise.throw_error(message)
   end
 
   defp do_translate({:if, _, [test, blocks]}) do
