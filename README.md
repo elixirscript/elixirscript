@@ -114,7 +114,7 @@ The following aren't defined (yet):
 
 The following are defined but incomplete:
 
-* quote - currently ignores options
+* quote - Currently ignores `:location` and `:context` options
 
 #### Most of the Standard Library isn't defined yet
 A lot of functions in the Kernel module are implemented. The Enum, Atom, List, Tuple, Logger, and Range modules are either fully defined are not complete. The rest still need to be implemented. Some modules like System or File may not be useful or function in the browser and may end up being only useful when using ElixirScript outside of the browser.

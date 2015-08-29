@@ -89,4 +89,20 @@ defmodule ElixirScript.Translator.Quote.Test do
 
     assert_translation(ex_ast, js_code)
   end
+
+  test "bind_quoted" do
+    ex_ast = quote do
+      quote bind_quoted: [x: x] do
+        x * x
+      end
+    end
+
+    js_code = "Erlang.tuple(
+      Erlang.atom('*'),
+      Erlang.list(Erlang.tuple(Erlang.atom('context'),Erlang.atom('Elixir.ElixirScript.Translator.Quote.Test')),Erlang.tuple(Erlang.atom('import'),Erlang.atom('Elixir.Kernel'))),
+      Erlang.list(x, x)
+    )"
+
+    assert_translation(ex_ast, js_code)    
+  end
 end
