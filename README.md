@@ -22,7 +22,7 @@ ElixirScript can be used in the following ways:
   From there you can either use the ElixirScript module directly or the mix command, `mix ex2js`
 
 * CLI Client
-  
+
     You can download the latest release from the [releases](https://github.com/bryanjos/elixirscript/releases) page and use the included `ex2js` escript.
 
 
@@ -31,7 +31,7 @@ Development
 ===========
 
 Clone the repo
-  
+
     git clone git@github.com:bryanjos/elixirscript.git
 
 Get dependencies
@@ -54,7 +54,7 @@ Usage
 ```
   usage: ex2js <input> [options]
 
-  <input> path to elixir files or 
+  <input> path to elixir files or
           the elixir code string if the -ex flag is used
 
   options:
@@ -74,7 +74,7 @@ Depending on your setup that may not work. With `-r` you can specify the root pa
 
 Ex.
 ```bash
-mix ex2js "my/elixir/dir/**/*.ex" -r "js" -o my/js/dir 
+mix ex2js "my/elixir/dir/**/*.ex" -r "js" -o my/js/dir
 ```
 
 Will make the standard lib imports look like so
@@ -84,17 +84,17 @@ import Kernel from 'js/__lib/kernel'
 
 
 ## Examples
- 
+
  * Using the included mix command, converting a folder of elixir files to JavaScript
     ```bash
     mix ex2js "my/elixir/dir/**/*.ex" -o my/js/dir
     ```
-    
+
  * Using the included mix command, if you want to give it some elixir code and output JavaScript in the terminal
     ```bash
     mix ex2js -ex "[1, 2, 3, 4]"
     ```
-    
+
  * Using the included the ElixirScript module to turn Elixir code into JavaScript
     ```elixir
     iex(1)> ElixirScript.transpile("[1, 2, 3, 4]")
@@ -107,7 +107,7 @@ import Kernel from 'js/__lib/kernel'
 #### Not all of the Kernel.SpecialForms module is defined
 
 The following aren't defined (yet):
-    
+
 * `__CALLER__`
 * `__ENV__`
 * quote
@@ -132,5 +132,10 @@ There are probably more that I'm forgetting. Check the issues for what's impleme
 ### Example projects
 
 * [todo-elixirscript](https://github.com/bryanjos/example) The TodoMVC app using ElixirScript and Phoenix.
-    
+
 * [color_bar_spike](https://github.com/bryanjos/color_bar_spike) A canvas drawing example using ElixirScript, React and Delorean
+
+#### Using with Brunch
+There is a plugin for using ElixirScript in your Brunch project
+[here](https://www.npmjs.com/package/elixirscript-brunch)
+
