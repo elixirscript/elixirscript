@@ -116,6 +116,7 @@ The following are defined but incomplete:
 
 * quote - Currently ignores `:location` and `:context` options
 * try - Missing an implementation for the `else` block
+* for - `into` not implementated yet
 * bitstrings - Implemented, but no pattern matching support yet
 
 #### Most of the Standard Library isn't defined yet
