@@ -22,6 +22,7 @@ defmodule ElixirScript.Translator do
   alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.Bitstring
   alias ElixirScript.Translator.Receive
+  alias ElixirScript.Translator.Quote
   alias ElixirScript.Translator.Kernel, as: ExKernel
 
   @doc """
@@ -166,16 +167,12 @@ defmodule ElixirScript.Translator do
     raise ElixirScript.UnsupportedError, :__ENV__
   end
 
-  defp do_translate({:quote, [], _expr}) do
-    raise ElixirScript.UnsupportedError, :quote
+  defp do_translate({:quote, _, [[do: expr]]}) do
+    Quote.make_quote([], expr)
   end
 
-  defp do_translate({:unquote, [], _expr}) do
-    raise ElixirScript.UnsupportedError, :unquote
-  end
-
-  defp do_translate({:unquote_splicing, _, _expressions }) do
-    raise ElixirScript.UnsupportedError, :unquote_splicing
+  defp do_translate({:quote, _, [opts, [do: expr]]}) do
+    Quote.make_quote(opts, expr)
   end
 
   defp do_translate({:import, _, [{:__aliases__, _, module_name_list}]}) do

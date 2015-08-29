@@ -110,15 +110,16 @@ The following aren't defined (yet):
 
 * `__CALLER__`
 * `__ENV__`
-* quote
-* unquote
-* unquote_slicing
 * super
+
+The following are defined but incomplete:
+
+* quote - currently ignores options
 
 #### Most of the Standard Library isn't defined yet
 A lot of functions in the Kernel module are implemented. The Enum, Atom, List, Tuple, Logger, and Range modules are either fully defined are not complete. The rest still need to be implemented. Some modules like System or File may not be useful or function in the browser and may end up being only useful when using ElixirScript outside of the browser.
 
-#### No Macro support
+#### No Macros
 Not sure how this would be implemented right now, but looking for ideas.
 
 #### else blocks are currently not supported on try expressions

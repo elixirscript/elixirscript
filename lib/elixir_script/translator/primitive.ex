@@ -3,6 +3,7 @@ defmodule ElixirScript.Translator.Primitive do
   require Logger
   alias ESTree.Tools.Builder
   alias ElixirScript.Translator
+  alias ElixirScript.Translator.Quote
 
   def make_wildcard() do
     Builder.member_expression(
@@ -43,6 +44,26 @@ defmodule ElixirScript.Translator.Primitive do
     )
   end
 
+  def make_list_quoted(opts, ast) when is_list(ast) do
+    Builder.call_expression(
+      Builder.member_expression(
+        Builder.identifier("Erlang"),
+        Builder.identifier("list")
+      ),
+      Enum.map(ast, fn(x) -> Quote.make_quote(opts, x) end)
+    )
+  end
+
+  def make_list_no_translate(ast) when is_list(ast) do
+    Builder.call_expression(
+      Builder.member_expression(
+        Builder.identifier("Erlang"),
+        Builder.identifier("list")
+      ),
+      ast
+    )
+  end
+
   def make_tuple({ one, two }) do
     make_tuple([one, two])
   end
@@ -54,6 +75,16 @@ defmodule ElixirScript.Translator.Primitive do
         Builder.identifier("tuple")
       ),
       Enum.map(elements, fn(x) -> Translator.translate(x) end)
+    )
+  end
+
+  def make_tuple_quoted(opts, elements) do
+    Builder.call_expression(
+      Builder.member_expression(
+        Builder.identifier("Erlang"),
+        Builder.identifier("tuple")
+      ),
+      Enum.map(elements, fn(x) -> Quote.make_quote(opts, x) end)
     )
   end
 

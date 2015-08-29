@@ -1,3 +1,8 @@
+# v0.9.0-dev
+* Enhancements
+  * an implementation for quote. Currently ignores options
+  * an implementation for unquote and unquote_splicing
+
 # v0.8.0
 * Enhancements
   * Can now support catch blocks in try expressions

@@ -30,6 +30,10 @@ let Enum = {
     return the_default;
   },
 
+  concat: function(...enumables){
+    return enumables[0].concat(enumables.slice(1));
+  },
+
   count: function(collection, fun = null){
     if(fun == null){
       return Kernel.length(collection);
