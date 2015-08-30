@@ -37,6 +37,7 @@ defmodule ElixirScript.Preprocess.Aliases do
     |> HashSet.put(:Kernel)
     |> HashSet.put(:fun)
     |> HashSet.put(:Tuple)
+    |> HashSet.put(:Enum)
 
     state = %{ add: HashSet.new, defined: HashSet.new, stdlib: stdlib }
 

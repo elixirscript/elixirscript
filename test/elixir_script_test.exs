@@ -23,6 +23,7 @@ defmodule ElixirScript.Test do
 
     assert_js_matches """
       import Erlang from '__lib/erlang';
+      import Enum from '__lib/enum';
       import Kernel from '__lib/kernel';
       import Tuple from '__lib/tuple';
       import fun from '__lib/funcy/fun';
@@ -67,6 +68,7 @@ defmodule ElixirScript.Test do
 
     assert_js_matches """
       import Erlang from '__lib/erlang';
+      import Enum from '__lib/enum';
       import Kernel from '__lib/kernel';
       import Tuple from '__lib/tuple';
       import fun from '__lib/funcy/fun';
@@ -88,6 +90,7 @@ defmodule ElixirScript.Test do
 
      assert_js_matches """
        import Erlang from '__lib/erlang';
+       import Enum from '__lib/enum';
        import Kernel from '__lib/kernel';
        import Tuple from '__lib/tuple';
        import fun from '__lib/funcy/fun';
