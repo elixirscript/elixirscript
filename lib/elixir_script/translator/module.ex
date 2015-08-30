@@ -6,7 +6,6 @@ defmodule ElixirScript.Translator.Module do
   alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.JSModule
   alias ElixirScript.Preprocess.Aliases
-  alias ElixirScript.Translator.PatternMatching.Match
   alias ElixirScript.Translator.Function
 
   @standard_libs [
@@ -272,7 +271,7 @@ defmodule ElixirScript.Translator.Module do
   """
   def create_standard_lib_imports(used_standard_libs, root) do
     Enum.filter_map(@standard_libs,
-      fn({ name, options }) -> name in used_standard_libs or name in [:JS, :SpecialForms]  end,
+      fn({ name, _ }) -> name in used_standard_libs or name in [:JS, :SpecialForms]  end,
       fn({ name, options }) ->
         options = update_options(options, root)
         case name do

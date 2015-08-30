@@ -4,7 +4,6 @@ defmodule ElixirScript.Translator.Function do
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Utils
-  alias ElixirScript.Translator.PatternMatching
   alias ElixirScript.Translator.PatternMatching.Match
   alias ElixirScript.Preprocess.Variables
 
@@ -26,105 +25,30 @@ defmodule ElixirScript.Translator.Function do
     |> Stream.map(fn
       {:->, _, [ [{:when, _, [params | guards]}], body ]} ->
         { patterns, params } = Match.build_match(List.wrap(params))
-
-        params = Enum.filter(params, fn
-          (%ESTree.Identifier{name: :undefined}) -> false
-          (x) -> true
-        end)
-
-        body = body
-        |> prepare_function_body
-        |> JS.block_statement
-
-        guard_body = hd(List.wrap(guards))
-        |> prepare_function_body
-        |> JS.block_statement
-
-        JS.array_expression([
-          JS.array_expression(patterns),
-          JS.function_expression(
-            params,
-            [],
-            body
-          ),
-          JS.function_expression(
-            params,
-            [],
-            guard_body
-          )
-        ])
+        params = make_params(params)
+        body = make_body(body)
+        guard_body = make_guards(guards)
+        do_make_function_clause(patterns, params, body, guard_body)
 
       ({:->, _, [params, body]}) ->
         { patterns, params } = Match.build_match(params)
-
-        params = Enum.filter(params, fn
-          (%ESTree.Identifier{name: :undefined}) -> false
-          (x) -> true
-        end)
-
-        body = body
-        |> prepare_function_body
-        |> JS.block_statement
-
-        JS.array_expression([
-          JS.array_expression(patterns),
-          JS.function_expression(
-            params,
-            [],
-            body
-          )
-        ])        
+        params = make_params(params)
+        body = make_body(body)
+        do_make_function_clause(patterns, params, body)        
 
       ({_, _, [{:when, _, [{_, _, params} | guards] }, [do: body]]}) ->
         { patterns, params } = Match.build_match(params)
-
-        params = Enum.filter(params, fn
-          (%ESTree.Identifier{name: :undefined}) -> false
-          (x) -> true
-        end)
-
-        body = body
-        |> prepare_function_body
-        |> JS.block_statement
-
-        guard_body = hd(guards)
-        |> prepare_function_body
-        |> JS.block_statement
-
-        JS.array_expression([
-          JS.array_expression(patterns),
-          JS.function_expression(
-            params,
-            [],
-            body
-          ),
-          JS.function_expression(
-            params,
-            [],
-            guard_body
-          )
-        ])
+        params = make_params(params)
+        body = make_body(body)
+        guard_body = make_guards(guards)
+        do_make_function_clause(patterns, params, body, guard_body)
 
       ({_, _, [{_, _, params}, [do: body]]}) ->
         { patterns, params } = Match.build_match(params)
+        params = make_params(params)
+        body = make_body(body)
+        do_make_function_clause(patterns, params, body)
 
-        params = Enum.filter(params, fn
-          (%ESTree.Identifier{name: :undefined}) -> false
-          (x) -> true
-        end)
-
-        body = body
-        |> prepare_function_body
-        |> JS.block_statement
-
-        JS.array_expression([
-          JS.array_expression(patterns),
-          JS.function_expression(
-            params,
-            [],
-            body
-          )
-        ])
     end)
     |> Enum.to_list
 
@@ -132,6 +56,52 @@ defmodule ElixirScript.Translator.Function do
       JS.identifier("fun"),
       clauses
     )
+  end
+
+  defp make_body(body) do
+    body
+    |> prepare_function_body
+    |> JS.block_statement
+  end
+
+  defp make_guards(guards) do
+    hd(List.wrap(guards))
+    |> prepare_function_body
+    |> JS.block_statement
+  end
+
+  defp make_params(params) do
+    Enum.filter(params, fn
+      (%ESTree.Identifier{name: :undefined}) -> false
+      (_) -> true
+    end)
+  end
+
+  defp do_make_function_clause(patterns, params, body, guard_body) do
+    JS.array_expression([
+      JS.array_expression(patterns),
+      JS.function_expression(
+        params,
+        [],
+        body
+      ),
+      JS.function_expression(
+        params,
+        [],
+        guard_body
+      )
+    ])
+  end
+
+  defp do_make_function_clause(patterns, params, body) do
+    JS.array_expression([
+      JS.array_expression(patterns),
+      JS.function_expression(
+        params,
+        [],
+        body
+      )
+    ])
   end
 
   def make_function_or_property_call(module_name, function_name) do
@@ -269,7 +239,4 @@ defmodule ElixirScript.Translator.Function do
       list ++ [last_item]
     end
   end
-
-  def make_capture
-
 end

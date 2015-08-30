@@ -106,7 +106,7 @@ defmodule ElixirScript do
     "#{name}.js"
   end
 
-  defp process_include_path({ path, code } = pair, true) do
+  defp process_include_path({ _, _ } = pair, true) do
     pair
   end
 

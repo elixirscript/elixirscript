@@ -2,7 +2,6 @@ defmodule ElixirScript.Translator.Try do
   @moduledoc false
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
-  alias ElixirScript.Translator.PatternMatching
   alias ElixirScript.Translator.Function
   alias ElixirScript.Translator.Case
   alias ElixirScript.Translator.Utils
@@ -52,7 +51,7 @@ defmodule ElixirScript.Translator.Try do
   defp process_rescue_block(rescue_block) do
     Enum.map(rescue_block, fn(x) ->
       case x do
-        {:->, _, [[{value, _, module} = ast], block]} when not is_list(module) ->
+        {:->, _, [[{value, _, module}], block]} when not is_list(module) ->
           {:->, [], [[{value, [], convert_to_struct(module)}], block]}
         {:->, _, [[{:in, meta, [value, error_names]}], block]} ->
           error_names = Enum.map(error_names, fn(x) ->
@@ -105,7 +104,7 @@ defmodule ElixirScript.Translator.Try do
 
   defp convert_to_struct(module) do
     case module do
-      {:__aliases__, meta, name}  = _alias->
+      {:__aliases__, _, _}  = _alias->
         {:%, [], [_alias, {:%{}, [], []}]}
       ast ->
         ast

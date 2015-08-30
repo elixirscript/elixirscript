@@ -3,7 +3,6 @@ defmodule ElixirScript.Translator.Struct do
   require Logger
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
-  alias ElixirScript.Translator.Utils
 
   def make_struct(module_name, data) do
     JS.call_expression(

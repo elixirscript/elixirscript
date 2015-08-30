@@ -3,7 +3,7 @@ defmodule ElixirScript.Translator.Quote do
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Primitive
 
-  def make_quote(opts, expr) when is_number(expr) or is_binary(expr) or is_boolean(expr) or is_nil(expr) or is_atom(expr) do
+  def make_quote(_opts, expr) when is_number(expr) or is_binary(expr) or is_boolean(expr) or is_nil(expr) or is_atom(expr) do
     Translator.translate(expr)
   end
 
@@ -15,7 +15,7 @@ defmodule ElixirScript.Translator.Quote do
 
     if(has_unquote_splicing) do
       expr = Enum.map(expr, fn
-        ({:unquote_splicing, context, [param]}) ->
+        ({:unquote_splicing, _, [param]}) ->
           make_unquote_slicing(param)
         (x) ->
           Primitive.make_list_no_translate([make_quote(opts, x)])
@@ -42,7 +42,7 @@ defmodule ElixirScript.Translator.Quote do
     Primitive.make_tuple_quoted(opts, [:unquote, context, params])
   end
 
-  def make_quote(opts, {:unquote, context, [param]}) do
+  def make_quote(_, {:unquote, _, [param]}) do
     make_unquote(param)
   end
 
@@ -62,7 +62,7 @@ defmodule ElixirScript.Translator.Quote do
     Translator.translate(expr)
   end
 
-  defp is_in_bind_quoted(nil, name) do
+  defp is_in_bind_quoted(nil, _) do
     false
   end
 

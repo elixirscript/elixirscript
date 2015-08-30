@@ -3,8 +3,6 @@ defmodule ElixirScript.Translator.Assignment do
   require Logger
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
-  alias ElixirScript.Translator.Utils
-  alias ElixirScript.Translator.Primitive
   alias ElixirScript.Translator.PatternMatching.Match
 
   def make_assignment(left, right) do
@@ -24,11 +22,11 @@ defmodule ElixirScript.Translator.Assignment do
     array_pattern = JS.variable_declaration([declarator], :let)
 
     case left do
-      list when is_list(left) ->
+      list when is_list(list) ->
         make_ref(array_pattern, params, "list")
       {_left1, _left2} ->
         make_ref(array_pattern, params, "tuple")
-      {:{}, _, elements} ->
+      {:{}, _, _} ->
         make_ref(array_pattern, params, "tuple")
       _ ->
         array_pattern       
@@ -56,14 +54,5 @@ defmodule ElixirScript.Translator.Assignment do
 
     ref_declaration = JS.variable_declaration([ref_declarator], :let)
     %ElixirScript.Translator.Group{ body: [array_pattern, ref_declaration] }    
-  end
-
-  defp make_function_assignment(function_name, function) do
-    declarator = JS.variable_declarator(
-      Translator.translate(function_name),
-      Translator.translate(function)
-    )
-
-    JS.variable_declaration([declarator], :let)   
   end
 end

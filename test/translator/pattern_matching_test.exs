@@ -1,9 +1,7 @@
 defmodule ElixirScript.Translator.PatternMatching.Test do
   use ShouldI
-  import ElixirScript.TestHelper
   alias ElixirScript.Translator
   alias ElixirScript.Translator.PatternMatching.Match
-  alias ElixirScript.Translator.Primitive
   alias ESTree.Tools.Builder, as: JS
 
   def make_list(values) when is_list(values) do

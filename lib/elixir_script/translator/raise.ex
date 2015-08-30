@@ -1,7 +1,6 @@
 defmodule ElixirScript.Translator.Raise do
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
-  alias ElixirScript.Translator.Utils
 
 
   def throw_error(module_name, data) do
