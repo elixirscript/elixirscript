@@ -4,10 +4,10 @@ defmodule ElixirScript.Translator.Case do
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Function
   
-  def make_case(condition, clauses) do
+  def make_case(condition, clauses, env) do
     Builder.call_expression(
       Builder.member_expression(
-        Function.make_anonymous_function(clauses),
+        Function.make_anonymous_function(clauses, env),
         Builder.identifier("call")
       ),
       [Translator.translate(condition)]

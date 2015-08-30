@@ -34,13 +34,13 @@ defmodule ElixirScript.Translator.Primitive do
     )
   end
 
-  def make_list(ast) when is_list(ast) do
+  def make_list(ast, env) when is_list(ast) do
     Builder.call_expression(
       Builder.member_expression(
         Builder.identifier("Erlang"),
         Builder.identifier("list")
       ),
-      Enum.map(ast, fn(x) -> Translator.translate(x) end)
+      Enum.map(ast, fn(x) -> Translator.translate(x, env) end)
     )
   end
 
@@ -64,17 +64,17 @@ defmodule ElixirScript.Translator.Primitive do
     )
   end
 
-  def make_tuple({ one, two }) do
-    make_tuple([one, two])
+  def make_tuple({ one, two }, env) do
+    make_tuple([one, two], env)
   end
 
-  def make_tuple(elements) do
+  def make_tuple(elements, env) do
     Builder.call_expression(
       Builder.member_expression(
         Builder.identifier("Erlang"),
         Builder.identifier("tuple")
       ),
-      Enum.map(elements, fn(x) -> Translator.translate(x) end)
+      Enum.map(elements, fn(x) -> Translator.translate(x, env) end)
     )
   end
 

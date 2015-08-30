@@ -2,11 +2,26 @@ exclude = if Node.alive?, do: [], else: [skip: true]
 
 ExUnit.start(exclude: exclude, formatters: [ShouldI.CLIFormatter])
 
+defmodule ElixirScript.Math do
+  defmacro squared(x) do
+    quote do
+      unquote(x) * unquote(x)
+    end
+  end
+end
+
 defmodule ElixirScript.TestHelper do
   use ShouldI
-  
+
+  def make_custom_env do
+    require Logger
+    require ElixirScript.Math
+    __ENV__
+  end
+
   def ex_ast_to_js(ex_ast) do
-    ElixirScript.Translator.translate(ex_ast)
+
+    ElixirScript.Translator.translate(ex_ast, make_custom_env)
     |> ElixirScript.javascript_ast_to_code
   end
 

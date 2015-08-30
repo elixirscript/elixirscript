@@ -5,60 +5,63 @@ defmodule ElixirScript.Translator.For do
   alias ElixirScript.Translator.Utils
 
 
-  def make_for(generators) do
-    _results = Translator.translate(quote do: _results)
-    variable_declaration = Translator.translate(quote do: _results = [])
+  def make_for(generators, env) do
+    quoted = quote do: _results
+    _results = Translator.translate(quoted, env)
 
-    block_statement = [variable_declaration] ++ [handle_generators(generators)] ++ [Builder.return_statement(_results)]
+    quoted = quote do: _results = []
+    variable_declaration = Translator.translate(quoted, env)
+
+    block_statement = [variable_declaration] ++ [handle_generators(generators, env)] ++ [Builder.return_statement(_results)]
 
     Utils.wrap_in_function_closure(block_statement)
   end
 
-  defp handle_generators(generators) do
+  defp handle_generators(generators, env) do
 
     case hd(generators) do
       {:<-, [], [identifier, enum]} ->
         case identifier do
           {value_one, value_two} ->
             elements = [value_one, value_two]
-            make_tuple_for(elements, enum, generators)
+            make_tuple_for(elements, enum, generators, env)
           {:{}, _, elements} ->
-            make_tuple_for(elements, enum, generators)         
+            make_tuple_for(elements, enum, generators, env)         
           _ ->
-            i = Translator.translate(identifier)
+            i = Translator.translate(identifier, env)
             variable_declarator = Builder.variable_declarator(i)
             variable_declaration = Builder.variable_declaration([variable_declarator], :let)
             
             Builder.for_of_statement(
               variable_declaration,
-              Translator.translate(enum),
-              Builder.block_statement(List.wrap(handle_generators(tl(generators))))
+              Translator.translate(enum, env),
+              Builder.block_statement(List.wrap(handle_generators(tl(generators), env)))
             )
         end
       [into: _expression] ->
         raise ElixirScript.UnsupportedError, :into
       [do: expression] ->
-        push_last_expression(Translator.translate(expression))
+        push_last_expression(Translator.translate(expression, env))
       filter ->
         Builder.if_statement(
-          Translator.translate(filter), 
-          handle_generators(tl(generators)), 
+          Translator.translate(filter, env), 
+          handle_generators(tl(generators), env), 
           nil
         )
     end
 
   end
 
-  defp make_tuple_for(elements, enum, generators) do
+  defp make_tuple_for(elements, enum, generators, env) do
     i = Builder.identifier("_ref")
     variable_declarator = Builder.variable_declarator(i)
     variable_declaration = Builder.variable_declaration([variable_declarator], :let)
 
     { variables, _ } = Enum.map_reduce(elements, 0, 
       fn(x, index) -> 
-        case Translator.translate(x) do
+        case Translator.translate(x, env) do
           %ESTree.Identifier{} ->
-            variable_declarator = Builder.variable_declarator(Translator.translate(x),
+            variable_declarator = Builder.variable_declarator(Translator.translate(x, env),
               Builder.call_expression(
                 Builder.member_expression(
                   Builder.identifier(:Kernel),
@@ -78,11 +81,11 @@ defmodule ElixirScript.Translator.For do
     variables = Enum.filter(variables, fn(x) -> x != nil end)
 
     new_identifier = Enum.map(elements, fn(x) ->
-        case Translator.translate(x) do
+        case Translator.translate(x, env) do
           %ESTree.Identifier{} ->
             Builder.identifier(:undefined)
           _ ->
-            Translator.translate(x)
+            Translator.translate(x, env)
         end
     end) 
     
@@ -96,12 +99,12 @@ defmodule ElixirScript.Translator.For do
 
     Builder.for_of_statement(
       variable_declaration,
-      Translator.translate(enum),
+      Translator.translate(enum, env),
       Builder.block_statement(
         [
           Builder.if_statement(
-            Utils.make_match(i, new_identifier),
-            Builder.block_statement(variables ++ List.wrap(handle_generators(tl(generators))))
+            Utils.make_match(i, new_identifier, env),
+            Builder.block_statement(variables ++ List.wrap(handle_generators(tl(generators), env)))
           )
         ]
       )

@@ -51,32 +51,32 @@ defmodule ElixirScript.Translator.Utils do
     Builder.identifier(module)
   end
 
-  def make_module_expression_tree(module, _computed) do
-    Translator.translate(module)
+  def make_module_expression_tree(module, _computed, env) do
+    Translator.translate(module, env)
   end
 
-  def make_call_expression_with_ast_params(module_name, function_name, params) do
+  def make_call_expression_with_ast_params(module_name, function_name, params, env) do
     Builder.call_expression(
-      make_member_expression(module_name, function_name),
+      make_member_expression(module_name, function_name, env),
       params
     )
   end
 
-  def make_call_expression(module_name, function_name, params) do
+  def make_call_expression(module_name, function_name, params, env) do
     Builder.call_expression(
-      make_member_expression(module_name, function_name),
-      Enum.map(params, &Translator.translate(&1))
+      make_member_expression(module_name, function_name, env),
+      Enum.map(params, &Translator.translate(&1, env))
     )
   end
 
-  def make_call_expression(function_name, params) do
+  def make_call_expression(function_name, params, env) do
     Builder.call_expression(
       Builder.identifier(function_name),
-      Enum.map(params, &Translator.translate(&1))
+      Enum.map(params, &Translator.translate(&1, env))
     )
   end
 
-  def make_member_expression(module_name, function_name, computed \\ false) do
+  def make_member_expression(module_name, function_name, env, computed \\ false) do
     case module_name do
       modules when is_list(modules) and length(modules) > 1 ->
         ast = make_module_expression_tree(modules, computed)
@@ -93,13 +93,13 @@ defmodule ElixirScript.Translator.Utils do
         )
       {{:., _, [_module_name, _function_name]}, _, _params } = ast ->
         Builder.member_expression(
-          Translator.translate(ast),
+          Translator.translate(ast, env),
           build_function_name_ast(function_name),
           computed                 
         )
       {:., _, _} = ast ->
         Builder.member_expression(
-          Translator.translate(ast),
+          Translator.translate(ast, env),
           build_function_name_ast(function_name),
           computed                 
         )
@@ -139,9 +139,9 @@ defmodule ElixirScript.Translator.Utils do
     )
   end
 
-  def make_match(pattern, expr) do
+  def make_match(pattern, expr, env) do
     Builder.call_expression(
-      make_member_expression("Kernel", "match__qmark__"),
+      make_member_expression("Kernel", "match__qmark__", env),
       [
         pattern,
         expr
@@ -149,9 +149,9 @@ defmodule ElixirScript.Translator.Utils do
     )
   end
 
-  def make_match(pattern, expr, guard) do
+  def make_match(pattern, expr, guard, env) do
     Builder.call_expression(
-      make_member_expression("Kernel", "match__qmark__"),
+      make_member_expression("Kernel", "match__qmark__", env),
       [
         pattern,
         expr,

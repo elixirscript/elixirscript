@@ -9,19 +9,6 @@ defmodule ElixirScript.Translator.Kernel do
     Translator.translate(quote do: Range.(unquote(first), unquote(last)))
   end
 
-  def make_unquote(expr) do
-      Builder.call_expression(
-        Builder.function_expression([],[],
-          Builder.block_statement([
-            Builder.return_statement(
-              Translator.translate(expr)
-            )
-          ])
-        ),
-        []
-      )
-  end
-
 
   def make___DIR__() do
     Utils.wrap_in_function_closure(

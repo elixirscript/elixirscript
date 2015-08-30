@@ -15,7 +15,9 @@ defmodule ElixirScript.Translator.Assignment.Test do
   end
 
   should "translate tuple assignment" do
-    ex_ast = quote do: {a, b} = {1, 2}
+    ex_ast = quote do
+      {a, b} = {1, 2}
+    end
     js_code = """
         let [a, b] = fun.bind(Erlang.tuple(fun.parameter, fun.parameter), Erlang.tuple(1, 2));
         let _ref = Erlang.tuple(a, b);
