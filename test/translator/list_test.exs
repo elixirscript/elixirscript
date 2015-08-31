@@ -26,12 +26,12 @@ defmodule ElixirScript.Translator.List.Test do
 
   should "concatenate lists" do
     ex_ast = quote do: [1, 2, 3] ++ [4, 5, 6]
-    js_code = "List.concat(Erlang.list(1,2,3),Erlang.list(4,5,6))"  
+    js_code = "Erlang.list(1,2,3).concat(Erlang.list(4,5,6))"  
 
     assert_translation(ex_ast, js_code)
 
     ex_ast = quote do: this.list ++ [4, 5, 6]
-    js_code = "List.concat(Kernel.JS.get_property_or_call_function(this,'list'),Erlang.list(4,5,6))"
+    js_code = "Kernel.JS.get_property_or_call_function(this,'list').concat(Erlang.list(4,5,6))"
 
     assert_translation(ex_ast, js_code)    
   end

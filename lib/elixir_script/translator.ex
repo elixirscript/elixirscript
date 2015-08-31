@@ -6,23 +6,24 @@ defmodule ElixirScript.Translator do
   alias ElixirScript.Translator.Assignment
   alias ElixirScript.Translator.Map
   alias ElixirScript.Translator.Struct
-  alias ElixirScript.Translator.Raise
   alias ElixirScript.Translator.Function
   alias ElixirScript.Translator.Capture
-  alias ElixirScript.Translator.Expression
   alias ElixirScript.Translator.Import
-  alias ElixirScript.Translator.If
   alias ElixirScript.Translator.Cond
   alias ElixirScript.Translator.Case
   alias ElixirScript.Translator.For
   alias ElixirScript.Translator.Try
   alias ElixirScript.Translator.Block
+  alias ElixirScript.Translator.Struct
   alias ElixirScript.Translator.Module
   alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.Bitstring
   alias ElixirScript.Translator.Receive
   alias ElixirScript.Translator.Quote
+  alias ElixirScript.Translator.Utils
+  alias ElixirScript.Translator.Logger
   alias ElixirScript.Translator.Kernel, as: ExKernel
+  alias ESTree.Tools.Builder, as: JS
 
   @doc """
   Translates Elixir AST to JavaScript AST
@@ -110,12 +111,17 @@ defmodule ElixirScript.Translator do
     end
   end
 
+  defp do_translate({{:., context, [{:__aliases__, _, [:Logger]}, function_name]}, _, params }, env) do
+    Logger.make_logger(function_name, params, env)
+  end
+
   defp do_translate({{:., _, [Access, :get]}, _, [target, property]}, env) do
     Map.make_get_property(target, property)
   end
 
   defp do_translate({:., _, [module_name, function_name]} = ast, env) do
     expanded_ast = Macro.expand(ast, env)
+
     if expanded_ast == ast do
       Function.make_function_or_property_call(module_name, function_name, env)
     else
@@ -125,6 +131,7 @@ defmodule ElixirScript.Translator do
 
   defp do_translate({{:., _, [module_name, function_name]}, _, [] } = ast, env) do
     expanded_ast = Macro.expand(ast, env)
+
     if expanded_ast == ast do
       Function.make_function_or_property_call(module_name, function_name, env)
     else
@@ -142,11 +149,15 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({{:., _, [module_name, function_name]}, _, params } = ast, env) do
-    expanded_ast = Macro.expand(ast, env)
-    if expanded_ast == ast do
-      Function.make_function_call(module_name, function_name, params, env)
+    if module_name == Kernel do
+      ExKernel.translate_kernel_function(function_name, params, env)
     else
-      translate(expanded_ast, env)
+      expanded_ast = Macro.expand(ast, env)
+      if expanded_ast == ast do
+        Function.make_function_call(module_name, function_name, params, env)
+      else
+        translate(expanded_ast, env)
+      end
     end
   end
 
@@ -163,7 +174,17 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:__DIR__, _, _expressions }, env) do
-    ExKernel.make___DIR__()
+    Utils.wrap_in_function_closure(
+      JS.if_statement(
+        JS.identifier(:__dirname),
+        JS.block_statement([
+          JS.return_statement(JS.identifier(:__dirname))
+        ]),
+        JS.block_statement([
+          JS.return_statement(JS.literal(nil))
+        ])      
+      )
+    )
   end
 
   defp do_translate({:try, _, [ blocks ]}, env) do
@@ -202,11 +223,11 @@ defmodule ElixirScript.Translator do
     Import.make_import(module_name_list, options)
   end
 
-  defp do_translate({:alias, _, [alias_info, options]}, env) do
+  defp do_translate({:alias, _, [alias_info, options]}, env) when is_tuple(alias_info) do
     Import.make_alias_import(alias_info, options)
   end
 
-  defp do_translate({:alias, _, [alias_info]}, env) do
+  defp do_translate({:alias, _, [alias_info]}, env) when is_tuple(alias_info) do
     Import.make_alias_import(alias_info, [])
   end
 
@@ -242,32 +263,8 @@ defmodule ElixirScript.Translator do
     Primitive.make_tuple(elements, env)
   end
 
-  defp do_translate({operator, _, [value]}, env) when operator in [:-, :!] do
-    Expression.make_unary_expression(operator, value, env)
-  end
-
   defp do_translate({:=, _, [left, right]}, env) do
     Assignment.make_assignment(left, right, env)
-  end
-
-  defp do_translate({:<>, _, [left, right]}, env) do
-    Expression.make_binary_expression(:+, left, right, env)
-  end
-
-  defp do_translate({:++, _, [left, right]}, env) do
-    ExKernel.concat_lists(left, right)
-  end
-
-  defp do_translate({operator, _, [left, right]}, env) when operator in [:+, :-, :/, :*, :==, :!=, :&&, :||, :>, :<, :>=, :<=, :===] do
-    Expression.make_binary_expression(operator, left, right, env)
-  end
-
-  defp do_translate({:and, _, [left, right]}, env) do
-    Expression.make_binary_expression(:&&, left, right, env)
-  end
-
-  defp do_translate({:or, _, [left, right]}, env) do
-    Expression.make_binary_expression(:||, left, right, env)
   end
 
   defp do_translate({function, _, [{:when, _, [{name, _, _params} | _guards] }, [do: _body]] } = ast, env) when function in [:def, :defp] do
@@ -286,47 +283,21 @@ defmodule ElixirScript.Translator do
     Struct.make_defexception(attributes)
   end
 
-  defp do_translate({:raise, _, [alias_info, attributes]}, env) do
-    {_, _, name} = alias_info
-
-    Raise.throw_error(name, attributes)
-  end
-
-  defp do_translate({:raise, _, [message]}, env) do
-    Raise.throw_error(message)
-  end
-
-  defp do_translate({:if, _, _} = ast, env) do
-    Macro.expand(ast, env)
-    |> translate
-  end
-
   defp do_translate({:defmodule, _, [{:__aliases__, _, module_name_list}, [do: body]]}, env) do
     Module.make_module(module_name_list, body, env)
   end
 
-  defp do_translate({:|>, _, [left, right]}, env) do
-    case right do
-      {{:., meta, [module, fun]}, meta2, params} ->
-        translate({{:., meta, [module, fun]}, meta2, [left] ++ params})  
-      {fun, meta, params} ->
-        translate({fun, meta, [left] ++ params})     
-    end
-  end
-
   defp do_translate({name, metadata, params} = ast, env) when is_list(params) do
-    expanded_ast = Macro.expand(ast, env)
-    if expanded_ast == ast do
-      name = Utils.filter_name(name)
-
-      case metadata[:import] do
-        Kernel ->
-          Function.make_function_call(:Kernel, name, params, env)
-        _ ->
-          Function.make_function_call(name, params, env)        
-      end
+    if metadata[:import] == Kernel do
+      ExKernel.translate_kernel_function(name, params, env)
     else
-      translate(expanded_ast)
+      expanded_ast = Macro.expand(ast, env)
+      if expanded_ast == ast do
+        name = Utils.filter_name(name)
+        Function.make_function_call(name, params, env)        
+      else
+        translate(expanded_ast)
+      end
     end
   end
 

@@ -1,7 +1,7 @@
 defmodule ElixirScript.Translator.Import do
   @moduledoc false
   require Logger
-  alias ESTree.Tools.Builder
+  alias ESTree.Tools.Builder, as: JS
 
   def make_alias_import(alias_info, options) do
     {_, _, name} = alias_info
@@ -9,14 +9,14 @@ defmodule ElixirScript.Translator.Import do
     import_specifier = if options[:as] do
       {_, _, alt} = options[:as]
       
-      Builder.import_specifier(
-        Builder.identifier("default"),
-        Builder.identifier(List.last(alt))
+      JS.import_specifier(
+        JS.identifier("default"),
+        JS.identifier(List.last(alt))
       )
     else      
-      Builder.import_default_specifier(
-        Builder.identifier(List.last(name)),
-        Builder.identifier(List.last(name))
+      JS.import_default_specifier(
+        JS.identifier(List.last(name)),
+        JS.identifier(List.last(name))
       )  
     end
 
@@ -26,24 +26,24 @@ defmodule ElixirScript.Translator.Import do
       make_source(name)
     end
 
-    Builder.import_declaration(
+    JS.import_declaration(
       [import_specifier], 
-      Builder.identifier(import_path)
+      JS.identifier(import_path)
     )
   end
 
   def make_import(module_name_list, options) do
-    mod = List.last(module_name_list) |> Builder.identifier
+    mod = List.last(module_name_list) |> JS.identifier
 
     specifiers = if options[:only] do
       Enum.map(options[:only], fn({name, _arity}) -> 
-        Builder.import_specifier(
-          Builder.identifier(name),
-          Builder.identifier(name)
+        JS.import_specifier(
+          JS.identifier(name),
+          JS.identifier(name)
         )
       end)
     else
-      List.wrap(Builder.import_namespace_specifier(mod))
+      List.wrap(JS.import_namespace_specifier(mod))
     end
 
     import_path = if options[:from] do
@@ -52,7 +52,7 @@ defmodule ElixirScript.Translator.Import do
       make_source(module_name_list)
     end
 
-    Builder.import_declaration(specifiers, Builder.identifier(import_path))
+    JS.import_declaration(specifiers, JS.identifier(import_path))
   end
 
   defp make_source(name) do
