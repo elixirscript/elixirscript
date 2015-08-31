@@ -30,8 +30,7 @@ defmodule ElixirScript.Translator.Module do
   def make_module(module_name_list, body, env) do
 
     body = make_inner_module_aliases(module_name_list, body)
-
-    { body, aliases, used_stdlibs } = Aliases.process(body)
+    { body, aliases, used_stdlibs } = Aliases.process(body, env)
 
     { body, functions } = extract_functions_from_module(body)
     { exported_functions, private_functions } = process_functions(functions, env)

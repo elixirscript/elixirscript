@@ -48,6 +48,7 @@ defmodule ElixirScript.Test do
   end
 
   should "parse multiple modules correctly" do
+
     js_code = ElixirScript.transpile("""
       defmodule Animals do
 
@@ -61,10 +62,11 @@ defmodule ElixirScript.Test do
         end
 
         defp something_else() do
+          ElixirScript.Math.squared(1)
         end
 
       end
-    """)
+    """, env: make_custom_env)
 
     assert_js_matches """
       import Erlang from '__lib/erlang';
@@ -76,7 +78,7 @@ defmodule ElixirScript.Test do
       const __MODULE__ = Erlang.atom('Animals');
 
       let something_else = fun([[], function() {
-        return null;
+        return 1 * 1;
       }]);
 
       let something = fun([[], function() {

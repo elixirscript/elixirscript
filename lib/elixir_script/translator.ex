@@ -32,11 +32,11 @@ defmodule ElixirScript.Translator do
     do_translate(ast, env)
   end
 
-  defp do_translate(ast, env) when is_number(ast) or is_binary(ast) or is_boolean(ast) or is_nil(ast) do
+  defp do_translate(ast, _) when is_number(ast) or is_binary(ast) or is_boolean(ast) or is_nil(ast) do
     Primitive.make_literal(ast)
   end
 
-  defp do_translate(ast, env) when is_atom(ast) do
+  defp do_translate(ast, _) when is_atom(ast) do
     Primitive.make_atom(ast)
   end
 
@@ -48,7 +48,7 @@ defmodule ElixirScript.Translator do
     Primitive.make_tuple({one, two}, env)
   end
 
-  defp do_translate({:&, [], [number]}, env) when is_number(number) do
+  defp do_translate({:&, [], [number]}, _) when is_number(number) do
     Primitive.make_identifier(String.to_atom("__#{number}"))
   end
 
@@ -72,26 +72,26 @@ defmodule ElixirScript.Translator do
     Module.make_attribute(name, value, env)
   end
 
-  defp do_translate({:@, _, [{name, _, _}]}, env) do
+  defp do_translate({:@, _, [{name, _, _}]}, _) do
     name = Utils.filter_name(name)
     Primitive.make_identifier(name)
   end
 
-  defp do_translate({:%, _, [alias_info, data]}, env) do
+  defp do_translate({:%, _, [alias_info, data]}, _) do
     {_, _, name} = alias_info
     {_, _, data} = data
     Struct.make_struct(name, data)
   end
 
-  defp do_translate({:%{}, _, [{:|, _, [map, data]}]}, env) do
+  defp do_translate({:%{}, _, [{:|, _, [map, data]}]}, _) do
     Map.make_map_update(map, data);
   end
 
-  defp do_translate({:%{}, _, properties}, env) do
+  defp do_translate({:%{}, _, properties}, _) do
     Map.make_object(properties)
   end
 
-  defp do_translate({:<<>>, _, elements}, env) do
+  defp do_translate({:<<>>, _, elements}, _) do
     is_interpolated_string = Enum.all?(elements, fn(x) -> 
       case x do
         b when is_binary(b) ->
@@ -111,11 +111,11 @@ defmodule ElixirScript.Translator do
     end
   end
 
-  defp do_translate({{:., context, [{:__aliases__, _, [:Logger]}, function_name]}, _, params }, env) do
+  defp do_translate({{:., _, [{:__aliases__, _, [:Logger]}, function_name]}, _, params }, env) do
     Logger.make_logger(function_name, params, env)
   end
 
-  defp do_translate({{:., _, [Access, :get]}, _, [target, property]}, env) do
+  defp do_translate({{:., _, [Access, :get]}, _, [target, property]}, _) do
     Map.make_get_property(target, property)
   end
 
@@ -161,19 +161,19 @@ defmodule ElixirScript.Translator do
     end
   end
 
-  defp do_translate({:_, _, _}, env) do
+  defp do_translate({:_, _, _}, _env) do
     Primitive.make_identifier(:undefined)
   end
 
-  defp do_translate({:__aliases__, _, aliases}, env) do
+  defp do_translate({:__aliases__, _, aliases}, _) do
     Primitive.make_identifier(aliases)
   end
 
-  defp do_translate({:__block__, _, expressions }, env) do
+  defp do_translate({:__block__, _, expressions }, _) do
     Block.make_block(expressions)
   end
 
-  defp do_translate({:__DIR__, _, _expressions }, env) do
+  defp do_translate({:__DIR__, _, _expressions }, _) do
     Utils.wrap_in_function_closure(
       JS.if_statement(
         JS.identifier(:__dirname),
@@ -195,47 +195,47 @@ defmodule ElixirScript.Translator do
     Receive.make_receive(expressions, env);
   end
 
-  defp do_translate({:super, _, _expressions }, env) do
+  defp do_translate({:super, _, _expressions }, _) do
     raise ElixirScript.UnsupportedError, :super
   end
 
-  defp do_translate({:__CALLER__, _, _expressions }, env) do
+  defp do_translate({:__CALLER__, _, _expressions }, _) do
     raise ElixirScript.UnsupportedError, :__CALLER__
   end
 
-  defp do_translate({:__ENV__, _, _expressions }, env) do
+  defp do_translate({:__ENV__, _, _expressions }, _) do
     raise ElixirScript.UnsupportedError, :__ENV__
   end
 
-  defp do_translate({:quote, _, [[do: expr]]}, env) do
+  defp do_translate({:quote, _, [[do: expr]]}, _) do
     Quote.make_quote([], expr)
   end
 
-  defp do_translate({:quote, _, [opts, [do: expr]]}, env) do
+  defp do_translate({:quote, _, [opts, [do: expr]]}, _) do
     Quote.make_quote(opts, expr)
   end
 
-  defp do_translate({:import, _, [{:__aliases__, _, module_name_list}]}, env) do
+  defp do_translate({:import, _, [{:__aliases__, _, module_name_list}]}, _) do
     Import.make_import(module_name_list, [])
   end
 
-  defp do_translate({:import, _, [{:__aliases__, _, module_name_list}, options ]}, env) do
+  defp do_translate({:import, _, [{:__aliases__, _, module_name_list}, options ]}, _) do
     Import.make_import(module_name_list, options)
   end
 
-  defp do_translate({:alias, _, [alias_info, options]}, env) when is_tuple(alias_info) do
+  defp do_translate({:alias, _, [alias_info, options]}, _) when is_tuple(alias_info) do
     Import.make_alias_import(alias_info, options)
   end
 
-  defp do_translate({:alias, _, [alias_info]}, env) when is_tuple(alias_info) do
+  defp do_translate({:alias, _, [alias_info]}, _) when is_tuple(alias_info) do
     Import.make_alias_import(alias_info, [])
   end
 
-  defp do_translate({:require, _, [alias_info, options]}, env) do
+  defp do_translate({:require, _, [alias_info, options]}, _) do
     Import.make_alias_import(alias_info, options)
   end
 
-  defp do_translate({:require, _, [alias_info]}, env) do
+  defp do_translate({:require, _, [alias_info]}, _) do
     Import.make_alias_import(alias_info, [])
   end
 
@@ -243,7 +243,7 @@ defmodule ElixirScript.Translator do
     Case.make_case(condition, clauses, env)
   end
 
-  defp do_translate({:cond, _, [[do: clauses]]}, env) do
+  defp do_translate({:cond, _, [[do: clauses]]}, _) do
     Cond.make_cond(clauses)
   end
 
@@ -255,7 +255,7 @@ defmodule ElixirScript.Translator do
     Function.make_anonymous_function(clauses, env)
   end
 
-  defp do_translate({:.., _, [first, last]}, env) do
+  defp do_translate({:.., _, [first, last]}, _) do
     ExKernel.make_range(first, last)
   end
 
@@ -275,11 +275,11 @@ defmodule ElixirScript.Translator do
     Function.process_function(Utils.filter_name(name), [ast], env)
   end
 
-  defp do_translate({:defstruct, _, attributes}, env) do
+  defp do_translate({:defstruct, _, attributes}, _) do
     Struct.make_defstruct(attributes)
   end
 
-  defp do_translate({:defexception, _, attributes}, env) do
+  defp do_translate({:defexception, _, attributes}, _) do
     Struct.make_defexception(attributes)
   end
 
@@ -301,7 +301,7 @@ defmodule ElixirScript.Translator do
     end
   end
 
-  defp do_translate({ name, _, _ }, env) do
+  defp do_translate({ name, _, _ }, _) do
     name = Utils.filter_name(name)   
     Primitive.make_identifier(name)
   end

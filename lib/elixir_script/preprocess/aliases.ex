@@ -29,7 +29,7 @@ defmodule ElixirScript.Preprocess.Aliases do
 
       #the "Hello.World" would be placed in a set and later used for building an alias
   """
-  def process(ast) do
+  def process(ast, env) do
     
     #These will always be added
     stdlib = HashSet.new 
@@ -42,36 +42,49 @@ defmodule ElixirScript.Preprocess.Aliases do
     state = %{ add: HashSet.new, defined: HashSet.new, stdlib: stdlib }
 
     {new_ast, state } = Macro.prewalk(ast, state, fn(x, acc) ->
-      process_aliases(x, acc)
+      process_aliases(x, acc, env)
     end)
 
     { new_ast, state.add, state.stdlib }
   end
 
-  def process_aliases({:alias, _, [{:__aliases__, _, _name}, [as: {:__aliases__, _, alias_name}]]} = ast, state) do
+  def process_aliases({:alias, _, [{:__aliases__, _, _name}, [as: {:__aliases__, _, alias_name}]]} = ast, state, _) do
     { ast, %{state | defined: HashSet.put(state.defined, List.last(alias_name)) } } 
   end
 
-  def process_aliases({:alias, _, [{:__aliases__, _, name}]} = ast, state) do
+  def process_aliases({:alias, _, [{:__aliases__, _, name}]} = ast, state, _) do
     { ast, %{state | defined: HashSet.put(state.defined, List.last(name)) } }
   end
 
-  def process_aliases({{:., _, [{:__aliases__, _, aliases}, _]}, _, _} = ast, state) when aliases in @standard_libs do
-    {ast, %{ state | stdlib: HashSet.put(state.stdlib, List.last(aliases))  }}
-  end
 
-  def process_aliases({{:., meta1, [{:__aliases__, meta2, aliases}, function]}, meta3, params}, state) do
-    if HashSet.member?(state.defined, List.last(aliases)) do
-      { {{:., meta1, [{:__aliases__, meta2, List.last(aliases) |> List.wrap  }, function]}, meta3, params}, state }
+  def process_aliases({{:., _, [{:__aliases__, _, aliases}, _]}, _, _} = ast, state, env) when aliases in @standard_libs do
+    expanded_ast = Macro.expand(ast, env)
+    if expanded_ast == ast do
+      {ast, %{ state | stdlib: HashSet.put(state.stdlib, List.last(aliases))  }}
     else
-      {
-        {{:., meta1, [{:__aliases__, meta2, List.last(aliases) |> List.wrap }, function]}, meta3, params},
-        %{ state | add: HashSet.put(state.add, aliases) }
-      }
+      process_aliases(expanded_ast, state, env)
     end
   end
 
-  def process_aliases(ast, state) do
+  def process_aliases({{:., meta1, [{:__aliases__, meta2, aliases}, function]}, meta3, params} = ast, state, env) do
+    expanded_ast = Macro.expand(ast, env)
+
+    if expanded_ast == ast do
+      new_ast = {{:., meta1, [{:__aliases__, meta2, List.last(aliases) |> List.wrap }, function]}, meta3, params}
+
+      new_state = if HashSet.member?(state.defined, List.last(aliases)) do
+        state
+      else
+        %{ state | add: HashSet.put(state.add, aliases) }
+      end
+
+      { new_ast, new_state }
+    else
+      process_aliases(expanded_ast, state, env)
+    end
+  end
+
+  def process_aliases(ast, state, env) do
     {ast, state}
   end
 end
