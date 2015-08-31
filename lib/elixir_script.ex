@@ -62,13 +62,14 @@ defmodule ElixirScript do
   def transpile_path(path, opts \\ []) do
     include_path = Dict.get(opts, :include_path, false)
     root = Dict.get(opts, :root)
+    env = Dict.get(opts, :env, __ENV__)
 
     path
     |> Path.wildcard
     |> Enum.map(fn(x) -> 
       File.read!(x)
       |> Code.string_to_quoted!
-      |> Translator.translate
+      |> Translator.translate(env)
     end)
     |> List.flatten
     |> Enum.map(fn(x) ->
