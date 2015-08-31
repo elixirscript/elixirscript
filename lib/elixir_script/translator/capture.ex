@@ -1,6 +1,6 @@
 defmodule ElixirScript.Translator.Capture do
   alias ESTree.Tools.Builder, as: JS
-  alias ElixirScript.Translator.PatternMatching.Match
+  alias ElixirScript.PatternMatching.Match
   alias ElixirScript.Translator.Utils
 
   def make_capture(function_name, arity, env) do

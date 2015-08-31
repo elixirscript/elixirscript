@@ -42,6 +42,10 @@ defmodule ElixirScript.Translator.Quote do
     Primitive.make_tuple_quoted(opts, [:unquote, context, params])
   end
 
+  def make_quote(_, {:alias!, _, [_alias]}) do
+    _alias
+  end
+
   def make_quote(_, {:unquote, _, [param]}) do
     make_unquote(param)
   end

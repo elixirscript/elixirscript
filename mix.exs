@@ -17,7 +17,7 @@ defmodule ElixirScript.Mixfile do
 
   def application do
     [
-      applications: [:logger]
+      applications: [:logger, :inflex, :estree]
     ]
   end
 

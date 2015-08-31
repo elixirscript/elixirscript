@@ -1,6 +1,5 @@
 defmodule ElixirScript.Translator.Import do
   @moduledoc false
-  require Logger
   alias ESTree.Tools.Builder, as: JS
 
   def make_alias_import(alias_info, options) do

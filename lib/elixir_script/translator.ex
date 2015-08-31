@@ -21,8 +21,8 @@ defmodule ElixirScript.Translator do
   alias ElixirScript.Translator.Receive
   alias ElixirScript.Translator.Quote
   alias ElixirScript.Translator.Utils
-  alias ElixirScript.Translator.Logger
-  alias ElixirScript.Translator.Kernel, as: ExKernel
+  alias ElixirScript.Lib.Logger
+  alias ElixirScript.Lib.Kernel, as: KernelLib
   alias ESTree.Tools.Builder, as: JS
 
   @doc """
@@ -67,7 +67,7 @@ defmodule ElixirScript.Translator do
     Function.make_anonymous_function([{:->, [], [params, body]}], env)
   end
 
-  defp do_translate({:@, _, [{name, _, [value]}]}, env) do
+  defp do_translate({:@, context, [{name, _, [value]}]}, env) do
     name = Utils.filter_name(name)
     Module.make_attribute(name, value, env)
   end
@@ -150,7 +150,7 @@ defmodule ElixirScript.Translator do
 
   defp do_translate({{:., _, [module_name, function_name]}, _, params } = ast, env) do
     if module_name == Kernel do
-      ExKernel.translate_kernel_function(function_name, params, env)
+      KernelLib.translate_kernel_function(function_name, params, env)
     else
       expanded_ast = Macro.expand(ast, env)
       if expanded_ast == ast do
@@ -255,10 +255,6 @@ defmodule ElixirScript.Translator do
     Function.make_anonymous_function(clauses, env)
   end
 
-  defp do_translate({:.., _, [first, last]}, _) do
-    ExKernel.make_range(first, last)
-  end
-
   defp do_translate({:{}, _, elements}, env) do
     Primitive.make_tuple(elements, env)
   end
@@ -289,7 +285,7 @@ defmodule ElixirScript.Translator do
 
   defp do_translate({name, metadata, params} = ast, env) when is_list(params) do
     if metadata[:import] == Kernel do
-      ExKernel.translate_kernel_function(name, params, env)
+      KernelLib.translate_kernel_function(name, params, env)
     else
       expanded_ast = Macro.expand(ast, env)
       if expanded_ast == ast do
