@@ -19,6 +19,8 @@ defmodule ElixirScript do
   or a tuple of the file name and the JavaScript code
 
   * root: a binary path prepended to the path of the standard lib imports if needed
+  * env: a Macro.env struct to use. This is most useful when using macros. Make sure that the
+  given env has the macros required
   """
 
   @doc """
@@ -38,8 +40,9 @@ defmodule ElixirScript do
   def transpile_quoted(quoted, opts \\ []) do
     include_path = Dict.get(opts, :include_path, false)
     root = Dict.get(opts, :root)
+    env = Dict.get(opts, :env, __ENV__)
 
-    case Translator.translate(quoted) do
+    case Translator.translate(quoted, env) do
       modules when is_list(modules) ->
         List.flatten(modules)
         |> Enum.map(fn(x) ->
