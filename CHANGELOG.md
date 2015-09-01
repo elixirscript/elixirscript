@@ -1,4 +1,4 @@
-# v0.10.0-dev
+# v0.10.0
 * Enhancements
   * Added `env` option for `ElixirScript.transpile` adding macros for compilation
   * Fixed `case` implementation to add `this` to call
