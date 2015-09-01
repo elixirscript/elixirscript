@@ -30,7 +30,7 @@ defmodule ElixirScript.Translator.Try.Test do
               function() {
                 return Kernel.throw(e);
               }
-            ]).call(e)
+            ]).call(this, e)
         }
       }.call(this))
     """
@@ -68,7 +68,7 @@ defmodule ElixirScript.Translator.Try.Test do
                 return Kernel.throw(e);
               }
             ]
-          ).call(e)
+          ).call(this, e)
         }
       }.call(this))
     """
@@ -97,7 +97,7 @@ defmodule ElixirScript.Translator.Try.Test do
             return Kernel.__in__(x, Erlang.list(ArgumentError.defstruct()));
           }], [[], function() {
             return Kernel.throw(e);
-          }]).call(e)
+          }]).call(this, e)
         }
       }.call(this))
     """
@@ -133,7 +133,7 @@ defmodule ElixirScript.Translator.Try.Test do
                 return Kernel.throw(e);
               }
             ]
-          ).call(e)
+          ).call(this, e)
         }
       }.call(this))
     """
@@ -178,7 +178,7 @@ defmodule ElixirScript.Translator.Try.Test do
                 return Kernel.throw(e);
               }
             ]
-          ).call(e)
+          ).call(this, e)
         }
       }.call(this))
     """
@@ -216,7 +216,7 @@ defmodule ElixirScript.Translator.Try.Test do
                 return Kernel.throw(e);
               }
             ]
-          ).call(e)
+          ).call(this, e)
         } finally {
           return IO.puts('This is printed regardless if it failed or succeed');
         }
@@ -302,7 +302,7 @@ defmodule ElixirScript.Translator.Try.Test do
               return Kernel.throw(e);
             }
           ]
-        ).call(e)
+        ).call(this, e)
       }
     }.call(this))
     """

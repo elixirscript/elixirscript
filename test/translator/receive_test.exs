@@ -22,7 +22,7 @@ defmodule ElixirScript.Translator.Receive.Test do
           return value;
         }], [[fun.wildcard], function() {
           return IO.puts('Unexpected message received');
-        }]).call(message);
+        }]).call(this, message);
       })
     """
 
@@ -52,7 +52,7 @@ defmodule ElixirScript.Translator.Receive.Test do
           return value;
         }], [[fun.wildcard], function() {
           return IO.puts('Unexpected message received');
-        }]).call(message);
+        }]).call(this, message);
       }, 
       5000, 
       fun([[5000], function() {

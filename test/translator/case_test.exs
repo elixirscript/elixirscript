@@ -16,7 +16,7 @@ defmodule ElixirScript.Translator.Case.Test do
         return value;
       }], [[Erlang.atom('error')], function() {
         return null;
-      }]).call(data)
+      }]).call(this, data)
     """
 
     assert_translation(ex_ast, js_code)
@@ -34,7 +34,7 @@ defmodule ElixirScript.Translator.Case.Test do
         return value0;
       }], [[true], function() {
         return true;
-      }]).call(data)
+      }]).call(this, data)
     """
 
     assert_translation(ex_ast, js_code)
@@ -54,7 +54,7 @@ defmodule ElixirScript.Translator.Case.Test do
         return value0;
       }], [[fun.wildcard], function() {
         return true;
-      }]).call(data)
+      }]).call(this, data)
     """
 
     assert_translation(ex_ast, js_code)
@@ -88,7 +88,7 @@ defmodule ElixirScript.Translator.Case.Test do
             return true;
           }
         ]
-      ).call(data)
+      ).call(this, data)
     """
 
     assert_translation(ex_ast, js_code)
@@ -111,7 +111,7 @@ defmodule ElixirScript.Translator.Case.Test do
         return Todo.add(data);
       }], [[Erlang.atom('error')], function() {
         return null;
-      }]).call(data)
+      }]).call(this, data)
     """
 
     assert_translation(ex_ast, js_code)
@@ -132,7 +132,7 @@ defmodule ElixirScript.Translator.Case.Test do
         return console.info(one);
       }], [[Erlang.atom('error')], function() {
         return null;
-      }]).call(data)
+      }]).call(this, data)
     """
 
     assert_translation(ex_ast, js_code)
@@ -162,7 +162,7 @@ defmodule ElixirScript.Translator.Case.Test do
             return null;
           }
         ]
-      ).call(data)
+      ).call(this, data)
     """
 
     assert_translation(ex_ast, js_code)
@@ -181,7 +181,7 @@ defmodule ElixirScript.Translator.Case.Test do
         return console.info(one);
       }], [[Erlang.atom('error')], function() {
         return null;
-      }]).call(data)
+      }]).call(this, data)
     """
 
     assert_translation(ex_ast, js_code)
@@ -210,7 +210,7 @@ defmodule ElixirScript.Translator.Case.Test do
             return null;
           }
         ]
-      ).call(data)
+      ).call(this, data)
     """
 
     assert_translation(ex_ast, js_code)
@@ -239,7 +239,7 @@ defmodule ElixirScript.Translator.Case.Test do
           return null;
         }
       ]
-    ).call(data)
+    ).call(this, data)
     """
 
     assert_translation(ex_ast, js_code)

@@ -40,7 +40,7 @@ defmodule ElixirScript do
   def transpile_quoted(quoted, opts \\ []) do
     include_path = Dict.get(opts, :include_path, false)
     root = Dict.get(opts, :root)
-    env = Dict.get(opts, :env, __ENV__)
+    env = Dict.get(opts, :env, create_default_env)
 
     case Translator.translate(quoted, env) do
       modules when is_list(modules) ->
@@ -55,6 +55,11 @@ defmodule ElixirScript do
     end
   end
 
+  defp create_default_env do
+    require Logger
+    __ENV__
+  end
+
   @doc """
   Transpiles the elixir files found at the given path
   """
@@ -62,7 +67,7 @@ defmodule ElixirScript do
   def transpile_path(path, opts \\ []) do
     include_path = Dict.get(opts, :include_path, false)
     root = Dict.get(opts, :root)
-    env = Dict.get(opts, :env, __ENV__)
+    env = Dict.get(opts, :env, create_default_env)
 
     path
     |> Path.wildcard
