@@ -41,6 +41,12 @@ defmodule ElixirScript do
     include_path = Dict.get(opts, :include_path, false)
     root = Dict.get(opts, :root)
     env = Dict.get(opts, :env, create_default_env)
+    macros = Dict.get(opts, :macros)
+
+    if macros do
+      Enum.each(macros, &Code.require_file(&1))
+      env = __ENV__
+    end
 
     case Translator.translate(quoted, env) do
       modules when is_list(modules) ->
@@ -68,6 +74,12 @@ defmodule ElixirScript do
     include_path = Dict.get(opts, :include_path, false)
     root = Dict.get(opts, :root)
     env = Dict.get(opts, :env, create_default_env)
+    macros = Dict.get(opts, :macros)
+
+    if macros do
+      Enum.each(macros, &Code.require_file(&1))
+      env = __ENV__
+    end
 
     path
     |> Path.wildcard

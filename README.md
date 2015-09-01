@@ -16,7 +16,7 @@ ElixirScript can be used in the following ways:
 * If using as part of a project, you can add the following to your deps
 
   ```elixir
-    {:elixir_script, "~> 0.8"}
+    {:elixir_script, "~> 0.10"}
   ```
 
   From there you can either use the ElixirScript module directly or the mix command, `mix ex2js`
@@ -101,6 +101,36 @@ import Kernel from 'js/__lib/kernel'
     ["Erlang.list(1,2,3,4)"]
     ```
 
+# Macros
+
+Macros can be used by adding the environment containing the Macro module required.
+
+```elixir
+#module with macro defined
+defmodule Math do
+  defmacro squared(x) do
+    quote do
+      unquote(x) * unquote(x)
+    end
+  end
+end
+
+#create an env with the module required if not already in the current enviroment
+def make_custom_env do
+  require Logger
+  require Math
+  __ENV__
+end
+
+
+#Now pass it to `ElixirScript.tranpile`
+ElixirScript.transpile("""
+  Math.squared(1)
+""", env: make_custom_env)
+
+# returns ["1 * 1"]
+```
+
 
 # Limitations
 
@@ -122,11 +152,8 @@ The following are defined but incomplete:
 #### Most of the Standard Library isn't defined yet
 A lot of functions in the Kernel module are implemented. The Enum, Atom, List, Tuple, Logger, and Range modules are either fully defined are not complete. The rest still need to be implemented. Some modules like System or File may not be useful or function in the browser and may end up being only useful when using ElixirScript outside of the browser.
 
-#### No Macros
-Not sure how this would be implemented right now, but looking for ideas.
 
 ### Example projects
-
 * [todo-elixirscript](https://github.com/bryanjos/example) The TodoMVC app using ElixirScript and Phoenix.
 
 * [color_bar_spike](https://github.com/bryanjos/color_bar_spike) A canvas drawing example using ElixirScript, React and Delorean
