@@ -169,8 +169,8 @@ defmodule ElixirScript.Translator do
     Primitive.make_identifier(aliases)
   end
 
-  defp do_translate({:__block__, _, expressions }, _) do
-    Block.make_block(expressions)
+  defp do_translate({:__block__, _, expressions }, env) do
+    Block.make_block(expressions, env)
   end
 
   defp do_translate({:__DIR__, _, _}, _) do

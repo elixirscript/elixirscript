@@ -5,6 +5,7 @@ defmodule ElixirScript.Translator.Module do
   alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.JSModule
   alias ElixirScript.Preprocess.Aliases
+  alias ElixirScript.Preprocess.Using
   alias ElixirScript.Translator.Function
 
   @standard_libs [
@@ -29,6 +30,7 @@ defmodule ElixirScript.Translator.Module do
   def make_module(module_name_list, body, env) do
 
     body = make_inner_module_aliases(module_name_list, body)
+    body = Using.process(body, env)
     { body, aliases, used_stdlibs } = Aliases.process(body, env)
 
     { body, functions } = extract_functions_from_module(body)

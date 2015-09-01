@@ -10,12 +10,24 @@ defmodule ElixirScript.Math do
   end
 end
 
+defmodule ElixirScript.Using do
+  defmacro __using__(_) do
+    quote do
+      def sandwich() do
+      end
+    end
+  end
+end
+
 defmodule ElixirScript.TestHelper do
   use ShouldI
+  require Logger
 
   def make_custom_env do
     require Logger
     require ElixirScript.Math
+    require ElixirScript.Using
+
     __ENV__
   end
 
