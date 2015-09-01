@@ -350,24 +350,4 @@ defmodule ElixirScript.Translator.Defmodule.Test do
 
     assert_translation(ex_ast, js_code)
   end
-
-  should "ignore standard libs" do
-    ex_ast = quote do
-      defmodule Animals do
-        Kernel.hd([1])
-        Kernel.SpecialForms.alias(Dog, [])
-      end
-    end 
-
-    js_code = """
-    const __MODULE__ = Erlang.atom('Animals');
-
-    Kernel.hd(Erlang.list(1));
-    Kernel.SpecialForms.alias(Dog, Erlang.list());
-
-    export default {};
-    """
-
-    assert_translation(ex_ast, js_code)
-  end
 end

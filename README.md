@@ -103,7 +103,7 @@ import Kernel from 'js/__lib/kernel'
 
 # Macros
 
-Macros can be used by adding the environment containing the Macro module required.
+Macros can be used when using ElixirScript as a library if the Macros are loaded into the current environment or if you give it a custom environment with the `env` option
 
 ```elixir
 #module with macro defined

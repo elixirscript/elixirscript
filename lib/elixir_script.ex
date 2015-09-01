@@ -3,6 +3,7 @@ defmodule ElixirScript do
   alias ElixirScript.Translator.JSModule
   alias ESTree.Tools.Builder
   alias ESTree.Tools.Generator
+  require Logger
 
   @moduledoc """
   Transpiles Elixir into JavaScript.
@@ -15,12 +16,12 @@ defmodule ElixirScript do
   that controls transpiler output.
 
   Available options are:
-  * include_path: a boolean controlling whether to return just the JavaScript code
+  * `:include_path` - a boolean controlling whether to return just the JavaScript code
   or a tuple of the file name and the JavaScript code
 
-  * root: a binary path prepended to the path of the standard lib imports if needed
-  * env: a Macro.env struct to use. This is most useful when using macros. Make sure that the
-  given env has the macros required
+  * `:root` - a binary path prepended to the path of the standard lib imports if needed
+  * `:env` - a Macro.env struct to use. This is most useful when using macros. Make sure that the
+  given env has the macros required. Defaults to __ENV__.
   """
 
   @doc """
@@ -40,13 +41,7 @@ defmodule ElixirScript do
   def transpile_quoted(quoted, opts \\ []) do
     include_path = Dict.get(opts, :include_path, false)
     root = Dict.get(opts, :root)
-    env = Dict.get(opts, :env, create_default_env)
-    macros = Dict.get(opts, :macros)
-
-    if macros do
-      Enum.each(macros, &Code.require_file(&1))
-      env = __ENV__
-    end
+    env = Dict.get(opts, :env, __ENV__)
 
     case Translator.translate(quoted, env) do
       modules when is_list(modules) ->
@@ -61,11 +56,6 @@ defmodule ElixirScript do
     end
   end
 
-  defp create_default_env do
-    require Logger
-    __ENV__
-  end
-
   @doc """
   Transpiles the elixir files found at the given path
   """
@@ -73,13 +63,7 @@ defmodule ElixirScript do
   def transpile_path(path, opts \\ []) do
     include_path = Dict.get(opts, :include_path, false)
     root = Dict.get(opts, :root)
-    env = Dict.get(opts, :env, create_default_env)
-    macros = Dict.get(opts, :macros)
-
-    if macros do
-      Enum.each(macros, &Code.require_file(&1))
-      env = __ENV__
-    end
+    env = Dict.get(opts, :env, __ENV__)
 
     path
     |> Path.wildcard
