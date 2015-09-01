@@ -2,14 +2,10 @@ defmodule ElixirScript.Lib.Kernel do
   @moduledoc false
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
-  alias ElixirScript.Utils
   alias ElixirScript.Translator.Function
   alias ElixirScript.Translator.Expression
   alias ElixirScript.Translator.If
   alias ElixirScript.Translator.Raise
-  alias ElixirScript.Translator.Module
-  alias ElixirScript.Translator.Struct
-  alias ElixirScript.Translator.Utils
 
   def translate_kernel_function(name, params, env) do
     do_translate({name, [], params}, env)
@@ -27,10 +23,6 @@ defmodule ElixirScript.Lib.Kernel do
     Expression.make_binary_expression(:+, left, right, env)
   end
 
-  defp do_translate({:--, _, [left, right]}, env) do
-
-  end
-
   defp do_translate({:++, _, [left, right]}, env) do
     JS.call_expression(
       JS.member_expression(
@@ -45,10 +37,6 @@ defmodule ElixirScript.Lib.Kernel do
 
   defp do_translate({:.., _, [first, last]}, _) do
     Translator.translate(quote do: Range.(unquote(first), unquote(last)))
-  end
-
-  defp do_translate({:=~, _, [left, right]}, _) do
-    
   end
 
   defp do_translate({:abs, _, [number]}, env) do

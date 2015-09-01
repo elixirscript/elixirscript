@@ -67,7 +67,7 @@ defmodule ElixirScript.Translator do
     Function.make_anonymous_function([{:->, [], [params, body]}], env)
   end
 
-  defp do_translate({:@, context, [{name, _, [value]}]}, env) do
+  defp do_translate({:@, _, [{name, _, [value]}]}, env) do
     name = Utils.filter_name(name)
     Module.make_attribute(name, value, env)
   end

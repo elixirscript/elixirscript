@@ -7,20 +7,17 @@ defmodule ElixirScript.Preprocess.Using do
     end)
   end
 
-  def process_using({:use, _, [{:__aliases__, _, module_name}, params]} = ast, env) do
-    expanded_ast = Macro.expand(ast, env)
-    eval_using(expanded_ast, env)
+  def process_using({:use, _, _} = ast, env) do
+    ast
+    |> Macro.expand(env)
+    |> expand__using__(env)
   end
 
-  def process_using({:use, context, [{:__aliases__, context2, module_name}]}, env) do
-    process_using({:use, context, [{:__aliases__, context2, module_name}, []]}, env)
-  end
-
-  def process_using(ast, env) do
+  def process_using(ast, _) do
     ast
   end
 
-  defp eval_using({:__block__, _, [{:require, _, _} = require_ast , {{:., _, [module_name, :__using__]}, _, _} = using_ast]}, env) do
+  defp expand__using__({:__block__, _, [{:require, _, _}, {{:., _, [_, :__using__]}, _, _} = using_ast]}, env) do
     Macro.expand_once(using_ast, env)
   end
 

@@ -3,7 +3,7 @@ defmodule ElixirScript.Translator.Capture do
   alias ElixirScript.PatternMatching.Match
   alias ElixirScript.Translator.Utils
 
-  def make_capture(function_name, arity, env) do
+  def make_capture(function_name, arity, _) do
     params = Enum.map(1..arity, fn(x) -> {String.to_atom("__#{x}"), [], ElixirScript.Translator.Capture} end)
 
     { patterns, params } = Match.build_match(params)

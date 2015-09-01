@@ -131,6 +131,8 @@ ElixirScript.transpile("""
 # returns ["1 * 1"]
 ```
 
+You should be able to use `use` in modules now as well, but modules that have `__using__` macros must also be require'd so that they can be expanded.
+
 
 # Limitations
 
