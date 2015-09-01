@@ -173,17 +173,16 @@ defmodule ElixirScript.Translator do
     Block.make_block(expressions)
   end
 
-  defp do_translate({:__DIR__, _, _expressions }, _) do
-    Utils.wrap_in_function_closure(
-      JS.if_statement(
-        JS.identifier(:__dirname),
-        JS.block_statement([
-          JS.return_statement(JS.identifier(:__dirname))
-        ]),
-        JS.block_statement([
-          JS.return_statement(JS.literal(nil))
-        ])      
-      )
+  defp do_translate({:__DIR__, _, _}, _) do
+    JS.call_expression(
+      JS.member_expression(
+        JS.member_expression(
+          JS.identifier(:Kernel),
+          JS.identifier(:SpecialForms)        
+        ),
+        JS.identifier(:__DIR__)
+      ),
+      []
     )
   end
 
