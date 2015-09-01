@@ -18,7 +18,7 @@ defmodule ElixirScript.Lib.Logger do
         JS.identifier("console"),
         JS.identifier(level)
       ),
-      Enum.map(params, fn(x) -> Translator.translate(x, env) end)
+      [Translator.translate(hd(params), env)]
     )
   end
 end

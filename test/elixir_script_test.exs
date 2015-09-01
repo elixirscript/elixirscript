@@ -12,6 +12,7 @@ defmodule ElixirScript.Test do
 
       defmodule Elephant do
         @ul JQuery.("#todo-list")
+        Logger.debug("heelo")
 
         def something() do
           @ul
