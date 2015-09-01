@@ -1,23 +1,23 @@
 defmodule ElixirScript.CLI do
   @moduledoc false
 
+  @switches [ 
+    output: :binary, elixir: :boolean, root: :binary, 
+    help: :boolean
+  ]
+
+  @aliases [ 
+    o: :output, ex: :elixir, h: :help, r: :root
+  ]
+
   def main(argv) do
     argv
     |> parse_args
     |> process
   end
 
-  def parse_args(args) do
-    switches = [ 
-      output: :binary, elixir: :boolean, root: :binary, 
-      help: :boolean
-    ]
-
-    aliases = [ 
-      o: :output, ex: :elixir, h: :help, r: :root 
-    ]
-    
-    parse = OptionParser.parse(args, switches: switches, aliases: aliases)
+  def parse_args(args) do    
+    parse = OptionParser.parse(args, switches: @switches, aliases: @aliases)
 
     case parse do
       { [help: true] , _ , _ } -> :help
@@ -50,7 +50,7 @@ defmodule ElixirScript.CLI do
   def do_process(input, options) do
     transpile_opts = [ 
       root: options[:root], 
-      include_path: options[:output] != nil 
+      include_path: options[:output] != nil
     ]
 
     transpile_output = case options[:elixir] do
@@ -78,7 +78,7 @@ defmodule ElixirScript.CLI do
 
   defp options_contains_unknown_values(options) do
     Enum.any?(options, fn({key, _value}) ->
-      if key in [:output, :elixir, :root, :help] do
+      if key in Keyword.keys(@switches) do
         false
       else
         true

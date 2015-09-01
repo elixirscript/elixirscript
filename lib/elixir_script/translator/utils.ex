@@ -1,6 +1,6 @@
 defmodule ElixirScript.Translator.Utils do
   @moduledoc false
-  alias ESTree.Tools.Builder
+  alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
 
   def inflate_groups(body) do
@@ -20,11 +20,11 @@ defmodule ElixirScript.Translator.Utils do
   end
 
   def make_throw_statement(error_name, message) do
-    Builder.throw_statement(
-      Builder.new_expression(
-        Builder.identifier(error_name),
+    JS.throw_statement(
+      JS.new_expression(
+        JS.identifier(error_name),
         [
-          Builder.literal(message)
+          JS.literal(message)
         ]
       )
     )
@@ -38,74 +38,74 @@ defmodule ElixirScript.Translator.Utils do
     Enum.reduce(modules, nil, fn(x, ast) ->
       case ast do
         nil ->
-          Builder.member_expression(Builder.identifier(x), nil, computed)
+          JS.member_expression(JS.identifier(x), nil, computed)
         %ESTree.MemberExpression{ property: nil } ->
-          %{ ast | property: Builder.identifier(x) }
+          %{ ast | property: JS.identifier(x) }
         _ ->
-          Builder.member_expression(ast, Builder.identifier(x), computed)
+          JS.member_expression(ast, JS.identifier(x), computed)
       end
     end)
   end
 
   def make_module_expression_tree(module, _computed) when is_binary(module) or is_atom(module) do
-    Builder.identifier(module)
+    JS.identifier(module)
   end
 
-  def make_module_expression_tree(module, _computed) do
-    Translator.translate(module)
+  def make_module_expression_tree(module, _computed, env) do
+    Translator.translate(module, env)
   end
 
-  def make_call_expression_with_ast_params(module_name, function_name, params) do
-    Builder.call_expression(
-      make_member_expression(module_name, function_name),
+  def make_call_expression_with_ast_params(module_name, function_name, params, env) do
+    JS.call_expression(
+      make_member_expression(module_name, function_name, env),
       params
     )
   end
 
-  def make_call_expression(module_name, function_name, params) do
-    Builder.call_expression(
-      make_member_expression(module_name, function_name),
-      Enum.map(params, &Translator.translate(&1))
+  def make_call_expression(module_name, function_name, params, env) do
+    JS.call_expression(
+      make_member_expression(module_name, function_name, env),
+      Enum.map(params, &Translator.translate(&1, env))
     )
   end
 
-  def make_call_expression(function_name, params) do
-    Builder.call_expression(
-      Builder.identifier(function_name),
-      Enum.map(params, &Translator.translate(&1))
+  def make_call_expression(function_name, params, env) do
+    JS.call_expression(
+      JS.identifier(function_name),
+      Enum.map(params, &Translator.translate(&1, env))
     )
   end
 
-  def make_member_expression(module_name, function_name, computed \\ false) do
+  def make_member_expression(module_name, function_name, env, computed \\ false) do
     case module_name do
       modules when is_list(modules) and length(modules) > 1 ->
         ast = make_module_expression_tree(modules, computed)
-        Builder.member_expression(
+        JS.member_expression(
           ast,
           build_function_name_ast(function_name),
           computed
         )
       modules when is_list(modules) and length(modules) == 1 ->
-        Builder.member_expression(
-          Builder.identifier(hd(modules)),
+        JS.member_expression(
+          JS.identifier(hd(modules)),
           build_function_name_ast(function_name),
           computed
         )
       {{:., _, [_module_name, _function_name]}, _, _params } = ast ->
-        Builder.member_expression(
-          Translator.translate(ast),
+        JS.member_expression(
+          Translator.translate(ast, env),
           build_function_name_ast(function_name),
           computed                 
         )
       {:., _, _} = ast ->
-        Builder.member_expression(
-          Translator.translate(ast),
+        JS.member_expression(
+          Translator.translate(ast, env),
           build_function_name_ast(function_name),
           computed                 
         )
       _ ->
-        Builder.member_expression(
-          Builder.identifier(module_name),
+        JS.member_expression(
+          JS.identifier(module_name),
           build_function_name_ast(function_name),
           computed
         )              
@@ -113,7 +113,7 @@ defmodule ElixirScript.Translator.Utils do
   end
 
   def build_function_name_ast(function_name) do
-    Builder.identifier(function_name)
+    JS.identifier(function_name)
   end
 
   def make_array_accessor_call(name, index) do
@@ -128,20 +128,20 @@ defmodule ElixirScript.Translator.Utils do
         [body]
     end
 
-    Builder.call_expression(
-      Builder.member_expression(
-        Builder.function_expression([],[],
-          Builder.block_statement(the_body)
+    JS.call_expression(
+      JS.member_expression(
+        JS.function_expression([],[],
+          JS.block_statement(the_body)
         ),
-        Builder.identifier("call")
+        JS.identifier("call")
       ),
-      [Builder.identifier("this")]
+      [JS.identifier("this")]
     )
   end
 
-  def make_match(pattern, expr) do
-    Builder.call_expression(
-      make_member_expression("Kernel", "match__qmark__"),
+  def make_match(pattern, expr, env) do
+    JS.call_expression(
+      make_member_expression("Kernel", "match__qmark__", env),
       [
         pattern,
         expr
@@ -149,9 +149,9 @@ defmodule ElixirScript.Translator.Utils do
     )
   end
 
-  def make_match(pattern, expr, guard) do
-    Builder.call_expression(
-      make_member_expression("Kernel", "match__qmark__"),
+  def make_match(pattern, expr, guard, env) do
+    JS.call_expression(
+      make_member_expression("Kernel", "match__qmark__", env),
       [
         pattern,
         expr,

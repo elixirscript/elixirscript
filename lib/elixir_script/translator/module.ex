@@ -1,11 +1,11 @@
 defmodule ElixirScript.Translator.Module do
   @moduledoc false
-  require Logger
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.JSModule
   alias ElixirScript.Preprocess.Aliases
+  alias ElixirScript.Preprocess.Using
   alias ElixirScript.Translator.Function
 
   @standard_libs [
@@ -23,21 +23,21 @@ defmodule ElixirScript.Translator.Module do
     {:fun, from: "__lib/funcy/fun" },
   ]
 
-  def make_module(module_name_list, nil) do
-    [%JSModule{ name: module_name_list, body: List.wrap(create__module__(module_name_list)) }] 
+  def make_module(module_name_list, nil, env) do
+    [%JSModule{ name: module_name_list, body: List.wrap(create__module__(module_name_list, env)) }] 
   end
 
-  def make_module(module_name_list, body) do
+  def make_module(module_name_list, body, env) do
 
     body = make_inner_module_aliases(module_name_list, body)
-
-    { body, aliases, used_stdlibs } = Aliases.process(body)
+    body = Using.process(body, env)
+    { body, aliases, used_stdlibs } = Aliases.process(body, env)
 
     { body, functions } = extract_functions_from_module(body)
-    { exported_functions, private_functions } = process_functions(functions)
+    { exported_functions, private_functions } = process_functions(functions, env)
 
     #Translate body
-    body = Translator.translate(body)
+    body = Translator.translate(body, env)
 
     body = case body do
       [%ESTree.BlockStatement{ body: body }] ->
@@ -92,7 +92,7 @@ defmodule ElixirScript.Translator.Module do
     result = [
       %JSModule{
         name: module_name_list,
-        body: imports ++ List.wrap(create__module__(module_name_list)) ++ structs ++ private_functions ++ exported_functions ++ body ++ [default],
+        body: imports ++ List.wrap(create__module__(module_name_list, env)) ++ structs ++ private_functions ++ exported_functions ++ body ++ [default],
         stdlibs: used_stdlibs |> HashSet.to_list
       }
     ] ++ List.flatten(modules)
@@ -226,33 +226,33 @@ defmodule ElixirScript.Translator.Module do
     end)
   end
 
-  defp process_functions(%{ exported: exported, private: private }) do
+  defp process_functions(%{ exported: exported, private: private }, env) do
     exported_functions = Enum.map(Dict.keys(exported), fn(key) ->
       functions = Dict.get(exported, key)
-      { key, Function.process_function(key, functions) }
+      { key, Function.process_function(key, functions, env) }
     end)
 
     private_functions = Enum.map(Dict.keys(private), fn(key) ->
       functions = Dict.get(private, key)
-      { key, Function.process_function(key, functions) }
+      { key, Function.process_function(key, functions, env) }
     end)
 
     { exported_functions, private_functions }
   end
 
-  def make_attribute(name, value) do
+  def make_attribute(name, value, env) do
     declarator = JS.variable_declarator(
       JS.identifier(name),
-      ElixirScript.Translator.translate(value)
+      ElixirScript.Translator.translate(value, env)
     )
 
     JS.variable_declaration([declarator], :const)
   end
 
-  defp create__module__(module_name_list) do
+  defp create__module__(module_name_list, env) do
     declarator = JS.variable_declarator(
       JS.identifier(:__MODULE__),
-      ElixirScript.Translator.translate(List.last(module_name_list))
+      ElixirScript.Translator.translate(List.last(module_name_list), env)
     )
 
     JS.variable_declaration([declarator], :const)

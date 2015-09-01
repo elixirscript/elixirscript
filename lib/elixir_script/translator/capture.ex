@@ -1,9 +1,9 @@
 defmodule ElixirScript.Translator.Capture do
   alias ESTree.Tools.Builder, as: JS
-  alias ElixirScript.Translator.PatternMatching.Match
+  alias ElixirScript.PatternMatching.Match
   alias ElixirScript.Translator.Utils
 
-  def make_capture(function_name, arity) do
+  def make_capture(function_name, arity, _) do
     params = Enum.map(1..arity, fn(x) -> {String.to_atom("__#{x}"), [], ElixirScript.Translator.Capture} end)
 
     { patterns, params } = Match.build_match(params)
@@ -25,7 +25,7 @@ defmodule ElixirScript.Translator.Capture do
     ])    
   end  
 
-  def make_capture(module_name, function_name, arity) do
+  def make_capture(module_name, function_name, arity, env) do
     params = Enum.map(1..arity, fn(x) -> {String.to_atom("__#{x}"), [], ElixirScript.Translator.Capture} end)
 
     { patterns, params } = Match.build_match(params)
@@ -38,7 +38,7 @@ defmodule ElixirScript.Translator.Capture do
         JS.block_statement([
           JS.return_statement(
             JS.call_expression(
-              Utils.make_member_expression(module_name, function_name),
+              Utils.make_member_expression(module_name, function_name, env),
               params
             )
           )

@@ -1,4 +1,4 @@
-defmodule ElixirScript.Translator.Kernel.Test do
+defmodule ElixirScript.Lib.Kernel.Test do
   use ShouldI
   import ElixirScript.TestHelper
 

@@ -89,7 +89,7 @@ defmodule ElixirScript.Translator.For.Test do
      (function () {
              let [_results] = fun.bind(fun.parameter,Erlang.list());
          for (let n of Erlang.list(1, 2, 3, 4, 5, 6)) {
-             if (Kernel.rem(n, 2) == 0)
+             if (n % 2 == 0)
                  _results = List.append(_results, n);
          }
          return _results;

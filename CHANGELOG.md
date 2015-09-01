@@ -1,4 +1,9 @@
-# v0.10.0-dev
+# v0.10.0
+* Enhancements
+  * Added `env` option for `ElixirScript.transpile` adding macros for compilation
+  * Fixed `case` implementation to add `this` to call
+  * Updated `Kernel` module to translate some functions to it's JavaScript equivalent
+  * Added `Logger` that translates Logger functions to console
 
 # v0.9.0
 * Enhancements

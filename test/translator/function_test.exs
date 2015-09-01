@@ -2,6 +2,22 @@ defmodule ElixirScript.Translator.Function.Test do
   use ShouldI
   import ElixirScript.TestHelper
 
+  should "translate function with a macro" do
+    ex_ast = quote do
+      def test1() do
+        ElixirScript.Math.squared(1)
+      end
+    end
+
+    js_code = """
+      let test1 = fun([[], function() {
+        return 1 * 1;
+      }]);
+    """
+
+    assert_translation(ex_ast, js_code)
+  end
+
   should "translate functions" do
     ex_ast = quote do
       def test1() do

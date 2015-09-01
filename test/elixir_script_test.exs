@@ -9,6 +9,7 @@ defmodule ElixirScript.Test do
 
   should "parse one module correctly" do
     js_code = ElixirScript.transpile("""
+
       defmodule Elephant do
         @ul JQuery.("#todo-list")
 
@@ -48,8 +49,10 @@ defmodule ElixirScript.Test do
   end
 
   should "parse multiple modules correctly" do
+
     js_code = ElixirScript.transpile("""
       defmodule Animals do
+        use ElixirScript.Using, async: true
 
         defmodule Elephant do
           defstruct trunk: true
@@ -61,31 +64,37 @@ defmodule ElixirScript.Test do
         end
 
         defp something_else() do
+          ElixirScript.Math.squared(1)
         end
 
       end
-    """)
+    """, env: make_custom_env)
 
     assert_js_matches """
-      import Erlang from '__lib/erlang';
-      import Enum from '__lib/enum';
-      import Kernel from '__lib/kernel';
-      import Tuple from '__lib/tuple';
-      import fun from '__lib/funcy/fun';
-      import Elephant from 'animals/elephant';
-      const __MODULE__ = Erlang.atom('Animals');
+    import Erlang from '__lib/erlang';
+    import Enum from '__lib/enum';
+    import Kernel from '__lib/kernel';
+    import Tuple from '__lib/tuple';
+    import fun from '__lib/funcy/fun';
+    import Elephant from 'animals/elephant';
+    const __MODULE__ = Erlang.atom('Animals');
 
-      let something_else = fun([[], function() {
-        return null;
-      }]);
+    let something_else = fun([[], function()    {
+       return     1 * 1;
+     }]);
 
-      let something = fun([[], function() {
-        return Elephant.defstruct();
-      }]);
+    let something = fun([[], function()    {
+       return     Elephant.defstruct();
+     }]);
 
-      export default {
-        something: something
-      };
+    let sandwich = fun([[], function()    {
+       return     null;
+     }]);
+
+    export default {
+      something: something,
+      sandwich: sandwich
+    };
      """, hd(js_code)
 
      assert_js_matches """
