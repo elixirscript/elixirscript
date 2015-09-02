@@ -22,6 +22,7 @@ defmodule ElixirScript.CLI do
     case parse do
       { [help: true] , _ , _ } -> :help
       { options , [input], _ } -> { input, options }
+      { [], [], [] } -> :help
     end
 
   end
