@@ -84,7 +84,7 @@ defmodule ElixirScript.Preprocess.Aliases do
     end
   end
 
-  def process_aliases(ast, state, env) do
+  def process_aliases(ast, state, _) do
     {ast, state}
   end
 end

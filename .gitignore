@@ -15,4 +15,5 @@ sample/dest
 fprof.trace
 index.js
 /doc
+/bench/snapshots
 
