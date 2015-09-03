@@ -126,7 +126,7 @@ defmodule ElixirScript.Translator.Function do
         JS.identifier("get_property_or_call_function")
       ),
       [
-        Utils.make_module_expression_tree(the_name, false),
+        Utils.make_module_expression_tree(the_name, false, env),
         Translator.translate(to_string(function_name), env)
       ]
     )

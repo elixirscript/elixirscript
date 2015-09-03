@@ -6,6 +6,12 @@ defmodule ElixirScript.Lib.Kernel do
   alias ElixirScript.Translator.Expression
   alias ElixirScript.Translator.Raise
 
+  @kernel_definitions Kernel.__info__(:functions) ++ Kernel.__info__(:macros)
+
+  def is_defined_in_kernel(name, arity) do
+    { name, arity } in @kernel_definitions
+  end
+
   def translate_kernel_function(name, params, env) do
     do_translate({name, [], params}, env)
   end

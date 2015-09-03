@@ -287,7 +287,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({name, metadata, params} = ast, env) when is_list(params) do
-    if metadata[:import] == Kernel do
+    if KernelLib.is_defined_in_kernel(name, length(params)) do
       KernelLib.translate_kernel_function(name, params, env)
     else
       expanded_ast = Macro.expand(ast, env)

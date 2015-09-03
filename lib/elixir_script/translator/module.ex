@@ -15,6 +15,7 @@ defmodule ElixirScript.Translator.Module do
     {:Enum, from: "__lib/enum" },
     {:Integer, from: "__lib/integer" },
     {:Kernel, from: "__lib/kernel" },
+    {:JS, from: "__lib/js" },
     {:List, from: "__lib/list" },
     {:Logger, from: "__lib/logger" },
     {:Mutable, from: "__lib/mutable" },
@@ -270,11 +271,11 @@ defmodule ElixirScript.Translator.Module do
   """
   def create_standard_lib_imports(used_standard_libs, root) do
     Enum.filter_map(@standard_libs,
-      fn({ name, _ }) -> name in used_standard_libs or name in [:JS, :SpecialForms]  end,
+      fn({ name, _ }) -> name in used_standard_libs or name in [:SpecialForms]  end,
       fn({ name, options }) ->
         options = update_options(options, root)
         case name do
-          n when n in [:JS, :SpecialForms] ->
+          n when n in [:SpecialForms] ->
             ElixirScript.Translator.Import.make_alias_import({ nil, nil, [:Kernel] }, options)    
           _ ->
             ElixirScript.Translator.Import.make_alias_import({ nil, nil, [name] }, options) 

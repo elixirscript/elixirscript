@@ -9,7 +9,7 @@ defmodule ElixirScript.Preprocess.Aliases do
     [:Integer],
     [:Kernel],
     [:Kernel, :SpecialForms],
-    [:Kernel, :JS],
+    [:JS],
     [:List],
     [:Logger],
     [:Mutable],
@@ -35,6 +35,7 @@ defmodule ElixirScript.Preprocess.Aliases do
     stdlib = HashSet.new 
     |> HashSet.put(:Erlang)
     |> HashSet.put(:Kernel)
+    |> HashSet.put(:JS)
     |> HashSet.put(:fun)
     |> HashSet.put(:Tuple)
     |> HashSet.put(:Enum)

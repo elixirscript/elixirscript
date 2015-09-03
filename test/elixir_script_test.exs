@@ -26,6 +26,7 @@ defmodule ElixirScript.Test do
       import Erlang from '__lib/erlang';
       import Enum from '__lib/enum';
       import Kernel from '__lib/kernel';
+      import JS from '__lib/js';
       import Tuple from '__lib/tuple';
       import fun from '__lib/funcy/fun';
 
@@ -74,6 +75,7 @@ defmodule ElixirScript.Test do
     import Erlang from '__lib/erlang';
     import Enum from '__lib/enum';
     import Kernel from '__lib/kernel';
+    import JS from '__lib/js';
     import Tuple from '__lib/tuple';
     import fun from '__lib/funcy/fun';
     import Elephant from 'animals/elephant';
@@ -101,6 +103,7 @@ defmodule ElixirScript.Test do
        import Erlang from '__lib/erlang';
        import Enum from '__lib/enum';
        import Kernel from '__lib/kernel';
+       import JS from '__lib/js';
        import Tuple from '__lib/tuple';
        import fun from '__lib/funcy/fun';
        

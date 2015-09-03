@@ -6,7 +6,7 @@ import Tuple from './tuple';
 let Kernel = {
   __MODULE__: Erlang.atom('Kernel'),
 
-  SpecialForms: SpecialForms
+  SpecialForms: SpecialForms,
 
   tl: function(list){
     return Erlang.list(...list.slice(1));

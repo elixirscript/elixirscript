@@ -30,11 +30,11 @@ defmodule ElixirScript.Translator.Utils do
     )
   end
 
-  def make_module_expression_tree([module], computed) do
-    make_module_expression_tree(module, computed)
+  def make_module_expression_tree([module], computed, env) do
+    make_module_expression_tree(module, computed, env)
   end
 
-  def make_module_expression_tree(modules, computed) when is_list(modules) do
+  def make_module_expression_tree(modules, computed, _) when is_list(modules) do
     Enum.reduce(modules, nil, fn(x, ast) ->
       case ast do
         nil ->
@@ -47,7 +47,7 @@ defmodule ElixirScript.Translator.Utils do
     end)
   end
 
-  def make_module_expression_tree(module, _computed) when is_binary(module) or is_atom(module) do
+  def make_module_expression_tree(module, _computed, _) when is_binary(module) or is_atom(module) do
     JS.identifier(module)
   end
 
@@ -79,7 +79,7 @@ defmodule ElixirScript.Translator.Utils do
   def make_member_expression(module_name, function_name, env, computed \\ false) do
     case module_name do
       modules when is_list(modules) and length(modules) > 1 ->
-        ast = make_module_expression_tree(modules, computed)
+        ast = make_module_expression_tree(modules, computed, env)
         JS.member_expression(
           ast,
           build_function_name_ast(function_name),
