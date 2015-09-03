@@ -1,14 +1,12 @@
 import Erlang from './erlang';
 import SpecialForms from './kernel/special_forms';
-import JS from './kernel/js';
 import fun from './funcy/fun';
 import Tuple from './tuple';
 
 let Kernel = {
   __MODULE__: Erlang.atom('Kernel'),
 
-  SpecialForms: SpecialForms,
-  JS: JS,
+  SpecialForms: SpecialForms
 
   tl: function(list){
     return Erlang.list(...list.slice(1));

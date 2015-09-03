@@ -165,7 +165,7 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
       Taco.test1()
     end
 
-    js_code = "Kernel.JS.get_property_or_call_function(Taco, 'test1')"   
+    js_code = "JS.get_property_or_call_function(Taco, 'test1')"   
 
     assert_translation(ex_ast, js_code)
 

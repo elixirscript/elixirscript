@@ -264,7 +264,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     import Bears from 'lions/tigers/bears';
     const __MODULE__ = Erlang.atom('Animals');
 
-     Kernel.JS.get_property_or_call_function(Bears, 'oh_my');
+     JS.get_property_or_call_function(Bears, 'oh_my');
 
      export default {};
     """
@@ -284,8 +284,8 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     import Bears from 'lions/tigers/bears';
     const __MODULE__ = Erlang.atom('Animals');
 
-    Kernel.JS.get_property_or_call_function(Bears, 'oh_my');
-    Kernel.JS.get_property_or_call_function(Bears, 'oh_my_2');
+    JS.get_property_or_call_function(Bears, 'oh_my');
+    JS.get_property_or_call_function(Bears, 'oh_my_2');
      
      export default {};
     """
@@ -308,7 +308,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
       const __MODULE__ = Erlang.atom('Animals');
 
       let hello = fun([[], function() {
-        return Kernel.JS.get_property_or_call_function(Bears, 'oh_my');
+        return JS.get_property_or_call_function(Bears, 'oh_my');
       }]);
 
       export default {
@@ -338,8 +338,8 @@ defmodule ElixirScript.Translator.Defmodule.Test do
       let hello = fun([
         [fun.parameter], 
         function(param) {
-          Kernel.JS.get_property_or_call_function(Bears, 'oh_my');
-          return Kernel.JS.get_property_or_call_function(Bears, 'oh_my');
+          JS.get_property_or_call_function(Bears, 'oh_my');
+          return JS.get_property_or_call_function(Bears, 'oh_my');
         }
       ]);
 

@@ -14,7 +14,7 @@ defmodule ElixirScript.Translator.Bug.Test do
      import JQuery from 'jquery';
      const __MODULE__ = Erlang.atom('Todo');
      
-     JQuery(Kernel.JS.get_property_or_call_function(e, 'target'));
+     JQuery(JS.get_property_or_call_function(e, 'target'));
      export default {};
     """
 
@@ -27,7 +27,7 @@ defmodule ElixirScript.Translator.Bug.Test do
     end
 
     js_code = """
-      const graphic_store = Kernel.JS.get_property_or_call_function(App.Stores.GraphicStore, 'create_store');
+      const graphic_store = JS.get_property_or_call_function(App.Stores.GraphicStore, 'create_store');
 
     """
 
@@ -52,7 +52,7 @@ defmodule ElixirScript.Translator.Bug.Test do
     end
 
     js_code = """
-      Kernel.JS.get_property_or_call_function(this, 'getRawCanvas').getContext('2d')
+      JS.get_property_or_call_function(this, 'getRawCanvas').getContext('2d')
     """
 
     assert_translation(ex_ast, js_code) 

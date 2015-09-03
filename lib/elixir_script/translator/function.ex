@@ -122,10 +122,7 @@ defmodule ElixirScript.Translator.Function do
 
     JS.call_expression(
       JS.member_expression(
-        JS.member_expression(
-          JS.identifier("Kernel"),
-          JS.identifier("JS")
-        ),
+        JS.identifier("JS"),
         JS.identifier("get_property_or_call_function")
       ),
       [
