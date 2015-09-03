@@ -4,7 +4,6 @@ defmodule ElixirScript.Lib.Kernel do
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Function
   alias ElixirScript.Translator.Expression
-  alias ElixirScript.Translator.If
   alias ElixirScript.Translator.Raise
 
   def translate_kernel_function(name, params, env) do
@@ -149,8 +148,9 @@ defmodule ElixirScript.Lib.Kernel do
     )
   end
 
-  defp do_translate({:if, _, [test, blocks]}, _) do
-    If.make_if(test, blocks)
+  defp do_translate({:if, _, _} = ast, env) do
+    Macro.expand(ast, env)
+    |> Translator.translate(env)
   end
 
   defp do_translate({:|>, _, [left, right]}, _) do

@@ -71,20 +71,15 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-      let test1 = fun(
-        [
-          [fun.parameter, fun.parameter], 
-          function(alpha, beta){ 
-            return (function(){
-              if(1 == 1){
-                return 1;
-              }else{
-                return 2;
-              }
-            }.call(this));
-          } 
-        ]
-      );
+let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
+             return     fun([[fun.parameter], function(x)    {
+             return     2;
+           }, function(x)    {
+             return     Kernel.__in__(x,Erlang.list(false,null));
+           }],[[fun.wildcard], function()    {
+             return     1;
+           }]).call(this, 1 == 1);
+           }]);
     """
 
     assert_translation(ex_ast, js_code)
@@ -104,21 +99,21 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-     let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
-             return     (function()    {
-             if(1 == 1)     {
-             return     (function()    {
-             if(2 == 2)     {
-             return     4;
-           } else     {
-             let [a0] = fun.bind(fun.parameter,1);
-             return     a0;
-           }
-           }.call(this));
-           } else     {
+let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
+             return     fun([[fun.parameter], function(x)    {
              return     2;
-           }
-           }.call(this));
+           }, function(x)    {
+             return     Kernel.__in__(x,Erlang.list(false,null));
+           }],[[fun.wildcard], function()    {
+             return     fun([[fun.parameter], function(x)    {
+             let [a000] = fun.bind(fun.parameter,1);
+             return     a000;
+           }, function(x)    {
+             return     Kernel.__in__(x,Erlang.list(false,null));
+           }],[[fun.wildcard], function()    {
+             return     4;
+           }]).call(this,2 == 2);
+           }]).call(this,1 == 1);
            }]);
     """
 

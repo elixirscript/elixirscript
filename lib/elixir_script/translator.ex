@@ -23,6 +23,7 @@ defmodule ElixirScript.Translator do
   alias ElixirScript.Translator.Utils
   alias ElixirScript.Lib.Logger
   alias ElixirScript.Lib.Kernel, as: KernelLib
+  alias ElixirScript.Lib.JS, as: JSLib
   alias ESTree.Tools.Builder, as: JS
 
   @doc """
@@ -149,15 +150,18 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({{:., _, [module_name, function_name]}, _, params } = ast, env) do
-    if module_name == Kernel do
-      KernelLib.translate_kernel_function(function_name, params, env)
-    else
-      expanded_ast = Macro.expand(ast, env)
-      if expanded_ast == ast do
-        Function.make_function_call(module_name, function_name, params, env)
-      else
-        translate(expanded_ast, env)
-      end
+    case module_name do
+      Kernel ->
+        KernelLib.translate_kernel_function(function_name, params, env)
+      {:__aliases__, [alias: false], [:JS]} ->
+        JSLib.translate_js_function(function_name, params, env)
+      _ ->
+        expanded_ast = Macro.expand(ast, env)
+        if expanded_ast == ast do
+          Function.make_function_call(module_name, function_name, params, env)
+        else
+          translate(expanded_ast, env)
+        end
     end
   end
 
@@ -195,15 +199,15 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:super, _, _expressions }, _) do
-    raise ElixirScript.UnsupportedError, :super
+    raise ElixirScript.UnsupportedError, "super"
   end
 
   defp do_translate({:__CALLER__, _, _expressions }, _) do
-    raise ElixirScript.UnsupportedError, :__CALLER__
+    raise ElixirScript.UnsupportedError, "__CALLER__"
   end
 
   defp do_translate({:__ENV__, _, _expressions }, _) do
-    raise ElixirScript.UnsupportedError, :__ENV__
+    raise ElixirScript.UnsupportedError, "__ENV__"
   end
 
   defp do_translate({:quote, _, [[do: expr]]}, _) do
@@ -214,12 +218,12 @@ defmodule ElixirScript.Translator do
     Quote.make_quote(opts, expr)
   end
 
-  defp do_translate({:import, _, [{:__aliases__, _, module_name_list}]}, _) do
-    Import.make_import(module_name_list, [])
+  defp do_translate({:import, _, [{:__aliases__, _, module_name_list}, [only: functions] ]}, _) do
+    Import.make_import(module_name_list, [only: functions])
   end
 
-  defp do_translate({:import, _, [{:__aliases__, _, module_name_list}, options ]}, _) do
-    Import.make_import(module_name_list, options)
+  defp do_translate({ :import, _, _ }, _) do
+    raise ElixirScript.UnsupportedError, "import without `:only` option"
   end
 
   defp do_translate({:alias, _, [alias_info, options]}, _) when is_tuple(alias_info) do
