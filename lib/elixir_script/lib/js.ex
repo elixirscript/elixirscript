@@ -14,4 +14,16 @@ defmodule ElixirScript.Lib.JS do
     )
   end
 
+  defp do_translate({:mutate, _, [object, property, value]}, env) do
+    Builder.assignment_expression(
+      :=,
+      Builder.member_expression(
+        Translator.translate(object, env),
+        Translator.translate(property, env),
+        true        
+      ),
+      Translator.translate(value, env)
+    )
+  end
+
 end

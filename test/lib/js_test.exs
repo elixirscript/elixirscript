@@ -23,4 +23,16 @@ defmodule ElixirScript.Lib.JS.Test do
 
     assert_translation(ex_ast, js_code)
   end
+
+  should "translate update" do
+    ex_ast = quote do
+      JS.mutate A, "b", [1, 2, 3]
+    end
+
+    js_code = """
+      A['b'] = Erlang.list(1, 2, 3)
+    """
+
+    assert_translation(ex_ast, js_code)
+  end
 end
