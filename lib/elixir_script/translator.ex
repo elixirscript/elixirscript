@@ -24,6 +24,7 @@ defmodule ElixirScript.Translator do
   alias ElixirScript.Lib.Logger
   alias ElixirScript.Lib.Kernel, as: KernelLib
   alias ElixirScript.Lib.JS, as: JSLib
+  alias ElixirScript.Lib.DOM, as: DOMLib
   alias ESTree.Tools.Builder, as: JS
 
   @doc """
@@ -153,8 +154,10 @@ defmodule ElixirScript.Translator do
     case module_name do
       Kernel ->
         KernelLib.translate_kernel_function(function_name, params, env)
-      {:__aliases__, [alias: false], [:JS]} ->
+      {:__aliases__, _, [:JS]} ->
         JSLib.translate_js_function(function_name, params, env)
+      {:__aliases__, _, [:DOM]} ->
+        DOMLib.translate_dom_function(function_name, params, env)
       _ ->
         expanded_ast = Macro.expand(ast, env)
         if expanded_ast == ast do

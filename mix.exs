@@ -4,7 +4,7 @@ defmodule ElixirScript.Mixfile do
   def project do
     [
       app: :elixir_script,
-      version: "0.10.0",
+      version: "0.11.0-dev",
       elixir: "~> 1.0",
       escript: escript_config,
       deps: deps,
@@ -44,7 +44,7 @@ defmodule ElixirScript.Mixfile do
 
   defp package do
     [
-      files: ["lib", "priv/javascript/lib", "mix.exs", "README*", "readme*", "LICENSE*", "license*", "CHANGELOG*"],
+      files: ["lib", "priv/javascript/dist", "mix.exs", "README*", "readme*", "LICENSE*", "license*", "CHANGELOG*"],
       contributors: ["Bryan Joseph"],
       licenses: ["MIT"],
       links: %{ 
@@ -60,9 +60,11 @@ defmodule ElixirScript.Mixfile do
   end
 
   def dist(_) do
-   dist_folder = "dist"
-   folder_name = "#{dist_folder}/ex2js"
-   archive_file_name = "#{dist_folder}/ex2js.tar.gz"
+    dist_folder = "dist"
+    folder_name = "#{dist_folder}/ex2js"
+    archive_file_name = "#{dist_folder}/ex2js.tar.gz"
+
+    File.mkdir_p("priv/javascript/dist")
 
     Mix.Task.run "app.start"
     Mix.Tasks.Escript.Build.run([])
@@ -71,11 +73,14 @@ defmodule ElixirScript.Mixfile do
       File.rm_rf(dist_folder)
     end
 
-    System.cmd("gulp", ["dist"])
+    { elixir_js, _ } = System.cmd("node", ["node_modules/rollup/bin/rollup", "./priv/javascript/elixir.js"])
+    File.write!("priv/javascript/dist/elixir.js", elixir_js)
 
     File.mkdir_p(folder_name <> "/bin")
     File.cp!("ex2js", "#{folder_name}/bin/ex2js")
-    File.cp_r!("priv/javascript/dist", "#{folder_name}/lib")
+    File.cp_r!("priv/javascript/dist", "#{folder_name}/dist")
+    File.cp_r!("LICENSE", "#{folder_name}/LICENSE")
+    File.cp_r!("THIRD-PARTY-LICENSES", "#{folder_name}/THIRD-PARTY-LICENSES")
 
     System.cmd("tar", ["czf", archive_file_name, folder_name])
 

@@ -1,3 +1,14 @@
+# v0.11.0-dev
+* Enhancement
+  * Added `JS` module with `new` and `mutate` functions
+  * All Standard libraries are rolled up into one elixir.js file and imported from that
+  * Added DOM module for creating virtual DOM nodes, and diffing them and applying patches to real DOM 
+
+* Breaking
+  * import - `only` option is the only one allowed
+  * aliases are now longer automatically turned into ES6 import statements. You must alias all modules used within a module
+  * `Mutable.update` has been replaced by `JS.mutate`
+
 # v0.10.0
 * Enhancements
   * Added `env` option for `ElixirScript.transpile` adding macros for compilation

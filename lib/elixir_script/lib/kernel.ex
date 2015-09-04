@@ -159,6 +159,11 @@ defmodule ElixirScript.Lib.Kernel do
     |> Translator.translate(env)
   end
 
+  defp do_translate({:unless, _, _} = ast, env) do
+    Macro.expand(ast, env)
+    |> Translator.translate(env)
+  end
+
   defp do_translate({:|>, _, [left, right]}, _) do
     case right do
       {{:., meta, [module, fun]}, meta2, params} ->

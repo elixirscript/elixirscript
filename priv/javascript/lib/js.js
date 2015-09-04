@@ -1,4 +1,4 @@
-import Erlang from '../erlang';
+import Erlang from './erlang';
 
 let JS = {
   __MODULE__: Erlang.atom('JS'),

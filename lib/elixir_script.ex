@@ -80,10 +80,10 @@ defmodule ElixirScript do
 
   @doc """
   Copies the javascript that makes up the ElixirScript standard libs
-  to the specified location in a "/__lib" folder
+  to the specified location
   """
   def copy_standard_libs_to_destination(destination) do
-    File.cp_r!(operating_path <> "/lib", destination <> "/__lib")
+    File.cp_r!(operating_path <> "/dist", destination)
   end
 
   defp convert_to_code(js_ast, root, include_path) do
@@ -96,7 +96,7 @@ defmodule ElixirScript do
   defp process_module(%JSModule{} = module, root) do
     file_path = create_file_name(module)
 
-    program = ElixirScript.Translator.Module.create_standard_lib_imports(module.stdlibs, root) ++ module.body
+    program = create_standard_lib_imports(root) ++ module.body
     |> ESTree.Tools.Builder.program
 
     { file_path, program }
@@ -104,6 +104,28 @@ defmodule ElixirScript do
 
   defp process_module(module, _root) do
     { "", module }
+  end
+
+  defp create_standard_lib_imports(root) do
+    module_name_list = [:Elixir]
+    options = [
+      from: root(root) <> "elixir", 
+      only: [
+        fun: 1, virtualDom: 1, 
+        Erlang: 1, Kernel: 1, Atom: 1, Enum: 1, Integer: 1, 
+        JS: 1, List: 1, Range: 1, Tuple: 1, Agent: 1, Keyword: 1
+      ]
+    ]
+
+    [ElixirScript.Translator.Import.make_import(module_name_list, options)]
+  end
+
+  defp root(nil) do
+    ""
+  end
+
+  defp root(root) do
+    root <> "/"
   end
 
   defp create_file_name(%JSModule{ name: module_list }) do

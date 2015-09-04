@@ -8,22 +8,6 @@ defmodule ElixirScript.Translator.Module do
   alias ElixirScript.Preprocess.Using
   alias ElixirScript.Translator.Function
 
-  @standard_libs [
-    {:Erlang, from: "__lib/erlang" },
-    {:Atom, from: "__lib/atom" },
-    {:BitString, from: "__lib/bit_string" },
-    {:Enum, from: "__lib/enum" },
-    {:Integer, from: "__lib/integer" },
-    {:Kernel, from: "__lib/kernel" },
-    {:JS, from: "__lib/js" },
-    {:List, from: "__lib/list" },
-    {:Logger, from: "__lib/logger" },
-    {:Mutable, from: "__lib/mutable" },
-    {:Range, from: "__lib/range" },
-    {:Tuple, from: "__lib/tuple" },
-    {:fun, from: "__lib/funcy/fun" },
-  ]
-
   def make_module(module_name_list, nil, env) do
     [%JSModule{ name: module_name_list, body: List.wrap(create__module__(module_name_list, env)) }] 
   end
@@ -31,7 +15,6 @@ defmodule ElixirScript.Translator.Module do
   def make_module(module_name_list, body, env) do
     body = make_inner_module_aliases(module_name_list, body)
     body = Using.process(body, env)
-    { body, aliases, used_stdlibs } = Aliases.process(body, env)
 
     { body, functions } = extract_functions_from_module(body)
     { exported_functions, private_functions } = process_functions(functions, env)
@@ -54,7 +37,7 @@ defmodule ElixirScript.Translator.Module do
 
     #Add imports found from walking the ast
     #and make sure to only put one declaration per alias    
-    imports = process_imports(imports, aliases)
+    imports = process_imports(imports)
     imports = imports.imports
 
     #Collect all the functions so that we can process their arity
@@ -92,8 +75,7 @@ defmodule ElixirScript.Translator.Module do
     result = [
       %JSModule{
         name: module_name_list,
-        body: imports ++ List.wrap(create__module__(module_name_list, env)) ++ structs ++ private_functions ++ exported_functions ++ body ++ [default],
-        stdlibs: used_stdlibs |> HashSet.to_list
+        body: imports ++ List.wrap(create__module__(module_name_list, env)) ++ structs ++ private_functions ++ exported_functions ++ body ++ [default]
       }
     ] ++ List.flatten(modules)
     
@@ -200,8 +182,8 @@ defmodule ElixirScript.Translator.Module do
     end
   end
 
-  defp process_imports(imports, aliases) do
-    imports ++ make_imports(aliases)
+  defp process_imports(imports) do
+    imports
     |> Enum.reduce(HashSet.new, fn(x, acc)-> 
       HashSet.put(acc, x) 
     end)
@@ -262,34 +244,6 @@ defmodule ElixirScript.Translator.Module do
     Enum.map(enum, fn(x) ->
       ElixirScript.Translator.Import.make_alias_import({ nil, nil, x }, [])
     end)
-  end
-
-  @doc """
-  Takes the given list of used_standard_libs which represent
-  the standard libs used in a module and creates import statements
-  for them
-  """
-  def create_standard_lib_imports(used_standard_libs, root) do
-    Enum.filter_map(@standard_libs,
-      fn({ name, _ }) -> name in used_standard_libs or name in [:SpecialForms]  end,
-      fn({ name, options }) ->
-        options = update_options(options, root)
-        case name do
-          n when n in [:SpecialForms] ->
-            ElixirScript.Translator.Import.make_alias_import({ nil, nil, [:Kernel] }, options)    
-          _ ->
-            ElixirScript.Translator.Import.make_alias_import({ nil, nil, [name] }, options) 
-        end
-    end)
-  end
-
-
-  defp update_options(options, nil) do
-    options
-  end
-
-  defp update_options(options, root) do
-    [from: root <> "/" <> options[:from]]
   end
 
 end
