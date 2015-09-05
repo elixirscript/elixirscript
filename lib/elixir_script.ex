@@ -113,7 +113,8 @@ defmodule ElixirScript do
       only: [
         fun: 1, virtualDom: 1, 
         Erlang: 1, Kernel: 1, Atom: 1, Enum: 1, Integer: 1, 
-        JS: 1, List: 1, Range: 1, Tuple: 1, Agent: 1, Keyword: 1
+        JS: 1, List: 1, Range: 1, Tuple: 1, Agent: 1, Keyword: 1,
+        Fetch: 1
       ]
     ]
 

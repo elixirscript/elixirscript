@@ -1,6 +1,7 @@
 self.mailbox = self.mailbox || {};
 
 export { default as fun } from './lib/funcy/fun';
+export { default as Fetch } from './lib/fetch';
 export { default as Erlang } from './lib/erlang';
 export { default as Kernel } from './lib/kernel';
 export { default as Atom } from './lib/atom';

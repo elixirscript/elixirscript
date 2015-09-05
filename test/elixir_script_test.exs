@@ -23,7 +23,7 @@ defmodule ElixirScript.Test do
     """)
 
     assert_js_matches """
-      import { fun, Erlang, Kernel, Atom, Enum, Integer, JS, List, Range, Tuple } from 'elixir';
+      import { fun, virtualDom, Erlang, Kernel, Atom, Enum, Integer, JS, List, Range, Tuple, Agent, Keyword, Fetch } from 'elixir';
       
       const __MODULE__ = Erlang.atom('Elephant');
 
@@ -66,7 +66,7 @@ defmodule ElixirScript.Test do
     """, env: make_custom_env)
 
     assert_js_matches """
-    import { fun, Erlang, Kernel, Atom, Enum, Integer, JS, List, Range, Tuple } from 'elixir';
+    import { fun, virtualDom, Erlang, Kernel, Atom, Enum, Integer, JS, List, Range, Tuple, Agent, Keyword, Fetch } from 'elixir';
     import Elephant from 'animals/elephant';
     const __MODULE__ = Erlang.atom('Animals');
 
@@ -89,7 +89,7 @@ defmodule ElixirScript.Test do
      """, hd(js_code)
 
      assert_js_matches """
-        import { fun, Erlang, Kernel, Atom, Enum, Integer, JS, List, Range, Tuple } from 'elixir';
+        import { fun, virtualDom, Erlang, Kernel, Atom, Enum, Integer, JS, List, Range, Tuple, Agent, Keyword, Fetch } from 'elixir';
        
        const __MODULE__ = Erlang.atom('Elephant');
        function defstruct(trunk = true){return {__struct__: __MODULE__, trunk: trunk};}
