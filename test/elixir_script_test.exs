@@ -3,7 +3,7 @@ defmodule ElixirScript.Test do
   import ElixirScript.TestHelper
 
   should "chain methods" do
-    js_code = ElixirScript.transpile("""
+    js_code = ElixirScript.compile("""
       JQuery.("<div/>").text(html)
     """)
 
@@ -11,12 +11,12 @@ defmodule ElixirScript.Test do
   end
 
   should "turn javascript ast into javascript code strings" do
-    js_code = ElixirScript.transpile(":atom")
+    js_code = ElixirScript.compile(":atom")
     assert hd(js_code) == "Erlang.atom('atom')"
   end
 
   should "parse one module correctly" do
-    js_code = ElixirScript.transpile("""
+    js_code = ElixirScript.compile("""
 
       defmodule Elephant do
         @ul JQuery.("#todo-list")
@@ -53,7 +53,7 @@ defmodule ElixirScript.Test do
 
   should "parse multiple modules correctly" do
 
-    js_code = ElixirScript.transpile("""
+    js_code = ElixirScript.compile("""
       defmodule Animals do
         use ElixirScript.Using, async: true
 

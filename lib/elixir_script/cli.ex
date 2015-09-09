@@ -49,27 +49,27 @@ defmodule ElixirScript.CLI do
   end
 
   def do_process(input, options) do
-    transpile_opts = [ 
+    compile_opts = [ 
       root: options[:root], 
       include_path: options[:output] != nil
     ]
 
-    transpile_output = case options[:elixir] do
+    compile_output = case options[:elixir] do
       true ->
-        ElixirScript.transpile(input, transpile_opts)
+        ElixirScript.compile(input, compile_opts)
       _ ->
-        ElixirScript.transpile_path(input, transpile_opts)  
+        ElixirScript.compile_path(input, compile_opts)  
     end
 
     case options[:output] do
       nil ->
-        Enum.each(transpile_output, 
+        Enum.each(compile_output, 
           fn
           ({_path, code})-> IO.write(code) 
           (code)-> IO.write(code) 
         end)
       output_path ->
-        Enum.each(transpile_output, fn(x) ->
+        Enum.each(compile_output, fn(x) ->
           write_to_file(x, output_path) 
         end)
 

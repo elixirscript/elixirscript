@@ -6,13 +6,13 @@ defmodule ElixirScript do
   require Logger
 
   @moduledoc """
-  Transpiles Elixir into JavaScript.
+  Translates Elixir into JavaScript.
 
-  All transpile functions return a list of
+  All compile functions return a list of
   transpiled javascript code or a tuple consisting of
   the file name for the code and the transpiled javascript code.
 
-  All transpile functions also take an optional opts parameter
+  All compile functions also take an optional opts parameter
   that controls transpiler output.
 
   Available options are:
@@ -25,20 +25,20 @@ defmodule ElixirScript do
   """
 
   @doc """
-  Transpiles the given Elixir code string
+  Compiles the given Elixir code string
   """
-  @spec transpile(binary, Dict.t) :: [binary | { binary, binary }]
-  def transpile(elixir_code, opts \\ []) do
+  @spec compile(binary, Dict.t) :: [binary | { binary, binary }]
+  def compile(elixir_code, opts \\ []) do
     elixir_code
     |> Code.string_to_quoted!
-    |> transpile_quoted(opts)
+    |> compile_quoted(opts)
   end
 
   @doc """
-  Transpiles the given Elixir code in quoted form
+  Compiles the given Elixir code in quoted form
   """
-  @spec transpile_quoted(Macro.t, Dict.t) :: [binary | { binary, binary }]
-  def transpile_quoted(quoted, opts \\ []) do
+  @spec compile_quoted(Macro.t, Dict.t) :: [binary | { binary, binary }]
+  def compile_quoted(quoted, opts \\ []) do
     include_path = Dict.get(opts, :include_path, false)
     root = Dict.get(opts, :root)
     env = Dict.get(opts, :env, custom_env)
@@ -57,10 +57,10 @@ defmodule ElixirScript do
   end
 
   @doc """
-  Transpiles the elixir files found at the given path
+  Compiles the elixir files found at the given path
   """
-  @spec transpile_path(binary, Dict.t) :: [binary | { binary, binary }]
-  def transpile_path(path, opts \\ []) do
+  @spec compile_path(binary, Dict.t) :: [binary | { binary, binary }]
+  def compile_path(path, opts \\ []) do
     include_path = Dict.get(opts, :include_path, false)
     root = Dict.get(opts, :root)
     env = Dict.get(opts, :env, custom_env)

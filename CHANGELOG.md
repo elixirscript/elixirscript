@@ -15,6 +15,7 @@
   * import - `only` option is the only one allowed
   * aliases are now longer automatically turned into ES6 import statements. You must alias all modules used within a module
   * `Mutable.update` has been replaced by `JS.mutate`
+  * `transpile`, `transpile_quoted`, and `transpile_path` are now `compile`, `compile_quoted`, and `compile_path`
 
 # v0.10.0
 * Enhancements
