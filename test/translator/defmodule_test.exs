@@ -137,65 +137,6 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "translate modules with 2 inner modules" do
-    ex_ast = quote do
-      defmodule Animals do
-
-        defmodule Elephant do
-          defstruct trunk: true
-        end
-
-        defmodule Bear do
-          defstruct trunk: true
-        end
-
-
-        def something() do
-          %Elephant{}
-        end
-
-        defp something_else() do
-        end
-
-      end
-    end
-
-    js_code = """
-        import * as Bear from 'animals/bear';
-         import * as Elephant from 'animals/elephant';
-         const __MODULE__ = Erlang.atom('Animals');
-         let something_else = fun([[], function()    {
-             return     null;
-           }]);
-         let something = fun([[], function()    {
-             return     Elephant.defstruct();
-           }]);
-         export {
-             something
-       };
-         const __MODULE__ = Erlang.atom('Elephant');
-         function defstruct(trunk = true)        {
-                 return     {
-                     [Erlang.atom('__struct__')]: __MODULE__,         [Erlang.atom('trunk')]: trunk
-           };
-               }
-         export {
-             defstruct
-       };
-         const __MODULE__ = Erlang.atom('Bear');
-         function defstruct(trunk = true)        {
-                 return     {
-                     [Erlang.atom('__struct__')]: __MODULE__,         [Erlang.atom('trunk')]: trunk
-           };
-               }
-         export {
-             defstruct
-       };
-    """
-
-    assert_translation(ex_ast, js_code)
-  end
-
 
   should "translate modules with inner module that has inner module" do
     ex_ast = quote do
@@ -221,6 +162,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
+
          import * as Elephant from 'animals/elephant';
          const __MODULE__ = Erlang.atom('Animals');
          let something_else = fun([[], function()    {
@@ -232,6 +174,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
          export {
              something
        };
+
          import * as Bear from 'animals/elephant/bear';
          const __MODULE__ = Erlang.atom('Elephant');
          function defstruct(trunk = true)        {
@@ -242,6 +185,8 @@ defmodule ElixirScript.Translator.Defmodule.Test do
          export {
              defstruct
        };
+
+
          const __MODULE__ = Erlang.atom('Bear');
          function defstruct(trunk = true)        {
                  return     {
