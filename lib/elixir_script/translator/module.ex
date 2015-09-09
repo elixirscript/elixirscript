@@ -55,7 +55,7 @@ defmodule ElixirScript.Translator.Module do
     exported_object = JS.object_expression(
       make_defstruct_property(structs) ++
       Enum.map(exported_functions, fn({key, _value}) -> 
-        JS.property(JS.identifier(key), JS.identifier(key))
+        JS.property(JS.identifier(key), JS.identifier(key), :init, true)
       end)
     )
 
@@ -176,9 +176,9 @@ defmodule ElixirScript.Translator.Module do
   defp make_defstruct_property([the_struct]) do
     case the_struct do
       %ESTree.FunctionDeclaration{id: %ESTree.Identifier{name: :defstruct}} ->
-        [JS.property(JS.identifier(:defstruct), JS.identifier(:defstruct))]
+        [JS.property(JS.identifier(:defstruct), JS.identifier(:defstruct), :init, true )]
       %ESTree.FunctionDeclaration{id: %ESTree.Identifier{name: :defexception}} ->
-        [JS.property(JS.identifier(:defexception), JS.identifier(:defexception))]    
+        [JS.property(JS.identifier(:defexception), JS.identifier(:defexception), :init, true )]    
     end
   end
 

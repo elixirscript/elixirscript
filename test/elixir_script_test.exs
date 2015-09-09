@@ -46,7 +46,7 @@ defmodule ElixirScript.Test do
       const ul = JQuery('#todo-list');
 
       export {
-        something: something
+        something
       };
     """, hd(js_code)
   end
@@ -91,8 +91,8 @@ defmodule ElixirScript.Test do
      }]);
 
     export {
-      something: something,
-      sandwich: sandwich
+      something,
+      sandwich
     };
      """, hd(js_code)
 
@@ -101,7 +101,7 @@ defmodule ElixirScript.Test do
        
        const __MODULE__ = Erlang.atom('Elephant');
        function defstruct(trunk = true){return {[Erlang.atom('__struct__')]: __MODULE__, [Erlang.atom('trunk')]: trunk};}
-       export  {defstruct: defstruct};     
+       export  {defstruct};     
        """, List.last(js_code)
   end
 end

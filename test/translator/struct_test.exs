@@ -18,7 +18,7 @@ defmodule ElixirScript.Translator.Struct.Test do
              [Erlang.atom('age')]: age
          };
      }
-     export { defstruct: defstruct };
+     export { defstruct };
     """
 
     assert_translation(ex_ast, js_code)
@@ -41,7 +41,7 @@ defmodule ElixirScript.Translator.Struct.Test do
              [Erlang.atom('age')]: age
          };
      }
-     export { defstruct: defstruct };
+     export { defstruct };
     """
 
     assert_translation(ex_ast, js_code)
@@ -127,7 +127,7 @@ defmodule ElixirScript.Translator.Struct.Test do
              [Erlang.atom('message')]: message
          };
      }
-     export { defexception: defexception };
+     export { defexception };
      """
 
     assert_translation(ex_ast, js_code)
@@ -146,7 +146,7 @@ defmodule ElixirScript.Translator.Struct.Test do
              [Erlang.atom('message')]: message
          };
      }
-     export { defexception: defexception };
+     export { defexception };
     """
 
     assert_translation(ex_ast, js_code)

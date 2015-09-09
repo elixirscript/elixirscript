@@ -49,7 +49,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
 
       const ul = JQuery('#todo-list');
 
-      export { something: something };
+      export { something };
     """
 
     assert_translation(ex_ast, js_code)
@@ -85,7 +85,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
         }
       ]);
 
-     export { something: something };
+     export { something };
     """
 
     assert_translation(ex_ast, js_code)
@@ -120,7 +120,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
              return     Elephant.defstruct();
            }]);
          export {
-             something: something
+             something
        };
          const __MODULE__ = Erlang.atom('Elephant');
          function defstruct(trunk = true)        {
@@ -129,7 +129,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
            };
                }
          export {
-             defstruct: defstruct
+             defstruct
        };
 
     """
@@ -171,7 +171,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
              return     Elephant.defstruct();
            }]);
          export {
-             something: something
+             something
        };
          const __MODULE__ = Erlang.atom('Elephant');
          function defstruct(trunk = true)        {
@@ -180,7 +180,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
            };
                }
          export {
-             defstruct: defstruct
+             defstruct
        };
          const __MODULE__ = Erlang.atom('Bear');
          function defstruct(trunk = true)        {
@@ -189,7 +189,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
            };
                }
          export {
-             defstruct: defstruct
+             defstruct
        };
     """
 
@@ -230,7 +230,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
              return     Elephant.defstruct();
            }]);
          export {
-             something: something
+             something
        };
          import * as Bear from 'animals/elephant/bear';
          const __MODULE__ = Erlang.atom('Elephant');
@@ -240,7 +240,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
            };
                }
          export {
-             defstruct: defstruct
+             defstruct
        };
          const __MODULE__ = Erlang.atom('Bear');
          function defstruct(trunk = true)        {
@@ -249,7 +249,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
            };
                }
          export {
-             defstruct: defstruct
+             defstruct
        };
     """
 

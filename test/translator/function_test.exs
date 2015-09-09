@@ -312,7 +312,7 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
         ]
       );
 
-     export { example: example };
+     export { example };
     """  
     assert_translation(ex_ast, js_code)
 
@@ -327,7 +327,7 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
     js_code = """
      const __MODULE__ = Erlang.atom('Example');
      let example = fun([[fun.parameter], function(oneArg){return null;}]);
-     export {example: example};
+     export {example};
     """  
     assert_translation(ex_ast, js_code)
 
@@ -476,7 +476,7 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
     ]);
 
     export {
-      something: something
+      something
     };
     """  
     assert_translation(ex_ast, js_code)
@@ -738,7 +738,7 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
     }]);
 
     export {
-      something: something
+      something
     };
     """
     
