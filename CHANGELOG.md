@@ -6,6 +6,10 @@
   * Added `Fetch` module to wrap fetch API
   * Added `Keyword` module with functions, `has_key?` and `get`
   * Added `Agent` module with functions, `start`, `get`, `update`, and `get_and_update`
+  * Map keys are now correctly turned into their atom counterparts if atom keys are used
+  * Modules no longer export a default object
+  * Added `default` option to alias
+  * `alias` now translates to a namespace import unless `default` option is given
 
 * Breaking
   * import - `only` option is the only one allowed
