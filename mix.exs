@@ -11,7 +11,9 @@ defmodule ElixirScript.Mixfile do
       description: description,
       package: package,
       source_url: "https://github.com/bryanjos/elixirscript",
-      aliases: aliases
+      aliases: aliases,
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [coveralls: :test]
     ]
   end
 
@@ -28,7 +30,8 @@ defmodule ElixirScript.Mixfile do
       { :shouldi, only: :test },
       { :earmark, "~> 0.1", only: :dev },
       { :ex_doc, "~> 0.8", only: :dev },
-      {:benchfella, "~> 0.2", only: :test}   
+      {:benchfella, "~> 0.2", only: :test},
+      {:excoveralls, "~> 0.3", only: :test}  
     ]
   end
 

@@ -13,12 +13,12 @@ defmodule ElixirScript.Translator.Struct.Test do
      const __MODULE__ = Erlang.atom('User');
      function defstruct(name = 'john', age = 27) {
          return {
-             __struct__: __MODULE__,
-             name: name,
-             age: age
+             [Erlang.atom('__struct__')]: __MODULE__,
+             [Erlang.atom('name')]: name,
+             [Erlang.atom('age')]: age
          };
      }
-     export default { defstruct: defstruct };
+     export { defstruct: defstruct };
     """
 
     assert_translation(ex_ast, js_code)
@@ -36,12 +36,12 @@ defmodule ElixirScript.Translator.Struct.Test do
      const __MODULE__ = Erlang.atom('User');
      function defstruct(name, age) {
          return {
-             __struct__: __MODULE__,
-             name: name,
-             age: age
+             [Erlang.atom('__struct__')]: __MODULE__,
+             [Erlang.atom('name')]: name,
+             [Erlang.atom('age')]: age
          };
      }
-     export default { defstruct: defstruct };
+     export { defstruct: defstruct };
     """
 
     assert_translation(ex_ast, js_code)
@@ -123,11 +123,11 @@ defmodule ElixirScript.Translator.Struct.Test do
      const __MODULE__ = Erlang.atom('MyAppError');
      function defexception(message = 'This is a message') {
          return {
-             __struct__: __MODULE__,
-             message: message
+             [Erlang.atom('__struct__')]: __MODULE__,
+             [Erlang.atom('message')]: message
          };
      }
-     export default { defexception: defexception };
+     export { defexception: defexception };
      """
 
     assert_translation(ex_ast, js_code)
@@ -142,11 +142,11 @@ defmodule ElixirScript.Translator.Struct.Test do
      const __MODULE__ = Erlang.atom('MyAppError');
      function defexception(message = null) {
          return {
-             __struct__: __MODULE__,
-             message: message
+             [Erlang.atom('__struct__')]: __MODULE__,
+             [Erlang.atom('message')]: message
          };
      }
-     export default { defexception: defexception };
+     export { defexception: defexception };
     """
 
     assert_translation(ex_ast, js_code)

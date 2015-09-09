@@ -43,13 +43,13 @@ defmodule ElixirScript.Translator.Primitive do
     )
   end
 
-  def make_list_quoted(opts, ast) when is_list(ast) do
+  def make_list_quoted(opts, ast, env) when is_list(ast) do
     Builder.call_expression(
       Builder.member_expression(
         Builder.identifier("Erlang"),
         Builder.identifier("list")
       ),
-      Enum.map(ast, fn(x) -> Quote.make_quote(opts, x) end)
+      Enum.map(ast, fn(x) -> Quote.make_quote(opts, x, env) end)
     )
   end
 
@@ -77,13 +77,13 @@ defmodule ElixirScript.Translator.Primitive do
     )
   end
 
-  def make_tuple_quoted(opts, elements) do
+  def make_tuple_quoted(opts, elements, env) do
     Builder.call_expression(
       Builder.member_expression(
         Builder.identifier("Erlang"),
         Builder.identifier("tuple")
       ),
-      Enum.map(elements, fn(x) -> Quote.make_quote(opts, x) end)
+      Enum.map(elements, fn(x) -> Quote.make_quote(opts, x, env) end)
     )
   end
 

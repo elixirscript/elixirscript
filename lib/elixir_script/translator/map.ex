@@ -4,27 +4,27 @@ defmodule ElixirScript.Translator.Map do
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Utils
 
-  def make_get_property(target, property) do
+  def make_get_property(target, property, env) do
     JS.member_expression(
-      Translator.translate(target),
-      Translator.translate(property),
+      Translator.translate(target, env),
+      Translator.translate(property, env),
       true
     )
   end
 
-  def make_object(properties) do
+  def make_object(properties, env) do
     properties
     |> Enum.map(fn
-      ({x, {:__aliases__, _, [value]}}) -> JS.property(JS.literal(x), JS.identifier(value)) 
-      ({x, y}) -> JS.property( JS.literal(x), Translator.translate(y)) 
+      ({x, {:__aliases__, _, [value]}}) -> JS.property(Translator.translate(x, env), JS.identifier(value), :init, false, false, true) 
+      ({x, y}) -> JS.property( Translator.translate(x, env), Translator.translate(y, env),  :init, false, false, true) 
     end)
     |> JS.object_expression
   end
 
-  def make_map_update(map, data) do
+  def make_map_update(map, data, env) do
     _results = JS.identifier("_results")
     prop = JS.identifier(:prop)
-    _map = Translator.translate(map)
+    _map = Translator.translate(map, env)
 
     variable_declarator = JS.variable_declarator(_results, JS.object_expression([]))
     variable_declaration = JS.variable_declaration([variable_declarator], :let)
@@ -75,7 +75,7 @@ defmodule ElixirScript.Translator.Map do
             JS.identifier("_results"),
             JS.identifier(key)
           ),
-          Translator.translate(value)
+          Translator.translate(value, env)
         )
       )
     end)

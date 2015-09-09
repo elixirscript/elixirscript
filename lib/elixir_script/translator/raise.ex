@@ -1,9 +1,11 @@
 defmodule ElixirScript.Translator.Raise do
+  @moduledoc false
+
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
 
 
-  def throw_error(module_name, data) do
+  def throw_error(module_name, data, env) do
     JS.throw_statement(
       JS.new_expression(
         JS.identifier(List.last(module_name)),
@@ -17,7 +19,7 @@ defmodule ElixirScript.Translator.Raise do
               JS.assignment_expression(
                 :=,
                 JS.identifier(k),
-                Translator.translate(v)
+                Translator.translate(v, env)
               )
             end)
           )
@@ -26,14 +28,14 @@ defmodule ElixirScript.Translator.Raise do
     )
   end
 
-  def throw_error(message) do
+  def throw_error(message, env) do
     JS.throw_statement(
       JS.new_expression(
         JS.identifier("RuntimeError"),
         [
           JS.object_expression(
             [
-              JS.property(JS.identifier(:__struct__), Translator.translate(:RuntimeError)),
+              JS.property(JS.identifier(:__struct__), Translator.translate(:RuntimeError, env)),
               JS.property(JS.identifier("message"), JS.literal(message))
             ]
           )

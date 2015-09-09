@@ -41,17 +41,17 @@ defmodule ElixirScript do
   def transpile_quoted(quoted, opts \\ []) do
     include_path = Dict.get(opts, :include_path, false)
     root = Dict.get(opts, :root)
-    env = Dict.get(opts, :env, __ENV__)
+    env = Dict.get(opts, :env, custom_env)
 
     case Translator.translate(quoted, env) do
       modules when is_list(modules) ->
         List.flatten(modules)
         |> Enum.map(fn(x) ->
-          convert_to_code(x, root, include_path)
+          convert_to_code(x, root, include_path, env)
         end)
       module ->
         List.wrap(
-          convert_to_code(module, root, include_path)
+          convert_to_code(module, root, include_path, env)
         )
     end
   end
@@ -63,7 +63,7 @@ defmodule ElixirScript do
   def transpile_path(path, opts \\ []) do
     include_path = Dict.get(opts, :include_path, false)
     root = Dict.get(opts, :root)
-    env = Dict.get(opts, :env, __ENV__)
+    env = Dict.get(opts, :env, custom_env)
 
     path
     |> Path.wildcard
@@ -74,8 +74,14 @@ defmodule ElixirScript do
     end)
     |> List.flatten
     |> Enum.map(fn(x) ->
-      convert_to_code(x, root, include_path)
+      convert_to_code(x, root, include_path, env)
     end)
+  end
+
+  defp custom_env() do
+    require Logger
+    require ElixirScript.Lib.JS
+    __ENV__
   end
 
   @doc """
@@ -86,27 +92,27 @@ defmodule ElixirScript do
     File.cp_r!(operating_path <> "/dist", destination)
   end
 
-  defp convert_to_code(js_ast, root, include_path) do
+  defp convert_to_code(js_ast, root, include_path, env) do
       js_ast
-      |> process_module(root)
+      |> process_module(root, env)
       |> javascript_ast_to_code
       |> process_include_path(include_path)
   end
 
-  defp process_module(%JSModule{} = module, root) do
+  defp process_module(%JSModule{} = module, root, env) do
     file_path = create_file_name(module)
 
-    program = create_standard_lib_imports(root) ++ module.body
+    program = create_standard_lib_imports(root, env) ++ module.body
     |> ESTree.Tools.Builder.program
 
     { file_path, program }
   end
 
-  defp process_module(module, _root) do
+  defp process_module(module, _root, _) do
     { "", module }
   end
 
-  defp create_standard_lib_imports(root) do
+  defp create_standard_lib_imports(root, env) do
     module_name_list = [:Elixir]
     options = [
       from: root(root) <> "elixir", 
@@ -118,7 +124,7 @@ defmodule ElixirScript do
       ]
     ]
 
-    [ElixirScript.Translator.Import.make_import(module_name_list, options)]
+    [ElixirScript.Translator.Import.make_import(module_name_list, options, env)]
   end
 
   defp root(nil) do

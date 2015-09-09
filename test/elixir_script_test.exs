@@ -2,6 +2,14 @@ defmodule ElixirScript.Test do
   use ShouldI
   import ElixirScript.TestHelper
 
+  should "chain methods" do
+    js_code = ElixirScript.transpile("""
+      JQuery.("<div/>").text(html)
+    """)
+
+    assert hd(js_code) == "JQuery('<div/>').text(html)"
+  end
+
   should "turn javascript ast into javascript code strings" do
     js_code = ElixirScript.transpile(":atom")
     assert hd(js_code) == "Erlang.atom('atom')"
@@ -37,7 +45,7 @@ defmodule ElixirScript.Test do
 
       const ul = JQuery('#todo-list');
 
-      export default {
+      export {
         something: something
       };
     """, hd(js_code)
@@ -67,7 +75,7 @@ defmodule ElixirScript.Test do
 
     assert_js_matches """
     import { fun, virtualDom, Erlang, Kernel, Atom, Enum, Integer, JS, List, Range, Tuple, Agent, Keyword, Fetch } from 'elixir';
-    import Elephant from 'animals/elephant';
+    import * as Elephant from 'animals/elephant';
     const __MODULE__ = Erlang.atom('Animals');
 
     let something_else = fun([[], function()    {
@@ -82,7 +90,7 @@ defmodule ElixirScript.Test do
        return     null;
      }]);
 
-    export default {
+    export {
       something: something,
       sandwich: sandwich
     };
@@ -92,8 +100,8 @@ defmodule ElixirScript.Test do
         import { fun, virtualDom, Erlang, Kernel, Atom, Enum, Integer, JS, List, Range, Tuple, Agent, Keyword, Fetch } from 'elixir';
        
        const __MODULE__ = Erlang.atom('Elephant');
-       function defstruct(trunk = true){return {__struct__: __MODULE__, trunk: trunk};}
-       export default {defstruct: defstruct};     
+       function defstruct(trunk = true){return {[Erlang.atom('__struct__')]: __MODULE__, [Erlang.atom('trunk')]: trunk};}
+       export  {defstruct: defstruct};     
        """, List.last(js_code)
   end
 end

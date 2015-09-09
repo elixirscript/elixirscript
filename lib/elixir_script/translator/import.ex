@@ -1,23 +1,44 @@
 defmodule ElixirScript.Translator.Import do
   @moduledoc false
   alias ESTree.Tools.Builder, as: JS
+  alias ElixirScript.Translator
 
   def make_alias_import(alias_info, options) do
     {_, _, name} = alias_info
 
-    import_specifier = if options[:as] do
-      {_, _, alt} = options[:as]
-      
-      JS.import_specifier(
-        JS.identifier("default"),
-        JS.identifier(List.last(alt))
-      )
-    else      
+    default = Dict.get(options, :default, false)
+
+    
+     import_specifier = if default == false do
+      if options[:as] do
+        {_, _, alt} = options[:as]
+        
+        JS.import_namespace_specifier(
+          JS.identifier(List.last(alt))
+        )
+      else      
+      JS.import_namespace_specifier(
+        JS.identifier(List.last(name))
+      )  
+      end
+    else
+      if options[:as] do
+        {_, _, alt} = options[:as]
+        
+        JS.import_specifier(
+          JS.identifier("default"),
+          JS.identifier(List.last(alt))
+        )
+      else      
       JS.import_default_specifier(
         JS.identifier(List.last(name)),
         JS.identifier(List.last(name))
       )  
+      end
     end
+    
+
+
 
     import_path = if options[:from] do
       "'#{options[:from]}'"
@@ -31,15 +52,23 @@ defmodule ElixirScript.Translator.Import do
     )
   end
 
-  def make_import(module_name_list, options) do
+  def make_import(module_name_list, options, env) do
     mod = List.last(module_name_list) |> JS.identifier
 
     specifiers = if options[:only] do
-      Enum.map(options[:only], fn({name, _arity}) -> 
-        JS.import_specifier(
-          JS.identifier(name),
-          JS.identifier(name)
-        )
+      Enum.map(options[:only], fn
+        ({name, _arity}) ->
+          name = JS.identifier(name)
+          JS.import_specifier(
+            name,
+            name
+          )
+        (name) ->
+          name = Translator.translate(name, env)
+          JS.import_specifier(
+            name,
+            name
+          )   
       end)
     else
       List.wrap(JS.import_namespace_specifier(mod))

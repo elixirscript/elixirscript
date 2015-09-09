@@ -16,23 +16,23 @@ defmodule ElixirScript.Lib.DOM.Test do
     end
 
     js_code = """
-    virtualDom.h('section', { 'id': 'todoapp' },
+    virtualDom.h('section', { ['id']: 'todoapp' },
       Erlang.list(
-        virtualDom.h('header', { 'id': 'header' },
+        virtualDom.h('header', {  ['id']: 'header' },
           Erlang.list(
             virtualDom.h('h1', {}, Erlang.list(
               'todos'
               )
             ),
             virtualDom.h('input', { 
-              'id': 'new-todo', 
-              'placeholder': 'What needs to be done?',
-              'autofocus': true 
+              ['id']: 'new-todo', 
+              ['placeholder']: 'What needs to be done?',
+              ['autofocus']: true 
               }
             )
           )
         ),
-        virtualDom.h('section',{ 'id': 'main' })
+        virtualDom.h('section',{ ['id']: 'main' })
       )
     )
     """

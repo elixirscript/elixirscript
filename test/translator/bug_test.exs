@@ -5,7 +5,7 @@ defmodule ElixirScript.Translator.Bug.Test do
   should "correctly not create 2 imports" do
     ex_ast = quote do
       defmodule App.Todo do
-        alias JQuery, from: "jquery"
+        alias JQuery, from: "jquery", default: true
         JQuery.(e.target)
       end
     end
@@ -15,7 +15,7 @@ defmodule ElixirScript.Translator.Bug.Test do
      const __MODULE__ = Erlang.atom('Todo');
      
      JQuery(JS.get_property_or_call_function(e, 'target'));
-     export default {};
+     export {};
     """
 
     assert_translation(ex_ast, js_code)   
@@ -85,18 +85,18 @@ defmodule ElixirScript.Translator.Bug.Test do
     js_code = """
       let getDispatcher = fun([[], function() {
         return DeLorean.Flux.createDispatcher({
-          'startPainting': fun([[], function() {
+          [Erlang.atom('startPainting')]: fun([[], function() {
             return this.dispatch('startPainting');
           }]),
-          'stopPainting': fun([[], function() {
+          [Erlang.atom('stopPainting')]: fun([[], function() {
             return this.dispatch('stopPainting');
           }]),
-          'addPoint': fun([[fun.parameter], function(data) {
+          [Erlang.atom('addPoint')]: fun([[fun.parameter], function(data) {
             return this.dispatch('addPoint', data);
           }]),
-          'getStores': fun([[], function() {
+           [Erlang.atom('getStores')]: fun([[], function() {
             return {
-              'graphic': GraphicStore
+              [Erlang.atom('graphic')]: GraphicStore
             };
           }])
         });

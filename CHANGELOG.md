@@ -2,7 +2,10 @@
 * Enhancement
   * Added `JS` module with `new` and `mutate` functions
   * All Standard libraries are rolled up into one elixir.js file and imported from that
-  * Added DOM module for creating virtual DOM nodes, and diffing them and applying patches to real DOM 
+  * Added `DOM` module for creating virtual DOM nodes, and diffing them and applying patches to real DOM 
+  * Added `Fetch` module to wrap fetch API
+  * Added `Keyword` module with functions, `has_key?` and `get`
+  * Added `Agent` module with functions, `start`, `get`, `update`, and `get_and_update`
 
 * Breaking
   * import - `only` option is the only one allowed

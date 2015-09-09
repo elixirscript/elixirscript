@@ -49,7 +49,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
 
       const ul = JQuery('#todo-list');
 
-      export default { something: something };
+      export { something: something };
     """
 
     assert_translation(ex_ast, js_code)
@@ -67,7 +67,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
-     import Crane from 'icabod/crane';
+     import * as Crane from 'icabod/crane';
      const __MODULE__ = Erlang.atom('Elephant');
 
       let something_else = fun([
@@ -85,7 +85,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
         }
       ]);
 
-     export default { something: something };
+     export { something: something };
     """
 
     assert_translation(ex_ast, js_code)
@@ -111,30 +111,26 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
-      import Elephant from 'animals/elephant';
-      const __MODULE__ = Erlang.atom('Animals');
-
-      let something_else = fun([[], function() {
-        return null;
-      }]);
-
-      let something = fun([[], function() {
-        return Elephant.defstruct();
-      }]);
-
-      export default {
-        something: something
-      };
-
-      const __MODULE__ = Erlang.atom('Elephant');
-      function defstruct(trunk = true) {
-        return {
-          __struct__: __MODULE__,
-          trunk: trunk
-        };
-      }
-
-      export default {defstruct: defstruct};
+         import * as Elephant from 'animals/elephant';
+         const __MODULE__ = Erlang.atom('Animals');
+         let something_else = fun([[], function()    {
+             return     null;
+           }]);
+         let something = fun([[], function()    {
+             return     Elephant.defstruct();
+           }]);
+         export {
+             something: something
+       };
+         const __MODULE__ = Erlang.atom('Elephant');
+         function defstruct(trunk = true)        {
+                 return     {
+                     [Erlang.atom('__struct__')]: __MODULE__,         [Erlang.atom('trunk')]: trunk
+           };
+               }
+         export {
+             defstruct: defstruct
+       };
 
     """
 
@@ -165,43 +161,36 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
-      import Elephant from 'animals/elephant';
-      import Bear from 'animals/bear';
-      const __MODULE__ = Erlang.atom('Animals');
-
-
-      let something_else = fun([[], function() {
-        return null;
-      }]);
-
-      let something = fun([[], function() {
-        return Elephant.defstruct();
-      }]);
-
-      export default {
-        something: something
-      };
-
-      const __MODULE__ = Erlang.atom('Elephant');
-
-      function defstruct(trunk = true) {
-        return {
-          __struct__: __MODULE__,
-          trunk: trunk
-        };
-      }
-
-      export default {defstruct: defstruct};
-
-      const __MODULE__ = Erlang.atom('Bear');
-      function defstruct(trunk = true) {
-        return {
-          __struct__: __MODULE__,
-          trunk: trunk
-        };
-      }
-
-      export default {defstruct: defstruct};
+        import * as Bear from 'animals/bear';
+         import * as Elephant from 'animals/elephant';
+         const __MODULE__ = Erlang.atom('Animals');
+         let something_else = fun([[], function()    {
+             return     null;
+           }]);
+         let something = fun([[], function()    {
+             return     Elephant.defstruct();
+           }]);
+         export {
+             something: something
+       };
+         const __MODULE__ = Erlang.atom('Elephant');
+         function defstruct(trunk = true)        {
+                 return     {
+                     [Erlang.atom('__struct__')]: __MODULE__,         [Erlang.atom('trunk')]: trunk
+           };
+               }
+         export {
+             defstruct: defstruct
+       };
+         const __MODULE__ = Erlang.atom('Bear');
+         function defstruct(trunk = true)        {
+                 return     {
+                     [Erlang.atom('__struct__')]: __MODULE__,         [Erlang.atom('trunk')]: trunk
+           };
+               }
+         export {
+             defstruct: defstruct
+       };
     """
 
     assert_translation(ex_ast, js_code)
@@ -232,21 +221,36 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
-     import Elephant from 'animals/elephant';
-     const __MODULE__ = Erlang.atom('Animals');
-     let something_else = fun([[], function(){return null;}]);
-     let something = fun([[], function(){return Elephant.defstruct();}]);
-
-     export default {something: something};
-     import Bear from 'animals/elephant/bear';
-
-     const __MODULE__ = Erlang.atom('Elephant');
-     function defstruct(trunk = true){return {__struct__: __MODULE__, trunk: trunk};}
-     export default {defstruct: defstruct};
-
-     const __MODULE__ = Erlang.atom('Bear');
-     function defstruct(trunk = true){return {__struct__: __MODULE__, trunk: trunk};}
-     export default {defstruct: defstruct};
+         import * as Elephant from 'animals/elephant';
+         const __MODULE__ = Erlang.atom('Animals');
+         let something_else = fun([[], function()    {
+             return     null;
+           }]);
+         let something = fun([[], function()    {
+             return     Elephant.defstruct();
+           }]);
+         export {
+             something: something
+       };
+         import * as Bear from 'animals/elephant/bear';
+         const __MODULE__ = Erlang.atom('Elephant');
+         function defstruct(trunk = true)        {
+                 return     {
+                     [Erlang.atom('__struct__')]: __MODULE__,         [Erlang.atom('trunk')]: trunk
+           };
+               }
+         export {
+             defstruct: defstruct
+       };
+         const __MODULE__ = Erlang.atom('Bear');
+         function defstruct(trunk = true)        {
+                 return     {
+                     [Erlang.atom('__struct__')]: __MODULE__,         [Erlang.atom('trunk')]: trunk
+           };
+               }
+         export {
+             defstruct: defstruct
+       };
     """
 
     assert_translation(ex_ast, js_code)

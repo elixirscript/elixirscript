@@ -8,7 +8,7 @@ defmodule ElixirScript.Translator.Alias.Test do
     end
 
     js_code = """
-      import World from 'hello/world';
+      import * as World from 'hello/world';
     """
 
     assert_translation(ex_ast, js_code)
@@ -20,11 +20,22 @@ defmodule ElixirScript.Translator.Alias.Test do
     end
 
     js_code = """
-    import { default as Test } from 'hello/world';
+    import * as Test from 'hello/world';
     """
 
     assert_translation(ex_ast, js_code)
   end
 
+  should "translate default alias with as" do
+    ex_ast = quote do
+      alias Hello.World, [as: Test, default: true]
+    end
+
+    js_code = """
+    import { default as Test } from 'hello/world';
+    """
+
+    assert_translation(ex_ast, js_code)
+  end
 
 end

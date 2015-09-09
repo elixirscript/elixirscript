@@ -40,8 +40,10 @@ defmodule ElixirScript.Lib.Kernel do
     )
   end
 
-  defp do_translate({:.., _, [first, last]}, _) do
-    Translator.translate(quote do: Range.(unquote(first), unquote(last)))
+  defp do_translate({:.., _, [first, last]}, env) do
+    quoted_range = quote do: Range.(unquote(first), unquote(last))
+
+    Translator.translate(quoted_range, env)
   end
 
   defp do_translate({:abs, _, [number]}, env) do
@@ -164,12 +166,12 @@ defmodule ElixirScript.Lib.Kernel do
     |> Translator.translate(env)
   end
 
-  defp do_translate({:|>, _, [left, right]}, _) do
+  defp do_translate({:|>, _, [left, right]}, env) do
     case right do
       {{:., meta, [module, fun]}, meta2, params} ->
-        Translator.translate({{:., meta, [module, fun]}, meta2, [left] ++ params})  
+        Translator.translate({{:., meta, [module, fun]}, meta2, [left] ++ params}, env)  
       {fun, meta, params} ->
-        Translator.translate({fun, meta, [left] ++ params})     
+        Translator.translate({fun, meta, [left] ++ params}, env)     
     end
   end
 
@@ -198,18 +200,18 @@ defmodule ElixirScript.Lib.Kernel do
     )
   end
 
-  defp do_translate({:raise, _, [alias_info, attributes]}, _) do
+  defp do_translate({:raise, _, [alias_info, attributes]}, env) do
     {_, _, name} = alias_info
 
-    Raise.throw_error(name, attributes)
+    Raise.throw_error(name, attributes, env)
   end
 
-  defp do_translate({:raise, _, [message]}, _) do
-    Raise.throw_error(message)
+  defp do_translate({:raise, _, [message]}, env) do
+    Raise.throw_error(message, env)
   end
 
-  defp do_translate({:to_string, _, [param]}, _) when is_binary(param) do
-    Translator.translate(param)
+  defp do_translate({:to_string, _, [param]}, env) when is_binary(param) do
+    Translator.translate(param, env)
   end
 
   defp do_translate({name, _, params}, env) do

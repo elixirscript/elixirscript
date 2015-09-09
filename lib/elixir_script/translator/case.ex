@@ -10,7 +10,7 @@ defmodule ElixirScript.Translator.Case do
         Function.make_anonymous_function(clauses, env),
         JS.identifier("call")
       ),
-      [JS.identifier(:this), Translator.translate(condition)]
+      [JS.identifier(:this), Translator.translate(condition, env)]
     )
   end  
 end

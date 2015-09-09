@@ -18,32 +18,32 @@ defmodule ElixirScript.Translator.Function do
     JS.variable_declaration([declarator], :let)
   end
 
-  def make_anonymous_function(functions, env \\ __ENV__) do
+  def make_anonymous_function(functions, env) do
     clauses = functions
     |> Stream.map(fn(x) -> Variables.process(x) end)
     |> Stream.map(fn
       {:->, _, [ [{:when, _, [params | guards]}], body ]} ->
-        { patterns, params } = Match.build_match(List.wrap(params))
+        { patterns, params } = Match.build_match(List.wrap(params), env)
         params = make_params(params)
         body = make_body(body, env)
         guard_body = make_guards(guards, env)
         do_make_function_clause(patterns, params, body, guard_body)
 
       ({:->, _, [params, body]}) ->
-        { patterns, params } = Match.build_match(params)
+        { patterns, params } = Match.build_match(params, env)
         params = make_params(params)
         body = make_body(body, env)
         do_make_function_clause(patterns, params, body)        
 
       ({_, _, [{:when, _, [{_, _, params} | guards] }, [do: body]]}) ->
-        { patterns, params } = Match.build_match(params)
+        { patterns, params } = Match.build_match(params, env)
         params = make_params(params)
         body = make_body(body, env)
         guard_body = make_guards(guards, env)
         do_make_function_clause(patterns, params, body, guard_body)
 
       ({_, _, [{_, _, params}, [do: body]]}) ->
-        { patterns, params } = Match.build_match(params)
+        { patterns, params } = Match.build_match(params, env)
         params = make_params(params)
         body = make_body(body, env)
         do_make_function_clause(patterns, params, body)
@@ -142,7 +142,9 @@ defmodule ElixirScript.Translator.Function do
         name
       {name, _, _} when is_atom(name) ->
         name
-      {{:., _, [_module_name, _function_name]}, _, _params } = ast ->
+      {{:., _, [_, _]}, _, _ } = ast ->
+        ast
+      {{:., _, [{:__aliases__, _, _}]}, _, _} = ast ->
         ast
       name ->
         case to_string(name) do

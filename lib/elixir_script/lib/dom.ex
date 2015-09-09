@@ -2,6 +2,7 @@ defmodule ElixirScript.Lib.DOM do
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
 
+
   def translate_dom_function(name, params, env) do
     do_translate({name, [], params}, env)
   end
@@ -41,6 +42,14 @@ defmodule ElixirScript.Lib.DOM do
   end
 
   defp config_to_map(config) do
+    config = Enum.map(config, fn({key, value}) ->
+    if is_atom(key) do
+      {Atom.to_string(key), value}
+    else
+      {key, value}
+    end
+    end)
+    
     {:%{}, [], config}
   end
 
