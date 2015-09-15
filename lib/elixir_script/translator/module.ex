@@ -13,8 +13,8 @@ defmodule ElixirScript.Translator.Module do
   end
 
   def make_module(module_name_list, body, env) do
-    body = make_inner_module_aliases(module_name_list, body)
     body = Using.process(body, env)
+    { body, aliases } = Aliases.process(body, env)
 
     { body, functions } = extract_functions_from_module(body)
     { exported_functions, private_functions } = process_functions(functions, env)
@@ -37,7 +37,7 @@ defmodule ElixirScript.Translator.Module do
 
     #Add imports found from walking the ast
     #and make sure to only put one declaration per alias    
-    imports = process_imports(imports)
+    imports = process_imports(imports, aliases)
     imports = imports.imports
 
     #Collect all the functions so that we can process their arity
@@ -80,34 +80,6 @@ defmodule ElixirScript.Translator.Module do
     ] ++ List.flatten(modules)
     
     result
-  end
-
-  defp make_inner_module_aliases(module_name_list, body) do
-    case body do
-      {:__block__, meta2, list2} ->
-        list2 = Enum.map(list2, fn(x) ->
-          case x do
-            {:defmodule, meta1, [{:__aliases__, meta2, module_name_list2}, [do: body2]]} ->
-              [
-                {:defmodule, meta1, [{:__aliases__, meta2, module_name_list ++ module_name_list2}, [do: body2]]},
-                {:alias, meta1, [{:__aliases__, [alias: false], module_name_list ++ module_name_list2}]}
-              ]    
-            _ ->
-              x
-          end
-        end)
-        |> List.flatten
-
-        {:__block__, meta2, list2}
-      {:defmodule, meta1, [{:__aliases__, meta2, module_name_list2}, [do: body2]]} ->
-        {:__block__, meta2, [
-            {:defmodule, meta1, [{:__aliases__, meta2, module_name_list ++ module_name_list2}, [do: body2]]},
-            {:alias, meta1, [{:__aliases__, [alias: false], module_name_list ++ module_name_list2}]}
-          ]
-        }
-      _ ->
-        body 
-    end
   end
 
   defp extract_functions_from_module({:__block__, meta, body_list}) do
@@ -182,8 +154,8 @@ defmodule ElixirScript.Translator.Module do
     end
   end
 
-  defp process_imports(imports) do
-    imports
+  defp process_imports(imports, aliases) do
+    imports ++ make_imports(aliases)
     |> Enum.reduce(HashSet.new, fn(x, acc)-> 
       HashSet.put(acc, x) 
     end)

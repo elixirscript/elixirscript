@@ -3,12 +3,17 @@ defmodule ElixirScript.Translator.Primitive do
   alias ESTree.Tools.Builder
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Quote
+  alias ElixirScript.Translator.Utils
 
   def make_wildcard() do
     Builder.member_expression(
       Builder.identifier("fun"),
       Builder.identifier("wildcard")
     )
+  end
+
+  def make_identifier({:__aliases__, _, aliases}) do
+    Utils.make_module_expression_tree(aliases, false, __ENV__)
   end
 
   def make_identifier([ast]) do

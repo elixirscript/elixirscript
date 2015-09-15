@@ -136,11 +136,6 @@ You should be able to use `use` in modules now as well, but modules that have `_
 
 # Limitations
 
-#### Must alias modules used within a module
-
-This used to be done automatically, but was too unstable to keep in. 
-For now, you must alias all the modules you intent to use within a module.
-
 #### Not all of the Kernel.SpecialForms module is defined
 
 The following aren't defined (yet):
@@ -155,7 +150,6 @@ The following are defined but incomplete:
 * try - Missing an implementation for the `else` block
 * for - `into` not implementated yet
 * bitstring - Implemented, but no pattern matching support yet
-* import - works with `only` and nothing else. 
 
 #### Most of the Standard Library isn't defined yet
 A lot of functions in the Kernel module are implemented. The Enum, Atom, List, Tuple, Logger, and Range modules are either fully defined are not complete. The rest still need to be implemented. Some modules like System or File may not be useful or function in the browser and may end up being only useful when using ElixirScript outside of the browser.

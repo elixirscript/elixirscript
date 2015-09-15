@@ -7,6 +7,8 @@ defmodule ElixirScript.Lib.JS do
 
   defmacro update(object, property, value)
 
+  defmacro import(module, from)
+
   @doc false
   def translate_js_function(name, params, env) do
     do_translate({name, [], params}, env)
@@ -35,6 +37,32 @@ defmodule ElixirScript.Lib.JS do
         true        
       ),
       Translator.translate(value, env)
+    )
+  end
+
+  defp do_translate({:import, _, [module_names, from]}, env) when is_list(module_names) do
+    import_specifiers = Enum.map(module_names, fn(x) -> 
+        Builder.import_specifier(
+          Translator.translate(x, env),
+          Translator.translate(x, env)
+        )
+    end)
+
+    Builder.import_declaration(
+      import_specifiers, 
+      Builder.identifier("'#{from}'")
+    )
+  end
+
+  defp do_translate({:import, _, [module_name, from]}, env) do
+    import_specifier = Builder.import_specifier(
+      Builder.identifier("default"),
+      Translator.translate(module_name, env)
+    )
+
+    Builder.import_declaration(
+      [import_specifier], 
+      Builder.identifier("'#{from}'")
     )
   end
 

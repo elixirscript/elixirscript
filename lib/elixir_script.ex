@@ -42,18 +42,39 @@ defmodule ElixirScript do
     include_path = Dict.get(opts, :include_path, false)
     root = Dict.get(opts, :root)
     env = Dict.get(opts, :env, custom_env)
+    import_standard_libs? = Dict.get(opts, :import_standard_libs, true)
 
-    case Translator.translate(quoted, env) do
-      modules when is_list(modules) ->
-        List.flatten(modules)
-        |> Enum.map(fn(x) ->
-          convert_to_code(x, root, include_path, env)
-        end)
-      module ->
-        List.wrap(
-          convert_to_code(module, root, include_path, env)
-        )
+
+    ElixirScript.State.start_link(env)
+    build_environment([quoted])
+
+    if Set.size(ElixirScript.State.get().modules) > 0 do
+      create_code(root, include_path, import_standard_libs?)
+    else
+      result = case Translator.translate(quoted, env) do
+        modules when is_list(modules) ->
+          List.flatten(modules)
+          |> Enum.map(fn(x) ->
+            convert_to_code(x, root, include_path, env, import_standard_libs?)
+          end)
+        module ->
+          List.wrap(
+            convert_to_code(module, root, include_path, env, import_standard_libs?)
+          )
+      end
+
+      ElixirScript.State.stop
+
+      result
     end
+  end
+
+  def make_defmodule({:defmodule, _, _} = ast) do
+    ast
+  end
+
+  def make_defmodule(ast) do
+    {:defmodule, [], [{:__aliases__, [], [:Temp]}, [do: { :__block__, [], [ast] }]]}
   end
 
   @doc """
@@ -65,23 +86,43 @@ defmodule ElixirScript do
     root = Dict.get(opts, :root)
     env = Dict.get(opts, :env, custom_env)
 
+    ElixirScript.State.start_link(env)
+
     path
     |> Path.wildcard
     |> Enum.map(fn(x) -> 
       File.read!(x)
       |> Code.string_to_quoted!
-      |> Translator.translate(env)
     end)
-    |> List.flatten
-    |> Enum.map(fn(x) ->
-      convert_to_code(x, root, include_path, env)
-    end)
+    |> build_environment
+
+
+    create_code(root, include_path, true)
+  end
+
+  defp build_environment(code_list) do
+    code_list
+    |> ElixirScript.Preprocess.Environment.get_info    
   end
 
   defp custom_env() do
     require Logger
-    require ElixirScript.Lib.JS
+    require ElixirScript.Lib.JS, as: JS
     __ENV__
+  end
+
+  defp create_code(root, include_path, import_standard_libs?) do
+    result = Enum.map(ElixirScript.State.get().modules, fn(x) ->
+      ElixirScript.Translator.Module.make_module(x.name, x.body, ElixirScript.State.get().env)
+    end)
+    |> List.flatten
+    |> Enum.map(fn(x) ->
+      convert_to_code(x, root, include_path, ElixirScript.State.get().env, import_standard_libs?)
+    end)
+
+    ElixirScript.State.stop
+
+    result
   end
 
   @doc """
@@ -92,39 +133,52 @@ defmodule ElixirScript do
     File.cp_r!(operating_path <> "/dist", destination)
   end
 
-  defp convert_to_code(js_ast, root, include_path, env) do
+  defp convert_to_code(js_ast, root, include_path, env, import_standard_libs \\ true) do
       js_ast
-      |> process_module(root, env)
+      |> process_module(root, env, import_standard_libs)
       |> javascript_ast_to_code
       |> process_include_path(include_path)
   end
 
-  defp process_module(%JSModule{} = module, root, env) do
+  defp process_module(%JSModule{} = module, root, env, import_standard_libs) do
     file_path = create_file_name(module)
 
-    program = create_standard_lib_imports(root, env) ++ module.body
+    standard_libs_import = if import_standard_libs do
+      create_standard_lib_imports(root, env)
+    else
+      []
+    end
+
+    program = standard_libs_import ++ module.body
     |> ESTree.Tools.Builder.program
 
     { file_path, program }
   end
 
-  defp process_module(module, _root, _) do
+  defp process_module(module, _root, _, _) do
     { "", module }
   end
 
   defp create_standard_lib_imports(root, env) do
-    module_name_list = [:Elixir]
-    options = [
-      from: root(root) <> "elixir", 
-      only: [
-        fun: 1, virtualDom: 1, 
-        Erlang: 1, Kernel: 1, Atom: 1, Enum: 1, Integer: 1, 
-        JS: 1, List: 1, Range: 1, Tuple: 1, Agent: 1, Keyword: 1,
-        Fetch: 1
-      ]
+    module_names = [
+      :fun, :Erlang, :Kernel, :Atom, :Enum, :Integer, 
+      :JS, :List, :Range, :Tuple, :Agent, :Keyword,
+      :Fetch
     ]
 
-    [ElixirScript.Translator.Import.make_import(module_name_list, options, env)]
+    import_specifiers = Enum.map(module_names, fn(x) -> 
+        Builder.import_specifier(
+          Builder.identifier(x),
+          Builder.identifier(x)
+        )
+    end)
+
+    import_declaration = Builder.import_declaration(
+      import_specifiers, 
+      Builder.identifier("'#{root(root) <> "elixir"}'")
+    )
+
+    [import_declaration]
   end
 
   defp root(nil) do

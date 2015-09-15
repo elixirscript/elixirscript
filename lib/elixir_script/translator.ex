@@ -23,7 +23,6 @@ defmodule ElixirScript.Translator do
   alias ElixirScript.Lib.Logger
   alias ElixirScript.Lib.Kernel, as: KernelLib
   alias ElixirScript.Lib.JS, as: JSLib
-  alias ElixirScript.Lib.DOM, as: DOMLib
   alias ESTree.Tools.Builder, as: JS
 
   @doc """
@@ -155,8 +154,6 @@ defmodule ElixirScript.Translator do
         KernelLib.translate_kernel_function(function_name, params, env)
       {:__aliases__, _, [:JS]} ->
         JSLib.translate_js_function(function_name, params, env)
-      {:__aliases__, _, [:DOM]} ->
-        DOMLib.translate_dom_function(function_name, params, env)
       _ ->
         expanded_ast = Macro.expand(ast, env)
         if expanded_ast == ast do
@@ -172,7 +169,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:__aliases__, _, aliases}, _) do
-    Primitive.make_identifier(aliases)
+    Primitive.make_identifier({:__aliases__, [], aliases})
   end
 
   defp do_translate({:__block__, _, expressions }, env) do
@@ -220,8 +217,12 @@ defmodule ElixirScript.Translator do
     Quote.make_quote(opts, expr, env)
   end
 
-  defp do_translate({:import, _, [{:__aliases__, _, module_name_list}, [only: functions] ]}, env) do
-    Import.make_import(module_name_list, [only: functions], env)
+  defp do_translate({:import, _, [{:__aliases__, _, module_name_list}, params ]}, env) do
+    if params[:only] == nil do
+      raise ElixirScript.UnsupportedError, "import without `:only` option"      
+    end
+
+    Import.make_import(module_name_list, params, env)
   end
 
   defp do_translate({ :import, _, _ }, _) do

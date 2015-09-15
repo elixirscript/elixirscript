@@ -1,19 +1,16 @@
 # v0.11.0-dev
 * Enhancement
-  * Added `JS` module with `new` and `mutate` functions
+  * `import` works with all options
+  * Added `JS` module with `new`, `mutate`, `import` macros
   * All Standard libraries are rolled up into one elixir.js file and imported from that
-  * Added `DOM` module for creating virtual DOM nodes, and diffing them and applying patches to real DOM 
   * Added `Fetch` module to wrap fetch API
   * Added `Keyword` module with functions, `has_key?` and `get`
   * Added `Agent` module with functions, `start`, `get`, `update`, and `get_and_update`
   * Map keys are now correctly turned into their atom counterparts if atom keys are used
   * Modules no longer export a default object
-  * Added `default` option to alias
   * `alias` now translates to a namespace import unless `default` option is given
 
 * Breaking
-  * import - `only` option is the only one allowed
-  * aliases are now longer automatically turned into ES6 import statements. You must alias all modules used within a module
   * `Mutable.update` has been replaced by `JS.mutate`
   * `transpile`, `transpile_quoted`, and `transpile_path` are now `compile`, `compile_quoted`, and `compile_path`
 
