@@ -163,7 +163,7 @@ defmodule ElixirScript do
     module_names = [
       :fun, :Erlang, :Kernel, :Atom, :Enum, :Integer, 
       :JS, :List, :Range, :Tuple, :Agent, :Keyword,
-      :Fetch
+      :BitString
     ]
 
     import_specifiers = Enum.map(module_names, fn(x) -> 
