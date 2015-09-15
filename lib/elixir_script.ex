@@ -102,7 +102,7 @@ defmodule ElixirScript do
 
   defp build_environment(code_list) do
     code_list
-    |> ElixirScript.Preprocess.Environment.get_info    
+    |> ElixirScript.Preprocess.Modules.get_info    
   end
 
   defp custom_env() do

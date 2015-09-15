@@ -51,6 +51,13 @@ defmodule ElixirScript.Translator.Import do
 
     functions = State.get_module(module_name_list).functions
 
+    functions = Enum.map(functions, fn
+      ({name, _arity}) ->
+        name
+      (name) ->
+        name 
+    end)
+
     specifiers = Enum.map(functions, fn
       ({name, _arity}) ->
         name = JS.identifier(name)
@@ -59,7 +66,7 @@ defmodule ElixirScript.Translator.Import do
           name
         )
       (name) ->
-        name = Translator.translate(name, env)
+        name = JS.identifier(name)
         JS.import_specifier(
           name,
           name
@@ -76,9 +83,16 @@ defmodule ElixirScript.Translator.Import do
 
     functions = State.get_module(module_name_list).functions
 
+    functions = Enum.map(functions, fn
+      ({name, _arity}) ->
+        name
+      (name) ->
+        name 
+    end)
+
     specifiers = Enum.map(functions, fn
       (name) ->
-        name = Translator.translate(name, env)
+        name = JS.identifier(name)
         JS.import_specifier(
           name,
           name
@@ -105,11 +119,11 @@ defmodule ElixirScript.Translator.Import do
 
     specifiers = Enum.map(functions, fn
       (name) ->
-        name = Translator.translate(name, env)
+        name = JS.identifier(name)
         JS.import_specifier(
           name,
           name
-        )   
+        )  
     end)
 
     import_path = make_source(module_name_list)
@@ -132,7 +146,7 @@ defmodule ElixirScript.Translator.Import do
 
     specifiers = Enum.map(functions, fn
       (name) ->
-        name = Translator.translate(name, env)
+        name = JS.identifier(name)
         JS.import_specifier(
           name,
           name
@@ -159,11 +173,11 @@ defmodule ElixirScript.Translator.Import do
   end
 
   def get_functions_from_module(module, [only: only]) do
-    Set.intersection(Enum.into(only, HastSet.new), Enum.into(module.functions, HastSet.new))
+    Set.intersection(Enum.into(only, HashSet.new), Enum.into(module.functions, HashSet.new))
   end
 
   def get_functions_from_module(module, [except: except]) do
-    Set.difference(Enum.into(module.functions, HastSet.new), Enum.into(except, HastSet.new))    
+    Set.difference(Enum.into(module.functions, HashSet.new), Enum.into(except, HashSet.new))    
   end
 
 end

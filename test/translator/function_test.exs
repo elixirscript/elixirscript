@@ -600,6 +600,22 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
         ]
       );
     """
+    assert_translation(ex_ast, js_code)
+  end
+
+  should "pattern match function with map reference" do
+    ex_ast = quote do
+      def something(%{ which: 13 } = a) do
+      end
+    end
+
+    js_code = """
+     let something = fun([[fun.capture({
+        'which': 13
+       })], function(a)    {
+         return     null;
+       }]);
+    """
 
     assert_translation(ex_ast, js_code)
   end

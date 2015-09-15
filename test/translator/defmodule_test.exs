@@ -241,17 +241,101 @@ defmodule ElixirScript.Translator.Defmodule.Test do
 
       defmodule Lions.Tigers do
         Lions.Tigers.Bears.oh_my()
+
+        def oh_my() do
+        end
+      end
+    end 
+
+    js_code = """
+         const __MODULE__ = Erlang.atom('Tigers');
+         let oh_my = fun([[], function()    {
+             return     null;
+           }]);
+         JS.get_property_or_call_function(Lions.Tigers.Bears,'oh_my');
+         export {
+             oh_my
+       };
+
+         import * as Tigers from 'lions/tigers';
+         const __MODULE__ = Erlang.atom('Animals');
+         JS.get_property_or_call_function(Tigers,'oh_my');
+         export {};
+    """
+
+    assert_translation(ex_ast, js_code)
+  end
+
+  should "import only" do
+    ex_ast = quote do
+      defmodule Lions.Tigers do
+        def oh_my() do
+        end
+
+        def oh_my2() do
+        end
+      end
+
+      defmodule Animals do
+        import Lions.Tigers, only: [oh_my: 1]
+
+        oh_my()
+      end
+    end 
+
+    js_code = """
+         import { oh_my } from 'lions/tigers';
+         const __MODULE__ = Erlang.atom('Animals');
+         oh_my();
+         export {};
+
+         const __MODULE__ = Erlang.atom('Tigers');
+         let oh_my2 = fun([[], function()    {
+             return     null;
+           }]);
+         let oh_my = fun([[], function()    {
+             return     null;
+           }]);
+         export {
+             oh_my2,     oh_my
+       };
+    """
+
+    assert_translation(ex_ast, js_code)
+  end
+
+  should "import except" do
+    ex_ast = quote do
+      defmodule Lions.Tigers do
+        def oh_my() do
+        end
+
+        def oh_my2() do
+        end
+      end
+
+      defmodule Animals do
+        import Lions.Tigers, except: [oh_my: 1]
+
+        oh_my2()
       end
     end 
 
     js_code = """
      const __MODULE__ = Erlang.atom('Tigers');
-     JS.get_property_or_call_function(Lions.Tigers.Bears,'oh_my');
-     export {};
+     let oh_my2 = fun([[], function()    {
+         return     null;
+       }]);
+     let oh_my = fun([[], function()    {
+         return     null;
+       }]);
+     export {
+         oh_my2,     oh_my
+   };
 
-     import * as Tigers from 'lions/tigers';
+     import { oh_my2 } from 'lions/tigers';
      const __MODULE__ = Erlang.atom('Animals');
-     JS.get_property_or_call_function(Tigers,'oh_my');
+     oh_my2();
      export {};
     """
 

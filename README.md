@@ -16,7 +16,7 @@ ElixirScript can be used in the following ways:
 * If using as part of a project, you can add the following to your deps
 
   ```elixir
-    {:elixir_script, "~> 0.10"}
+    {:elixir_script, "~> 0.11"}
   ```
 
   From there you can either use the ElixirScript module directly or the mix command, `mix ex2js`
@@ -103,7 +103,7 @@ import {...} from 'js/elixir'
 
 # Macros
 
-Macros can be used when using ElixirScript as a library if the Macros are loaded into the current environment or if you give it a custom environment with the `env` option
+Macros can only be used when using ElixirScript as a library if the Macros are loaded into the current environment or if you give it a custom environment with the `env` option
 
 ```elixir
 #module with macro defined
@@ -133,6 +133,18 @@ ElixirScript.compile("""
 
 You should be able to use `use` in modules now as well, but modules that have `__using__` macros must also be require'd so that they can be expanded.
 
+
+# Using JavaScript libraries
+
+You can use `alias`, `import`, and `require` as you would in Elixir (sans macros).
+
+For JavaScript modules, use `JS.import`
+
+```elixir
+JS.import A, "a" #translates to "import {default as A} from 'a'"
+
+JS.import [A, B, C], "a" #translates to "import {A, B, C} from 'a'"
+```
 
 # Limitations
 

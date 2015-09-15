@@ -1,69 +1,38 @@
 defmodule ElixirScript.Lib.JS do
-  alias ESTree.Tools.Builder
-  alias ElixirScript.Translator
-  alias ElixirScript.Translator.Utils
 
+  @doc """
+  Creates new JavaScript objects.
+
+  ex:
+    JS.new User, ["first_name", "last_name"]
+  """
   defmacro new(module, params)
 
+
+  @doc """
+  Updates an existing JavaScript object.
+
+  ex:
+    JS.update elem, "width", 100
+  """
   defmacro update(object, property, value)
 
+
+  @doc """
+  Imports a JavaScript module.
+
+  Elixir modules can use the normal `import`, `alias` and `require`,
+  but JavaScript modules work differently and have to be imported
+  using this.
+
+  If module is not a list, then it is treated as a default import, 
+  otherwise it is not. 
+
+  ex:
+    JS.import A, "a" #translates to "import {default as A} from 'a'"
+
+    JS.import [A, B, C], "a" #translates to "import {A, B, C} from 'a'"
+  """
   defmacro import(module, from)
-
-  @doc false
-  def translate_js_function(name, params, env) do
-    do_translate({name, [], params}, env)
-  end
-
-  defp do_translate({:new, _, [{:__aliases__, _, module_name}, params]}, env) do
-    Builder.new_expression(
-      Utils.make_module_expression_tree(module_name, false, env),
-      Enum.map(params, &Translator.translate(&1, env))
-    )
-  end
-
-  defp do_translate({:new, _, [module_name, params]}, env) do
-    Builder.new_expression(
-      Translator.translate(module_name, env),
-      Enum.map(params, &Translator.translate(&1, env))
-    )
-  end
-
-  defp do_translate({:update, _, [object, property, value]}, env) do
-    Builder.assignment_expression(
-      :=,
-      Builder.member_expression(
-        Translator.translate(object, env),
-        Translator.translate(property, env),
-        true        
-      ),
-      Translator.translate(value, env)
-    )
-  end
-
-  defp do_translate({:import, _, [module_names, from]}, env) when is_list(module_names) do
-    import_specifiers = Enum.map(module_names, fn(x) -> 
-        Builder.import_specifier(
-          Translator.translate(x, env),
-          Translator.translate(x, env)
-        )
-    end)
-
-    Builder.import_declaration(
-      import_specifiers, 
-      Builder.identifier("'#{from}'")
-    )
-  end
-
-  defp do_translate({:import, _, [module_name, from]}, env) do
-    import_specifier = Builder.import_specifier(
-      Builder.identifier("default"),
-      Translator.translate(module_name, env)
-    )
-
-    Builder.import_declaration(
-      [import_specifier], 
-      Builder.identifier("'#{from}'")
-    )
-  end
 
 end

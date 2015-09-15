@@ -20,9 +20,9 @@ defmodule ElixirScript.Translator do
   alias ElixirScript.Translator.Receive
   alias ElixirScript.Translator.Quote
   alias ElixirScript.Translator.Utils
-  alias ElixirScript.Lib.Logger
-  alias ElixirScript.Lib.Kernel, as: KernelLib
-  alias ElixirScript.Lib.JS, as: JSLib
+  alias ElixirScript.Translator.Kernel, as: KernelLib
+  alias ElixirScript.Translator.Logger
+  alias ElixirScript.Translator.JS, as: JSLib
   alias ESTree.Tools.Builder, as: JS
 
   @doc """
@@ -218,15 +218,11 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:import, _, [{:__aliases__, _, module_name_list}, params ]}, env) do
-    if params[:only] == nil do
-      raise ElixirScript.UnsupportedError, "import without `:only` option"      
-    end
-
     Import.make_import(module_name_list, params, env)
   end
 
-  defp do_translate({ :import, _, _ }, _) do
-    raise ElixirScript.UnsupportedError, "import without `:only` option"
+  defp do_translate({:import, _, [{:__aliases__, _, module_name_list}]}, env) do
+    Import.make_import(module_name_list, [], env)
   end
 
   defp do_translate({:alias, _, [alias_info, options]}, _) when is_tuple(alias_info) do

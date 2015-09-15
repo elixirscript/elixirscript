@@ -3,7 +3,6 @@
   * `import` works with all options
   * Added `JS` module with `new`, `mutate`, `import` macros
   * All Standard libraries are rolled up into one elixir.js file and imported from that
-  * Added `Fetch` module to wrap fetch API
   * Added `Keyword` module with functions, `has_key?` and `get`
   * Added `Agent` module with functions, `start`, `get`, `update`, and `get_and_update`
   * Map keys are now correctly turned into their atom counterparts if atom keys are used

@@ -50,7 +50,9 @@ defmodule ElixirScript.Translator.Quote.Test do
         quote do: test(1)
     end
 
-    js_code = "Erlang.tuple(Erlang.atom('test'), Erlang.list(), Erlang.list(1))"
+    js_code = "Erlang.tuple(Erlang.atom('test'), 
+      Erlang.list(Erlang.tuple(Erlang.atom('context'),Erlang.atom('Elixir.ElixirScript.Translator.Quote.Test')),Erlang.tuple(Erlang.atom('import'),Erlang.atom('Elixir.ExUnit.Case'))), 
+      Erlang.list(1))"
 
     assert_translation(ex_ast, js_code)
   end
@@ -61,9 +63,11 @@ defmodule ElixirScript.Translator.Quote.Test do
         quote do: test(x)
     end
 
-    js_code = " Erlang.tuple(Erlang.atom('test'), Erlang.list(), Erlang.list(
-      Erlang.tuple(Erlang.atom('x'), Erlang.list(), Erlang.atom('Elixir.ElixirScript.Translator.Quote.Test'))
-    ))"
+    js_code = "Erlang.tuple(
+      Erlang.atom('test'),
+      Erlang.list(Erlang.tuple(Erlang.atom('context'),Erlang.atom('Elixir.ElixirScript.Translator.Quote.Test')),Erlang.tuple(Erlang.atom('import'),Erlang.atom('Elixir.ExUnit.Case'))),
+      Erlang.list(Erlang.tuple(Erlang.atom('x'),Erlang.list(),Erlang.atom('Elixir.ElixirScript.Translator.Quote.Test')))
+    )"
 
     assert_translation(ex_ast, js_code)
   end
@@ -74,7 +78,11 @@ defmodule ElixirScript.Translator.Quote.Test do
         quote do: test(unquote(x))
     end
 
-    js_code = "Erlang.tuple(Erlang.atom('test'), Erlang.list(), Erlang.list(x))"
+    js_code = "Erlang.tuple(
+      Erlang.atom('test'), 
+      Erlang.list(Erlang.tuple(Erlang.atom('context'),Erlang.atom('Elixir.ElixirScript.Translator.Quote.Test')),Erlang.tuple(Erlang.atom('import'),Erlang.atom('Elixir.ExUnit.Case'))),
+      Erlang.list(x)
+    )"
 
     assert_translation(ex_ast, js_code)
   end

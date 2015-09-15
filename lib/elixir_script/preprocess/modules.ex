@@ -1,4 +1,6 @@
-defmodule ElixirScript.Preprocess.Environment do
+defmodule ElixirScript.Preprocess.Modules do
+  @moduledoc false
+
   alias ElixirScript.State
 
   def get_info(modules) do

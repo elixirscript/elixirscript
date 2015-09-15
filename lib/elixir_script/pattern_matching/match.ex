@@ -129,11 +129,11 @@ defmodule ElixirScript.PatternMatching.Match do
     do_build_match({:%{}, meta, props}, env)
   end
 
-  defp do_build_match({:=, _, [{name, _, _}, right]}, env) when not name in [:%, :{}, :__aliases__, :^] do
+  defp do_build_match({:=, _, [{name, _, _}, right]}, env) when not name in [:%, :{}, :__aliases__, :^, :%{}] do
     unify(name, right, env)
   end
 
-  defp do_build_match({:=, _, [left, {name, _, _}]}, env) when not name in [:%, :{}, :__aliases__, :^] do
+  defp do_build_match({:=, _, [left, {name, _, _}]}, env) when not name in [:%, :{}, :__aliases__, :^, :%{}] do
     unify(name, left, env)
   end
 

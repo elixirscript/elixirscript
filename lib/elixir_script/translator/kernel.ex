@@ -1,4 +1,4 @@
-defmodule ElixirScript.Lib.Kernel do
+defmodule ElixirScript.Translator.Kernel do
   @moduledoc false
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
