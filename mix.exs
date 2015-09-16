@@ -4,7 +4,7 @@ defmodule ElixirScript.Mixfile do
   def project do
     [
       app: :elixir_script,
-      version: "0.11.0-dev",
+      version: "0.11.0",
       elixir: "~> 1.0",
       escript: escript_config,
       deps: deps,
@@ -93,7 +93,7 @@ defmodule ElixirScript.Mixfile do
 
   def install(_) do
     Mix.Task.run "app.start"
-    
+
     System.cmd("tar", ["-zxvf", "dist/ex2js.tar.gz"])
 
     File.rm_rf!("/usr/local/ex2js")
