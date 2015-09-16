@@ -45,11 +45,11 @@ defmodule ElixirScript do
     import_standard_libs? = Dict.get(opts, :import_standard_libs, true)
 
 
-    ElixirScript.State.start_link(env)
+    ElixirScript.State.start_link(root, env)
     build_environment([quoted])
 
     if Set.size(ElixirScript.State.get().modules) > 0 do
-      create_code(root, include_path, import_standard_libs?)
+      create_code(include_path, import_standard_libs?)
     else
       result = case Translator.translate(quoted, env) do
         modules when is_list(modules) ->
@@ -86,7 +86,7 @@ defmodule ElixirScript do
     root = Dict.get(opts, :root)
     env = Dict.get(opts, :env, custom_env)
 
-    ElixirScript.State.start_link(env)
+    ElixirScript.State.start_link(root, env)
 
     path
     |> Path.wildcard
@@ -97,7 +97,7 @@ defmodule ElixirScript do
     |> build_environment
 
 
-    create_code(root, include_path, true)
+    create_code(include_path, true)
   end
 
   defp build_environment(code_list) do
@@ -111,13 +111,15 @@ defmodule ElixirScript do
     __ENV__
   end
 
-  defp create_code(root, include_path, import_standard_libs?) do
-    result = Enum.map(ElixirScript.State.get().modules, fn(x) ->
-      ElixirScript.Translator.Module.make_module(x.name, x.body, ElixirScript.State.get().env)
+  defp create_code(include_path, import_standard_libs?) do
+    state = ElixirScript.State.get()
+
+    result = Enum.map(state.modules, fn(x) ->
+      ElixirScript.Translator.Module.make_module(x.name, x.body, state.env)
     end)
     |> List.flatten
     |> Enum.map(fn(x) ->
-      convert_to_code(x, root, include_path, ElixirScript.State.get().env, import_standard_libs?)
+      convert_to_code(x, state.root, include_path, state.env, import_standard_libs?)
     end)
 
     ElixirScript.State.stop
@@ -144,7 +146,7 @@ defmodule ElixirScript do
     file_path = create_file_name(module)
 
     standard_libs_import = if import_standard_libs do
-      create_standard_lib_imports(root, env)
+      ElixirScript.Translator.Import.create_standard_lib_imports(root, env)
     else
       []
     end
@@ -157,36 +159,6 @@ defmodule ElixirScript do
 
   defp process_module(module, _root, _, _) do
     { "", module }
-  end
-
-  defp create_standard_lib_imports(root, env) do
-    module_names = [
-      :fun, :Erlang, :Kernel, :Atom, :Enum, :Integer, 
-      :JS, :List, :Range, :Tuple, :Agent, :Keyword,
-      :BitString
-    ]
-
-    import_specifiers = Enum.map(module_names, fn(x) -> 
-        Builder.import_specifier(
-          Builder.identifier(x),
-          Builder.identifier(x)
-        )
-    end)
-
-    import_declaration = Builder.import_declaration(
-      import_specifiers, 
-      Builder.identifier("'#{root(root) <> "elixir"}'")
-    )
-
-    [import_declaration]
-  end
-
-  defp root(nil) do
-    ""
-  end
-
-  defp root(root) do
-    root <> "/"
   end
 
   defp create_file_name(%JSModule{ name: module_list }) do

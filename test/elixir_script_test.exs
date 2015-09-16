@@ -55,7 +55,6 @@ defmodule ElixirScript.Test do
 
     js_code = ElixirScript.compile("""
       defmodule Animals do
-        use ElixirScript.Using, async: true
 
         defmodule Elephant do
           defstruct trunk: true
@@ -66,10 +65,6 @@ defmodule ElixirScript.Test do
           %Elephant{}
         end
 
-        defp something_else() do
-          ElixirScript.Math.squared(1)
-        end
-
       end
     """, env: make_custom_env)
 
@@ -78,21 +73,12 @@ defmodule ElixirScript.Test do
     import * as Elephant from 'animals/elephant';
     const __MODULE__ = Erlang.atom('Animals');
 
-    let something_else = fun([[], function()    {
-       return     1 * 1;
-     }]);
-
     let something = fun([[], function()    {
        return     Elephant.defstruct();
      }]);
 
-    let sandwich = fun([[], function()    {
-       return     null;
-     }]);
-
     export {
-      something,
-      sandwich
+      something
     };
      """, hd(js_code)
 
@@ -104,4 +90,37 @@ defmodule ElixirScript.Test do
        export  {defstruct};     
        """, List.last(js_code)
   end
+
+
+  should "parse macros" do
+
+    js_code = ElixirScript.compile("""
+      defmodule Animals do
+        use ElixirScript.Using
+
+        defp something_else() do
+          ElixirScript.Math.squared(1)
+        end
+
+      end
+    """, env: make_custom_env)
+
+    assert_js_matches """
+    import { fun, Erlang, Kernel, Atom, Enum, Integer, JS, List, Range, Tuple, Agent, Keyword, BitString } from 'elixir';
+    const __MODULE__ = Erlang.atom('Animals');
+
+    let something_else = fun([[], function()    {
+       return     1 * 1;
+     }]);
+
+    let sandwich = fun([[], function()    {
+       return     null;
+     }]);
+
+    export {
+      sandwich
+    };
+     """, hd(js_code)
+  end
+
 end

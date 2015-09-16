@@ -1,8 +1,8 @@
 defmodule ElixirScript.State do
   @moduledoc false
 
-  def start_link(env \\ __ENV__) do
-    Agent.start_link(fn -> %ElixirScript.Env{ env: env } end, name: __MODULE__)
+  def start_link(root, env \\ __ENV__) do
+    Agent.start_link(fn -> %ElixirScript.Env{ root: root, env: env } end, name: __MODULE__)
   end
 
   def update_env(env) do

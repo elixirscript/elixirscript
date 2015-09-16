@@ -63,13 +63,14 @@ defmodule ElixirScript.Mixfile do
   end
 
   def dist(_) do
+    Mix.Task.run "app.start"
+
     dist_folder = "dist"
     folder_name = "#{dist_folder}/ex2js"
     archive_file_name = "#{dist_folder}/ex2js.tar.gz"
 
     File.mkdir_p("priv/javascript/dist")
 
-    Mix.Task.run "app.start"
     Mix.Tasks.Escript.Build.run([])
 
     if File.exists?(dist_folder) do
@@ -92,7 +93,7 @@ defmodule ElixirScript.Mixfile do
 
   def install(_) do
     Mix.Task.run "app.start"
-
+    
     System.cmd("tar", ["-zxvf", "dist/ex2js.tar.gz"])
 
     File.rm_rf!("/usr/local/ex2js")
