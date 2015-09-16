@@ -10,6 +10,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
 
     js_code = """
     const __MODULE__ = Erlang.atom('Elephant');
+    export {};
     """
 
     assert_translation(ex_ast, js_code)
@@ -49,7 +50,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
 
       const ul = JQuery('#todo-list');
 
-      export default { something: something };
+      export { something };
     """
 
     assert_translation(ex_ast, js_code)
@@ -67,7 +68,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
-     import Crane from 'icabod/crane';
+     import * as Crane from 'icabod/crane';
      const __MODULE__ = Erlang.atom('Elephant');
 
       let something_else = fun([
@@ -85,7 +86,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
         }
       ]);
 
-     export default { something: something };
+     export { something };
     """
 
     assert_translation(ex_ast, js_code)
@@ -111,97 +112,32 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
-      import Elephant from 'animals/elephant';
+      const __MODULE__ = Erlang.atom('Elephant');
+        function defstruct(trunk = true) {
+          return {
+            [Erlang.atom('__struct__')]: __MODULE__, [Erlang.atom('trunk')]: trunk
+          };
+        }
+
+        export {
+          defstruct
+        };
+
+      import * as Elephant from 'animals/elephant';
       const __MODULE__ = Erlang.atom('Animals');
 
-      let something_else = fun([[], function() {
+      let something_else = fun([[], function(){
         return null;
       }]);
 
-      let something = fun([[], function() {
-        return Elephant.defstruct();
+      let something = fun([[], function(){
+        return     Elephant.defstruct();
       }]);
 
-      export default {
-        something: something
+      export {
+        something
       };
 
-      const __MODULE__ = Erlang.atom('Elephant');
-      function defstruct(trunk = true) {
-        return {
-          __struct__: __MODULE__,
-          trunk: trunk
-        };
-      }
-
-      export default {defstruct: defstruct};
-
-    """
-
-    assert_translation(ex_ast, js_code)
-  end
-
-  should "translate modules with 2 inner modules" do
-    ex_ast = quote do
-      defmodule Animals do
-
-        defmodule Elephant do
-          defstruct trunk: true
-        end
-
-        defmodule Bear do
-          defstruct trunk: true
-        end
-
-
-        def something() do
-          %Elephant{}
-        end
-
-        defp something_else() do
-        end
-
-      end
-    end
-
-    js_code = """
-      import Elephant from 'animals/elephant';
-      import Bear from 'animals/bear';
-      const __MODULE__ = Erlang.atom('Animals');
-
-
-      let something_else = fun([[], function() {
-        return null;
-      }]);
-
-      let something = fun([[], function() {
-        return Elephant.defstruct();
-      }]);
-
-      export default {
-        something: something
-      };
-
-      const __MODULE__ = Erlang.atom('Elephant');
-
-      function defstruct(trunk = true) {
-        return {
-          __struct__: __MODULE__,
-          trunk: trunk
-        };
-      }
-
-      export default {defstruct: defstruct};
-
-      const __MODULE__ = Erlang.atom('Bear');
-      function defstruct(trunk = true) {
-        return {
-          __struct__: __MODULE__,
-          trunk: trunk
-        };
-      }
-
-      export default {defstruct: defstruct};
     """
 
     assert_translation(ex_ast, js_code)
@@ -232,88 +168,64 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
-     import Elephant from 'animals/elephant';
+
+         const __MODULE__ = Erlang.atom('Bear');
+         function defstruct(trunk = true)        {
+                 return     {
+                     [Erlang.atom('__struct__')]: __MODULE__,         [Erlang.atom('trunk')]: trunk
+           };
+               }
+         export {
+             defstruct
+       };
+
+         import * as Bear from 'elephant/bear';
+         const __MODULE__ = Erlang.atom('Elephant');
+         function defstruct(trunk = true)        {
+                 return     {
+                     [Erlang.atom('__struct__')]: __MODULE__,         [Erlang.atom('trunk')]: trunk
+           };
+               }
+         export {
+             defstruct
+       };
+
+         import * as Elephant from 'animals/elephant';
+         const __MODULE__ = Erlang.atom('Animals');
+         let something_else = fun([[], function()    {
+             return     null;
+           }]);
+         let something = fun([[], function()    {
+             return     Elephant.defstruct();
+           }]);
+         export {
+             something
+       };
+    """
+
+    assert_translation(ex_ast, js_code)
+  end
+
+  should "Pull out module references and make them into imports if modules listed" do
+    ex_ast = quote do
+      defmodule Animals do
+        Lions.Tigers.oh_my()
+      end
+
+      defmodule Lions.Tigers do
+        Lions.Tigers.Bears.oh_my()
+      end
+    end 
+
+    js_code = """
+     import * as Tigers from 'lions/tigers';
      const __MODULE__ = Erlang.atom('Animals');
-     let something_else = fun([[], function(){return null;}]);
-     let something = fun([[], function(){return Elephant.defstruct();}]);
+     JS.get_property_or_call_function(Tigers,'oh_my');
+     export {};
 
-     export default {something: something};
-     import Bear from 'animals/elephant/bear';
-
-     const __MODULE__ = Erlang.atom('Elephant');
-     function defstruct(trunk = true){return {__struct__: __MODULE__, trunk: trunk};}
-     export default {defstruct: defstruct};
-
-     const __MODULE__ = Erlang.atom('Bear');
-     function defstruct(trunk = true){return {__struct__: __MODULE__, trunk: trunk};}
-     export default {defstruct: defstruct};
-    """
-
-    assert_translation(ex_ast, js_code)
-  end
-
-
-  should "Pull out module references and make them into imports" do
-    ex_ast = quote do
-      defmodule Animals do
-        Lions.Tigers.Bears.oh_my()
-      end
-    end 
-
-    js_code = """
-    import Bears from 'lions/tigers/bears';
-    const __MODULE__ = Erlang.atom('Animals');
-
-     JS.get_property_or_call_function(Bears, 'oh_my');
-
-     export default {};
-    """
-
-    assert_translation(ex_ast, js_code)
-  end
-
-  should "Only add one import per module reference" do
-    ex_ast = quote do
-      defmodule Animals do
-        Lions.Tigers.Bears.oh_my()
-        Lions.Tigers.Bears.oh_my_2()
-      end
-    end 
-
-    js_code = """
-    import Bears from 'lions/tigers/bears';
-    const __MODULE__ = Erlang.atom('Animals');
-
-    JS.get_property_or_call_function(Bears, 'oh_my');
-    JS.get_property_or_call_function(Bears, 'oh_my_2');
-     
-     export default {};
-    """
-
-    assert_translation(ex_ast, js_code)
-  end
-
-  should "Pull references from functions" do
-    ex_ast = quote do
-      defmodule Animals do
-
-        def hello() do
-            Lions.Tigers.Bears.oh_my()
-        end
-      end
-    end 
-
-    js_code = """
-      import Bears from 'lions/tigers/bears';
-      const __MODULE__ = Erlang.atom('Animals');
-
-      let hello = fun([[], function() {
-        return JS.get_property_or_call_function(Bears, 'oh_my');
-      }]);
-
-      export default {
-        hello: hello
-      };
+     const __MODULE__ = Erlang.atom('Tigers');
+     JS.get_property_or_call_function(Lions.Tigers.Bears,'oh_my');
+     export {};
     """
 
     assert_translation(ex_ast, js_code)
@@ -322,30 +234,109 @@ defmodule ElixirScript.Translator.Defmodule.Test do
   should "ignore aliases already added" do
     ex_ast = quote do
       defmodule Animals do
-        alias Lions.Tigers.Bears
+        alias Lions.Tigers
 
-        def hello(param) do
-            Bears.oh_my()
-            Lions.Tigers.Bears.oh_my()
+        Tigers.oh_my()
+      end
+
+      defmodule Lions.Tigers do
+        Lions.Tigers.Bears.oh_my()
+
+        def oh_my() do
         end
       end
     end 
 
     js_code = """
-      import Bears from 'lions/tigers/bears';
-      const __MODULE__ = Erlang.atom('Animals');
+         const __MODULE__ = Erlang.atom('Tigers');
+         let oh_my = fun([[], function()    {
+             return     null;
+           }]);
+         JS.get_property_or_call_function(Lions.Tigers.Bears,'oh_my');
+         export {
+             oh_my
+       };
 
-      let hello = fun([
-        [fun.parameter], 
-        function(param) {
-          JS.get_property_or_call_function(Bears, 'oh_my');
-          return JS.get_property_or_call_function(Bears, 'oh_my');
-        }
-      ]);
+         import * as Tigers from 'lions/tigers';
+         const __MODULE__ = Erlang.atom('Animals');
+         JS.get_property_or_call_function(Tigers,'oh_my');
+         export {};
+    """
 
-      export default {
-        hello: hello
-      };
+    assert_translation(ex_ast, js_code)
+  end
+
+  should "import only" do
+    ex_ast = quote do
+      defmodule Lions.Tigers do
+        def oh_my() do
+        end
+
+        def oh_my2() do
+        end
+      end
+
+      defmodule Animals do
+        import Lions.Tigers, only: [oh_my: 1]
+
+        oh_my()
+      end
+    end 
+
+    js_code = """
+         import { oh_my } from 'lions/tigers';
+         const __MODULE__ = Erlang.atom('Animals');
+         oh_my();
+         export {};
+
+         const __MODULE__ = Erlang.atom('Tigers');
+         let oh_my2 = fun([[], function()    {
+             return     null;
+           }]);
+         let oh_my = fun([[], function()    {
+             return     null;
+           }]);
+         export {
+             oh_my2,     oh_my
+       };
+    """
+
+    assert_translation(ex_ast, js_code)
+  end
+
+  should "import except" do
+    ex_ast = quote do
+      defmodule Lions.Tigers do
+        def oh_my() do
+        end
+
+        def oh_my2() do
+        end
+      end
+
+      defmodule Animals do
+        import Lions.Tigers, except: [oh_my: 1]
+
+        oh_my2()
+      end
+    end 
+
+    js_code = """
+     const __MODULE__ = Erlang.atom('Tigers');
+     let oh_my2 = fun([[], function()    {
+         return     null;
+       }]);
+     let oh_my = fun([[], function()    {
+         return     null;
+       }]);
+     export {
+         oh_my2,     oh_my
+   };
+
+     import { oh_my2 } from 'lions/tigers';
+     const __MODULE__ = Erlang.atom('Animals');
+     oh_my2();
+     export {};
     """
 
     assert_translation(ex_ast, js_code)

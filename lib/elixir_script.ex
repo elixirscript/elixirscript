@@ -6,13 +6,13 @@ defmodule ElixirScript do
   require Logger
 
   @moduledoc """
-  Transpiles Elixir into JavaScript.
+  Translates Elixir into JavaScript.
 
-  All transpile functions return a list of
+  All compile functions return a list of
   transpiled javascript code or a tuple consisting of
   the file name for the code and the transpiled javascript code.
 
-  All transpile functions also take an optional opts parameter
+  All compile functions also take an optional opts parameter
   that controls transpiler output.
 
   Available options are:
@@ -25,84 +25,139 @@ defmodule ElixirScript do
   """
 
   @doc """
-  Transpiles the given Elixir code string
+  Compiles the given Elixir code string
   """
-  @spec transpile(binary, Dict.t) :: [binary | { binary, binary }]
-  def transpile(elixir_code, opts \\ []) do
+  @spec compile(binary, Dict.t) :: [binary | { binary, binary }]
+  def compile(elixir_code, opts \\ []) do
     elixir_code
     |> Code.string_to_quoted!
-    |> transpile_quoted(opts)
+    |> compile_quoted(opts)
   end
 
   @doc """
-  Transpiles the given Elixir code in quoted form
+  Compiles the given Elixir code in quoted form
   """
-  @spec transpile_quoted(Macro.t, Dict.t) :: [binary | { binary, binary }]
-  def transpile_quoted(quoted, opts \\ []) do
+  @spec compile_quoted(Macro.t, Dict.t) :: [binary | { binary, binary }]
+  def compile_quoted(quoted, opts \\ []) do
     include_path = Dict.get(opts, :include_path, false)
     root = Dict.get(opts, :root)
-    env = Dict.get(opts, :env, __ENV__)
+    env = Dict.get(opts, :env, custom_env)
+    import_standard_libs? = Dict.get(opts, :import_standard_libs, true)
 
-    case Translator.translate(quoted, env) do
-      modules when is_list(modules) ->
-        List.flatten(modules)
-        |> Enum.map(fn(x) ->
-          convert_to_code(x, root, include_path)
-        end)
-      module ->
-        List.wrap(
-          convert_to_code(module, root, include_path)
-        )
+
+    ElixirScript.State.start_link(root, env)
+    build_environment([quoted])
+
+    if Set.size(ElixirScript.State.get().modules) > 0 do
+      create_code(include_path, import_standard_libs?)
+    else
+      result = case Translator.translate(quoted, env) do
+        modules when is_list(modules) ->
+          List.flatten(modules)
+          |> Enum.map(fn(x) ->
+            convert_to_code(x, root, include_path, env, import_standard_libs?)
+          end)
+        module ->
+          List.wrap(
+            convert_to_code(module, root, include_path, env, import_standard_libs?)
+          )
+      end
+
+      ElixirScript.State.stop
+
+      result
     end
   end
 
+  def make_defmodule({:defmodule, _, _} = ast) do
+    ast
+  end
+
+  def make_defmodule(ast) do
+    {:defmodule, [], [{:__aliases__, [], [:Temp]}, [do: { :__block__, [], [ast] }]]}
+  end
+
   @doc """
-  Transpiles the elixir files found at the given path
+  Compiles the elixir files found at the given path
   """
-  @spec transpile_path(binary, Dict.t) :: [binary | { binary, binary }]
-  def transpile_path(path, opts \\ []) do
+  @spec compile_path(binary, Dict.t) :: [binary | { binary, binary }]
+  def compile_path(path, opts \\ []) do
     include_path = Dict.get(opts, :include_path, false)
     root = Dict.get(opts, :root)
-    env = Dict.get(opts, :env, __ENV__)
+    env = Dict.get(opts, :env, custom_env)
+
+    ElixirScript.State.start_link(root, env)
 
     path
     |> Path.wildcard
     |> Enum.map(fn(x) -> 
       File.read!(x)
       |> Code.string_to_quoted!
-      |> Translator.translate(env)
+    end)
+    |> build_environment
+
+
+    create_code(include_path, true)
+  end
+
+  defp build_environment(code_list) do
+    code_list
+    |> ElixirScript.Preprocess.Modules.get_info    
+  end
+
+  defp custom_env() do
+    require Logger
+    require ElixirScript.Lib.JS, as: JS
+    __ENV__
+  end
+
+  defp create_code(include_path, import_standard_libs?) do
+    state = ElixirScript.State.get()
+
+    result = Enum.map(state.modules, fn(x) ->
+      ElixirScript.Translator.Module.make_module(x.name, x.body, state.env)
     end)
     |> List.flatten
     |> Enum.map(fn(x) ->
-      convert_to_code(x, root, include_path)
+      convert_to_code(x, state.root, include_path, state.env, import_standard_libs?)
     end)
+
+    ElixirScript.State.stop
+
+    result
   end
 
   @doc """
   Copies the javascript that makes up the ElixirScript standard libs
-  to the specified location in a "/__lib" folder
+  to the specified location
   """
   def copy_standard_libs_to_destination(destination) do
-    File.cp_r!(operating_path <> "/lib", destination <> "/__lib")
+    File.cp_r!(operating_path <> "/dist", destination)
   end
 
-  defp convert_to_code(js_ast, root, include_path) do
+  defp convert_to_code(js_ast, root, include_path, env, import_standard_libs \\ true) do
       js_ast
-      |> process_module(root)
+      |> process_module(root, env, import_standard_libs)
       |> javascript_ast_to_code
       |> process_include_path(include_path)
   end
 
-  defp process_module(%JSModule{} = module, root) do
+  defp process_module(%JSModule{} = module, root, env, import_standard_libs) do
     file_path = create_file_name(module)
 
-    program = ElixirScript.Translator.Module.create_standard_lib_imports(module.stdlibs, root) ++ module.body
+    standard_libs_import = if import_standard_libs do
+      ElixirScript.Translator.Import.create_standard_lib_imports(root, env)
+    else
+      []
+    end
+
+    program = standard_libs_import ++ module.body
     |> ESTree.Tools.Builder.program
 
     { file_path, program }
   end
 
-  defp process_module(module, _root) do
+  defp process_module(module, _root, _, _) do
     { "", module }
   end
 

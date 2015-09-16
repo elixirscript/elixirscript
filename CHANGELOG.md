@@ -1,3 +1,18 @@
+# v0.11.0-dev
+* Enhancement
+  * `import` works with all options
+  * Added `JS` module with `new`, `mutate`, `import` macros
+  * All Standard libraries are rolled up into one elixir.js file and imported from that
+  * Added `Keyword` module with functions, `has_key?` and `get`
+  * Added `Agent` module with functions, `start`, `get`, `update`, and `get_and_update`
+  * Map keys are now correctly turned into their atom counterparts if atom keys are used
+  * Modules no longer export a default object
+  * `alias` now translates to a namespace import unless `default` option is given
+
+* Breaking
+  * `Mutable.update` has been replaced by `JS.mutate`
+  * `transpile`, `transpile_quoted`, and `transpile_path` are now `compile`, `compile_quoted`, and `compile_path`
+
 # v0.10.0
 * Enhancements
   * Added `env` option for `ElixirScript.transpile` adding macros for compilation

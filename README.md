@@ -64,10 +64,10 @@ Usage
   -h  --help            this message
 ```
 
-A note on `-r`. The standard lib modules are included in the output inside the `__libs` folder. They are by default included by importing them like so
+A note on `-r`. The standard lib modules are included in the output as `elixir.js`. They are by default included by importing them like so
 
 ```javascript
-import Kernel from '__lib/kernel'
+import {...} from 'elixir'
 ```
 
 Depending on your setup that may not work. With `-r` you can specify the root path that will be prepended to the default path.
@@ -79,7 +79,7 @@ mix ex2js "my/elixir/dir/**/*.ex" -r "js" -o my/js/dir
 
 Will make the standard lib imports look like so
 ```javascript
-import Kernel from 'js/__lib/kernel'
+import {...} from 'js/elixir'
 ```
 
 
@@ -97,13 +97,13 @@ import Kernel from 'js/__lib/kernel'
 
  * Using the included the ElixirScript module to turn Elixir code into JavaScript
     ```elixir
-    iex(1)> ElixirScript.transpile("[1, 2, 3, 4]")
+    iex(1)> ElixirScript.compile("[1, 2, 3, 4]")
     ["Erlang.list(1,2,3,4)"]
     ```
 
 # Macros
 
-Macros can be used when using ElixirScript as a library if the Macros are loaded into the current environment or if you give it a custom environment with the `env` option
+Macros can only be used when using ElixirScript as a library if the Macros are loaded into the current environment or if you give it a custom environment with the `env` option
 
 ```elixir
 #module with macro defined
@@ -123,8 +123,8 @@ def make_custom_env do
 end
 
 
-#Now pass it to `ElixirScript.tranpile`
-ElixirScript.transpile("""
+#Now pass it to `ElixirScript.compile`
+ElixirScript.compile("""
   Math.squared(1)
 """, env: make_custom_env)
 
@@ -133,6 +133,18 @@ ElixirScript.transpile("""
 
 You should be able to use `use` in modules now as well, but modules that have `__using__` macros must also be require'd so that they can be expanded.
 
+
+# Using JavaScript libraries
+
+You can use `alias`, `import`, and `require` as you would in Elixir (sans macros).
+
+For JavaScript modules, use `JS.import`
+
+```elixir
+JS.import A, "a" #translates to "import {default as A} from 'a'"
+
+JS.import [A, B, C], "a" #translates to "import {A, B, C} from 'a'"
+```
 
 # Limitations
 

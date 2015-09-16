@@ -2,20 +2,39 @@ defmodule ElixirScript.Translator.Bug.Test do
   use ShouldI
   import ElixirScript.TestHelper
 
+  should "Translate" do
+    ex_ast = quote do
+      React.createElement(
+        React.Text,
+        %{"style" => styles().welcome},
+        "Welcome to React Native!"
+      )
+    end
+
+    js_code = """
+     React.createElement(React.Text,{
+             ['style']: JS.get_property_or_call_function(styles,'welcome')
+       },'Welcome to React Native!')
+    """
+
+    assert_translation(ex_ast, js_code) 
+
+  end
+
   should "correctly not create 2 imports" do
     ex_ast = quote do
       defmodule App.Todo do
-        alias JQuery, from: "jquery"
+        JS.import JQuery, "jquery"
         JQuery.(e.target)
       end
     end
 
     js_code = """
-     import JQuery from 'jquery';
+     import { default as JQuery } from 'jquery';
      const __MODULE__ = Erlang.atom('Todo');
      
      JQuery(JS.get_property_or_call_function(e, 'target'));
-     export default {};
+     export {};
     """
 
     assert_translation(ex_ast, js_code)   
@@ -85,18 +104,18 @@ defmodule ElixirScript.Translator.Bug.Test do
     js_code = """
       let getDispatcher = fun([[], function() {
         return DeLorean.Flux.createDispatcher({
-          'startPainting': fun([[], function() {
+          [Erlang.atom('startPainting')]: fun([[], function() {
             return this.dispatch('startPainting');
           }]),
-          'stopPainting': fun([[], function() {
+          [Erlang.atom('stopPainting')]: fun([[], function() {
             return this.dispatch('stopPainting');
           }]),
-          'addPoint': fun([[fun.parameter], function(data) {
+          [Erlang.atom('addPoint')]: fun([[fun.parameter], function(data) {
             return this.dispatch('addPoint', data);
           }]),
-          'getStores': fun([[], function() {
+           [Erlang.atom('getStores')]: fun([[], function() {
             return {
-              'graphic': GraphicStore
+              [Erlang.atom('graphic')]: GraphicStore
             };
           }])
         });

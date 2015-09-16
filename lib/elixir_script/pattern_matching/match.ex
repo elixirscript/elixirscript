@@ -1,4 +1,6 @@
 defmodule ElixirScript.PatternMatching.Match do
+  @moduledoc false
+
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Utils
@@ -88,30 +90,30 @@ defmodule ElixirScript.PatternMatching.Match do
     )
   end
   
-  def build_match(params) do
-    Enum.map(params, &do_build_match(&1))
+  def build_match(params, env) do
+    Enum.map(params, &do_build_match(&1, env))
     |> reduce_patterns
   end
 
-  defp do_build_match({:^, _, [value]}) do
-    { [bound(Translator.translate(value))], [nil] }
+  defp do_build_match({:^, _, [value]}, env) do
+    { [bound(Translator.translate(value, env))], [nil] }
   end
 
-  defp do_build_match({:_, _, _}) do
+  defp do_build_match({:_, _, _}, env) do
     { [@wildcard], [JS.identifier(:undefined)] }
   end
 
-  defp do_build_match([{:|, _, [head, tail]}]) do
-    { [@head_tail], [Translator.translate(head), Translator.translate(tail)] }
+  defp do_build_match([{:|, _, [head, tail]}], env) do
+    { [@head_tail], [Translator.translate(head, env), Translator.translate(tail, env)] }
   end
 
-  defp do_build_match({:<>, _, [prefix, value]}) do
-    { [startsWith(prefix)], [Translator.translate(value)] }
+  defp do_build_match({:<>, _, [prefix, value]}, env) do
+    { [startsWith(prefix)], [Translator.translate(value, env)] }
   end
 
-  defp do_build_match({:%{}, _, props}) do
+  defp do_build_match({:%{}, _, props}, env) do
     properties = Enum.map(props, fn({key, value}) ->
-      {pattern, params} = do_build_match(value)
+      {pattern, params} = do_build_match(value, env)
       { JS.property(JS.literal(key), hd(List.wrap(pattern))), params }
     end)
 
@@ -122,44 +124,44 @@ defmodule ElixirScript.PatternMatching.Match do
     { JS.object_expression(List.wrap(props)), params }
   end
 
-  defp do_build_match({:%, _, [{:__aliases__, _, name}, {:%{}, meta, props}]}) do
+  defp do_build_match({:%, _, [{:__aliases__, _, name}, {:%{}, meta, props}]}, env) do
     props = [{"__struct__" ,List.last(name)}] ++ props
-    do_build_match({:%{}, meta, props})
+    do_build_match({:%{}, meta, props}, env)
   end
 
-  defp do_build_match({:=, _, [{name, _, _}, right]}) when not name in [:%, :{}, :__aliases__, :^] do
-    unify(name, right)
+  defp do_build_match({:=, _, [{name, _, _}, right]}, env) when not name in [:%, :{}, :__aliases__, :^, :%{}] do
+    unify(name, right, env)
   end
 
-  defp do_build_match({:=, _, [left, {name, _, _}]}) when not name in [:%, :{}, :__aliases__, :^] do
-    unify(name, left)
+  defp do_build_match({:=, _, [left, {name, _, _}]}, env) when not name in [:%, :{}, :__aliases__, :^, :%{}] do
+    unify(name, left, env)
   end
 
-  defp do_build_match(list) when is_list(list) do
+  defp do_build_match(list, env) when is_list(list) do
     { patterns, params } = list
-    |> Enum.map(&build_match([&1]))
+    |> Enum.map(&build_match([&1], env))
     |> reduce_patterns
 
     {[make_list(patterns)], params}
   end
 
-  defp do_build_match(term) when is_number(term) or is_binary(term) or is_boolean(term) or is_atom(term) or is_nil(term) do
-    { [Translator.translate(term)], [] }
+  defp do_build_match(term, env) when is_number(term) or is_binary(term) or is_boolean(term) or is_atom(term) or is_nil(term) do
+    { [Translator.translate(term, env)], [] }
   end
 
-  defp do_build_match({ one, two }) do
-    do_build_match({:{}, [], [one, two]})
+  defp do_build_match({ one, two }, env) do
+    do_build_match({:{}, [], [one, two]}, env)
   end
 
-  defp do_build_match({:{}, _, list}) do
+  defp do_build_match({:{}, _, list}, env) do
     { patterns, params } = list
-    |> Enum.map(&build_match([&1]))
+    |> Enum.map(&build_match([&1], env))
     |> reduce_patterns
 
     {[make_tuple(patterns)], params}   
   end
 
-  defp do_build_match({name, _, _}) do
+  defp do_build_match({name, _, _}, env) do
     name = Utils.filter_name(name)
     { [@parameter], [JS.identifier(name)] }
   end
@@ -171,8 +173,8 @@ defmodule ElixirScript.PatternMatching.Match do
     end)
   end
 
-  defp unify(target, source) do
-    {patterns, params} = build_match([source])
+  defp unify(target, source, env) do
+    {patterns, params} = build_match([source], env)
     { [capture(hd(patterns))], params ++ [JS.identifier(Utils.filter_name(target))] }
   end
 

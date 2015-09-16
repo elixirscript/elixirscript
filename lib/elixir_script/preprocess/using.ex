@@ -1,5 +1,5 @@
 defmodule ElixirScript.Preprocess.Using do
-
+  @moduledoc false
 
   def process(ast, env) do
     Macro.prewalk(ast, fn(x) ->

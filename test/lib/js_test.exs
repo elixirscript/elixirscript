@@ -26,7 +26,7 @@ defmodule ElixirScript.Lib.JS.Test do
 
   should "translate update" do
     ex_ast = quote do
-      JS.mutate A, "b", [1, 2, 3]
+      JS.update A, "b", [1, 2, 3]
     end
 
     js_code = """

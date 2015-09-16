@@ -97,6 +97,12 @@ defmodule ElixirScript.Translator.Utils do
           build_function_name_ast(function_name),
           computed                 
         )
+      {{:., _, [{:__aliases__, _, _}]}, _, _} = ast ->
+        JS.member_expression(
+          Translator.translate(ast, env),
+          build_function_name_ast(function_name),
+          computed                 
+        )
       {:., _, _} = ast ->
         JS.member_expression(
           Translator.translate(ast, env),

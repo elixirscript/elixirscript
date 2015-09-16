@@ -1,7 +1,5 @@
 import BitString from './bit_string';
 
-//self.mailbox = self.mailbox || {};
-
 function atom (_value) {
   return Symbol.for(_value);
 }

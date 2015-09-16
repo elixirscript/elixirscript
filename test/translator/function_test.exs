@@ -253,7 +253,7 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
         ]
       );
 
-     export default {};
+     export {};
     """  
     assert_translation(ex_ast, js_code)
 
@@ -312,7 +312,7 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
         ]
       );
 
-     export default { example: example };
+     export { example };
     """  
     assert_translation(ex_ast, js_code)
 
@@ -327,7 +327,7 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
     js_code = """
      const __MODULE__ = Erlang.atom('Example');
      let example = fun([[fun.parameter], function(oneArg){return null;}]);
-     export default {example: example};
+     export {example};
     """  
     assert_translation(ex_ast, js_code)
 
@@ -475,8 +475,8 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
       }
     ]);
 
-    export default {
-      something: something
+    export {
+      something
     };
     """  
     assert_translation(ex_ast, js_code)
@@ -599,6 +599,22 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
           }
         ]
       );
+    """
+    assert_translation(ex_ast, js_code)
+  end
+
+  should "pattern match function with map reference" do
+    ex_ast = quote do
+      def something(%{ which: 13 } = a) do
+      end
+    end
+
+    js_code = """
+     let something = fun([[fun.capture({
+        'which': 13
+       })], function(a)    {
+         return     null;
+       }]);
     """
 
     assert_translation(ex_ast, js_code)
@@ -737,8 +753,8 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
       return null;
     }]);
 
-    export default {
-      something: something
+    export {
+      something
     };
     """
     

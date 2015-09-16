@@ -5,7 +5,7 @@ defmodule ElixirScript.Translator.Assignment do
   alias ElixirScript.PatternMatching.Match
 
   def make_assignment(left, right, env) do
-    { patterns, params } = Match.build_match([left])
+    { patterns, params } = Match.build_match([left], env)
 
       declarator = JS.variable_declarator(
         JS.array_pattern(params),

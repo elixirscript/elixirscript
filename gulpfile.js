@@ -12,27 +12,6 @@ var testPath = path + '/build/tests/**/*.spec.js';
 
 var libPath = path + '/lib';
 
-var libs = [
-  libPath + '/bit_string.js',
-  libPath + '/erlang.js',
-  libPath + '/kernel/js.js',
-  libPath + '/kernel/special_forms.js',
-  libPath + '/kernel.js',
-  libPath + '/atom.js',
-  libPath + '/enum.js',
-  libPath + '/integer.js',
-  libPath + '/list.js',
-  libPath + '/logger.js',
-  libPath + '/mutable.js',
-  libPath + '/range.js',
-  libPath + '/tuple.js'
-];
-
-gulp.task('dist', function() {
-  return gulp.src(stdLibPath)
-      .pipe(gulp.dest('./priv/javascript/dist'));
-});
-
 gulp.task('build', function() {
   return gulp.src([libPath + '/**/*.js'])
       .pipe(babel({sourceMap: false, modules:'common'}))

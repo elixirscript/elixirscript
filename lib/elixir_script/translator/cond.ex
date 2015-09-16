@@ -5,19 +5,19 @@ defmodule ElixirScript.Translator.Cond do
   alias ElixirScript.Translator.Function
   alias ElixirScript.Translator.Utils
 
-  def make_cond(clauses) do
-    process_cond(clauses, nil)
+  def make_cond(clauses, env) do
+    process_cond(clauses, nil, env)
     |> Utils.wrap_in_function_closure()
   end
 
-  defp process_cond([], ast) do
+  defp process_cond([], ast, env) do
     ast
   end
 
-  defp process_cond(clauses, ast) do
+  defp process_cond(clauses, ast, env) do
     {:->, _, [clause, clause_body]} = hd(clauses)
 
-    translated_body = Translator.translate(clause_body)
+    translated_body = Translator.translate(clause_body, env)
 
     if translated_body.type != "BlockStatement" do
       translated_body = Builder.block_statement([translated_body])
@@ -30,12 +30,12 @@ defmodule ElixirScript.Translator.Cond do
       translated_body   
     else
       ast = Builder.if_statement(
-        Translator.translate(hd(clause)),
+        Translator.translate(hd(clause), env),
         translated_body,
         nil
       )
 
-      %ESTree.IfStatement{ ast |  alternate: process_cond(tl(clauses), nil) }
+      %ESTree.IfStatement{ ast |  alternate: process_cond(tl(clauses), nil, env) }
     end
   end
   

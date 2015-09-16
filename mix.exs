@@ -4,14 +4,16 @@ defmodule ElixirScript.Mixfile do
   def project do
     [
       app: :elixir_script,
-      version: "0.10.0",
+      version: "0.11.0-dev",
       elixir: "~> 1.0",
       escript: escript_config,
       deps: deps,
       description: description,
       package: package,
       source_url: "https://github.com/bryanjos/elixirscript",
-      aliases: aliases
+      aliases: aliases,
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [coveralls: :test]
     ]
   end
 
@@ -23,12 +25,13 @@ defmodule ElixirScript.Mixfile do
 
   defp deps do
     [
-      { :inflex, "~> 1.4" },
-      { :estree, "~> 2.0"},
-      { :shouldi, only: :test },
-      { :earmark, "~> 0.1", only: :dev },
-      { :ex_doc, "~> 0.8", only: :dev },
-      {:benchfella, "~> 0.2", only: :test}   
+      {:inflex, "~> 1.4" },
+      {:estree, "~> 2.0"},
+      {:shouldi, only: :test },
+      {:earmark, "~> 0.1", only: :dev },
+      {:ex_doc, "~> 0.9", only: :dev },
+      {:benchfella, "~> 0.2", only: :test},
+      {:excoveralls, "~> 0.3", only: :test}  
     ]
   end
 
@@ -44,7 +47,7 @@ defmodule ElixirScript.Mixfile do
 
   defp package do
     [
-      files: ["lib", "priv/javascript/lib", "mix.exs", "README*", "readme*", "LICENSE*", "license*", "CHANGELOG*"],
+      files: ["lib", "priv/javascript/dist", "mix.exs", "README*", "readme*", "LICENSE*", "license*", "CHANGELOG*"],
       contributors: ["Bryan Joseph"],
       licenses: ["MIT"],
       links: %{ 
@@ -60,22 +63,28 @@ defmodule ElixirScript.Mixfile do
   end
 
   def dist(_) do
-   dist_folder = "dist"
-   folder_name = "#{dist_folder}/ex2js"
-   archive_file_name = "#{dist_folder}/ex2js.tar.gz"
-
     Mix.Task.run "app.start"
+
+    dist_folder = "dist"
+    folder_name = "#{dist_folder}/ex2js"
+    archive_file_name = "#{dist_folder}/ex2js.tar.gz"
+
+    File.mkdir_p("priv/javascript/dist")
+
     Mix.Tasks.Escript.Build.run([])
 
     if File.exists?(dist_folder) do
       File.rm_rf(dist_folder)
     end
 
-    System.cmd("gulp", ["dist"])
+    { elixir_js, _ } = System.cmd("node", ["node_modules/rollup/bin/rollup", "./priv/javascript/elixir.js"])
+    File.write!("priv/javascript/dist/elixir.js", elixir_js)
 
     File.mkdir_p(folder_name <> "/bin")
     File.cp!("ex2js", "#{folder_name}/bin/ex2js")
-    File.cp_r!("priv/javascript/dist", "#{folder_name}/lib")
+    File.cp_r!("priv/javascript/dist", "#{folder_name}/dist")
+    File.cp_r!("LICENSE", "#{folder_name}/LICENSE")
+    File.cp_r!("THIRD-PARTY-LICENSES", "#{folder_name}/THIRD-PARTY-LICENSES")
 
     System.cmd("tar", ["czf", archive_file_name, folder_name])
 
@@ -84,7 +93,7 @@ defmodule ElixirScript.Mixfile do
 
   def install(_) do
     Mix.Task.run "app.start"
-
+    
     System.cmd("tar", ["-zxvf", "dist/ex2js.tar.gz"])
 
     File.rm_rf!("/usr/local/ex2js")

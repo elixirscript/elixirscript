@@ -32,9 +32,7 @@ defmodule ElixirScript.TestHelper do
   end
 
   def ex_ast_to_js(ex_ast) do
-
-    ElixirScript.Translator.translate(ex_ast, make_custom_env)
-    |> ElixirScript.javascript_ast_to_code
+    ElixirScript.compile_quoted(ex_ast, [env: make_custom_env, import_standard_libs: false])
   end
 
   def strip_spaces(js) do
@@ -47,7 +45,7 @@ defmodule ElixirScript.TestHelper do
 
 
   def assert_translation(ex_ast, js_code) do
-    converted_code = ex_ast_to_js(ex_ast)
+    converted_code = ex_ast_to_js(ex_ast) |> Enum.join("\n\n")
 
     assert converted_code |> strip_spaces == strip_spaces(js_code), """
     **Code Does Not Match **

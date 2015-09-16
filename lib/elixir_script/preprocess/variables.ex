@@ -37,7 +37,7 @@ defmodule ElixirScript.Preprocess.Variables do
 
     { [var1, var2], state } = Enum.map_reduce([var1, var2], state, fn(x, current_state) ->
       case x do
-        {variable_name, meta2, context} when not(variable_name in [:%, :{}, :^, :&]) ->
+        {variable_name, meta2, context} when not(variable_name in [:%, :{}, :^, :&, :%{}]) ->
           {new_variable_name, new_state} = get_new_variable_name(variable_name, current_state)
           { {new_variable_name, meta2, context} , new_state }
         _ ->
@@ -54,7 +54,7 @@ defmodule ElixirScript.Preprocess.Variables do
 
     { variables, state } = Enum.map_reduce(variables, state, fn(x, current_state) ->
       case x do
-        {variable_name, meta3, context} when not(variable_name in [:%, :{}, :^, :&, :_]) ->
+        {variable_name, meta3, context} when not(variable_name in [:%, :{}, :^, :&, :_, :%{}]) ->
           {new_variable_name, new_state} = get_new_variable_name(variable_name, current_state)
           { {new_variable_name, meta3, context} , new_state }
         _ ->
@@ -71,7 +71,7 @@ defmodule ElixirScript.Preprocess.Variables do
 
     { variables, state } = Enum.map_reduce(variables, state, fn(x, current_state) ->
       case x do
-        {variable_name, meta3, context} when not(variable_name in [:%, :{}, :^, :&, :_]) ->
+        {variable_name, meta3, context} when not(variable_name in [:%, :{}, :^, :&, :_, :%{}]) ->
           {new_variable_name, new_state} = get_new_variable_name(variable_name, current_state)
           { {new_variable_name, meta3, context} , new_state }
         _ ->
@@ -82,7 +82,7 @@ defmodule ElixirScript.Preprocess.Variables do
     { {:=, meta, [variables, value]}, state }
   end
 
-  def process_variables({:=, meta, [{variable_name, meta2, context}, value]}, state) when not(variable_name in [:%, :{}, :^, :&, :.]) do
+  def process_variables({:=, meta, [{variable_name, meta2, context}, value]}, state) when not(variable_name in [:%, :{}, :^, :&, :., :%{}]) do
     { value, _ } = process_variables(value, state)
 
     {new_variable_name, new_state} = get_new_variable_name(variable_name, state)

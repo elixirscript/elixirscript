@@ -26,7 +26,7 @@ defmodule ElixirScript.PatternMatching.Match.Test do
 
   should "match wildcard" do
     params = [{:_, [], Test}]
-    result = Match.build_match(params)
+    result = Match.build_match(params, __ENV__)
     expected_result = { [Match.wildcard],  [JS.identifier(:undefined)] }
 
     assert result == expected_result
@@ -34,7 +34,7 @@ defmodule ElixirScript.PatternMatching.Match.Test do
 
   should "match one identifier param" do
     params = [{:a, [], Test}]
-    result = Match.build_match(params)
+    result = Match.build_match(params, __ENV__)
     expected_result = {[Match.parameter],  [JS.identifier("a")]}
 
     assert result == expected_result
@@ -42,7 +42,7 @@ defmodule ElixirScript.PatternMatching.Match.Test do
 
   should "match multiple identifier params" do
     params = [{:a, [], Test}, {:b, [], Test}, {:c, [], Test}]
-    result = Match.build_match(params)
+    result = Match.build_match(params, __ENV__)
     expected_result = { 
       List.duplicate(Match.parameter, 3),  
       [JS.identifier("a"), JS.identifier("b"), JS.identifier("c")]
@@ -53,7 +53,7 @@ defmodule ElixirScript.PatternMatching.Match.Test do
 
   should "match head and tail param" do
     params = [[{:|, [], [{:head, [], Elixir}, {:tail, [], Elixir}]}]]
-    result = Match.build_match(params)
+    result = Match.build_match(params, __ENV__)
     expected_result = { 
       [Match.headTail],  
       [JS.identifier("head"), JS.identifier("tail")]
@@ -64,7 +64,7 @@ defmodule ElixirScript.PatternMatching.Match.Test do
 
   should "match prefix param" do
     params = [{:<>, [context: Elixir, import: Kernel], ["Bearer ", {:token, [], Elixir}]}]
-    result = Match.build_match(params)
+    result = Match.build_match(params, __ENV__)
     expected_result = { 
       [Match.startsWith("Bearer ")],  
       [JS.identifier("token")]
@@ -75,7 +75,7 @@ defmodule ElixirScript.PatternMatching.Match.Test do
 
   should "match list" do
     params = [[{:a, [], Elixir}, {:b, [], Elixir}, {:c, [], Elixir}]]
-    result = Match.build_match(params)
+    result = Match.build_match(params, __ENV__)
     expected_result = { 
       [make_list(List.duplicate(Match.parameter, 3))],  
       [JS.identifier("a"), JS.identifier("b"), JS.identifier("c")]
@@ -86,7 +86,7 @@ defmodule ElixirScript.PatternMatching.Match.Test do
 
   should "match list with a literal" do
     params = [[1, {:b, [], Elixir}, {:c, [], Elixir}]]
-    result = Match.build_match(params)
+    result = Match.build_match(params, __ENV__)
     expected_result = { 
       [make_list([JS.literal(1), Match.parameter, Match.parameter])],  
       [JS.identifier("b"), JS.identifier("c")]
@@ -97,7 +97,7 @@ defmodule ElixirScript.PatternMatching.Match.Test do
 
   should "match number" do
     params = [1]
-    result = Match.build_match(params)
+    result = Match.build_match(params, __ENV__)
     expected_result = { 
       [JS.literal(1)],  
       []
@@ -108,10 +108,10 @@ defmodule ElixirScript.PatternMatching.Match.Test do
 
   should "match struct pattern" do
     params = [{:%, [], [{:__aliases__, [alias: false], [:Hello]}, {:%{}, [], []}]}]
-    result = Match.build_match(params)
+    result = Match.build_match(params, __ENV__)
     expected_result = { 
       [JS.object_expression([
-        JS.property(JS.literal("__struct__"), Translator.translate(:Hello))
+        JS.property(JS.literal("__struct__"), Translator.translate(:Hello, __ENV__))
       ])],  
       []
     }
@@ -121,11 +121,11 @@ defmodule ElixirScript.PatternMatching.Match.Test do
 
   should "match struct pattern with property" do
     params = [{:%, [], [{:__aliases__, [alias: false], [:Hello]}, {:%{}, [], [key: 1]}]}]
-    result = Match.build_match(params)
+    result = Match.build_match(params, __ENV__)
     expected_result = { 
       [JS.object_expression([
-        JS.property(JS.literal("__struct__"), Translator.translate(:Hello)),
-        JS.property(JS.literal(:key), Translator.translate(1))
+        JS.property(JS.literal("__struct__"), Translator.translate(:Hello, __ENV__)),
+        JS.property(JS.literal(:key), Translator.translate(1, __ENV__))
       ])],  
       []
     }
@@ -135,10 +135,10 @@ defmodule ElixirScript.PatternMatching.Match.Test do
 
   should "match struct pattern with property param" do
     params = [{:%, [], [{:__aliases__, [alias: false], [:Hello]}, {:%{}, [], [key: {:key, [], Elixir }]}]}]
-    result = Match.build_match(params)
+    result = Match.build_match(params, __ENV__)
     expected_result = { 
       [JS.object_expression([
-        JS.property(JS.literal("__struct__"), Translator.translate(:Hello)),
+        JS.property(JS.literal("__struct__"), Translator.translate(:Hello, __ENV__)),
         JS.property(JS.literal(:key), Match.parameter)
       ])],  
       [JS.identifier("key")]
@@ -149,7 +149,7 @@ defmodule ElixirScript.PatternMatching.Match.Test do
 
   should "capture parameter when assigning it" do
     params = [{:=, [], [1, {:a, [], Elixir}]}]
-    result = Match.build_match(params)
+    result = Match.build_match(params, __ENV__)
     expected_result = { 
       [Match.capture(JS.literal(1))],  
       [JS.identifier("a")]
@@ -159,7 +159,7 @@ defmodule ElixirScript.PatternMatching.Match.Test do
 
 
     params = [{:=, [], [{:a, [], Elixir}, 1]}]
-    result = Match.build_match(params)
+    result = Match.build_match(params, __ENV__)
     expected_result = { 
       [Match.capture(JS.literal(1))],  
       [JS.identifier("a")]
@@ -169,10 +169,10 @@ defmodule ElixirScript.PatternMatching.Match.Test do
 
 
     params = [{:=, [], [{:%, [], [{:__aliases__, [alias: false], [:AStruct]}, {:%{}, [], []}]}, {:a, [], ElixirScript.Translator.Function.Test}]}]
-    result = Match.build_match(params)
+    result = Match.build_match(params, __ENV__)
     expected_result = { 
       [Match.capture(JS.object_expression([
-        JS.property(JS.literal("__struct__"), Translator.translate(:AStruct)),
+        JS.property(JS.literal("__struct__"), Translator.translate(:AStruct, __ENV__)),
       ]))],  
       [JS.identifier("a")]
     }
@@ -182,7 +182,7 @@ defmodule ElixirScript.PatternMatching.Match.Test do
 
   should "match and assign list" do
     params = [{:=, [], [[{:a, [], Elixir}, {:b, [], Elixir}, {:c, [], Elixir}], {:d, [], Elixir}]}]
-    result = Match.build_match(params)
+    result = Match.build_match(params, __ENV__)
     expected_result = { 
       [Match.capture(make_list([Match.parameter, Match.parameter, Match.parameter]))],  
       [JS.identifier("a"), JS.identifier("b"), JS.identifier("c"), JS.identifier("d")]
@@ -193,7 +193,7 @@ defmodule ElixirScript.PatternMatching.Match.Test do
 
   should "match on tuple" do
     params = [{:{}, [], [1, {:b, [], Elixir}, 3]}]
-    result = Match.build_match(params)
+    result = Match.build_match(params, __ENV__)
     expected_result = { 
       [make_tuple([JS.literal(1), Match.parameter, JS.literal(3)])],  
       [JS.identifier("b")]
@@ -202,7 +202,7 @@ defmodule ElixirScript.PatternMatching.Match.Test do
     assert result == expected_result
 
     params = [{1, {:b, [], Elixir}}]
-    result = Match.build_match(params)
+    result = Match.build_match(params, __ENV__)
     expected_result = { 
       [make_tuple([JS.literal(1), Match.parameter])],  
       [JS.identifier("b")]
@@ -213,7 +213,7 @@ defmodule ElixirScript.PatternMatching.Match.Test do
 
   should "match on map" do
     params = [{:%{}, [], [which: 13]}]
-    result = Match.build_match(params)
+    result = Match.build_match(params, __ENV__)
 
     expected_result = { 
       [JS.object_expression([
@@ -228,7 +228,7 @@ defmodule ElixirScript.PatternMatching.Match.Test do
 
   should "match on bound value" do
     params = [{:^, [], [{:a, [], Elixir}]}]
-    result = Match.build_match(params)
+    result = Match.build_match(params, __ENV__)
 
     expected_result = { 
       [Match.bound(JS.identifier("a"))],
