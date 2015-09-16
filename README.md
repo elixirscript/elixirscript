@@ -16,7 +16,7 @@ ElixirScript can be used in the following ways:
 * If using as part of a project, you can add the following to your deps
 
   ```elixir
-    {:elixir_script, "~> 0.10"}
+    {:elixir_script, "~> 0.11"}
   ```
 
   From there you can either use the ElixirScript module directly or the mix command, `mix ex2js`
@@ -168,8 +168,8 @@ A lot of functions in the Kernel module are implemented. The Enum, Atom, List, T
 
 
 ### Example projects
-* [todo-elixirscript](https://github.com/bryanjos/example) The TodoMVC app using ElixirScript and Phoenix.
-
+* [phoenix_chat_example](https://github.com/bryanjos/phoenix_chat_example) The Pheonix Chat App using ElixirScript.
+* [MobileElixir](https://github.com/bryanjos/MobileElixir) Using ElixirScript with React Native
 * [color_bar_spike](https://github.com/bryanjos/color_bar_spike) A canvas drawing example using ElixirScript, React and Delorean
 
 #### Using with Brunch

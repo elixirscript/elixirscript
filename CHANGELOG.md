@@ -1,4 +1,4 @@
-# v0.11.0-dev
+# v0.11.0
 * Enhancement
   * `import` works with all options
   * Added `JS` module with `new`, `mutate`, `import` macros
