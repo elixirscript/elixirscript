@@ -16,7 +16,7 @@ ElixirScript can be used in the following ways:
 * If using as part of a project, you can add the following to your deps
 
   ```elixir
-    {:elixir_script, "~> 0.11"}
+    {:elixir_script, "~> 0.10"}
   ```
 
   From there you can either use the ElixirScript module directly or the mix command, `mix ex2js`
@@ -123,7 +123,7 @@ def make_custom_env do
 end
 
 
-#Now pass it to `ElixirScript.tranpile`
+#Now pass it to `ElixirScript.compile`
 ElixirScript.compile("""
   Math.squared(1)
 """, env: make_custom_env)
