@@ -12,9 +12,9 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-      fun([[Erlang.atom('ok')], function() {
+      Patterns.defmatch({ pattern: [Erlang.atom('ok')], fn: function() {
         return value;
-      }], [[Erlang.atom('error')], function() {
+      }}, [[Erlang.atom('error')], function() {
         return null;
       }]).call(this, data)
     """
@@ -29,8 +29,8 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-      fun([[false], function() {
-        let [value0] = fun.bind(fun.parameter,13);
+      Patterns.defmatch([[false], function() {
+        let [value0] = Patterns.match(Patterns.variable(),13);
         return value0;
       }], [[true], function() {
         return true;
@@ -49,10 +49,10 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-      fun([[false], function() {
-        let [value0] = fun.bind(fun.parameter,13);
+      Patterns.defmatch([[false], function() {
+        let [value0] = Patterns.match(Patterns.variable(),13);
         return value0;
-      }], [[fun.wildcard], function() {
+      }], [[Patterns.wildcard()], function() {
         return true;
       }]).call(this, data)
     """
@@ -71,11 +71,11 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-      fun(
+      Patterns.defmatch(
         [
-          [fun.parameter], 
+          [Patterns.variable()], 
           function(number) {
-            let [value0] = fun.bind(fun.parameter,13);
+            let [value0] = Patterns.match(Patterns.variable(),13);
             return value0;
           }, 
           function(number) {
@@ -83,7 +83,7 @@ defmodule ElixirScript.Translator.Case.Test do
           }
         ], 
         [
-          [fun.wildcard], 
+          [Patterns.wildcard()], 
           function() {
             return true;
           }
@@ -106,7 +106,7 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-      fun([[Erlang.atom('ok')], function() {
+      Patterns.defmatch([[Erlang.atom('ok')], function() {
         console.info('info');
         return Todo.add(data);
       }], [[Erlang.atom('error')], function() {
@@ -128,7 +128,7 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-      fun([[Erlang.tuple(fun.parameter, fun.parameter)], function(one, two) {
+      Patterns.defmatch([[Erlang.tuple(Patterns.variable(), Patterns.variable())], function(one, two) {
         return console.info(one);
       }], [[Erlang.atom('error')], function() {
         return null;
@@ -149,9 +149,9 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-      fun(
+      Patterns.defmatch(
         [
-          [Erlang.tuple(Erlang.tuple(fun.parameter, fun.parameter), fun.parameter)], 
+          [Erlang.tuple(Erlang.tuple(Patterns.variable(), Patterns.variable()), Patterns.variable())], 
           function(one, two, three) {
             return console.info(one);
           }
@@ -177,7 +177,7 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-      fun([[Erlang.tuple(fun.parameter, Erlang.tuple(fun.parameter, fun.parameter))], function(one, two, three) {
+      Patterns.defmatch([[Erlang.tuple(Patterns.variable(), Erlang.tuple(Patterns.variable(), Patterns.variable()))], function(one, two, three) {
         return console.info(one);
       }], [[Erlang.atom('error')], function() {
         return null;
@@ -197,9 +197,9 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-      fun(
+      Patterns.defmatch(
         [
-          [{'__struct__': Erlang.atom('AStruct'), 'key': {'__struct__': Erlang.atom('BStruct'), 'key2': fun.parameter}}], 
+          [{'__struct__': Erlang.atom('AStruct'), 'key': {'__struct__': Erlang.atom('BStruct'), 'key2': Patterns.variable()}}], 
           function(value){
             return console.info(value);
           }
@@ -226,9 +226,9 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-    fun(
+    Patterns.defmatch(
       [
-        [{'__struct__': Erlang.atom('AStruct'), 'key': {'__struct__': Erlang.atom('BStruct'), 'key2': fun.parameter, 'key3': {'__struct__': Erlang.atom('CStruct'), 'key4': fun.parameter}}}], 
+        [{'__struct__': Erlang.atom('AStruct'), 'key': {'__struct__': Erlang.atom('BStruct'), 'key2': Patterns.variable(), 'key3': {'__struct__': Erlang.atom('CStruct'), 'key4': Patterns.variable()}}}], 
         function(value,value2){
           return console.info(value);
         }

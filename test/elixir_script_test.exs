@@ -35,11 +35,11 @@ defmodule ElixirScript.Test do
       
       const __MODULE__ = Erlang.atom('Elephant');
 
-      let something_else = fun([[], function() {
+      let something_else = Patterns.defmatch([[], function() {
         return null;
       }]);
 
-      let something = fun([[], function() {
+      let something = Patterns.defmatch([[], function() {
         return ul;
       }]);
 
@@ -73,7 +73,7 @@ defmodule ElixirScript.Test do
     import * as Elephant from 'animals/elephant';
     const __MODULE__ = Erlang.atom('Animals');
 
-    let something = fun([[], function()    {
+    let something = Patterns.defmatch([[], function()    {
        return     Elephant.defstruct();
      }]);
 
@@ -109,11 +109,11 @@ defmodule ElixirScript.Test do
     import { fun, Erlang, Kernel, Atom, Enum, Integer, JS, List, Range, Tuple, Agent, Keyword, BitString } from 'elixir';
     const __MODULE__ = Erlang.atom('Animals');
 
-    let something_else = fun([[], function()    {
+    let something_else = Patterns.defmatch([[], function()    {
        return     1 * 1;
      }]);
 
-    let sandwich = fun([[], function()    {
+    let sandwich = Patterns.defmatch([[], function()    {
        return     null;
      }]);
 

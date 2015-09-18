@@ -54,7 +54,7 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-      let [user] = fun.bind(fun.parameter,User.defstruct());
+      let [user] = Patterns.match(Patterns.variable(),User.defstruct());
     """
 
     assert_translation(ex_ast, js_code)
@@ -64,7 +64,7 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-     let [user] = fun.bind(fun.parameter,User.defstruct(name = 'John'));
+     let [user] = Patterns.match(Patterns.variable(),User.defstruct(name = 'John'));
     """
 
     assert_translation(ex_ast, js_code)
@@ -76,7 +76,7 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-     let [user] = fun.bind(fun.parameter,(function()    {
+     let [user] = Patterns.match(Patterns.variable(),(function()    {
              let _results = {};
              for(let prop in map)     {
              if(map.hasOwnProperty(prop))     {
@@ -96,7 +96,7 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-     let [user] = fun.bind(fun.parameter,(function()    {
+     let [user] = Patterns.match(Patterns.variable(),(function()    {
              let _results = {};
              for(let prop in map)     {
              if(map.hasOwnProperty(prop))     {

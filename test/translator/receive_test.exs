@@ -16,11 +16,11 @@ defmodule ElixirScript.Translator.Receive.Test do
 
     js_code = """
       Kernel.SpecialForms.receive(function(message) {
-        return fun([[Erlang.atom('ok')], function() {
+        return Patterns.defmatch([[Erlang.atom('ok')], function() {
           return value;
         }], [[Erlang.atom('error')], function() {
           return value;
-        }], [[fun.wildcard], function() {
+        }], [[Patterns.wildcard()], function() {
           return IO.puts('Unexpected message received');
         }]).call(this, message);
       })
@@ -46,16 +46,16 @@ defmodule ElixirScript.Translator.Receive.Test do
 
     js_code = """
       Kernel.SpecialForms.receive(function(message) {
-        return fun([[Erlang.atom('ok')], function() {
+        return Patterns.defmatch([[Erlang.atom('ok')], function() {
           return value;
         }], [[Erlang.atom('error')], function() {
           return value;
-        }], [[fun.wildcard], function() {
+        }], [[Patterns.wildcard()], function() {
           return IO.puts('Unexpected message received');
         }]).call(this, message);
       }, 
       5000, 
-      fun([[5000], function() {
+      Patterns.defmatch([[5000], function() {
         return IO.puts('No message in 5 seconds');
       }]))
     """

@@ -4,12 +4,12 @@ defmodule ElixirScript.Translator.Assignment.Test do
 
   should "translate simple assignment" do
     ex_ast = quote do: a = 1
-    js_code = "let [a] = fun.bind(fun.parameter, 1);"
+    js_code = "let [a] = Patterns.match(Patterns.variable(), 1);"
 
     assert_translation(ex_ast, js_code)
 
     ex_ast = quote do: a = :atom
-    js_code = "let [a] = fun.bind(fun.parameter, Erlang.atom('atom'));"
+    js_code = "let [a] = Patterns.match(Patterns.variable(), Erlang.atom('atom'));"
 
     assert_translation(ex_ast, js_code)
   end
@@ -19,7 +19,7 @@ defmodule ElixirScript.Translator.Assignment.Test do
       {a, b} = {1, 2}
     end
     js_code = """
-        let [a, b] = fun.bind(Erlang.tuple(fun.parameter, fun.parameter), Erlang.tuple(1, 2));
+        let [a, b] = Patterns.match(Erlang.tuple(Patterns.variable(), Patterns.variable()), Erlang.tuple(1, 2));
         let _ref = Erlang.tuple(a, b);
     """
 
@@ -27,7 +27,7 @@ defmodule ElixirScript.Translator.Assignment.Test do
 
     ex_ast = quote do: {a, _, c} = {1, 2, 3}
     js_code = """
-        let [a, undefined, c] = fun.bind(Erlang.tuple(fun.parameter, fun.wildcard, fun.parameter), Erlang.tuple(1, 2, 3));
+        let [a, undefined, c] = Patterns.match(Erlang.tuple(Patterns.variable(), Patterns.wildcard(), Patterns.variable()), Erlang.tuple(1, 2, 3));
         let _ref = Erlang.tuple(a, undefined, c);
     """
 
@@ -36,7 +36,7 @@ defmodule ElixirScript.Translator.Assignment.Test do
 
     ex_ast = quote do: {^a, _, c} = {1, 2, 3}
     js_code = """
-         let [,undefined,c] = fun.bind(Erlang.tuple(fun.bound(a),fun.wildcard,fun.parameter),Erlang.tuple(1,2,3));
+         let [,undefined,c] = Patterns.match(Erlang.tuple(fun.bound(a),Patterns.wildcard(),Patterns.variable()),Erlang.tuple(1,2,3));
          let _ref = Erlang.tuple(undefined,undefined,c);
     """
 
@@ -46,7 +46,7 @@ defmodule ElixirScript.Translator.Assignment.Test do
   should "translate bound assignment" do
     ex_ast = quote do: ^a = 1
     js_code = """ 
-        let [] = fun.bind(fun.bound(a), 1);
+        let [] = Patterns.match(fun.bound(a), 1);
     """
 
     assert_translation(ex_ast, js_code)
@@ -55,7 +55,7 @@ defmodule ElixirScript.Translator.Assignment.Test do
   should "translate list assignment" do
     ex_ast = quote do: [a, b] = [1, 2]
     js_code = """
-        let [a, b] = fun.bind(Erlang.list(fun.parameter, fun.parameter), Erlang.list(1, 2));
+        let [a, b] = Patterns.match(Erlang.list(Patterns.variable(), Patterns.variable()), Erlang.list(1, 2));
         let _ref = Erlang.list(a, b);
     """
 
@@ -65,7 +65,7 @@ defmodule ElixirScript.Translator.Assignment.Test do
   should "translate head/tail assignment" do
     ex_ast = quote do: [a | b] = [1, 2, 3, 4]
     js_code = """
-        let [a, b] = fun.bind(fun.headTail, Erlang.list(1, 2, 3, 4));
+        let [a, b] = Patterns.match(fun.headTail, Erlang.list(1, 2, 3, 4));
         let _ref = Erlang.list(a, b);
     """
 

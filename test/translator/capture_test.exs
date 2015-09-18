@@ -8,7 +8,7 @@ defmodule ElixirScript.Translator.Capture.Test do
     end
 
     js_code = """
-     let [fun] = fun.bind(fun.parameter,[[fun.parameter], function(__1)    {
+     let [fun] = Patterns.match(Patterns.variable(),[[Patterns.variable()], function(__1)    {
              return     Kernel.is_atom(__1);
            }]);
     """
@@ -24,7 +24,7 @@ defmodule ElixirScript.Translator.Capture.Test do
     end
 
     js_code = """
-     let [fun] = fun.bind(fun.parameter,fun([[fun.parameter], function(__1)    {
+     let [fun] = Patterns.match(Patterns.variable(),Patterns.defmatch([[Patterns.variable()], function(__1)    {
              return     Kernel.is_atom(__1);
            }]));
     """
@@ -41,7 +41,7 @@ defmodule ElixirScript.Translator.Capture.Test do
     end
 
     js_code = """
-     let [fun] = fun.bind(fun.parameter,[[fun.parameter], function(__1)    {
+     let [fun] = Patterns.match(Patterns.variable(),[[Patterns.variable()], function(__1)    {
              return     local_function(__1);
            }]);
     """
@@ -57,7 +57,7 @@ defmodule ElixirScript.Translator.Capture.Test do
     end
 
     js_code = """
-     let [fun] = fun.bind(fun.parameter,fun([[fun.parameter], function(__1)    {
+     let [fun] = Patterns.match(Patterns.variable(),Patterns.defmatch([[Patterns.variable()], function(__1)    {
              return     __1 * 2;
            }]));
     """
@@ -73,7 +73,7 @@ defmodule ElixirScript.Translator.Capture.Test do
     end
 
     js_code = """
-     let [fun] = fun.bind(fun.parameter,fun([[fun.parameter, fun.parameter], function(__1,__2)    {
+     let [fun] = Patterns.match(Patterns.variable(),Patterns.defmatch([[Patterns.variable(), Patterns.variable()], function(__1,__2)    {
              return     Erlang.tuple(__1,__2);
            }]));
     """
@@ -85,7 +85,7 @@ defmodule ElixirScript.Translator.Capture.Test do
     end
 
     js_code = """
-     let [fun] = fun.bind(fun.parameter,fun([[fun.parameter, fun.parameter, fun.parameter], function(__1,__2,__3)    {
+     let [fun] = Patterns.match(Patterns.variable(),Patterns.defmatch([[Patterns.variable(), Patterns.variable(), Patterns.variable()], function(__1,__2,__3)    {
              return     Erlang.tuple(__1,__2,__3);
            }]));
     """
@@ -102,7 +102,7 @@ defmodule ElixirScript.Translator.Capture.Test do
     end
 
     js_code = """
-      Enum.map(items, fun([[fun.parameter], function(__1) {
+      Enum.map(items, Patterns.defmatch([[Patterns.variable()], function(__1) {
         return process(__1);
       }]))
     """
@@ -115,7 +115,7 @@ defmodule ElixirScript.Translator.Capture.Test do
     end
 
     js_code = """
-      elem.keypress(fun([[fun.parameter], function(__1) {
+      elem.keypress(Patterns.defmatch([[Patterns.variable()], function(__1) {
         return process_event(__1);
       }]))
     """

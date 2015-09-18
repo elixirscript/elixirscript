@@ -55,7 +55,7 @@ defmodule ElixirScript.PatternMatching.Match.Test do
     params = [[{:|, [], [{:head, [], Elixir}, {:tail, [], Elixir}]}]]
     result = Match.build_match(params, __ENV__)
     expected_result = { 
-      [Match.headTail],  
+      [Match.head_tail],  
       [JS.identifier("head"), JS.identifier("tail")]
     }
 
@@ -66,7 +66,7 @@ defmodule ElixirScript.PatternMatching.Match.Test do
     params = [{:<>, [context: Elixir, import: Kernel], ["Bearer ", {:token, [], Elixir}]}]
     result = Match.build_match(params, __ENV__)
     expected_result = { 
-      [Match.startsWith("Bearer ")],  
+      [Match.starts_with("Bearer ")],  
       [JS.identifier("token")]
     }
 

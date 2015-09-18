@@ -102,18 +102,18 @@ defmodule ElixirScript.Translator.Bug.Test do
 
 
     js_code = """
-      let getDispatcher = fun([[], function() {
+      let getDispatcher = Patterns.defmatch([[], function() {
         return DeLorean.Flux.createDispatcher({
-          [Erlang.atom('startPainting')]: fun([[], function() {
+          [Erlang.atom('startPainting')]: Patterns.defmatch([[], function() {
             return this.dispatch('startPainting');
           }]),
-          [Erlang.atom('stopPainting')]: fun([[], function() {
+          [Erlang.atom('stopPainting')]: Patterns.defmatch([[], function() {
             return this.dispatch('stopPainting');
           }]),
-          [Erlang.atom('addPoint')]: fun([[fun.parameter], function(data) {
+          [Erlang.atom('addPoint')]: Patterns.defmatch([[Patterns.variable()], function(data) {
             return this.dispatch('addPoint', data);
           }]),
-           [Erlang.atom('getStores')]: fun([[], function() {
+           [Erlang.atom('getStores')]: Patterns.defmatch([[], function() {
             return {
               [Erlang.atom('graphic')]: GraphicStore
             };

@@ -17,7 +17,7 @@ defmodule ElixirScript.Translator.Try.Test do
         try {
           return do_something_that_may_fail(some_arg);
         } catch (e) {
-          fun(
+          Patterns.defmatch(
             [
               [{
                 '__struct__': Erlang.atom('ArgumentError')
@@ -53,7 +53,7 @@ defmodule ElixirScript.Translator.Try.Test do
         try {
           return do_something_that_may_fail(some_arg);
         } catch (e) {
-          fun(
+          Patterns.defmatch(
             [
               [{
                 '__struct__': Erlang.atom('ArgumentError')
@@ -91,7 +91,7 @@ defmodule ElixirScript.Translator.Try.Test do
         try {
           return do_something_that_may_fail(some_arg);
         } catch (e) {
-          fun([[fun.parameter], function(x) {
+          Patterns.defmatch([[Patterns.variable()], function(x) {
             return IO.puts('Invalid argument given');
           }, function(x) {
             return Kernel.__in__(x, Erlang.list(ArgumentError.defstruct()));
@@ -120,9 +120,9 @@ defmodule ElixirScript.Translator.Try.Test do
         try {
           return do_something_that_may_fail(some_arg);
         } catch (e) {
-          fun(
+          Patterns.defmatch(
             [
-              [fun.parameter], 
+              [Patterns.variable()], 
               function(x) {
                 return IO.puts('Invalid argument given');
               }
@@ -159,7 +159,7 @@ defmodule ElixirScript.Translator.Try.Test do
         try {
           return do_something_that_may_fail(some_arg);
         } catch (e) {
-          fun(
+          Patterns.defmatch(
             [
               [{'__struct__': Erlang.atom('ArgumentError')}], 
               function() {
@@ -167,7 +167,7 @@ defmodule ElixirScript.Translator.Try.Test do
               }
             ], 
             [
-              [fun.parameter], 
+              [Patterns.variable()], 
               function(x) {
                 return IO.puts('x');
               }
@@ -203,7 +203,7 @@ defmodule ElixirScript.Translator.Try.Test do
         try {
           return do_something_that_may_fail(some_arg);
         } catch (e) {
-          fun(
+          Patterns.defmatch(
             [
               [{'__struct__': Erlang.atom('ArgumentError')}], 
               function() {
@@ -283,7 +283,7 @@ defmodule ElixirScript.Translator.Try.Test do
       try {
         return do_something_that_may_fail(some_arg);
       } catch (e) {
-        fun(
+        Patterns.defmatch(
           [
             [Erlang.atom('throw'), Erlang.atom('Error')], 
             function() {

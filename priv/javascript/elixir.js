@@ -1,6 +1,7 @@
 self.mailbox = self.mailbox || {};
 
-export { default as fun } from './lib/funcy/fun';
+export { default as Patterns } from './lib/patterns/patterns';
+export { default as Immutable } from './lib/immutable/immutable';
 export { default as Erlang } from './lib/erlang';
 export { default as BitString } from './lib/bit_string';
 export { default as Kernel } from './lib/kernel';

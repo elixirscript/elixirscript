@@ -5,55 +5,49 @@ let Enum = {
   __MODULE__: Erlang.atom('Enum'),
 
   all__qmark__: function(collection, fun = (x) => x){
-    let result = Enum.filter(collection, function(x){
-      return !fun(x);
-    });
-
-    return result === [];
+    return collection.every(fun);
   },
 
   any__qmark__: function(collection, fun = (x) => x){
-    let result = Enum.filter(collection, function(x){
-      return fun(x);
-    });
-
-    return result !== [];
+    return collection.some(fun);
   },
 
   at: function(collection, n, the_default = null){
-    for (var i = 0; i < collection.length; i++) {
-      if(i === n){
-        return collection[i];
-      }
-    }
-
-    return the_default;
+    return collection.get(n, the_default);
   },
 
   concat: function(...enumables){
-    return enumables[0].concat(enumables.slice(1));
+    return enumables.first().concat(enumables.last());
   },
 
   count: function(collection, fun = null){
     if(fun == null){
-      return Kernel.length(collection);
+      return collection.count();
     }else{
-      return Kernel.length(collection.filter(fun));
+      return collection.count(fun);
     }
   },
 
+  drop: function(collection, count){
+    return collection.skip(count);
+  },
+
+  drop_while: function(collection, fun){
+    return collection.skipWhile(fun);
+  },
+
   each: function(collection, fun){
-    [].forEach.call(collection, fun);
+    collection.forEach(fun);
   },
 
   empty__qmark__: function(collection){
-    return Kernel.length(collection) === 0;
+    return collection.count() === 0;
   },
 
   fetch: function(collection, n){
     if(Kernel.is_list(collection)){
-      if(n < collection.length && n >= 0){
-        return Erlang.tuple(Erlang.atom("ok"), collection[n]);
+      if(n < collection.count() && n >= 0){
+        return Erlang.tuple(Erlang.atom("ok"), collection.get(n));
       }else{
         return Erlang.atom("error");
       }
@@ -64,8 +58,8 @@ let Enum = {
 
   fetch__emark__: function(collection, n){
     if(Kernel.is_list(collection)){
-      if(n < collection.length && n >= 0){
-        return collection[n];
+      if(n < collection.count() && n >= 0){
+        return collection.get(n);
       }else{
         throw new Error("out of bounds error");
       }
@@ -75,19 +69,31 @@ let Enum = {
   },
 
   filter: function(collection, fun){
-    return [].filter.call(collection, fun);
+    return collection.filter(fun);
+  },
+
+  filter_map: function(collection, filter, mapper){
+    return collection.filter(filter).map(mapper);
+  },
+
+  find: function(collection, if_none = null, fun){
+    return collection.find(fun, null, if_none);
+  },
+
+  flat_map: function(collection, fun){
+    return collection.flatMap(fun);
   },
 
   map: function(collection, fun){
-    return [].map.call(collection, fun);
+    return collection.map(fun);
   },
 
   map_reduce: function(collection, acc, fun){
     let mapped = Erlang.list();
     let the_acc = acc;
 
-    for (var i = 0; i < collection.length; i++) {
-      let tuple = fun(collection[i], the_acc);
+    for (var i = 0; i < collection.count(); i++) {
+      let tuple = fun(collection.get(i), the_acc);
 
       the_acc = Kernel.elem(tuple, 1);
       mapped = Erlang.list(...mapped.concat([Kernel.elem(tuple, 0)]));
@@ -97,23 +103,36 @@ let Enum = {
   },
 
   member: function(collection, value){
-    for(let x of collection){
-      if(x === value){
-        return true;
-      }
-    }
-
-    return false;
+    return collection.includes(value);
   },
 
   reduce: function(collection, acc, fun){
-    let the_acc = acc;
+    return collection.reduce(fun, acc);
+  },
 
-    for (var i = 0; i < collection.length; i++) {
-      the_acc = fun(collection[i], the_acc);
+  take: function(collection, count){
+    return collection.take(count);
+  },
+
+  take_every: function(collection, nth){
+    let result = [];
+    let index = 0;
+
+    for(let elem of collection){
+      if(index % nth === 0){
+        result.push(elem);
+      }
     }
 
-    return the_acc;
+    return Erlang.list(...result);
+  },
+
+  take_while: function(collection, fun){
+    return collection.takeWhile(fun);
+  },
+
+  to_list: function(collection){
+    return collection.toList();
   }
 };
 

@@ -1,15 +1,20 @@
 import BitString from './bit_string';
+import Immutable from './immutable/immutable';
 
 function atom (_value) {
   return Symbol.for(_value);
 }
 
 function list(...args){
-  return Object.freeze(args);
+  return Immutable.fromJS(args);
 }
 
 function tuple(...args){
-  return Object.freeze({__tuple__: Object.freeze(args) });
+  return Immutable.fromJS({__tuple__: args });
+}
+
+function map(obj){
+  return Immutable.fromJS(obj);
 }
 
 function bitstring(...args){
@@ -21,23 +26,15 @@ function bitstring(...args){
     return Object.freeze(args);
   };
 
-  let _value = Object.freeze(this.process(args));
-
-  this.value = function(){
-    return _value;
-  };
-
-  this.length = _value.length;
-
-  this.get = function(i){
-    return _value[i];
-  };
+  this.value = Immutable.fromJS(this.process(args));
+  this.length = this.value.count();
+  this.get = this.value.get;
 
   return this;
 }
 
 bitstring.prototype[Symbol.iterator] = function () {
-  return this.value()[Symbol.iterator]();
+  return this.value[Symbol.iterator]();
 };
 
 bitstring.prototype.toString = function(){

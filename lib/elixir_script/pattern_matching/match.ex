@@ -6,48 +6,57 @@ defmodule ElixirScript.PatternMatching.Match do
   alias ElixirScript.Translator.Utils
 
   @wildcard JS.member_expression(
-    JS.identifier(:fun),
+    JS.identifier(:Patterns),
     JS.identifier(:wildcard)
   )
 
   @parameter JS.member_expression(
-    JS.identifier(:fun),
-    JS.identifier(:parameter)
+    JS.identifier(:Patterns),
+    JS.identifier(:variable)
   )
 
   @head_tail JS.member_expression(
-    JS.identifier(:fun),
+    JS.identifier(:Patterns),
     JS.identifier(:headTail)
   )
 
   @starts_with JS.member_expression(
-    JS.identifier(:fun),
+    JS.identifier(:Patterns),
     JS.identifier(:startsWith)
   )
 
   @capture JS.member_expression(
-    JS.identifier(:fun),
+    JS.identifier(:Patterns),
     JS.identifier(:capture)
   )
 
   @bound JS.member_expression(
-    JS.identifier(:fun),
+    JS.identifier(:Patterns),
     JS.identifier(:bound)
   )
 
   def wildcard() do
-    @wildcard
+    JS.call_expression(
+      @wildcard,
+      []
+    )
   end
 
   def parameter() do
-    @parameter
+    JS.call_expression(
+      @parameter,
+      []
+    )
   end
 
-  def headTail() do
-    @head_tail
+  def head_tail() do
+    JS.call_expression(
+      @head_tail,
+      []
+    )
   end
 
-  def startsWith(prefix) do
+  def starts_with(prefix) do
     JS.call_expression(
       @starts_with,
       [JS.literal(prefix)]
@@ -100,15 +109,15 @@ defmodule ElixirScript.PatternMatching.Match do
   end
 
   defp do_build_match({:_, _, _}, env) do
-    { [@wildcard], [JS.identifier(:undefined)] }
+    { [wildcard()], [JS.identifier(:undefined)] }
   end
 
   defp do_build_match([{:|, _, [head, tail]}], env) do
-    { [@head_tail], [Translator.translate(head, env), Translator.translate(tail, env)] }
+    { [head_tail()], [Translator.translate(head, env), Translator.translate(tail, env)] }
   end
 
   defp do_build_match({:<>, _, [prefix, value]}, env) do
-    { [startsWith(prefix)], [Translator.translate(value, env)] }
+    { [starts_with(prefix)], [Translator.translate(value, env)] }
   end
 
   defp do_build_match({:%{}, _, props}, env) do
@@ -163,7 +172,7 @@ defmodule ElixirScript.PatternMatching.Match do
 
   defp do_build_match({name, _, _}, env) do
     name = Utils.filter_name(name)
-    { [@parameter], [JS.identifier(name)] }
+    { [parameter()], [JS.identifier(name)] }
   end
 
   defp reduce_patterns(patterns) do

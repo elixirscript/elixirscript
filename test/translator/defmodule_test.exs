@@ -33,7 +33,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     js_code = """
       const __MODULE__ = Erlang.atom('Elephant');
 
-      let something_else = fun([
+      let something_else = Patterns.defmatch([
         [], 
         function(){
           return null;
@@ -41,7 +41,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
       ]);
 
 
-      let something = fun([
+      let something = Patterns.defmatch([
         [], 
         function(){
           return ul;
@@ -71,7 +71,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
      import * as Crane from 'icabod/crane';
      const __MODULE__ = Erlang.atom('Elephant');
 
-      let something_else = fun([
+      let something_else = Patterns.defmatch([
         [], 
         function(){
           return null;
@@ -79,7 +79,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
       ]);
 
 
-      let something = fun([
+      let something = Patterns.defmatch([
         [], 
         function(){
           return null;
@@ -126,11 +126,11 @@ defmodule ElixirScript.Translator.Defmodule.Test do
       import * as Elephant from 'animals/elephant';
       const __MODULE__ = Erlang.atom('Animals');
 
-      let something_else = fun([[], function(){
+      let something_else = Patterns.defmatch([[], function(){
         return null;
       }]);
 
-      let something = fun([[], function(){
+      let something = Patterns.defmatch([[], function(){
         return     Elephant.defstruct();
       }]);
 
@@ -192,10 +192,10 @@ defmodule ElixirScript.Translator.Defmodule.Test do
 
          import * as Elephant from 'animals/elephant';
          const __MODULE__ = Erlang.atom('Animals');
-         let something_else = fun([[], function()    {
+         let something_else = Patterns.defmatch([[], function()    {
              return     null;
            }]);
-         let something = fun([[], function()    {
+         let something = Patterns.defmatch([[], function()    {
              return     Elephant.defstruct();
            }]);
          export {
@@ -249,7 +249,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
 
     js_code = """
          const __MODULE__ = Erlang.atom('Tigers');
-         let oh_my = fun([[], function()    {
+         let oh_my = Patterns.defmatch([[], function()    {
              return     null;
            }]);
          JS.get_property_or_call_function(Lions.Tigers.Bears,'oh_my');
@@ -290,10 +290,10 @@ defmodule ElixirScript.Translator.Defmodule.Test do
          export {};
 
          const __MODULE__ = Erlang.atom('Tigers');
-         let oh_my2 = fun([[], function()    {
+         let oh_my2 = Patterns.defmatch([[], function()    {
              return     null;
            }]);
-         let oh_my = fun([[], function()    {
+         let oh_my = Patterns.defmatch([[], function()    {
              return     null;
            }]);
          export {
@@ -323,10 +323,10 @@ defmodule ElixirScript.Translator.Defmodule.Test do
 
     js_code = """
      const __MODULE__ = Erlang.atom('Tigers');
-     let oh_my2 = fun([[], function()    {
+     let oh_my2 = Patterns.defmatch([[], function()    {
          return     null;
        }]);
-     let oh_my = fun([[], function()    {
+     let oh_my = Patterns.defmatch([[], function()    {
          return     null;
        }]);
      export {

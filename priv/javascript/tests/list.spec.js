@@ -8,13 +8,13 @@ describe('List', function(){
     it('must make a tuple with the value duplicated the specified amount of times', function(){
       let t = List.duplicate("value", 3);
 
-      expect(t.length).to.equal(3);
-      expect(t[0]).to.equal("value");
-      expect(t[1]).to.equal("value");
-      expect(t[2]).to.equal("value");
+      expect(t.count()).to.equal(3);
+      expect(t.get(0)).to.equal("value");
+      expect(t.get(1)).to.equal("value");
+      expect(t.get(2)).to.equal("value");
 
       t = List.duplicate("value", 0);
-      expect(t.length).to.equal(0);
+      expect(t.count()).to.equal(0);
     })
   })
 
@@ -22,7 +22,7 @@ describe('List', function(){
     it('must delete first item', function(){
       let t = Erlang.list(1, 2, 3);
       t = List.delete_at(t, 0);
-      expect(t[0]).to.equal(2);
+      expect(t.get(0)).to.equal(2);
     })
   })
 
@@ -30,7 +30,7 @@ describe('List', function(){
     it('delete item in list', function(){
       let t = Erlang.list(Erlang.atom("a"), Erlang.atom("b"), Erlang.atom("c"));
       t = List.delete(t, Erlang.atom("b"));
-      expect(t[1]).to.equal(Erlang.atom("c"));
+      expect(t.get(1)).to.equal(Erlang.atom("c"));
     })
   })
 
@@ -40,9 +40,9 @@ describe('List', function(){
 
       t = List.flatten(t);
 
-      expect(t[0]).to.equal(1);
-      expect(t[1]).to.equal(2);
-      expect(t[2]).to.equal(3);
+      expect(t.get(0)).to.equal(1);
+      expect(t.get(1)).to.equal(2);
+      expect(t.get(2)).to.equal(3);
     })
 
     it('must flatten a deeply nested list into one list', function(){
@@ -50,17 +50,17 @@ describe('List', function(){
 
       t = List.flatten(t);
 
-      expect(t[0]).to.equal(1);
-      expect(t[1]).to.equal(2);
-      expect(t[2]).to.equal(4);
-      expect(t[3]).to.equal(3);
+      expect(t.get(0)).to.equal(1);
+      expect(t.get(1)).to.equal(2);
+      expect(t.get(2)).to.equal(4);
+      expect(t.get(3)).to.equal(3);
     })
   })
 
   describe('toString', function(){
     it('must display correctly', function(){
       let t = Erlang.list(1, 2, 3);
-      expect(t.toString()).to.equal("1,2,3");
+      expect(t.toString()).to.equal('List [ 1, 2, 3 ]');
     })
   })
 

@@ -1,7 +1,8 @@
 import Erlang from './erlang';
 import SpecialForms from './kernel/special_forms';
-import fun from './funcy/fun';
+import * as Patterns from './patterns/patterns';
 import Tuple from './tuple';
+import Immutable from './immutable/immutable';
 
 let Kernel = {
   __MODULE__: Erlang.atom('Kernel'),
@@ -13,7 +14,7 @@ let Kernel = {
   },
 
   hd: function(list){
-    return list[0];
+    return list.first();
   },
 
   is_nil: function(x){
@@ -46,11 +47,11 @@ let Kernel = {
   },
 
   is_list: function(x){
-    return x instanceof Array;
+    return Immutable.List.isList(x);
   },
 
   is_map: function(x){
-    return typeof x === 'object' || x instanceof Object && x.__tuple__ === null;
+    return Immutable.Map.isMap(x);
   },
 
   is_number: function(x){
@@ -58,7 +59,7 @@ let Kernel = {
   },
 
   is_tuple: function(x){
-    return (typeof x === 'object' || x instanceof Object) && x.__tuple__ !== null;
+    return Kernel.is_map(x) && x.has("__tuple__");
   },
 
   length: function(x){
@@ -104,7 +105,7 @@ let Kernel = {
       return tuple[index];
     }
 
-    return tuple.__tuple__[index];
+    return tuple.get("__tuple__").get(index);
   },
 
   rem: function(left, right){
@@ -149,15 +150,8 @@ let Kernel = {
 
   match__qmark__: function(pattern, expr, guard = () => true){
     try{
-      let match = fun([
-        [pattern],
-        function(){
-          return true;
-        },
-        guard
-      ]);
-
-      return match(expr);
+      Patterns.match(pattern, expr, guard);
+      return true;
     }catch(e){
       return false;
     }

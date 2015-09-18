@@ -6,26 +6,19 @@ Tuple.__MODULE__ = Erlang.atom('Tuple');
 
 Tuple.to_string = function(tuple){
   var i, s = "";
-  for (i = 0; i < tuple.__tuple__.length; i++) {
+  for(let elem of tuple.get("__tuple__")){
     if (s !== "") {
       s += ", ";
     }
-    s += tuple.__tuple__[i].toString();
+    
+    s += elem.toString(); 
   }
 
   return "{" + s + "}";
 };
 
 Tuple.delete_at = function(tuple, index){
-  let new_list = [];
-
-  for (var i = 0; i < tuple.__tuple__.length; i++) {
-    if(i !== index){
-      new_list.push(tuple.__tuple__[i]);
-    }
-  }
-
-  return Erlang.tuple.apply(null, new_list);
+  return tuple.set("__tuple__", tuple.get("__tuple__").delete(index));
 };
 
 Tuple.duplicate = function(data, size){
@@ -41,13 +34,13 @@ Tuple.duplicate = function(data, size){
 Tuple.insert_at = function(tuple, index, term){
   let new_tuple = [];
 
-  for (var i = 0; i <= tuple.__tuple__.length; i++) {
+  for (var i = 0; i <= tuple.get("__tuple__").count(); i++) {
     if(i === index){
       new_tuple.push(term);
       i++;
-      new_tuple.push(tuple.__tuple__[i]);
+      new_tuple.push(tuple.get("__tuple__").get(i));
     }else{
-      new_tuple.push(tuple.__tuple__[i]);
+      new_tuple.push(tuple.get("__tuple__").get(i));
     }
   }
 
@@ -55,21 +48,15 @@ Tuple.insert_at = function(tuple, index, term){
 };
 
 Tuple.from_list = function(list){
-  return Erlang.tuple.apply(null, list);
+  return Erlang.tuple.apply(null, list.toJS());
 };
 
 Tuple.to_list = function(tuple){
-  let new_list = [];
-
-  for (var i = 0; i < tuple.__tuple__.length; i++) {
-    new_list.push(tuple.__tuple__[i]);
-  }
-
-  return Erlang.list(...new_list);
+  return tuple.get("__tuple__");
 };
 
 Tuple.iterator = function(tuple){
-  return tuple.__tuple__[Symbol.iterator]();
+  return tuple.get("__tuple__")[Symbol.iterator]();
 };
 
 export default Tuple;

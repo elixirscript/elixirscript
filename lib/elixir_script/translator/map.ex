@@ -4,6 +4,16 @@ defmodule ElixirScript.Translator.Map do
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Utils
 
+  def make_map(object_expression) do
+    JS.call_expression(
+      JS.member_expression(
+        JS.identifier("Erlang"),
+        JS.identifier("map")
+      ),
+      [object_expression]
+    )
+  end
+
   def make_get_property(target, property, env) do
     JS.member_expression(
       Translator.translate(target, env),
@@ -13,12 +23,13 @@ defmodule ElixirScript.Translator.Map do
   end
 
   def make_object(properties, env) do
-    properties
+    object = properties
     |> Enum.map(fn
       ({x, {:__aliases__, _, [value]}}) -> JS.property(Translator.translate(x, env), JS.identifier(value), :init, false, false, true) 
       ({x, y}) -> JS.property( Translator.translate(x, env), Translator.translate(y, env),  :init, false, false, true) 
     end)
     |> JS.object_expression
+    |> make_map
   end
 
   def make_map_update(map, data, env) do

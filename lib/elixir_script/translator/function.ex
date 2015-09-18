@@ -52,7 +52,10 @@ defmodule ElixirScript.Translator.Function do
     |> Enum.to_list
 
     JS.call_expression(
-      JS.identifier("fun"),
+      JS.member_expression(
+        JS.identifier("Patterns"),
+        JS.identifier("defmatch")
+      ),
       clauses
     )
   end
@@ -77,28 +80,43 @@ defmodule ElixirScript.Translator.Function do
   end
 
   defp do_make_function_clause(patterns, params, body, guard_body) do
-    JS.array_expression([
-      JS.array_expression(patterns),
-      JS.function_expression(
-        params,
-        [],
-        body
+    JS.object_expression([
+      JS.property(
+        JS.identifier(:pattern),
+        JS.array_expression(patterns)        
       ),
-      JS.function_expression(
-        params,
-        [],
-        guard_body
-      )
+      JS.property(
+        JS.identifier(:fn),
+        JS.function_expression(
+          params,
+          [],
+          body
+        )      
+      ),
+      JS.property(
+        JS.identifier(:guard),
+        JS.function_expression(
+          params,
+          [],
+          guard_body
+        )      
+      )      
     ])
   end
 
   defp do_make_function_clause(patterns, params, body) do
-    JS.array_expression([
-      JS.array_expression(patterns),
-      JS.function_expression(
-        params,
-        [],
-        body
+    JS.object_expression([
+      JS.property(
+        JS.identifier(:pattern),
+        JS.array_expression(patterns)        
+      ),
+      JS.property(
+        JS.identifier(:fn),
+        JS.function_expression(
+          params,
+          [],
+          body
+        )      
       )
     ])
   end

@@ -10,7 +10,7 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-      let test1 = fun([[], function() {
+      let test1 = Patterns.defmatch([[], function() {
         return 1 * 1;
       }]);
     """
@@ -25,7 +25,7 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-      let test1 = fun([[], function() {
+      let test1 = Patterns.defmatch([[], function() {
         return null;
       }]);
     """
@@ -38,7 +38,7 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-      let test1 = fun([[fun.parameter, fun.parameter], function(alpha, beta) {
+      let test1 = Patterns.defmatch([[Patterns.variable(), Patterns.variable()], function(alpha, beta) {
         return null;
       }]);
     """
@@ -52,8 +52,8 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-     let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
-             let [a0] = fun.bind(fun.parameter,alpha);
+     let test1 = Patterns.defmatch([[Patterns.variable(), Patterns.variable()], function(alpha,beta)    {
+             let [a0] = Patterns.match(Patterns.variable(),alpha);
              return     a0;
            }]);
     """
@@ -71,12 +71,12 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
-             return     fun([[fun.parameter], function(x)    {
+let test1 = Patterns.defmatch([[Patterns.variable(), Patterns.variable()], function(alpha,beta)    {
+             return     Patterns.defmatch([[Patterns.variable()], function(x)    {
              return     2;
            }, function(x)    {
              return     Kernel.__in__(x,Erlang.list(false,null));
-           }],[[fun.wildcard], function()    {
+           }],[[Patterns.wildcard()], function()    {
              return     1;
            }]).call(this, 1 == 1);
            }]);
@@ -99,18 +99,18 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
     end
 
     js_code = """
-let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
-             return     fun([[fun.parameter], function(x)    {
+let test1 = Patterns.defmatch([[Patterns.variable(), Patterns.variable()], function(alpha,beta)    {
+             return     Patterns.defmatch([[Patterns.variable()], function(x)    {
              return     2;
            }, function(x)    {
              return     Kernel.__in__(x,Erlang.list(false,null));
-           }],[[fun.wildcard], function()    {
-             return     fun([[fun.parameter], function(x)    {
-             let [a000] = fun.bind(fun.parameter,1);
+           }],[[Patterns.wildcard()], function()    {
+             return     Patterns.defmatch([[Patterns.variable()], function(x)    {
+             let [a000] = Patterns.match(Patterns.variable(),1);
              return     a000;
            }, function(x)    {
              return     Kernel.__in__(x,Erlang.list(false,null));
-           }],[[fun.wildcard], function()    {
+           }],[[Patterns.wildcard()], function()    {
              return     4;
            }]).call(this,2 == 2);
            }]).call(this,1 == 1);
@@ -126,8 +126,8 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
     end
 
     js_code = """
-     let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
-             let [a0,b0] = fun.bind(Erlang.tuple(fun.parameter,fun.parameter),Erlang.tuple(1,2));
+     let test1 = Patterns.defmatch([[Patterns.variable(), Patterns.variable()], function(alpha,beta)    {
+             let [a0,b0] = Patterns.match(Erlang.tuple(Patterns.variable(),Patterns.variable()),Erlang.tuple(1,2));
              let _ref = Erlang.tuple(a0,b0);
              return     _ref;
            }]);
@@ -192,7 +192,7 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
       Enum.map(list, fn(x) -> x * 2 end)
     end
 
-    js_code = "Enum.map(list,fun([[fun.parameter], function(x){return x * 2;}]))"
+    js_code = "Enum.map(list,Patterns.defmatch([[Patterns.variable()], function(x){return x * 2;}]))"
 
     assert_translation(ex_ast, js_code)
   end
@@ -221,7 +221,7 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
     js_code = """
      const __MODULE__ = Erlang.atom('Example');
 
-     let example = fun(
+     let example = Patterns.defmatch(
         [
           [], 
           function() {
@@ -229,24 +229,24 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
           }
         ],
         [
-          [fun.parameter], function(oneArg) {
+          [Patterns.variable()], function(oneArg) {
                 return null;
            } 
         ],
         [
-          [fun.parameter, fun.parameter], 
+          [Patterns.variable(), Patterns.variable()], 
           function(oneArg, twoArg) {
             return null;
           } 
         ], 
         [
-          [fun.parameter, fun.parameter, fun.parameter], 
+          [Patterns.variable(), Patterns.variable(), Patterns.variable()], 
           function(oneArg, twoArg, redArg) {
             return null;
           } 
         ],  
         [
-          [fun.parameter, fun.parameter, fun.parameter, fun.parameter], 
+          [Patterns.variable(), Patterns.variable(), Patterns.variable(), Patterns.variable()], 
           function(oneArg, twoArg, redArg, blueArg) {
             return null;
           } 
@@ -280,7 +280,7 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
     js_code = """
      const __MODULE__ = Erlang.atom('Example');
 
-     let example = fun(
+     let example = Patterns.defmatch(
         [
           [], 
           function() {
@@ -288,24 +288,24 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
           }
         ],
         [
-          [fun.parameter], function(oneArg) {
+          [Patterns.variable()], function(oneArg) {
                 return null;
            } 
         ],
         [
-          [fun.parameter, fun.parameter], 
+          [Patterns.variable(), Patterns.variable()], 
           function(oneArg, twoArg) {
             return null;
           } 
         ], 
         [
-          [fun.parameter, fun.parameter, fun.parameter], 
+          [Patterns.variable(), Patterns.variable(), Patterns.variable()], 
           function(oneArg, twoArg, redArg) {
             return null;
           } 
         ],  
         [
-          [fun.parameter, fun.parameter, fun.parameter, fun.parameter], 
+          [Patterns.variable(), Patterns.variable(), Patterns.variable(), Patterns.variable()], 
           function(oneArg, twoArg, redArg, blueArg) {
             return null;
           } 
@@ -326,7 +326,7 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
 
     js_code = """
      const __MODULE__ = Erlang.atom('Example');
-     let example = fun([[fun.parameter], function(oneArg){return null;}]);
+     let example = Patterns.defmatch([[Patterns.variable()], function(oneArg){return null;}]);
      export {example};
     """  
     assert_translation(ex_ast, js_code)
@@ -370,8 +370,8 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
 
 
     js_code = """
-      let something = fun(
-        [[fun.parameter], function(one){ return null; }, function(one){ return Kernel.is_number(one); } ]
+      let something = Patterns.defmatch(
+        [[Patterns.variable()], function(one){ return null; }, function(one){ return Kernel.is_number(one); } ]
       );
     """
 
@@ -385,9 +385,9 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
 
 
     js_code = """
-      let something = fun(
+      let something = Patterns.defmatch(
         [
-          [fun.parameter], 
+          [Patterns.variable()], 
           function(one){ 
             return null; 
           }, 
@@ -407,9 +407,9 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
 
 
     js_code = """
-      let something = fun(
+      let something = Patterns.defmatch(
         [
-          [fun.parameter], 
+          [Patterns.variable()], 
           function(one){ 
             return null; 
           }, 
@@ -429,8 +429,8 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
 
 
     js_code = """
-    let something = fun([
-      [fun.parameter, fun.parameter], 
+    let something = Patterns.defmatch([
+      [Patterns.variable(), Patterns.variable()], 
       function(one,two){
         return null;
       }, 
@@ -455,9 +455,9 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
     js_code = """
     const __MODULE__ = Erlang.atom('Example');
 
-    let something = fun(
+    let something = Patterns.defmatch(
     [
-      [fun.parameter], 
+      [Patterns.variable()], 
       function(one) {
         return null;
       }, 
@@ -466,7 +466,7 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
       }
     ], 
     [
-      [fun.parameter], 
+      [Patterns.variable()], 
       function(one) {
         return null;
       }, 
@@ -491,7 +491,7 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
 
 
     js_code = """
-      let something = fun(
+      let something = Patterns.defmatch(
         [
           [1], 
           function(){ 
@@ -512,7 +512,7 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
 
 
     js_code = """
-      let something = fun(
+      let something = Patterns.defmatch(
         [
           [fun.headTail], 
           function(apple, fruits){ 
@@ -533,8 +533,8 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
 
 
     js_code = """
-      let something = fun([
-        [Erlang.list(fun.parameter, fun.parameter, fun.parameter)], 
+      let something = Patterns.defmatch([
+        [Erlang.list(Patterns.variable(), Patterns.variable(), Patterns.variable())], 
         function(apple, pear, banana) {
           return null;
         }
@@ -552,9 +552,9 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
 
 
     js_code = """
-      let something = fun(
+      let something = Patterns.defmatch(
         [
-          [Erlang.tuple(fun.parameter, fun.parameter)], 
+          [Erlang.tuple(Patterns.variable(), Patterns.variable())], 
           function(apple, fruits){ 
             return null; 
           }
@@ -573,7 +573,7 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
 
 
     js_code = """
-      let something = fun([
+      let something = Patterns.defmatch([
         [{'__struct__': Erlang.atom('AStruct')}], 
         function(){
           return null;
@@ -591,7 +591,7 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
     end
 
     js_code = """
-      let something = fun(
+      let something = Patterns.defmatch(
         [
           [fun.capture({'__struct__': Erlang.atom('AStruct')})], 
           function(a){ 
@@ -610,7 +610,7 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
     end
 
     js_code = """
-     let something = fun([[fun.capture({
+     let something = Patterns.defmatch([[fun.capture({
         'which': 13
        })], function(a)    {
          return     null;
@@ -628,8 +628,8 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
 
 
     js_code = """
-      let something = fun([
-        [{'__struct__': Erlang.atom('AStruct'), 'key': fun.parameter, 'key1': 2}], 
+      let something = Patterns.defmatch([
+        [{'__struct__': Erlang.atom('AStruct'), 'key': Patterns.variable(), 'key1': 2}], 
         function(value){
           return null;
         }
@@ -645,9 +645,9 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
 
 
     js_code = """
-     let something = fun(
+     let something = Patterns.defmatch(
       [
-        [{'__struct__': Erlang.atom('AStruct'), 'key': fun.parameter, 'key1': 2}], 
+        [{'__struct__': Erlang.atom('AStruct'), 'key': Patterns.variable(), 'key1': 2}], 
         function(value){
           return null;
         }, 
@@ -668,7 +668,7 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
 
 
     js_code = """
-      let something = fun(
+      let something = Patterns.defmatch(
         [
           [fun.startsWith('Bearer')], 
           function(token){ 
@@ -687,9 +687,9 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
 
 
     js_code = """
-      let something = fun(
+      let something = Patterns.defmatch(
         [
-          [fun.startsWith('Bearer'), fun.parameter], 
+          [fun.startsWith('Bearer'), Patterns.variable()], 
           function(token, hotel){ 
             return null; 
           }
@@ -706,9 +706,9 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
 
 
     js_code = """
-      let something = fun(
+      let something = Patterns.defmatch(
         [
-          [fun.startsWith('Bearer'), fun.parameter, 1], 
+          [fun.startsWith('Bearer'), Patterns.variable(), 1], 
           function(token, hotel){ 
             return null; 
           }
@@ -741,15 +741,15 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
     js_code = """
     const __MODULE__ = Erlang.atom('Example');
 
-    let something = fun([[1], function() {
+    let something = Patterns.defmatch([[1], function() {
       return null;
     }], [[2], function() {
       return null;
-    }], [[fun.parameter], function(one) {
+    }], [[Patterns.variable()], function(one) {
       return null;
     }, function(one) {
       return Kernel.is_binary(one);
-    }], [[fun.parameter], function(one) {
+    }], [[Patterns.variable()], function(one) {
       return null;
     }]);
 
@@ -771,9 +771,9 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
     end
 
     js_code = """
-     let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
-             let [a0] = fun.bind(fun.parameter,1);
-             let [a1] = fun.bind(fun.parameter,2);
+     let test1 = Patterns.defmatch([[Patterns.variable(), Patterns.variable()], function(alpha,beta)    {
+             let [a0] = Patterns.match(Patterns.variable(),1);
+             let [a1] = Patterns.match(Patterns.variable(),2);
              return     a1;
            }]);
     """
@@ -789,10 +789,10 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
     end
 
     js_code = """
-     let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
-             let [a0] = fun.bind(fun.parameter,1);
-             let [a1] = fun.bind(fun.parameter,a0);
-             let [a2] = fun.bind(fun.parameter,2);
+     let test1 = Patterns.defmatch([[Patterns.variable(), Patterns.variable()], function(alpha,beta)    {
+             let [a0] = Patterns.match(Patterns.variable(),1);
+             let [a1] = Patterns.match(Patterns.variable(),a0);
+             let [a2] = Patterns.match(Patterns.variable(),2);
              return     a2;
            }]);
     """
@@ -807,9 +807,9 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
     end
 
     js_code = """
-     let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
-             let [a0] = fun.bind(fun.parameter,1);
-             let [a1,b0,c0] = fun.bind(Erlang.list(fun.parameter,fun.parameter,fun.parameter),Erlang.list(a0,2,3));
+     let test1 = Patterns.defmatch([[Patterns.variable(), Patterns.variable()], function(alpha,beta)    {
+             let [a0] = Patterns.match(Patterns.variable(),1);
+             let [a1,b0,c0] = Patterns.match(Erlang.list(Patterns.variable(),Patterns.variable(),Patterns.variable()),Erlang.list(a0,2,3));
              let _ref = Erlang.list(a1,b0,c0);
              return     _ref;
            }]);
@@ -828,9 +828,9 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
     end
 
     js_code = """
-     let test1 = fun([[fun.parameter, fun.parameter], function(alpha__qmark__,beta__emark__)    {
-             let [a__qmark__0] = fun.bind(fun.parameter,1);
-             let [b__emark__0] = fun.bind(fun.parameter,2);
+     let test1 = Patterns.defmatch([[Patterns.variable(), Patterns.variable()], function(alpha__qmark__,beta__emark__)    {
+             let [a__qmark__0] = Patterns.match(Patterns.variable(),1);
+             let [b__emark__0] = Patterns.match(Patterns.variable(),2);
              return     b__emark__0;
            }]);
     """
