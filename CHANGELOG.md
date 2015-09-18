@@ -10,7 +10,7 @@
   * `alias` now translates to a namespace import unless `default` option is given
 
 * Breaking
-  * `Mutable.update` has been replaced by `JS.mutate`
+  * `Mutable.update` has been replaced by `JS.update`
   * `transpile`, `transpile_quoted`, and `transpile_path` are now `compile`, `compile_quoted`, and `compile_path`
 
 # v0.10.0
