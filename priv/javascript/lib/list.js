@@ -1,9 +1,10 @@
 import Erlang from './erlang';
 import Kernel from './kernel';
+import Immutable from './immutable/immutable';
 
 let List = {};
 
-List.__MODULE__ = Erlang.atom('List');
+List.__MODULE__ = Kernel.SpecialForms.atom('List');
 
 List.delete = function(list, item){
   return list.filter(x => x !== item);
@@ -14,20 +15,14 @@ List.delete_at = function(list, index){
 };
 
 List.duplicate = function(elem, n){
-  let new_value = [];
-
-  for (var i = 0; i < n; i++) {
-    new_value.push(elem);
-  }
-
-  return Erlang.list(...new_value);
+  return Immutable.Repeat(elem, n);
 };
 
 List.first = function(list){
   return list.first;
 };
 
-List.flatten = function(list, tail = Erlang.list()){
+List.flatten = function(list, tail = Kernel.SpecialForms.list()){
   return list.flatten().concat(tail);
 };
 
@@ -51,7 +46,7 @@ List.insert_at = function(list, index, value){
     }
   }
 
-  return Erlang.list(...new_value);
+  return Kernel.SpecialForms.list(...new_value);
 };
 
 List.keydelete = function(list, key, position){
@@ -77,7 +72,7 @@ List.keyreplace = function(list, key, position, new_tuple){
     }
   }
 
-  return Erlang.list(...new_list);
+  return Kernel.SpecialForms.list(...new_list);
 };
 
 
@@ -109,7 +104,7 @@ List.keysort = function(list, position){
 
   });
 
-  return Erlang.list(...new_list);
+  return Kernel.SpecialForms.list(...new_list);
 };
 
 List.keystore = function(list, key, position, new_tuple){
@@ -129,7 +124,7 @@ List.keystore = function(list, key, position, new_tuple){
     new_list.push(new_tuple);
   }
 
-  return Erlang.list(...new_list);
+  return Kernel.SpecialForms.list(...new_list);
 };
 
 List.last = function(list){
@@ -147,7 +142,7 @@ List.replace_at = function(list, index, value){
     }
   }
 
-  return Erlang.list(...new_value);
+  return Kernel.SpecialForms.list(...new_value);
 };
 
 List.update_at = function(list, index, fun){
@@ -168,22 +163,22 @@ List.wrap = function(list){
   if(Kernel.is_list(list)){
     return list;
   }else if(list == null){
-    return Erlang.list();
+    return Kernel.SpecialForms.list();
   }else{
-    return Erlang.list(list);
+    return Kernel.SpecialForms.list(list);
   }
 };
 
 List.zip = function(list_of_lists){
   if(list_of_lists.count() === 0){
-    return Erlang.list();
+    return Kernel.SpecialForms.list();
   }
 
   return list_of_lists.first().zip(list_of_lists.rest());
 };
 
 List.to_tuple = function(list){
-  return Erlang.tuple.apply(null, list);
+  return Kernel.SpecialForms.tuple.apply(null, list);
 };
 
 List.append = function(list, value){

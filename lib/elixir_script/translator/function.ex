@@ -25,27 +25,27 @@ defmodule ElixirScript.Translator.Function do
       {:->, _, [ [{:when, _, [params | guards]}], body ]} ->
         { patterns, params } = Match.build_match(List.wrap(params), env)
         params = make_params(params)
-        body = make_body(body, env)
+        body = make_function_body(body, env)
         guard_body = make_guards(guards, env)
         do_make_function_clause(patterns, params, body, guard_body)
 
       ({:->, _, [params, body]}) ->
         { patterns, params } = Match.build_match(params, env)
         params = make_params(params)
-        body = make_body(body, env)
+        body = make_function_body(body, env)
         do_make_function_clause(patterns, params, body)        
 
       ({_, _, [{:when, _, [{_, _, params} | guards] }, [do: body]]}) ->
         { patterns, params } = Match.build_match(params, env)
         params = make_params(params)
-        body = make_body(body, env)
+        body = make_function_body(body, env)
         guard_body = make_guards(guards, env)
         do_make_function_clause(patterns, params, body, guard_body)
 
       ({_, _, [{_, _, params}, [do: body]]}) ->
         { patterns, params } = Match.build_match(params, env)
         params = make_params(params)
-        body = make_body(body, env)
+        body = make_function_body(body, env)
         do_make_function_clause(patterns, params, body)
 
     end)
@@ -60,7 +60,7 @@ defmodule ElixirScript.Translator.Function do
     )
   end
 
-  defp make_body(body, env) do
+  def make_function_body(body, env) do
     body
     |> prepare_function_body(env)
     |> JS.block_statement

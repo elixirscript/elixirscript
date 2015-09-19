@@ -84,6 +84,10 @@ let Enum = {
     return collection.flatMap(fun);
   },
 
+  into: function(collection, list){
+    return list.concat(collection);
+  },
+
   map: function(collection, fun){
     return collection.map(fun);
   },

@@ -39,7 +39,7 @@ export class Type {
 
 export class Bound {
   constructor(value) {
-    this.value = value;
+    this.value = Immutable.fromJS(value);
   }
 }
 
@@ -65,4 +65,8 @@ export function headTail(){
 
 export function type(type, objPattern = {}){
   return new Type(type, objPattern);
+}
+
+export function bound(value){
+  return new Bound(value);
 }

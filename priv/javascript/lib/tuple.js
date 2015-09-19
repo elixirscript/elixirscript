@@ -1,4 +1,5 @@
 import Erlang from './erlang';
+import Immutable from './immutable/immutable';
 
 let Tuple = {};
 
@@ -22,13 +23,7 @@ Tuple.delete_at = function(tuple, index){
 };
 
 Tuple.duplicate = function(data, size){
-  let array = [];
-
-  for (var i = size - 1; i >= 0; i--) {
-    array.push(data);
-  }
-
-  return Erlang.tuple.apply(null, array);
+  return Erlang.tuple.apply(null, Immutable.Repeat(data, size).toJS());
 };
 
 Tuple.insert_at = function(tuple, index, term){

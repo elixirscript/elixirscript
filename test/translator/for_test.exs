@@ -20,6 +20,24 @@ defmodule ElixirScript.Translator.For.Test do
     assert_translation(ex_ast, js_code)
   end
 
+  should "translate simple for with into" do
+    ex_ast = quote do
+      for n <- [1, 2, 3, 4], into: [], do: n * 2
+    end
+
+    js_code = """
+     (function () {
+             let [_results] = Patterns.match(Patterns.variable(),Erlang.list());
+         for (let n of Erlang.list(1, 2, 3, 4)) {
+             _results = List.append(_results, n * 2);
+         }
+         return _results;
+     }.call(this))
+    """
+
+    assert_translation(ex_ast, js_code)
+  end
+
   should "translate for with string" do
     ex_ast = quote do
       for n <- "Opera", do: n

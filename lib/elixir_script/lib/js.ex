@@ -35,4 +35,16 @@ defmodule ElixirScript.Lib.JS do
   """
   defmacro import(module, from)
 
+
+  @doc """
+  Turns an ElixirScript data structure into a JavaScript one.
+  """
+  defmacro to_js(value)
+
+
+  @doc """
+  Turns an ElixirScript data structure into JSON.
+  """
+  defmacro to_json(value)
+
 end

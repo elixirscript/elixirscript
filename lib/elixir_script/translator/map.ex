@@ -15,10 +15,12 @@ defmodule ElixirScript.Translator.Map do
   end
 
   def make_get_property(target, property, env) do
-    JS.member_expression(
-      Translator.translate(target, env),
-      Translator.translate(property, env),
-      true
+    JS.call_expression(
+      JS.member_expression(
+        Translator.translate(target, env),
+        JS.identifier("get")
+      ),
+      [Translator.translate(property, env)]
     )
   end
 

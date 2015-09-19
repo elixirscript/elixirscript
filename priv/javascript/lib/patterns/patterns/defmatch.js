@@ -49,3 +49,33 @@ export function match(pattern, expr, guard = () => true){
     throw new MatchError('No match for: ' + expr.toString());
   }
 }
+
+export function match_no_throw(pattern, expr, guard = () => true){
+  pattern = Immutable.fromJS(pattern);
+  expr = Immutable.fromJS(expr);
+
+  let result = [];
+  let processedPattern = buildMatch(pattern);
+  if (processedPattern(expr, result) && guard.apply(this, result)){
+    return result;
+  }else{
+    return null;
+  }
+}
+
+export function patternMap(collection, pattern, fun, guard = () => true){
+  let ret = [];
+
+  for(let elem of collection){
+    try{
+      let result = fun.apply(this, match(pattern, elem, guard));
+      ret.append(result);       
+    }catch(e){
+      if(typeof e !== MatchError){
+        throw e;
+      }
+    }
+  }
+
+  return Immutable.fromJS(ret);
+}
