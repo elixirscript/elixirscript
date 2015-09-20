@@ -4,6 +4,7 @@ defmodule ElixirScript.PatternMatching.Match do
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Utils
+  alias ElixirScript.Translator.Map
 
   @wildcard JS.member_expression(
     JS.identifier(:Patterns),
@@ -123,7 +124,7 @@ defmodule ElixirScript.PatternMatching.Match do
   defp do_build_match({:%{}, _, props}, env) do
     properties = Enum.map(props, fn({key, value}) ->
       {pattern, params} = do_build_match(value, env)
-      { JS.property(JS.literal(key), hd(List.wrap(pattern))), params }
+      { Map.make_property(JS.literal(key), hd(List.wrap(pattern))), params }
     end)
 
     {props, params} = Enum.reduce(properties, {[], []}, fn({prop, param}, {props, params}) ->

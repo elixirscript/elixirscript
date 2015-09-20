@@ -9,8 +9,8 @@ defmodule ElixirScript.Translator.For.Test do
 
     js_code = """
      (function () {
-             let [_results] = Patterns.match(Patterns.variable(),Erlang.list());
-         for (let n of Erlang.list(1, 2, 3, 4)) {
+             let [_results] = Patterns.match(Patterns.variable(),Kernel.SpecialForms.list());
+         for (let n of Kernel.SpecialForms.list(1, 2, 3, 4)) {
              _results = List.append(_results, n * 2);
          }
          return _results;
@@ -27,8 +27,8 @@ defmodule ElixirScript.Translator.For.Test do
 
     js_code = """
      (function () {
-             let [_results] = Patterns.match(Patterns.variable(),Erlang.list());
-         for (let n of Erlang.list(1, 2, 3, 4)) {
+             let [_results] = Patterns.match(Patterns.variable(),Kernel.SpecialForms.list());
+         for (let n of Kernel.SpecialForms.list(1, 2, 3, 4)) {
              _results = List.append(_results, n * 2);
          }
          return _results;
@@ -45,7 +45,7 @@ defmodule ElixirScript.Translator.For.Test do
 
     js_code = """
      (function () {
-             let [_results] = Patterns.match(Patterns.variable(),Erlang.list());
+             let [_results] = Patterns.match(Patterns.variable(),Kernel.SpecialForms.list());
          for (let n of 'Opera') {
              _results = List.append(_results, n);
          }
@@ -63,9 +63,9 @@ defmodule ElixirScript.Translator.For.Test do
 
     js_code = """
      (function () {
-             let [_results] = Patterns.match(Patterns.variable(),Erlang.list());
-         for (let x of Erlang.list(1, 2)) {
-             for (let y of Erlang.list(2, 3)) {
+             let [_results] = Patterns.match(Patterns.variable(),Kernel.SpecialForms.list());
+         for (let x of Kernel.SpecialForms.list(1, 2)) {
+             for (let y of Kernel.SpecialForms.list(2, 3)) {
                  _results = List.append(_results, x * y);
              }
          }
@@ -85,9 +85,9 @@ defmodule ElixirScript.Translator.For.Test do
 
     js_code = """
      let [r] = Patterns.match(Patterns.variable(),(function()    {
-             let [_results] = Patterns.match(Patterns.variable(),Erlang.list());
-             for(let x of Erlang.list(1,2)) {
-         for(let y of Erlang.list(2,3)) {
+             let [_results] = Patterns.match(Patterns.variable(),Kernel.SpecialForms.list());
+             for(let x of Kernel.SpecialForms.list(1,2)) {
+         for(let y of Kernel.SpecialForms.list(2,3)) {
          _results = List.append(_results,x * y);
        }
        }
@@ -105,8 +105,8 @@ defmodule ElixirScript.Translator.For.Test do
 
     js_code = """
      (function () {
-             let [_results] = Patterns.match(Patterns.variable(),Erlang.list());
-         for (let n of Erlang.list(1, 2, 3, 4, 5, 6)) {
+             let [_results] = Patterns.match(Patterns.variable(),Kernel.SpecialForms.list());
+         for (let n of Kernel.SpecialForms.list(1, 2, 3, 4, 5, 6)) {
              if (n % 2 == 0)
                  _results = List.append(_results, n);
          }
@@ -126,9 +126,9 @@ defmodule ElixirScript.Translator.For.Test do
 
     js_code = """
      (function () {
-             let [_results] = Patterns.match(Patterns.variable(),Erlang.list());
-         for (let _ref of Erlang.list(Erlang.tuple(Erlang.atom('user'), 'john'), Erlang.tuple(Erlang.atom('admin'), 'john'), Erlang.tuple(Erlang.atom('user'), 'meg'))) {
-             if (Kernel.match__qmark__(_ref, Erlang.tuple(Erlang.atom('user'), undefined))) {
+             let [_results] = Patterns.match(Patterns.variable(),Kernel.SpecialForms.list());
+         for (let _ref of Kernel.SpecialForms.list(Kernel.SpecialForms.tuple(Kernel.SpecialForms.atom('user'), 'john'), Kernel.SpecialForms.tuple(Kernel.SpecialForms.atom('admin'), 'john'), Kernel.SpecialForms.tuple(Kernel.SpecialForms.atom('user'), 'meg'))) {
+             if (Kernel.match__qmark__(_ref, Kernel.SpecialForms.tuple(Kernel.SpecialForms.atom('user'), undefined))) {
                  let name = Kernel.elem(_ref, 1);
                  _results = List.append(_results, String.upcase(name));
              }

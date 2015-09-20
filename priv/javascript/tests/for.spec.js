@@ -7,7 +7,7 @@ var expect = require('chai').expect;
 const $ = Patterns.variable();
 
 describe('for', () => {
-  it('something', () => {
+  it('simple for', () => {
     //for n <- [1, 2, 3, 4], do: n * 2
     let collections = Immutable.fromJS([
       [$, [1, 2, 3, 4]]
@@ -18,7 +18,7 @@ describe('for', () => {
     expect(result).to.equal([2, 4, 6, 8]);
   });
 
-  it('something else', () => {
+  it('for with multiple generators', () => {
     //for x <- [1, 2], y <- [2, 3], do: x*y
     let collections = Immutable.fromJS([
       [$, [1, 2]],
@@ -31,7 +31,7 @@ describe('for', () => {
   });
 
 
-  it('something 3', () => {
+  it('for with filter', () => {
     //for n <- [1, 2, 3, 4, 5, 6], rem(n, 2) == 0, do: n
     let collections = Immutable.fromJS([
       [$, [1, 2, 3, 4, 5, 6]]
@@ -42,7 +42,7 @@ describe('for', () => {
     expect(result).to.equal([2, 4, 6]);
   });
 
-  it('something 4', () => {
+  it('for with pattern matching', () => {
     //for {:user, name} <- [user: "john", admin: "john", user: "meg"], do
     // String.upcase(name)
     //end

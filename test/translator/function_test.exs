@@ -75,7 +75,7 @@ let test1 = Patterns.defmatch([[Patterns.variable(), Patterns.variable()], funct
              return     Patterns.defmatch([[Patterns.variable()], function(x)    {
              return     2;
            }, function(x)    {
-             return     Kernel.__in__(x,Erlang.list(false,null));
+             return     Kernel.__in__(x,Kernel.SpecialForms.list(false,null));
            }],[[Patterns.wildcard()], function()    {
              return     1;
            }]).call(this, 1 == 1);
@@ -103,13 +103,13 @@ let test1 = Patterns.defmatch([[Patterns.variable(), Patterns.variable()], funct
              return     Patterns.defmatch([[Patterns.variable()], function(x)    {
              return     2;
            }, function(x)    {
-             return     Kernel.__in__(x,Erlang.list(false,null));
+             return     Kernel.__in__(x,Kernel.SpecialForms.list(false,null));
            }],[[Patterns.wildcard()], function()    {
              return     Patterns.defmatch([[Patterns.variable()], function(x)    {
              let [a000] = Patterns.match(Patterns.variable(),1);
              return     a000;
            }, function(x)    {
-             return     Kernel.__in__(x,Erlang.list(false,null));
+             return     Kernel.__in__(x,Kernel.SpecialForms.list(false,null));
            }],[[Patterns.wildcard()], function()    {
              return     4;
            }]).call(this,2 == 2);
@@ -127,8 +127,8 @@ let test1 = Patterns.defmatch([[Patterns.variable(), Patterns.variable()], funct
 
     js_code = """
      let test1 = Patterns.defmatch([[Patterns.variable(), Patterns.variable()], function(alpha,beta)    {
-             let [a0,b0] = Patterns.match(Erlang.tuple(Patterns.variable(),Patterns.variable()),Erlang.tuple(1,2));
-             let _ref = Erlang.tuple(a0,b0);
+             let [a0,b0] = Patterns.match(Kernel.SpecialForms.tuple(Patterns.variable(),Patterns.variable()),Kernel.SpecialForms.tuple(1,2));
+             let _ref = Kernel.SpecialForms.tuple(a0,b0);
              return     _ref;
            }]);
     """
@@ -219,7 +219,7 @@ let test1 = Patterns.defmatch([[Patterns.variable(), Patterns.variable()], funct
     end 
 
     js_code = """
-     const __MODULE__ = Erlang.atom('Example');
+     const __MODULE__ = Kernel.SpecialForms.atom('Example');
 
      let example = Patterns.defmatch(
         [
@@ -278,7 +278,7 @@ let test1 = Patterns.defmatch([[Patterns.variable(), Patterns.variable()], funct
     end 
 
     js_code = """
-     const __MODULE__ = Erlang.atom('Example');
+     const __MODULE__ = Kernel.SpecialForms.atom('Example');
 
      let example = Patterns.defmatch(
         [
@@ -325,7 +325,7 @@ let test1 = Patterns.defmatch([[Patterns.variable(), Patterns.variable()], funct
     end 
 
     js_code = """
-     const __MODULE__ = Erlang.atom('Example');
+     const __MODULE__ = Kernel.SpecialForms.atom('Example');
      let example = Patterns.defmatch([[Patterns.variable()], function(oneArg){return null;}]);
      export {example};
     """  
@@ -357,7 +357,7 @@ let test1 = Patterns.defmatch([[Patterns.variable(), Patterns.variable()], funct
       is_atom(:atom)
     end
 
-    js_code = "Kernel.is_atom(Erlang.atom('atom'))"
+    js_code = "Kernel.is_atom(Kernel.SpecialForms.atom('atom'))"
 
     assert_translation(ex_ast, js_code)
   end
@@ -435,7 +435,7 @@ let test1 = Patterns.defmatch([[Patterns.variable(), Patterns.variable()], funct
         return null;
       }, 
       function(one,two){
-        return Kernel.__in__(one, Erlang.list(1,2,3));
+        return Kernel.__in__(one, Kernel.SpecialForms.list(1,2,3));
       }
     ]);
     """
@@ -453,7 +453,7 @@ let test1 = Patterns.defmatch([[Patterns.variable(), Patterns.variable()], funct
     end 
 
     js_code = """
-    const __MODULE__ = Erlang.atom('Example');
+    const __MODULE__ = Kernel.SpecialForms.atom('Example');
 
     let something = Patterns.defmatch(
     [
@@ -462,7 +462,7 @@ let test1 = Patterns.defmatch([[Patterns.variable(), Patterns.variable()], funct
         return null;
       }, 
       function(one) {
-        return Kernel.__in__(one, Erlang.list(1, 2, 3));
+        return Kernel.__in__(one, Kernel.SpecialForms.list(1, 2, 3));
       }
     ], 
     [
@@ -534,7 +534,7 @@ let test1 = Patterns.defmatch([[Patterns.variable(), Patterns.variable()], funct
 
     js_code = """
       let something = Patterns.defmatch([
-        [Erlang.list(Patterns.variable(), Patterns.variable(), Patterns.variable())], 
+        [Kernel.SpecialForms.list(Patterns.variable(), Patterns.variable(), Patterns.variable())], 
         function(apple, pear, banana) {
           return null;
         }
@@ -554,7 +554,7 @@ let test1 = Patterns.defmatch([[Patterns.variable(), Patterns.variable()], funct
     js_code = """
       let something = Patterns.defmatch(
         [
-          [Erlang.tuple(Patterns.variable(), Patterns.variable())], 
+          [Kernel.SpecialForms.tuple(Patterns.variable(), Patterns.variable())], 
           function(apple, fruits){ 
             return null; 
           }
@@ -574,7 +574,7 @@ let test1 = Patterns.defmatch([[Patterns.variable(), Patterns.variable()], funct
 
     js_code = """
       let something = Patterns.defmatch([
-        [{'__struct__': Erlang.atom('AStruct')}], 
+        [{'__struct__': Kernel.SpecialForms.atom('AStruct')}], 
         function(){
           return null;
         }
@@ -593,7 +593,7 @@ let test1 = Patterns.defmatch([[Patterns.variable(), Patterns.variable()], funct
     js_code = """
       let something = Patterns.defmatch(
         [
-          [fun.capture({'__struct__': Erlang.atom('AStruct')})], 
+          [fun.capture({'__struct__': Kernel.SpecialForms.atom('AStruct')})], 
           function(a){ 
             return null; 
           }
@@ -629,7 +629,7 @@ let test1 = Patterns.defmatch([[Patterns.variable(), Patterns.variable()], funct
 
     js_code = """
       let something = Patterns.defmatch([
-        [{'__struct__': Erlang.atom('AStruct'), 'key': Patterns.variable(), 'key1': 2}], 
+        [{'__struct__': Kernel.SpecialForms.atom('AStruct'), 'key': Patterns.variable(), 'key1': 2}], 
         function(value){
           return null;
         }
@@ -647,7 +647,7 @@ let test1 = Patterns.defmatch([[Patterns.variable(), Patterns.variable()], funct
     js_code = """
      let something = Patterns.defmatch(
       [
-        [{'__struct__': Erlang.atom('AStruct'), 'key': Patterns.variable(), 'key1': 2}], 
+        [{'__struct__': Kernel.SpecialForms.atom('AStruct'), 'key': Patterns.variable(), 'key1': 2}], 
         function(value){
           return null;
         }, 
@@ -739,7 +739,7 @@ let test1 = Patterns.defmatch([[Patterns.variable(), Patterns.variable()], funct
 
 
     js_code = """
-    const __MODULE__ = Erlang.atom('Example');
+    const __MODULE__ = Kernel.SpecialForms.atom('Example');
 
     let something = Patterns.defmatch([[1], function() {
       return null;
@@ -809,8 +809,8 @@ let test1 = Patterns.defmatch([[Patterns.variable(), Patterns.variable()], funct
     js_code = """
      let test1 = Patterns.defmatch([[Patterns.variable(), Patterns.variable()], function(alpha,beta)    {
              let [a0] = Patterns.match(Patterns.variable(),1);
-             let [a1,b0,c0] = Patterns.match(Erlang.list(Patterns.variable(),Patterns.variable(),Patterns.variable()),Erlang.list(a0,2,3));
-             let _ref = Erlang.list(a1,b0,c0);
+             let [a1,b0,c0] = Patterns.match(Kernel.SpecialForms.list(Patterns.variable(),Patterns.variable(),Patterns.variable()),Kernel.SpecialForms.list(a0,2,3));
+             let _ref = Kernel.SpecialForms.list(a1,b0,c0);
              return     _ref;
            }]);
     """

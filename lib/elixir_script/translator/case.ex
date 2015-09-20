@@ -12,5 +12,5 @@ defmodule ElixirScript.Translator.Case do
       ),
       [JS.identifier(:this), Translator.translate(condition, env)]
     )
-  end  
+  end
 end

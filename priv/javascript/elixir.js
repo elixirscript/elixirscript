@@ -1,4 +1,6 @@
-self.mailbox = self.mailbox || {};
+import Immutable from './lib/immutable/immutable';
+
+self.mailbox = self.mailbox || Immutable.Map({});
 
 export { default as Patterns } from './lib/patterns/patterns';
 export { default as Immutable } from './lib/immutable/immutable';

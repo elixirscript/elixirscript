@@ -12,9 +12,9 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-      Patterns.defmatch({ pattern: [Erlang.atom('ok')], fn: function() {
+      Patterns.defmatch({ pattern: [Kernel.SpecialForms.atom('ok')], fn: function() {
         return value;
-      }}, [[Erlang.atom('error')], function() {
+      }}, [[Kernel.SpecialForms.atom('error')], function() {
         return null;
       }]).call(this, data)
     """
@@ -79,7 +79,7 @@ defmodule ElixirScript.Translator.Case.Test do
             return value0;
           }, 
           function(number) {
-            return Kernel.__in__(number, Erlang.list(1, 2, 3, 4));
+            return Kernel.__in__(number, Kernel.SpecialForms.list(1, 2, 3, 4));
           }
         ], 
         [
@@ -106,10 +106,10 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-      Patterns.defmatch([[Erlang.atom('ok')], function() {
+      Patterns.defmatch([[Kernel.SpecialForms.atom('ok')], function() {
         console.info('info');
         return Todo.add(data);
-      }], [[Erlang.atom('error')], function() {
+      }], [[Kernel.SpecialForms.atom('error')], function() {
         return null;
       }]).call(this, data)
     """
@@ -128,9 +128,9 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-      Patterns.defmatch([[Erlang.tuple(Patterns.variable(), Patterns.variable())], function(one, two) {
+      Patterns.defmatch([[Kernel.SpecialForms.tuple(Patterns.variable(), Patterns.variable())], function(one, two) {
         return console.info(one);
-      }], [[Erlang.atom('error')], function() {
+      }], [[Kernel.SpecialForms.atom('error')], function() {
         return null;
       }]).call(this, data)
     """
@@ -151,13 +151,13 @@ defmodule ElixirScript.Translator.Case.Test do
     js_code = """
       Patterns.defmatch(
         [
-          [Erlang.tuple(Erlang.tuple(Patterns.variable(), Patterns.variable()), Patterns.variable())], 
+          [Kernel.SpecialForms.tuple(Kernel.SpecialForms.tuple(Patterns.variable(), Patterns.variable()), Patterns.variable())], 
           function(one, two, three) {
             return console.info(one);
           }
         ], 
         [
-          [Erlang.atom('error')], 
+          [Kernel.SpecialForms.atom('error')], 
           function() {
             return null;
           }
@@ -177,9 +177,9 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-      Patterns.defmatch([[Erlang.tuple(Patterns.variable(), Erlang.tuple(Patterns.variable(), Patterns.variable()))], function(one, two, three) {
+      Patterns.defmatch([[Kernel.SpecialForms.tuple(Patterns.variable(), Kernel.SpecialForms.tuple(Patterns.variable(), Patterns.variable()))], function(one, two, three) {
         return console.info(one);
-      }], [[Erlang.atom('error')], function() {
+      }], [[Kernel.SpecialForms.atom('error')], function() {
         return null;
       }]).call(this, data)
     """
@@ -199,13 +199,13 @@ defmodule ElixirScript.Translator.Case.Test do
     js_code = """
       Patterns.defmatch(
         [
-          [{'__struct__': Erlang.atom('AStruct'), 'key': {'__struct__': Erlang.atom('BStruct'), 'key2': Patterns.variable()}}], 
+          [{'__struct__': Kernel.SpecialForms.atom('AStruct'), 'key': {'__struct__': Kernel.SpecialForms.atom('BStruct'), 'key2': Patterns.variable()}}], 
           function(value){
             return console.info(value);
           }
         ],
         [
-          [Erlang.atom('error')], 
+          [Kernel.SpecialForms.atom('error')], 
           function(){
             return null;
           }
@@ -228,13 +228,13 @@ defmodule ElixirScript.Translator.Case.Test do
     js_code = """
     Patterns.defmatch(
       [
-        [{'__struct__': Erlang.atom('AStruct'), 'key': {'__struct__': Erlang.atom('BStruct'), 'key2': Patterns.variable(), 'key3': {'__struct__': Erlang.atom('CStruct'), 'key4': Patterns.variable()}}}], 
+        [{'__struct__': Kernel.SpecialForms.atom('AStruct'), 'key': {'__struct__': Kernel.SpecialForms.atom('BStruct'), 'key2': Patterns.variable(), 'key3': {'__struct__': Kernel.SpecialForms.atom('CStruct'), 'key4': Patterns.variable()}}}], 
         function(value,value2){
           return console.info(value);
         }
       ],
       [
-        [Erlang.atom('error')], 
+        [Kernel.SpecialForms.atom('error')], 
         function(){
           return null;
         }

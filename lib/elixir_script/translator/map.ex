@@ -27,11 +27,23 @@ defmodule ElixirScript.Translator.Map do
   def make_object(properties, env) do
     object = properties
     |> Enum.map(fn
-      ({x, {:__aliases__, _, [value]}}) -> JS.property(Translator.translate(x, env), JS.identifier(value), :init, false, false, true) 
-      ({x, y}) -> JS.property( Translator.translate(x, env), Translator.translate(y, env),  :init, false, false, true) 
+      ({x, {:__aliases__, _, [value]}}) -> make_property(Translator.translate(x, env), JS.identifier(value)) 
+      ({x, y}) -> make_property(Translator.translate(x, env), Translator.translate(y, env)) 
     end)
     |> JS.object_expression
     |> make_map
+  end
+
+  def make_property(%ESTree.Identifier{} = key, value) do
+    JS.property(key, value) 
+  end
+
+  def make_property(%ESTree.Literal{value: k} = key, value) when is_binary(k) do
+    JS.property(JS.identifier(k), value) 
+  end
+
+  def make_property(key, value) do
+    JS.property(key, value, :init, false, false, true) 
   end
 
   def make_map_update(map, data, env) do

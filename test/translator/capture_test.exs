@@ -74,7 +74,7 @@ defmodule ElixirScript.Translator.Capture.Test do
 
     js_code = """
      let [fun] = Patterns.match(Patterns.variable(),Patterns.defmatch([[Patterns.variable(), Patterns.variable()], function(__1,__2)    {
-             return     Erlang.tuple(__1,__2);
+             return     Kernel.SpecialForms.tuple(__1,__2);
            }]));
     """
 
@@ -86,7 +86,7 @@ defmodule ElixirScript.Translator.Capture.Test do
 
     js_code = """
      let [fun] = Patterns.match(Patterns.variable(),Patterns.defmatch([[Patterns.variable(), Patterns.variable(), Patterns.variable()], function(__1,__2,__3)    {
-             return     Erlang.tuple(__1,__2,__3);
+             return     Kernel.SpecialForms.tuple(__1,__2,__3);
            }]));
     """
 

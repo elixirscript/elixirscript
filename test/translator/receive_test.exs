@@ -16,9 +16,9 @@ defmodule ElixirScript.Translator.Receive.Test do
 
     js_code = """
       Kernel.SpecialForms.receive(function(message) {
-        return Patterns.defmatch([[Erlang.atom('ok')], function() {
+        return Patterns.defmatch([[Kernel.SpecialForms.atom('ok')], function() {
           return value;
-        }], [[Erlang.atom('error')], function() {
+        }], [[Kernel.SpecialForms.atom('error')], function() {
           return value;
         }], [[Patterns.wildcard()], function() {
           return IO.puts('Unexpected message received');
@@ -46,9 +46,9 @@ defmodule ElixirScript.Translator.Receive.Test do
 
     js_code = """
       Kernel.SpecialForms.receive(function(message) {
-        return Patterns.defmatch([[Erlang.atom('ok')], function() {
+        return Patterns.defmatch([[Kernel.SpecialForms.atom('ok')], function() {
           return value;
-        }], [[Erlang.atom('error')], function() {
+        }], [[Kernel.SpecialForms.atom('error')], function() {
           return value;
         }], [[Patterns.wildcard()], function() {
           return IO.puts('Unexpected message received');

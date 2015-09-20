@@ -17,7 +17,7 @@ defmodule ElixirScript.Translator.Quote.Test do
         quote do: :time
     end
 
-    js_code = "Erlang.atom('time')"
+    js_code = "Kernel.SpecialForms.atom('time')"
 
     assert_translation(ex_ast, js_code)
   end
@@ -28,7 +28,7 @@ defmodule ElixirScript.Translator.Quote.Test do
         quote do: {1, 2}
     end
 
-    js_code = "Erlang.tuple(1, 2)"
+    js_code = "Kernel.SpecialForms.tuple(1, 2)"
 
     assert_translation(ex_ast, js_code)
   end
@@ -39,7 +39,7 @@ defmodule ElixirScript.Translator.Quote.Test do
         quote do: {1, 2, 3}
     end
 
-    js_code = "Erlang.tuple(Erlang.atom('{}'), Erlang.list(), Erlang.list(1, 2, 3))"
+    js_code = "Kernel.SpecialForms.tuple(Kernel.SpecialForms.atom('{}'), Kernel.SpecialForms.list(), Kernel.SpecialForms.list(1, 2, 3))"
 
     assert_translation(ex_ast, js_code)
   end
@@ -50,9 +50,9 @@ defmodule ElixirScript.Translator.Quote.Test do
         quote do: test(1)
     end
 
-    js_code = "Erlang.tuple(Erlang.atom('test'), 
-      Erlang.list(Erlang.tuple(Erlang.atom('context'),Erlang.atom('Elixir.ElixirScript.Translator.Quote.Test')),Erlang.tuple(Erlang.atom('import'),Erlang.atom('Elixir.ExUnit.Case'))), 
-      Erlang.list(1))"
+    js_code = "Kernel.SpecialForms.tuple(Kernel.SpecialForms.atom('test'), 
+      Kernel.SpecialForms.list(Kernel.SpecialForms.tuple(Kernel.SpecialForms.atom('context'),Kernel.SpecialForms.atom('Elixir.ElixirScript.Translator.Quote.Test')),Kernel.SpecialForms.tuple(Kernel.SpecialForms.atom('import'),Kernel.SpecialForms.atom('Elixir.ExUnit.Case'))), 
+      Kernel.SpecialForms.list(1))"
 
     assert_translation(ex_ast, js_code)
   end
@@ -63,10 +63,10 @@ defmodule ElixirScript.Translator.Quote.Test do
         quote do: test(x)
     end
 
-    js_code = "Erlang.tuple(
-      Erlang.atom('test'),
-      Erlang.list(Erlang.tuple(Erlang.atom('context'),Erlang.atom('Elixir.ElixirScript.Translator.Quote.Test')),Erlang.tuple(Erlang.atom('import'),Erlang.atom('Elixir.ExUnit.Case'))),
-      Erlang.list(Erlang.tuple(Erlang.atom('x'),Erlang.list(),Erlang.atom('Elixir.ElixirScript.Translator.Quote.Test')))
+    js_code = "Kernel.SpecialForms.tuple(
+      Kernel.SpecialForms.atom('test'),
+      Kernel.SpecialForms.list(Kernel.SpecialForms.tuple(Kernel.SpecialForms.atom('context'),Kernel.SpecialForms.atom('Elixir.ElixirScript.Translator.Quote.Test')),Kernel.SpecialForms.tuple(Kernel.SpecialForms.atom('import'),Kernel.SpecialForms.atom('Elixir.ExUnit.Case'))),
+      Kernel.SpecialForms.list(Kernel.SpecialForms.tuple(Kernel.SpecialForms.atom('x'),Kernel.SpecialForms.list(),Kernel.SpecialForms.atom('Elixir.ElixirScript.Translator.Quote.Test')))
     )"
 
     assert_translation(ex_ast, js_code)
@@ -78,10 +78,10 @@ defmodule ElixirScript.Translator.Quote.Test do
         quote do: test(unquote(x))
     end
 
-    js_code = "Erlang.tuple(
-      Erlang.atom('test'), 
-      Erlang.list(Erlang.tuple(Erlang.atom('context'),Erlang.atom('Elixir.ElixirScript.Translator.Quote.Test')),Erlang.tuple(Erlang.atom('import'),Erlang.atom('Elixir.ExUnit.Case'))),
-      Erlang.list(x)
+    js_code = "Kernel.SpecialForms.tuple(
+      Kernel.SpecialForms.atom('test'), 
+      Kernel.SpecialForms.list(Kernel.SpecialForms.tuple(Kernel.SpecialForms.atom('context'),Kernel.SpecialForms.atom('Elixir.ElixirScript.Translator.Quote.Test')),Kernel.SpecialForms.tuple(Kernel.SpecialForms.atom('import'),Kernel.SpecialForms.atom('Elixir.ExUnit.Case'))),
+      Kernel.SpecialForms.list(x)
     )"
 
     assert_translation(ex_ast, js_code)
@@ -93,7 +93,7 @@ defmodule ElixirScript.Translator.Quote.Test do
         quote do: sum(1, unquote_splicing(values), 5)
     end
 
-    js_code = "Erlang.tuple(Erlang.atom('sum'), Erlang.list(), Enum.concat(Erlang.list(1), values, Erlang.list(5)))"
+    js_code = "Kernel.SpecialForms.tuple(Kernel.SpecialForms.atom('sum'), Kernel.SpecialForms.list(), Enum.concat(Kernel.SpecialForms.list(1), values, Kernel.SpecialForms.list(5)))"
 
     assert_translation(ex_ast, js_code)
   end
@@ -105,10 +105,10 @@ defmodule ElixirScript.Translator.Quote.Test do
       end
     end
 
-    js_code = "Erlang.tuple(
-      Erlang.atom('*'),
-      Erlang.list(Erlang.tuple(Erlang.atom('context'),Erlang.atom('Elixir.ElixirScript.Translator.Quote.Test')),Erlang.tuple(Erlang.atom('import'),Erlang.atom('Elixir.Kernel'))),
-      Erlang.list(x, x)
+    js_code = "Kernel.SpecialForms.tuple(
+      Kernel.SpecialForms.atom('*'),
+      Kernel.SpecialForms.list(Kernel.SpecialForms.tuple(Kernel.SpecialForms.atom('context'),Kernel.SpecialForms.atom('Elixir.ElixirScript.Translator.Quote.Test')),Kernel.SpecialForms.tuple(Kernel.SpecialForms.atom('import'),Kernel.SpecialForms.atom('Elixir.Kernel'))),
+      Kernel.SpecialForms.list(x, x)
     )"
 
     assert_translation(ex_ast, js_code)    

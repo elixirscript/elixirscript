@@ -31,7 +31,7 @@ defmodule ElixirScript.Translator.Bug.Test do
 
     js_code = """
      import { default as JQuery } from 'jquery';
-     const __MODULE__ = Erlang.atom('Todo');
+     const __MODULE__ = Kernel.SpecialForms.atom('Todo');
      
      JQuery(JS.get_property_or_call_function(e, 'target'));
      export {};
@@ -104,18 +104,18 @@ defmodule ElixirScript.Translator.Bug.Test do
     js_code = """
       let getDispatcher = Patterns.defmatch([[], function() {
         return DeLorean.Flux.createDispatcher({
-          [Erlang.atom('startPainting')]: Patterns.defmatch([[], function() {
+          [Kernel.SpecialForms.atom('startPainting')]: Patterns.defmatch([[], function() {
             return this.dispatch('startPainting');
           }]),
-          [Erlang.atom('stopPainting')]: Patterns.defmatch([[], function() {
+          [Kernel.SpecialForms.atom('stopPainting')]: Patterns.defmatch([[], function() {
             return this.dispatch('stopPainting');
           }]),
-          [Erlang.atom('addPoint')]: Patterns.defmatch([[Patterns.variable()], function(data) {
+          [Kernel.SpecialForms.atom('addPoint')]: Patterns.defmatch([[Patterns.variable()], function(data) {
             return this.dispatch('addPoint', data);
           }]),
-           [Erlang.atom('getStores')]: Patterns.defmatch([[], function() {
+           [Kernel.SpecialForms.atom('getStores')]: Patterns.defmatch([[], function() {
             return {
-              [Erlang.atom('graphic')]: GraphicStore
+              [Kernel.SpecialForms.atom('graphic')]: GraphicStore
             };
           }])
         });

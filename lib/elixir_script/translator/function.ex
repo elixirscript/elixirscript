@@ -5,6 +5,7 @@ defmodule ElixirScript.Translator.Function do
   alias ElixirScript.Translator.Utils
   alias ElixirScript.PatternMatching.Match
   alias ElixirScript.Preprocess.Variables
+  alias ElixirScript.Translator.Map
 
 
   def process_function(name, functions, env) do
@@ -81,43 +82,16 @@ defmodule ElixirScript.Translator.Function do
 
   defp do_make_function_clause(patterns, params, body, guard_body) do
     JS.object_expression([
-      JS.property(
-        JS.identifier(:pattern),
-        JS.array_expression(patterns)        
-      ),
-      JS.property(
-        JS.identifier(:fn),
-        JS.function_expression(
-          params,
-          [],
-          body
-        )      
-      ),
-      JS.property(
-        JS.identifier(:guard),
-        JS.function_expression(
-          params,
-          [],
-          guard_body
-        )      
-      )      
+      Map.make_property(JS.literal("pattern"), JS.array_expression(patterns)),
+      Map.make_property(JS.literal("fn"), JS.function_expression(params, [], body) ),
+      Map.make_property(JS.literal("guard"), JS.function_expression(params, [], guard_body) )      
     ])
   end
 
   defp do_make_function_clause(patterns, params, body) do
     JS.object_expression([
-      JS.property(
-        JS.identifier(:pattern),
-        JS.array_expression(patterns)        
-      ),
-      JS.property(
-        JS.identifier(:fn),
-        JS.function_expression(
-          params,
-          [],
-          body
-        )      
-      )
+      Map.make_property(JS.literal("pattern"), JS.array_expression(patterns)),
+      Map.make_property(JS.literal("fn"), JS.function_expression(params, [], body) )
     ])
   end
 

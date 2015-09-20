@@ -12,7 +12,7 @@ defmodule ElixirScript.Test do
 
   should "turn javascript ast into javascript code strings" do
     js_code = ElixirScript.compile(":atom")
-    assert hd(js_code) == "Erlang.atom('atom')"
+    assert hd(js_code) == "Kernel.SpecialForms.atom('atom')"
   end
 
   should "parse one module correctly" do
@@ -33,7 +33,7 @@ defmodule ElixirScript.Test do
     assert_js_matches """
       import { fun, Erlang, Kernel, Atom, Enum, Integer, JS, List, Range, Tuple, Agent, Keyword, BitString } from 'elixir';
       
-      const __MODULE__ = Erlang.atom('Elephant');
+      const __MODULE__ = Kernel.SpecialForms.atom('Elephant');
 
       let something_else = Patterns.defmatch([[], function() {
         return null;
@@ -71,7 +71,7 @@ defmodule ElixirScript.Test do
     assert_js_matches """
     import { fun, Erlang, Kernel, Atom, Enum, Integer, JS, List, Range, Tuple, Agent, Keyword, BitString } from 'elixir';
     import * as Elephant from 'animals/elephant';
-    const __MODULE__ = Erlang.atom('Animals');
+    const __MODULE__ = Kernel.SpecialForms.atom('Animals');
 
     let something = Patterns.defmatch([[], function()    {
        return     Elephant.defstruct();
@@ -85,8 +85,8 @@ defmodule ElixirScript.Test do
      assert_js_matches """
         import { fun, Erlang, Kernel, Atom, Enum, Integer, JS, List, Range, Tuple, Agent, Keyword, BitString } from 'elixir';
        
-       const __MODULE__ = Erlang.atom('Elephant');
-       function defstruct(trunk = true){return {[Erlang.atom('__struct__')]: __MODULE__, [Erlang.atom('trunk')]: trunk};}
+       const __MODULE__ = Kernel.SpecialForms.atom('Elephant');
+       function defstruct(trunk = true){return {[Kernel.SpecialForms.atom('__struct__')]: __MODULE__, [Kernel.SpecialForms.atom('trunk')]: trunk};}
        export  {defstruct};     
        """, List.last(js_code)
   end
@@ -107,7 +107,7 @@ defmodule ElixirScript.Test do
 
     assert_js_matches """
     import { fun, Erlang, Kernel, Atom, Enum, Integer, JS, List, Range, Tuple, Agent, Keyword, BitString } from 'elixir';
-    const __MODULE__ = Erlang.atom('Animals');
+    const __MODULE__ = Kernel.SpecialForms.atom('Animals');
 
     let something_else = Patterns.defmatch([[], function()    {
        return     1 * 1;

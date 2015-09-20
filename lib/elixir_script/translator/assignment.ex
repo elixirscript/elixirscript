@@ -44,7 +44,10 @@ defmodule ElixirScript.Translator.Assignment do
       ref,
       JS.call_expression(
         JS.member_expression(
-          JS.identifier("Erlang"),
+          JS.member_expression(
+            JS.identifier("Kernel"),
+            JS.identifier("SpecialForms")
+          ),
           JS.identifier(type)
         ),
         params

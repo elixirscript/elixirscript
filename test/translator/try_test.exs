@@ -20,7 +20,7 @@ defmodule ElixirScript.Translator.Try.Test do
           Patterns.defmatch(
             [
               [{
-                '__struct__': Erlang.atom('ArgumentError')
+                '__struct__': Kernel.SpecialForms.atom('ArgumentError')
               }], 
               function() {
                 return IO.puts('Invalid argument given');
@@ -56,7 +56,7 @@ defmodule ElixirScript.Translator.Try.Test do
           Patterns.defmatch(
             [
               [{
-                '__struct__': Erlang.atom('ArgumentError')
+                '__struct__': Kernel.SpecialForms.atom('ArgumentError')
               }],
               function() {
                 return IO.puts('Invalid argument given');
@@ -94,7 +94,7 @@ defmodule ElixirScript.Translator.Try.Test do
           Patterns.defmatch([[Patterns.variable()], function(x) {
             return IO.puts('Invalid argument given');
           }, function(x) {
-            return Kernel.__in__(x, Erlang.list(ArgumentError.defstruct()));
+            return Kernel.__in__(x, Kernel.SpecialForms.list(ArgumentError.defstruct()));
           }], [[], function() {
             return Kernel.throw(e);
           }]).call(this, e)
@@ -161,7 +161,7 @@ defmodule ElixirScript.Translator.Try.Test do
         } catch (e) {
           Patterns.defmatch(
             [
-              [{'__struct__': Erlang.atom('ArgumentError')}], 
+              [{'__struct__': Kernel.SpecialForms.atom('ArgumentError')}], 
               function() {
                 return IO.puts('ArgumentError');
               }
@@ -205,7 +205,7 @@ defmodule ElixirScript.Translator.Try.Test do
         } catch (e) {
           Patterns.defmatch(
             [
-              [{'__struct__': Erlang.atom('ArgumentError')}], 
+              [{'__struct__': Kernel.SpecialForms.atom('ArgumentError')}], 
               function() {
                 return IO.puts('Invalid argument given');
               }
@@ -285,13 +285,13 @@ defmodule ElixirScript.Translator.Try.Test do
       } catch (e) {
         Patterns.defmatch(
           [
-            [Erlang.atom('throw'), Erlang.atom('Error')], 
+            [Kernel.SpecialForms.atom('throw'), Kernel.SpecialForms.atom('Error')], 
             function() {
               return IO.puts('caught error');
             }
           ], 
           [
-            [{'__struct__': Erlang.atom('ArgumentError')}], 
+            [{'__struct__': Kernel.SpecialForms.atom('ArgumentError')}], 
             function() {
               return IO.puts('Invalid argument given');
             }

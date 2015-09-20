@@ -4,7 +4,7 @@ defmodule ElixirScript.Translator.Access.Test do
 
   should "translate access" do
     ex_ast = quote do: a[:b]
-    js_code = "a.get(Erlang.atom('b'))"
+    js_code = "a.get(Kernel.SpecialForms.atom('b'))"
 
     assert_translation(ex_ast, js_code)
 

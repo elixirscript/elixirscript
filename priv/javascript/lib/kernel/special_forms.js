@@ -33,8 +33,8 @@ let SpecialForms = {
     return Patterns.bound(_var);
   },
 
-  case: function(condition, clauses){
-    return Patterns.defmatch(clauses).apply(this, [condition]);
+  _case: function(condition, clauses){
+    return Patterns.defmatch(...clauses)(condition);
   },
 
   cond: function(clauses){
@@ -120,8 +120,7 @@ let SpecialForms = {
 
   tuple: function(...args){
     return Immutable.fromJS({__tuple__: args });
-  },
-
+  }
 
 };
 
