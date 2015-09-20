@@ -1,20 +1,18 @@
-import Immutable from './immutable/immutable';
-
 class BitString {
   constructor(...args){
     this.raw_value = function(){
       return Object.freeze(args);
     };
 
-    this.value = Immutable.fromJS(this.process(args));
+    this.value = Object.freeze(this.process(args));
   }
 
   get(index){
-    return this.value.get(index);
+    return this.value[index];
   }
 
   count(){
-    return this.value.count();
+    return this.value.length;
   }
 
   [Symbol.iterator]() {
@@ -27,7 +25,7 @@ class BitString {
       if (s !== "") {
         s += ", ";
       }
-      s += this.get(i).toString();
+      s += this[i].toString();
     }
 
     return "<<" + s + ">>";

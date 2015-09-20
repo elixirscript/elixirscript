@@ -38,7 +38,7 @@ describe('match', () => {
     let c = {a: 1};
 
     let [d] = Patterns.match(Patterns.capture(c), {a: 1});
-    expect(d.get("a")).to.equal(1);
+    expect(d["a"]).to.equal(1);
   });
 
   it('must throw an error when capture value does not match', () => {

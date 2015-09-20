@@ -1,7 +1,6 @@
 import BitString from '../bit_string';
 import Enum from '../enum';
 import * as Patterns from '../patterns/patterns';
-import Immutable from '../immutable/immutable';
 
 let SpecialForms = {
 
@@ -22,7 +21,7 @@ let SpecialForms = {
   },
 
   list: function(...args){
-    return Immutable.fromJS(args);
+    return Object.freeze(args);
   },
 
   bitstring: function(...args){
@@ -39,8 +38,8 @@ let SpecialForms = {
 
   cond: function(clauses){
     for(let clause of clauses){
-      if(clause.first()){
-        return clause.last();
+      if(clause[0]){
+        return clause[1];
       }
     }
 
@@ -52,18 +51,18 @@ let SpecialForms = {
   },
 
   map: function(obj){
-    return Immutable.fromJS(obj);
+    return Object.freeze(obj);
   },
 
   map_update: function(map, values){
-    return map.merge(this.map(values));
+    return Object.assign(map, value);
   },
 
-  _for: function(collections, fun, filter = () => true, into = Immutable.List.of(), previousValues = []){
-    let pattern = collections.first().get(0);
-    let collection = collections.first().get(1);
+  _for: function(collections, fun, filter = () => true, into = [], previousValues = []){
+    let pattern = collections[0][0];
+    let collection = collections[0][1];
 
-    if(collections.size === 1){
+    if(collections.length === 1){
 
       for(let elem of collection){
         let r = Patterns.match_no_throw(pattern, elem);
@@ -76,14 +75,16 @@ let SpecialForms = {
 
       return into;
     }else{
+      let _into = []
+
       for(let elem of collection){
         let r = Patterns.match_no_throw(pattern, elem);
         if(r){
-          into = Enum.into(this._for(collections.rest(), fun, filter, into, previousValues.concat(r)), into);
+          _into = Enum.into(this._for(collections.slice(1), fun, filter, _into, previousValues.concat(r)), into);
         }
       }
 
-      return into;
+      return _into;
     }
   },
 
@@ -119,7 +120,7 @@ let SpecialForms = {
   },
 
   tuple: function(...args){
-    return Immutable.fromJS({__tuple__: args });
+    return Object.freeze({__tuple__: SpecialForms.list(...args) });
   }
 
 };

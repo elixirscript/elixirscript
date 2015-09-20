@@ -1,20 +1,16 @@
-import Erlang from './erlang';
 import SpecialForms from './kernel/special_forms';
 import * as Patterns from './patterns/patterns';
 import Tuple from './tuple';
-import Immutable from './immutable/immutable';
-
 let Kernel = {
-  __MODULE__: Erlang.atom('Kernel'),
 
   SpecialForms: SpecialForms,
 
   tl: function(list){
-    return Erlang.list(...list.slice(1));
+    return SpecialForms.list(...list.slice(1));
   },
 
   hd: function(list){
-    return list.first();
+    return list[0];
   },
 
   is_nil: function(x){
@@ -47,11 +43,11 @@ let Kernel = {
   },
 
   is_list: function(x){
-    return Immutable.List.isList(x);
+    return x instanceof Array;
   },
 
   is_map: function(x){
-    return Immutable.Map.isMap(x);
+    return typeof x === 'object' || x instanceof Object && x.__tuple__ === null;
   },
 
   is_number: function(x){
@@ -59,7 +55,7 @@ let Kernel = {
   },
 
   is_tuple: function(x){
-    return Kernel.is_map(x) && x.has("__tuple__");
+    return (typeof x === 'object' || x instanceof Object) && x.__tuple__ !== null;
   },
 
   length: function(x){
@@ -79,7 +75,7 @@ let Kernel = {
   },
 
   is_bitstring: function(x){
-    return Kernel.is_binary(x) || x instanceof Erlang.bitstring;
+    return Kernel.is_binary(x) || x instanceof SpecialForms.bitstring;
   },
 
   __in__: function(left, right){
@@ -105,7 +101,7 @@ let Kernel = {
       return tuple[index];
     }
 
-    return tuple.get("__tuple__").get(index);
+    return tuple.__tuple__[index];
   },
 
   rem: function(left, right){
@@ -149,12 +145,7 @@ let Kernel = {
   },
 
   match__qmark__: function(pattern, expr, guard = () => true){
-    try{
-      Patterns.match(pattern, expr, guard);
-      return true;
-    }catch(e){
-      return false;
-    }
+    return Patterns.match_no_throw(pattern, expr, guard) != null;
   }
 };
 

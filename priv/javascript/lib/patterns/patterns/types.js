@@ -1,9 +1,8 @@
 /* @flow */
-import Immutable from '../../immutable/immutable';
-
-
 export class Variable {
-  constructor(name = null) {
+  name: ?string;
+
+  constructor(name: ?string = null) {
     this.name = name;
   }
 }
@@ -14,14 +13,18 @@ export class Wildcard {
 }
 
 export class StartsWith {
-  constructor(prefix) {
+  prefix: string;
+
+  constructor(prefix: string) {
     this.prefix = prefix;
   }
 }
 
 export class Capture {
-  constructor(value) {
-    this.value = Immutable.fromJS(value);
+  value: any;
+
+  constructor(value: any) {
+    this.value = value;
   }
 }
 
@@ -31,42 +34,47 @@ export class HeadTail {
 }
 
 export class Type {
-  constructor(type, objPattern = {}) {
-    this.type = Immutable.fromJS(type);
-    this.objPattern = Immutable.fromJS(objPattern);
+  type: any;
+  objPattern: Object;
+
+  constructor(type: any, objPattern: Object = {}) {
+    this.type = type
+    this.objPattern = objPattern
   }
 }
 
 export class Bound {
-  constructor(value) {
-    this.value = Immutable.fromJS(value);
+  value: any;
+
+  constructor(value: any) {
+    this.value = value;
   }
 }
 
-export function variable(name = null){
+export function variable(name: ?string = null): Variable {
   return new Variable(name);
 }
 
-export function wildcard(){
+export function wildcard(): Wildcard {
   return new Wildcard();
 }
 
-export function startsWith(prefix){
+export function startsWith(prefix: string): StartsWith {
   return new StartsWith(prefix);
 }
 
-export function capture(value){
+export function capture(value: any): Capture {
   return new Capture(value);
 }
 
-export function headTail(){
+export function headTail(): HeadTail {
   return new HeadTail();
 }
 
-export function type(type, objPattern = {}){
+export function type(type: any, objPattern: Object = {}): Type {
   return new Type(type, objPattern);
 }
 
-export function bound(value){
+export function bound(value: any): Bound {
   return new Bound(value);
 }

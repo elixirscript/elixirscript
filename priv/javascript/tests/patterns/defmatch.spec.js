@@ -8,14 +8,8 @@ describe('example', () => {
   it('must correctly evaluate example', () => {
 
     let fact = Patterns.defmatch(
-      {
-        pattern: [0],
-        fn: () => 1
-      },
-      {
-        pattern: [$],
-        fn: (n) => n * fact(n - 1)
-      }
+      Patterns.make_case([0], () => 1),
+      Patterns.make_case([$], (n) => n * fact(n - 1))
     );
 
     let response = fact(0);
@@ -30,22 +24,16 @@ describe('defmatch', () => {
   it('must throw error when no match is found', () => {
 
     let fn = Patterns.defmatch(
-      {
-        pattern: [0],
-        fn: () => 1
-      }
+      Patterns.make_case([0], () => 1)
     );
 
-    expect(fn.bind(fn, 1)).to.throw("No match for: List [ 1 ]");
+    expect(fn.bind(fn, 1)).to.throw("No match for: 1");
   });
 
   it('must have wildcard except everything', () => {
 
     let fn = Patterns.defmatch(
-      {
-        pattern: [_],
-        fn: () => 1
-      }
+      Patterns.make_case([_], () => 1)
     );
 
     expect(fn(1)).to.equal(1);
@@ -57,27 +45,18 @@ describe('defmatch', () => {
   it('must work symbols', () => {
 
     let fn = Patterns.defmatch(
-      {
-        pattern: [Symbol.for('infinity')],
-        fn: () => 1
-      }
+      Patterns.make_case([Symbol.for('infinity')], () => 1)
     );
 
     expect(fn(Symbol.for('infinity'))).to.equal(1);
-    expect(fn.bind(fn, Symbol('infinity'))).to.throw("No match for: List [ Symbol(infinity) ]");
+    expect(fn.bind(fn, Symbol('infinity'))).to.throw("No match for: Symbol(infinity)");
   });
 
   it('must match on values in object', () => {
 
     let fn = Patterns.defmatch(
-      {
-        pattern: [{value: $}],
-        fn: (val) => 1 + val
-      },
-      {
-        pattern: [{a: {b: {c: $} } }],
-        fn: (val) => 1 - val
-      }
+      Patterns.make_case([{value: $}], (val) => 1 + val),
+      Patterns.make_case([{a: {b: {c: $} } }], (val) => 1 - val)
     );
 
     expect(fn({value: 20})).to.equal(21);
@@ -87,14 +66,8 @@ describe('defmatch', () => {
   it('must match on objects even when value has more keys', () => {
 
     let fn = Patterns.defmatch(
-      {
-        pattern: [{value: $}],
-        fn: (val) => 1 + val
-      },
-      {
-        pattern: [{a: {b: {c: $} } }],
-        fn: (val) => 1 - val
-      }
+      Patterns.make_case([{value: $}], (val) => 1 + val),
+      Patterns.make_case([{a: {b: {c: $} } }], (val) => 1 - val)
     );
 
     expect(fn({value: 20})).to.equal(21);
@@ -104,10 +77,7 @@ describe('defmatch', () => {
   it('must match on substrings', () => {
 
     let fn = Patterns.defmatch(
-      {
-        pattern: [Patterns.startsWith("Bearer ")],
-        fn: (token) => token
-      }
+      Patterns.make_case([Patterns.startsWith("Bearer ")], (token) => token)
     );
 
     expect(fn("Bearer 1234")).to.equal("1234");
@@ -117,42 +87,32 @@ describe('defmatch', () => {
   it('must work with guards', () => {
 
     let fn = Patterns.defmatch(
-      {
-        pattern: [$],
-        guard: (number) => number > 0,
-        fn: (number) => number
-      }
+      Patterns.make_case([$], (number) => number, (number) => number > 0)
     );
 
     expect(fn(3)).to.equal(3);
-    expect(fn.bind(fn, -1)).to.throw("No match for: List [ -1 ]");
+    expect(fn.bind(fn, -1)).to.throw("No match for: -1");
   });
 
   it('must capture entire match as parameter', () => {
 
     let fn = Patterns.defmatch(
-      {
-        pattern: [Patterns.capture({a: {b: {c: $} } })],
-        fn: (val, bound_value) => bound_value.get("a").get("b").get("c")
-      }
+      Patterns.make_case([Patterns.capture({a: {b: {c: $} } })], (val, bound_value) => bound_value["a"]["b"]["c"])
     );
 
     expect(fn({a: {b: {c: 20} } })).to.equal(20);
 
     fn = Patterns.defmatch(
-      {
-        pattern: [Patterns.capture([1, $, 3, $])],
-        fn: (a, b, bound_value) => bound_value.count()
-      }
+      Patterns.make_case([Patterns.capture([1, $, 3, $])], (a, b, bound_value) => bound_value.length)
     );
 
     expect(fn([1, 2, 3, 4])).to.equal(4);
 
     fn = Patterns.defmatch(
-      {
-        pattern: [Patterns.capture([1, Patterns.capture({a: {b: {c: $} } }), 3, $])],
-        fn: (c, two, four, arg) =>  two.get("a").get("b").get("c")
-      }
+      Patterns.make_case(
+        [Patterns.capture([1, Patterns.capture({a: {b: {c: $} } }), 3, $])], 
+        (c, two, four, arg) =>  two["a"]["b"]["c"]
+      )
     );
 
     expect(fn([1, {a: {b: {c: 20} } }, 3, 4])).to.equal(20);
@@ -161,10 +121,10 @@ describe('defmatch', () => {
   it('must produce a head and a tail', () => {
 
     let fn = Patterns.defmatch(
-      {
-        pattern: [Patterns.headTail()],
-        fn: (head, tail) => tail
-      }
+      Patterns.make_case(
+        [Patterns.headTail()], 
+        (head, tail) => tail
+      )
     );
 
     expect(fn([3, 1, 2, 4]).length).to.equal(3);
@@ -179,23 +139,14 @@ describe('defmatch', () => {
     }
 
     let fn = Patterns.defmatch(
-      {
-        pattern: [Patterns.type(Tuple, {value: [1, 2, 3]})],
-        fn: () => 3
-      }
+      Patterns.make_case(
+        [Patterns.type(Tuple, {value: [1, 2, 3]})], 
+        () => 3
+      )
     );
 
     expect(fn(new Tuple(1, 2, 3))).to.equal(3);
-
-
-    fn = Patterns.defmatch(
-      {
-        pattern: [Patterns.type(Tuple, { value: [1, 2, 3] })],
-        fn: () => 3
-      }
-    );
-
-    expect(fn.bind(fn, new Tuple(1, 2, 4))).to.throw("No match for: List [ [object Object] ]");
+    expect(fn.bind(fn, new Tuple(1, 2, 4))).to.throw("No match for: [object Object]");
   });
 
 

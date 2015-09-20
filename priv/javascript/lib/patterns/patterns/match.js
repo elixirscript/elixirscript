@@ -1,9 +1,8 @@
 /* @flow */
-
 import Checks from "./checks";
-import Immutable from '../../immutable/immutable';
+import * as Types from "./types";
 
-export function buildMatch(pattern){
+export function buildMatch(pattern: any): Function {
 
   if(Checks.is_variable(pattern)){
     return resolveVariable(pattern);
@@ -33,8 +32,8 @@ export function buildMatch(pattern){
     return resolveType(pattern);
   }
 
-  if(Checks.is_list(pattern)){
-    return resolveList(pattern);
+  if(Checks.is_array(pattern)){
+    return resolveArray(pattern);
   }
 
   if(Checks.is_number(pattern)){
@@ -61,23 +60,17 @@ export function buildMatch(pattern){
     return resolvePrimitive(pattern);
   }
 
-  if(Checks.is_map(pattern)){
-    return resolveMap(pattern);
-  }
-
-  if(Checks.is_array(pattern)){
-    return resolveArray(pattern);
-  }
-
   if(Checks.is_object(pattern)){
     return resolveObject(pattern);
   }
 
-  return false;
+  return function(value: any, args: Array<any>): boolean {
+    return false;
+  };
 }
 
-function resolveBound(pattern){
-  return function(value, args) {
+function resolveBound(pattern: Types.Bound): Function {
+  return function(value: any, args: Array<any>): boolean {
     if(typeof value === typeof pattern.value && value === pattern.value){
       args.push(value);
       return true;
@@ -87,36 +80,37 @@ function resolveBound(pattern){
   };
 }
 
-function resolvePrimitive(pattern){
+function resolvePrimitive(pattern: any): Function {
   let patternType = typeof pattern;
   let patternValue = pattern;
 
-  return function(value) {
+  return function(value: any): boolean {
     return (typeof value === patternType && value === patternValue) ||
       (Checks.is_number(patternValue) && isNaN(value) && isNaN(patternValue));
   }; 
 }
 
-function resolveWildcard(){
-  return function() {
+function resolveWildcard(): Function {
+  return function(): boolean {
     return true;
   }; 
 }
 
-function resolveVariable(){
-  return function(value, args) {
+function resolveVariable(): Function {
+  return function(value: any, args: Array<any>): boolean {
     args.push(value);
     return true;
   }; 
 }
 
-function resolveHeadTail(){
-  return function(value, args) {
-    if(!Checks.is_list(value) || value.count() < 2){
+function resolveHeadTail(): Function {
+  return function(value: any, args: Array<any>): boolean {
+    if(!Checks.is_array(value) || value.length < 2){
       return false;
     }
 
-    const [head, ...tail] = value;
+    const head = value[0];
+    const tail = value.slice(1);
     
     args.push(head);
     args.push(tail);
@@ -125,10 +119,10 @@ function resolveHeadTail(){
   };
 }
 
-function resolveCapture(pattern){
+function resolveCapture(pattern: Types.Capture): Function {
   const matches = buildMatch(pattern.value);
 
-  return function(value, args){
+  return function(value: any, args: Array<any>): boolean {
     if(matches(value, args)){
       args.push(value);
       return true;
@@ -138,10 +132,10 @@ function resolveCapture(pattern){
   };
 }
 
-function resolveStartsWith(pattern){
+function resolveStartsWith(pattern: Types.StartsWith): Function {
   const prefix = pattern.prefix;
 
-  return function(value, args){
+  return function(value: any, args: Array<any>): boolean {
     if(Checks.is_string(value) && value.startsWith(prefix)){
       args.push(value.substring(prefix.length));
       return true;
@@ -151,81 +145,45 @@ function resolveStartsWith(pattern){
   };
 }
 
-function resolveType(pattern){
-  return function(value, args){
+function resolveType(pattern: Types.Type): Function {
+  return function(value: any, args: Array<any>): boolean {
     if(!value instanceof pattern.type){
       return false;
     }
 
-    const matches = buildMatch(pattern.objPattern.toJS());
+    const matches = buildMatch(pattern.objPattern);
     return matches(value, args) && args.push(value) > 0;
   };
 }
 
-function resolveList(pattern){
+function resolveArray(pattern: Array<any>): Function {
   const matches = pattern.map(x => buildMatch(x));
 
-  return function(value, args) {
-    if(!Checks.is_list(value) || value.count() != pattern.count()){
-      return false;
-    }
-
-    return value.every(function(v, i) {
-      return matches.get(i)(value.get(i), args);
-    });
-  };
-}
-
-function resolveMap(pattern){
-  let matches = Immutable.Map();
-
-  for(let key of pattern.keys()){
-    matches = matches.set(key, buildMatch(pattern.get(key)));
-  }
-
-  return function(value, args){
-    if(!Checks.is_map(value) || pattern.count() > value.count()){
-      return false;
-    }
-
-    for(let key of pattern.keys()){
-      if(!value.has(key) || !matches.get(key)(value.get(key), args) ){
-        return false;
-      }      
-    }
-
-    return true;
-  };
-}
-
-function resolveArray(pattern){
-  const matches = pattern.map(x => buildMatch(x));
-
-  return function(value, bindings) {
+  return function(value: any, args: Array<any>): boolean {
     if(!Checks.is_array(value) || value.length != pattern.length){
       return false;
     }
 
     return value.every(function(v, i) {
-      return matches[i](value[i], bindings);
+      return matches[i](value[i], args);
     });
   };
 }
 
-function resolveObject(pattern){
+function resolveObject(pattern: Object): Function {
   let matches = {};
 
   for(let key of Object.keys(pattern)){
     matches[key] = buildMatch(pattern[key]);
   }
 
-  return function(value, bindings){
+  return function(value: any, args: Array<any>): boolean {
     if(!Checks.is_object(value) || pattern.length > value.length){
       return false;
     }
 
     for(let key of Object.keys(pattern)){
-      if(!(key in value) || !matches[key](value[key], bindings) ){
+      if(!(key in value) || !matches[key](value[key], args) ){
         return false;
       }      
     }

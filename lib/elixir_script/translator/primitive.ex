@@ -97,6 +97,19 @@ defmodule ElixirScript.Translator.Primitive do
     )
   end
 
+  def make_tuple_no_translate(elements) do
+    JS.call_expression(
+      JS.member_expression(
+        JS.member_expression(
+          JS.identifier("Kernel"),
+          JS.identifier("SpecialForms")
+        ),
+        JS.identifier("tuple")
+      ),
+      elements
+    )
+  end
+
   def make_tuple_quoted(opts, elements, env) do
     JS.call_expression(
       JS.member_expression(

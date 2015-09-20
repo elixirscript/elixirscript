@@ -1,29 +1,63 @@
-import Erlang from './erlang';
 import Kernel from './kernel';
-import Immutable from './immutable/immutable';
 
 let List = {};
 
-List.__MODULE__ = Kernel.SpecialForms.atom('List');
-
 List.delete = function(list, item){
-  return list.filter(x => x !== item);
+  let new_value = [];
+  let value_found = false;
+
+  for(let x of list){
+    if(x === item && value_found !== false){
+      new_value.push(x);
+      value_found = true;
+    }else if(x !== item){
+      new_value.push(x);
+    }
+  }
+
+  return Kernel.SpecialForms.list(...new_value);
 };
 
 List.delete_at = function(list, index){
-  return list.delete(index);
+  let new_value = [];
+
+  for(let i = 0; i < list.length; i++){
+    if(i !== index){
+      new_value.push(list[i]);
+    }
+  }
+
+  return Kernel.SpecialForms.list(...new_value);
 };
 
 List.duplicate = function(elem, n){
-  return Immutable.Repeat(elem, n);
+  let new_value = [];
+
+  for (var i = 0; i < n; i++) {
+    new_value.push(elem);
+  }
+
+  return Kernel.SpecialForms.list(...new_value);
 };
 
 List.first = function(list){
-  return list.first;
+  return list[0];
 };
 
 List.flatten = function(list, tail = Kernel.SpecialForms.list()){
-  return list.flatten().concat(tail);
+  let new_value = [];
+
+  for(let x of list){
+    if(Kernel.is_list(x)){
+      new_value = new_value.concat(List.flatten(x));
+    }else{
+      new_value.push(x);
+    }
+  }
+
+  new_value = new_value.concat(tail);
+
+  return Kernel.SpecialForms.list(...new_value);
 };
 
 List.foldl = function(list, acc, func){
@@ -31,7 +65,13 @@ List.foldl = function(list, acc, func){
 };
 
 List.foldr = function(list, acc, func){
-  return list.reduceRight(func, acc);
+  let new_acc = acc;
+
+  for (var i = list.length - 1; i >= 0; i--) {
+    new_acc = func(list[i], new_acc);
+  }
+
+  return new_acc;
 };
 
 List.insert_at = function(list, index, value){
@@ -40,9 +80,9 @@ List.insert_at = function(list, index, value){
   for(let i = 0; i < list.length; i++){
     if(i === index){
       new_value.push(value);
-      new_value.push(list.get(i));
+      new_value.push(list[i]);
     }else{
-      new_value.push(list.get(i));
+      new_value.push(list[i]);
     }
   }
 
@@ -50,23 +90,45 @@ List.insert_at = function(list, index, value){
 };
 
 List.keydelete = function(list, key, position){
-  return list.filter(x => !Kernel.match__qmark__(x.get(position), key));
+  let new_list = [];
+
+  for(let i = 0; i < list.length; i++){
+    if(!Kernel.match__qmark__(list[i][position], key)){
+      new_list.push(list[i]);
+    }
+  }
+
+  return Kernel.SpecialForms.list(...new_list);
 };
 
 List.keyfind = function(list, key, position, _default = null){
-  return list.first(x => Kernel.match__qmark__(x.get(position), key), _default);
+
+  for(let i = 0; i < list.length; i++){
+    if(Kernel.match__qmark__(list[i][position], key)){
+      return list[i];
+    }
+  }
+
+  return _default;
 };
 
 List.keymember__qmark__ = function(list, key, position){
-  return list.some(x => Kernel.match__qmark__(x.get(position), key));
+
+  for(let i = 0; i < list.length; i++){
+    if(Kernel.match__qmark__(list[i][position], key)){
+      return true;
+    }
+  }
+
+  return false;
 };
 
 List.keyreplace = function(list, key, position, new_tuple){
   let new_list = [];
 
-  for(let i = 0; i < list.count(); i++){
-    if(!Kernel.match__qmark__(list.get(i).get(position), key)){
-      new_list.push(list.get(i));
+  for(let i = 0; i < list.length; i++){
+    if(!Kernel.match__qmark__(list[i][position], key)){
+      new_list.push(list[i]);
     }else{
       new_list.push(new_tuple);
     }
@@ -81,21 +143,21 @@ List.keysort = function(list, position){
 
   new_list.sort(function(a, b){
     if(position === 0){
-      if(a.get(position).value < b.get(position).value){
+      if(a[position].value < b[position].value){
         return -1;
       }
 
-      if(a.get(position).value > b.get(position).value){
+      if(a[position].value > b[position].value){
         return 1;
       }
 
       return 0;
     }else{
-      if(a.get(position) < b.get(position)){
+      if(a[position] < b[position]){
         return -1;
       }
 
-      if(a.get(position) > b.get(position)){
+      if(a[position] > b[position]){
         return 1;
       }
 
@@ -112,8 +174,8 @@ List.keystore = function(list, key, position, new_tuple){
   let replaced = false;
 
   for(let i = 0; i < list.length; i++){
-    if(!Kernel.match__qmark__(list.get(i).get(position), key)){
-      new_list.push(list.get(i));
+    if(!Kernel.match__qmark__(list[i][position], key)){
+      new_list.push(list[i]);
     }else{
       new_list.push(new_tuple);
       replaced = true;
@@ -128,17 +190,17 @@ List.keystore = function(list, key, position, new_tuple){
 };
 
 List.last = function(list){
-  return list.last();
+  return list[list.length - 1];
 };
 
 List.replace_at = function(list, index, value){
   let new_value = [];
 
-  for(let i = 0; i < list.count(); i++){
+  for(let i = 0; i < list.length; i++){
     if(i === index){
       new_value.push(value);
     }else{
-      new_value.push(list.get(i));
+      new_value.push(list[i]);
     }
   }
 
@@ -170,11 +232,29 @@ List.wrap = function(list){
 };
 
 List.zip = function(list_of_lists){
-  if(list_of_lists.count() === 0){
+  if(list_of_lists.length === 0){
     return Kernel.SpecialForms.list();
   }
 
-  return list_of_lists.first().zip(list_of_lists.rest());
+  let new_value = [];
+  let smallest_length = list_of_lists[0];
+
+  for(let x of list_of_lists){
+    if(x.length < smallest_length){
+      smallest_length = x.length;
+    }
+  }
+
+  for(let i = 0; i < smallest_length; i++){
+    let current_value = [];
+    for(let j = 0; j < list_of_lists.length; j++){
+      current_value.push(list_of_lists[j][i]);
+    }
+
+    new_value.push(Kernel.SpecialForms.tuple(...current_value));
+  }
+
+  return Kernel.SpecialForms.list(...new_value);
 };
 
 List.to_tuple = function(list){
@@ -182,7 +262,7 @@ List.to_tuple = function(list){
 };
 
 List.append = function(list, value){
-  return list.push(value);
+  return Kernel.SpecialForms.list(...list.concat([value]));
 };
 
 List.concat = function(left, right){

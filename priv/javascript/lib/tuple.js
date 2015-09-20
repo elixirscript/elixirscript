@@ -1,57 +1,73 @@
-import Erlang from './erlang';
-import Immutable from './immutable/immutable';
+import Kernel from './kernel';
 
 let Tuple = {};
 
-Tuple.__MODULE__ = Erlang.atom('Tuple');
-
 Tuple.to_string = function(tuple){
   var i, s = "";
-  for(let elem of tuple.get("__tuple__")){
+  for (i = 0; i < tuple.__tuple__.length; i++) {
     if (s !== "") {
       s += ", ";
     }
-    
-    s += elem.toString(); 
+    s += tuple.__tuple__[i].toString();
   }
 
   return "{" + s + "}";
 };
 
 Tuple.delete_at = function(tuple, index){
-  return tuple.set("__tuple__", tuple.get("__tuple__").delete(index));
+  let new_list = [];
+
+  for (var i = 0; i < tuple.__tuple__.length; i++) {
+    if(i !== index){
+      new_list.push(tuple.__tuple__[i]);
+    }
+  }
+
+  return Kernel.SpecialForms.tuple.apply(null, new_list);
 };
 
 Tuple.duplicate = function(data, size){
-  return Erlang.tuple.apply(null, Immutable.Repeat(data, size).toJS());
+  let array = [];
+
+  for (var i = size - 1; i >= 0; i--) {
+    array.push(data);
+  }
+
+  return Kernel.SpecialForms.tuple.apply(null, array);
 };
 
 Tuple.insert_at = function(tuple, index, term){
   let new_tuple = [];
 
-  for (var i = 0; i <= tuple.get("__tuple__").count(); i++) {
+  for (var i = 0; i <= tuple.__tuple__.length; i++) {
     if(i === index){
       new_tuple.push(term);
       i++;
-      new_tuple.push(tuple.get("__tuple__").get(i));
+      new_tuple.push(tuple.__tuple__[i]);
     }else{
-      new_tuple.push(tuple.get("__tuple__").get(i));
+      new_tuple.push(tuple.__tuple__[i]);
     }
   }
 
-  return Erlang.tuple.apply(null, new_tuple);
+  return Kernel.SpecialForms.tuple.apply(null, new_tuple);
 };
 
 Tuple.from_list = function(list){
-  return Erlang.tuple.apply(null, list.toJS());
+  return Kernel.SpecialForms.tuple.apply(null, list);
 };
 
 Tuple.to_list = function(tuple){
-  return tuple.get("__tuple__");
+  let new_list = [];
+
+  for (var i = 0; i < tuple.__tuple__.length; i++) {
+    new_list.push(tuple.__tuple__[i]);
+  }
+
+  return Kernel.SpecialForms.list(...new_list);
 };
 
 Tuple.iterator = function(tuple){
-  return tuple.get("__tuple__")[Symbol.iterator]();
+  return tuple.__tuple__[Symbol.iterator]();
 };
 
 export default Tuple;

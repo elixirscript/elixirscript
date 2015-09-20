@@ -1,81 +1,81 @@
 /* @flow */
 
 import { buildMatch } from "./match";
-import Immutable from '../../immutable/immutable';
 
 export class MatchError extends Error {
-  constructor(message) {
+  constructor(arg: any) {
     super();
-    this.message = message; 
+    this.message = 'No match for: ' + arg.toString(); 
     this.stack = (new Error()).stack;
     this.name = this.constructor.name;
   }
+}
+
+
+export class Case {
+  pattern: Function;
+  fn: Function;
+  guard: Function;
+
+  constructor(pattern: Array<any>, fn: Function, guard: Function = () => true){
+    this.pattern = buildMatch(pattern);
+    this.fn = fn;
+    this.guard = guard;
+  }
+}
+
+export function make_case(pattern: Array<any>, fn: Function, guard: Function = () => true): Case {
+  return new Case(pattern, fn, guard);
 }    
 
-export function defmatch(...cases){
-  cases = Immutable.fromJS(cases);
-
-  const processedCases = cases.map(x => {
-    return Immutable.Map({
-      pattern: buildMatch(x.get("pattern")),
-      guard: x.get("guard") || function(){ return true; },
-      fn: x.get("fn")
-    });
-  });
-
-  return function(...args) {
-    args = Immutable.fromJS(args);
-
-    for (let processedCase of processedCases) {
+export function defmatch(...cases: Array<Case>): Function {
+  return function(...args: Array<any>): any {
+    for (let processedCase of cases) {
       let result = [];
-      if (processedCase.get("pattern")(args, result) && processedCase.get("guard").apply(this, result)) {
-        return processedCase.get("fn").apply(this, result);
+      if (processedCase.pattern(args, result) && processedCase.guard.apply(this, result)) {
+        return processedCase.fn.apply(this, result);
       }
     }
 
-    throw new MatchError('No match for: ' + args.toString());
+    throw new MatchError(args);
   };
 }
 
-export function match(pattern, expr, guard = () => true){
-  pattern = Immutable.fromJS(pattern);
-  expr = Immutable.fromJS(expr);
-
+export function match(pattern: any, expr: any, guard: Function = () => true): Array<any> {
   let result = [];
   let processedPattern = buildMatch(pattern);
   if (processedPattern(expr, result) && guard.apply(this, result)){
     return result;
   }else{
-    throw new MatchError('No match for: ' + expr.toString());
+    throw new MatchError(expr);
   }
 }
 
-export function match_no_throw(pattern, expr, guard = () => true){
-  pattern = Immutable.fromJS(pattern);
-  expr = Immutable.fromJS(expr);
+export function match_no_throw(pattern: any, expr: any, guard: Function = () => true): ?Array<any> {
+  try{
+    return match(pattern, expr, guard);
+  }catch(e){
+    if(e instanceof MatchError){
+      return null;
+    }
 
-  let result = [];
-  let processedPattern = buildMatch(pattern);
-  if (processedPattern(expr, result) && guard.apply(this, result)){
-    return result;
-  }else{
-    return null;
+    throw e;
   }
 }
 
-export function patternMap(collection, pattern, fun, guard = () => true){
+export function patternMap(collection: Array<any>, pattern: any, fun: Function, guard: Function = () => true): Array<any> {
   let ret = [];
 
   for(let elem of collection){
     try{
       let result = fun.apply(this, match(pattern, elem, guard));
-      ret.append(result);       
+      ret = ret.concat(result);       
     }catch(e){
-      if(typeof e !== MatchError){
+    if(!(e instanceof MatchError)){
         throw e;
       }
     }
   }
 
-  return Immutable.fromJS(ret);
+  return ret;
 }

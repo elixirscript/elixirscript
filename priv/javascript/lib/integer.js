@@ -1,7 +1,6 @@
-import Erlang from './erlang';
+import Kernel from './kernel';
 
 let Integer = {
-  __MODULE__: Erlang.atom('Integer'),
 
   is_even: function(n){
     return n % 2 === 0;
@@ -15,16 +14,16 @@ let Integer = {
     let result = parseInt(bin);
 
     if(isNaN(result)){
-      return Erlang.atom("error");
+      return Kernel.SpecialForms.atom("error");
     }
 
     let indexOfDot = bin.indexOf(".");
 
     if(indexOfDot >= 0){
-      return Erlang.tuple(result, bin.substring(indexOfDot));
+      return Kernel.SpecialForms.tuple(result, bin.substring(indexOfDot));
     }
 
-    return Erlang.tuple(result, "");
+    return Kernel.SpecialForms.tuple(result, "");
   },
 
   to_char_list: function(number, base = 10){

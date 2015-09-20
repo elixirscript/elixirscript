@@ -1,10 +1,7 @@
-import Immutable from './lib/immutable/immutable';
-
-self.mailbox = self.mailbox || Immutable.Map({});
+self.mailbox = self.mailbox || {};
 
 export { default as Patterns } from './lib/patterns/patterns';
 export { default as Immutable } from './lib/immutable/immutable';
-export { default as Erlang } from './lib/erlang';
 export { default as BitString } from './lib/bit_string';
 export { default as Kernel } from './lib/kernel';
 export { default as Atom } from './lib/atom';

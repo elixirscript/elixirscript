@@ -81,18 +81,30 @@ defmodule ElixirScript.Translator.Function do
   end
 
   defp do_make_function_clause(patterns, params, body, guard_body) do
-    JS.object_expression([
-      Map.make_property(JS.literal("pattern"), JS.array_expression(patterns)),
-      Map.make_property(JS.literal("fn"), JS.function_expression(params, [], body) ),
-      Map.make_property(JS.literal("guard"), JS.function_expression(params, [], guard_body) )      
-    ])
+    JS.call_expression(
+      JS.member_expression(
+        JS.identifier("Patterns"),
+        JS.identifier("make_case")
+      ),
+      [
+        JS.array_expression(patterns), 
+        JS.function_expression(params, [], body),
+        JS.function_expression(params, [], guard_body)
+      ]
+    )
   end
 
   defp do_make_function_clause(patterns, params, body) do
-    JS.object_expression([
-      Map.make_property(JS.literal("pattern"), JS.array_expression(patterns)),
-      Map.make_property(JS.literal("fn"), JS.function_expression(params, [], body) )
-    ])
+    JS.call_expression(
+      JS.member_expression(
+        JS.identifier("Patterns"),
+        JS.identifier("make_case")
+      ),
+      [
+        JS.array_expression(patterns), 
+        JS.function_expression(params, [], body)
+      ]
+    )
   end
 
   def make_function_or_property_call(module_name, function_name, env) do

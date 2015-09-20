@@ -1,4 +1,3 @@
-var Erlang = require('../lib/erlang');
 var Kernel = require('../lib/kernel');
 var expect = require('chai').expect;
 
@@ -22,14 +21,14 @@ describe('Kernel', function(){
     });
 
     it('match atoms', function(){
-      expect(Kernel.match__qmark__(Erlang.atom("test"), Erlang.atom("test"))).to.equal(true);
-      expect(Kernel.match__qmark__(Erlang.atom("test"), Erlang.atom("notest"))).to.equal(false);
+      expect(Kernel.match__qmark__(Kernel.SpecialForms.atom("test"), Kernel.SpecialForms.atom("test"))).to.equal(true);
+      expect(Kernel.match__qmark__(Kernel.SpecialForms.atom("test"), Kernel.SpecialForms.atom("notest"))).to.equal(false);
     });
 
     it('match tuples', function(){
-      expect(Kernel.match__qmark__(Erlang.tuple(1, 2, 3), Erlang.tuple(1, 2, 3))).to.equal(true);
-      expect(Kernel.match__qmark__(Erlang.tuple(1, undefined, 3), Erlang.tuple(1, 2, 3))).to.equal(true);
-      expect(Kernel.match__qmark__(Erlang.tuple(1, 2, 3), Erlang.tuple(1, 2))).to.equal(false);
+      expect(Kernel.match__qmark__(Kernel.SpecialForms.tuple(1, 2, 3), Kernel.SpecialForms.tuple(1, 2, 3))).to.equal(true);
+      expect(Kernel.match__qmark__(Kernel.SpecialForms.tuple(1, undefined, 3), Kernel.SpecialForms.tuple(1, 2, 3))).to.equal(true);
+      expect(Kernel.match__qmark__(Kernel.SpecialForms.tuple(1, 2, 3), Kernel.SpecialForms.tuple(1, 2))).to.equal(false);
     });
 
     it('match list', function(){

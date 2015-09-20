@@ -1,8 +1,6 @@
-import Erlang from './erlang';
 import Kernel from './kernel';
 
 let Enum = {
-  __MODULE__: Erlang.atom('Enum'),
 
   all__qmark__: function(collection, fun = (x) => x){
     return collection.every(fun);
@@ -13,27 +11,41 @@ let Enum = {
   },
 
   at: function(collection, n, the_default = null){
-    return collection.get(n, the_default);
+    if(n > this.count(collection) || n < 0){
+      return the_default;
+    }
+
+    return collection[n];
   },
 
   concat: function(...enumables){
-    return enumables.first().concat(enumables.last());
+    return enumables[0].concat(enumables[1]);
   },
 
   count: function(collection, fun = null){
     if(fun == null){
-      return collection.count();
-    }else{
-      return collection.count(fun);
+      return collection.length;
+    } else {
+      return collection.filter(fun).length;
     }
   },
 
   drop: function(collection, count){
-    return collection.skip(count);
+    return collection.slice(count);
   },
 
   drop_while: function(collection, fun){
-    return collection.skipWhile(fun);
+    let count = 0;
+
+    for(let elem of collection){
+      if(fun(elem)){
+        count = count + 1;
+      }else{
+        break;
+      }
+    }
+
+    return collection.slice(count);
   },
 
   each: function(collection, fun){
@@ -41,13 +53,13 @@ let Enum = {
   },
 
   empty__qmark__: function(collection){
-    return collection.count() === 0;
+    return collection.length === 0;
   },
 
   fetch: function(collection, n){
     if(Kernel.is_list(collection)){
-      if(n < collection.count() && n >= 0){
-        return Erlang.tuple(Erlang.atom("ok"), collection.get(n));
+      if(n < this.count(collection) && n >= 0){
+        return Erlang.tuple(Erlang.atom("ok"), collection[n]);
       }else{
         return Erlang.atom("error");
       }
@@ -58,8 +70,8 @@ let Enum = {
 
   fetch__emark__: function(collection, n){
     if(Kernel.is_list(collection)){
-      if(n < collection.count() && n >= 0){
-        return collection.get(n);
+      if(n < this.count(collection) && n >= 0){
+        return collection[n];
       }else{
         throw new Error("out of bounds error");
       }
@@ -80,10 +92,6 @@ let Enum = {
     return collection.find(fun, null, if_none);
   },
 
-  flat_map: function(collection, fun){
-    return collection.flatMap(fun);
-  },
-
   into: function(collection, list){
     return list.concat(collection);
   },
@@ -96,8 +104,8 @@ let Enum = {
     let mapped = Erlang.list();
     let the_acc = acc;
 
-    for (var i = 0; i < collection.count(); i++) {
-      let tuple = fun(collection.get(i), the_acc);
+    for (var i = 0; i < this.count(collection); i++) {
+      let tuple = fun(collection[i], the_acc);
 
       the_acc = Kernel.elem(tuple, 1);
       mapped = Erlang.list(...mapped.concat([Kernel.elem(tuple, 0)]));
@@ -115,7 +123,7 @@ let Enum = {
   },
 
   take: function(collection, count){
-    return collection.take(count);
+    return collection.slice(0, count);
   },
 
   take_every: function(collection, nth){
@@ -132,11 +140,21 @@ let Enum = {
   },
 
   take_while: function(collection, fun){
-    return collection.takeWhile(fun);
+    let count = 0;
+
+    for(let elem of collection){
+      if(fun(elem)){
+        count = count + 1;
+      }else{
+        break;
+      }
+    }
+
+    return collection.slice(0, count);
   },
 
   to_list: function(collection){
-    return collection.toList();
+    return collection;
   }
 };
 

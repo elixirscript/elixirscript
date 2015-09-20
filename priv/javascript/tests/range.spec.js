@@ -9,7 +9,7 @@ describe('Range', function(){
 
       expect(range.first()).to.equal(0);
       expect(range.last()).to.equal(2);
-      expect(range.count()).to.equal(3);
+      expect(range.length()).to.equal(3);
     })
   })
 })

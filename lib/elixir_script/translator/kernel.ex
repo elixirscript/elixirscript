@@ -109,7 +109,7 @@ defmodule ElixirScript.Translator.Kernel do
 
   defp do_translate({:tuple_size, _, [tuple]}, env) do
     quoted = quote do
-      unquote(tuple).get("__tuple__").size
+      unquote(tuple).__tuple__.length
     end
 
     Translator.translate(quoted, env)
@@ -117,7 +117,7 @@ defmodule ElixirScript.Translator.Kernel do
 
   defp do_translate({:map_size, _, [map]}, env) do
     quoted = quote do
-      unquote(map).size
+      Object.keys(unquote(map)).length
     end
 
     Translator.translate(quoted, env)
@@ -163,12 +163,10 @@ defmodule ElixirScript.Translator.Kernel do
   end
 
   defp do_translate({:hd, _, [list]}, env) do
-    JS.call_expression(
-      JS.member_expression(
-        Translator.translate(list, env),
-        JS.identifier(:first)
-      ),
-      []
+    JS.member_expression(
+      Translator.translate(list, env),
+      JS.identifier(0),
+      true
     )
   end
 
@@ -176,16 +174,16 @@ defmodule ElixirScript.Translator.Kernel do
     JS.call_expression(
       JS.member_expression(
         Translator.translate(list, env),
-        JS.identifier(:rest)
+        JS.identifier(:splice)
       ),
-      []
+      [1]
     )
   end
 
   defp do_translate({:length, _, [list]}, env) when is_list(list) do
     JS.member_expression(
       Translator.translate(list, env),
-      JS.identifier(:size)
+      JS.identifier(:length)
     )
   end
 

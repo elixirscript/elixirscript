@@ -1,78 +1,69 @@
 /* @flow */
 
 import { Variable, Wildcard, HeadTail, Capture, Type, StartsWith, Bound } from "./types";
-import Immutable from '../../immutable/immutable';
 
-function is_number(number){
-  return typeof number === 'number';
+function is_number(value: any): boolean {
+  return typeof value === 'number';
 }
 
-function is_string(string){
-  return typeof string === 'string';
+function is_string(value: any): boolean{
+  return typeof value === 'string';
 }
 
-function is_boolean(bool){
-  return typeof bool === 'boolean';
+function is_boolean(value: any): boolean {
+  return typeof value === 'boolean';
 }
 
-function is_symbol(symbol){
-  return typeof symbol === 'symbol';
+function is_symbol(value: any): boolean {
+  return typeof value === 'symbol';
 }
 
-function is_null(nil){
-  return nil === null;
+function is_null(value: any): boolean {
+  return value === null;
 }
 
-function is_undefined(undef){
-  return typeof undef === 'undefined';
+function is_undefined(value: any): boolean {
+  return typeof value === 'undefined';
 }
 
-function is_map(obj){
-  return Immutable.Map.isMap(obj);
+function is_function(value: any): boolean {
+  return typeof value === 'function';
 }
 
-function is_list(list){
-  return Immutable.List.isList(list);
-}
-
-function is_function(fun){
-  return typeof fun === 'function';
-}
-
-function is_variable(value){
+function is_variable(value: any): boolean {
   return value instanceof Variable;
 }
 
-function is_wildcard(value){
+function is_wildcard(value: any): boolean {
   return value instanceof Wildcard;
 }
 
-function is_headTail(value){
+function is_headTail(value: any): boolean {
   return value instanceof HeadTail;
 }
 
-function is_capture(value){
+function is_capture(value: any): boolean {
   return value instanceof Capture;
 }
 
-function is_type(value){
+function is_type(value: any): boolean {
   return value instanceof Type;
 }
 
-function is_startsWith(value){
+function is_startsWith(value: any): boolean {
   return value instanceof StartsWith;
 }
 
-function is_bound(value){
+function is_bound(value: any): boolean {
   return value instanceof Bound;
 }
 
-function is_object(obj){
-  return typeof obj === 'object';
+function is_object(value: any): boolean {
+  return typeof value === 'object';
 }
 
-function is_array(arr){
-  return Array.isArray(arr);
+function is_array(value: any): boolean {
+  return Array.isArray(value);
 }
 
 export default {
@@ -82,8 +73,6 @@ export default {
   is_symbol,
   is_null,
   is_undefined,
-  is_map,
-  is_list,
   is_function,
   is_variable,
   is_wildcard,

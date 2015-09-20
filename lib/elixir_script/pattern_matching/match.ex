@@ -3,6 +3,7 @@ defmodule ElixirScript.PatternMatching.Match do
 
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
+  alias ElixirScript.Translator.Primitive
   alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.Map
 
@@ -77,28 +78,6 @@ defmodule ElixirScript.PatternMatching.Match do
       [value]
     )
   end
-
-
-
-  def make_list(values) when is_list(values) do
-    JS.call_expression(
-      JS.member_expression(
-        JS.identifier("Erlang"),
-        JS.identifier("list")
-      ),
-      values
-    )
-  end
-
-  def make_tuple(values) when is_list(values) do
-    JS.call_expression(
-      JS.member_expression(
-        JS.identifier("Erlang"),
-        JS.identifier("tuple")
-      ),
-      values
-    )
-  end
   
   def build_match(params, env) do
     Enum.map(params, &do_build_match(&1, env))
@@ -152,7 +131,7 @@ defmodule ElixirScript.PatternMatching.Match do
     |> Enum.map(&build_match([&1], env))
     |> reduce_patterns
 
-    {[make_list(patterns)], params}
+    {[Primitive.make_list_no_translate(patterns)], params}
   end
 
   defp do_build_match(term, env) when is_number(term) or is_binary(term) or is_boolean(term) or is_atom(term) or is_nil(term) do
@@ -168,7 +147,7 @@ defmodule ElixirScript.PatternMatching.Match do
     |> Enum.map(&build_match([&1], env))
     |> reduce_patterns
 
-    {[make_tuple(patterns)], params}   
+    {[Primitive.make_tuple_no_translate(patterns)], params}   
   end
 
   defp do_build_match({name, _, _}, env) do
