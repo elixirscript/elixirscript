@@ -18,14 +18,25 @@ defmodule ElixirScript.Translator.Map.Test do
 
   should "translate map within map" do
     ex_ast = quote do: %{one: "one", two: %{three: "three"}}
-    js_code = "Kernel.SpecialForms.map({[Kernel.SpecialForms.atom('one')]: 'one', [Kernel.SpecialForms.atom('two')]: {[Kernel.SpecialForms.atom('three')]: 'three'}})"
+    js_code = """
+      Kernel.SpecialForms.map({
+        [Kernel.SpecialForms.atom('one')]: 'one',
+        [Kernel.SpecialForms.atom('two')]: Kernel.SpecialForms.map({
+             [Kernel.SpecialForms.atom('three')]: 'three'
+        })
+      })
+    """
 
     assert_translation(ex_ast, js_code)
   end
 
   should "translate map with string keys" do
     ex_ast = quote do: %{"one" => "one", "two" => "two"}
-    js_code = "Kernel.SpecialForms.map({['one']: 'one', ['two']: 'two'})"
+    js_code = """
+     Kernel.SpecialForms.map({
+             one: 'one',     two: 'two'
+       })
+    """
 
     assert_translation(ex_ast, js_code)
   end

@@ -1,3 +1,10 @@
+# v0.12.0-dev
+* Enhancement
+  * Updated tuple implementation. It's now a class.
+  * Replaced pattern matching library with custom one
+  * Added PostOffice. Only thing that current uses it is Agent
+  * Removed erlang.js. Moved data types to Kernel.SpecialForms
+
 # v0.11.0
 * Enhancement
   * `import` works with all options

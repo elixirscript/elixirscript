@@ -31,26 +31,17 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
-      const __MODULE__ = Kernel.SpecialForms.atom('Elephant');
-
-      let something_else = Patterns.defmatch([
-        [], 
-        function(){
-          return null;
-        }
-      ]);
-
-
-      let something = Patterns.defmatch([
-        [], 
-        function(){
-          return ul;
-        }
-      ]);
-
-      const ul = JQuery('#todo-list');
-
-      export { something };
+         const __MODULE__ = Kernel.SpecialForms.atom('Elephant');
+         let something_else = Patterns.defmatch(Patterns.make_case([],function()    {
+             return     null;
+           }));
+         let something = Patterns.defmatch(Patterns.make_case([],function()    {
+             return     ul;
+           }));
+         const ul = JQuery('#todo-list');
+         export {
+             something
+       };
     """
 
     assert_translation(ex_ast, js_code)
@@ -68,25 +59,17 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
-     import * as Crane from 'icabod/crane';
-     const __MODULE__ = Kernel.SpecialForms.atom('Elephant');
-
-      let something_else = Patterns.defmatch([
-        [], 
-        function(){
-          return null;
-        }
-      ]);
-
-
-      let something = Patterns.defmatch([
-        [], 
-        function(){
-          return null;
-        }
-      ]);
-
-     export { something };
+         import * as Crane from 'icabod/crane';
+         const __MODULE__ = Kernel.SpecialForms.atom('Elephant');
+         let something_else = Patterns.defmatch(Patterns.make_case([],function()    {
+             return     null;
+           }));
+         let something = Patterns.defmatch(Patterns.make_case([],function()    {
+             return     null;
+           }));
+         export {
+             something
+       };
     """
 
     assert_translation(ex_ast, js_code)
@@ -112,31 +95,27 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
-      const __MODULE__ = Kernel.SpecialForms.atom('Elephant');
-        function defstruct(trunk = true) {
-          return {
-            [Kernel.SpecialForms.atom('__struct__')]: __MODULE__, [Kernel.SpecialForms.atom('trunk')]: trunk
-          };
-        }
+         const __MODULE__ = Kernel.SpecialForms.atom('Elephant');
+         function defstruct(trunk = true)        {
+                 return     Kernel.SpecialForms.map({
+             [Kernel.SpecialForms.atom('__struct__')]: __MODULE__,     [Kernel.SpecialForms.atom('trunk')]: trunk
+       });
+               }
+         export {
+             defstruct
+       };
 
-        export {
-          defstruct
-        };
-
-      import * as Elephant from 'animals/elephant';
-      const __MODULE__ = Kernel.SpecialForms.atom('Animals');
-
-      let something_else = Patterns.defmatch([[], function(){
-        return null;
-      }]);
-
-      let something = Patterns.defmatch([[], function(){
-        return     Elephant.defstruct();
-      }]);
-
-      export {
-        something
-      };
+         import * as Elephant from 'animals/elephant';
+         const __MODULE__ = Kernel.SpecialForms.atom('Animals');
+         let something_else = Patterns.defmatch(Patterns.make_case([],function()    {
+             return     null;
+           }));
+         let something = Patterns.defmatch(Patterns.make_case([],function()    {
+             return     Elephant.defstruct();
+           }));
+         export {
+             something
+       };
 
     """
 
@@ -168,12 +147,11 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
-
          const __MODULE__ = Kernel.SpecialForms.atom('Bear');
          function defstruct(trunk = true)        {
-                 return     {
-                     [Kernel.SpecialForms.atom('__struct__')]: __MODULE__,         [Kernel.SpecialForms.atom('trunk')]: trunk
-           };
+                 return     Kernel.SpecialForms.map({
+             [Kernel.SpecialForms.atom('__struct__')]: __MODULE__,     [Kernel.SpecialForms.atom('trunk')]: trunk
+       });
                }
          export {
              defstruct
@@ -182,9 +160,9 @@ defmodule ElixirScript.Translator.Defmodule.Test do
          import * as Bear from 'elephant/bear';
          const __MODULE__ = Kernel.SpecialForms.atom('Elephant');
          function defstruct(trunk = true)        {
-                 return     {
-                     [Kernel.SpecialForms.atom('__struct__')]: __MODULE__,         [Kernel.SpecialForms.atom('trunk')]: trunk
-           };
+                 return     Kernel.SpecialForms.map({
+             [Kernel.SpecialForms.atom('__struct__')]: __MODULE__,     [Kernel.SpecialForms.atom('trunk')]: trunk
+       });
                }
          export {
              defstruct
@@ -192,12 +170,12 @@ defmodule ElixirScript.Translator.Defmodule.Test do
 
          import * as Elephant from 'animals/elephant';
          const __MODULE__ = Kernel.SpecialForms.atom('Animals');
-         let something_else = Patterns.defmatch([[], function()    {
+         let something_else = Patterns.defmatch(Patterns.make_case([],function()    {
              return     null;
-           }]);
-         let something = Patterns.defmatch([[], function()    {
+           }));
+         let something = Patterns.defmatch(Patterns.make_case([],function()    {
              return     Elephant.defstruct();
-           }]);
+           }));
          export {
              something
        };
@@ -249,9 +227,9 @@ defmodule ElixirScript.Translator.Defmodule.Test do
 
     js_code = """
          const __MODULE__ = Kernel.SpecialForms.atom('Tigers');
-         let oh_my = Patterns.defmatch([[], function()    {
+         let oh_my = Patterns.defmatch(Patterns.make_case([],function()    {
              return     null;
-           }]);
+           }));
          JS.get_property_or_call_function(Lions.Tigers.Bears,'oh_my');
          export {
              oh_my
@@ -290,12 +268,12 @@ defmodule ElixirScript.Translator.Defmodule.Test do
          export {};
 
          const __MODULE__ = Kernel.SpecialForms.atom('Tigers');
-         let oh_my2 = Patterns.defmatch([[], function()    {
+         let oh_my2 = Patterns.defmatch(Patterns.make_case([],function()    {
              return     null;
-           }]);
-         let oh_my = Patterns.defmatch([[], function()    {
+           }));
+         let oh_my = Patterns.defmatch(Patterns.make_case([],function()    {
              return     null;
-           }]);
+           }));
          export {
              oh_my2,     oh_my
        };
@@ -322,21 +300,21 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end 
 
     js_code = """
-     const __MODULE__ = Kernel.SpecialForms.atom('Tigers');
-     let oh_my2 = Patterns.defmatch([[], function()    {
-         return     null;
-       }]);
-     let oh_my = Patterns.defmatch([[], function()    {
-         return     null;
-       }]);
-     export {
-         oh_my2,     oh_my
-   };
+         const __MODULE__ = Kernel.SpecialForms.atom('Tigers');
+         let oh_my2 = Patterns.defmatch(Patterns.make_case([],function()    {
+             return     null;
+           }));
+         let oh_my = Patterns.defmatch(Patterns.make_case([],function()    {
+             return     null;
+           }));
+         export {
+             oh_my2,     oh_my
+       };
 
-     import { oh_my2 } from 'lions/tigers';
-     const __MODULE__ = Kernel.SpecialForms.atom('Animals');
-     oh_my2();
-     export {};
+         import { oh_my2 } from 'lions/tigers';
+         const __MODULE__ = Kernel.SpecialForms.atom('Animals');
+         oh_my2();
+         export {};
     """
 
     assert_translation(ex_ast, js_code)

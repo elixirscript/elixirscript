@@ -12,11 +12,11 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-      Patterns.defmatch({ pattern: [Kernel.SpecialForms.atom('ok')], fn: function() {
-        return value;
-      }}, [[Kernel.SpecialForms.atom('error')], function() {
-        return null;
-      }]).call(this, data)
+     Patterns.defmatch(Patterns.make_case([Kernel.SpecialForms.atom('ok')],function()    {
+             return     value;
+           }),Patterns.make_case([Kernel.SpecialForms.atom('error')],function()    {
+             return     null;
+           })).call(this,data)
     """
 
     assert_translation(ex_ast, js_code)
@@ -29,12 +29,12 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-      Patterns.defmatch([[false], function() {
-        let [value0] = Patterns.match(Patterns.variable(),13);
-        return value0;
-      }], [[true], function() {
-        return true;
-      }]).call(this, data)
+     Patterns.defmatch(Patterns.make_case([false],function()    {
+             let [value0] = Patterns.match(Patterns.variable(),13);
+             return     value0;
+           }),Patterns.make_case([true],function()    {
+             return     true;
+           })).call(this,data)
     """
 
     assert_translation(ex_ast, js_code)
@@ -49,12 +49,12 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-      Patterns.defmatch([[false], function() {
-        let [value0] = Patterns.match(Patterns.variable(),13);
-        return value0;
-      }], [[Patterns.wildcard()], function() {
-        return true;
-      }]).call(this, data)
+     Patterns.defmatch(Patterns.make_case([false],function()    {
+             let [value0] = Patterns.match(Patterns.variable(),13);
+             return     value0;
+           }),Patterns.make_case([Patterns.wildcard()],function()    {
+             return     true;
+           })).call(this,data)
     """
 
     assert_translation(ex_ast, js_code)
@@ -71,24 +71,14 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-      Patterns.defmatch(
-        [
-          [Patterns.variable()], 
-          function(number) {
-            let [value0] = Patterns.match(Patterns.variable(),13);
-            return value0;
-          }, 
-          function(number) {
-            return Kernel.__in__(number, Kernel.SpecialForms.list(1, 2, 3, 4));
-          }
-        ], 
-        [
-          [Patterns.wildcard()], 
-          function() {
-            return true;
-          }
-        ]
-      ).call(this, data)
+     Patterns.defmatch(Patterns.make_case([Patterns.variable()],function(number)    {
+             let [value0] = Patterns.match(Patterns.variable(),13);
+             return     value0;
+           },function(number)    {
+             return     Kernel.__in__(number,Kernel.SpecialForms.list(1,2,3,4));
+           }),Patterns.make_case([Patterns.wildcard()],function()    {
+             return     true;
+           })).call(this,data)
     """
 
     assert_translation(ex_ast, js_code)
@@ -106,12 +96,12 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-      Patterns.defmatch([[Kernel.SpecialForms.atom('ok')], function() {
-        console.info('info');
-        return Todo.add(data);
-      }], [[Kernel.SpecialForms.atom('error')], function() {
-        return null;
-      }]).call(this, data)
+     Patterns.defmatch(Patterns.make_case([Kernel.SpecialForms.atom('ok')],function()    {
+             console.info('info');
+             return     Todo.add(data);
+           }),Patterns.make_case([Kernel.SpecialForms.atom('error')],function()    {
+             return     null;
+           })).call(this,data)
     """
 
     assert_translation(ex_ast, js_code)
@@ -128,11 +118,11 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-      Patterns.defmatch([[Kernel.SpecialForms.tuple(Patterns.variable(), Patterns.variable())], function(one, two) {
-        return console.info(one);
-      }], [[Kernel.SpecialForms.atom('error')], function() {
-        return null;
-      }]).call(this, data)
+     Patterns.defmatch(Patterns.make_case([Kernel.SpecialForms.tuple(Patterns.variable(),Patterns.variable())],function(one,two)    {
+             return     console.info(one);
+           }),Patterns.make_case([Kernel.SpecialForms.atom('error')],function()    {
+             return     null;
+           })).call(this,data)
     """
 
     assert_translation(ex_ast, js_code)
@@ -149,20 +139,11 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-      Patterns.defmatch(
-        [
-          [Kernel.SpecialForms.tuple(Kernel.SpecialForms.tuple(Patterns.variable(), Patterns.variable()), Patterns.variable())], 
-          function(one, two, three) {
-            return console.info(one);
-          }
-        ], 
-        [
-          [Kernel.SpecialForms.atom('error')], 
-          function() {
-            return null;
-          }
-        ]
-      ).call(this, data)
+     Patterns.defmatch(Patterns.make_case([Kernel.SpecialForms.tuple(Kernel.SpecialForms.tuple(Patterns.variable(),Patterns.variable()),Patterns.variable())],function(one,two,three)    {
+             return     console.info(one);
+           }),Patterns.make_case([Kernel.SpecialForms.atom('error')],function()    {
+             return     null;
+           })).call(this,data)
     """
 
     assert_translation(ex_ast, js_code)
@@ -177,11 +158,12 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-      Patterns.defmatch([[Kernel.SpecialForms.tuple(Patterns.variable(), Kernel.SpecialForms.tuple(Patterns.variable(), Patterns.variable()))], function(one, two, three) {
-        return console.info(one);
-      }], [[Kernel.SpecialForms.atom('error')], function() {
-        return null;
-      }]).call(this, data)
+     Patterns.defmatch(Patterns.make_case([Kernel.SpecialForms.tuple(Patterns.variable(),Kernel.SpecialForms.tuple(Patterns.variable(),Patterns.variable()))],function(one,two,three)    {
+             return     console.info(one);
+           }),Patterns.make_case([Kernel.SpecialForms.atom('error')],function()    {
+             return     null;
+           })).call(this,data)
+
     """
 
     assert_translation(ex_ast, js_code)
@@ -197,20 +179,15 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-      Patterns.defmatch(
-        [
-          [{'__struct__': Kernel.SpecialForms.atom('AStruct'), 'key': {'__struct__': Kernel.SpecialForms.atom('BStruct'), 'key2': Patterns.variable()}}], 
-          function(value){
-            return console.info(value);
-          }
-        ],
-        [
-          [Kernel.SpecialForms.atom('error')], 
-          function(){
-            return null;
-          }
-        ]
-      ).call(this, data)
+     Patterns.defmatch(Patterns.make_case([{
+             __struct__: Kernel.SpecialForms.atom('AStruct'),     ['key']: {
+             __struct__: Kernel.SpecialForms.atom('BStruct'),     ['key2']: Patterns.variable()
+       }
+       }],function(value)    {
+             return     console.info(value);
+           }),Patterns.make_case([Kernel.SpecialForms.atom('error')],function()    {
+             return     null;
+           })).call(this,data)
     """
 
     assert_translation(ex_ast, js_code)
@@ -226,20 +203,17 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-    Patterns.defmatch(
-      [
-        [{'__struct__': Kernel.SpecialForms.atom('AStruct'), 'key': {'__struct__': Kernel.SpecialForms.atom('BStruct'), 'key2': Patterns.variable(), 'key3': {'__struct__': Kernel.SpecialForms.atom('CStruct'), 'key4': Patterns.variable()}}}], 
-        function(value,value2){
-          return console.info(value);
-        }
-      ],
-      [
-        [Kernel.SpecialForms.atom('error')], 
-        function(){
-          return null;
-        }
-      ]
-    ).call(this, data)
+     Patterns.defmatch(Patterns.make_case([{
+             __struct__: Kernel.SpecialForms.atom('AStruct'),     ['key']: {
+             __struct__: Kernel.SpecialForms.atom('BStruct'),     ['key2']: Patterns.variable(),     ['key3']: {
+             __struct__: Kernel.SpecialForms.atom('CStruct'),     ['key4']: Patterns.variable()
+       }
+       }
+       }],function(value,value2)    {
+             return     console.info(value);
+           }),Patterns.make_case([Kernel.SpecialForms.atom('error')],function()    {
+             return     null;
+           })).call(this,data)
     """
 
     assert_translation(ex_ast, js_code)

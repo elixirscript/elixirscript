@@ -36,7 +36,7 @@ defmodule ElixirScript.Translator.Assignment.Test do
 
     ex_ast = quote do: {^a, _, c} = {1, 2, 3}
     js_code = """
-         let [,undefined,c] = Patterns.match(Kernel.SpecialForms.tuple(fun.bound(a),Patterns.wildcard(),Patterns.variable()),Kernel.SpecialForms.tuple(1,2,3));
+         let [,undefined,c] = Patterns.match(Kernel.SpecialForms.tuple(Patterns.bound(a),Patterns.wildcard(),Patterns.variable()),Kernel.SpecialForms.tuple(1,2,3));
          let _ref = Kernel.SpecialForms.tuple(undefined,undefined,c);
     """
 
@@ -46,7 +46,7 @@ defmodule ElixirScript.Translator.Assignment.Test do
   should "translate bound assignment" do
     ex_ast = quote do: ^a = 1
     js_code = """ 
-        let [] = Patterns.match(fun.bound(a), 1);
+     let [] = Patterns.match(Patterns.bound(a),1);
     """
 
     assert_translation(ex_ast, js_code)
@@ -65,8 +65,8 @@ defmodule ElixirScript.Translator.Assignment.Test do
   should "translate head/tail assignment" do
     ex_ast = quote do: [a | b] = [1, 2, 3, 4]
     js_code = """
-        let [a, b] = Patterns.match(fun.headTail, Kernel.SpecialForms.list(1, 2, 3, 4));
-        let _ref = Kernel.SpecialForms.list(a, b);
+         let [a,b] = Patterns.match(Patterns.headTail(),Kernel.SpecialForms.list(1,2,3,4));
+         let _ref = Kernel.SpecialForms.list(a,b);
     """
 
     assert_translation(ex_ast, js_code)

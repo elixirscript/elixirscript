@@ -15,15 +15,15 @@ defmodule ElixirScript.Translator.Receive.Test do
     end
 
     js_code = """
-      Kernel.SpecialForms.receive(function(message) {
-        return Patterns.defmatch([[Kernel.SpecialForms.atom('ok')], function() {
-          return value;
-        }], [[Kernel.SpecialForms.atom('error')], function() {
-          return value;
-        }], [[Patterns.wildcard()], function() {
-          return IO.puts('Unexpected message received');
-        }]).call(this, message);
-      })
+     Kernel.SpecialForms.receive(function(message)    {
+             return     Patterns.defmatch(Patterns.make_case([Kernel.SpecialForms.atom('ok')],function()    {
+             return     value;
+           }),Patterns.make_case([Kernel.SpecialForms.atom('error')],function()    {
+             return     value;
+           }),Patterns.make_case([Patterns.wildcard()],function()    {
+             return     IO.puts('Unexpected message received');
+           })).call(this,message);
+           })
     """
 
     assert_translation(ex_ast, js_code)
@@ -45,19 +45,17 @@ defmodule ElixirScript.Translator.Receive.Test do
     end
 
     js_code = """
-      Kernel.SpecialForms.receive(function(message) {
-        return Patterns.defmatch([[Kernel.SpecialForms.atom('ok')], function() {
-          return value;
-        }], [[Kernel.SpecialForms.atom('error')], function() {
-          return value;
-        }], [[Patterns.wildcard()], function() {
-          return IO.puts('Unexpected message received');
-        }]).call(this, message);
-      }, 
-      5000, 
-      Patterns.defmatch([[5000], function() {
-        return IO.puts('No message in 5 seconds');
-      }]))
+     Kernel.SpecialForms.receive(function(message)    {
+             return     Patterns.defmatch(Patterns.make_case([Kernel.SpecialForms.atom('ok')],function()    {
+             return     value;
+           }),Patterns.make_case([Kernel.SpecialForms.atom('error')],function()    {
+             return     value;
+           }),Patterns.make_case([Patterns.wildcard()],function()    {
+             return     IO.puts('Unexpected message received');
+           })).call(this,message);
+           },5000,Patterns.defmatch(Patterns.make_case([5000],function()    {
+             return     IO.puts('No message in 5 seconds');
+           })))
     """
 
     assert_translation(ex_ast, js_code)

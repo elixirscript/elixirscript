@@ -12,9 +12,9 @@ defmodule ElixirScript.Translator.Bug.Test do
     end
 
     js_code = """
-     React.createElement(React.Text,{
-             ['style']: JS.get_property_or_call_function(styles,'welcome')
-       },'Welcome to React Native!')
+     React.createElement(React.Text,Kernel.SpecialForms.map({
+             style: JS.get_property_or_call_function(styles,'welcome')
+       }),'Welcome to React Native!')
     """
 
     assert_translation(ex_ast, js_code) 
@@ -102,24 +102,21 @@ defmodule ElixirScript.Translator.Bug.Test do
 
 
     js_code = """
-      let getDispatcher = Patterns.defmatch([[], function() {
-        return DeLorean.Flux.createDispatcher({
-          [Kernel.SpecialForms.atom('startPainting')]: Patterns.defmatch([[], function() {
-            return this.dispatch('startPainting');
-          }]),
-          [Kernel.SpecialForms.atom('stopPainting')]: Patterns.defmatch([[], function() {
-            return this.dispatch('stopPainting');
-          }]),
-          [Kernel.SpecialForms.atom('addPoint')]: Patterns.defmatch([[Patterns.variable()], function(data) {
-            return this.dispatch('addPoint', data);
-          }]),
-           [Kernel.SpecialForms.atom('getStores')]: Patterns.defmatch([[], function() {
-            return {
-              [Kernel.SpecialForms.atom('graphic')]: GraphicStore
-            };
-          }])
-        });
-      }]);
+     let getDispatcher = Patterns.defmatch(Patterns.make_case([],function()    {
+             return     DeLorean.Flux.createDispatcher(Kernel.SpecialForms.map({
+             [Kernel.SpecialForms.atom('startPainting')]: Patterns.defmatch(Patterns.make_case([],function()    {
+             return     this.dispatch('startPainting');
+           })),     [Kernel.SpecialForms.atom('stopPainting')]: Patterns.defmatch(Patterns.make_case([],function()    {
+             return     this.dispatch('stopPainting');
+           })),     [Kernel.SpecialForms.atom('addPoint')]: Patterns.defmatch(Patterns.make_case([Patterns.variable()],function(data)    {
+             return     this.dispatch('addPoint',data);
+           })),     [Kernel.SpecialForms.atom('getStores')]: Patterns.defmatch(Patterns.make_case([],function()    {
+             return     Kernel.SpecialForms.map({
+             [Kernel.SpecialForms.atom('graphic')]: GraphicStore
+       });
+           }))
+       }));
+           }));
     """
 
     assert_translation(ex_ast, js_code)
