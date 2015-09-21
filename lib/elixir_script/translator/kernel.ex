@@ -109,7 +109,7 @@ defmodule ElixirScript.Translator.Kernel do
 
   defp do_translate({:tuple_size, _, [tuple]}, env) do
     quoted = quote do
-      unquote(tuple).__tuple__.length
+      unquote(tuple).count()
     end
 
     Translator.translate(quoted, env)

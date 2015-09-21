@@ -5,7 +5,13 @@ import { buildMatch } from "./match";
 export class MatchError extends Error {
   constructor(arg: any) {
     super();
-    this.message = 'No match for: ' + arg.toString(); 
+
+    if(typeof arg === 'symbol'){
+      this.message = 'No match for: ' + arg.toString(); 
+    }else{
+      this.message = 'No match for: ' + arg;      
+    }
+
     this.stack = (new Error()).stack;
     this.name = this.constructor.name;
   }

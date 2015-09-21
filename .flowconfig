@@ -1,6 +1,7 @@
 [ignore]
 .*/dist/.*
 .*/build/.*
+.*/dist_build/.*
 .*/node_modules/.*
 
 [include]

@@ -49,7 +49,9 @@ let Enum = {
   },
 
   each: function(collection, fun){
-    collection.forEach(fun);
+    for(let elem of collection){
+      fun(elem);
+    }
   },
 
   empty__qmark__: function(collection){
@@ -59,9 +61,9 @@ let Enum = {
   fetch: function(collection, n){
     if(Kernel.is_list(collection)){
       if(n < this.count(collection) && n >= 0){
-        return Erlang.tuple(Erlang.atom("ok"), collection[n]);
+        return Kernel.SpecialForms.tuple(Kernel.SpecialForms.atom("ok"), collection[n]);
       }else{
-        return Erlang.atom("error");
+        return Kernel.SpecialForms.atom("error");
       }
     }
 
@@ -101,17 +103,17 @@ let Enum = {
   },
 
   map_reduce: function(collection, acc, fun){
-    let mapped = Erlang.list();
+    let mapped = Kernel.SpecialForms.list();
     let the_acc = acc;
 
     for (var i = 0; i < this.count(collection); i++) {
       let tuple = fun(collection[i], the_acc);
 
       the_acc = Kernel.elem(tuple, 1);
-      mapped = Erlang.list(...mapped.concat([Kernel.elem(tuple, 0)]));
+      mapped = Kernel.SpecialForms.list(...mapped.concat([Kernel.elem(tuple, 0)]));
     }
 
-    return Erlang.tuple(mapped, the_acc);
+    return Kernel.SpecialForms.tuple(mapped, the_acc);
   },
 
   member: function(collection, value){
@@ -136,7 +138,7 @@ let Enum = {
       }
     }
 
-    return Erlang.list(...result);
+    return Kernel.SpecialForms.list(...result);
   },
 
   take_while: function(collection, fun){

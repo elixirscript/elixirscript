@@ -1,6 +1,7 @@
 /* @flow */
 
 import { Variable, Wildcard, HeadTail, Capture, Type, StartsWith, Bound } from "./types";
+import Tuple from '../../tuple';
 
 function is_number(value: any): boolean {
   return typeof value === 'number';
@@ -8,6 +9,10 @@ function is_number(value: any): boolean {
 
 function is_string(value: any): boolean{
   return typeof value === 'string';
+}
+
+function is_tuple(value: any): boolean{
+  return value instanceof Tuple;
 }
 
 function is_boolean(value: any): boolean {
@@ -27,7 +32,7 @@ function is_undefined(value: any): boolean {
 }
 
 function is_function(value: any): boolean {
-  return typeof value === 'function';
+  return Object.prototype.toString.call(value) == '[object Function]';
 }
 
 function is_variable(value: any): boolean {
@@ -82,5 +87,6 @@ export default {
   is_startsWith,
   is_bound,
   is_object,
-  is_array
+  is_array,
+  is_tuple
 };

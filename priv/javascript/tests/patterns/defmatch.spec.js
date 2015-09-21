@@ -1,5 +1,6 @@
 var expect = require('chai').expect;
 var Patterns = require("../../lib/patterns/patterns");
+var Tuple = require("../../lib/tuple");
 
 const _ = Patterns.wildcard();
 const $ = Patterns.variable();
@@ -130,23 +131,17 @@ describe('defmatch', () => {
     expect(fn([3, 1, 2, 4]).length).to.equal(3);
   });
 
-  it('must match on type', () => {
-
-    class Tuple {
-      constructor(...elems){
-        this.value = elems;
-      }
-    }
+  it('must match on tuple', () => {
 
     let fn = Patterns.defmatch(
       Patterns.make_case(
-        [Patterns.type(Tuple, {value: [1, 2, 3]})], 
+        [new Tuple(1, 2, 3)], 
         () => 3
       )
     );
 
     expect(fn(new Tuple(1, 2, 3))).to.equal(3);
-    expect(fn.bind(fn, new Tuple(1, 2, 4))).to.throw("No match for: [object Object]");
+    expect(fn.bind(fn, new Tuple(1, 2, 4))).to.throw("No match for: {1, 2, 4}");
   });
 
 

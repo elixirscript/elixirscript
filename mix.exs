@@ -77,14 +77,15 @@ defmodule ElixirScript.Mixfile do
       File.rm_rf(dist_folder)
     end
 
-    { elixir_js, _ } = System.cmd("node", ["node_modules/rollup/bin/rollup", "./priv/javascript/elixir.js"])
+    { _ , _ } = System.cmd("node", ["node_modules/gulp/bin/gulp.js", "dist_build"])
+    { elixir_js, _ } = System.cmd("node", ["node_modules/rollup/bin/rollup", "./priv/javascript/dist_build/elixir.js"])
     File.write!("priv/javascript/dist/elixir.js", elixir_js)
+    { _ , _ } = System.cmd("node", ["node_modules/gulp/bin/gulp.js", "dist_add_source_map"])
 
     File.mkdir_p(folder_name <> "/bin")
     File.cp!("ex2js", "#{folder_name}/bin/ex2js")
     File.cp_r!("priv/javascript/dist", "#{folder_name}/dist")
     File.cp_r!("LICENSE", "#{folder_name}/LICENSE")
-    File.cp_r!("THIRD-PARTY-LICENSES", "#{folder_name}/THIRD-PARTY-LICENSES")
 
     System.cmd("tar", ["czf", archive_file_name, folder_name])
 

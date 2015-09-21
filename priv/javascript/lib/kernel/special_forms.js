@@ -1,4 +1,5 @@
 import BitString from '../bit_string';
+import Tuple from '../tuple';
 import Enum from '../enum';
 import * as Patterns from '../patterns/patterns';
 
@@ -55,7 +56,8 @@ let SpecialForms = {
   },
 
   map_update: function(map, values){
-    return Object.assign(map, value);
+    let obj = Object.assign({}, map);
+    return Object.freeze(Object.assign(obj, values));
   },
 
   _for: function(collections, fun, filter = () => true, into = [], previousValues = []){
@@ -120,7 +122,7 @@ let SpecialForms = {
   },
 
   tuple: function(...args){
-    return Object.freeze({__tuple__: SpecialForms.list(...args) });
+    return new Tuple(...args);
   }
 
 };

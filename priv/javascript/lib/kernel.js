@@ -1,5 +1,5 @@
 import SpecialForms from './kernel/special_forms';
-import * as Patterns from './patterns/patterns';
+import Patterns from './patterns/patterns';
 import Tuple from './tuple';
 let Kernel = {
 
@@ -47,7 +47,7 @@ let Kernel = {
   },
 
   is_map: function(x){
-    return typeof x === 'object' || x instanceof Object && x.__tuple__ === null;
+    return typeof x === 'object' || x instanceof Object;
   },
 
   is_number: function(x){
@@ -55,7 +55,7 @@ let Kernel = {
   },
 
   is_tuple: function(x){
-    return (typeof x === 'object' || x instanceof Object) && x.__tuple__ !== null;
+    return x instanceof Tuple;
   },
 
   length: function(x){
@@ -101,7 +101,7 @@ let Kernel = {
       return tuple[index];
     }
 
-    return tuple.__tuple__[index];
+    return tuple.get(index);
   },
 
   rem: function(left, right){
