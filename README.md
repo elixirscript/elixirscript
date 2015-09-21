@@ -98,7 +98,7 @@ import {...} from 'js/elixir'
  * Using the included the ElixirScript module to turn Elixir code into JavaScript
     ```elixir
     iex(1)> ElixirScript.compile("[1, 2, 3, 4]")
-    ["Erlang.list(1,2,3,4)"]
+    ["Kernel.SpecialForms.list(1,2,3,4)"]
     ```
 
 # Macros
