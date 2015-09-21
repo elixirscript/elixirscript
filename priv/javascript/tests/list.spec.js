@@ -1,5 +1,5 @@
 var List = require('../lib/list');
-var Erlang = require('../lib/erlang');
+var Kernel = require('../lib/kernel');
 var expect = require('chai').expect;
 
 describe('List', function(){
@@ -20,7 +20,7 @@ describe('List', function(){
 
   describe('delete_at', function(){
     it('must delete first item', function(){
-      let t = Erlang.list(1, 2, 3);
+      let t = Kernel.SpecialForms.list(1, 2, 3);
       t = List.delete_at(t, 0);
       expect(t[0]).to.equal(2);
     })
@@ -28,15 +28,15 @@ describe('List', function(){
 
   describe('delete', function(){
     it('delete item in list', function(){
-      let t = Erlang.list(Erlang.atom("a"), Erlang.atom("b"), Erlang.atom("c"));
-      t = List.delete(t, Erlang.atom("b"));
-      expect(t[1]).to.equal(Erlang.atom("c"));
+      let t = Kernel.SpecialForms.list(Kernel.SpecialForms.atom("a"), Kernel.SpecialForms.atom("b"), Kernel.SpecialForms.atom("c"));
+      t = List.delete(t, Kernel.SpecialForms.atom("b"));
+      expect(t[1]).to.equal(Kernel.SpecialForms.atom("c"));
     })
   })
 
   describe('flatten', function(){
     it('must flatten a list into one list', function(){
-      let t = Erlang.list(1, Erlang.list(2), 3);
+      let t = Kernel.SpecialForms.list(1, Kernel.SpecialForms.list(2), 3);
 
       t = List.flatten(t);
 
@@ -46,7 +46,7 @@ describe('List', function(){
     })
 
     it('must flatten a deeply nested list into one list', function(){
-      let t = Erlang.list(1, Erlang.list(2, Erlang.list(4)), 3);
+      let t = Kernel.SpecialForms.list(1, Kernel.SpecialForms.list(2, Kernel.SpecialForms.list(4)), 3);
 
       t = List.flatten(t);
 
@@ -59,14 +59,14 @@ describe('List', function(){
 
   describe('toString', function(){
     it('must display correctly', function(){
-      let t = Erlang.list(1, 2, 3);
-      expect(t.toString()).to.equal("1,2,3");
+      let t = Kernel.SpecialForms.list(1, 2, 3);
+      expect(t.toString()).to.equal('1,2,3');
     })
   })
 
   describe('destructuring', function(){
     it('destructure into an array', function(){
-      let t = Erlang.list(1, 2, 3);
+      let t = Kernel.SpecialForms.list(1, 2, 3);
       let [a, b, c] = t;
       expect(a).to.equal(1);
       expect(b).to.equal(2);

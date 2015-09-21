@@ -10,15 +10,15 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-     const __MODULE__ = Erlang.atom('User');
-     function defstruct(name = 'john', age = 27) {
-         return {
-             [Erlang.atom('__struct__')]: __MODULE__,
-             [Erlang.atom('name')]: name,
-             [Erlang.atom('age')]: age
-         };
-     }
-     export { defstruct };
+         const __MODULE__ = Kernel.SpecialForms.atom('User');
+         function defstruct(name = 'john',age = 27)        {
+                 return     Kernel.SpecialForms.map({
+             [Kernel.SpecialForms.atom('__struct__')]: __MODULE__,     [Kernel.SpecialForms.atom('name')]: name,     [Kernel.SpecialForms.atom('age')]: age
+       });
+               }
+         export {
+             defstruct
+       };
     """
 
     assert_translation(ex_ast, js_code)
@@ -33,15 +33,15 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-     const __MODULE__ = Erlang.atom('User');
-     function defstruct(name, age) {
-         return {
-             [Erlang.atom('__struct__')]: __MODULE__,
-             [Erlang.atom('name')]: name,
-             [Erlang.atom('age')]: age
-         };
-     }
-     export { defstruct };
+         const __MODULE__ = Kernel.SpecialForms.atom('User');
+         function defstruct(name,age)        {
+                 return     Kernel.SpecialForms.map({
+             [Kernel.SpecialForms.atom('__struct__')]: __MODULE__,     [Kernel.SpecialForms.atom('name')]: name,     [Kernel.SpecialForms.atom('age')]: age
+       });
+               }
+         export {
+             defstruct
+       };
     """
 
     assert_translation(ex_ast, js_code)
@@ -54,7 +54,7 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-      let [user] = fun.bind(fun.parameter,User.defstruct());
+      let [user] = Patterns.match(Patterns.variable(),User.defstruct());
     """
 
     assert_translation(ex_ast, js_code)
@@ -64,7 +64,7 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-     let [user] = fun.bind(fun.parameter,User.defstruct(name = 'John'));
+     let [user] = Patterns.match(Patterns.variable(),User.defstruct(name = 'John'));
     """
 
     assert_translation(ex_ast, js_code)
@@ -76,7 +76,7 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-     let [user] = fun.bind(fun.parameter,(function()    {
+     let [user] = Patterns.match(Patterns.variable(),(function()    {
              let _results = {};
              for(let prop in map)     {
              if(map.hasOwnProperty(prop))     {
@@ -96,7 +96,7 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-     let [user] = fun.bind(fun.parameter,(function()    {
+     let [user] = Patterns.match(Patterns.variable(),(function()    {
              let _results = {};
              for(let prop in map)     {
              if(map.hasOwnProperty(prop))     {
@@ -120,14 +120,15 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-     const __MODULE__ = Erlang.atom('MyAppError');
-     function defexception(message = 'This is a message') {
-         return {
-             [Erlang.atom('__struct__')]: __MODULE__,
-             [Erlang.atom('message')]: message
-         };
-     }
-     export { defexception };
+         const __MODULE__ = Kernel.SpecialForms.atom('MyAppError');
+         function defexception(message = 'This is a message')        {
+                 return     Kernel.SpecialForms.map({
+             [Kernel.SpecialForms.atom('__struct__')]: __MODULE__,     [Kernel.SpecialForms.atom('message')]: message
+       });
+               }
+         export {
+             defexception
+       };
      """
 
     assert_translation(ex_ast, js_code)
@@ -139,14 +140,15 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-     const __MODULE__ = Erlang.atom('MyAppError');
-     function defexception(message = null) {
-         return {
-             [Erlang.atom('__struct__')]: __MODULE__,
-             [Erlang.atom('message')]: message
-         };
-     }
-     export { defexception };
+         const __MODULE__ = Kernel.SpecialForms.atom('MyAppError');
+         function defexception(message = null)        {
+                 return     Kernel.SpecialForms.map({
+             [Kernel.SpecialForms.atom('__struct__')]: __MODULE__,     [Kernel.SpecialForms.atom('message')]: message
+       });
+               }
+         export {
+             defexception
+       };
     """
 
     assert_translation(ex_ast, js_code)
@@ -170,7 +172,7 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-      throw new RuntimeError({__struct__: Erlang.atom('RuntimeError'), message: 'did not get what was expected'});
+      throw new RuntimeError({__struct__: Kernel.SpecialForms.atom('RuntimeError'), message: 'did not get what was expected'});
     """
 
     assert_translation(ex_ast, js_code)

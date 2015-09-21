@@ -13,26 +13,19 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-      (function() {
-        try {
-          return do_something_that_may_fail(some_arg);
-        } catch (e) {
-          fun(
-            [
-              [{
-                '__struct__': Erlang.atom('ArgumentError')
-              }], 
-              function() {
-                return IO.puts('Invalid argument given');
-              }], 
-            [
-              [], 
-              function() {
-                return Kernel.throw(e);
-              }
-            ]).call(this, e)
-        }
-      }.call(this))
+     (function()    {
+             try    {
+             return     do_something_that_may_fail(some_arg);
+           }    catch(e) {
+         Patterns.defmatch(Patterns.make_case([{
+             [Kernel.SpecialForms.atom('__struct__')]: Kernel.SpecialForms.atom('ArgumentError')
+       }],function()    {
+             return     IO.puts('Invalid argument given');
+           }),Patterns.make_case([],function()    {
+             return     Kernel.throw(e);
+           })).call(this,e)
+       }
+           }.call(this))
     """
 
     assert_translation(ex_ast, js_code)
@@ -49,28 +42,19 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-      (function() {
-        try {
-          return do_something_that_may_fail(some_arg);
-        } catch (e) {
-          fun(
-            [
-              [{
-                '__struct__': Erlang.atom('ArgumentError')
-              }],
-              function() {
-                return IO.puts('Invalid argument given');
-              }
-            ], 
-            [
-              [], 
-              function() {
-                return Kernel.throw(e);
-              }
-            ]
-          ).call(this, e)
-        }
-      }.call(this))
+     (function()    {
+             try    {
+             return     do_something_that_may_fail(some_arg);
+           }    catch(e) {
+         Patterns.defmatch(Patterns.make_case([{
+             [Kernel.SpecialForms.atom('__struct__')]: Kernel.SpecialForms.atom('ArgumentError')
+       }],function()    {
+             return     IO.puts('Invalid argument given');
+           }),Patterns.make_case([],function()    {
+             return     Kernel.throw(e);
+           })).call(this,e)
+       }
+           }.call(this))
     """
 
     assert_translation(ex_ast, js_code)
@@ -87,19 +71,19 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-      (function() {
-        try {
-          return do_something_that_may_fail(some_arg);
-        } catch (e) {
-          fun([[fun.parameter], function(x) {
-            return IO.puts('Invalid argument given');
-          }, function(x) {
-            return Kernel.__in__(x, Erlang.list(ArgumentError.defstruct()));
-          }], [[], function() {
-            return Kernel.throw(e);
-          }]).call(this, e)
-        }
-      }.call(this))
+     (function()    {
+             try    {
+             return     do_something_that_may_fail(some_arg);
+           }    catch(e) {
+         Patterns.defmatch(Patterns.make_case([Patterns.variable()],function(x)    {
+             return     IO.puts('Invalid argument given');
+           },function(x)    {
+             return     Kernel.__in__(x,Kernel.SpecialForms.list(ArgumentError.defstruct()));
+           }),Patterns.make_case([],function()    {
+             return     Kernel.throw(e);
+           })).call(this,e)
+       }
+           }.call(this))
     """
 
     assert_translation(ex_ast, js_code)
@@ -116,26 +100,17 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-      (function() {
-        try {
-          return do_something_that_may_fail(some_arg);
-        } catch (e) {
-          fun(
-            [
-              [fun.parameter], 
-              function(x) {
-                return IO.puts('Invalid argument given');
-              }
-            ], 
-            [
-              [], 
-              function() {
-                return Kernel.throw(e);
-              }
-            ]
-          ).call(this, e)
-        }
-      }.call(this))
+     (function()    {
+             try    {
+             return     do_something_that_may_fail(some_arg);
+           }    catch(e) {
+         Patterns.defmatch(Patterns.make_case([Patterns.variable()],function(x)    {
+             return     IO.puts('Invalid argument given');
+           }),Patterns.make_case([],function()    {
+             return     Kernel.throw(e);
+           })).call(this,e)
+       }
+           }.call(this))
     """
 
     assert_translation(ex_ast, js_code)
@@ -155,32 +130,21 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-      (function() {
-        try {
-          return do_something_that_may_fail(some_arg);
-        } catch (e) {
-          fun(
-            [
-              [{'__struct__': Erlang.atom('ArgumentError')}], 
-              function() {
-                return IO.puts('ArgumentError');
-              }
-            ], 
-            [
-              [fun.parameter], 
-              function(x) {
-                return IO.puts('x');
-              }
-            ], 
-            [
-              [], 
-              function() {
-                return Kernel.throw(e);
-              }
-            ]
-          ).call(this, e)
-        }
-      }.call(this))
+     (function()    {
+             try    {
+             return     do_something_that_may_fail(some_arg);
+           }    catch(e) {
+         Patterns.defmatch(Patterns.make_case([{
+             [Kernel.SpecialForms.atom('__struct__')]: Kernel.SpecialForms.atom('ArgumentError')
+       }],function()    {
+             return     IO.puts('ArgumentError');
+           }),Patterns.make_case([Patterns.variable()],function(x)    {
+             return     IO.puts('x');
+           }),Patterns.make_case([],function()    {
+             return     Kernel.throw(e);
+           })).call(this,e)
+       }
+           }.call(this))
     """
 
     assert_translation(ex_ast, js_code)
@@ -199,28 +163,21 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-      (function() {
-        try {
-          return do_something_that_may_fail(some_arg);
-        } catch (e) {
-          fun(
-            [
-              [{'__struct__': Erlang.atom('ArgumentError')}], 
-              function() {
-                return IO.puts('Invalid argument given');
-              }
-            ], 
-            [
-              [], 
-              function() {
-                return Kernel.throw(e);
-              }
-            ]
-          ).call(this, e)
-        } finally {
-          return IO.puts('This is printed regardless if it failed or succeed');
-        }
-      }.call(this))
+     (function()    {
+             try    {
+             return     do_something_that_may_fail(some_arg);
+           }    catch(e) {
+         Patterns.defmatch(Patterns.make_case([{
+             [Kernel.SpecialForms.atom('__struct__')]: Kernel.SpecialForms.atom('ArgumentError')
+       }],function()    {
+             return     IO.puts('Invalid argument given');
+           }),Patterns.make_case([],function()    {
+             return     Kernel.throw(e);
+           })).call(this,e)
+       }finally    {
+             return     IO.puts('This is printed regardless if it failed or succeed');
+           }
+           }.call(this))
     """
 
     assert_translation(ex_ast, js_code)
@@ -279,32 +236,21 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-    (function() {
-      try {
-        return do_something_that_may_fail(some_arg);
-      } catch (e) {
-        fun(
-          [
-            [Erlang.atom('throw'), Erlang.atom('Error')], 
-            function() {
-              return IO.puts('caught error');
-            }
-          ], 
-          [
-            [{'__struct__': Erlang.atom('ArgumentError')}], 
-            function() {
-              return IO.puts('Invalid argument given');
-            }
-          ], 
-          [
-            [],
-            function() {
-              return Kernel.throw(e);
-            }
-          ]
-        ).call(this, e)
-      }
-    }.call(this))
+     (function()    {
+             try    {
+             return     do_something_that_may_fail(some_arg);
+           }    catch(e) {
+         Patterns.defmatch(Patterns.make_case([Kernel.SpecialForms.atom('throw'), Kernel.SpecialForms.atom('Error')],function()    {
+             return     IO.puts('caught error');
+           }),Patterns.make_case([{
+             [Kernel.SpecialForms.atom('__struct__')]: Kernel.SpecialForms.atom('ArgumentError')
+       }],function()    {
+             return     IO.puts('Invalid argument given');
+           }),Patterns.make_case([],function()    {
+             return     Kernel.throw(e);
+           })).call(this,e)
+       }
+           }.call(this))
     """
 
     assert_translation(ex_ast, js_code)

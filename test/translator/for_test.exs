@@ -8,13 +8,27 @@ defmodule ElixirScript.Translator.For.Test do
     end
 
     js_code = """
-     (function () {
-             let [_results] = fun.bind(fun.parameter,Erlang.list());
-         for (let n of Erlang.list(1, 2, 3, 4)) {
-             _results = List.append(_results, n * 2);
-         }
-         return _results;
-     }.call(this))
+     Kernel.SpecialForms._for(Kernel.SpecialForms.list(Kernel.SpecialForms.list(Patterns.variable(),Kernel.SpecialForms.list(1,2,3,4))),function(n)    {
+             return     n * 2;
+           },function()    {
+             return     true;
+           },Kernel.SpecialForms.list())
+    """
+
+    assert_translation(ex_ast, js_code)
+  end
+
+  should "translate simple for with into" do
+    ex_ast = quote do
+      for n <- [1, 2, 3, 4], into: [], do: n * 2
+    end
+
+    js_code = """
+     Kernel.SpecialForms._for(Kernel.SpecialForms.list(Kernel.SpecialForms.list(Patterns.variable(),Kernel.SpecialForms.list(1,2,3,4))),function(n)    {
+             return     n * 2;
+           },function()    {
+             return     true;
+           },Kernel.SpecialForms.list())
     """
 
     assert_translation(ex_ast, js_code)
@@ -26,13 +40,11 @@ defmodule ElixirScript.Translator.For.Test do
     end
 
     js_code = """
-     (function () {
-             let [_results] = fun.bind(fun.parameter,Erlang.list());
-         for (let n of 'Opera') {
-             _results = List.append(_results, n);
-         }
-         return _results;
-     }.call(this))
+     Kernel.SpecialForms._for(Kernel.SpecialForms.list(Kernel.SpecialForms.list(Patterns.variable(),'Opera')),function(n)    {
+             return     n;
+           },function()    {
+             return     true;
+           },Kernel.SpecialForms.list())
     """
 
     assert_translation(ex_ast, js_code)
@@ -44,15 +56,13 @@ defmodule ElixirScript.Translator.For.Test do
     end
 
     js_code = """
-     (function () {
-             let [_results] = fun.bind(fun.parameter,Erlang.list());
-         for (let x of Erlang.list(1, 2)) {
-             for (let y of Erlang.list(2, 3)) {
-                 _results = List.append(_results, x * y);
-             }
-         }
-         return _results;
-     }.call(this))
+     Kernel.SpecialForms._for(Kernel.SpecialForms.list(
+      Kernel.SpecialForms.list(Patterns.variable(), Kernel.SpecialForms.list(1,2)),
+      Kernel.SpecialForms.list(Patterns.variable(), Kernel.SpecialForms.list(2,3))), function(x,y)    {
+             return     x * y;
+           },function()    {
+             return     true;
+           },Kernel.SpecialForms.list())
     """
 
     assert_translation(ex_ast, js_code)
@@ -66,15 +76,11 @@ defmodule ElixirScript.Translator.For.Test do
     end
 
     js_code = """
-     let [r] = fun.bind(fun.parameter,(function()    {
-             let [_results] = fun.bind(fun.parameter,Erlang.list());
-             for(let x of Erlang.list(1,2)) {
-         for(let y of Erlang.list(2,3)) {
-         _results = List.append(_results,x * y);
-       }
-       }
-             return     _results;
-           }.call(this)));
+     let [r] = Patterns.match(Patterns.variable(),Kernel.SpecialForms._for(Kernel.SpecialForms.list(Kernel.SpecialForms.list(Patterns.variable(),Kernel.SpecialForms.list(1,2)),Kernel.SpecialForms.list(Patterns.variable(),Kernel.SpecialForms.list(2,3))),function(x,y)    {
+             return     x * y;
+           },function()    {
+             return     true;
+           },Kernel.SpecialForms.list()));
     """
 
     assert_translation(ex_ast, js_code)
@@ -86,14 +92,11 @@ defmodule ElixirScript.Translator.For.Test do
     end
 
     js_code = """
-     (function () {
-             let [_results] = fun.bind(fun.parameter,Erlang.list());
-         for (let n of Erlang.list(1, 2, 3, 4, 5, 6)) {
-             if (n % 2 == 0)
-                 _results = List.append(_results, n);
-         }
-         return _results;
-     }.call(this))
+     Kernel.SpecialForms._for(Kernel.SpecialForms.list(Kernel.SpecialForms.list(Patterns.variable(),Kernel.SpecialForms.list(1,2,3,4,5,6))),function(n)    {
+             return     n;
+           },function(n)    {
+             return     n % 2 == 0;
+           },Kernel.SpecialForms.list())
     """
 
     assert_translation(ex_ast, js_code)
@@ -107,16 +110,18 @@ defmodule ElixirScript.Translator.For.Test do
     end
 
     js_code = """
-     (function () {
-             let [_results] = fun.bind(fun.parameter,Erlang.list());
-         for (let _ref of Erlang.list(Erlang.tuple(Erlang.atom('user'), 'john'), Erlang.tuple(Erlang.atom('admin'), 'john'), Erlang.tuple(Erlang.atom('user'), 'meg'))) {
-             if (Kernel.match__qmark__(_ref, Erlang.tuple(Erlang.atom('user'), undefined))) {
-                 let name = Kernel.elem(_ref, 1);
-                 _results = List.append(_results, String.upcase(name));
-             }
-         }
-         return _results;
-     }.call(this))
+     Kernel.SpecialForms._for(Kernel.SpecialForms.list(
+      Kernel.SpecialForms.list(
+        Kernel.SpecialForms.tuple(Kernel.SpecialForms.atom('user'),Patterns.variable()),
+        Kernel.SpecialForms.list(
+          Kernel.SpecialForms.tuple(Kernel.SpecialForms.atom('user'),'john'),
+          Kernel.SpecialForms.tuple(Kernel.SpecialForms.atom('admin'),'john'),
+          Kernel.SpecialForms.tuple(Kernel.SpecialForms.atom('user'),'meg')))),function(name)    {
+             return     String.upcase(name);
+           },function()    {
+             return     true;
+           },Kernel.SpecialForms.list()
+      )
     """
 
     assert_translation(ex_ast, js_code)

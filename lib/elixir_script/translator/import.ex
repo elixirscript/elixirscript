@@ -184,7 +184,7 @@ defmodule ElixirScript.Translator.Import do
 
   def create_standard_lib_imports(root, env) do
     module_names = [
-      :fun, :Erlang, :Kernel, :Atom, :Enum, :Integer, 
+      :Patterns, :Kernel, :Atom, :Enum, :Integer, 
       :JS, :List, :Range, :Tuple, :Agent, :Keyword,
       :BitString
     ]

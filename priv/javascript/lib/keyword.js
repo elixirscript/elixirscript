@@ -1,9 +1,6 @@
-import Erlang from './erlang';
 import Kernel from './kernel';
 
 let Keyword = {};
-
-Keyword.__MODULE__ = Erlang.atom("Keyword");
 
 Keyword.has_key__qm__ = function(keywords, key){
   for(let keyword of keywords){

@@ -10,9 +10,9 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-      let test1 = fun([[], function() {
-        return 1 * 1;
-      }]);
+     let test1 = Patterns.defmatch(Patterns.make_case([],function()    {
+             return     1 * 1;
+           }));
     """
 
     assert_translation(ex_ast, js_code)
@@ -25,9 +25,9 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-      let test1 = fun([[], function() {
-        return null;
-      }]);
+     let test1 = Patterns.defmatch(Patterns.make_case([],function()    {
+             return     null;
+           }));
     """
 
     assert_translation(ex_ast, js_code)
@@ -38,9 +38,9 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-      let test1 = fun([[fun.parameter, fun.parameter], function(alpha, beta) {
-        return null;
-      }]);
+     let test1 = Patterns.defmatch(Patterns.make_case([Patterns.variable(), Patterns.variable()],function(alpha,beta)    {
+             return     null;
+           }));
     """
 
     assert_translation(ex_ast, js_code)
@@ -52,10 +52,10 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-     let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
-             let [a0] = fun.bind(fun.parameter,alpha);
+     let test1 = Patterns.defmatch(Patterns.make_case([Patterns.variable(), Patterns.variable()],function(alpha,beta)    {
+             let [a0] = Patterns.match(Patterns.variable(),alpha);
              return     a0;
-           }]);
+           }));
     """
 
     assert_translation(ex_ast, js_code)
@@ -71,15 +71,15 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
-             return     fun([[fun.parameter], function(x)    {
+     let test1 = Patterns.defmatch(Patterns.make_case([Patterns.variable(), Patterns.variable()],function(alpha,beta)    {
+             return     Patterns.defmatch(Patterns.make_case([Patterns.variable()],function(x)    {
              return     2;
-           }, function(x)    {
-             return     Kernel.__in__(x,Erlang.list(false,null));
-           }],[[fun.wildcard], function()    {
+           },function(x)    {
+             return     Kernel.__in__(x,Kernel.SpecialForms.list(false,null));
+           }),Patterns.make_case([Patterns.wildcard()],function()    {
              return     1;
-           }]).call(this, 1 == 1);
-           }]);
+           })).call(this,1 == 1);
+           }));
     """
 
     assert_translation(ex_ast, js_code)
@@ -99,22 +99,22 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
     end
 
     js_code = """
-let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
-             return     fun([[fun.parameter], function(x)    {
+     let test1 = Patterns.defmatch(Patterns.make_case([Patterns.variable(), Patterns.variable()],function(alpha,beta)    {
+             return     Patterns.defmatch(Patterns.make_case([Patterns.variable()],function(x)    {
              return     2;
-           }, function(x)    {
-             return     Kernel.__in__(x,Erlang.list(false,null));
-           }],[[fun.wildcard], function()    {
-             return     fun([[fun.parameter], function(x)    {
-             let [a000] = fun.bind(fun.parameter,1);
+           },function(x)    {
+             return     Kernel.__in__(x,Kernel.SpecialForms.list(false,null));
+           }),Patterns.make_case([Patterns.wildcard()],function()    {
+             return     Patterns.defmatch(Patterns.make_case([Patterns.variable()],function(x)    {
+             let [a000] = Patterns.match(Patterns.variable(),1);
              return     a000;
-           }, function(x)    {
-             return     Kernel.__in__(x,Erlang.list(false,null));
-           }],[[fun.wildcard], function()    {
+           },function(x)    {
+             return     Kernel.__in__(x,Kernel.SpecialForms.list(false,null));
+           }),Patterns.make_case([Patterns.wildcard()],function()    {
              return     4;
-           }]).call(this,2 == 2);
-           }]).call(this,1 == 1);
-           }]);
+           })).call(this,2 == 2);
+           })).call(this,1 == 1);
+           }));
     """
 
     assert_translation(ex_ast, js_code)
@@ -126,11 +126,11 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
     end
 
     js_code = """
-     let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
-             let [a0,b0] = fun.bind(Erlang.tuple(fun.parameter,fun.parameter),Erlang.tuple(1,2));
-             let _ref = Erlang.tuple(a0,b0);
+     let test1 = Patterns.defmatch(Patterns.make_case([Patterns.variable(), Patterns.variable()],function(alpha,beta)    {
+             let [a0,b0] = Patterns.match(Kernel.SpecialForms.tuple(Patterns.variable(),Patterns.variable()),Kernel.SpecialForms.tuple(1,2));
+             let _ref = Kernel.SpecialForms.tuple(a0,b0);
              return     _ref;
-           }]);
+           }));
     """
 
     assert_translation(ex_ast, js_code)
@@ -192,7 +192,11 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
       Enum.map(list, fn(x) -> x * 2 end)
     end
 
-    js_code = "Enum.map(list,fun([[fun.parameter], function(x){return x * 2;}]))"
+    js_code = """
+     Enum.map(list,Patterns.defmatch(Patterns.make_case([Patterns.variable()],function(x)    {
+             return     x * 2;
+           })))
+    """
 
     assert_translation(ex_ast, js_code)
   end
@@ -219,41 +223,19 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
     end 
 
     js_code = """
-     const __MODULE__ = Erlang.atom('Example');
-
-     let example = fun(
-        [
-          [], 
-          function() {
-            return null;
-          }
-        ],
-        [
-          [fun.parameter], function(oneArg) {
-                return null;
-           } 
-        ],
-        [
-          [fun.parameter, fun.parameter], 
-          function(oneArg, twoArg) {
-            return null;
-          } 
-        ], 
-        [
-          [fun.parameter, fun.parameter, fun.parameter], 
-          function(oneArg, twoArg, redArg) {
-            return null;
-          } 
-        ],  
-        [
-          [fun.parameter, fun.parameter, fun.parameter, fun.parameter], 
-          function(oneArg, twoArg, redArg, blueArg) {
-            return null;
-          } 
-        ]
-      );
-
-     export {};
+         const __MODULE__ = Kernel.SpecialForms.atom('Example');
+         let example = Patterns.defmatch(Patterns.make_case([],function()    {
+             return     null;
+           }),Patterns.make_case([Patterns.variable()],function(oneArg)    {
+             return     null;
+           }),Patterns.make_case([Patterns.variable(), Patterns.variable()],function(oneArg,twoArg)    {
+             return     null;
+           }),Patterns.make_case([Patterns.variable(), Patterns.variable(), Patterns.variable()],function(oneArg,twoArg,redArg)    {
+             return     null;
+           }),Patterns.make_case([Patterns.variable(), Patterns.variable(), Patterns.variable(), Patterns.variable()],function(oneArg,twoArg,redArg,blueArg)    {
+             return     null;
+           }));
+         export {};
     """  
     assert_translation(ex_ast, js_code)
 
@@ -278,41 +260,21 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
     end 
 
     js_code = """
-     const __MODULE__ = Erlang.atom('Example');
-
-     let example = fun(
-        [
-          [], 
-          function() {
-            return null;
-          }
-        ],
-        [
-          [fun.parameter], function(oneArg) {
-                return null;
-           } 
-        ],
-        [
-          [fun.parameter, fun.parameter], 
-          function(oneArg, twoArg) {
-            return null;
-          } 
-        ], 
-        [
-          [fun.parameter, fun.parameter, fun.parameter], 
-          function(oneArg, twoArg, redArg) {
-            return null;
-          } 
-        ],  
-        [
-          [fun.parameter, fun.parameter, fun.parameter, fun.parameter], 
-          function(oneArg, twoArg, redArg, blueArg) {
-            return null;
-          } 
-        ]
-      );
-
-     export { example };
+         const __MODULE__ = Kernel.SpecialForms.atom('Example');
+         let example = Patterns.defmatch(Patterns.make_case([],function()    {
+             return     null;
+           }),Patterns.make_case([Patterns.variable()],function(oneArg)    {
+             return     null;
+           }),Patterns.make_case([Patterns.variable(), Patterns.variable()],function(oneArg,twoArg)    {
+             return     null;
+           }),Patterns.make_case([Patterns.variable(), Patterns.variable(), Patterns.variable()],function(oneArg,twoArg,redArg)    {
+             return     null;
+           }),Patterns.make_case([Patterns.variable(), Patterns.variable(), Patterns.variable(), Patterns.variable()],function(oneArg,twoArg,redArg,blueArg)    {
+             return     null;
+           }));
+         export {
+             example
+       };
     """  
     assert_translation(ex_ast, js_code)
 
@@ -325,9 +287,13 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
     end 
 
     js_code = """
-     const __MODULE__ = Erlang.atom('Example');
-     let example = fun([[fun.parameter], function(oneArg){return null;}]);
-     export {example};
+         const __MODULE__ = Kernel.SpecialForms.atom('Example');
+         let example = Patterns.defmatch(Patterns.make_case([Patterns.variable()],function(oneArg)    {
+             return     null;
+           }));
+         export {
+             example
+       };
     """  
     assert_translation(ex_ast, js_code)
 
@@ -357,7 +323,7 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
       is_atom(:atom)
     end
 
-    js_code = "Kernel.is_atom(Erlang.atom('atom'))"
+    js_code = "Kernel.is_atom(Kernel.SpecialForms.atom('atom'))"
 
     assert_translation(ex_ast, js_code)
   end
@@ -370,9 +336,11 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
 
 
     js_code = """
-      let something = fun(
-        [[fun.parameter], function(one){ return null; }, function(one){ return Kernel.is_number(one); } ]
-      );
+     let something = Patterns.defmatch(Patterns.make_case([Patterns.variable()],function(one)    {
+             return     null;
+           },function(one)    {
+             return     Kernel.is_number(one);
+           }));
     """
 
     assert_translation(ex_ast, js_code)
@@ -385,17 +353,11 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
 
 
     js_code = """
-      let something = fun(
-        [
-          [fun.parameter], 
-          function(one){ 
-            return null; 
-          }, 
-          function(one){ 
-            return Kernel.is_number(one) || Kernel.is_atom(one);
-          } 
-        ]
-      );
+     let something = Patterns.defmatch(Patterns.make_case([Patterns.variable()],function(one)    {
+             return     null;
+           },function(one)    {
+             return     Kernel.is_number(one) || Kernel.is_atom(one);
+           }));
     """
 
     assert_translation(ex_ast, js_code)
@@ -407,17 +369,11 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
 
 
     js_code = """
-      let something = fun(
-        [
-          [fun.parameter], 
-          function(one){ 
-            return null; 
-          }, 
-          function(one){ 
-            return Kernel.is_number(one) || Kernel.is_atom(one);
-          } 
-        ]
-      );
+     let something = Patterns.defmatch(Patterns.make_case([Patterns.variable()],function(one)    {
+             return     null;
+           },function(one)    {
+             return     Kernel.is_number(one) || Kernel.is_atom(one);
+           }));
     """
 
     assert_translation(ex_ast, js_code)
@@ -429,15 +385,11 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
 
 
     js_code = """
-    let something = fun([
-      [fun.parameter, fun.parameter], 
-      function(one,two){
-        return null;
-      }, 
-      function(one,two){
-        return Kernel.__in__(one, Erlang.list(1,2,3));
-      }
-    ]);
+     let something = Patterns.defmatch(Patterns.make_case([Patterns.variable(), Patterns.variable()],function(one,two)    {
+             return     null;
+           },function(one,two)    {
+             return     Kernel.__in__(one,Kernel.SpecialForms.list(1,2,3));
+           }));
     """
 
     assert_translation(ex_ast, js_code)
@@ -453,31 +405,19 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
     end 
 
     js_code = """
-    const __MODULE__ = Erlang.atom('Example');
-
-    let something = fun(
-    [
-      [fun.parameter], 
-      function(one) {
-        return null;
-      }, 
-      function(one) {
-        return Kernel.__in__(one, Erlang.list(1, 2, 3));
-      }
-    ], 
-    [
-      [fun.parameter], 
-      function(one) {
-        return null;
-      }, 
-      function(one) {
-        return Kernel.is_number(one) || Kernel.is_atom(one);
-      }
-    ]);
-
-    export {
-      something
-    };
+         const __MODULE__ = Kernel.SpecialForms.atom('Example');
+         let something = Patterns.defmatch(Patterns.make_case([Patterns.variable()],function(one)    {
+             return     null;
+           },function(one)    {
+             return     Kernel.__in__(one,Kernel.SpecialForms.list(1,2,3));
+           }),Patterns.make_case([Patterns.variable()],function(one)    {
+             return     null;
+           },function(one)    {
+             return     Kernel.is_number(one) || Kernel.is_atom(one);
+           }));
+         export {
+             something
+       };
     """  
     assert_translation(ex_ast, js_code)
 
@@ -491,14 +431,9 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
 
 
     js_code = """
-      let something = fun(
-        [
-          [1], 
-          function(){ 
-            return null; 
-          }
-        ]
-      );
+     let something = Patterns.defmatch(Patterns.make_case([1],function()    {
+             return     null;
+           }));
     """
 
     assert_translation(ex_ast, js_code)
@@ -512,14 +447,9 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
 
 
     js_code = """
-      let something = fun(
-        [
-          [fun.headTail], 
-          function(apple, fruits){ 
-            return null; 
-          }
-        ]
-      );
+     let something = Patterns.defmatch(Patterns.make_case([Patterns.headTail()],function(apple,fruits)    {
+             return     null;
+           }));
     """
 
     assert_translation(ex_ast, js_code)
@@ -533,12 +463,9 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
 
 
     js_code = """
-      let something = fun([
-        [Erlang.list(fun.parameter, fun.parameter, fun.parameter)], 
-        function(apple, pear, banana) {
-          return null;
-        }
-      ]);
+     let something = Patterns.defmatch(Patterns.make_case([Kernel.SpecialForms.list(Patterns.variable(),Patterns.variable(),Patterns.variable())],function(apple,pear,banana)    {
+             return     null;
+           }));
     """
 
     assert_translation(ex_ast, js_code)
@@ -552,14 +479,9 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
 
 
     js_code = """
-      let something = fun(
-        [
-          [Erlang.tuple(fun.parameter, fun.parameter)], 
-          function(apple, fruits){ 
-            return null; 
-          }
-        ]
-      );
+     let something = Patterns.defmatch(Patterns.make_case([Kernel.SpecialForms.tuple(Patterns.variable(),Patterns.variable())],function(apple,fruits)    {
+             return     null;
+           }));
     """
 
     assert_translation(ex_ast, js_code)
@@ -573,12 +495,11 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
 
 
     js_code = """
-      let something = fun([
-        [{'__struct__': Erlang.atom('AStruct')}], 
-        function(){
-          return null;
-        }
-      ]);
+     let something = Patterns.defmatch(Patterns.make_case([{
+             [Kernel.SpecialForms.atom('__struct__')]: Kernel.SpecialForms.atom('AStruct')
+       }],function()    {
+             return     null;
+           }));
     """
 
     assert_translation(ex_ast, js_code)
@@ -591,14 +512,11 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
     end
 
     js_code = """
-      let something = fun(
-        [
-          [fun.capture({'__struct__': Erlang.atom('AStruct')})], 
-          function(a){ 
-            return null; 
-          }
-        ]
-      );
+     let something = Patterns.defmatch(Patterns.make_case([Patterns.capture({
+             [Kernel.SpecialForms.atom('__struct__')]: Kernel.SpecialForms.atom('AStruct')
+       })],function(a)    {
+             return     null;
+           }));
     """
     assert_translation(ex_ast, js_code)
   end
@@ -610,11 +528,11 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
     end
 
     js_code = """
-     let something = fun([[fun.capture({
-        'which': 13
-       })], function(a)    {
-         return     null;
-       }]);
+     let something = Patterns.defmatch(Patterns.make_case([Patterns.capture({
+             [Kernel.SpecialForms.atom('which')]: 13
+       })],function(a)    {
+             return     null;
+           }));
     """
 
     assert_translation(ex_ast, js_code)
@@ -628,12 +546,11 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
 
 
     js_code = """
-      let something = fun([
-        [{'__struct__': Erlang.atom('AStruct'), 'key': fun.parameter, 'key1': 2}], 
-        function(value){
-          return null;
-        }
-      ]);
+     let something = Patterns.defmatch(Patterns.make_case([{
+             [Kernel.SpecialForms.atom('__struct__')]: Kernel.SpecialForms.atom('AStruct'),     [Kernel.SpecialForms.atom('key')]: Patterns.variable(),     [Kernel.SpecialForms.atom('key1')]: 2
+       }],function(value)    {
+             return     null;
+           }));
     """
 
     assert_translation(ex_ast, js_code)
@@ -645,16 +562,13 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
 
 
     js_code = """
-     let something = fun(
-      [
-        [{'__struct__': Erlang.atom('AStruct'), 'key': fun.parameter, 'key1': 2}], 
-        function(value){
-          return null;
-        }, 
-        function(value){
-          return Kernel.is_number(value);
-        }
-      ]);
+     let something = Patterns.defmatch(Patterns.make_case([{
+             [Kernel.SpecialForms.atom('__struct__')]: Kernel.SpecialForms.atom('AStruct'),     [Kernel.SpecialForms.atom('key')]: Patterns.variable(),     [Kernel.SpecialForms.atom('key1')]: 2
+       }],function(value)    {
+             return     null;
+           },function(value)    {
+             return     Kernel.is_number(value);
+           }));
     """
 
     assert_translation(ex_ast, js_code)
@@ -668,14 +582,9 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
 
 
     js_code = """
-      let something = fun(
-        [
-          [fun.startsWith('Bearer')], 
-          function(token){ 
-            return null; 
-          }
-        ]
-      );
+     let something = Patterns.defmatch(Patterns.make_case([Patterns.startsWith('Bearer ')],function(token)    {
+             return     null;
+           }));
     """
 
     assert_translation(ex_ast, js_code)
@@ -687,14 +596,9 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
 
 
     js_code = """
-      let something = fun(
-        [
-          [fun.startsWith('Bearer'), fun.parameter], 
-          function(token, hotel){ 
-            return null; 
-          }
-        ]
-      );
+     let something = Patterns.defmatch(Patterns.make_case([Patterns.startsWith('Bearer '), Patterns.variable()],function(token,hotel)    {
+             return     null;
+           }));
     """
 
     assert_translation(ex_ast, js_code)
@@ -706,14 +610,9 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
 
 
     js_code = """
-      let something = fun(
-        [
-          [fun.startsWith('Bearer'), fun.parameter, 1], 
-          function(token, hotel){ 
-            return null; 
-          }
-        ]
-      );
+     let something = Patterns.defmatch(Patterns.make_case([Patterns.startsWith('Bearer '), Patterns.variable(), 1],function(token,hotel)    {
+             return     null;
+           }));
     """
 
     assert_translation(ex_ast, js_code)
@@ -739,23 +638,21 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
 
 
     js_code = """
-    const __MODULE__ = Erlang.atom('Example');
-
-    let something = fun([[1], function() {
-      return null;
-    }], [[2], function() {
-      return null;
-    }], [[fun.parameter], function(one) {
-      return null;
-    }, function(one) {
-      return Kernel.is_binary(one);
-    }], [[fun.parameter], function(one) {
-      return null;
-    }]);
-
-    export {
-      something
-    };
+         const __MODULE__ = Kernel.SpecialForms.atom('Example');
+         let something = Patterns.defmatch(Patterns.make_case([1],function()    {
+             return     null;
+           }),Patterns.make_case([2],function()    {
+             return     null;
+           }),Patterns.make_case([Patterns.variable()],function(one)    {
+             return     null;
+           },function(one)    {
+             return     Kernel.is_binary(one);
+           }),Patterns.make_case([Patterns.variable()],function(one)    {
+             return     null;
+           }));
+         export {
+             something
+       };
     """
     
     assert_translation(ex_ast, js_code)
@@ -771,11 +668,11 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
     end
 
     js_code = """
-     let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
-             let [a0] = fun.bind(fun.parameter,1);
-             let [a1] = fun.bind(fun.parameter,2);
+     let test1 = Patterns.defmatch(Patterns.make_case([Patterns.variable(), Patterns.variable()],function(alpha,beta)    {
+             let [a0] = Patterns.match(Patterns.variable(),1);
+             let [a1] = Patterns.match(Patterns.variable(),2);
              return     a1;
-           }]);
+           }));
     """
 
     assert_translation(ex_ast, js_code)
@@ -789,12 +686,12 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
     end
 
     js_code = """
-     let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
-             let [a0] = fun.bind(fun.parameter,1);
-             let [a1] = fun.bind(fun.parameter,a0);
-             let [a2] = fun.bind(fun.parameter,2);
+     let test1 = Patterns.defmatch(Patterns.make_case([Patterns.variable(), Patterns.variable()],function(alpha,beta)    {
+             let [a0] = Patterns.match(Patterns.variable(),1);
+             let [a1] = Patterns.match(Patterns.variable(),a0);
+             let [a2] = Patterns.match(Patterns.variable(),2);
              return     a2;
-           }]);
+           }));
     """
 
     assert_translation(ex_ast, js_code)
@@ -807,12 +704,12 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
     end
 
     js_code = """
-     let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
-             let [a0] = fun.bind(fun.parameter,1);
-             let [a1,b0,c0] = fun.bind(Erlang.list(fun.parameter,fun.parameter,fun.parameter),Erlang.list(a0,2,3));
-             let _ref = Erlang.list(a1,b0,c0);
+     let test1 = Patterns.defmatch(Patterns.make_case([Patterns.variable(), Patterns.variable()],function(alpha,beta)    {
+             let [a0] = Patterns.match(Patterns.variable(),1);
+             let [a1,b0,c0] = Patterns.match(Kernel.SpecialForms.list(Patterns.variable(),Patterns.variable(),Patterns.variable()),Kernel.SpecialForms.list(a0,2,3));
+             let _ref = Kernel.SpecialForms.list(a1,b0,c0);
              return     _ref;
-           }]);
+           }));
     """
 
     assert_translation(ex_ast, js_code)
@@ -828,11 +725,11 @@ let test1 = fun([[fun.parameter, fun.parameter], function(alpha,beta)    {
     end
 
     js_code = """
-     let test1 = fun([[fun.parameter, fun.parameter], function(alpha__qmark__,beta__emark__)    {
-             let [a__qmark__0] = fun.bind(fun.parameter,1);
-             let [b__emark__0] = fun.bind(fun.parameter,2);
+     let test1 = Patterns.defmatch(Patterns.make_case([Patterns.variable(), Patterns.variable()],function(alpha__qmark__,beta__emark__)    {
+             let [a__qmark__0] = Patterns.match(Patterns.variable(),1);
+             let [b__emark__0] = Patterns.match(Patterns.variable(),2);
              return     b__emark__0;
-           }]);
+           }));
     """
 
     assert_translation(ex_ast, js_code)

@@ -1,9 +1,6 @@
-import Erlang from './erlang';
 import Kernel from './kernel';
 
 let List = {};
-
-List.__MODULE__ = Erlang.atom('List');
 
 List.delete = function(list, item){
   let new_value = [];
@@ -18,7 +15,7 @@ List.delete = function(list, item){
     }
   }
 
-  return Erlang.list(...new_value);
+  return Kernel.SpecialForms.list(...new_value);
 };
 
 List.delete_at = function(list, index){
@@ -30,7 +27,7 @@ List.delete_at = function(list, index){
     }
   }
 
-  return Erlang.list(...new_value);
+  return Kernel.SpecialForms.list(...new_value);
 };
 
 List.duplicate = function(elem, n){
@@ -40,18 +37,14 @@ List.duplicate = function(elem, n){
     new_value.push(elem);
   }
 
-  return Erlang.list(...new_value);
+  return Kernel.SpecialForms.list(...new_value);
 };
 
 List.first = function(list){
-  if(list.length === 0){
-    return null;
-  }
-
   return list[0];
 };
 
-List.flatten = function(list, tail = Erlang.list()){
+List.flatten = function(list, tail = Kernel.SpecialForms.list()){
   let new_value = [];
 
   for(let x of list){
@@ -64,17 +57,11 @@ List.flatten = function(list, tail = Erlang.list()){
 
   new_value = new_value.concat(tail);
 
-  return Erlang.list(...new_value);
+  return Kernel.SpecialForms.list(...new_value);
 };
 
 List.foldl = function(list, acc, func){
-  let new_acc = acc;
-
-  for(let x of list){
-    new_acc = func(x, new_acc);
-  }
-
-  return new_acc;
+  return list.reduce(func, acc);
 };
 
 List.foldr = function(list, acc, func){
@@ -99,7 +86,7 @@ List.insert_at = function(list, index, value){
     }
   }
 
-  return Erlang.list(...new_value);
+  return Kernel.SpecialForms.list(...new_value);
 };
 
 List.keydelete = function(list, key, position){
@@ -111,7 +98,7 @@ List.keydelete = function(list, key, position){
     }
   }
 
-  return Erlang.list(...new_list);
+  return Kernel.SpecialForms.list(...new_list);
 };
 
 List.keyfind = function(list, key, position, _default = null){
@@ -147,7 +134,7 @@ List.keyreplace = function(list, key, position, new_tuple){
     }
   }
 
-  return Erlang.list(...new_list);
+  return Kernel.SpecialForms.list(...new_list);
 };
 
 
@@ -179,7 +166,7 @@ List.keysort = function(list, position){
 
   });
 
-  return Erlang.list(...new_list);
+  return Kernel.SpecialForms.list(...new_list);
 };
 
 List.keystore = function(list, key, position, new_tuple){
@@ -199,14 +186,10 @@ List.keystore = function(list, key, position, new_tuple){
     new_list.push(new_tuple);
   }
 
-  return Erlang.list(...new_list);
+  return Kernel.SpecialForms.list(...new_list);
 };
 
 List.last = function(list){
-  if(list.length === 0){
-    return null;
-  }
-
   return list[list.length - 1];
 };
 
@@ -221,17 +204,17 @@ List.replace_at = function(list, index, value){
     }
   }
 
-  return Erlang.list(...new_value);
+  return Kernel.SpecialForms.list(...new_value);
 };
 
 List.update_at = function(list, index, fun){
   let new_value = [];
 
-  for(let i = 0; i < list.length; i++){
+  for(let i = 0; i < list.count(); i++){
     if(i === index){
-      new_value.push(fun(list[i]));
+      new_value.push(fun(list.get(i)));
     }else{
-      new_value.push(list[i]);
+      new_value.push(list.get(i));
     }
   }
 
@@ -242,15 +225,15 @@ List.wrap = function(list){
   if(Kernel.is_list(list)){
     return list;
   }else if(list == null){
-    return Erlang.list();
+    return Kernel.SpecialForms.list();
   }else{
-    return Erlang.list(list);
+    return Kernel.SpecialForms.list(list);
   }
 };
 
 List.zip = function(list_of_lists){
   if(list_of_lists.length === 0){
-    return Erlang.list();
+    return Kernel.SpecialForms.list();
   }
 
   let new_value = [];
@@ -268,22 +251,22 @@ List.zip = function(list_of_lists){
       current_value.push(list_of_lists[j][i]);
     }
 
-    new_value.push(Erlang.tuple(...current_value));
+    new_value.push(Kernel.SpecialForms.tuple(...current_value));
   }
 
-  return Erlang.list(...new_value);
+  return Kernel.SpecialForms.list(...new_value);
 };
 
 List.to_tuple = function(list){
-  return Erlang.tuple.apply(null, list);
+  return Kernel.SpecialForms.tuple.apply(null, list);
 };
 
 List.append = function(list, value){
-  return Erlang.list(...list.concat([value]));
+  return Kernel.SpecialForms.list(...list.concat([value]));
 };
 
 List.concat = function(left, right){
-  return Erlang.list(...left.concat(right));
+  return left.concat(right);
 };
 
 export default List;

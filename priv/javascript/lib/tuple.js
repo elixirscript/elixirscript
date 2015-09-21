@@ -1,75 +1,90 @@
-import Erlang from './erlang';
+import Kernel from './kernel';
 
-let Tuple = {};
+class Tuple {
+  
+  constructor(...args){
+    this.values = Object.freeze(args);
+  }
 
-Tuple.__MODULE__ = Erlang.atom('Tuple');
+  get(index) {
+    return this.values[index];
+  }
 
-Tuple.to_string = function(tuple){
-  var i, s = "";
-  for (i = 0; i < tuple.__tuple__.length; i++) {
-    if (s !== "") {
-      s += ", ";
+  count() {
+    return this.values.length;
+  }
+
+  [Symbol.iterator]() {
+    return this.values[Symbol.iterator]();
+  }
+
+  toString() {
+    var i, s = "";
+    for (i = 0; i < this.values.length; i++) {
+      if (s !== "") {
+        s += ", ";
+      }
+      s += this.values[i].toString();
     }
-    s += tuple.__tuple__[i].toString();
+
+    return "{" + s + "}";    
   }
 
-  return "{" + s + "}";
-};
+  static to_string(tuple){
+    return tuple.toString();
+  };
 
-Tuple.delete_at = function(tuple, index){
-  let new_list = [];
+  static delete_at(tuple, index){
+    let new_list = [];
 
-  for (var i = 0; i < tuple.__tuple__.length; i++) {
-    if(i !== index){
-      new_list.push(tuple.__tuple__[i]);
+    for (var i = 0; i < tuple.count(); i++) {
+      if(i !== index){
+        new_list.push(tuple.get(i));
+      }
     }
-  }
 
-  return Erlang.tuple.apply(null, new_list);
-};
+    return Kernel.SpecialForms.tuple.apply(null, new_list);
+  };
 
-Tuple.duplicate = function(data, size){
-  let array = [];
+  static duplicate(data, size){
+    let array = [];
 
-  for (var i = size - 1; i >= 0; i--) {
-    array.push(data);
-  }
-
-  return Erlang.tuple.apply(null, array);
-};
-
-Tuple.insert_at = function(tuple, index, term){
-  let new_tuple = [];
-
-  for (var i = 0; i <= tuple.__tuple__.length; i++) {
-    if(i === index){
-      new_tuple.push(term);
-      i++;
-      new_tuple.push(tuple.__tuple__[i]);
-    }else{
-      new_tuple.push(tuple.__tuple__[i]);
+    for (var i = size - 1; i >= 0; i--) {
+      array.push(data);
     }
-  }
 
-  return Erlang.tuple.apply(null, new_tuple);
-};
+    return Kernel.SpecialForms.tuple.apply(null, array);
+  };
 
-Tuple.from_list = function(list){
-  return Erlang.tuple.apply(null, list);
-};
+  static insert_at(tuple, index, term){
+    let new_tuple = [];
 
-Tuple.to_list = function(tuple){
-  let new_list = [];
+    for (var i = 0; i <= tuple.count(); i++) {
+      if(i === index){
+        new_tuple.push(term);
+        i++;
+        new_tuple.push(tuple.get(i));
+      }else{
+        new_tuple.push(tuple.get(i));
+      }
+    }
 
-  for (var i = 0; i < tuple.__tuple__.length; i++) {
-    new_list.push(tuple.__tuple__[i]);
-  }
+    return Kernel.SpecialForms.tuple.apply(null, new_tuple);
+  };
 
-  return Erlang.list(...new_list);
-};
+  static from_list(list){
+    return Kernel.SpecialForms.tuple.apply(null, list);
+  };
 
-Tuple.iterator = function(tuple){
-  return tuple.__tuple__[Symbol.iterator]();
-};
+  static to_list(tuple){
+    let new_list = [];
+
+    for (var i = 0; i < tuple.count(); i++) {
+      new_list.push(tuple.get(i));
+    }
+
+    return Kernel.SpecialForms.list(...new_list);
+  };
+}
 
 export default Tuple;

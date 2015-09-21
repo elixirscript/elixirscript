@@ -11,8 +11,8 @@ defmodule ElixirScript.Translator.Assignment do
         JS.array_pattern(params),
         JS.call_expression(
           JS.member_expression(
-            JS.identifier("fun"),
-            JS.identifier("bind")
+            JS.identifier("Patterns"),
+            JS.identifier("match")
           ),
           [hd(patterns), Translator.translate(right, env)]
         )
@@ -44,7 +44,10 @@ defmodule ElixirScript.Translator.Assignment do
       ref,
       JS.call_expression(
         JS.member_expression(
-          JS.identifier("Erlang"),
+          JS.member_expression(
+            JS.identifier("Kernel"),
+            JS.identifier("SpecialForms")
+          ),
           JS.identifier(type)
         ),
         params

@@ -3,6 +3,8 @@ var mocha = require('gulp-mocha');
 var concat = require('gulp-concat');
 var babel = require('gulp-babel');
 var eslint = require('gulp-eslint');
+var rollup = require('gulp-rollup');
+var sourcemaps = require('gulp-sourcemaps');
 
 var path = './priv/javascript';
 
@@ -34,6 +36,21 @@ gulp.task('lint', function () {
         .pipe(eslint())
         .pipe(eslint.format())
         .pipe(eslint.failOnError());
+});
+
+
+gulp.task('dist_build', function() {
+  return gulp.src(['./priv/javascript/**/*.js', '!./priv/javascript/build/**/*.js', '!./priv/javascript/dist/**/*.js',  '!./priv/javascript/dist_build/**/*.js', '!./priv/javascript/tests/**/*.js'])
+      .pipe(babel({whitelist: ['flow'], optional: ["minification.deadCodeElimination"]}))
+      .pipe(gulp.dest('./priv/javascript/dist_build'));
+});
+
+
+gulp.task('dist_add_source_map', function() {
+  return gulp.src(['./priv/javascript/dist/elixir.js'])
+      .pipe(sourcemaps.init())
+      .pipe(sourcemaps.write())
+      .pipe(gulp.dest('./priv/javascript/dist'));
 });
 
 

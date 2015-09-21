@@ -3,51 +3,62 @@ defmodule ElixirScript.PatternMatching.Match do
 
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
+  alias ElixirScript.Translator.Primitive
   alias ElixirScript.Translator.Utils
+  alias ElixirScript.Translator.Map
 
   @wildcard JS.member_expression(
-    JS.identifier(:fun),
+    JS.identifier(:Patterns),
     JS.identifier(:wildcard)
   )
 
   @parameter JS.member_expression(
-    JS.identifier(:fun),
-    JS.identifier(:parameter)
+    JS.identifier(:Patterns),
+    JS.identifier(:variable)
   )
 
   @head_tail JS.member_expression(
-    JS.identifier(:fun),
+    JS.identifier(:Patterns),
     JS.identifier(:headTail)
   )
 
   @starts_with JS.member_expression(
-    JS.identifier(:fun),
+    JS.identifier(:Patterns),
     JS.identifier(:startsWith)
   )
 
   @capture JS.member_expression(
-    JS.identifier(:fun),
+    JS.identifier(:Patterns),
     JS.identifier(:capture)
   )
 
   @bound JS.member_expression(
-    JS.identifier(:fun),
+    JS.identifier(:Patterns),
     JS.identifier(:bound)
   )
 
   def wildcard() do
-    @wildcard
+    JS.call_expression(
+      @wildcard,
+      []
+    )
   end
 
   def parameter() do
-    @parameter
+    JS.call_expression(
+      @parameter,
+      []
+    )
   end
 
-  def headTail() do
-    @head_tail
+  def head_tail() do
+    JS.call_expression(
+      @head_tail,
+      []
+    )
   end
 
-  def startsWith(prefix) do
+  def starts_with(prefix) do
     JS.call_expression(
       @starts_with,
       [JS.literal(prefix)]
@@ -67,28 +78,6 @@ defmodule ElixirScript.PatternMatching.Match do
       [value]
     )
   end
-
-
-
-  def make_list(values) when is_list(values) do
-    JS.call_expression(
-      JS.member_expression(
-        JS.identifier("Erlang"),
-        JS.identifier("list")
-      ),
-      values
-    )
-  end
-
-  def make_tuple(values) when is_list(values) do
-    JS.call_expression(
-      JS.member_expression(
-        JS.identifier("Erlang"),
-        JS.identifier("tuple")
-      ),
-      values
-    )
-  end
   
   def build_match(params, env) do
     Enum.map(params, &do_build_match(&1, env))
@@ -100,21 +89,21 @@ defmodule ElixirScript.PatternMatching.Match do
   end
 
   defp do_build_match({:_, _, _}, env) do
-    { [@wildcard], [JS.identifier(:undefined)] }
+    { [wildcard()], [JS.identifier(:undefined)] }
   end
 
   defp do_build_match([{:|, _, [head, tail]}], env) do
-    { [@head_tail], [Translator.translate(head, env), Translator.translate(tail, env)] }
+    { [head_tail()], [Translator.translate(head, env), Translator.translate(tail, env)] }
   end
 
   defp do_build_match({:<>, _, [prefix, value]}, env) do
-    { [startsWith(prefix)], [Translator.translate(value, env)] }
+    { [starts_with(prefix)], [Translator.translate(value, env)] }
   end
 
   defp do_build_match({:%{}, _, props}, env) do
     properties = Enum.map(props, fn({key, value}) ->
       {pattern, params} = do_build_match(value, env)
-      { JS.property(JS.literal(key), hd(List.wrap(pattern))), params }
+      { Map.make_property(Translator.translate(key, env), hd(List.wrap(pattern))), params }
     end)
 
     {props, params} = Enum.reduce(properties, {[], []}, fn({prop, param}, {props, params}) ->
@@ -125,7 +114,7 @@ defmodule ElixirScript.PatternMatching.Match do
   end
 
   defp do_build_match({:%, _, [{:__aliases__, _, name}, {:%{}, meta, props}]}, env) do
-    props = [{"__struct__" ,List.last(name)}] ++ props
+    props = [{:__struct__ , List.last(name)}] ++ props
     do_build_match({:%{}, meta, props}, env)
   end
 
@@ -142,7 +131,7 @@ defmodule ElixirScript.PatternMatching.Match do
     |> Enum.map(&build_match([&1], env))
     |> reduce_patterns
 
-    {[make_list(patterns)], params}
+    {[Primitive.make_list_no_translate(patterns)], params}
   end
 
   defp do_build_match(term, env) when is_number(term) or is_binary(term) or is_boolean(term) or is_atom(term) or is_nil(term) do
@@ -158,12 +147,12 @@ defmodule ElixirScript.PatternMatching.Match do
     |> Enum.map(&build_match([&1], env))
     |> reduce_patterns
 
-    {[make_tuple(patterns)], params}   
+    {[Primitive.make_tuple_no_translate(patterns)], params}   
   end
 
   defp do_build_match({name, _, _}, env) do
     name = Utils.filter_name(name)
-    { [@parameter], [JS.identifier(name)] }
+    { [parameter()], [JS.identifier(name)] }
   end
 
   defp reduce_patterns(patterns) do

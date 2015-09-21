@@ -34,9 +34,7 @@ defmodule ElixirScript.Translator.Kernel do
         Translator.translate(left, env),
         JS.identifier(:concat)
       ),
-      [
-        Translator.translate(right, env),
-      ]
+      [Translator.translate(right, env)]
     )
   end
 
@@ -47,13 +45,11 @@ defmodule ElixirScript.Translator.Kernel do
   end
 
   defp do_translate({:abs, _, [number]}, env) do
-    JS.call_expression(
-      JS.member_expression(
-        JS.identifier(:Map),
-        JS.identifier(:abs)
-      ),
-      [Translator.translate(number, env)]
-    ) 
+    quoted = quote do
+      Math.abs(unquote(number))
+    end
+
+    Translator.translate(quoted, env)
   end
 
   defp do_translate({:apply, _, [fun, args]}, env) do
@@ -100,13 +96,11 @@ defmodule ElixirScript.Translator.Kernel do
   end
 
   defp do_translate({:round, _, [value]}, env) do
-    JS.call_expression(
-      JS.member_expression(
-        JS.identifier(:Math),
-        JS.identifier(:round)
-      ),
-      [Translator.translate(value, env)]
-    )
+    quoted = quote do
+      Math.round(unquote(value))
+    end
+
+    Translator.translate(quoted, env)
   end
 
   defp do_translate({:self, _, []}, _) do
@@ -114,26 +108,19 @@ defmodule ElixirScript.Translator.Kernel do
   end
 
   defp do_translate({:tuple_size, _, [tuple]}, env) do
-    JS.member_expression(
-      JS.member_expression(
-        Translator.translate(tuple, env),
-        JS.identifier(:__tuple__)
-      ),
-      JS.identifier(:length)
-    )
+    quoted = quote do
+      unquote(tuple).count()
+    end
+
+    Translator.translate(quoted, env)
   end
 
   defp do_translate({:map_size, _, [map]}, env) do
-    JS.member_expression(
-      JS.call_expression(
-        JS.member_expression(
-          JS.identifier(:Object),
-          JS.identifier(:keys)
-        ),
-        [Translator.translate(map, env)]
-      ),
-      JS.identifier(:length)
-    )
+    quoted = quote do
+      Object.keys(unquote(map)).length
+    end
+
+    Translator.translate(quoted, env)
   end
 
   defp do_translate({:max, _, params}, env) do

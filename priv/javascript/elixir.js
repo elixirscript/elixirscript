@@ -1,7 +1,9 @@
-self.mailbox = self.mailbox || {};
+import PostOffice from './lib/post_office';
 
-export { default as fun } from './lib/funcy/fun';
-export { default as Erlang } from './lib/erlang';
+
+self.post_office = self.post_office || new PostOffice();
+
+export { default as Patterns } from './lib/patterns/patterns';
 export { default as BitString } from './lib/bit_string';
 export { default as Kernel } from './lib/kernel';
 export { default as Atom } from './lib/atom';

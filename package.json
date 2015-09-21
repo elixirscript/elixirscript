@@ -25,6 +25,8 @@
     "gulp-concat": "^2.5.2",
     "gulp-eslint": "^0.13.2",
     "gulp-mocha": "^2.0.1",
+    "gulp-rollup": "^1.0.1",
+    "gulp-sourcemaps": "^1.5.2",
     "rollup": "^0.14.1"
   }
 }

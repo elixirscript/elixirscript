@@ -1,8 +1,4 @@
-import Erlang from './erlang';
-
 let Atom = {};
-
-Atom.__MODULE__ = Erlang.atom("Atom");
 
 Atom.to_string = function (atom) {
   return Symbol.keyFor(atom);

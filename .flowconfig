@@ -1,0 +1,12 @@
+[ignore]
+.*/dist/.*
+.*/build/.*
+.*/dist_build/.*
+.*/node_modules/.*
+
+[include]
+./priv/javascript
+
+[libs]
+
+[options]

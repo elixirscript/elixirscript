@@ -1,6 +1,7 @@
 defmodule ElixirScript.Translator.Cond do
   @moduledoc false
-  alias ESTree.Tools.Builder
+
+  alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Function
   alias ElixirScript.Translator.Utils
@@ -20,16 +21,16 @@ defmodule ElixirScript.Translator.Cond do
     translated_body = Translator.translate(clause_body, env)
 
     if translated_body.type != "BlockStatement" do
-      translated_body = Builder.block_statement([translated_body])
+      translated_body = JS.block_statement([translated_body])
     end
 
-    translated_body = Builder.block_statement(Utils.inflate_groups(translated_body.body))
+    translated_body = JS.block_statement(Utils.inflate_groups(translated_body.body))
     translated_body = Function.return_last_expression(translated_body)
 
     if hd(clause) == true do
       translated_body   
     else
-      ast = Builder.if_statement(
+      ast = JS.if_statement(
         Translator.translate(hd(clause), env),
         translated_body,
         nil

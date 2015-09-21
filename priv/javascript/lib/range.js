@@ -1,5 +1,3 @@
-import Erlang from './erlang';
-
 let Range = function(_first, _last){
   if (!(this instanceof Range)){
     return new Range(_first, _last);
@@ -32,8 +30,6 @@ let Range = function(_first, _last){
   return this;
 };
 
-Range.__MODULE__ = Erlang.atom('Range');
-
 Range.prototype[Symbol.iterator] = function(){
   return this.value()[Symbol.iterator]();
 };
@@ -45,5 +41,4 @@ Range.new = function (first, last) {
 Range.range__qmark__ = function (range) {
   return range instanceof Range;
 };
-
 export default Range;

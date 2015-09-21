@@ -5,6 +5,7 @@ defmodule ElixirScript.Translator.Function do
   alias ElixirScript.Translator.Utils
   alias ElixirScript.PatternMatching.Match
   alias ElixirScript.Preprocess.Variables
+  alias ElixirScript.Translator.Map
 
 
   def process_function(name, functions, env) do
@@ -25,39 +26,42 @@ defmodule ElixirScript.Translator.Function do
       {:->, _, [ [{:when, _, [params | guards]}], body ]} ->
         { patterns, params } = Match.build_match(List.wrap(params), env)
         params = make_params(params)
-        body = make_body(body, env)
+        body = make_function_body(body, env)
         guard_body = make_guards(guards, env)
         do_make_function_clause(patterns, params, body, guard_body)
 
       ({:->, _, [params, body]}) ->
         { patterns, params } = Match.build_match(params, env)
         params = make_params(params)
-        body = make_body(body, env)
+        body = make_function_body(body, env)
         do_make_function_clause(patterns, params, body)        
 
       ({_, _, [{:when, _, [{_, _, params} | guards] }, [do: body]]}) ->
         { patterns, params } = Match.build_match(params, env)
         params = make_params(params)
-        body = make_body(body, env)
+        body = make_function_body(body, env)
         guard_body = make_guards(guards, env)
         do_make_function_clause(patterns, params, body, guard_body)
 
       ({_, _, [{_, _, params}, [do: body]]}) ->
         { patterns, params } = Match.build_match(params, env)
         params = make_params(params)
-        body = make_body(body, env)
+        body = make_function_body(body, env)
         do_make_function_clause(patterns, params, body)
 
     end)
     |> Enum.to_list
 
     JS.call_expression(
-      JS.identifier("fun"),
+      JS.member_expression(
+        JS.identifier("Patterns"),
+        JS.identifier("defmatch")
+      ),
       clauses
     )
   end
 
-  defp make_body(body, env) do
+  def make_function_body(body, env) do
     body
     |> prepare_function_body(env)
     |> JS.block_statement
@@ -77,30 +81,30 @@ defmodule ElixirScript.Translator.Function do
   end
 
   defp do_make_function_clause(patterns, params, body, guard_body) do
-    JS.array_expression([
-      JS.array_expression(patterns),
-      JS.function_expression(
-        params,
-        [],
-        body
+    JS.call_expression(
+      JS.member_expression(
+        JS.identifier("Patterns"),
+        JS.identifier("make_case")
       ),
-      JS.function_expression(
-        params,
-        [],
-        guard_body
-      )
-    ])
+      [
+        JS.array_expression(patterns), 
+        JS.function_expression(params, [], body),
+        JS.function_expression(params, [], guard_body)
+      ]
+    )
   end
 
   defp do_make_function_clause(patterns, params, body) do
-    JS.array_expression([
-      JS.array_expression(patterns),
-      JS.function_expression(
-        params,
-        [],
-        body
-      )
-    ])
+    JS.call_expression(
+      JS.member_expression(
+        JS.identifier("Patterns"),
+        JS.identifier("make_case")
+      ),
+      [
+        JS.array_expression(patterns), 
+        JS.function_expression(params, [], body)
+      ]
+    )
   end
 
   def make_function_or_property_call(module_name, function_name, env) do

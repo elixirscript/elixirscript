@@ -1,15 +1,12 @@
-import Erlang from './erlang';
 import SpecialForms from './kernel/special_forms';
-import fun from './funcy/fun';
+import Patterns from './patterns/patterns';
 import Tuple from './tuple';
-
 let Kernel = {
-  __MODULE__: Erlang.atom('Kernel'),
 
   SpecialForms: SpecialForms,
 
   tl: function(list){
-    return Erlang.list(...list.slice(1));
+    return SpecialForms.list(...list.slice(1));
   },
 
   hd: function(list){
@@ -50,7 +47,7 @@ let Kernel = {
   },
 
   is_map: function(x){
-    return typeof x === 'object' || x instanceof Object && x.__tuple__ === null;
+    return typeof x === 'object' || x instanceof Object;
   },
 
   is_number: function(x){
@@ -58,7 +55,7 @@ let Kernel = {
   },
 
   is_tuple: function(x){
-    return (typeof x === 'object' || x instanceof Object) && x.__tuple__ !== null;
+    return x instanceof Tuple;
   },
 
   length: function(x){
@@ -78,7 +75,7 @@ let Kernel = {
   },
 
   is_bitstring: function(x){
-    return Kernel.is_binary(x) || x instanceof Erlang.bitstring;
+    return Kernel.is_binary(x) || x instanceof SpecialForms.bitstring;
   },
 
   __in__: function(left, right){
@@ -104,7 +101,7 @@ let Kernel = {
       return tuple[index];
     }
 
-    return tuple.__tuple__[index];
+    return tuple.get(index);
   },
 
   rem: function(left, right){
@@ -148,19 +145,7 @@ let Kernel = {
   },
 
   match__qmark__: function(pattern, expr, guard = () => true){
-    try{
-      let match = fun([
-        [pattern],
-        function(){
-          return true;
-        },
-        guard
-      ]);
-
-      return match(expr);
-    }catch(e){
-      return false;
-    }
+    return Patterns.match_no_throw(pattern, expr, guard) != null;
   }
 };
 
