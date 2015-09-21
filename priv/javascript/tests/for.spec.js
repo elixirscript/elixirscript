@@ -13,7 +13,7 @@ describe('for', () => {
 
     let result = Kernel.SpecialForms._for(collections, (n) => n * 2);
 
-    expect(result).to.equal([2, 4, 6, 8]);
+    expect(result).to.eql([2, 4, 6, 8]);
   });
 
   it('for with multiple generators', () => {
@@ -25,7 +25,7 @@ describe('for', () => {
 
     let result = Kernel.SpecialForms._for(collections, (x, y) => x * y);
 
-    expect(result).to.equal([2, 3, 4, 6]);
+    expect(result).to.eql([2, 3, 4, 6]);
   });
 
 
@@ -37,7 +37,7 @@ describe('for', () => {
 
     let result = Kernel.SpecialForms._for(collections, (n) => n, (n) => n % 2 == 0);
 
-    expect(result).to.equal([2, 4, 6]);
+    expect(result).to.eql([2, 4, 6]);
   });
 
   it('for with pattern matching', () => {
@@ -50,6 +50,6 @@ describe('for', () => {
 
     let result = Kernel.SpecialForms._for(collections, (name) => name.toUpperCase());
 
-    expect(result).to.equal(["JOHN", "MEG"]);
+    expect(result).to.eql(["JOHN", "MEG"]);
   });
 });

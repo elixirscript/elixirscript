@@ -79,8 +79,8 @@ defmodule ElixirScript.Translator.Struct do
         JS.return_statement(
           ElixirScript.Translator.Map.make_map(
             JS.object_expression(
-              [JS.property(Translator.translate(:__struct__, env), JS.identifier(:__MODULE__), :init, false, false, true)] ++
-              Enum.map(params, fn(x) -> JS.property(Translator.translate(x, env), JS.identifier(x), :init, false, false, true) end)
+              [ElixirScript.Translator.Map.make_property(Translator.translate(:__struct__, env), JS.identifier(:__MODULE__))] ++
+              Enum.map(params, fn(x) -> ElixirScript.Translator.Map.make_property(Translator.translate(x, env), JS.identifier(x)) end)
             )
           )
         )

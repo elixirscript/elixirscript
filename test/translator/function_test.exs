@@ -496,7 +496,7 @@ defmodule ElixirScript.Translator.Function.Test do
 
     js_code = """
      let something = Patterns.defmatch(Patterns.make_case([{
-             __struct__: Kernel.SpecialForms.atom('AStruct')
+             [Kernel.SpecialForms.atom('__struct__')]: Kernel.SpecialForms.atom('AStruct')
        }],function()    {
              return     null;
            }));
@@ -513,7 +513,7 @@ defmodule ElixirScript.Translator.Function.Test do
 
     js_code = """
      let something = Patterns.defmatch(Patterns.make_case([Patterns.capture({
-             __struct__: Kernel.SpecialForms.atom('AStruct')
+             [Kernel.SpecialForms.atom('__struct__')]: Kernel.SpecialForms.atom('AStruct')
        })],function(a)    {
              return     null;
            }));
@@ -529,7 +529,7 @@ defmodule ElixirScript.Translator.Function.Test do
 
     js_code = """
      let something = Patterns.defmatch(Patterns.make_case([Patterns.capture({
-             ['which']: 13
+             [Kernel.SpecialForms.atom('which')]: 13
        })],function(a)    {
              return     null;
            }));
@@ -547,7 +547,7 @@ defmodule ElixirScript.Translator.Function.Test do
 
     js_code = """
      let something = Patterns.defmatch(Patterns.make_case([{
-             __struct__: Kernel.SpecialForms.atom('AStruct'),     ['key']: Patterns.variable(),     ['key1']: 2
+             [Kernel.SpecialForms.atom('__struct__')]: Kernel.SpecialForms.atom('AStruct'),     [Kernel.SpecialForms.atom('key')]: Patterns.variable(),     [Kernel.SpecialForms.atom('key1')]: 2
        }],function(value)    {
              return     null;
            }));
@@ -563,7 +563,7 @@ defmodule ElixirScript.Translator.Function.Test do
 
     js_code = """
      let something = Patterns.defmatch(Patterns.make_case([{
-             __struct__: Kernel.SpecialForms.atom('AStruct'),     ['key']: Patterns.variable(),     ['key1']: 2
+             [Kernel.SpecialForms.atom('__struct__')]: Kernel.SpecialForms.atom('AStruct'),     [Kernel.SpecialForms.atom('key')]: Patterns.variable(),     [Kernel.SpecialForms.atom('key1')]: 2
        }],function(value)    {
              return     null;
            },function(value)    {

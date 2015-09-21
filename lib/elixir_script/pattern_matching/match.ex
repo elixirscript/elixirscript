@@ -103,7 +103,7 @@ defmodule ElixirScript.PatternMatching.Match do
   defp do_build_match({:%{}, _, props}, env) do
     properties = Enum.map(props, fn({key, value}) ->
       {pattern, params} = do_build_match(value, env)
-      { Map.make_property(JS.literal(key), hd(List.wrap(pattern))), params }
+      { Map.make_property(Translator.translate(key, env), hd(List.wrap(pattern))), params }
     end)
 
     {props, params} = Enum.reduce(properties, {[], []}, fn({prop, param}, {props, params}) ->
@@ -114,7 +114,7 @@ defmodule ElixirScript.PatternMatching.Match do
   end
 
   defp do_build_match({:%, _, [{:__aliases__, _, name}, {:%{}, meta, props}]}, env) do
-    props = [{"__struct__" ,List.last(name)}] ++ props
+    props = [{:__struct__ , List.last(name)}] ++ props
     do_build_match({:%{}, meta, props}, env)
   end
 

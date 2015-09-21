@@ -93,7 +93,7 @@ defmodule ElixirScript.PatternMatching.Match.Test do
     result = Match.build_match(params, __ENV__)
     expected_result = { 
       [JS.object_expression([
-        Map.make_property(JS.literal("__struct__"), Translator.translate(:Hello, __ENV__))
+        Map.make_property(Translator.translate(:__struct__, __ENV__), Translator.translate(:Hello, __ENV__))
       ])],  
       []
     }
@@ -106,8 +106,8 @@ defmodule ElixirScript.PatternMatching.Match.Test do
     result = Match.build_match(params, __ENV__)
     expected_result = { 
       [JS.object_expression([
-        Map.make_property(JS.literal("__struct__"), Translator.translate(:Hello, __ENV__)),
-        Map.make_property(JS.literal(:key), Translator.translate(1, __ENV__))
+        Map.make_property(Translator.translate(:__struct__, __ENV__), Translator.translate(:Hello, __ENV__)),
+        Map.make_property(Translator.translate(:key, __ENV__), Translator.translate(1, __ENV__))
       ])],  
       []
     }
@@ -120,8 +120,8 @@ defmodule ElixirScript.PatternMatching.Match.Test do
     result = Match.build_match(params, __ENV__)
     expected_result = { 
       [JS.object_expression([
-        Map.make_property(JS.literal("__struct__"), Translator.translate(:Hello, __ENV__)),
-        Map.make_property(JS.literal(:key), Match.parameter)
+        Map.make_property(Translator.translate(:__struct__, __ENV__), Translator.translate(:Hello, __ENV__)),
+        Map.make_property(Translator.translate(:key, __ENV__), Match.parameter)
       ])],  
       [JS.identifier("key")]
     }
@@ -154,7 +154,7 @@ defmodule ElixirScript.PatternMatching.Match.Test do
     result = Match.build_match(params, __ENV__)
     expected_result = { 
       [Match.capture(JS.object_expression([
-        Map.make_property(JS.literal("__struct__"), Translator.translate(:AStruct, __ENV__)),
+        Map.make_property(Translator.translate(:__struct__, __ENV__), Translator.translate(:AStruct, __ENV__)),
       ]))],  
       [JS.identifier("a")]
     }
@@ -199,7 +199,7 @@ defmodule ElixirScript.PatternMatching.Match.Test do
 
     expected_result = { 
       [JS.object_expression([
-              Map.make_property(JS.literal(:which), JS.literal(13))
+              Map.make_property(Translator.translate(:which, __ENV__), JS.literal(13))
             ])],
       []
     }

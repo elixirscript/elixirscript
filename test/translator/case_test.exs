@@ -180,8 +180,8 @@ defmodule ElixirScript.Translator.Case.Test do
 
     js_code = """
      Patterns.defmatch(Patterns.make_case([{
-             __struct__: Kernel.SpecialForms.atom('AStruct'),     ['key']: {
-             __struct__: Kernel.SpecialForms.atom('BStruct'),     ['key2']: Patterns.variable()
+             [Kernel.SpecialForms.atom('__struct__')]: Kernel.SpecialForms.atom('AStruct'),     [Kernel.SpecialForms.atom('key')]: {
+             [Kernel.SpecialForms.atom('__struct__')]: Kernel.SpecialForms.atom('BStruct'),     [Kernel.SpecialForms.atom('key2')]: Patterns.variable()
        }
        }],function(value)    {
              return     console.info(value);
@@ -204,9 +204,9 @@ defmodule ElixirScript.Translator.Case.Test do
 
     js_code = """
      Patterns.defmatch(Patterns.make_case([{
-             __struct__: Kernel.SpecialForms.atom('AStruct'),     ['key']: {
-             __struct__: Kernel.SpecialForms.atom('BStruct'),     ['key2']: Patterns.variable(),     ['key3']: {
-             __struct__: Kernel.SpecialForms.atom('CStruct'),     ['key4']: Patterns.variable()
+             [Kernel.SpecialForms.atom('__struct__')]: Kernel.SpecialForms.atom('AStruct'),     [Kernel.SpecialForms.atom('key')]: {
+             [Kernel.SpecialForms.atom('__struct__')]: Kernel.SpecialForms.atom('BStruct'),     [Kernel.SpecialForms.atom('key2')]: Patterns.variable(),     [Kernel.SpecialForms.atom('key3')]: {
+             [Kernel.SpecialForms.atom('__struct__')]: Kernel.SpecialForms.atom('CStruct'),     [Kernel.SpecialForms.atom('key4')]: Patterns.variable()
        }
        }
        }],function(value,value2)    {

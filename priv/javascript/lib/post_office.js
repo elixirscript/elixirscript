@@ -1,11 +1,11 @@
 /* @flow */
-function update(map, key, value){
+function update(map: Map, key: Symbol, value: any): Map {
   let m = new Map(map);
   m.set(key, value);
   return m;
 }
 
-function remove(map, key){
+function remove(map: Map, key: Symbol): Map {
   let m = new Map(map);
   m.delete(key);
   return m;

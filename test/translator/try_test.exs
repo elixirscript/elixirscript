@@ -18,7 +18,7 @@ defmodule ElixirScript.Translator.Try.Test do
              return     do_something_that_may_fail(some_arg);
            }    catch(e) {
          Patterns.defmatch(Patterns.make_case([{
-             __struct__: Kernel.SpecialForms.atom('ArgumentError')
+             [Kernel.SpecialForms.atom('__struct__')]: Kernel.SpecialForms.atom('ArgumentError')
        }],function()    {
              return     IO.puts('Invalid argument given');
            }),Patterns.make_case([],function()    {
@@ -47,7 +47,7 @@ defmodule ElixirScript.Translator.Try.Test do
              return     do_something_that_may_fail(some_arg);
            }    catch(e) {
          Patterns.defmatch(Patterns.make_case([{
-             __struct__: Kernel.SpecialForms.atom('ArgumentError')
+             [Kernel.SpecialForms.atom('__struct__')]: Kernel.SpecialForms.atom('ArgumentError')
        }],function()    {
              return     IO.puts('Invalid argument given');
            }),Patterns.make_case([],function()    {
@@ -135,7 +135,7 @@ defmodule ElixirScript.Translator.Try.Test do
              return     do_something_that_may_fail(some_arg);
            }    catch(e) {
          Patterns.defmatch(Patterns.make_case([{
-             __struct__: Kernel.SpecialForms.atom('ArgumentError')
+             [Kernel.SpecialForms.atom('__struct__')]: Kernel.SpecialForms.atom('ArgumentError')
        }],function()    {
              return     IO.puts('ArgumentError');
            }),Patterns.make_case([Patterns.variable()],function(x)    {
@@ -168,7 +168,7 @@ defmodule ElixirScript.Translator.Try.Test do
              return     do_something_that_may_fail(some_arg);
            }    catch(e) {
          Patterns.defmatch(Patterns.make_case([{
-             __struct__: Kernel.SpecialForms.atom('ArgumentError')
+             [Kernel.SpecialForms.atom('__struct__')]: Kernel.SpecialForms.atom('ArgumentError')
        }],function()    {
              return     IO.puts('Invalid argument given');
            }),Patterns.make_case([],function()    {
@@ -243,7 +243,7 @@ defmodule ElixirScript.Translator.Try.Test do
          Patterns.defmatch(Patterns.make_case([Kernel.SpecialForms.atom('throw'), Kernel.SpecialForms.atom('Error')],function()    {
              return     IO.puts('caught error');
            }),Patterns.make_case([{
-             __struct__: Kernel.SpecialForms.atom('ArgumentError')
+             [Kernel.SpecialForms.atom('__struct__')]: Kernel.SpecialForms.atom('ArgumentError')
        }],function()    {
              return     IO.puts('Invalid argument given');
            }),Patterns.make_case([],function()    {
