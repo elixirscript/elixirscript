@@ -4,18 +4,14 @@ defmodule ElixirScript.Translator.Capture do
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.PatternMatching.Match
   alias ElixirScript.Translator.Utils
+  alias ElixirScript.Translator.Function
 
   def make_capture(function_name, arity, env) do
     params = Enum.map(1..arity, fn(x) -> {String.to_atom("__#{x}"), [], ElixirScript.Translator.Capture} end)
 
     { patterns, params } = Match.build_match(params, env)
 
-    JS.array_expression([
-      JS.array_expression(patterns),
-      JS.function_expression(
-        params,
-        [],
-        JS.block_statement([
+    body =         JS.block_statement([
           JS.return_statement(
             JS.call_expression(
               JS.identifier(function_name),
@@ -23,8 +19,11 @@ defmodule ElixirScript.Translator.Capture do
             )
           )
         ])
-      )
-    ])    
+
+
+    Function.make_defmatch([
+      Function.do_make_function_clause(patterns, params, body)
+    ])
   end  
 
   def make_capture(module_name, function_name, arity, env) do
@@ -32,21 +31,21 @@ defmodule ElixirScript.Translator.Capture do
 
     { patterns, params } = Match.build_match(params, env)
 
-    JS.array_expression([
-      JS.array_expression(patterns),
-      JS.function_expression(
-        params,
-        [],
-        JS.block_statement([
-          JS.return_statement(
-            JS.call_expression(
-              Utils.make_member_expression(module_name, function_name, env),
-              params
-            )
-          )
-        ])
+    body = JS.block_statement([
+      JS.return_statement(
+        JS.call_expression(
+          Utils.make_member_expression(module_name, function_name, env),
+          params
+        )
       )
     ])
+
+
+    Function.make_defmatch([
+      Function.do_make_function_clause(patterns, params, body)
+    ])
+
+
   end
 
   def find_value_placeholders(ast) do

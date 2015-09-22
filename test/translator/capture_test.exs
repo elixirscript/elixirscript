@@ -8,9 +8,9 @@ defmodule ElixirScript.Translator.Capture.Test do
     end
 
     js_code = """
-     let [fun] = Patterns.match(Patterns.variable(),[[Patterns.variable()], function(__1)    {
+     let [fun] = Patterns.match(Patterns.variable(),Patterns.defmatch(Patterns.make_case([Patterns.variable()],function(__1)    {
              return     Kernel.is_atom(__1);
-           }]);
+           })));
     """
 
     assert_translation(ex_ast, js_code)
@@ -41,9 +41,9 @@ defmodule ElixirScript.Translator.Capture.Test do
     end
 
     js_code = """
-     let [fun] = Patterns.match(Patterns.variable(),[[Patterns.variable()], function(__1)    {
+     let [fun] = Patterns.match(Patterns.variable(),Patterns.defmatch(Patterns.make_case([Patterns.variable()],function(__1)    {
              return     local_function(__1);
-           }]);
+           })));
     """
 
     assert_translation(ex_ast, js_code)
