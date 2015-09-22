@@ -76,16 +76,9 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-     let [user] = Patterns.match(Patterns.variable(),(function()    {
-             let _results = {};
-             for(let prop in map)     {
-             if(map.hasOwnProperty(prop))     {
-             _results[prop] = map[prop];
-           }
-           }
-             _results.key = value;
-             return     _results;
-           }.call(this)));
+     let [user] = Patterns.match(Patterns.variable(),Kernel.SpecialForms.map_update(map,{
+             [Kernel.SpecialForms.atom('key')]: value
+       }));
     """
 
     assert_translation(ex_ast, js_code)
@@ -96,17 +89,9 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-     let [user] = Patterns.match(Patterns.variable(),(function()    {
-             let _results = {};
-             for(let prop in map)     {
-             if(map.hasOwnProperty(prop))     {
-             _results[prop] = map[prop];
-           }
-           }
-             _results.key = value;
-             _results.key1 = value1;
-             return     _results;
-           }.call(this)));
+     let [user] = Patterns.match(Patterns.variable(),Kernel.SpecialForms.map_update(map,{
+             [Kernel.SpecialForms.atom('key')]: value,     [Kernel.SpecialForms.atom('key1')]: value1
+       }));
     """
 
     assert_translation(ex_ast, js_code)

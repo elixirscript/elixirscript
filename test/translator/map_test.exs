@@ -40,4 +40,16 @@ defmodule ElixirScript.Translator.Map.Test do
 
     assert_translation(ex_ast, js_code)
   end
+
+
+  should "translate map update" do
+    ex_ast = quote do: %{ map | value: 1 }
+    js_code = """
+     Kernel.SpecialForms.map_update(map,{
+             [Kernel.SpecialForms.atom('value')]: 1
+       })
+    """
+
+    assert_translation(ex_ast, js_code)
+  end
 end
