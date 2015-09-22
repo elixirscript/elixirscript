@@ -4,6 +4,8 @@
   * Replaced pattern matching library with custom one
   * Added PostOffice. Only thing that current uses it is Agent
   * Removed erlang.js. Moved data types to Kernel.SpecialForms
+  * `else` now works for try expressions
+  * for now works with `into` for lists
 
 # v0.11.0
 * Enhancement
