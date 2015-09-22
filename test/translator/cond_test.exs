@@ -15,15 +15,13 @@ defmodule ElixirScript.Translator.Cond.Test do
     end
 
     js_code = """
-    (function(){
-      if(1 + 1 == 1){
-        return 'This will never match';
-      }else if(2 * 2 != 4){
-        return 'Nor this';
-      }else{
-        return 'This will';
-      }
-    }.call(this))
+     Kernel.SpecialForms.cond(Kernel.SpecialForms.list(1 + 1 == 1,function()    {
+             return     'This will never match';
+           }),Kernel.SpecialForms.list(2 * 2 != 4,function()    {
+             return     'Nor this';
+           }),Kernel.SpecialForms.list(true,function()    {
+             return     'This will';
+           }))
     """
 
     assert_translation(ex_ast, js_code)
@@ -43,18 +41,16 @@ defmodule ElixirScript.Translator.Cond.Test do
     end
 
     js_code = """
-     (function()    {
-             if(1 + 1 == 1)     {
+     Kernel.SpecialForms.cond(Kernel.SpecialForms.list(1 + 1 == 1,function()    {
              let [a] = Patterns.match(Patterns.variable(),1);
              return     'This will never match';
-           } else     if(2 * 2 != 4)         {
-                 let [a] = Patterns.match(Patterns.variable(),2);
-                 return     'Nor this';
-               } else         {
-                 let [a] = Patterns.match(Patterns.variable(),3);
-                 return     'This will';
-               }
-           }.call(this))
+           }),Kernel.SpecialForms.list(2 * 2 != 4,function()    {
+             let [a] = Patterns.match(Patterns.variable(),2);
+             return     'Nor this';
+           }),Kernel.SpecialForms.list(true,function()    {
+             let [a] = Patterns.match(Patterns.variable(),3);
+             return     'This will';
+           }))
     """
 
     assert_translation(ex_ast, js_code)

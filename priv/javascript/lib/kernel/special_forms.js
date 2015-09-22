@@ -40,7 +40,7 @@ let SpecialForms = {
   cond: function(clauses){
     for(let clause of clauses){
       if(clause[0]){
-        return clause[1];
+        return clause[1]();
       }
     }
 
@@ -123,6 +123,60 @@ let SpecialForms = {
 
   tuple: function(...args){
     return new Tuple(...args);
+  },
+
+
+  _try: function(do_fun, rescue_function, catch_fun, else_function, after_function){
+    let result = null;
+
+    try{
+      result = do_fun();
+    }catch(e){
+      let ex_result = null;
+
+      if(rescue_function){
+        try{
+          ex_result = rescue_function(e);
+          return ex_result;
+        }catch(ex){
+          if(ex instanceof Patterns.MatchError){
+            throw ex;
+          }
+        }
+      }
+
+      if(catch_fun){
+        try{
+          ex_result = catch_fun(e);
+          return ex_result;             
+        }catch(ex){
+          if(ex instanceof Patterns.MatchError){
+            throw ex;
+          }
+        }
+      }
+
+      throw e;
+
+    }finally{
+      if(after_function){
+        after_function();
+      }
+    }
+
+    if(else_function){
+      try{  
+        return else_function(result);
+      }catch(ex){
+          if(ex instanceof Patterns.MatchError){
+            throw new Error("No Match Found in Else");
+          }
+
+        throw ex;
+      }
+    }else{
+      return result;
+    }
   }
 
 };

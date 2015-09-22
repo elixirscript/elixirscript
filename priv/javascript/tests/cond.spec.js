@@ -8,9 +8,9 @@ describe('cond', () => {
 
   it('cond', () => {
     let clauses = [
-      [ 1 + 1 == 1,  "This will never match"],
-      [ 2 * 2 != 4,  "Nor this"],
-      [ true,  "This will"],
+      [ 1 + 1 == 1,  () => "This will never match"],
+      [ 2 * 2 != 4,  () => "Nor this"],
+      [ true,  () => "This will"],
     ];
 
     let result = Kernel.SpecialForms.cond(clauses);

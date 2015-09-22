@@ -3,41 +3,32 @@ defmodule ElixirScript.Translator.Cond do
 
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
+  alias ElixirScript.Translator.Primitive
   alias ElixirScript.Translator.Function
   alias ElixirScript.Translator.Utils
 
   def make_cond(clauses, env) do
-    process_cond(clauses, nil, env)
-    |> Utils.wrap_in_function_closure()
+    JS.call_expression(
+      JS.member_expression(
+        JS.member_expression(
+          JS.identifier("Kernel"),
+          JS.identifier("SpecialForms")
+        ),
+        JS.identifier("cond")
+      ),
+      process_cond(clauses, env)
+    )
   end
 
-  defp process_cond([], ast, env) do
-    ast
-  end
+  defp process_cond(clauses, env) do
+    Enum.map(clauses, fn({:->, _, [clause, clause_body]}) ->
+      translated_body = Function.prepare_function_body(clause_body, env) |> JS.block_statement
+      function = JS.function_expression([], [], translated_body)
+      translated_clause = Translator.translate(hd(clause), env)
 
-  defp process_cond(clauses, ast, env) do
-    {:->, _, [clause, clause_body]} = hd(clauses)
 
-    translated_body = Translator.translate(clause_body, env)
-
-    if translated_body.type != "BlockStatement" do
-      translated_body = JS.block_statement([translated_body])
-    end
-
-    translated_body = JS.block_statement(Utils.inflate_groups(translated_body.body))
-    translated_body = Function.return_last_expression(translated_body)
-
-    if hd(clause) == true do
-      translated_body   
-    else
-      ast = JS.if_statement(
-        Translator.translate(hd(clause), env),
-        translated_body,
-        nil
-      )
-
-      %ESTree.IfStatement{ ast |  alternate: process_cond(tl(clauses), nil, env) }
-    end
+      Primitive.make_list_no_translate([translated_clause, function])
+    end)
   end
   
 end

@@ -10,46 +10,58 @@ defmodule ElixirScript.Translator.Try do
 
   def make_try(blocks, env) do
     try_block = Dict.get(blocks, :do)
-    rescue_block = Dict.get(blocks, :rescue)
-    catch_block = Dict.get(blocks, :catch)
-    after_block = Dict.get(blocks, :after)
-    else_block = Dict.get(blocks, :else)
+    rescue_block = Dict.get(blocks, :rescue, nil)
+    catch_block = Dict.get(blocks, :catch, nil)
+    after_block = Dict.get(blocks, :after, nil)
+    else_block = Dict.get(blocks, :else, nil)
 
-    if(else_block != nil) do
-      raise ElixirScript.UnsupportedError, "try with else block"
+    translated_body = Function.prepare_function_body(try_block, env) |> JS.block_statement
+    try_block = JS.function_expression([], [], translated_body)
+
+    if rescue_block do
+      rescue_block = process_rescue_block(rescue_block, env)
+    else
+      rescue_block = JS.identifier(:null)
     end
 
-    processed_rescue_and_catch_blocks = process_rescue_and_catch(
-      process_rescue_block(rescue_block),
-      process_catch_block(catch_block),
-      env
-    )
-
-    the_catch = case processed_rescue_and_catch_blocks do
-      nil ->
-        nil
-      blocks ->
-        JS.catch_clause(@error_identifier, 
-          JS.block_statement(List.wrap(blocks))
-        )
+    if catch_block do
+      catch_block = process_catch_block(catch_block, env)
+    else
+      catch_block = JS.identifier(:null)
     end
 
-    Utils.wrap_in_function_closure(
-      JS.try_statement(
-        Function.return_last_expression(
-          JS.block_statement(List.wrap(Translator.translate(try_block, env)))
+    if after_block do
+      after_block = process_after_block(after_block, env)
+    else
+      after_block = JS.identifier(:null)
+    end
+
+    if else_block do
+      else_block = Function.make_anonymous_function(else_block, env)
+    else
+      else_block = JS.identifier(:null)
+    end
+
+    JS.call_expression(
+      JS.member_expression(
+        JS.member_expression(
+          JS.identifier("Kernel"),
+          JS.identifier("SpecialForms")
         ),
-        the_catch,
-        Function.return_last_expression(process_after_block(after_block, env))
-      )
+        JS.identifier("_try")
+      ),
+      [
+        try_block,
+        rescue_block,
+        catch_block,
+        else_block,
+        after_block
+      ]
     )
+
   end
 
-  defp process_rescue_block(nil) do
-    []
-  end
-
-  defp process_rescue_block(rescue_block) do
+  defp process_rescue_block(rescue_block, env) do
     Enum.map(rescue_block, fn(x) ->
       case x do
         {:->, _, [[{value, _, module}], block]} when not is_list(module) ->
@@ -69,34 +81,17 @@ defmodule ElixirScript.Translator.Try do
       end
     end)
     |> List.flatten
+    |> Function.make_anonymous_function(env)
   end
 
-  defp process_after_block(nil, _) do
-    nil
+  defp process_catch_block(catch_block, env) do
+    catch_block
+    |> Function.make_anonymous_function(env)
   end
 
   defp process_after_block(after_block, env) do
-    JS.block_statement(List.wrap(
-      Translator.translate(after_block, env)
-    ))
-  end
-
-  defp process_catch_block(nil) do
-    []
-  end
-
-  defp process_catch_block(catch_block) do
-    catch_block
-  end
-
-  def process_rescue_and_catch([], [], _) do
-    nil
-  end
-
-  def process_rescue_and_catch(processed_rescue_block, processed_catch_block, env) do
-    processed_clauses = processed_catch_block ++ processed_rescue_block
-    processed_clauses = processed_clauses ++ [{:->, [], [[], [quote do: throw(e)]]}]
-    Case.make_case({:e, [], __MODULE__}, processed_clauses, env)
+      translated_body = Function.prepare_function_body(after_block, env) |> JS.block_statement
+      JS.function_expression([], [], translated_body)
   end
 
   defp convert_to_struct([module]) do
