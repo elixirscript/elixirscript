@@ -161,7 +161,7 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-      throw new MyAppError(MyAppError.defexception(message='did not get what was expected'));
+      throw MyAppError.defexception(message = 'did not get what was expected');
     """
 
     assert_translation(ex_ast, js_code)
@@ -172,7 +172,9 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-      throw new RuntimeError({__struct__: Kernel.SpecialForms.atom('RuntimeError'), message: 'did not get what was expected'});
+     throw     {
+                     [Kernel.SpecialForms.atom('__struct__')]: Kernel.SpecialForms.atom('RuntimeError'),         [Kernel.SpecialForms.atom('message')]: 'did not get what was expected'
+           };
     """
 
     assert_translation(ex_ast, js_code)

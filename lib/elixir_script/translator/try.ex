@@ -1,10 +1,7 @@
 defmodule ElixirScript.Translator.Try do
   @moduledoc false
   alias ESTree.Tools.Builder, as: JS
-  alias ElixirScript.Translator
   alias ElixirScript.Translator.Function
-  alias ElixirScript.Translator.Case
-  alias ElixirScript.Translator.Utils
 
   @error_identifier JS.identifier(:e)
 
@@ -100,8 +97,8 @@ defmodule ElixirScript.Translator.Try do
 
   defp convert_to_struct(module) do
     case module do
-      {:__aliases__, _, _}  = _alias->
-        {:%, [], [_alias, {:%{}, [], []}]}
+      {:__aliases__, _, _}  = alias_ast->
+        {:%, [], [alias_ast, {:%{}, [], []}]}
       ast ->
         ast
     end

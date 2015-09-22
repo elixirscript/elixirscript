@@ -2,6 +2,7 @@ defmodule ElixirScript.Translator.Kernel do
   @moduledoc false
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
+  alias ElixirScript.Translator.Map
   alias ElixirScript.Translator.Function
   alias ElixirScript.Translator.Expression
   alias ElixirScript.Translator.Raise
@@ -58,7 +59,7 @@ defmodule ElixirScript.Translator.Kernel do
         Translator.translate(fun, env),
         JS.identifier(:apply)
       ),
-      [JS.identifier(:this)] ++ Enum.map(args, &Translator.translate(&1, env))
+      [JS.identifier(:null)] ++ Enum.map(args, &Translator.translate(&1, env))
     )
   end
 
@@ -71,7 +72,7 @@ defmodule ElixirScript.Translator.Kernel do
         ),
         JS.identifier(:apply)
       ),
-      [JS.identifier(:this)] ++ Enum.map(args, &Translator.translate(&1, env))
+      [JS.identifier(:null)] ++ Enum.map(args, &Translator.translate(&1, env))
     )
   end
 
@@ -190,11 +191,32 @@ defmodule ElixirScript.Translator.Kernel do
   defp do_translate({:raise, _, [alias_info, attributes]}, env) do
     {_, _, name} = alias_info
 
-    Raise.throw_error(name, attributes, env)
+    JS.throw_statement(
+      JS.call_expression(
+        JS.member_expression(
+          JS.identifier(List.last(name)),
+          JS.identifier(:defexception)
+        ),
+        Enum.map(attributes, fn({k, v})->
+          JS.assignment_expression(
+            :=,
+            JS.identifier(k),
+            Translator.translate(v, env)
+          )
+        end)
+      )
+    )
   end
 
   defp do_translate({:raise, _, [message]}, env) do
-    Raise.throw_error(message, env)
+    JS.throw_statement(
+      JS.object_expression(
+        [
+          Map.make_property(Translator.translate(:__struct__, env), Translator.translate(:RuntimeError, env)),
+          Map.make_property(Translator.translate(:message, env), JS.literal(message))
+        ]
+      )
+    )
   end
 
   defp do_translate({:to_string, _, [param]}, env) when is_binary(param) do
