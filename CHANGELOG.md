@@ -1,4 +1,4 @@
-# v0.12.0-dev
+# v0.12.0
 * Enhancement
   * Updated tuple implementation. It's now a class.
   * Replaced pattern matching library with custom one
