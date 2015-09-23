@@ -183,10 +183,7 @@ defmodule ElixirScript.Translator do
   defp do_translate({:__DIR__, _, _}, _) do
     JS.call_expression(
       JS.member_expression(
-        JS.member_expression(
-          JS.identifier(:Kernel),
-          JS.identifier(:SpecialForms)        
-        ),
+        Primitive.special_forms(),
         JS.identifier(:__DIR__)
       ),
       []

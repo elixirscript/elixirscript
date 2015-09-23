@@ -10,10 +10,7 @@ defmodule ElixirScript.Translator.Cond do
   def make_cond(clauses, env) do
     JS.call_expression(
       JS.member_expression(
-        JS.member_expression(
-          JS.identifier("Kernel"),
-          JS.identifier("SpecialForms")
-        ),
+        Primitive.special_forms(),
         JS.identifier("cond")
       ),
       process_cond(clauses, env)

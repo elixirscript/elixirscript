@@ -5,6 +5,13 @@ defmodule ElixirScript.Translator.Primitive do
   alias ElixirScript.Translator.Quote
   alias ElixirScript.Translator.Utils
 
+  def special_forms() do
+    JS.member_expression(
+      JS.identifier("Kernel"),
+      JS.identifier("SpecialForms")
+    )
+  end
+
   def make_wildcard() do
     JS.member_expression(
       JS.identifier("fun"),
@@ -31,10 +38,7 @@ defmodule ElixirScript.Translator.Primitive do
   def make_atom(ast) when is_atom(ast) do
     JS.call_expression(
       JS.member_expression(
-        JS.member_expression(
-          JS.identifier("Kernel"),
-          JS.identifier("SpecialForms")
-        ),
+        special_forms(),
         JS.identifier("atom")
       ),
       [JS.literal(ast)]
@@ -44,10 +48,7 @@ defmodule ElixirScript.Translator.Primitive do
   def make_list(ast, env) when is_list(ast) do
     JS.call_expression(
       JS.member_expression(
-        JS.member_expression(
-          JS.identifier("Kernel"),
-          JS.identifier("SpecialForms")
-        ),
+        special_forms(),
         JS.identifier("list")
       ),
       Enum.map(ast, fn(x) -> Translator.translate(x, env) end)
@@ -57,10 +58,7 @@ defmodule ElixirScript.Translator.Primitive do
   def make_list_quoted(opts, ast, env) when is_list(ast) do
     JS.call_expression(
       JS.member_expression(
-        JS.member_expression(
-          JS.identifier("Kernel"),
-          JS.identifier("SpecialForms")
-        ),
+        special_forms(),
         JS.identifier("list")
       ),
       Enum.map(ast, fn(x) -> Quote.make_quote(opts, x, env) end)
@@ -70,10 +68,7 @@ defmodule ElixirScript.Translator.Primitive do
   def make_list_no_translate(ast) when is_list(ast) do
     JS.call_expression(
       JS.member_expression(
-        JS.member_expression(
-          JS.identifier("Kernel"),
-          JS.identifier("SpecialForms")
-        ),
+        special_forms(),
         JS.identifier("list")
       ),
       ast
@@ -87,10 +82,7 @@ defmodule ElixirScript.Translator.Primitive do
   def make_tuple(elements, env) do
     JS.call_expression(
       JS.member_expression(
-        JS.member_expression(
-          JS.identifier("Kernel"),
-          JS.identifier("SpecialForms")
-        ),
+        special_forms(),
         JS.identifier("tuple")
       ),
       Enum.map(elements, fn(x) -> Translator.translate(x, env) end)
@@ -100,10 +92,7 @@ defmodule ElixirScript.Translator.Primitive do
   def make_tuple_no_translate(elements) do
     JS.call_expression(
       JS.member_expression(
-        JS.member_expression(
-          JS.identifier("Kernel"),
-          JS.identifier("SpecialForms")
-        ),
+        special_forms(),
         JS.identifier("tuple")
       ),
       elements
@@ -113,10 +102,7 @@ defmodule ElixirScript.Translator.Primitive do
   def make_tuple_quoted(opts, elements, env) do
     JS.call_expression(
       JS.member_expression(
-        JS.member_expression(
-          JS.identifier("Kernel"),
-          JS.identifier("SpecialForms")
-        ),
+        special_forms(),
         JS.identifier("tuple")
       ),
       Enum.map(elements, fn(x) -> Quote.make_quote(opts, x, env) end)

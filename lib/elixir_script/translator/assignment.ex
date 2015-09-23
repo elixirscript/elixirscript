@@ -2,6 +2,7 @@ defmodule ElixirScript.Translator.Assignment do
   @moduledoc false
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
+  alias ElixirScript.Translator.Primitive
   alias ElixirScript.PatternMatching.Match
 
   def make_assignment(left, right, env) do
@@ -44,10 +45,7 @@ defmodule ElixirScript.Translator.Assignment do
       ref,
       JS.call_expression(
         JS.member_expression(
-          JS.member_expression(
-            JS.identifier("Kernel"),
-            JS.identifier("SpecialForms")
-          ),
+          Primitive.special_forms(),
           JS.identifier(type)
         ),
         params

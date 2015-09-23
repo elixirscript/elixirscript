@@ -2,15 +2,13 @@ defmodule ElixirScript.Translator.Map do
   @moduledoc false
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
+  alias ElixirScript.Translator.Primitive
   alias ElixirScript.Translator.Utils
 
   def make_map(object_expression) do
     JS.call_expression(
       JS.member_expression(
-        JS.member_expression(
-          JS.identifier("Kernel"),
-          JS.identifier("SpecialForms")
-        ),
+        Primitive.special_forms(),
         JS.identifier("map")
       ),
       [object_expression]
@@ -60,10 +58,7 @@ defmodule ElixirScript.Translator.Map do
 
     JS.call_expression(
       JS.member_expression(
-        JS.member_expression(
-          JS.identifier("Kernel"),
-          JS.identifier("SpecialForms")
-        ),
+        Primitive.special_forms(),
         JS.identifier("map_update")
       ),
       [map, map_update]

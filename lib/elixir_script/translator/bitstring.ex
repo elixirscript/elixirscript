@@ -2,15 +2,13 @@ defmodule ElixirScript.Translator.Bitstring do
   @moduledoc false
   alias ESTree.Tools.Builder
   alias ElixirScript.Translator
+  alias ElixirScript.Translator.Primitive
 
   
   def make_bitstring(elements, env) do
     Builder.call_expression(
       Builder.member_expression(
-        Builder.member_expression(
-          Builder.identifier("Kernel"),
-          Builder.identifier("SpecialForms")
-        ),
+        Primitive.special_forms(),
         Builder.identifier("bitstring")
       ),
       Enum.map(elements, &make_bitstring_element(&1, env))

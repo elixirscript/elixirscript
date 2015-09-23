@@ -2,14 +2,12 @@ defmodule ElixirScript.Translator.Receive do
   @moduledoc false
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
+  alias ElixirScript.Translator.Primitive
 
   def make_receive([do: clauses], env) do
     JS.call_expression(
       JS.member_expression(
-        JS.member_expression(
-          JS.identifier("Kernel"),
-          JS.identifier("SpecialForms")
-        ),
+        Primitive.special_forms(),
         JS.identifier("receive")
       ),
       [
@@ -29,10 +27,7 @@ defmodule ElixirScript.Translator.Receive do
   def make_receive([do: clauses, after: [{:->, _, [[time], _body]}] = after_clause], env) do
     JS.call_expression(
       JS.member_expression(
-        JS.member_expression(
-          JS.identifier("Kernel"),
-          JS.identifier("SpecialForms")
-        ),
+        Primitive.special_forms(),
         JS.identifier("receive")
       ),
       [

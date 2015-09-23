@@ -2,6 +2,7 @@ defmodule ElixirScript.Translator.Try do
   @moduledoc false
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator.Function
+  alias ElixirScript.Translator.Primitive
 
   def make_try(blocks, env) do
     try_block = Dict.get(blocks, :do)
@@ -39,10 +40,7 @@ defmodule ElixirScript.Translator.Try do
 
     JS.call_expression(
       JS.member_expression(
-        JS.member_expression(
-          JS.identifier("Kernel"),
-          JS.identifier("SpecialForms")
-        ),
+        Primitive.special_forms(),
         JS.identifier("_try")
       ),
       [
