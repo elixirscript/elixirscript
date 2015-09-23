@@ -69,6 +69,13 @@ defmodule ElixirScript.Translator.Utils do
     )
   end
 
+  def make_call_expression(function_name, params, env) when is_tuple(function_name) do
+    JS.call_expression(
+      Translator.translate(function_name, env),
+      Enum.map(params, &Translator.translate(&1, env))
+    )
+  end
+
   def make_call_expression(function_name, params, env) do
     JS.call_expression(
       JS.identifier(function_name),

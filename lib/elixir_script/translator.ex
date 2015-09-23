@@ -119,6 +119,10 @@ defmodule ElixirScript.Translator do
     Map.make_get_property(target, property, env)
   end
 
+  defp do_translate({{:., _, [function_name]}, _, params}, env) do
+    Function.make_function_call(function_name, params, env)
+  end
+
   defp do_translate({:., _, [module_name, function_name]} = ast, env) do
     expanded_ast = Macro.expand(ast, env)
 
@@ -291,7 +295,6 @@ defmodule ElixirScript.Translator do
     else
       expanded_ast = Macro.expand(ast, env)
       if expanded_ast == ast do
-        name = Utils.filter_name(name)
         Function.make_function_call(name, params, env)        
       else
         translate(expanded_ast, env)

@@ -11,7 +11,7 @@ defmodule ElixirScript.Translator.Capture do
 
     { patterns, params } = Match.build_match(params, env)
 
-    body =         JS.block_statement([
+    body = JS.block_statement([
           JS.return_statement(
             JS.call_expression(
               JS.identifier(function_name),

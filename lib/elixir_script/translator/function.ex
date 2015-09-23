@@ -140,6 +140,10 @@ defmodule ElixirScript.Translator.Function do
     )
   end
 
+  def make_function_call(function_name, params, env) when is_tuple(function_name) do
+    Utils.make_call_expression(function_name, params, env)
+  end
+
   def make_function_call(function_name, params, env) do
     Utils.make_call_expression(Utils.filter_name(function_name), params, env)
   end

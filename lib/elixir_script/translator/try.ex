@@ -3,8 +3,6 @@ defmodule ElixirScript.Translator.Try do
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator.Function
 
-  @error_identifier JS.identifier(:e)
-
   def make_try(blocks, env) do
     try_block = Dict.get(blocks, :do)
     rescue_block = Dict.get(blocks, :rescue, nil)

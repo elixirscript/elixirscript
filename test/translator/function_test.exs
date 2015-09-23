@@ -2,6 +2,20 @@ defmodule ElixirScript.Translator.Function.Test do
   use ShouldI
   import ElixirScript.TestHelper
 
+  should "call fun" do
+    ex_ast = quote do
+      fun.(:atom)
+    end
+
+    js_code = """
+    fun(Kernel.SpecialForms.atom('atom'))
+    """
+
+    assert_translation(ex_ast, js_code) 
+
+  end
+
+
   should "translate function with a macro" do
     ex_ast = quote do
       def test1() do

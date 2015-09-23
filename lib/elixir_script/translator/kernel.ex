@@ -54,26 +54,19 @@ defmodule ElixirScript.Translator.Kernel do
   end
 
   defp do_translate({:apply, _, [fun, args]}, env) do
-    JS.call_expression(
-      JS.member_expression(
-        Translator.translate(fun, env),
-        JS.identifier(:apply)
-      ),
-      [JS.identifier(:null)] ++ Enum.map(args, &Translator.translate(&1, env))
-    )
+    quoted = quote do
+      unquote(fun)(unquote_splicing(args))
+    end
+
+    Translator.translate(quoted, env)
   end
 
   defp do_translate({:apply, _, [module, fun, args]}, env) do
-    JS.call_expression(
-      JS.member_expression(
-        JS.member_expression(
-          Translator.translate(module, env),
-          Translator.translate(fun, env)
-        ),
-        JS.identifier(:apply)
-      ),
-      [JS.identifier(:null)] ++ Enum.map(args, &Translator.translate(&1, env))
-    )
+    quoted = quote do
+      unquote(module).unquote(fun)(unquote_splicing(args))
+    end
+
+    Translator.translate(quoted, env)
   end
 
   defp do_translate({:and, _, [left, right]}, env) do
@@ -124,24 +117,20 @@ defmodule ElixirScript.Translator.Kernel do
     Translator.translate(quoted, env)
   end
 
-  defp do_translate({:max, _, params}, env) do
-    JS.call_expression(
-      JS.member_expression(
-        JS.identifier(:Math),
-        JS.identifier(:max)
-      ),
-      Enum.map(params, &Translator.translate(&1, env))
-    )
+  defp do_translate({:max, _, [first, second]}, env) do
+    quoted = quote do
+      Math.max(unquote(first), unquote(second))
+    end
+
+    Translator.translate(quoted, env)
   end
 
-  defp do_translate({:min, _, params}, env) do
-    JS.call_expression(
-      JS.member_expression(
-        JS.identifier(:Math),
-        JS.identifier(:min)
-      ),
-      Enum.map(params, &Translator.translate(&1, env))
-    )
+  defp do_translate({:min, _, [first, second]}, env) do
+    quoted = quote do
+      Math.min(unquote(first), unquote(second))
+    end
+
+    Translator.translate(quoted, env)
   end
 
   defp do_translate({:if, _, _} = ast, env) do
@@ -164,20 +153,20 @@ defmodule ElixirScript.Translator.Kernel do
   end
 
   defp do_translate({:hd, _, [list]}, env) do
-    JS.member_expression(
-      Translator.translate(list, env),
-      JS.identifier(0),
-      true
-    )
+    quoted = quote do
+      unquote(list)[0]
+    end
+
+    Translator.translate(quoted, env)
   end
 
   defp do_translate({:tl, _, [list]}, env) do
     JS.call_expression(
       JS.member_expression(
         Translator.translate(list, env),
-        JS.identifier(:splice)
+        JS.identifier(:slice)
       ),
-      [1]
+      [JS.literal(1)]
     )
   end
 

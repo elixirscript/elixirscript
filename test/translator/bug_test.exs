@@ -2,7 +2,7 @@ defmodule ElixirScript.Translator.Bug.Test do
   use ShouldI
   import ElixirScript.TestHelper
 
-  should "Translate" do
+  should "Translate react element" do
     ex_ast = quote do
       React.createElement(
         React.Text,
