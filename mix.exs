@@ -13,7 +13,10 @@ defmodule ElixirScript.Mixfile do
       source_url: "https://github.com/bryanjos/elixirscript",
       aliases: aliases,
       test_coverage: [tool: ExCoveralls],
-      preferred_cli_env: [coveralls: :test]
+      preferred_cli_env: [coveralls: :test],
+      docs: [
+        extras: ["README.md"]
+      ]
     ]
   end
 
@@ -29,7 +32,7 @@ defmodule ElixirScript.Mixfile do
       {:estree, "~> 2.0"},
       {:shouldi, only: :test },
       {:earmark, "~> 0.1", only: :dev },
-      {:ex_doc, "~> 0.9", only: :dev },
+      {:ex_doc, "~> 0.10", only: :dev },
       {:benchfella, "~> 0.2", only: :test},
       {:excoveralls, "~> 0.3", only: :test}  
     ]

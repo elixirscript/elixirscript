@@ -175,6 +175,18 @@ The intent of this guide is to get you started with ElixirScript. It will give y
 
 ### Appendix
 
+#### Using JavaScript Modules
+
+You can use `alias`, `import`, and `require` as you would in Elixir (sans macros).
+
+For JavaScript modules, use `JS.import`
+
+```elixir
+JS.import A, "a" #translates to "import {default as A} from 'a'"
+
+JS.import [A, B, C], "a" #translates to "import {A, B, C} from 'a'"
+```
+
 #### Gulp
 
 I am a gulp user and I use elixirscript with gulp. Here is a snippet of how I my gulpfile looks

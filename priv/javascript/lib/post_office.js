@@ -1,4 +1,6 @@
 /* @flow */
+import Signal from './signals';
+
 function update(map: Map, key: Symbol, value: any): Map {
   let m = new Map(map);
   m.set(key, value);
@@ -11,49 +13,85 @@ function remove(map: Map, key: Symbol): Map {
   return m;
 }
 
-class PostOffice {
-  mailboxes: Map;
-  subscribers: Map;
+class MailBox {
+  signal: Signal;
+  messages: Array<any>;
 
-  constructor(){
-    this.mailboxes = new Map();
-    this.subscribers = new Map();
+  constructor(context: any = this){
+    this.signal = new Signal();
+    this.signal.add((...params) => this.messages = this.messages.concat(params), context);
+    this.messages = [];
   }
 
-  send(address: Symbol, message: any): void {
-    this.mailboxes = update(this.mailboxes, address, this.mailboxes.get(address).concat([message]));
+  receive(...messages){
+    this.signal.dispatch(...messages);
+  }
 
-    if(this.subscribers.get(address)){
-      this.subscribers.get(address)();
+  peek(){
+    if(this.messages.length === 0){
+      return null;
     }
+
+    return this.messages[0];
   }
 
-  receive(address: Symbol): any {
-    let result = this.mailboxes.get(address)[0];
+  read(){
+    let result = this.messages[0];
+    this.messages = this.messages.slice(1);
 
-    this.mailboxes = update(this.mailboxes, address, this.mailboxes.get(address).slice(1));
     return result;
   }
 
-  peek(address: Symbol): any {
-    return this.mailboxes.get(address)[0];
+  add_subscriber(fn: Function, context: any = this){
+    this.signal.add(fn, context);
   }
 
-  add_mailbox(address: Symbol = Symbol()): Symbol {
-    this.mailboxes = update(this.mailboxes, address, []);
+  remove_subscriber(fn: Function){
+    this.signal.remove(fn);
+  }
+
+  dispose(){
+    this.signal.dispose();
+    this.messages = null;
+  }
+}
+
+
+class PostOffice {
+  mailboxes: Map;
+
+  constructor(){
+    this.mailboxes = new Map();
+  }
+
+  send(address: Symbol, message: any): void {
+    this.mailboxes.get(address).receive(message);
+  }
+
+  receive(address: Symbol): any {
+    return this.mailboxes.get(address).read();
+  }
+
+  peek(address: Symbol): any {
+    return this.mailboxes.get(address).peek();
+  }
+
+  add_mailbox(address: Symbol = Symbol(), context: any = this): Symbol {
+    this.mailboxes = update(this.mailboxes, address, new MailBox());
     return address;
   }
 
   remove_mailbox(address: Symbol): void {
+    this.mailboxes.get(address).dispose();
     this.mailboxes = remove(this.mailboxes, address);
   }
 
-  subscribe(address: Symbol, subscribtion_fn: Function): void {
-    this.subscribers = update(this.subscribers, address, subscribtion_fn);
+  subscribe(address: Symbol, subscribtion_fn: Function, context: any = this ): void {
+    this.mailboxes.get(address).add_subscriber(subscribtion_fn, context);    
   }
 
-  unsubscribe(address: Symbol): void {
-    this.subscribers = remove(this.subscribers, address);
+  unsubscribe(address: Symbol, subscribtion_fn: Function): void {
+    this.mailboxes.get(address).remove_subscriber(subscribtion_fn);   
   }
 }
 

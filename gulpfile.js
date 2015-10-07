@@ -6,6 +6,8 @@ var eslint = require('gulp-eslint');
 var rollup = require('gulp-rollup');
 var sourcemaps = require('gulp-sourcemaps');
 
+require("babel/polyfill");
+
 var path = './priv/javascript';
 
 var stdLibPath = path + '/lib/**/*.js';
