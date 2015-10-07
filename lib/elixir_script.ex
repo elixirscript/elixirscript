@@ -135,6 +135,13 @@ defmodule ElixirScript do
     File.cp_r!(operating_path <> "/dist", destination)
   end
 
+  @doc """
+  Returns the standard lib js code
+  """
+  def standard_libs() do
+    File.read!(operating_path <> "/dist/elixir.js")
+  end
+
   defp convert_to_code(js_ast, root, include_path, env, import_standard_libs \\ true) do
       js_ast
       |> process_module(root, env, import_standard_libs)

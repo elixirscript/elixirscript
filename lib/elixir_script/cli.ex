@@ -3,11 +3,11 @@ defmodule ElixirScript.CLI do
 
   @switches [ 
     output: :binary, elixir: :boolean, root: :binary, 
-    help: :boolean
+    help: :boolean, stdlib: :boolean
   ]
 
   @aliases [ 
-    o: :output, ex: :elixir, h: :help, r: :root
+    o: :output, ex: :elixir, h: :help, r: :root, st: :stdlib
   ]
 
   def main(argv) do
@@ -21,6 +21,7 @@ defmodule ElixirScript.CLI do
 
     case parse do
       { [help: true] , _ , _ } -> :help
+      { [stdlib: true] , _ , _ } -> :stdlib
       { options , [input], _ } -> { input, options }
       { [], [], [] } -> :help
     end
@@ -36,8 +37,13 @@ defmodule ElixirScript.CLI do
       -o  --output [path]   places output at the given path
       -ex --elixir          read input as elixir code string
       -r  --root [path]     root path for standard libs
+      -st  --stdlib         outputs the standard lib js file
       -h  --help            this message
     """
+  end
+
+  def process(:stdlib) do
+    IO.write(ElixirScript.standard_libs)
   end
 
   def process({ input, options }) do
