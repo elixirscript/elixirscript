@@ -55,5 +55,12 @@ gulp.task('dist_add_source_map', function() {
       .pipe(gulp.dest('./priv/javascript/dist'));
 });
 
+gulp.task('common', function() {
+  return gulp.src(['./priv/javascript/dist/elixir.js'])
+      .pipe(babel({sourceMap: false, modules:'common'}))
+      .pipe(gulp.dest('./priv/javascript/umd'));
+});
+
+
 
 gulp.task('default', ['lint', 'test']);

@@ -99,7 +99,13 @@ let Enum = {
   },
 
   map: function(collection, fun){
-    return collection.map(fun);
+    let result = [];
+
+    for(let elem of collection){
+      result.push(fun(elem));
+    }
+
+    return result;
   },
 
   map_reduce: function(collection, acc, fun){
