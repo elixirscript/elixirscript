@@ -5,7 +5,6 @@ defmodule ElixirScript.Translator.Kernel do
   alias ElixirScript.Translator.Map
   alias ElixirScript.Translator.Function
   alias ElixirScript.Translator.Expression
-  alias ElixirScript.Translator.Raise
 
   @kernel_definitions Kernel.__info__(:functions) ++ Kernel.__info__(:macros)
 
@@ -98,7 +97,81 @@ defmodule ElixirScript.Translator.Kernel do
   end
 
   defp do_translate({:self, _, []}, _) do
-    JS.identifier(:self)
+    JS.call_expression(
+      JS.member_expression(
+        JS.identifier(:self),
+        JS.member_expression(
+          JS.identifier(:scheduler),
+          JS.identifier(:pid)
+        )
+      ),
+      []
+    )
+  end
+
+  defp do_translate({:spawn, _, [fun]}, env) do
+    JS.call_expression(
+      JS.member_expression(
+        JS.identifier(:self),
+        JS.member_expression(
+          JS.identifier(:scheduler),
+          JS.identifier(:spawn)
+        )
+      ),
+      [Translator.translate(fun, env)]
+    )
+  end
+
+  defp do_translate({:spawn, _, [module, fun, args]}, env) do
+    JS.call_expression(
+      JS.member_expression(
+        JS.identifier(:self),
+        JS.member_expression(
+          JS.identifier(:scheduler),
+          JS.identifier(:spawn_from_module)
+        )
+      ),
+      [Translator.translate(module, env), Translator.translate(fun, env), Translator.translate(args, env)]
+    )
+  end
+
+  defp do_translate({:spawn_link, _, [fun]}, env) do
+    JS.call_expression(
+      JS.member_expression(
+        JS.identifier(:self),
+        JS.member_expression(
+          JS.identifier(:scheduler),
+          JS.identifier(:spawn_link)
+        )
+      ),
+      [Translator.translate(fun, env)]
+    )
+  end
+
+  defp do_translate({:spawn_link, _, [module, fun, args]}, env) do
+    JS.call_expression(
+      JS.member_expression(
+        JS.identifier(:self),
+        JS.member_expression(
+          JS.identifier(:scheduler),
+          JS.identifier(:spawn_link_from_module)
+        )
+      ),
+      [Translator.translate(module, env), Translator.translate(fun, env), Translator.translate(args, env)]
+    )
+  end
+
+  defp do_translate({:exit, _, [reason]}, env) do
+    JS.call_expression(
+      JS.member_expression(
+        JS.identifier(:self),
+        JS.member_expression(
+          JS.identifier(:scheduler),
+          JS.identifier(:exit)
+        )
+      ),
+      [Translator.translate(reason, env)]
+    )
   end
 
   defp do_translate({:tuple_size, _, [tuple]}, env) do

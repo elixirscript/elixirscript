@@ -7,7 +7,7 @@ defmodule ElixirScript.Translator.Receive do
   def make_receive([do: clauses], env) do
     JS.call_expression(
       JS.member_expression(
-        Primitive.special_forms(),
+        Primitive.scheduler(),
         JS.identifier("receive")
       ),
       [
@@ -27,7 +27,7 @@ defmodule ElixirScript.Translator.Receive do
   def make_receive([do: clauses, after: [{:->, _, [[time], _body]}] = after_clause], env) do
     JS.call_expression(
       JS.member_expression(
-        Primitive.special_forms(),
+        Primitive.scheduler(),
         JS.identifier("receive")
       ),
       [

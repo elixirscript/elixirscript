@@ -30,8 +30,16 @@ class Scheduler {
     return this.add_proc(fun, args, false).pid;
   }
 
+  spawn_from_module(module, fun, ...args){
+    return this.add_proc(module[fun], args, false).pid;
+  }
+
   spawn_link(fun, ...args){
     return this.add_proc(fun, args, true).pid; 
+  }
+
+  spawn_link_from_module(module, fun, ...args){
+    return this.add_proc(module[fun], args, true).pid; 
   }
 
   link(pid){

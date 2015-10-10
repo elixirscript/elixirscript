@@ -12,6 +12,13 @@ defmodule ElixirScript.Translator.Primitive do
     )
   end
 
+  def scheduler() do
+    JS.member_expression(
+      JS.identifier("self"),
+      JS.identifier("scheduler")
+    )
+  end
+
   def make_wildcard() do
     JS.member_expression(
       JS.identifier("fun"),
