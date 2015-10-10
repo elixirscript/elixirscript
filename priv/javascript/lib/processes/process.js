@@ -2,9 +2,8 @@
 
 /* @flow */
 import Mailbox from "./mailbox";
-import ProcessManager from "./process_manager";
+import Scheduler from "./scheduler";
 import States from "./states";
-import Patterns from "../patterns/patterns";
 
 const NOMSG = Symbol();
 
@@ -13,15 +12,15 @@ class Process {
   mailbox: Mailbox;
   func: Function;
   args: Array;
-  manager: ProcessManager;
+  scheduler: Scheduler;
   status: Symbol;
 
-  constructor(pid: Number, func: Function, args: Array, mailbox: Mailbox, manager: ProcessManager){
+  constructor(pid: Number, func: Function, args: Array, mailbox: Mailbox, scheduler: Scheduler){
     this.pid = pid;
     this.func = func;
     this.args = args;
     this.mailbox = mailbox;
-    this.manager = manager;
+    this.scheduler = scheduler;
     this.status = States.STOPPED;
   }
 
@@ -45,11 +44,11 @@ class Process {
       retval = e;
     }
 
-    this.manager.exit(this.pid, retval);
+    this.scheduler.exit(this.pid, retval);
   }
 
   exit(reason){
-    this.manager.remove_proc(this.pid, reason);
+    this.scheduler.remove_proc(this.pid, reason);
   }
 
   receive(fun){
@@ -72,7 +71,7 @@ class Process {
 
   run(machine, step){
     const function_scope = this;
-    this.manager.set_current(this);
+    this.scheduler.set_current(this);
 
     if(!step.done){
       let value = step.value;
@@ -80,7 +79,7 @@ class Process {
       if(Array.isArray(value) && (value[0] === States.SLEEP || value[0] === States.RECEIVE)){
         if(value[0] === States.SLEEP){
 
-          this.manager.delay(function() { 
+          this.scheduler.delay(function() { 
             function_scope.run(machine, machine.next()); 
           }, value[1]);
 
@@ -88,25 +87,25 @@ class Process {
           if(value[2] != null && value[2] < Date.now()){
             let result = value[3]();
 
-            this.manager.queue(function() { 
+            this.scheduler.queue(function() { 
               function_scope.run(machine, machine.next(result)); 
             });
           }else{
             let result = function_scope.receive(value[1]);
 
             if(result === NOMSG){
-              this.manager.suspend(function() { 
+              this.scheduler.suspend(function() { 
                 function_scope.run(machine, step); 
               });         
             }else{
-              this.manager.queue(function() { 
+              this.scheduler.queue(function() { 
                 function_scope.run(machine, machine.next(result)); 
               });          
             }
           }
         }      
       }else{
-        this.manager.queue(function() { 
+        this.scheduler.queue(function() { 
           function_scope.run(machine, machine.next()); 
         });  
       }
