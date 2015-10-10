@@ -3,11 +3,23 @@ import Kernel from './kernel';
 let Enum = {
 
   all__qmark__: function(collection, fun = (x) => x){
-    return collection.every(fun);
+    for(let elem of collection){
+      if(!fun(elem)){
+        return false;
+      }
+    }
+
+    return true;
   },
 
   any__qmark__: function(collection, fun = (x) => x){
-    return collection.some(fun);
+    for(let elem of collection){
+      if(fun(elem)){
+        return true;
+      }
+    }
+
+    return false;
   },
 
   at: function(collection, n, the_default = null){
@@ -83,15 +95,29 @@ let Enum = {
   },
 
   filter: function(collection, fun){
-    return collection.filter(fun);
+    let result = [];
+
+    for(let elem of collection){
+      if(fun(elem)){
+        result.push(elem);
+      }
+    }
+
+    return result;
   },
 
   filter_map: function(collection, filter, mapper){
-    return collection.filter(filter).map(mapper);
+    return Enum.map(Enum.filter(collection, filter), mapper);
   },
 
   find: function(collection, if_none = null, fun){
-    return collection.find(fun, null, if_none);
+    for(let elem of collection){
+      if(fun(elem)){
+        return elem;
+      }
+    }
+
+    return if_none;
   },
 
   into: function(collection, list){
@@ -127,7 +153,15 @@ let Enum = {
   },
 
   reduce: function(collection, acc, fun){
-    return collection.reduce(fun, acc);
+    let the_acc = acc;
+
+    for (var i = 0; i < this.count(collection); i++) {
+      let tuple = fun(collection[i], the_acc);
+
+      the_acc = Kernel.elem(tuple, 1);
+    }
+
+    return the_acc;
   },
 
   take: function(collection, count){
