@@ -4,6 +4,7 @@
 import Mailbox from "./mailbox";
 import Scheduler from "./scheduler";
 import States from "./states";
+import Patterns from "../patterns/patterns";
 
 const NOMSG = Symbol();
 

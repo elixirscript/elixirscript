@@ -1,5 +1,9 @@
+# v0.13.0-dev
+* Enhancements
+  * Introduction of processes
+
 # v0.12.0
-* Enhancement
+* Enhancements
   * Updated tuple implementation. It's now a class.
   * Replaced pattern matching library with custom one
   * Added PostOffice. Only thing that current uses it is Agent
@@ -8,7 +12,7 @@
   * for now works with `into` for lists
 
 # v0.11.0
-* Enhancement
+* Enhancements
   * `import` works with all options
   * Added `JS` module with `new`, `mutate`, `import` macros
   * All Standard libraries are rolled up into one elixir.js file and imported from that

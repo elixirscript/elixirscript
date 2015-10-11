@@ -6,19 +6,28 @@ import Process from "./process";
 import States from "./states";
 import TaskQueue from "./task_queue";
 
+
+const throttle = 10; //ms between queued tasks
+
 class Scheduler {
 
   constructor(){
-    this.process_counter = 0;
+    this.process_counter = -1;
     this.pids = new Map();
     this.mailboxes = new Map();
     this.names = new Map();
     this.links = new Map();
 
-    const throttle = 10; //ms between queued tasks
     this.current_process = null;
     this.task_queue = new TaskQueue(throttle);
     this.suspended = new Map();
+
+    let scheduler_scope = this;
+    this.main_process = this.spawn(function*(){
+        while(true){
+          yield scheduler_scope.sleep(10000);
+        }
+    });
   }
 
   set_current(process){
@@ -26,19 +35,19 @@ class Scheduler {
     this.current_process.status = States.RUNNING;
   }
 
-  spawn(fun, ...args){
+  spawn(fun, args){
     return this.add_proc(fun, args, false).pid;
   }
 
-  spawn_from_module(module, fun, ...args){
+  spawn_from_module(module, fun, args){
     return this.add_proc(module[fun], args, false).pid;
   }
 
-  spawn_link(fun, ...args){
+  spawn_link(fun, args){
     return this.add_proc(fun, args, true).pid; 
   }
 
-  spawn_link_from_module(module, fun, ...args){
+  spawn_link_from_module(module, fun, args){
     return this.add_proc(module[fun], args, true).pid; 
   }
 
