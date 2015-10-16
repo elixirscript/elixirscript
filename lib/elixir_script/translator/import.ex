@@ -1,7 +1,6 @@
 defmodule ElixirScript.Translator.Import do
   @moduledoc false
   alias ESTree.Tools.Builder, as: JS
-  alias ElixirScript.Translator
   alias ElixirScript.State
 
   def make_alias_import(alias_info, options) do
@@ -46,9 +45,7 @@ defmodule ElixirScript.Translator.Import do
     )
   end
 
-  def make_import(module_name_list, [], env) do
-    mod = List.last(module_name_list) |> JS.identifier
-
+  def make_import(module_name_list, [], _) do
     functions = State.get_module(module_name_list).functions
 
     functions = Enum.map(functions, fn
@@ -78,9 +75,7 @@ defmodule ElixirScript.Translator.Import do
     JS.import_declaration(specifiers, JS.identifier(import_path))
   end
 
-  def make_import(module_name_list, [only: :functions], env) do
-    mod = List.last(module_name_list) |> JS.identifier
-
+  def make_import(module_name_list, [only: :functions], _) do
     functions = State.get_module(module_name_list).functions
 
     functions = Enum.map(functions, fn
@@ -104,9 +99,7 @@ defmodule ElixirScript.Translator.Import do
     JS.import_declaration(specifiers, JS.identifier(import_path))
   end
 
-  def make_import(module_name_list, [only: only], env) do
-    mod = List.last(module_name_list) |> JS.identifier
-
+  def make_import(module_name_list, [only: only], _) do
     only = Enum.map(only, fn
       ({name, _arity}) ->
         name
@@ -131,9 +124,7 @@ defmodule ElixirScript.Translator.Import do
     JS.import_declaration(specifiers, JS.identifier(import_path))
   end
 
-  def make_import(module_name_list, [except: except], env) do
-    mod = List.last(module_name_list) |> JS.identifier
-
+  def make_import(module_name_list, [except: except], _) do
     except = Enum.map(except, fn
       ({name, _arity}) ->
         name
@@ -181,12 +172,11 @@ defmodule ElixirScript.Translator.Import do
     Set.difference(Enum.into(module.functions, HashSet.new), Enum.into(except, HashSet.new))    
   end
 
-
-  def create_standard_lib_imports(root, env) do
+  def create_standard_lib_imports(root, _) do
     module_names = [
       :Patterns, :Kernel, :Atom, :Enum, :Integer, 
       :JS, :List, :Range, :Tuple, :Agent, :Keyword,
-      :BitString
+      :BitString, :Base, :String
     ]
 
     import_specifiers = Enum.map(module_names, fn(x) -> 

@@ -15,7 +15,7 @@ defmodule ElixirScript.Mixfile do
       test_coverage: [tool: ExCoveralls],
       preferred_cli_env: [coveralls: :test],
       docs: [
-        extras: ["README.md"]
+        extras: ["README.md", "GettingStarted.md", "FAQ.md"]
       ]
     ]
   end
@@ -51,9 +51,9 @@ defmodule ElixirScript.Mixfile do
   defp package do
     [
       files: ["lib", "priv/javascript/dist", "mix.exs", "README*", "readme*", "LICENSE*", "license*", "CHANGELOG*"],
-      contributors: ["Bryan Joseph"],
+      maintainers: ["Bryan Joseph"],
       licenses: ["MIT"],
-      links: %{ 
+      links: %{
         "GitHub" => "https://github.com/bryanjos/elixirscript"
       },
       build_tools: ["mix"]
