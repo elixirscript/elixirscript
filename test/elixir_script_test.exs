@@ -31,7 +31,7 @@ defmodule ElixirScript.Test do
     """)
 
     assert_js_matches """
-         import { Patterns, Kernel, Atom, Enum, Integer, JS, List, Range, Tuple, Agent, Keyword, BitString, Base, String } from 'elixir';
+         import { Patterns, Kernel, Atom, Enum, Integer, JS, List, Range, Tuple, Agent, Keyword, BitString, Base, String, Bitwise } from 'elixir';
          const __MODULE__ = Kernel.SpecialForms.atom('Elephant');
          let something_else = Patterns.defmatch(Patterns.make_case([],function()    {
              return     null;
@@ -64,7 +64,7 @@ defmodule ElixirScript.Test do
     """, env: make_custom_env)
 
     assert_js_matches """
-      import { Patterns, Kernel, Atom, Enum, Integer, JS, List, Range, Tuple, Agent, Keyword, BitString, Base, String } from 'elixir';
+      import { Patterns, Kernel, Atom, Enum, Integer, JS, List, Range, Tuple, Agent, Keyword, BitString, Base, String, Bitwise } from 'elixir';
       import * as Elephant from 'animals/elephant';
 
        const __MODULE__ = Kernel.SpecialForms.atom('Animals');
@@ -77,7 +77,7 @@ defmodule ElixirScript.Test do
      """, hd(js_code)
 
      assert_js_matches """
-         import { Patterns, Kernel, Atom, Enum, Integer, JS, List, Range, Tuple, Agent, Keyword, BitString, Base, String } from 'elixir';
+         import { Patterns, Kernel, Atom, Enum, Integer, JS, List, Range, Tuple, Agent, Keyword, BitString, Base, String, Bitwise } from 'elixir';
          const __MODULE__ = Kernel.SpecialForms.atom('Elephant');
          function defstruct(trunk = true)        {
                  return     Kernel.SpecialForms.map({
@@ -105,7 +105,7 @@ defmodule ElixirScript.Test do
     """, env: make_custom_env)
 
     assert_js_matches """
-         import { Patterns, Kernel, Atom, Enum, Integer, JS, List, Range, Tuple, Agent, Keyword, BitString, Base, String } from 'elixir';
+         import { Patterns, Kernel, Atom, Enum, Integer, JS, List, Range, Tuple, Agent, Keyword, BitString, Base, String, Bitwise } from 'elixir';
          const __MODULE__ = Kernel.SpecialForms.atom('Animals');
          let something_else = Patterns.defmatch(Patterns.make_case([],function()    {
              return     1 * 1;

@@ -176,7 +176,7 @@ defmodule ElixirScript.Translator.Import do
     module_names = [
       :Patterns, :Kernel, :Atom, :Enum, :Integer, 
       :JS, :List, :Range, :Tuple, :Agent, :Keyword,
-      :BitString, :Base, :String
+      :BitString, :Base, :String, :Bitwise
     ]
 
     import_specifiers = Enum.map(module_names, fn(x) -> 
