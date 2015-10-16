@@ -72,6 +72,9 @@ The compiler to this point has been focused on translating Kernel.SpecialForms a
     * Agent
     * Integer
     * Keyword
+    * Base
+    * String
+    * Bitwise
     
 #### Missing Modules
     * Everything else
