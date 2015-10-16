@@ -15,7 +15,7 @@ defmodule ElixirScript.Translator.Primitive do
   def scheduler() do
     JS.member_expression(
       JS.identifier("self"),
-      JS.identifier("scheduler")
+      JS.identifier("system")
     )
   end
 

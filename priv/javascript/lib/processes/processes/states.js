@@ -1,6 +1,6 @@
 export default {
   NORMAL: Symbol.for("normal"),
-  SHUTDOWN: Symbol.for("shutdown"),
+  KILL: Symbol.for("kill"),
   SUSPEND: Symbol.for("suspend"),
   CONTINUE: Symbol.for("continue"),
   RECEIVE: Symbol.for("receive"),
@@ -10,5 +10,6 @@ export default {
   SUSPENDED: Symbol.for("suspended"),
   STOPPED: Symbol.for("stopped"),
   SLEEP: Symbol.for("sleep"),
-  EXIT: Symbol.for("exit")
+  EXIT: Symbol.for("exit"),
+  NOMATCH: Symbol.for("no_match")
 }

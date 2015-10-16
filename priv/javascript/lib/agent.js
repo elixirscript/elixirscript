@@ -1,40 +1,119 @@
 import Kernel from './kernel';
 import Keyword from './keyword';
 
-let Agent = {};
+function start(fun, options = []){
+  let pid = self.system.spawn(start_process(module, args));
 
-Agent.start = function(fun, options = []){
-  const name = Keyword.has_key__qm__(options, Kernel.SpecialForms.atom("name")) ? Keyword.get(options, Kernel.SpecialForms.atom("name")) : Symbol();
-  
-  self.post_office.add_mailbox(name);
-  self.post_office.send(name, fun());
+  if(Keyword.has_key__qm__(options, Kernel.SpecialForms.atom("name"))){
+    let name = Keyword.get(options, Kernel.SpecialForms.atom("name"));
 
-  return Kernel.SpecialForms.tuple(Kernel.SpecialForms.atom("ok"), name);
+    self.system.register(name, pid);
+    return Kernel.SpecialForms.tuple(Kernel.SpecialForms.atom("ok"), name);
+  }
+
+  return Kernel.SpecialForms.tuple(Kernel.SpecialForms.atom("ok"), pid);
 }
 
-Agent.stop = function(agent, timeout = 5000){
-  self.post_office.remove_mailbox(agent);
-  return Kernel.SpecialForms.atom("ok");
+function start_link(fun, options = []){
+  let pid = self.system.spawn_link(start_process(module, args));
+
+  if(Keyword.has_key__qm__(options, Kernel.SpecialForms.atom("name"))){
+    let name = Keyword.get(options, Kernel.SpecialForms.atom("name"));
+
+    self.system.register(name, pid);
+    return Kernel.SpecialForms.tuple(Kernel.SpecialForms.atom("ok"), name);
+  }
+
+  return Kernel.SpecialForms.tuple(Kernel.SpecialForms.atom("ok"), pid);
 }
 
-Agent.update = function(agent, fun, timeout = 5000){
+function start_process(fun){
+  return function*(){
+    yield self.system.put("state", fun.apply(null, []));
 
-  const current_state = self.post_office.receive(agent);
-  self.post_office.send(agent, fun(current_state));
+    try{
+      while(true){
+        yield self.system.receive(function(args){
+          let command = args[0];
 
-  return Kernel.SpecialForms.atom("ok");
+          switch(command){
+            case "update":
+              let updateFn = args[1];
+              let sender = args[2];
+
+              let current_state = self.system.get("state");
+              let new_state = updateFn(current_state);
+
+              self.system.put("state", new_state);
+              self.system.send(sender, Symbol.for("ok"));
+
+              break;
+            case "get":
+              let getFn = args[1];
+              let sender = args[2];
+
+              let current_state = self.system.get("state");
+              let return_value = getFn(current_state);
+
+              self.system.send(sender, return_value);
+
+              break;
+            case "get_and_update":
+              let updateFn = args[1];
+              let sender = args[2];
+
+              let current_state = self.system.get("state");
+              let get_and_update_tuple = updateFn(current_state);
+
+              self.system.put("state", Kernel.elem(get_and_update_tuple, 1));
+              self.system.send(sender, Kernel.elem(get_and_update_tuple, 0));
+
+              break;
+            case "stop":
+              throw "stop";
+          }        
+        });
+      }
+    }catch(e){
+      if(e !== "stop"){
+        throw e;
+      }
+    }
+  }
 }
 
-Agent.get = function(agent, fun, timeout = 5000){
-  return fun(self.post_office.peek(agent));
+function* stop(agent, timeout = 5000){
+  self.system.send(agent, ["stop", self.system.pid()]);
 }
 
-Agent.get_and_update = function(agent, fun, timeout = 5000){
+function* update(agent, fun, timeout = 5000){
+  self.system.send(agent, ["update", fun, self.system.pid()]);
 
-  const get_and_update_tuple = fun(self.post_office.receive(agent));
-  self.post_office.send(agent, Kernel.elem(get_and_update_tuple, 1));
-
-  return Kernel.elem(get_and_update_tuple, 0);
+  return yield self.system.receive(function(args){
+    return args;
+  }); 
 }
 
-export default Agent;
+function* get(agent, fun, timeout = 5000){
+  self.system.send(agent, ["update", fun, self.system.pid()]);
+
+  return yield self.system.receive(function(args){
+    return args;
+  }); 
+}
+
+function* get_and_update(agent, fun, timeout = 5000){
+  self.system.send(agent, ["get_and_update", fun, self.system.pid()]);
+
+  return yield self.system.receive(function(args){
+    return args;
+  }); 
+}
+
+export default {
+  start,
+  stop,
+  update,
+  get,
+  get_and_update
+};

@@ -15,7 +15,7 @@ defmodule ElixirScript.Translator.Receive.Test do
     end
 
     js_code = """
-     yield self.scheduler.receive(function(message)    {
+     yield self.system.receive(function(message)    {
              return     Patterns.defmatch(Patterns.make_case([Kernel.SpecialForms.atom('ok')],function()    {
              return     value;
            }),Patterns.make_case([Kernel.SpecialForms.atom('error')],function()    {
@@ -45,7 +45,7 @@ defmodule ElixirScript.Translator.Receive.Test do
     end
 
     js_code = """
-     yield self.scheduler.receive(function(message)    {
+     yield self.system.receive(function(message)    {
              return     Patterns.defmatch(Patterns.make_case([Kernel.SpecialForms.atom('ok')],function()    {
              return     value;
            }),Patterns.make_case([Kernel.SpecialForms.atom('error')],function()    {

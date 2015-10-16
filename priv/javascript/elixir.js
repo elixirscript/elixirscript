@@ -1,9 +1,9 @@
 import PostOffice from './lib/post_office';
-import Scheduler from './lib/processes/scheduler';
+import { ProcessSystem } from './lib/processes/processes';
 
 
 self.post_office = self.post_office || new PostOffice();
-self.scheduler = self.scheduler || new Scheduler();
+self.system = self.system || new ProcessSystem();
 
 export { default as Patterns } from './lib/patterns/patterns';
 export { default as BitString } from './lib/bit_string';
@@ -17,3 +17,4 @@ export { default as Range } from './lib/range';
 export { default as Tuple } from './lib/tuple';
 export { default as Agent } from './lib/agent';
 export { default as Keyword } from './lib/keyword';
+export { GenServer } from './lib/processes/processes';
