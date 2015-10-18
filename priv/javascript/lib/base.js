@@ -25,7 +25,7 @@ function decode64__em__(data){
 }
 
 
-export {
+export default {
   encode64,
   decode64,
   decode64__em__
