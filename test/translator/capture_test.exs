@@ -4,12 +4,12 @@ defmodule ElixirScript.Translator.Capture.Test do
 
   should "translate capture operator with Module, function, and arity" do
     ex_ast = quote do
-      fun = &Kernel.is_atom/1
+      fun = &Elixir.Kernel.is_atom/1
     end
 
     js_code = """
-     let [fun] = Patterns.match(Patterns.variable(),Patterns.defmatch(Patterns.make_case([Patterns.variable()],function(__1)    {
-             return     Kernel.is_atom(__1);
+     let [fun] = Elixir.Patterns.match(Elixir.Patterns.variable(),Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.variable()],function(__1)    {
+             return     Elixir.Kernel.is_atom(__1);
            })));
     """
 
@@ -24,8 +24,8 @@ defmodule ElixirScript.Translator.Capture.Test do
     end
 
     js_code = """
-     let [fun] = Patterns.match(Patterns.variable(),Patterns.defmatch(Patterns.make_case([Patterns.variable()],function(__1)    {
-             return     Kernel.is_atom(__1);
+     let [fun] = Elixir.Patterns.match(Elixir.Patterns.variable(),Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.variable()],function(__1)    {
+             return     Elixir.Kernel.is_atom(__1);
            })));
     """
 
@@ -41,7 +41,7 @@ defmodule ElixirScript.Translator.Capture.Test do
     end
 
     js_code = """
-     let [fun] = Patterns.match(Patterns.variable(),Patterns.defmatch(Patterns.make_case([Patterns.variable()],function(__1)    {
+     let [fun] = Elixir.Patterns.match(Elixir.Patterns.variable(),Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.variable()],function(__1)    {
              return     local_function(__1);
            })));
     """
@@ -57,7 +57,7 @@ defmodule ElixirScript.Translator.Capture.Test do
     end
 
     js_code = """
-     let [fun] = Patterns.match(Patterns.variable(),Patterns.defmatch(Patterns.make_case([Patterns.variable()],function(__1)    {
+     let [fun] = Elixir.Patterns.match(Elixir.Patterns.variable(),Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.variable()],function(__1)    {
              return     __1 * 2;
            })));
     """
@@ -73,8 +73,8 @@ defmodule ElixirScript.Translator.Capture.Test do
     end
 
     js_code = """
-     let [fun] = Patterns.match(Patterns.variable(),Patterns.defmatch(Patterns.make_case([Patterns.variable(), Patterns.variable()],function(__1,__2)    {
-             return     Kernel.SpecialForms.tuple(__1,__2);
+     let [fun] = Elixir.Patterns.match(Elixir.Patterns.variable(),Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.variable(), Elixir.Patterns.variable()],function(__1,__2)    {
+             return     Elixir.Kernel.SpecialForms.tuple(__1,__2);
            })));
     """
 
@@ -85,8 +85,8 @@ defmodule ElixirScript.Translator.Capture.Test do
     end
 
     js_code = """
-     let [fun] = Patterns.match(Patterns.variable(),Patterns.defmatch(Patterns.make_case([Patterns.variable(), Patterns.variable(), Patterns.variable()],function(__1,__2,__3)    {
-             return     Kernel.SpecialForms.tuple(__1,__2,__3);
+     let [fun] = Elixir.Patterns.match(Elixir.Patterns.variable(),Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.variable(), Elixir.Patterns.variable(), Elixir.Patterns.variable()],function(__1,__2,__3)    {
+             return     Elixir.Kernel.SpecialForms.tuple(__1,__2,__3);
            })));
     """
 
@@ -98,11 +98,11 @@ defmodule ElixirScript.Translator.Capture.Test do
   should "translate capture operator with anonymous functions as parameters" do  
 
     ex_ast = quote do
-      Enum.map(items, &process(&1))
+      Elixir.Enum.map(items, &process(&1))
     end
 
     js_code = """
-     Enum.map(items,Patterns.defmatch(Patterns.make_case([Patterns.variable()],function(__1)    {
+     Elixir.Enum.map(items,Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.variable()],function(__1)    {
              return     process(__1);
            })))
     """
@@ -115,7 +115,7 @@ defmodule ElixirScript.Translator.Capture.Test do
     end
 
     js_code = """
-     elem.keypress(Patterns.defmatch(Patterns.make_case([Patterns.variable()],function(__1)    {
+     elem.keypress(Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.variable()],function(__1)    {
              return     process_event(__1);
            })))
     """

@@ -4,6 +4,6 @@ defmodule ElixirScript.Translator.Atom.Test do
 
   should "translate atom" do
     ex_ast = quote do: :atom
-    assert_translation(ex_ast, "Kernel.SpecialForms.atom('atom')")
+    assert_translation(ex_ast, "Elixir.Kernel.SpecialForms.atom('atom')")
   end
 end

@@ -13,10 +13,10 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-     Kernel.SpecialForms._try(function()    {
+     Elixir.Kernel.SpecialForms._try(function()    {
              return     do_something_that_may_fail(some_arg);
-           },Patterns.defmatch(Patterns.make_case([{
-             [Kernel.SpecialForms.atom('__struct__')]: Kernel.SpecialForms.atom('ArgumentError')
+           },Elixir.Patterns.defmatch(Elixir.Patterns.make_case([{
+             [Elixir.Kernel.SpecialForms.atom('__struct__')]: Elixir.Kernel.SpecialForms.atom('ArgumentError')
        }],function()    {
              return     IO.puts('Invalid argument given');
            })),null,null,null)
@@ -36,10 +36,10 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-     Kernel.SpecialForms._try(function()    {
+     Elixir.Kernel.SpecialForms._try(function()    {
              return     do_something_that_may_fail(some_arg);
-           },Patterns.defmatch(Patterns.make_case([{
-             [Kernel.SpecialForms.atom('__struct__')]: Kernel.SpecialForms.atom('ArgumentError')
+           },Elixir.Patterns.defmatch(Elixir.Patterns.make_case([{
+             [Elixir.Kernel.SpecialForms.atom('__struct__')]: Elixir.Kernel.SpecialForms.atom('ArgumentError')
        }],function()    {
              return     IO.puts('Invalid argument given');
            })),null,null,null)
@@ -59,12 +59,12 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-     Kernel.SpecialForms._try(function()    {
+     Elixir.Kernel.SpecialForms._try(function()    {
              return     do_something_that_may_fail(some_arg);
-           },Patterns.defmatch(Patterns.make_case([Patterns.variable()],function(x)    {
+           },Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.variable()],function(x)    {
              return     IO.puts('Invalid argument given');
            },function(x)    {
-             return     Kernel.__in__(x,Kernel.SpecialForms.list(ArgumentError.defstruct()));
+             return     Elixir.Kernel.__in__(x,Elixir.Kernel.SpecialForms.list(ArgumentError.defstruct(Elixir.Kernel.SpecialForms.map({}))));
            })),null,null,null)
     """
 
@@ -82,9 +82,9 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-     Kernel.SpecialForms._try(function()    {
+     Elixir.Kernel.SpecialForms._try(function()    {
              return     do_something_that_may_fail(some_arg);
-           },Patterns.defmatch(Patterns.make_case([Patterns.variable()],function(x)    {
+           },Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.variable()],function(x)    {
              return     IO.puts('Invalid argument given');
            })),null,null,null)
     """
@@ -106,13 +106,13 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-     Kernel.SpecialForms._try(function()    {
+     Elixir.Kernel.SpecialForms._try(function()    {
              return     do_something_that_may_fail(some_arg);
-           },Patterns.defmatch(Patterns.make_case([{
-             [Kernel.SpecialForms.atom('__struct__')]: Kernel.SpecialForms.atom('ArgumentError')
+           },Elixir.Patterns.defmatch(Elixir.Patterns.make_case([{
+             [Elixir.Kernel.SpecialForms.atom('__struct__')]: Elixir.Kernel.SpecialForms.atom('ArgumentError')
        }],function()    {
              return     IO.puts('ArgumentError');
-           }),Patterns.make_case([Patterns.variable()],function(x)    {
+           }),Elixir.Patterns.make_case([Elixir.Patterns.variable()],function(x)    {
              return     IO.puts('x');
            })),null,null,null)
     """
@@ -133,10 +133,10 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-     Kernel.SpecialForms._try(function()    {
+     Elixir.Kernel.SpecialForms._try(function()    {
              return     do_something_that_may_fail(some_arg);
-           },Patterns.defmatch(Patterns.make_case([{
-             [Kernel.SpecialForms.atom('__struct__')]: Kernel.SpecialForms.atom('ArgumentError')
+           },Elixir.Patterns.defmatch(Elixir.Patterns.make_case([{
+             [Elixir.Kernel.SpecialForms.atom('__struct__')]: Elixir.Kernel.SpecialForms.atom('ArgumentError')
        }],function()    {
              return     IO.puts('Invalid argument given');
            })),null,null,function()    {
@@ -157,7 +157,7 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-     Kernel.SpecialForms._try(function()    {
+     Elixir.Kernel.SpecialForms._try(function()    {
              return     do_something_that_may_fail(some_arg);
            },null,null,null,function()    {
              return     IO.puts('This is printed regardless if it failed or succeed');
@@ -180,14 +180,14 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-     Kernel.SpecialForms._try(function()    {
+     Elixir.Kernel.SpecialForms._try(function()    {
              return     1 / x;
-           },null,null,Patterns.defmatch(Patterns.make_case([Patterns.variable()],function(y)    {
-             return     Kernel.SpecialForms.atom('small');
+           },null,null,Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.variable()],function(y)    {
+             return     Elixir.Kernel.SpecialForms.atom('small');
            },function(y)    {
              return     (y < 1) && (y > -1);
-           }),Patterns.make_case([Patterns.wildcard()],function()    {
-             return     Kernel.SpecialForms.atom('large');
+           }),Elixir.Patterns.make_case([Elixir.Patterns.wildcard()],function()    {
+             return     Elixir.Kernel.SpecialForms.atom('large');
            })),null)
     """
 
@@ -208,13 +208,13 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-     Kernel.SpecialForms._try(function()    {
+     Elixir.Kernel.SpecialForms._try(function()    {
              return     do_something_that_may_fail(some_arg);
-           },Patterns.defmatch(Patterns.make_case([{
-             [Kernel.SpecialForms.atom('__struct__')]: Kernel.SpecialForms.atom('ArgumentError')
+           },Elixir.Patterns.defmatch(Elixir.Patterns.make_case([{
+             [Elixir.Kernel.SpecialForms.atom('__struct__')]: Elixir.Kernel.SpecialForms.atom('ArgumentError')
        }],function()    {
              return     IO.puts('Invalid argument given');
-           })),Patterns.defmatch(Patterns.make_case([Kernel.SpecialForms.atom('throw'), Kernel.SpecialForms.atom('Error')],function()    {
+           })),Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Kernel.SpecialForms.atom('throw'), Elixir.Kernel.SpecialForms.atom('Error')],function()    {
              return     IO.puts('caught error');
            })),null,null)
     """

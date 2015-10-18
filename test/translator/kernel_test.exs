@@ -34,7 +34,7 @@ defmodule ElixirScript.Translator.Kernel.Test do
     end
 
     js_code = """
-    Enum.reverse(1,2,3)
+    Elixir.Enum.reverse(1,2,3)
     """
 
     assert_translation(ex_ast, js_code) 
@@ -47,7 +47,7 @@ defmodule ElixirScript.Translator.Kernel.Test do
     end
 
     js_code = """
-    Kernel.SpecialForms.list(1,2,3)[0]
+    Elixir.Kernel.SpecialForms.list(1,2,3)[0]
     """
 
     assert_translation(ex_ast, js_code) 
@@ -60,7 +60,7 @@ defmodule ElixirScript.Translator.Kernel.Test do
     end
 
     js_code = """
-    Kernel.SpecialForms.list(1,2,3).slice(1)
+    Elixir.Kernel.SpecialForms.list(1,2,3).slice(1)
     """
 
     assert_translation(ex_ast, js_code) 

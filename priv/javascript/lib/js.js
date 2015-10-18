@@ -1,5 +1,5 @@
 let JS = {
-  get_property_or_call_function: function(item, property){
+  call_property: function(item, property){
     if(item[property] instanceof Function){
       return item[property]();
     }else{

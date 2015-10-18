@@ -79,7 +79,6 @@ defmodule ElixirScript.Translator do
 
   defp do_translate({:%, _, [alias_info, data]}, env) do
     {_, _, name} = alias_info
-    {_, _, data} = data
     Struct.make_struct(name, data, env)
   end
 

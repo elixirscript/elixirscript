@@ -4,12 +4,12 @@ defmodule ElixirScript.Translator.Assignment.Test do
 
   should "translate simple assignment" do
     ex_ast = quote do: a = 1
-    js_code = "let [a] = Patterns.match(Patterns.variable(), 1);"
+    js_code = "let [a] = Elixir.Patterns.match(Elixir.Patterns.variable(), 1);"
 
     assert_translation(ex_ast, js_code)
 
     ex_ast = quote do: a = :atom
-    js_code = "let [a] = Patterns.match(Patterns.variable(), Kernel.SpecialForms.atom('atom'));"
+    js_code = "let [a] = Elixir.Patterns.match(Elixir.Patterns.variable(), Elixir.Kernel.SpecialForms.atom('atom'));"
 
     assert_translation(ex_ast, js_code)
   end
@@ -19,16 +19,16 @@ defmodule ElixirScript.Translator.Assignment.Test do
       {a, b} = {1, 2}
     end
     js_code = """
-        let [a, b] = Patterns.match(Kernel.SpecialForms.tuple(Patterns.variable(), Patterns.variable()), Kernel.SpecialForms.tuple(1, 2));
-        let _ref = Kernel.SpecialForms.tuple(a, b);
+        let [a, b] = Elixir.Patterns.match(Elixir.Kernel.SpecialForms.tuple(Elixir.Patterns.variable(), Elixir.Patterns.variable()), Elixir.Kernel.SpecialForms.tuple(1, 2));
+        let _ref = Elixir.Kernel.SpecialForms.tuple(a, b);
     """
 
     assert_translation(ex_ast, js_code)
 
     ex_ast = quote do: {a, _, c} = {1, 2, 3}
     js_code = """
-        let [a, undefined, c] = Patterns.match(Kernel.SpecialForms.tuple(Patterns.variable(), Patterns.wildcard(), Patterns.variable()), Kernel.SpecialForms.tuple(1, 2, 3));
-        let _ref = Kernel.SpecialForms.tuple(a, undefined, c);
+        let [a, undefined, c] = Elixir.Patterns.match(Elixir.Kernel.SpecialForms.tuple(Elixir.Patterns.variable(), Elixir.Patterns.wildcard(), Elixir.Patterns.variable()), Elixir.Kernel.SpecialForms.tuple(1, 2, 3));
+        let _ref = Elixir.Kernel.SpecialForms.tuple(a, undefined, c);
     """
 
     assert_translation(ex_ast, js_code)
@@ -36,8 +36,8 @@ defmodule ElixirScript.Translator.Assignment.Test do
 
     ex_ast = quote do: {^a, _, c} = {1, 2, 3}
     js_code = """
-         let [,undefined,c] = Patterns.match(Kernel.SpecialForms.tuple(Patterns.bound(a),Patterns.wildcard(),Patterns.variable()),Kernel.SpecialForms.tuple(1,2,3));
-         let _ref = Kernel.SpecialForms.tuple(undefined,undefined,c);
+         let [,undefined,c] = Elixir.Patterns.match(Elixir.Kernel.SpecialForms.tuple(Elixir.Patterns.bound(a),Elixir.Patterns.wildcard(),Elixir.Patterns.variable()),Elixir.Kernel.SpecialForms.tuple(1,2,3));
+         let _ref = Elixir.Kernel.SpecialForms.tuple(undefined,undefined,c);
     """
 
     assert_translation(ex_ast, js_code)
@@ -46,7 +46,7 @@ defmodule ElixirScript.Translator.Assignment.Test do
   should "translate bound assignment" do
     ex_ast = quote do: ^a = 1
     js_code = """ 
-     let [] = Patterns.match(Patterns.bound(a),1);
+     let [] = Elixir.Patterns.match(Elixir.Patterns.bound(a),1);
     """
 
     assert_translation(ex_ast, js_code)
@@ -55,8 +55,8 @@ defmodule ElixirScript.Translator.Assignment.Test do
   should "translate list assignment" do
     ex_ast = quote do: [a, b] = [1, 2]
     js_code = """
-        let [a, b] = Patterns.match(Kernel.SpecialForms.list(Patterns.variable(), Patterns.variable()), Kernel.SpecialForms.list(1, 2));
-        let _ref = Kernel.SpecialForms.list(a, b);
+        let [a, b] = Elixir.Patterns.match(Elixir.Kernel.SpecialForms.list(Elixir.Patterns.variable(), Elixir.Patterns.variable()), Elixir.Kernel.SpecialForms.list(1, 2));
+        let _ref = Elixir.Kernel.SpecialForms.list(a, b);
     """
 
     assert_translation(ex_ast, js_code)
@@ -65,8 +65,8 @@ defmodule ElixirScript.Translator.Assignment.Test do
   should "translate head/tail assignment" do
     ex_ast = quote do: [a | b] = [1, 2, 3, 4]
     js_code = """
-         let [a,b] = Patterns.match(Patterns.headTail(),Kernel.SpecialForms.list(1,2,3,4));
-         let _ref = Kernel.SpecialForms.list(a,b);
+         let [a,b] = Elixir.Patterns.match(Elixir.Patterns.headTail(),Elixir.Kernel.SpecialForms.list(1,2,3,4));
+         let _ref = Elixir.Kernel.SpecialForms.list(a,b);
     """
 
     assert_translation(ex_ast, js_code)

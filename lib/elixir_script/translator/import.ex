@@ -173,21 +173,12 @@ defmodule ElixirScript.Translator.Import do
   end
 
   def create_standard_lib_imports(root, _) do
-    module_names = [
-      :Patterns, :Kernel, :Atom, :Enum, :Integer, 
-      :JS, :List, :Range, :Tuple, :Agent, :Keyword,
-      :BitString, :Base, :String, :Bitwise
-    ]
-
-    import_specifiers = Enum.map(module_names, fn(x) -> 
-        JS.import_specifier(
-          JS.identifier(x),
-          JS.identifier(x)
-        )
-    end)
+    import_specifier = JS.import_namespace_specifier(
+      JS.identifier(:Elixir)
+    )
 
     import_declaration = JS.import_declaration(
-      import_specifiers, 
+      [import_specifier], 
       JS.identifier("'#{root(root) <> "elixir"}'")
     )
 

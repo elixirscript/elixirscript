@@ -7,6 +7,32 @@ defmodule ElixirScript.Translator.Function do
   alias ElixirScript.Preprocess.Variables
   alias ElixirScript.Translator.Map
 
+  @standard_libs [
+    :Patterns, :Kernel, :Atom, :Enum, :Integer, :JS, 
+    :List, :Range, :Tuple, :Agent, :Keyword, :BitString, 
+    :Base, :String, :Bitwise
+  ]
+
+  def update_alias({:__aliases__, context, [name | rest]}) when name in @standard_libs do
+    {:__aliases__, context, [:Elixir, name] ++ rest }
+  end
+
+  def update_alias({:__aliases__, context, [name]}) when name in @standard_libs do
+    {:__aliases__, context, [:Elixir, name] }
+  end
+
+  def update_alias({{:., context, [module_name, function_name]}, context2, params }) do
+    {{:., context, [update_alias(module_name), function_name]}, context2, params }
+  end
+
+  def update_alias(ast) do
+    ast
+  end
+
+  def module_in_standard_libs?(name) do
+    name in @standard_libs
+  end
+
 
   def process_function(name, functions, env) do
     result = make_anonymous_function(functions, env)
@@ -16,7 +42,7 @@ defmodule ElixirScript.Translator.Function do
       result
     )
 
-    JS.variable_declaration([declarator], :let)
+    JS.variable_declaration([declarator], :const)
   end
 
   def make_anonymous_function(functions, env) do
@@ -58,8 +84,11 @@ defmodule ElixirScript.Translator.Function do
   def make_defmatch(clauses) do
     JS.call_expression(
       JS.member_expression(
-        JS.identifier("Patterns"),
-        JS.identifier("defmatch")
+        JS.identifier("Elixir"),
+        JS.member_expression(
+          JS.identifier("Patterns"),
+          JS.identifier("defmatch")
+        )
       ),
       clauses
     )
@@ -87,8 +116,11 @@ defmodule ElixirScript.Translator.Function do
   def do_make_function_clause(patterns, params, body, guard_body) do
     JS.call_expression(
       JS.member_expression(
-        JS.identifier("Patterns"),
-        JS.identifier("make_case")
+        JS.identifier("Elixir"),
+        JS.member_expression(
+          JS.identifier("Patterns"),
+          JS.identifier("make_case")
+        )
       ),
       [
         JS.array_expression(patterns), 
@@ -101,8 +133,11 @@ defmodule ElixirScript.Translator.Function do
   def do_make_function_clause(patterns, params, body) do
     JS.call_expression(
       JS.member_expression(
-        JS.identifier("Patterns"),
-        JS.identifier("make_case")
+        JS.identifier("Elixir"),
+        JS.member_expression(
+          JS.identifier("Patterns"),
+          JS.identifier("make_case")
+        )
       ),
       [
         JS.array_expression(patterns), 
@@ -112,7 +147,7 @@ defmodule ElixirScript.Translator.Function do
   end
 
   def make_function_or_property_call(module_name, function_name, env) do
-    the_name = case module_name do
+    the_name = case update_alias(module_name) do
       {:__aliases__, _, name} ->
         name
       {name, _, _} when is_atom(name) ->
@@ -130,8 +165,11 @@ defmodule ElixirScript.Translator.Function do
 
     JS.call_expression(
       JS.member_expression(
-        JS.identifier("JS"),
-        JS.identifier("get_property_or_call_function")
+        JS.identifier("Elixir"),
+        JS.member_expression(
+          JS.identifier("JS"),
+          JS.identifier("call_property")
+        )
       ),
       [
         Utils.make_module_expression_tree(the_name, false, env),
@@ -149,7 +187,7 @@ defmodule ElixirScript.Translator.Function do
   end
 
   def make_function_call(module_name, function_name, params, env) do
-    the_name = case module_name do
+    the_name = case update_alias(module_name) do
       {:__aliases__, _, name} ->
         name
       {name, _, _} when is_atom(name) ->

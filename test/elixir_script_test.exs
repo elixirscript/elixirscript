@@ -12,7 +12,7 @@ defmodule ElixirScript.Test do
 
   should "turn javascript ast into javascript code strings" do
     js_code = ElixirScript.compile(":atom")
-    assert hd(js_code) == "Kernel.SpecialForms.atom('atom')"
+    assert hd(js_code) == "Elixir.Kernel.SpecialForms.atom('atom')"
   end
 
   should "parse one module correctly" do
@@ -31,12 +31,12 @@ defmodule ElixirScript.Test do
     """)
 
     assert_js_matches """
-         import { Patterns, Kernel, Atom, Enum, Integer, JS, List, Range, Tuple, Agent, Keyword, BitString, Base, String, Bitwise } from 'elixir';
-         const __MODULE__ = Kernel.SpecialForms.atom('Elephant');
-         let something_else = Patterns.defmatch(Patterns.make_case([],function()    {
+         import * as Elixir from 'elixir';
+         const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elephant');
+         const something_else = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([],function()    {
              return     null;
            }));
-         let something = Patterns.defmatch(Patterns.make_case([],function()    {
+         const something = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([],function()    {
              return     ul;
            }));
          const ul = JQuery('#todo-list');
@@ -64,12 +64,12 @@ defmodule ElixirScript.Test do
     """, env: make_custom_env)
 
     assert_js_matches """
-      import { Patterns, Kernel, Atom, Enum, Integer, JS, List, Range, Tuple, Agent, Keyword, BitString, Base, String, Bitwise } from 'elixir';
+      import * as Elixir from 'elixir';
       import * as Elephant from 'animals/elephant';
 
-       const __MODULE__ = Kernel.SpecialForms.atom('Animals');
-       let something = Patterns.defmatch(Patterns.make_case([],function()    {
-           return     Elephant.defstruct();
+       const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Animals');
+       const something = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([],function()    {
+           return     Elephant.defstruct(Elixir.Kernel.SpecialForms.map({}));
          }));
        export {
            something
@@ -77,12 +77,12 @@ defmodule ElixirScript.Test do
      """, hd(js_code)
 
      assert_js_matches """
-         import { Patterns, Kernel, Atom, Enum, Integer, JS, List, Range, Tuple, Agent, Keyword, BitString, Base, String, Bitwise } from 'elixir';
-         const __MODULE__ = Kernel.SpecialForms.atom('Elephant');
-         function defstruct(trunk = true)        {
-                 return     Kernel.SpecialForms.map({
-             [Kernel.SpecialForms.atom('__struct__')]: __MODULE__,     [Kernel.SpecialForms.atom('trunk')]: trunk
-       });
+         import * as Elixir from 'elixir';
+         const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elephant');
+         function defstruct(values = {})        {
+                 return     Kernel.defstruct({
+             [Elixir.Kernel.SpecialForms.atom('__struct__')]: __MODULE__,     [Elixir.Kernel.SpecialForms.atom('trunk')]: true
+       },values);
                }
          export {
              defstruct
@@ -105,12 +105,12 @@ defmodule ElixirScript.Test do
     """, env: make_custom_env)
 
     assert_js_matches """
-         import { Patterns, Kernel, Atom, Enum, Integer, JS, List, Range, Tuple, Agent, Keyword, BitString, Base, String, Bitwise } from 'elixir';
-         const __MODULE__ = Kernel.SpecialForms.atom('Animals');
-         let something_else = Patterns.defmatch(Patterns.make_case([],function()    {
+         import * as Elixir from 'elixir';
+         const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Animals');
+         const something_else = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([],function()    {
              return     1 * 1;
            }));
-         let sandwich = Patterns.defmatch(Patterns.make_case([],function()    {
+         const sandwich = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([],function()    {
              return     null;
            }));
          export {

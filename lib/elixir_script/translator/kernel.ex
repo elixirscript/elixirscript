@@ -286,7 +286,7 @@ defmodule ElixirScript.Translator.Kernel do
   end
 
   defp do_translate({name, _, params}, env) do
-    Function.make_function_call(:Kernel, name, params, env) 
+    Function.make_function_call({:__aliases__, [], [:Elixir, :Kernel]}, name, params, env) 
   end
 
 end

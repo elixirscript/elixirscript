@@ -12,8 +12,8 @@ defmodule ElixirScript.Translator.Bug.Test do
     end
 
     js_code = """
-     React.createElement(React.Text,Kernel.SpecialForms.map({
-             style: JS.get_property_or_call_function(styles,'welcome')
+     React.createElement(React.Text,Elixir.Kernel.SpecialForms.map({
+             style: Elixir.JS.call_property(styles,'welcome')
        }),'Welcome to React Native!')
     """
 
@@ -31,9 +31,9 @@ defmodule ElixirScript.Translator.Bug.Test do
 
     js_code = """
      import { default as JQuery } from 'jquery';
-     const __MODULE__ = Kernel.SpecialForms.atom('Todo');
+     const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Todo');
      
-     JQuery(JS.get_property_or_call_function(e, 'target'));
+     JQuery(Elixir.JS.call_property(e, 'target'));
      export {};
     """
 
@@ -46,7 +46,7 @@ defmodule ElixirScript.Translator.Bug.Test do
     end
 
     js_code = """
-      const graphic_store = JS.get_property_or_call_function(App.Stores.GraphicStore, 'create_store');
+      const graphic_store = Elixir.JS.call_property(App.Stores.GraphicStore, 'create_store');
 
     """
 
@@ -55,11 +55,11 @@ defmodule ElixirScript.Translator.Bug.Test do
   
   should "replace !" do
     ex_ast = quote do
-      Enum.fetch!(data, i)
+      Elixir.Enum.fetch!(data, i)
     end
 
     js_code = """
-      Enum.fetch__emark__(data, i)
+      Elixir.Enum.fetch__emark__(data, i)
     """
 
     assert_translation(ex_ast, js_code) 
@@ -71,7 +71,7 @@ defmodule ElixirScript.Translator.Bug.Test do
     end
 
     js_code = """
-      JS.get_property_or_call_function(this, 'getRawCanvas').getContext('2d')
+      Elixir.JS.call_property(this, 'getRawCanvas').getContext('2d')
     """
 
     assert_translation(ex_ast, js_code) 
@@ -102,17 +102,17 @@ defmodule ElixirScript.Translator.Bug.Test do
 
 
     js_code = """
-     let getDispatcher = Patterns.defmatch(Patterns.make_case([],function()    {
-             return     DeLorean.Flux.createDispatcher(Kernel.SpecialForms.map({
-             [Kernel.SpecialForms.atom('startPainting')]: Patterns.defmatch(Patterns.make_case([],function()    {
+     const getDispatcher = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([],function()    {
+             return     DeLorean.Flux.createDispatcher(Elixir.Kernel.SpecialForms.map({
+             [Elixir.Kernel.SpecialForms.atom('startPainting')]: Elixir.Patterns.defmatch(Elixir.Patterns.make_case([],function()    {
              return     this.dispatch('startPainting');
-           })),     [Kernel.SpecialForms.atom('stopPainting')]: Patterns.defmatch(Patterns.make_case([],function()    {
+           })),     [Elixir.Kernel.SpecialForms.atom('stopPainting')]: Elixir.Patterns.defmatch(Elixir.Patterns.make_case([],function()    {
              return     this.dispatch('stopPainting');
-           })),     [Kernel.SpecialForms.atom('addPoint')]: Patterns.defmatch(Patterns.make_case([Patterns.variable()],function(data)    {
+           })),     [Elixir.Kernel.SpecialForms.atom('addPoint')]: Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.variable()],function(data)    {
              return     this.dispatch('addPoint',data);
-           })),     [Kernel.SpecialForms.atom('getStores')]: Patterns.defmatch(Patterns.make_case([],function()    {
-             return     Kernel.SpecialForms.map({
-             [Kernel.SpecialForms.atom('graphic')]: GraphicStore
+           })),     [Elixir.Kernel.SpecialForms.atom('getStores')]: Elixir.Patterns.defmatch(Elixir.Patterns.make_case([],function()    {
+             return     Elixir.Kernel.SpecialForms.map({
+             [Elixir.Kernel.SpecialForms.atom('graphic')]: GraphicStore
        });
            }))
        }));

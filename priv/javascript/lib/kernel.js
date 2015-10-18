@@ -146,6 +146,10 @@ let Kernel = {
 
   match__qmark__: function(pattern, expr, guard = () => true){
     return Patterns.match_no_throw(pattern, expr, guard) != null;
+  },
+
+  defstruct: function(defaults, values){
+    return Kernel.SpecialForms.map_update(defaults, values);
   }
 };
 

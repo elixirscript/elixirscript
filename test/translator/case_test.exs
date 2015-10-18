@@ -12,9 +12,9 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-     Patterns.defmatch(Patterns.make_case([Kernel.SpecialForms.atom('ok')],function()    {
+     Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Kernel.SpecialForms.atom('ok')],function()    {
              return     value;
-           }),Patterns.make_case([Kernel.SpecialForms.atom('error')],function()    {
+           }),Elixir.Patterns.make_case([Elixir.Kernel.SpecialForms.atom('error')],function()    {
              return     null;
            })).call(this,data)
     """
@@ -29,10 +29,10 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-     Patterns.defmatch(Patterns.make_case([false],function()    {
-             let [value0] = Patterns.match(Patterns.variable(),13);
+     Elixir.Patterns.defmatch(Elixir.Patterns.make_case([false],function()    {
+             let [value0] = Elixir.Patterns.match(Elixir.Patterns.variable(),13);
              return     value0;
-           }),Patterns.make_case([true],function()    {
+           }),Elixir.Patterns.make_case([true],function()    {
              return     true;
            })).call(this,data)
     """
@@ -49,10 +49,10 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-     Patterns.defmatch(Patterns.make_case([false],function()    {
-             let [value0] = Patterns.match(Patterns.variable(),13);
+     Elixir.Patterns.defmatch(Elixir.Patterns.make_case([false],function()    {
+             let [value0] = Elixir.Patterns.match(Elixir.Patterns.variable(),13);
              return     value0;
-           }),Patterns.make_case([Patterns.wildcard()],function()    {
+           }),Elixir.Patterns.make_case([Elixir.Patterns.wildcard()],function()    {
              return     true;
            })).call(this,data)
     """
@@ -71,12 +71,12 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-     Patterns.defmatch(Patterns.make_case([Patterns.variable()],function(number)    {
-             let [value0] = Patterns.match(Patterns.variable(),13);
+     Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.variable()],function(number)    {
+             let [value0] = Elixir.Patterns.match(Elixir.Patterns.variable(),13);
              return     value0;
            },function(number)    {
-             return     Kernel.__in__(number,Kernel.SpecialForms.list(1,2,3,4));
-           }),Patterns.make_case([Patterns.wildcard()],function()    {
+             return     Elixir.Kernel.__in__(number,Elixir.Kernel.SpecialForms.list(1,2,3,4));
+           }),Elixir.Patterns.make_case([Elixir.Patterns.wildcard()],function()    {
              return     true;
            })).call(this,data)
     """
@@ -96,10 +96,10 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-     Patterns.defmatch(Patterns.make_case([Kernel.SpecialForms.atom('ok')],function()    {
+     Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Kernel.SpecialForms.atom('ok')],function()    {
              console.info('info');
              return     Todo.add(data);
-           }),Patterns.make_case([Kernel.SpecialForms.atom('error')],function()    {
+           }),Elixir.Patterns.make_case([Elixir.Kernel.SpecialForms.atom('error')],function()    {
              return     null;
            })).call(this,data)
     """
@@ -118,9 +118,9 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-     Patterns.defmatch(Patterns.make_case([Kernel.SpecialForms.tuple(Patterns.variable(),Patterns.variable())],function(one,two)    {
+     Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Kernel.SpecialForms.tuple(Elixir.Patterns.variable(),Elixir.Patterns.variable())],function(one,two)    {
              return     console.info(one);
-           }),Patterns.make_case([Kernel.SpecialForms.atom('error')],function()    {
+           }),Elixir.Patterns.make_case([Elixir.Kernel.SpecialForms.atom('error')],function()    {
              return     null;
            })).call(this,data)
     """
@@ -139,9 +139,9 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-     Patterns.defmatch(Patterns.make_case([Kernel.SpecialForms.tuple(Kernel.SpecialForms.tuple(Patterns.variable(),Patterns.variable()),Patterns.variable())],function(one,two,three)    {
+     Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Kernel.SpecialForms.tuple(Elixir.Kernel.SpecialForms.tuple(Elixir.Patterns.variable(),Elixir.Patterns.variable()),Elixir.Patterns.variable())],function(one,two,three)    {
              return     console.info(one);
-           }),Patterns.make_case([Kernel.SpecialForms.atom('error')],function()    {
+           }),Elixir.Patterns.make_case([Elixir.Kernel.SpecialForms.atom('error')],function()    {
              return     null;
            })).call(this,data)
     """
@@ -158,9 +158,9 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-     Patterns.defmatch(Patterns.make_case([Kernel.SpecialForms.tuple(Patterns.variable(),Kernel.SpecialForms.tuple(Patterns.variable(),Patterns.variable()))],function(one,two,three)    {
+     Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Kernel.SpecialForms.tuple(Elixir.Patterns.variable(),Elixir.Kernel.SpecialForms.tuple(Elixir.Patterns.variable(),Elixir.Patterns.variable()))],function(one,two,three)    {
              return     console.info(one);
-           }),Patterns.make_case([Kernel.SpecialForms.atom('error')],function()    {
+           }),Elixir.Patterns.make_case([Elixir.Kernel.SpecialForms.atom('error')],function()    {
              return     null;
            })).call(this,data)
 
@@ -179,13 +179,13 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-     Patterns.defmatch(Patterns.make_case([{
-             [Kernel.SpecialForms.atom('__struct__')]: Kernel.SpecialForms.atom('AStruct'),     [Kernel.SpecialForms.atom('key')]: {
-             [Kernel.SpecialForms.atom('__struct__')]: Kernel.SpecialForms.atom('BStruct'),     [Kernel.SpecialForms.atom('key2')]: Patterns.variable()
+     Elixir.Patterns.defmatch(Elixir.Patterns.make_case([{
+             [Elixir.Kernel.SpecialForms.atom('__struct__')]: Elixir.Kernel.SpecialForms.atom('AStruct'),     [Elixir.Kernel.SpecialForms.atom('key')]: {
+             [Elixir.Kernel.SpecialForms.atom('__struct__')]: Elixir.Kernel.SpecialForms.atom('BStruct'),     [Elixir.Kernel.SpecialForms.atom('key2')]: Elixir.Patterns.variable()
        }
        }],function(value)    {
              return     console.info(value);
-           }),Patterns.make_case([Kernel.SpecialForms.atom('error')],function()    {
+           }),Elixir.Patterns.make_case([Elixir.Kernel.SpecialForms.atom('error')],function()    {
              return     null;
            })).call(this,data)
     """
@@ -203,15 +203,15 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-     Patterns.defmatch(Patterns.make_case([{
-             [Kernel.SpecialForms.atom('__struct__')]: Kernel.SpecialForms.atom('AStruct'),     [Kernel.SpecialForms.atom('key')]: {
-             [Kernel.SpecialForms.atom('__struct__')]: Kernel.SpecialForms.atom('BStruct'),     [Kernel.SpecialForms.atom('key2')]: Patterns.variable(),     [Kernel.SpecialForms.atom('key3')]: {
-             [Kernel.SpecialForms.atom('__struct__')]: Kernel.SpecialForms.atom('CStruct'),     [Kernel.SpecialForms.atom('key4')]: Patterns.variable()
+     Elixir.Patterns.defmatch(Elixir.Patterns.make_case([{
+             [Elixir.Kernel.SpecialForms.atom('__struct__')]: Elixir.Kernel.SpecialForms.atom('AStruct'),     [Elixir.Kernel.SpecialForms.atom('key')]: {
+             [Elixir.Kernel.SpecialForms.atom('__struct__')]: Elixir.Kernel.SpecialForms.atom('BStruct'),     [Elixir.Kernel.SpecialForms.atom('key2')]: Elixir.Patterns.variable(),     [Elixir.Kernel.SpecialForms.atom('key3')]: {
+             [Elixir.Kernel.SpecialForms.atom('__struct__')]: Elixir.Kernel.SpecialForms.atom('CStruct'),     [Elixir.Kernel.SpecialForms.atom('key4')]: Elixir.Patterns.variable()
        }
        }
        }],function(value,value2)    {
              return     console.info(value);
-           }),Patterns.make_case([Kernel.SpecialForms.atom('error')],function()    {
+           }),Elixir.Patterns.make_case([Elixir.Kernel.SpecialForms.atom('error')],function()    {
              return     null;
            })).call(this,data)
     """

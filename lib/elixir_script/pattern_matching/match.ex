@@ -8,33 +8,51 @@ defmodule ElixirScript.PatternMatching.Match do
   alias ElixirScript.Translator.Map
 
   @wildcard JS.member_expression(
-    JS.identifier(:Patterns),
-    JS.identifier(:wildcard)
+    JS.identifier("Elixir"),
+    JS.member_expression(
+        JS.identifier(:Patterns),
+        JS.identifier(:wildcard)
+      )
   )
 
   @parameter JS.member_expression(
-    JS.identifier(:Patterns),
-    JS.identifier(:variable)
+    JS.identifier("Elixir"),
+    JS.member_expression(
+        JS.identifier(:Patterns),
+        JS.identifier(:variable)
+      )
   )
 
   @head_tail JS.member_expression(
-    JS.identifier(:Patterns),
-    JS.identifier(:headTail)
+    JS.identifier("Elixir"),
+    JS.member_expression(
+        JS.identifier(:Patterns),
+        JS.identifier(:headTail)
+      )
   )
 
   @starts_with JS.member_expression(
-    JS.identifier(:Patterns),
-    JS.identifier(:startsWith)
+    JS.identifier("Elixir"),
+    JS.member_expression(
+        JS.identifier(:Patterns),
+        JS.identifier(:startsWith)
+      )
   )
 
   @capture JS.member_expression(
-    JS.identifier(:Patterns),
-    JS.identifier(:capture)
+    JS.identifier("Elixir"),
+    JS.member_expression(
+        JS.identifier(:Patterns),
+        JS.identifier(:capture)
+      )
   )
 
   @bound JS.member_expression(
-    JS.identifier(:Patterns),
-    JS.identifier(:bound)
+    JS.identifier("Elixir"),
+    JS.member_expression(
+        JS.identifier(:Patterns),
+        JS.identifier(:bound)
+      )
   )
 
   def wildcard() do

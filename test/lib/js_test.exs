@@ -30,7 +30,7 @@ defmodule ElixirScript.Lib.JS.Test do
     end
 
     js_code = """
-      A['b'] = Kernel.SpecialForms.list(1, 2, 3)
+      A['b'] = Elixir.Kernel.SpecialForms.list(1, 2, 3)
     """
 
     assert_translation(ex_ast, js_code)

@@ -4,14 +4,14 @@ defmodule ElixirScript.Translator.Map.Test do
 
   should "translate empty map" do
     ex_ast = quote do: %{}
-    js_code = "Kernel.SpecialForms.map({})"
+    js_code = "Elixir.Kernel.SpecialForms.map({})"
 
     assert_translation(ex_ast, js_code)
   end
 
   should "translate map with elements" do
     ex_ast = quote do: %{one: "one", two: "two"}
-    js_code = "Kernel.SpecialForms.map({[Kernel.SpecialForms.atom('one')]: 'one', [Kernel.SpecialForms.atom('two')]: 'two'})"
+    js_code = "Elixir.Kernel.SpecialForms.map({[Elixir.Kernel.SpecialForms.atom('one')]: 'one', [Elixir.Kernel.SpecialForms.atom('two')]: 'two'})"
 
     assert_translation(ex_ast, js_code)
   end
@@ -19,10 +19,10 @@ defmodule ElixirScript.Translator.Map.Test do
   should "translate map within map" do
     ex_ast = quote do: %{one: "one", two: %{three: "three"}}
     js_code = """
-      Kernel.SpecialForms.map({
-        [Kernel.SpecialForms.atom('one')]: 'one',
-        [Kernel.SpecialForms.atom('two')]: Kernel.SpecialForms.map({
-             [Kernel.SpecialForms.atom('three')]: 'three'
+      Elixir.Kernel.SpecialForms.map({
+        [Elixir.Kernel.SpecialForms.atom('one')]: 'one',
+        [Elixir.Kernel.SpecialForms.atom('two')]: Elixir.Kernel.SpecialForms.map({
+             [Elixir.Kernel.SpecialForms.atom('three')]: 'three'
         })
       })
     """
@@ -33,7 +33,7 @@ defmodule ElixirScript.Translator.Map.Test do
   should "translate map with string keys" do
     ex_ast = quote do: %{"one" => "one", "two" => "two"}
     js_code = """
-     Kernel.SpecialForms.map({
+     Elixir.Kernel.SpecialForms.map({
              one: 'one',     two: 'two'
        })
     """
@@ -45,8 +45,8 @@ defmodule ElixirScript.Translator.Map.Test do
   should "translate map update" do
     ex_ast = quote do: %{ map | value: 1 }
     js_code = """
-     Kernel.SpecialForms.map_update(map,{
-             [Kernel.SpecialForms.atom('value')]: 1
+     Elixir.Kernel.SpecialForms.map_update(map,{
+             [Elixir.Kernel.SpecialForms.atom('value')]: 1
        })
     """
 

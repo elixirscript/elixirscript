@@ -12,8 +12,11 @@ defmodule ElixirScript.Translator.Assignment do
         JS.array_pattern(params),
         JS.call_expression(
           JS.member_expression(
-            JS.identifier("Patterns"),
-            JS.identifier("match")
+            JS.identifier("Elixir"),
+            JS.member_expression(
+              JS.identifier("Patterns"),
+              JS.identifier("match")
+            )
           ),
           [hd(patterns), Translator.translate(right, env)]
         )

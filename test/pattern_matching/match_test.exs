@@ -45,7 +45,7 @@ defmodule ElixirScript.PatternMatching.Match.Test do
   end
 
   should "match prefix param" do
-    params = [{:<>, [context: Elixir, import: Kernel], ["Bearer ", {:token, [], Elixir}]}]
+    params = [{:<>, [context: Elixir, import: Elixir.Kernel], ["Bearer ", {:token, [], Elixir}]}]
     result = Match.build_match(params, __ENV__)
     expected_result = { 
       [Match.starts_with("Bearer ")],  

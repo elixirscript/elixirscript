@@ -8,11 +8,11 @@ defmodule ElixirScript.Translator.For.Test do
     end
 
     js_code = """
-     Kernel.SpecialForms._for(Kernel.SpecialForms.list(Kernel.SpecialForms.list(Patterns.variable(),Kernel.SpecialForms.list(1,2,3,4))),function(n)    {
+     Elixir.Kernel.SpecialForms._for(Elixir.Kernel.SpecialForms.list(Elixir.Kernel.SpecialForms.list(Elixir.Patterns.variable(),Elixir.Kernel.SpecialForms.list(1,2,3,4))),function(n)    {
              return     n * 2;
            },function()    {
              return     true;
-           },Kernel.SpecialForms.list())
+           },Elixir.Kernel.SpecialForms.list())
     """
 
     assert_translation(ex_ast, js_code)
@@ -24,11 +24,11 @@ defmodule ElixirScript.Translator.For.Test do
     end
 
     js_code = """
-     Kernel.SpecialForms._for(Kernel.SpecialForms.list(Kernel.SpecialForms.list(Patterns.variable(),Kernel.SpecialForms.list(1,2,3,4))),function(n)    {
+     Elixir.Kernel.SpecialForms._for(Elixir.Kernel.SpecialForms.list(Elixir.Kernel.SpecialForms.list(Elixir.Patterns.variable(),Elixir.Kernel.SpecialForms.list(1,2,3,4))),function(n)    {
              return     n * 2;
            },function()    {
              return     true;
-           },Kernel.SpecialForms.list())
+           },Elixir.Kernel.SpecialForms.list())
     """
 
     assert_translation(ex_ast, js_code)
@@ -40,11 +40,11 @@ defmodule ElixirScript.Translator.For.Test do
     end
 
     js_code = """
-     Kernel.SpecialForms._for(Kernel.SpecialForms.list(Kernel.SpecialForms.list(Patterns.variable(),'Opera')),function(n)    {
+     Elixir.Kernel.SpecialForms._for(Elixir.Kernel.SpecialForms.list(Elixir.Kernel.SpecialForms.list(Elixir.Patterns.variable(),'Opera')),function(n)    {
              return     n;
            },function()    {
              return     true;
-           },Kernel.SpecialForms.list())
+           },Elixir.Kernel.SpecialForms.list())
     """
 
     assert_translation(ex_ast, js_code)
@@ -56,13 +56,13 @@ defmodule ElixirScript.Translator.For.Test do
     end
 
     js_code = """
-     Kernel.SpecialForms._for(Kernel.SpecialForms.list(
-      Kernel.SpecialForms.list(Patterns.variable(), Kernel.SpecialForms.list(1,2)),
-      Kernel.SpecialForms.list(Patterns.variable(), Kernel.SpecialForms.list(2,3))), function(x,y)    {
+     Elixir.Kernel.SpecialForms._for(Elixir.Kernel.SpecialForms.list(
+      Elixir.Kernel.SpecialForms.list(Elixir.Patterns.variable(), Elixir.Kernel.SpecialForms.list(1,2)),
+      Elixir.Kernel.SpecialForms.list(Elixir.Patterns.variable(), Elixir.Kernel.SpecialForms.list(2,3))), function(x,y)    {
              return     x * y;
            },function()    {
              return     true;
-           },Kernel.SpecialForms.list())
+           },Elixir.Kernel.SpecialForms.list())
     """
 
     assert_translation(ex_ast, js_code)
@@ -76,11 +76,11 @@ defmodule ElixirScript.Translator.For.Test do
     end
 
     js_code = """
-     let [r] = Patterns.match(Patterns.variable(),Kernel.SpecialForms._for(Kernel.SpecialForms.list(Kernel.SpecialForms.list(Patterns.variable(),Kernel.SpecialForms.list(1,2)),Kernel.SpecialForms.list(Patterns.variable(),Kernel.SpecialForms.list(2,3))),function(x,y)    {
+     let [r] = Elixir.Patterns.match(Elixir.Patterns.variable(),Elixir.Kernel.SpecialForms._for(Elixir.Kernel.SpecialForms.list(Elixir.Kernel.SpecialForms.list(Elixir.Patterns.variable(),Elixir.Kernel.SpecialForms.list(1,2)),Elixir.Kernel.SpecialForms.list(Elixir.Patterns.variable(),Elixir.Kernel.SpecialForms.list(2,3))),function(x,y)    {
              return     x * y;
            },function()    {
              return     true;
-           },Kernel.SpecialForms.list()));
+           },Elixir.Kernel.SpecialForms.list()));
     """
 
     assert_translation(ex_ast, js_code)
@@ -92,11 +92,11 @@ defmodule ElixirScript.Translator.For.Test do
     end
 
     js_code = """
-     Kernel.SpecialForms._for(Kernel.SpecialForms.list(Kernel.SpecialForms.list(Patterns.variable(),Kernel.SpecialForms.list(1,2,3,4,5,6))),function(n)    {
+     Elixir.Kernel.SpecialForms._for(Elixir.Kernel.SpecialForms.list(Elixir.Kernel.SpecialForms.list(Elixir.Patterns.variable(),Elixir.Kernel.SpecialForms.list(1,2,3,4,5,6))),function(n)    {
              return     n;
            },function(n)    {
              return     n % 2 == 0;
-           },Kernel.SpecialForms.list())
+           },Elixir.Kernel.SpecialForms.list())
     """
 
     assert_translation(ex_ast, js_code)
@@ -110,17 +110,17 @@ defmodule ElixirScript.Translator.For.Test do
     end
 
     js_code = """
-     Kernel.SpecialForms._for(Kernel.SpecialForms.list(
-      Kernel.SpecialForms.list(
-        Kernel.SpecialForms.tuple(Kernel.SpecialForms.atom('user'),Patterns.variable()),
-        Kernel.SpecialForms.list(
-          Kernel.SpecialForms.tuple(Kernel.SpecialForms.atom('user'),'john'),
-          Kernel.SpecialForms.tuple(Kernel.SpecialForms.atom('admin'),'john'),
-          Kernel.SpecialForms.tuple(Kernel.SpecialForms.atom('user'),'meg')))),function(name)    {
-             return     String.upcase(name);
+     Elixir.Kernel.SpecialForms._for(Elixir.Kernel.SpecialForms.list(
+      Elixir.Kernel.SpecialForms.list(
+        Elixir.Kernel.SpecialForms.tuple(Elixir.Kernel.SpecialForms.atom('user'),Elixir.Patterns.variable()),
+        Elixir.Kernel.SpecialForms.list(
+          Elixir.Kernel.SpecialForms.tuple(Elixir.Kernel.SpecialForms.atom('user'),'john'),
+          Elixir.Kernel.SpecialForms.tuple(Elixir.Kernel.SpecialForms.atom('admin'),'john'),
+          Elixir.Kernel.SpecialForms.tuple(Elixir.Kernel.SpecialForms.atom('user'),'meg')))),function(name)    {
+             return     Elixir.String.upcase(name);
            },function()    {
              return     true;
-           },Kernel.SpecialForms.list()
+           },Elixir.Kernel.SpecialForms.list()
       )
     """
 

@@ -26,8 +26,11 @@ defmodule ElixirScript.Translator.Quote do
 
       JS.call_expression(
         JS.member_expression(
-          JS.identifier("Enum"),
-          JS.identifier("concat")
+          JS.identifier("Elixir"),
+          JS.member_expression(
+            JS.identifier("Enum"),
+            JS.identifier("concat")
+          )
         ),
         expr
       )

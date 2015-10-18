@@ -29,6 +29,10 @@ defmodule ElixirScript.Translator.Capture do
   def make_capture(module_name, function_name, arity, env) do
     params = Enum.map(1..arity, fn(x) -> {String.to_atom("__#{x}"), [], ElixirScript.Translator.Capture} end)
 
+    if Function.module_in_standard_libs?(module_name) do
+      module_name = [:Elixir, module_name]
+    end
+
     { patterns, params } = Match.build_match(params, env)
 
     body = JS.block_statement([
