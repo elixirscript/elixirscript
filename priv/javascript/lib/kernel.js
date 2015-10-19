@@ -150,7 +150,13 @@ let Kernel = {
 
   defstruct: function(defaults, values){
     return Kernel.SpecialForms.map_update(defaults, values);
-  }
+  },
+
+  is_struct_fn: function(__struct__){
+    return function(x){
+      return Kernel.is_map && x[Kernel.SpecialForms.atom("__struct__")] === __struct__;
+    }
+  },
 };
 
 export default Kernel;

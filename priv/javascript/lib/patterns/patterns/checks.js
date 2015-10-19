@@ -71,6 +71,10 @@ function is_array(value: any): boolean {
   return Array.isArray(value);
 }
 
+function is_struct(__struct__: Symbol, value: any): boolean {
+  return is_object(value) && value[Symbol.for("__struct__")] === __struct__;
+}
+
 export default {
   is_number,
   is_string,

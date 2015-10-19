@@ -12,13 +12,20 @@ defmodule ElixirScript.Preprocess.Modules do
   end
 
   defp do_get_info({:defmodule, _, [{:__aliases__, meta, module_name_list}, [do: body]]} = ast) do
-    #TODO: expand macro here - body = Macro.expand(body, State.get().env)
     body = make_inner_module_aliases(module_name_list, body)
 
     functions = get_functions_from_module(body)
     macros = get_macros_from_module(body)
+
+    body = case body do
+      {:__block__, _, _ } ->
+        Macro.expand(body, State.get().env)
+      _ ->
+        body
+    end
     
     mod = %ElixirScript.Module{ name: module_name_list , body: body, functions: functions, macros: macros }
+
     State.add_module(mod)
 
     ast
