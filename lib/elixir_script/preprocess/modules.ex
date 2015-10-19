@@ -11,6 +11,22 @@ defmodule ElixirScript.Preprocess.Modules do
     end)
   end
 
+  defp do_get_info({:defprotocol, _, [name, [do: {:__block__, _, spec}]]}) do
+    State.add_protocol(name, spec)
+  end
+
+  defp do_get_info({:defprotocol, _, [name, [do: spec]]}) do
+    State.add_protocol(name, [spec])
+  end
+
+  defp do_get_info({:defimpl, _, protocol, [ [for: type],  [do: {:__block__, _, spec}] ]}) do
+    State.add_protocol_impl(protocol, type, spec)
+  end
+
+  defp do_get_info({:defimpl, _, protocol, [ [for: type],  [do: spec] ]}) do
+    State.add_protocol_impl(protocol, type, [spec])
+  end
+
   defp do_get_info({:defmodule, _, [{:__aliases__, meta, module_name_list}, [do: body]]} = ast) do
     body = make_inner_module_aliases(module_name_list, body)
 

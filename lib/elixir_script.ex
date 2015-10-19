@@ -114,13 +114,21 @@ defmodule ElixirScript do
   defp create_code(include_path, import_standard_libs?) do
     state = ElixirScript.State.get()
 
-    result = Enum.map(state.modules, fn(x) ->
-      ElixirScript.Translator.Module.make_module(x.name, x.body, state.env)
+    current = self
+
+    result = state.modules
+    |> Enum.map(fn(x) ->
+      result = ElixirScript.Translator.Module.make_module(x.name, x.body, state.env)
+      |> Enum.map(fn(x) ->
+        convert_to_code(x, state.root, include_path, state.env, import_standard_libs?)
+      end)
+
+      spawn_link fn -> (send current, { self, result }) end
+    end)
+    |> Enum.map(fn (pid) ->
+      receive do { ^pid, x } -> x end
     end)
     |> List.flatten
-    |> Enum.map(fn(x) ->
-      convert_to_code(x, state.root, include_path, state.env, import_standard_libs?)
-    end)
 
     ElixirScript.State.stop
 
