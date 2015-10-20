@@ -11,23 +11,23 @@ defmodule ElixirScript.Preprocess.Modules do
     end)
   end
 
-  defp do_get_info({:defprotocol, _, [name, [do: {:__block__, _, spec}]]}) do
-    State.add_protocol(name, spec)
+  def do_get_info({:defprotocol, _, [name, [do: {:__block__, context, spec}]]}) do
+    ElixirScript.State.add_protocol(name, {:__block__, context, spec})
   end
 
-  defp do_get_info({:defprotocol, _, [name, [do: spec]]}) do
-    State.add_protocol(name, [spec])
+  def do_get_info({:defprotocol, _, [name, [do: spec]]}) do
+    ElixirScript.State.add_protocol(name, {:__block__, [], [spec]})
   end
 
-  defp do_get_info({:defimpl, _, protocol, [ [for: type],  [do: {:__block__, _, spec}] ]}) do
-    State.add_protocol_impl(protocol, type, spec)
+  def do_get_info({:defimpl, _, [ protocol, [for: type],  [do: {:__block__, context, spec}] ]}) do
+    ElixirScript.State.add_protocol_impl(protocol, type, {:__block__, context, spec})
   end
 
-  defp do_get_info({:defimpl, _, protocol, [ [for: type],  [do: spec] ]}) do
-    State.add_protocol_impl(protocol, type, [spec])
+  def do_get_info({:defimpl, _, [ protocol, [for: type],  [do: spec] ]}) do
+    ElixirScript.State.add_protocol_impl(protocol, type, {:__block__, [], [spec]})
   end
 
-  defp do_get_info({:defmodule, _, [{:__aliases__, meta, module_name_list}, [do: body]]} = ast) do
+  def do_get_info({:defmodule, _, [{:__aliases__, meta, module_name_list}, [do: body]]} = ast) do
     body = make_inner_module_aliases(module_name_list, body)
 
     functions = get_functions_from_module(body)
@@ -47,7 +47,7 @@ defmodule ElixirScript.Preprocess.Modules do
     ast
   end
 
-  defp do_get_info(ast) do
+  def do_get_info(ast) do
     ast
   end
 

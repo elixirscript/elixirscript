@@ -285,6 +285,14 @@ defmodule ElixirScript.Translator do
     Module.make_module(module_name_list, body, env)
   end
 
+  defp do_translate({:defprotocol, _, _}) do
+    %ElixirScript.Translator.Group{}
+  end
+
+  defp do_translate({:defimpl, _, _}) do
+    %ElixirScript.Translator.Group{}
+  end
+
   defp do_translate({name, metadata, params} = ast, env) when is_list(params) do
     if KernelLib.is_defined_in_kernel(name, length(params)) do
       KernelLib.translate_kernel_function(name, params, env)

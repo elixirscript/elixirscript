@@ -31,7 +31,7 @@ defmodule ElixirScript.Translator.Bug.Test do
 
     js_code = """
      import { default as JQuery } from 'jquery';
-     const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Todo');
+     const __MODULE__ = Elixir.Kernel.SpecialForms.atom('App.Todo');
      
      JQuery(Elixir.JS.call_property(e, 'target'));
      export {};

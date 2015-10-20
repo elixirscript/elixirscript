@@ -25,7 +25,8 @@ defmodule ElixirScript.State do
 
   def module_listed?(module_name) do
     Agent.get(__MODULE__, fn(state) ->
-      Enum.any?(state.modules, fn(x) -> x.name == module_name end)
+      Enum.any?(state.modules, fn(x) -> x.name == module_name end) ||
+      Enum.any?(state.protocols, fn({key, value}) -> key == module_name end)
     end)
   end
 

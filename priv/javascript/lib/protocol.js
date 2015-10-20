@@ -42,11 +42,4 @@ class Protocol{
 }
 
 
-function defprotocol(spec){
-  return new Protocol(spec);
-}
-
-
-export default {
-  defprotocol
-}
+export default Protocol;

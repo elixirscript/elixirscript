@@ -1,6 +1,7 @@
 import SpecialForms from './kernel/special_forms';
 import Patterns from './patterns/patterns';
 import Tuple from './tuple';
+import Protocol from './protocol';
 let Kernel = {
 
   SpecialForms: SpecialForms,
@@ -157,6 +158,14 @@ let Kernel = {
       return Kernel.is_map && x[Kernel.SpecialForms.atom("__struct__")] === __struct__;
     }
   },
+
+  defprotocol: function(spec){
+    return new Protocol(spec);
+  },
+
+  defimpl: function(protocol, type, impl){
+    protocol.implementation(type, impl);
+  }
 };
 
 export default Kernel;

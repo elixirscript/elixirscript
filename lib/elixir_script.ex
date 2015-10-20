@@ -43,13 +43,16 @@ defmodule ElixirScript do
     root = Dict.get(opts, :root)
     env = Dict.get(opts, :env, custom_env)
     import_standard_libs? = Dict.get(opts, :import_standard_libs, true)
+    use_default_protocols? = Dict.get(opts, :use_default_protocols, true)
 
 
     ElixirScript.State.start_link(root, env)
     build_environment([quoted])
 
-    if Set.size(ElixirScript.State.get().modules) > 0 do
-      create_code(include_path, import_standard_libs?)
+    state = ElixirScript.State.get()
+
+    if Set.size(state.modules) > 0 || Dict.size(state.protocols) > 0 do
+      create_code(include_path, import_standard_libs?, use_default_protocols?)
     else
       result = case Translator.translate(quoted, env) do
         modules when is_list(modules) ->
@@ -97,12 +100,12 @@ defmodule ElixirScript do
     |> build_environment
 
 
-    create_code(include_path, true)
+    create_code(include_path, true, true)
   end
 
   defp build_environment(code_list) do
     code_list
-    |> ElixirScript.Preprocess.Modules.get_info    
+    |> ElixirScript.Preprocess.Modules.get_info   
   end
 
   defp custom_env() do
@@ -111,7 +114,12 @@ defmodule ElixirScript do
     __ENV__
   end
 
-  defp create_code(include_path, import_standard_libs?) do
+  defp create_code(include_path, import_standard_libs?, use_default_protocols?) do
+
+    if use_default_protocols? do
+      ElixirScript.Translator.Protocol.add_default_protocols()
+    end
+
     state = ElixirScript.State.get()
 
     current = self
@@ -130,9 +138,16 @@ defmodule ElixirScript do
     end)
     |> List.flatten
 
+    protocol_result = state.protocols |> Dict.to_list
+    |> ElixirScript.Translator.Protocol.consolidate(state.env)
+    |> Enum.map(fn(x) ->
+        convert_to_code(x, state.root, include_path, state.env, import_standard_libs?)
+      end)
+    |> List.flatten
+
     ElixirScript.State.stop
 
-    result
+    result ++ protocol_result
   end
 
   @doc """

@@ -7,6 +7,7 @@ defmodule ElixirScript.Translator.Module do
   alias ElixirScript.Preprocess.Aliases
   alias ElixirScript.Preprocess.Using
   alias ElixirScript.Translator.Function
+  alias ElixirScript.Translator.Primitive
 
   def make_module(module_name_list, nil, env) do
     [%JSModule{ name: module_name_list, body: List.wrap(create__module__(module_name_list, env)) }] 
@@ -82,7 +83,7 @@ defmodule ElixirScript.Translator.Module do
     result
   end
 
-  defp extract_functions_from_module({:__block__, meta, body_list}) do
+  def extract_functions_from_module({:__block__, meta, body_list}) do
     { body_list, functions } = Enum.map_reduce(body_list,
       %{exported: HashDict.new(), private: HashDict.new()}, fn
         ({:def, _, [{:when, _, [{name, _, _} | _guards] }, _] } = function, state) ->
@@ -104,7 +105,7 @@ defmodule ElixirScript.Translator.Module do
           {
             nil,
             %{ state | private: HashDict.put(state.private, name, HashDict.get(state.private, name, []) ++ [function]) }
-          }
+          }         
         (x, state) ->
           { x, state }
       end)
@@ -115,11 +116,11 @@ defmodule ElixirScript.Translator.Module do
     { body, functions }
   end
 
-  defp extract_functions_from_module(body) do
+  def extract_functions_from_module(body) do
     extract_functions_from_module({:__block__, [], List.wrap(body)})
   end
 
-  defp extract_imports_from_body(body) do
+  def extract_imports_from_body(body) do
     Enum.partition(body, fn(x) ->
       case x do
         %ESTree.ImportDeclaration{} ->
@@ -130,7 +131,7 @@ defmodule ElixirScript.Translator.Module do
     end)
   end
 
-  defp extract_structs_from_body(body) do
+  def extract_structs_from_body(body) do
     Enum.partition(body, fn(x) ->
       case x do
         %ESTree.FunctionDeclaration{} ->
@@ -154,7 +155,7 @@ defmodule ElixirScript.Translator.Module do
     end
   end
 
-  defp process_imports(imports, aliases) do
+  def process_imports(imports, aliases) do
     imports ++ make_imports(aliases)
     |> Enum.reduce(HashSet.new, fn(x, acc)-> 
       HashSet.put(acc, x) 
@@ -180,7 +181,7 @@ defmodule ElixirScript.Translator.Module do
     end)
   end
 
-  defp process_functions(%{ exported: exported, private: private }, env) do
+  def process_functions(%{ exported: exported, private: private }, env) do
     exported_functions = Enum.map(Dict.keys(exported), fn(key) ->
       functions = Dict.get(exported, key)
       { key, Function.process_function(key, functions, env) }
@@ -203,10 +204,14 @@ defmodule ElixirScript.Translator.Module do
     JS.variable_declaration([declarator], :const)
   end
 
-  defp create__module__(module_name_list, env) do
+  def create__module__(module_name_list, env) do
+    module_name = Enum.map(module_name_list, &Atom.to_string(&1))
+    |> Enum.join(".")
+    |> String.to_atom
+
     declarator = JS.variable_declarator(
       JS.identifier(:__MODULE__),
-      ElixirScript.Translator.translate(List.last(module_name_list), env)
+      Primitive.make_atom(module_name)
     )
 
     JS.variable_declaration([declarator], :const)

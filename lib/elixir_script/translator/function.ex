@@ -75,6 +75,11 @@ defmodule ElixirScript.Translator.Function do
         body = make_function_body(body, env)
         do_make_function_clause(patterns, params, body)
 
+      ({_, _, [{_, _, params}]}) ->
+        { patterns, params } = Match.build_match(params, env)
+        params = make_params(params)
+        body = make_function_body([], env)
+        do_make_function_clause(patterns, params, body)
     end)
     |> Enum.to_list
 

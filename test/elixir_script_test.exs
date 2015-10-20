@@ -78,7 +78,7 @@ defmodule ElixirScript.Test do
 
      assert_js_matches """
          import * as Elixir from 'elixir';
-         const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elephant');
+         const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Animals.Elephant');
          function defstruct(values = {})        {
                  return     Kernel.defstruct({
              [Elixir.Kernel.SpecialForms.atom('__struct__')]: __MODULE__,     [Elixir.Kernel.SpecialForms.atom('trunk')]: true
@@ -87,7 +87,7 @@ defmodule ElixirScript.Test do
          export {
              defstruct
        };   
-       """, List.last(js_code)
+       """, Enum.fetch!(js_code, 1)
   end
 
 
