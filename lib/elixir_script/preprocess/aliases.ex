@@ -32,6 +32,14 @@ defmodule ElixirScript.Preprocess.Aliases do
     { ast, %{state | defined: HashSet.put(state.defined, List.last(name)) } }
   end
 
+  def process_aliases({{:., meta1, [{:__aliases__, meta2, aliases}, function]}, meta3, params} = ast, state, env) when aliases in [[:Collectable], [:Enumerable], [:Inspect], [:List, :Chars], [:String, :Chars]] do
+      new_ast = {{:., meta1, [{:__aliases__, meta2, List.last(aliases) |> List.wrap }, function]}, meta3, params}
+
+      new_state = %{ state | add: HashSet.put(state.add, [:Elixir] ++ aliases) }
+      { new_ast, new_state }
+  end
+
+
   def process_aliases({{:., meta1, [{:__aliases__, meta2, aliases}, function]}, meta3, params} = ast, state, env) do
     if ElixirScript.State.module_listed?(aliases) do
       new_ast = {{:., meta1, [{:__aliases__, meta2, List.last(aliases) |> List.wrap }, function]}, meta3, params}

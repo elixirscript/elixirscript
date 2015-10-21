@@ -13,6 +13,14 @@ defmodule ElixirScript.Translator.Function do
     :Base, :String, :Bitwise
   ]
 
+  def update_alias({:__aliases__, context, [:List, :Chars]} = ast) do
+    ast
+  end
+
+  def update_alias({:__aliases__, context, [:String, :Chars]} = ast) do
+    ast
+  end
+
   def update_alias({:__aliases__, context, [name | rest]}) when name in @standard_libs do
     {:__aliases__, context, [:Elixir, name] ++ rest }
   end

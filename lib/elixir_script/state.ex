@@ -30,6 +30,12 @@ defmodule ElixirScript.State do
     end)
   end
 
+  def protocol_listed?(module_name) do
+    Agent.get(__MODULE__, fn(state) ->
+      Enum.any?(state.protocols, fn({key, value}) -> key == module_name end)
+    end)
+  end
+
   def add_protocol(name, spec) do
     Agent.update(__MODULE__, fn(state) ->
       proto = Dict.get(state.protocols, name)

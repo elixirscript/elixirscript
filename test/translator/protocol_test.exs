@@ -20,7 +20,7 @@ defmodule ElixirScript.Translator.Protocol.Test do
       )
     });
 
-    export Collectable;
+    export default Collectable;
     """
 
     assert_translation(ex_ast, js_code)
@@ -93,7 +93,7 @@ defmodule ElixirScript.Translator.Protocol.Test do
    })
 
 
-    export Blank;
+    export default Blank;
     """
 
     assert_translation(ex_ast, js_code)

@@ -20,17 +20,7 @@ defmodule ElixirScript.Translator.Module do
     { body, functions } = extract_functions_from_module(body)
     { exported_functions, private_functions } = process_functions(functions, env)
 
-    #Translate body
-    body = Translator.translate(body, env)
-
-    body = case body do
-      [%ESTree.BlockStatement{ body: body }] ->
-        body
-      %ESTree.BlockStatement{ body: body } ->
-        body
-      _ ->
-        List.wrap(body)
-    end
+    body = translate_body(body, env)
 
     {imports, body} = extract_imports_from_body(body)
     {structs, body} = extract_structs_from_body(body)
@@ -81,6 +71,19 @@ defmodule ElixirScript.Translator.Module do
     ] ++ List.flatten(modules)
     
     result
+  end
+
+  def translate_body(body, env) do
+    body = Translator.translate(body, env)
+
+    body = case body do
+      [%ESTree.BlockStatement{ body: body }] ->
+        body
+      %ESTree.BlockStatement{ body: body } ->
+        body
+      _ ->
+        List.wrap(body)
+    end
   end
 
   def extract_functions_from_module({:__block__, meta, body_list}) do

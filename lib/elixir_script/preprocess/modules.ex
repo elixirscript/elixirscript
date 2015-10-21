@@ -11,19 +11,19 @@ defmodule ElixirScript.Preprocess.Modules do
     end)
   end
 
-  def do_get_info({:defprotocol, _, [name, [do: {:__block__, context, spec}]]}) do
+  def do_get_info({:defprotocol, _, [{:__aliases__, _, name}, [do: {:__block__, context, spec}]]}) do
     ElixirScript.State.add_protocol(name, {:__block__, context, spec})
   end
 
-  def do_get_info({:defprotocol, _, [name, [do: spec]]}) do
+  def do_get_info({:defprotocol, _, [{:__aliases__, _, name}, [do: spec]]}) do
     ElixirScript.State.add_protocol(name, {:__block__, [], [spec]})
   end
 
-  def do_get_info({:defimpl, _, [ protocol, [for: type],  [do: {:__block__, context, spec}] ]}) do
+  def do_get_info({:defimpl, _, [ {:__aliases__, _, protocol}, [for: type],  [do: {:__block__, context, spec}] ]}) do
     ElixirScript.State.add_protocol_impl(protocol, type, {:__block__, context, spec})
   end
 
-  def do_get_info({:defimpl, _, [ protocol, [for: type],  [do: spec] ]}) do
+  def do_get_info({:defimpl, _, [ {:__aliases__, _, protocol}, [for: type],  [do: spec] ]}) do
     ElixirScript.State.add_protocol_impl(protocol, type, {:__block__, [], [spec]})
   end
 

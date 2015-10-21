@@ -1,113 +1,70 @@
 defmodule ElixirScript.Translator.Protocol do
   @moduledoc false
 
-alias ESTree.Tools.Builder, as: JS
-alias ElixirScript.Translator
-alias ElixirScript.Translator.Module
-alias ElixirScript.Preprocess.Aliases
-alias ElixirScript.Translator.JSModule
-alias ElixirScript.Translator.Map
-alias ElixirScript.Translator.Function
-alias ElixirScript.Translator.Utils
+  alias ESTree.Tools.Builder, as: JS
+  alias ElixirScript.Translator
+  alias ElixirScript.Translator.Module
+  alias ElixirScript.Preprocess.Aliases
+  alias ElixirScript.Translator.JSModule
+  alias ElixirScript.Translator.Map
+  alias ElixirScript.Translator.Function
+  alias ElixirScript.Translator.Utils
 
 
-def add_default_protocols() do
-  quoted = quote do
-    defprotocol ElixirScript.String.Chars do
-      def to_string(thing)
+  def add_default_protocols() do
+    quoted = quote do
+      defprotocol Elixir.String.Chars do
+        def to_string(thing)
+      end
     end
-  end
 
-  ElixirScript.Preprocess.Modules.do_get_info(quoted)
+    ElixirScript.Preprocess.Modules.do_get_info(quoted)
 
-  quoted = quote do  
-    defprotocol ElixirScript.List.Chars do
-      def to_char_list(thing)
+    quoted = quote do  
+      defprotocol Elixir.List.Chars do
+        def to_char_list(thing)
+      end
     end
-  end
 
-  ElixirScript.Preprocess.Modules.do_get_info(quoted)
-  
-  quoted = quote do
-    defprotocol ElixirScript.Inspect do
-      def inspect(thing, opts)
-    end
-  end
-
-  ElixirScript.Preprocess.Modules.do_get_info(quoted)
-  
-  quoted = quote do
-    defprotocol ElixirScript.Enumerable do
-      def count(collection)
+    ElixirScript.Preprocess.Modules.do_get_info(quoted)
     
-      def member?(collection, value)
+    quoted = quote do
+      defprotocol Elixir.Inspect do
+        def inspect(thing, opts)
+      end
+    end
+
+    ElixirScript.Preprocess.Modules.do_get_info(quoted)
     
-      def reduce(collection, acc, fun)
+    quoted = quote do
+      defprotocol Elixir.Enumerable do
+        def count(collection)
+      
+        def member?(collection, value)
+      
+        def reduce(collection, acc, fun)
+      end
     end
+
+    ElixirScript.Preprocess.Modules.do_get_info(quoted)
+    
+    quoted = quote do
+      defprotocol Elixir.Collectable do
+        def into(collectable)
+      end
+    end
+
+    ElixirScript.Preprocess.Modules.do_get_info(quoted)
   end
 
-  ElixirScript.Preprocess.Modules.do_get_info(quoted)
-  
-  quoted = quote do
-    defprotocol ElixirScript.Collectable do
-      def into(collectable)
-    end
+  def consolidate(protocols, env) when is_list(protocols) do
+    Enum.map(protocols, fn({_, protocol}) ->
+      do_consolidate(protocol, env)
+    end)
   end
 
-  ElixirScript.Preprocess.Modules.do_get_info(quoted)
-end
-
-def consolidate(protocols, env) when is_list(protocols) do
-  Enum.map(protocols, fn({_, protocol}) ->
-    do_consolidate(protocol, env)
-  end)
-end
-
-#defprotocol ElixirScript.String.Chars do
-#  def to_string(thing)
-#end
-#
-#defprotocol ElixirScript.List.Chars do
-#  def to_char_list(thing)
-#end
-#
-#defprotocol ElixirScript.Inspect do
-#  def inspect(thing, opts)
-#end
-#
-#defprotocol ElixirScript.Enumerable do
-#  def count(collection)
-#
-#  def member?(collection, value)
-#
-#  def reduce(collection, acc, fun)
-#end
-#
-#defprotocol ElixirScript.Collectable do
-#  def into(collectable)
-#end
-
-
-  @doc """
-    import * as Elixir from "elixir";
-
-    const __MODULE__ = [Elixir.Kernel.SpecialForms.atom("Collectable")];
-
-    Collectable = Elixir.Protocol.defprotocol({
-      into: function(collectable){}
-    });
-
-    Collectable.impl(Array, {
-      into: function(collectable){
-        return collectable.push(a);
-      }
-    });
-
-    export Collectable;
-    { body, aliases } = Aliases.process(body, env)
-  """
   defp do_consolidate(protocol, env) do
-    {:__aliases__, _, name} = protocol.name
+    name = protocol.name
     spec = protocol.spec
     impls = protocol.impls |> Dict.to_list
 
@@ -128,16 +85,7 @@ end
 
     { exported_functions, private_functions } = process_functions(functions, env)
 
-    body = Translator.translate(body, env)
-
-    body = case body do
-      [%ESTree.BlockStatement{ body: body }] ->
-        body
-      %ESTree.BlockStatement{ body: body } ->
-        body
-      _ ->
-        List.wrap(body)
-    end
+    body = Module.translate_body(body, env)
 
     {imports, body} = Module.extract_imports_from_body(body)
 
@@ -177,16 +125,7 @@ end
       { body, functions } = Module.extract_functions_from_module(body)
       { exported_functions, private_functions } = process_functions(functions, env)
 
-      body = Translator.translate(body, env)
-
-      body = case body do
-        [%ESTree.BlockStatement{ body: body }] ->
-          body
-        %ESTree.BlockStatement{ body: body } ->
-          body
-        _ ->
-          List.wrap(body)
-      end
+      body = Module.translate_body(body, env)
 
       {imports, body} = Module.extract_imports_from_body(body)
 
@@ -222,7 +161,7 @@ end
   end
 
   defp create_module(name, spec, impls, imports, body, env) do
-    default = JS.export_named_declaration(JS.identifier(List.last(name)))
+    default = JS.export_default_declaration(JS.identifier(List.last(name)))
 
     %JSModule{
       name: name,
