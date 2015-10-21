@@ -281,8 +281,9 @@ defmodule ElixirScript.Translator.Kernel do
     )
   end
 
-  defp do_translate({:to_string, _, [param]}, env) when is_binary(param) do
-    Translator.translate(param, env)
+  defp do_translate({:to_string, _, _} = ast, env) do
+    Macro.expand(ast, env)
+    |> Translator.translate(env)
   end
 
   defp do_translate({name, _, params}, env) do

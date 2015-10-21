@@ -43,7 +43,6 @@ defmodule ElixirScript do
     root = Dict.get(opts, :root)
     env = Dict.get(opts, :env, custom_env)
     import_standard_libs? = Dict.get(opts, :import_standard_libs, true)
-    use_default_protocols? = Dict.get(opts, :use_default_protocols, true)
 
 
     ElixirScript.State.start_link(root, env)
@@ -52,7 +51,7 @@ defmodule ElixirScript do
     state = ElixirScript.State.get()
 
     if Set.size(state.modules) > 0 || Dict.size(state.protocols) > 0 do
-      create_code(include_path, import_standard_libs?, use_default_protocols?)
+      create_code(include_path, import_standard_libs?)
     else
       result = case Translator.translate(quoted, env) do
         modules when is_list(modules) ->
@@ -100,7 +99,7 @@ defmodule ElixirScript do
     |> build_environment
 
 
-    create_code(include_path, true, true)
+    create_code(include_path, true)
   end
 
   defp build_environment(code_list) do
@@ -114,11 +113,7 @@ defmodule ElixirScript do
     __ENV__
   end
 
-  defp create_code(include_path, import_standard_libs?, use_default_protocols?) do
-
-    if use_default_protocols? do
-      ElixirScript.Translator.Protocol.add_default_protocols()
-    end
+  defp create_code(include_path, import_standard_libs?) do
 
     state = ElixirScript.State.get()
 

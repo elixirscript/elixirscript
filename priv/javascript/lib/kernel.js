@@ -1,7 +1,10 @@
 import SpecialForms from './kernel/special_forms';
 import Patterns from './patterns/patterns';
 import Tuple from './tuple';
+import BitString from './bit_string';
 import Protocol from './protocol';
+import { PID } from './processes/processes';
+
 let Kernel = {
 
   SpecialForms: SpecialForms,
@@ -34,13 +37,12 @@ let Kernel = {
     return typeof x === 'function' || x instanceof Function;
   },
 
-  // from: http://stackoverflow.com/a/3885844
   is_float: function(x){
-    return x === +x && x !== (x|0);
+    return Kernel.is_number(x) && !Number.isInteger(x);
   },
 
   is_integer: function(x){
-    return x === +x && x === (x|0);
+    return Number.isInteger(x);
   },
 
   is_list: function(x){
@@ -52,7 +54,7 @@ let Kernel = {
   },
 
   is_number: function(x){
-    return Kernel.is_integer(x) || Kernel.is_float(x);
+    return typeof x === "number";
   },
 
   is_tuple: function(x){
@@ -64,7 +66,7 @@ let Kernel = {
   },
 
   is_pid: function(x){
-    return false;
+    return x instanceof PID;
   },
 
   is_port: function(x){
@@ -76,7 +78,7 @@ let Kernel = {
   },
 
   is_bitstring: function(x){
-    return Kernel.is_binary(x) || x instanceof SpecialForms.bitstring;
+    return Kernel.is_binary(x) || x instanceof BitString;
   },
 
   __in__: function(left, right){

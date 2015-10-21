@@ -26,6 +26,7 @@ defmodule ElixirScript.Test do
         end
 
         defp something_else() do
+          to_string(10)
         end
       end
     """)
@@ -34,7 +35,7 @@ defmodule ElixirScript.Test do
          import * as Elixir from 'elixir';
          const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elephant');
          const something_else = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([],function()    {
-             return     null;
+             return     Elixir.String.Chars.to_string(10);
            }));
          const something = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([],function()    {
              return     ul;

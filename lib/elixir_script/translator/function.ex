@@ -10,15 +10,16 @@ defmodule ElixirScript.Translator.Function do
   @standard_libs [
     :Patterns, :Kernel, :Atom, :Enum, :Integer, :JS, 
     :List, :Range, :Tuple, :Agent, :Keyword, :BitString, 
-    :Base, :String, :Bitwise
+    :Base, :String, :Bitwise, :Collectable, :Enumerable,
+    :Inspect
   ]
 
-  def update_alias({:__aliases__, context, [:List, :Chars]} = ast) do
-    ast
+  def update_alias({:__aliases__, context, [:List, :Chars]}) do
+    {:__aliases__, context, [:Elixir] ++ [:List, :Chars] }
   end
 
-  def update_alias({:__aliases__, context, [:String, :Chars]} = ast) do
-    ast
+  def update_alias({:__aliases__, context, [:String, :Chars]}) do
+    {:__aliases__, context, [:Elixir] ++ [:String, :Chars] }
   end
 
   def update_alias({:__aliases__, context, [name | rest]}) when name in @standard_libs do

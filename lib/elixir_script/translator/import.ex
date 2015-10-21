@@ -10,10 +10,6 @@ defmodule ElixirScript.Translator.Import do
 
     if State.protocol_listed?(name) do
       default = true
-
-      if name in [[:Collectable], [:Enumerable], [:Inspect], [:List, :Chars], [:String, :Chars]] do
-        name = [:Elixir] ++ name
-      end
     end
     
      import_specifier = if default == false do

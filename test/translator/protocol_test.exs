@@ -50,50 +50,34 @@ defmodule ElixirScript.Translator.Protocol.Test do
     end
 
     js_code = """
-    const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Blank');
-
-    let Blank = Elixir.Kernel.defprotocol({
-      blank__qmark__: Elixir.Patterns.defmatch(
-        Elixir.Patterns.make_case([Elixir.Patterns.variable()],function(data){
-          return null;
-        })
-      )
-    });
-
-   Elixir.Kernel.defimpl(Blank, Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.variable()],function(__1)    {
-         return     Elixir.Kernel.is_list(__1);
-       })),{
-         blank__qmark__: Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Kernel.SpecialForms.list()],function()    {
-         return     true;
-       }),Elixir.Patterns.make_case([Elixir.Patterns.wildcard()],function()    {
-         return     false;
-       }))
-   })
-
-
-   Elixir.Kernel.defimpl(Blank, Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.variable()],function(__1)    {
-         return     Elixir.Kernel.is_atom(__1);
-       })),{
-         blank__qmark__: Elixir.Patterns.defmatch(Elixir.Patterns.make_case([false],function()    {
-         return     true;
-       }),Elixir.Patterns.make_case([null],function()    {
-         return     true;
-       }),Elixir.Patterns.make_case([Elixir.Patterns.wildcard()],function()    {
-         return     false;
-       }))
-   })
-
-
-     Elixir.Kernel.defimpl(Blank, Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.variable()],function(__1)    {
-         return     Elixir.Kernel.is_integer(__1);
-       })),{
-         blank__qmark__: Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.variable()],function(number)    {
-         return     false;
-       }))
-   })
-
-
-    export default Blank;
+         const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Blank');
+         let Blank = Elixir.Kernel.defprotocol({
+             blank__qmark__: Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.variable()],function(data)    {
+             return     null;
+           }))
+       });
+         Elixir.Kernel.defimpl(Blank,Elixir.Kernel.is_list,{
+             blank__qmark__: Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Kernel.SpecialForms.list()],function()    {
+             return     true;
+           }),Elixir.Patterns.make_case([Elixir.Patterns.wildcard()],function()    {
+             return     false;
+           }))
+       })
+         Elixir.Kernel.defimpl(Blank,Elixir.Kernel.is_atom,{
+             blank__qmark__: Elixir.Patterns.defmatch(Elixir.Patterns.make_case([false],function()    {
+             return     true;
+           }),Elixir.Patterns.make_case([null],function()    {
+             return     true;
+           }),Elixir.Patterns.make_case([Elixir.Patterns.wildcard()],function()    {
+             return     false;
+           }))
+       })
+         Elixir.Kernel.defimpl(Blank,Elixir.Kernel.is_integer,{
+             blank__qmark__: Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.variable()],function(number)    {
+             return     false;
+           }))
+       })
+         export default Blank;
     """
 
     assert_translation(ex_ast, js_code)

@@ -10,53 +10,6 @@ defmodule ElixirScript.Translator.Protocol do
   alias ElixirScript.Translator.Function
   alias ElixirScript.Translator.Utils
 
-
-  def add_default_protocols() do
-    quoted = quote do
-      defprotocol Elixir.String.Chars do
-        def to_string(thing)
-      end
-    end
-
-    ElixirScript.Preprocess.Modules.do_get_info(quoted)
-
-    quoted = quote do  
-      defprotocol Elixir.List.Chars do
-        def to_char_list(thing)
-      end
-    end
-
-    ElixirScript.Preprocess.Modules.do_get_info(quoted)
-    
-    quoted = quote do
-      defprotocol Elixir.Inspect do
-        def inspect(thing, opts)
-      end
-    end
-
-    ElixirScript.Preprocess.Modules.do_get_info(quoted)
-    
-    quoted = quote do
-      defprotocol Elixir.Enumerable do
-        def count(collection)
-      
-        def member?(collection, value)
-      
-        def reduce(collection, acc, fun)
-      end
-    end
-
-    ElixirScript.Preprocess.Modules.do_get_info(quoted)
-    
-    quoted = quote do
-      defprotocol Elixir.Collectable do
-        def into(collectable)
-      end
-    end
-
-    ElixirScript.Preprocess.Modules.do_get_info(quoted)
-  end
-
   def consolidate(protocols, env) when is_list(protocols) do
     Enum.map(protocols, fn({_, protocol}) ->
       do_consolidate(protocol, env)
@@ -208,91 +161,113 @@ defmodule ElixirScript.Translator.Protocol do
     in JavaScript
   """
   defp map_to_js({:__aliases__, _, [:Integer]}) do
-    quoted = quote do
-      &Kernel.is_integer/1
-    end
-
-    Translator.translate(quoted, ElixirScript.State.get().env)
+    JS.member_expression(
+      JS.identifier(:Elixir),
+      JS.member_expression(
+        JS.identifier(:Kernel),
+        JS.identifier(:is_integer)
+      )
+    )
   end
 
   defp map_to_js({:__aliases__, _, [:Tuple]}) do
-    quoted = quote do
-      &Kernel.is_tuple/1
-    end
-
-    Translator.translate(quoted, ElixirScript.State.get().env)
+    JS.member_expression(
+      JS.identifier(:Elixir),
+      JS.member_expression(
+        JS.identifier(:Kernel),
+        JS.identifier(:is_tuple)
+      )
+    )
   end
 
   defp map_to_js({:__aliases__, _, [:Atom]}) do
-    quoted = quote do
-      &Kernel.is_atom/1
-    end
-
-    Translator.translate(quoted, ElixirScript.State.get().env)
+    JS.member_expression(
+      JS.identifier(:Elixir),
+      JS.member_expression(
+        JS.identifier(:Kernel),
+        JS.identifier(:is_atom)
+      )
+    )
   end
 
   defp map_to_js({:__aliases__, _, [:List]}) do
-    quoted = quote do
-      &Kernel.is_list/1
-    end
-
-    Translator.translate(quoted, ElixirScript.State.get().env)
+    JS.member_expression(
+      JS.identifier(:Elixir),
+      JS.member_expression(
+        JS.identifier(:Kernel),
+        JS.identifier(:is_list)
+      )
+    )
   end
 
   defp map_to_js({:__aliases__, _, [:BitString]}) do
-    quoted = quote do
-      &Kernel.is_bitstring/1
-    end
-
-    Translator.translate(quoted, ElixirScript.State.get().env)
+    JS.member_expression(
+      JS.identifier(:Elixir),
+      JS.member_expression(
+        JS.identifier(:Kernel),
+        JS.identifier(:is_bitstring)
+      )
+    )
   end
 
   defp map_to_js({:__aliases__, _, [:Float]}) do
-    quoted = quote do
-      &Kernel.is_float/1
-    end
-
-    Translator.translate(quoted, ElixirScript.State.get().env)
+    JS.member_expression(
+      JS.identifier(:Elixir),
+      JS.member_expression(
+        JS.identifier(:Kernel),
+        JS.identifier(:is_float)
+      )
+    )
   end
 
   defp map_to_js({:__aliases__, _, [:Function]}) do
-    quoted = quote do
-      &Kernel.is_function/1
-    end
-
-    Translator.translate(quoted, ElixirScript.State.get().env)
+    JS.member_expression(
+      JS.identifier(:Elixir),
+      JS.member_expression(
+        JS.identifier(:Kernel),
+        JS.identifier(:is_function)
+      )
+    )
   end
 
   defp map_to_js({:__aliases__, _, [:PID]}) do
-    quoted = quote do
-      &Kernel.is_pid/1
-    end
-
-    Translator.translate(quoted, ElixirScript.State.get().env)
+    JS.member_expression(
+      JS.identifier(:Elixir),
+      JS.member_expression(
+        JS.identifier(:Kernel),
+        JS.identifier(:is_pid)
+      )
+    )
   end
 
   defp map_to_js({:__aliases__, _, [:Port]}) do
-    quoted = quote do
-      &Kernel.is_port/1
-    end
-
-    Translator.translate(quoted, ElixirScript.State.get().env)
+    JS.member_expression(
+      JS.identifier(:Elixir),
+      JS.member_expression(
+        JS.identifier(:Kernel),
+        JS.identifier(:is_port)
+      )
+    )
   end
 
   defp map_to_js({:__aliases__, _, [:Reference]}) do
-    quoted = quote do
-      &Kernel.is_reference/1
-    end
-
-    Translator.translate(quoted, ElixirScript.State.get().env)
+    JS.member_expression(
+      JS.identifier(:Elixir),
+      JS.member_expression(
+        JS.identifier(:Kernel),
+        JS.identifier(:is_reference)
+      )
+    )
   end
 
   defp map_to_js({:__aliases__, _, [:Map]}) do
-    quoted = quote do
-      &Kernel.is_map/1
-    end
-
-    Translator.translate(quoted, ElixirScript.State.get().env)
+    JS.member_expression(
+      JS.identifier(:Elixir),
+      JS.member_expression(
+        JS.identifier(:Kernel),
+        JS.identifier(:is_map)
+      )
+    )
   end
 
   defp map_to_js({:__aliases__, _, [:Any]}) do
@@ -305,8 +280,12 @@ defmodule ElixirScript.Translator.Protocol do
 
 
   defp map_to_js({:__aliases__, _, struct}) do
+    module_name = Enum.map(struct, &Atom.to_string(&1))
+    |> Enum.join(".")
+    |> String.to_atom
+
     quoted = quote do
-      Kernel.is_struct_fn(unquote(List.last(struct)))
+      Kernel.is_struct_fn(unquote(module_name))
     end
 
     Translator.translate(quoted, ElixirScript.State.get().env)

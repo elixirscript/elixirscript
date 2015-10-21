@@ -13,7 +13,8 @@ class Protocol{
       return function(...args) {
         let thing = args[0];
 
-        for([check, implementation] of this.registry){
+        for(let [check, implementation] of this.registry){
+
           if(check(thing)){
             let fun = implementation[funName];
             let retval = fun.apply(this, args);

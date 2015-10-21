@@ -32,7 +32,7 @@ defmodule ElixirScript.TestHelper do
   end
 
   def ex_ast_to_js(ex_ast) do
-    ElixirScript.compile_quoted(ex_ast, [env: make_custom_env, import_standard_libs: false, use_default_protocols: false])
+    ElixirScript.compile_quoted(ex_ast, [env: make_custom_env, import_standard_libs: false])
   end
 
   def strip_spaces(js) do

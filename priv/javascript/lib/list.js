@@ -1,6 +1,9 @@
 import Kernel from './kernel';
+import Chars from './list/chars';
 
 let List = {};
+
+List.Chars = Chars;
 
 List.delete = function(list, item){
   let new_value = [];
