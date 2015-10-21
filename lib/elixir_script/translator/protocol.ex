@@ -113,6 +113,30 @@ defmodule ElixirScript.Translator.Protocol do
     end)
   end
 
+  def make_standard_lib_impl(protocol, type, impl, env) do
+    type = map_to_js(type)
+    protocol = Translator.translate(protocol, env)
+
+    { _, functions } = Module.extract_functions_from_module(impl)
+    { exported_functions, _ } = process_functions(functions, env)  
+
+    object = Enum.map(exported_functions, fn({key, value}) -> 
+      Map.make_property(JS.identifier(Utils.filter_name(key)), value) 
+    end)
+    |> JS.object_expression
+
+    JS.call_expression(
+      JS.member_expression(
+        JS.identifier(:Elixir),
+        JS.member_expression(
+          JS.identifier(:Kernel),
+          JS.identifier(:defimpl)
+        )
+      ),
+      [protocol, type, object]
+    )
+  end
+
   defp create_module(name, spec, impls, imports, body, env) do
     default = JS.export_default_declaration(JS.identifier(List.last(name)))
 

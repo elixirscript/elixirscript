@@ -26,6 +26,24 @@ defmodule ElixirScript.Translator.Protocol.Test do
     assert_translation(ex_ast, js_code)
   end
 
+  test "translate standard lib protocol defimpl" do
+    ex_ast = quote do
+      defimpl String.Chars, for: Duck do
+        def to_string(duck), do: "quack"
+      end
+    end
+
+    js_code = """
+     Elixir.Kernel.defimpl(Elixir.String.Chars, Elixir.Kernel.is_struct_fn(Elixir.Kernel.SpecialForms.atom('Duck')),{
+             to_string: Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.variable()],function(duck)    {
+             return     'quack';
+           }))
+       })
+    """
+
+    assert_translation(ex_ast, js_code)
+  end
+
 
   test "parse protocol spec with implementations" do
     ex_ast = quote do

@@ -3,6 +3,14 @@ defmodule ElixirScript.Preprocess.Modules do
 
   alias ElixirScript.State
 
+  @standard_lib_protocols [
+    [:Enumerable],
+    [:Inspect],
+    [:String, :Chars],
+    [:List, :Chars],
+    [:Collectable]
+  ]
+
   def get_info(modules) do
     Enum.each(modules, fn(m) ->
       Macro.postwalk(m, fn(x) ->
@@ -19,11 +27,11 @@ defmodule ElixirScript.Preprocess.Modules do
     ElixirScript.State.add_protocol(name, {:__block__, [], [spec]})
   end
 
-  def do_get_info({:defimpl, _, [ {:__aliases__, _, protocol}, [for: type],  [do: {:__block__, context, spec}] ]}) do
+  def do_get_info({:defimpl, _, [ {:__aliases__, _, protocol}, [for: type],  [do: {:__block__, context, spec}] ]}) when not protocol in @standard_lib_protocols do
     ElixirScript.State.add_protocol_impl(protocol, type, {:__block__, context, spec})
   end
 
-  def do_get_info({:defimpl, _, [ {:__aliases__, _, protocol}, [for: type],  [do: spec] ]}) do
+  def do_get_info({:defimpl, _, [ {:__aliases__, _, protocol}, [for: type],  [do: spec] ]})  when not protocol in @standard_lib_protocols do
     ElixirScript.State.add_protocol_impl(protocol, type, {:__block__, [], [spec]})
   end
 
