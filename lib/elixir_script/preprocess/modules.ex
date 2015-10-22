@@ -12,10 +12,15 @@ defmodule ElixirScript.Preprocess.Modules do
   ]
 
   def get_info(modules) do
-    Enum.each(modules, fn(m) ->
-      Macro.postwalk(m, fn(x) ->
-        do_get_info(x)
-      end)
+    Enum.map(modules, fn
+      { :__block__, _, list } ->
+        list
+      x ->
+        x
+    end)
+    |> List.flatten
+    |> Enum.each(fn(m) ->
+      Macro.postwalk(m, &do_get_info(&1))
     end)
   end
 

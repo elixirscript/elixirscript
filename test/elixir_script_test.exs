@@ -29,6 +29,7 @@ defmodule ElixirScript.Test do
           to_string(10)
         end
       end
+
     """)
 
     assert_js_matches """
