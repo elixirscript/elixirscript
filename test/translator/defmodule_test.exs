@@ -97,7 +97,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     js_code = """
          const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Animals.Elephant');
          function defstruct(values = {})        {
-                 return     Kernel.defstruct({
+                 return Elixir.Kernel.defstruct({
              [Elixir.Kernel.SpecialForms.atom('__struct__')]: __MODULE__,     [Elixir.Kernel.SpecialForms.atom('trunk')]: true
        },values);
                }
@@ -149,7 +149,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     js_code = """
         const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elephant.Bear');
          function defstruct(values = {})        {
-                 return     Kernel.defstruct({
+                 return Elixir.Kernel.defstruct({
              [Elixir.Kernel.SpecialForms.atom('__struct__')]: __MODULE__,     [Elixir.Kernel.SpecialForms.atom('trunk')]: true
        },values);
                }
@@ -160,7 +160,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
          import * as Bear from 'elephant/bear';
          const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Animals.Elephant');
          function defstruct(values = {})        {
-                 return     Kernel.defstruct({
+                 return Elixir.Kernel.defstruct({
              [Elixir.Kernel.SpecialForms.atom('__struct__')]: __MODULE__,     [Elixir.Kernel.SpecialForms.atom('trunk')]: true
        },values);
                }

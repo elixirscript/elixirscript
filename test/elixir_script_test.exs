@@ -81,7 +81,7 @@ defmodule ElixirScript.Test do
          import * as Elixir from 'elixir';
          const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Animals.Elephant');
          function defstruct(values = {})        {
-                 return     Kernel.defstruct({
+                 return  Elixir.Kernel.defstruct({
              [Elixir.Kernel.SpecialForms.atom('__struct__')]: __MODULE__,     [Elixir.Kernel.SpecialForms.atom('trunk')]: true
        },values);
                }
