@@ -21,5 +21,6 @@ export { default as Enumerable } from './lib/enumerable';
 export { default as Collectable } from './lib/collectable';
 export { default as Inspect } from './lib/inspect';
 export { default as Map } from './lib/map';
+export { default as Set } from './lib/set';
 export { default as MapSet } from './lib/map_set';
 

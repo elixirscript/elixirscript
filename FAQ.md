@@ -64,6 +64,8 @@ The compiler to this point has been focused on translating Kernel.SpecialForms a
     * Atom
     * Range
     * Logger
+    * Map
+    * MapSet
     
 #### Incomplete Modules
 
@@ -75,6 +77,7 @@ The compiler to this point has been focused on translating Kernel.SpecialForms a
     * Base
     * String
     * Bitwise
+    * Set
     
 #### Missing Modules
     * Everything else
