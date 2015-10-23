@@ -52,4 +52,11 @@ Kernel.defimpl(Chars, Kernel.is_tuple, {
   }
 });
 
+
+Kernel.defimpl(Chars, null, {
+  to_string: function(thing){
+    return thing.toString();
+  }
+});
+
 export default Chars;
