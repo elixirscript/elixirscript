@@ -7,12 +7,12 @@ defmodule ElixirScript.Test do
       JQuery.("<div/>").text(html)
     """)
 
-    assert hd(js_code) == "JQuery('<div/>').text(html)"
+    assert hd(js_code) =~ "JQuery('<div/>').text(html)"
   end
 
   should "turn javascript ast into javascript code strings" do
     js_code = ElixirScript.compile(":atom")
-    assert hd(js_code) == "Elixir.Kernel.SpecialForms.atom('atom')"
+    assert hd(js_code) =~ "Elixir.Kernel.SpecialForms.atom('atom')"
   end
 
   should "parse one module correctly" do

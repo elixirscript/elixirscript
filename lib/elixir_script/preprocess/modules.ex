@@ -14,9 +14,26 @@ defmodule ElixirScript.Preprocess.Modules do
   def get_info(modules) do
     Enum.map(modules, fn
       { :__block__, _, list } ->
-        list
-      x ->
+        {mods, no_mods} = Enum.partition(list, fn
+          ({:defprotocol, _, [{:__aliases__, _, protocol}| rest ] }) when not protocol in @standard_lib_protocols -> 
+            true
+          ({:defimpl, _, [ {:__aliases__, _, protocol} | rest] }) when not protocol in @standard_lib_protocols -> 
+            true
+          ({:defmodule, _, _}) -> 
+            true
+          _ -> 
+            false
+        end)
+
+        mods ++ [{:defmodule, [], [{:__aliases__, [], [:ElixirScript, :Temp]}, [do: { :__block__, [], no_mods }]]}]
+      ({:defprotocol, _, [{:__aliases__, _, protocol}| rest ] }) = x when not protocol in @standard_lib_protocols ->
         x
+      ({:defimpl, _, [ {:__aliases__, _, protocol} | rest] }) = x when not protocol in @standard_lib_protocols ->
+        x
+      ({:defmodule, _, _}) = x ->
+        x
+      x ->
+        {:defmodule, [], [{:__aliases__, [], [:ElixirScript, :Temp]}, [do: { :__block__, [], [x] }]]}
     end)
     |> List.flatten
     |> Enum.each(fn(m) ->
@@ -38,6 +55,13 @@ defmodule ElixirScript.Preprocess.Modules do
 
   def do_get_info({:defimpl, _, [ {:__aliases__, _, protocol}, [for: type],  [do: spec] ]})  when not protocol in @standard_lib_protocols do
     ElixirScript.State.add_protocol_impl(protocol, type, {:__block__, [], [spec]})
+  end
+
+  def do_get_info({:defmodule, _, [{:__aliases__, meta, [:ElixirScript, :Temp]}, [do: body]]} = ast) do    
+    mod = %ElixirScript.Module{ name: [:ElixirScript, :Temp] , body: body }
+    State.add_module(mod)
+    
+    ast
   end
 
   def do_get_info({:defmodule, _, [{:__aliases__, meta, module_name_list}, [do: body]]} = ast) do

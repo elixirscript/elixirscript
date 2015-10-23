@@ -49,34 +49,7 @@ defmodule ElixirScript do
     build_environment([quoted])
 
     state = ElixirScript.State.get()
-
-    if Set.size(state.modules) > 0 || Dict.size(state.protocols) > 0 do
-      create_code(include_path, import_standard_libs?)
-    else
-      result = case Translator.translate(quoted, env) do
-        modules when is_list(modules) ->
-          List.flatten(modules)
-          |> Enum.map(fn(x) ->
-            convert_to_code(x, root, include_path, env, import_standard_libs?)
-          end)
-        module ->
-          List.wrap(
-            convert_to_code(module, root, include_path, env, import_standard_libs?)
-          )
-      end
-
-      ElixirScript.State.stop
-
-      result
-    end
-  end
-
-  def make_defmodule({:defmodule, _, _} = ast) do
-    ast
-  end
-
-  def make_defmodule(ast) do
-    {:defmodule, [], [{:__aliases__, [], [:Temp]}, [do: { :__block__, [], [ast] }]]}
+    create_code(include_path, import_standard_libs?)
   end
 
   @doc """

@@ -9,6 +9,10 @@ defmodule ElixirScript.Translator.Module do
   alias ElixirScript.Translator.Function
   alias ElixirScript.Translator.Primitive
 
+  def make_module([:ElixirScript, :Temp], body, env) do
+    [%JSModule{ name: [:ElixirScript, :Temp], body: translate_body(body, env) |> Utils.inflate_groups }] 
+  end
+
   def make_module(module_name_list, nil, env) do
     [%JSModule{ name: module_name_list, body: List.wrap(create__module__(module_name_list, env)) }] 
   end
