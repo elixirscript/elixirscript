@@ -10,6 +10,9 @@ defmodule ElixirScript.Translator.Protocol do
   alias ElixirScript.Translator.Function
   alias ElixirScript.Translator.Utils
 
+  @doc """
+  Takes a list of protocols and turns them into modules
+  """
   def consolidate(protocols, env) when is_list(protocols) do
     Enum.map(protocols, fn({_, protocol}) ->
       do_consolidate(protocol, env)
@@ -36,7 +39,7 @@ defmodule ElixirScript.Translator.Protocol do
 
     { body, functions } = extract_function_from_spec(body)
 
-    { exported_functions, private_functions } = process_functions(functions, env)
+    { exported_functions, _ } = process_functions(functions, env)
 
     body = Module.translate_body(body, env)
 
@@ -76,7 +79,7 @@ defmodule ElixirScript.Translator.Protocol do
       type = map_to_js(type)
       { body, aliases } = Aliases.process(impl, env)
       { body, functions } = Module.extract_functions_from_module(body)
-      { exported_functions, private_functions } = process_functions(functions, env)
+      { exported_functions, _ } = process_functions(functions, env)
 
       body = Module.translate_body(body, env)
 
@@ -178,120 +181,48 @@ defmodule ElixirScript.Translator.Protocol do
     { exported_functions, private_functions }
   end
 
-
-  @doc """
-    Used to map Protocol types from Elixir to
-    a function used by the protocol implementation
-    in JavaScript
-  """
   defp map_to_js({:__aliases__, _, [:Integer]}) do
-    JS.member_expression(
-      JS.identifier(:Elixir),
-      JS.member_expression(
-        JS.identifier(:Kernel),
-        JS.identifier(:is_integer)
-      )
-    )
+    do_map_to_js(:is_integer)
   end
 
   defp map_to_js({:__aliases__, _, [:Tuple]}) do
-    JS.member_expression(
-      JS.identifier(:Elixir),
-      JS.member_expression(
-        JS.identifier(:Kernel),
-        JS.identifier(:is_tuple)
-      )
-    )
+    do_map_to_js(:is_tuple)
   end
 
   defp map_to_js({:__aliases__, _, [:Atom]}) do
-    JS.member_expression(
-      JS.identifier(:Elixir),
-      JS.member_expression(
-        JS.identifier(:Kernel),
-        JS.identifier(:is_atom)
-      )
-    )
+    do_map_to_js(:is_atom)
   end
 
   defp map_to_js({:__aliases__, _, [:List]}) do
-    JS.member_expression(
-      JS.identifier(:Elixir),
-      JS.member_expression(
-        JS.identifier(:Kernel),
-        JS.identifier(:is_list)
-      )
-    )
+    do_map_to_js(:is_list)
   end
 
   defp map_to_js({:__aliases__, _, [:BitString]}) do
-    JS.member_expression(
-      JS.identifier(:Elixir),
-      JS.member_expression(
-        JS.identifier(:Kernel),
-        JS.identifier(:is_bitstring)
-      )
-    )
+    do_map_to_js(:is_bitstring)
   end
 
   defp map_to_js({:__aliases__, _, [:Float]}) do
-    JS.member_expression(
-      JS.identifier(:Elixir),
-      JS.member_expression(
-        JS.identifier(:Kernel),
-        JS.identifier(:is_float)
-      )
-    )
+    do_map_to_js(:is_float)
   end
 
   defp map_to_js({:__aliases__, _, [:Function]}) do
-    JS.member_expression(
-      JS.identifier(:Elixir),
-      JS.member_expression(
-        JS.identifier(:Kernel),
-        JS.identifier(:is_function)
-      )
-    )
+    do_map_to_js(:is_function)
   end
 
   defp map_to_js({:__aliases__, _, [:PID]}) do
-    JS.member_expression(
-      JS.identifier(:Elixir),
-      JS.member_expression(
-        JS.identifier(:Kernel),
-        JS.identifier(:is_pid)
-      )
-    )
+    do_map_to_js(:is_pid)
   end
 
   defp map_to_js({:__aliases__, _, [:Port]}) do
-    JS.member_expression(
-      JS.identifier(:Elixir),
-      JS.member_expression(
-        JS.identifier(:Kernel),
-        JS.identifier(:is_port)
-      )
-    )
+    do_map_to_js(:is_port)
   end
 
   defp map_to_js({:__aliases__, _, [:Reference]}) do
-    JS.member_expression(
-      JS.identifier(:Elixir),
-      JS.member_expression(
-        JS.identifier(:Kernel),
-        JS.identifier(:is_reference)
-      )
-    )
+    do_map_to_js(:is_reference)
   end
 
   defp map_to_js({:__aliases__, _, [:Map]}) do
-    JS.member_expression(
-      JS.identifier(:Elixir),
-      JS.member_expression(
-        JS.identifier(:Kernel),
-        JS.identifier(:is_map)
-      )
-    )
+    do_map_to_js(:is_map)
   end
 
   defp map_to_js({:__aliases__, _, [:Any]}) do
@@ -313,6 +244,17 @@ defmodule ElixirScript.Translator.Protocol do
     end
 
     Translator.translate(quoted, ElixirScript.State.get().env)
+  end
+
+
+  defp do_map_to_js(identifier) do
+    JS.member_expression(
+      JS.identifier(:Elixir),
+      JS.member_expression(
+        JS.identifier(:Kernel),
+        JS.identifier(identifier)
+      )
+    )
   end
 
 end

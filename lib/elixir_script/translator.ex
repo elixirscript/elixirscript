@@ -311,6 +311,14 @@ defmodule ElixirScript.Translator do
     %ElixirScript.Translator.Group{}
   end
 
+  defp do_translate({:|, _, [elem, list]}, env) do
+    quoted = quote do
+      List.prepend(unquote(list), unquote(elem))
+    end
+
+    translate(quoted, env)
+  end
+
   defp do_translate({name, metadata, params} = ast, env) when is_list(params) do
     if KernelLib.is_defined_in_kernel(name, length(params)) do
       KernelLib.translate_kernel_function(name, params, env)

@@ -55,12 +55,8 @@ defmodule ElixirScript.Translator.Primitive do
     )
   end
 
-  def make_list([{:|, [], [elem, list]}], env) do
-    quoted = quote do
-      List.prepend(unquote(list), unquote(elem))
-    end
-
-    Translator.translate(quoted, env)
+  def make_list([{:|, _, [elem, list]} = ast], env) do
+    Translator.translate(ast, env)
   end
 
   def make_list(ast, env) when is_list(ast) do

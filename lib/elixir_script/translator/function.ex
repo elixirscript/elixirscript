@@ -55,6 +55,7 @@ defmodule ElixirScript.Translator.Function do
   end
 
   def make_anonymous_function(functions, env) do
+
     clauses = functions
     |> Stream.map(fn(x) -> Variables.process(x) end)
     |> Stream.map(fn
