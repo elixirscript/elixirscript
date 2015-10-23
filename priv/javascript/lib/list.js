@@ -268,6 +268,10 @@ List.append = function(list, value){
   return Kernel.SpecialForms.list(...list.concat([value]));
 };
 
+List.prepend = function(list, value){
+  return Kernel.SpecialForms.list(...[value].concat(list));
+};
+
 List.concat = function(left, right){
   return left.concat(right);
 };

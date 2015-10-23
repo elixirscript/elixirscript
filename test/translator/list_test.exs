@@ -35,4 +35,12 @@ defmodule ElixirScript.Translator.List.Test do
 
     assert_translation(ex_ast, js_code)    
   end
+
+  should "prepend element" do
+    ex_ast = quote do: [x|list]
+
+    js_code = "Elixir.List.prepend(list, x)"
+
+    assert_translation(ex_ast, js_code) 
+  end
 end

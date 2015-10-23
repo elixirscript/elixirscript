@@ -55,6 +55,14 @@ defmodule ElixirScript.Translator.Primitive do
     )
   end
 
+  def make_list([{:|, [], [elem, list]}], env) do
+    quoted = quote do
+      List.prepend(unquote(list), unquote(elem))
+    end
+
+    Translator.translate(quoted, env)
+  end
+
   def make_list(ast, env) when is_list(ast) do
     JS.call_expression(
       JS.member_expression(
