@@ -1,4 +1,5 @@
 import Kernel from './kernel';
+import Chars from './string/chars';
 
 function to_atom(string){
   return Symbol.for(string);
@@ -189,5 +190,6 @@ export default {
   to_float,
   to_integer,
   upcase,
-  valid_character__qm__
+  valid_character__qm__,
+  Chars
 }

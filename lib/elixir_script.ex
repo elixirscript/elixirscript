@@ -48,33 +48,8 @@ defmodule ElixirScript do
     ElixirScript.State.start_link(root, env)
     build_environment([quoted])
 
-    if Set.size(ElixirScript.State.get().modules) > 0 do
-      create_code(include_path, import_standard_libs?)
-    else
-      result = case Translator.translate(quoted, env) do
-        modules when is_list(modules) ->
-          List.flatten(modules)
-          |> Enum.map(fn(x) ->
-            convert_to_code(x, root, include_path, env, import_standard_libs?)
-          end)
-        module ->
-          List.wrap(
-            convert_to_code(module, root, include_path, env, import_standard_libs?)
-          )
-      end
-
-      ElixirScript.State.stop
-
-      result
-    end
-  end
-
-  def make_defmodule({:defmodule, _, _} = ast) do
-    ast
-  end
-
-  def make_defmodule(ast) do
-    {:defmodule, [], [{:__aliases__, [], [:Temp]}, [do: { :__block__, [], [ast] }]]}
+    state = ElixirScript.State.get()
+    create_code(include_path, import_standard_libs?)
   end
 
   @doc """
@@ -102,7 +77,7 @@ defmodule ElixirScript do
 
   defp build_environment(code_list) do
     code_list
-    |> ElixirScript.Preprocess.Modules.get_info    
+    |> ElixirScript.Preprocess.Modules.get_info   
   end
 
   defp custom_env() do
@@ -112,19 +87,35 @@ defmodule ElixirScript do
   end
 
   defp create_code(include_path, import_standard_libs?) do
+
     state = ElixirScript.State.get()
 
-    result = Enum.map(state.modules, fn(x) ->
-      ElixirScript.Translator.Module.make_module(x.name, x.body, state.env)
+    current = self
+
+    result = state.modules
+    |> Enum.map(fn(x) ->
+      result = ElixirScript.Translator.Module.make_module(x.name, x.body, state.env)
+      |> Enum.map(fn(x) ->
+        convert_to_code(x, state.root, include_path, state.env, import_standard_libs?)
+      end)
+
+      spawn_link fn -> (send current, { self, result }) end
+    end)
+    |> Enum.map(fn (pid) ->
+      receive do { ^pid, x } -> x end
     end)
     |> List.flatten
+
+    protocol_result = state.protocols |> Dict.to_list
+    |> ElixirScript.Translator.Protocol.consolidate(state.env)
     |> Enum.map(fn(x) ->
-      convert_to_code(x, state.root, include_path, state.env, import_standard_libs?)
-    end)
+        convert_to_code(x, state.root, include_path, state.env, import_standard_libs?)
+      end)
+    |> List.flatten
 
     ElixirScript.State.stop
 
-    result
+    result ++ protocol_result
   end
 
   @doc """

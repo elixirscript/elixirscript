@@ -25,7 +25,48 @@ defmodule ElixirScript.State do
 
   def module_listed?(module_name) do
     Agent.get(__MODULE__, fn(state) ->
-      Enum.any?(state.modules, fn(x) -> x.name == module_name end)
+      Enum.any?(state.modules, fn(x) -> x.name == module_name end) ||
+      Enum.any?(state.protocols, fn({key, value}) -> key == module_name end)
+    end)
+  end
+
+  def protocol_listed?(module_name) do
+    Agent.get(__MODULE__, fn(state) ->
+      Enum.any?(state.protocols, fn({key, value}) -> key == module_name end)
+    end)
+  end
+
+  def add_protocol(name, spec) do
+    Agent.update(__MODULE__, fn(state) ->
+      proto = Dict.get(state.protocols, name)
+
+      if proto == nil do
+        proto = %{name: name, spec: spec, impls: HashDict.new }
+      else
+        proto = %{ proto | spec: spec }
+      end
+
+      %{ state | protocols: Dict.put(state.protocols, name, proto) }
+    end)
+  end
+
+  def add_protocol_impl(protocol, type, impl) when is_list(type) do
+    Enum.each(type, fn(x) ->
+      add_protocol_impl(protocol, x, impl)
+    end)
+  end
+
+  def add_protocol_impl(protocol, type, impl) do
+    Agent.update(__MODULE__, fn(state) ->
+      proto = Dict.get(state.protocols, protocol)
+
+      if proto == nil do
+        proto = %{name: protocol, spec: nil, impls: HashDict.new }
+      end
+
+      proto = %{ proto | impls: Dict.put(proto.impls, type, impl) }
+
+      %{ state | protocols: Dict.put(state.protocols, protocol, proto) }
     end)
   end
 

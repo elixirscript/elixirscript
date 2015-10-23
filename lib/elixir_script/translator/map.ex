@@ -45,6 +45,10 @@ defmodule ElixirScript.Translator.Map do
     JS.property(key, value, :init, false, false, true) 
   end
 
+  def make_shorthand_property(%ESTree.Identifier{} = key) do
+    JS.property(key, key, :init, true) 
+  end
+
   def make_map_update(map, data, env) do
     map = Translator.translate(map, env)
 

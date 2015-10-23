@@ -20,10 +20,20 @@ defmodule ElixirScript.Translator do
   alias ElixirScript.Translator.Receive
   alias ElixirScript.Translator.Quote
   alias ElixirScript.Translator.Utils
+  alias ElixirScript.Translator.Protocol
   alias ElixirScript.Translator.Kernel, as: KernelLib
   alias ElixirScript.Translator.Logger
   alias ElixirScript.Translator.JS, as: JSLib
   alias ESTree.Tools.Builder, as: JS
+
+  @standard_lib_protocols [
+    [:Enumerable],
+    [:Inspect],
+    [:String, :Chars],
+    [:List, :Chars],
+    [:Collectable]
+  ]
+
 
   @doc """
   Translates Elixir AST to JavaScript AST
@@ -283,6 +293,30 @@ defmodule ElixirScript.Translator do
 
   defp do_translate({:defmodule, _, [{:__aliases__, _, module_name_list}, [do: body]]}, env) do
     Module.make_module(module_name_list, body, env)
+  end
+
+  defp do_translate({:defprotocol, _, _}, _) do
+    %ElixirScript.Translator.Group{}
+  end
+
+  defp do_translate({:defimpl, _, [ {:__aliases__, _, protocol}, [for: type],  [do: {:__block__, context, spec}] ]}, env) when protocol in @standard_lib_protocols do
+    Protocol.make_standard_lib_impl({:__aliases__, [], [:Elixir] ++ protocol}, type, {:__block__, context, spec}, env)
+  end
+
+  defp do_translate({:defimpl, _, [ {:__aliases__, _, protocol}, [for: type],  [do: spec] ]}, env) when protocol in @standard_lib_protocols do
+    Protocol.make_standard_lib_impl({:__aliases__, [], [:Elixir] ++ protocol}, type, {:__block__, [], [spec]}, env)
+  end
+
+  defp do_translate({:defimpl, _, _}, _) do
+    %ElixirScript.Translator.Group{}
+  end
+
+  defp do_translate({:|, _, [elem, list]}, env) do
+    quoted = quote do
+      List.prepend(unquote(list), unquote(elem))
+    end
+
+    translate(quoted, env)
   end
 
   defp do_translate({name, metadata, params} = ast, env) when is_list(params) do

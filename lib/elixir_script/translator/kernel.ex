@@ -216,6 +216,10 @@ defmodule ElixirScript.Translator.Kernel do
     |> Translator.translate(env)
   end
 
+  defp do_translate({:throw, _, [params]} = ast, env) do
+    JS.throw_statement(Translator.translate(params, env))
+  end
+
   defp do_translate({:|>, _, [left, right]}, env) do
     case right do
       {{:., meta, [module, fun]}, meta2, params} ->
@@ -281,8 +285,9 @@ defmodule ElixirScript.Translator.Kernel do
     )
   end
 
-  defp do_translate({:to_string, _, [param]}, env) when is_binary(param) do
-    Translator.translate(param, env)
+  defp do_translate({:to_string, _, _} = ast, env) do
+    Macro.expand(ast, env)
+    |> Translator.translate(env)
   end
 
   defp do_translate({name, _, params}, env) do

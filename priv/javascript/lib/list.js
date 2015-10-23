@@ -1,6 +1,9 @@
 import Kernel from './kernel';
+import Chars from './list/chars';
 
 let List = {};
+
+List.Chars = Chars;
 
 List.delete = function(list, item){
   let new_value = [];
@@ -263,6 +266,10 @@ List.to_tuple = function(list){
 
 List.append = function(list, value){
   return Kernel.SpecialForms.list(...list.concat([value]));
+};
+
+List.prepend = function(list, value){
+  return Kernel.SpecialForms.list(...[value].concat(list));
 };
 
 List.concat = function(left, right){

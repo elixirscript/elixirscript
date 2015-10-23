@@ -35,4 +35,26 @@ defmodule ElixirScript.Translator.List.Test do
 
     assert_translation(ex_ast, js_code)    
   end
+
+  should "prepend element" do
+    ex_ast = quote do: [x|list]
+
+    js_code = "Elixir.List.prepend(list, x)"
+
+    assert_translation(ex_ast, js_code) 
+  end
+
+  should "prepend element in function" do
+    ex_ast = quote do
+       fn (_) -> [x|list] end
+    end
+
+    js_code = """
+    Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.wildcard()],function(){
+      return Elixir.List.prepend(list, x);
+    }))
+    """
+
+    assert_translation(ex_ast, js_code) 
+  end
 end

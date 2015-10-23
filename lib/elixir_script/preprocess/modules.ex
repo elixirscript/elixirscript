@@ -3,28 +3,88 @@ defmodule ElixirScript.Preprocess.Modules do
 
   alias ElixirScript.State
 
+  @standard_lib_protocols [
+    [:Enumerable],
+    [:Inspect],
+    [:String, :Chars],
+    [:List, :Chars],
+    [:Collectable]
+  ]
+
   def get_info(modules) do
-    Enum.each(modules, fn(m) ->
-      Macro.postwalk(m, fn(x) ->
-        do_get_info(x)
-      end)
+    Enum.map(modules, fn
+      { :__block__, _, list } ->
+        {mods, no_mods} = Enum.partition(list, fn
+          ({:defprotocol, _, [{:__aliases__, _, protocol}| rest ] }) when not protocol in @standard_lib_protocols -> 
+            true
+          ({:defimpl, _, [ {:__aliases__, _, protocol} | rest] }) when not protocol in @standard_lib_protocols -> 
+            true
+          ({:defmodule, _, _}) -> 
+            true
+          _ -> 
+            false
+        end)
+
+        mods ++ [{:defmodule, [], [{:__aliases__, [], [:ElixirScript, :Temp]}, [do: { :__block__, [], no_mods }]]}]
+      ({:defprotocol, _, [{:__aliases__, _, protocol}| rest ] }) = x when not protocol in @standard_lib_protocols ->
+        x
+      ({:defimpl, _, [ {:__aliases__, _, protocol} | rest] }) = x when not protocol in @standard_lib_protocols ->
+        x
+      ({:defmodule, _, _}) = x ->
+        x
+      x ->
+        {:defmodule, [], [{:__aliases__, [], [:ElixirScript, :Temp]}, [do: { :__block__, [], [x] }]]}
+    end)
+    |> List.flatten
+    |> Enum.each(fn(m) ->
+      Macro.postwalk(m, &do_get_info(&1))
     end)
   end
 
-  defp do_get_info({:defmodule, _, [{:__aliases__, meta, module_name_list}, [do: body]]} = ast) do
-    #TODO: expand macro here - body = Macro.expand(body, State.get().env)
+  def do_get_info({:defprotocol, _, [{:__aliases__, _, name}, [do: {:__block__, context, spec}]]}) do
+    ElixirScript.State.add_protocol(name, {:__block__, context, spec})
+  end
+
+  def do_get_info({:defprotocol, _, [{:__aliases__, _, name}, [do: spec]]}) do
+    ElixirScript.State.add_protocol(name, {:__block__, [], [spec]})
+  end
+
+  def do_get_info({:defimpl, _, [ {:__aliases__, _, protocol}, [for: type],  [do: {:__block__, context, spec}] ]}) when not protocol in @standard_lib_protocols do
+    ElixirScript.State.add_protocol_impl(protocol, type, {:__block__, context, spec})
+  end
+
+  def do_get_info({:defimpl, _, [ {:__aliases__, _, protocol}, [for: type],  [do: spec] ]})  when not protocol in @standard_lib_protocols do
+    ElixirScript.State.add_protocol_impl(protocol, type, {:__block__, [], [spec]})
+  end
+
+  def do_get_info({:defmodule, _, [{:__aliases__, meta, [:ElixirScript, :Temp]}, [do: body]]} = ast) do    
+    mod = %ElixirScript.Module{ name: [:ElixirScript, :Temp] , body: body }
+    State.add_module(mod)
+    
+    ast
+  end
+
+  def do_get_info({:defmodule, _, [{:__aliases__, meta, module_name_list}, [do: body]]} = ast) do
     body = make_inner_module_aliases(module_name_list, body)
 
     functions = get_functions_from_module(body)
     macros = get_macros_from_module(body)
+
+    body = case body do
+      {:__block__, _, _ } ->
+        Macro.expand(body, State.get().env)
+      _ ->
+        body
+    end
     
     mod = %ElixirScript.Module{ name: module_name_list , body: body, functions: functions, macros: macros }
+
     State.add_module(mod)
 
     ast
   end
 
-  defp do_get_info(ast) do
+  def do_get_info(ast) do
     ast
   end
 

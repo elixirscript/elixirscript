@@ -32,25 +32,27 @@ defmodule ElixirScript.Preprocess.Aliases do
     { ast, %{state | defined: HashSet.put(state.defined, List.last(name)) } }
   end
 
+  def process_aliases({{:., meta1, [{:__aliases__, meta2, aliases}, function]}, meta3, params} = ast, state, env) when aliases in [[:Collectable], [:Enumerable], [:Inspect], [:List, :Chars], [:String, :Chars]] do
+      new_ast = {{:., meta1, [{:__aliases__, meta2, List.last(aliases) |> List.wrap }, function]}, meta3, params}
+
+      new_state = %{ state | add: HashSet.put(state.add, [:Elixir] ++ aliases) }
+      { new_ast, new_state }
+  end
+
+
   def process_aliases({{:., meta1, [{:__aliases__, meta2, aliases}, function]}, meta3, params} = ast, state, env) do
-    expanded_ast = Macro.expand(ast, env)
+    if ElixirScript.State.module_listed?(aliases) do
+      new_ast = {{:., meta1, [{:__aliases__, meta2, List.last(aliases) |> List.wrap }, function]}, meta3, params}
 
-    if expanded_ast == ast do
-      if ElixirScript.State.module_listed?(aliases) do
-        new_ast = {{:., meta1, [{:__aliases__, meta2, List.last(aliases) |> List.wrap }, function]}, meta3, params}
-
-        new_state = if !HashSet.member?(state.defined, List.last(aliases)) do
-          %{ state | add: HashSet.put(state.add, aliases) }
-        else
-          state
-        end
-
-        { new_ast, new_state }
+      new_state = if !HashSet.member?(state.defined, List.last(aliases)) do
+        %{ state | add: HashSet.put(state.add, aliases) }
       else
-        { ast, state }
+        state
       end
+
+      { new_ast, new_state }
     else
-      process_aliases(expanded_ast, state, env)
+      { ast, state }
     end
   end
 

@@ -7,12 +7,12 @@ defmodule ElixirScript.Test do
       JQuery.("<div/>").text(html)
     """)
 
-    assert hd(js_code) == "JQuery('<div/>').text(html)"
+    assert hd(js_code) =~ "JQuery('<div/>').text(html)"
   end
 
   should "turn javascript ast into javascript code strings" do
     js_code = ElixirScript.compile(":atom")
-    assert hd(js_code) == "Elixir.Kernel.SpecialForms.atom('atom')"
+    assert hd(js_code) =~ "Elixir.Kernel.SpecialForms.atom('atom')"
   end
 
   should "parse one module correctly" do
@@ -26,15 +26,17 @@ defmodule ElixirScript.Test do
         end
 
         defp something_else() do
+          to_string(10)
         end
       end
+
     """)
 
     assert_js_matches """
          import * as Elixir from 'elixir';
          const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elephant');
          const something_else = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([],function()    {
-             return     null;
+             return     Elixir.String.Chars.to_string(10);
            }));
          const something = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([],function()    {
              return     ul;
@@ -78,16 +80,16 @@ defmodule ElixirScript.Test do
 
      assert_js_matches """
          import * as Elixir from 'elixir';
-         const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elephant');
+         const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Animals.Elephant');
          function defstruct(values = {})        {
-                 return     Kernel.defstruct({
+                 return  Elixir.Kernel.defstruct({
              [Elixir.Kernel.SpecialForms.atom('__struct__')]: __MODULE__,     [Elixir.Kernel.SpecialForms.atom('trunk')]: true
        },values);
                }
          export {
              defstruct
        };   
-       """, List.last(js_code)
+       """, Enum.fetch!(js_code, 1)
   end
 
 

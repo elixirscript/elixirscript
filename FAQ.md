@@ -92,7 +92,7 @@ You **can** use ElixirScript on your front ends and have it work and interoperat
 
 ## Q. Can I use processes?
 
-### A. No, but follow [this issue](https://github.com/bryanjos/elixirscript/issues/95). Any ideas or contributions are appreciated.
+### A. No, but follow [this issue](https://github.com/bryanjos/elixirscript/issues/99). Any ideas or contributions are appreciated.
 
 
 

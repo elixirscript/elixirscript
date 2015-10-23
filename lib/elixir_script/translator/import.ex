@@ -8,6 +8,9 @@ defmodule ElixirScript.Translator.Import do
 
     default = Dict.get(options, :default, false)
 
+    if State.protocol_listed?(name) do
+      default = true
+    end
     
      import_specifier = if default == false do
       if options[:as] do

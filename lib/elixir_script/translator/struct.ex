@@ -86,7 +86,10 @@ defmodule ElixirScript.Translator.Struct do
         JS.return_statement(
           JS.call_expression(
             JS.member_expression(
-              JS.identifier("Kernel"),
+              JS.member_expression(
+                JS.identifier("Elixir"),
+                JS.identifier("Kernel")
+              ),
               JS.identifier("defstruct")
             ),
             [defaults, JS.identifier(:values)]
