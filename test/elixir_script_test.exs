@@ -21,6 +21,7 @@ defmodule ElixirScript.Test do
       defmodule Elephant do
         @ul JQuery.("#todo-list")
 
+        @doc "ignore"
         def something() do
           @ul
         end
