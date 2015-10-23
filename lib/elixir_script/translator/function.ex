@@ -11,7 +11,7 @@ defmodule ElixirScript.Translator.Function do
     :Patterns, :Kernel, :Atom, :Enum, :Integer, :JS, 
     :List, :Range, :Tuple, :Agent, :Keyword, :BitString, 
     :Base, :String, :Bitwise, :Collectable, :Enumerable,
-    :Inspect
+    :Inspect, :Map, :MapSet
   ]
 
   def update_alias({:__aliases__, context, [:List, :Chars]}) do

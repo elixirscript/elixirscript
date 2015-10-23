@@ -3,6 +3,8 @@
   * Added Base module with function: encode64, decode64, and decode64!
   * Added String module
   * Added Bitwise module
+  * Added Map module
+  * Added MapSet module
   * Protocol support
   * Added `Collectable`, `Enumerable`, `Inspect`, `List.Chars`, and `String.Chars` protocols
 
