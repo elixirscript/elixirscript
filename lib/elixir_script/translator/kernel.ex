@@ -279,6 +279,7 @@ defmodule ElixirScript.Translator.Kernel do
       JS.object_expression(
         [
           Map.make_property(Translator.translate(:__struct__, env), Translator.translate(:RuntimeError, env)),
+          Map.make_property(Translator.translate(:__exception__, env), Translator.translate(true, env)),
           Map.make_property(Translator.translate(:message, env), JS.literal(message))
         ]
       )

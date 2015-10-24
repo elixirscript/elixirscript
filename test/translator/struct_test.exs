@@ -164,7 +164,9 @@ defmodule ElixirScript.Translator.Struct.Test do
 
     js_code = """
      throw     {
-                     [Elixir.Kernel.SpecialForms.atom('__struct__')]: Elixir.Kernel.SpecialForms.atom('RuntimeError'),         [Elixir.Kernel.SpecialForms.atom('message')]: 'did not get what was expected'
+      [Elixir.Kernel.SpecialForms.atom('__struct__')]: Elixir.Kernel.SpecialForms.atom('RuntimeError'),
+      [Elixir.Kernel.SpecialForms.atom('__exception__')]: true,
+      [Elixir.Kernel.SpecialForms.atom('message')]: 'did not get what was expected'
            };
     """
 
