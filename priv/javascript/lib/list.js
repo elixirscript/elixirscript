@@ -5,7 +5,7 @@ let List = {};
 
 List.Chars = Chars;
 
-List.__delete__ = function(list, item){
+List.delete = function(list, item){
   let new_value = [];
   let value_found = false;
 

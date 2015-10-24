@@ -29,7 +29,7 @@ describe('List', function(){
   describe('delete', function(){
     it('delete item in list', function(){
       let t = Kernel.SpecialForms.list(Kernel.SpecialForms.atom("a"), Kernel.SpecialForms.atom("b"), Kernel.SpecialForms.atom("c"));
-      t = List.__delete__(t, Kernel.SpecialForms.atom("b"));
+      t = List.delete(t, Kernel.SpecialForms.atom("b"));
       expect(t[1]).to.equal(Kernel.SpecialForms.atom("c"));
     })
   })

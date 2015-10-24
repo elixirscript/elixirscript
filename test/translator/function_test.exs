@@ -89,7 +89,7 @@ defmodule ElixirScript.Translator.Function.Test do
              return     Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.variable()],function(x)    {
              return     2;
            },function(x)    {
-             return     Elixir.Kernel.__in__(x,Elixir.Kernel.SpecialForms.list(false,null));
+             return     Elixir.Kernel.in(x,Elixir.Kernel.SpecialForms.list(false,null));
            }),Elixir.Patterns.make_case([Elixir.Patterns.wildcard()],function()    {
              return     1;
            })).call(this,1 == 1);
@@ -117,13 +117,13 @@ defmodule ElixirScript.Translator.Function.Test do
              return     Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.variable()],function(x)    {
              return     2;
            },function(x)    {
-             return     Elixir.Kernel.__in__(x,Elixir.Kernel.SpecialForms.list(false,null));
+             return     Elixir.Kernel.in(x,Elixir.Kernel.SpecialForms.list(false,null));
            }),Elixir.Patterns.make_case([Elixir.Patterns.wildcard()],function()    {
              return     Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.variable()],function(x)    {
              let [a000] = Elixir.Patterns.match(Elixir.Patterns.variable(),1);
              return     a000;
            },function(x)    {
-             return     Elixir.Kernel.__in__(x,Elixir.Kernel.SpecialForms.list(false,null));
+             return     Elixir.Kernel.in(x,Elixir.Kernel.SpecialForms.list(false,null));
            }),Elixir.Patterns.make_case([Elixir.Patterns.wildcard()],function()    {
              return     4;
            })).call(this,2 == 2);
@@ -402,7 +402,7 @@ defmodule ElixirScript.Translator.Function.Test do
      const something = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.variable(), Elixir.Patterns.variable()],function(one,two)    {
              return     null;
            },function(one,two)    {
-             return     Elixir.Kernel.__in__(one,Elixir.Kernel.SpecialForms.list(1,2,3));
+             return     Elixir.Kernel.in(one,Elixir.Kernel.SpecialForms.list(1,2,3));
            }));
     """
 
@@ -423,7 +423,7 @@ defmodule ElixirScript.Translator.Function.Test do
          const something = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.variable()],function(one)    {
              return     null;
            },function(one)    {
-             return     Elixir.Kernel.__in__(one,Elixir.Kernel.SpecialForms.list(1,2,3));
+             return     Elixir.Kernel.in(one,Elixir.Kernel.SpecialForms.list(1,2,3));
            }),Elixir.Patterns.make_case([Elixir.Patterns.variable()],function(one)    {
              return     null;
            },function(one)    {

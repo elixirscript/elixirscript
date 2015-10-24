@@ -9,7 +9,7 @@ function to_list(map){
 }
 
 function __delete__(set, term){
-  return MapSet.__delete__(set, term);
+  return MapSet.delete(set, term);
 }
 
 function put(set, term){
@@ -49,7 +49,7 @@ export default {
   size,
   to_list,
   disjoin__qmark__,
-  __delete__,
+  delete: __delete__,
   subset__qmark__,
   equal__qmark__,
   member__qmark__,

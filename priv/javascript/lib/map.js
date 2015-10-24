@@ -1,5 +1,4 @@
 import SpecialForms from './kernel/special_forms';
-import List from './list';
 
 function __new__(){
   return SpecialForms.map({});
@@ -238,13 +237,13 @@ function update(map, key, initial, fun){
 
 
 export default {
-  __new__,
+  new: __new__,
   keys,
   size,
   to_list,
   values,
   from_struct,
-  __delete__,
+  delete: __delete__,
   drop,
   equal__qmark__,
   fetch__emark__,

@@ -187,7 +187,7 @@ export default {
   is_port,
   is_reference,
   is_bitstring,
-  __in__,
+  in: __in__,
   abs,
   round,
   elem,

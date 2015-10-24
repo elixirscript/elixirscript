@@ -14,7 +14,7 @@ function to_list(map){
 }
 
 function __delete__(set, term){
-  let new_list = List.__delete__(set.set, term);
+  let new_list = List.delete(set.set, term);
 
   let new_map = Object.assign({}, set);
   new_map.set = new_list;
@@ -38,7 +38,7 @@ function difference(set1, set2){
 
   for(let val of set1.set){
     if(member__qmark__(set2, val)){
-      new_map.set = List.__delete__(new_map.set, val);
+      new_map.set = List.delete(new_map.set, val);
     }
   }
 
@@ -51,7 +51,7 @@ function intersection(set1, set2){
 
   for(let val of set1.set){
     if(!member__qmark__(set2, val)){
-      new_map.set = List.__delete__(new_map.set, val);
+      new_map.set = List.delete(new_map.set, val);
     }
   }
 
@@ -100,11 +100,11 @@ function subset__qmark__(set1, set2){
 
 
 export default {
-  __new__,
+  new: __new__,
   size,
   to_list,
   disjoin__qmark__,
-  __delete__,
+  delete: __delete__,
   subset__qmark__,
   equal__qmark__,
   member__qmark__,

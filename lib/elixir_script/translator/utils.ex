@@ -173,18 +173,6 @@ defmodule ElixirScript.Translator.Utils do
     )
   end
 
-  def filter_name(:in) do
-    "__in__"
-  end
-
-  def filter_name(:new) do
-    "__new__"
-  end
-
-  def filter_name(:delete) do
-    "__delete__"
-  end
-
   def filter_name(name) do
     to_string(name)
     |> String.replace("?", "__qmark__")
