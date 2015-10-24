@@ -7,7 +7,8 @@
   * Added `MapSet` module
   * Added `Set` module
   * Protocol support
-  * Added `Collectable`, `Enumerable`, `Inspect`, `List.Chars`, and `String.Chars` protocols
+  * Added `Collectable`, `Enumerable`, `Inspect`, `List.Chars`, and `String.Chars` protocols.
+    The only one currently being used in the Standard Library, however, is String.Chars
 
 # v0.12.0
 * Enhancements
