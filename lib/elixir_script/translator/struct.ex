@@ -41,9 +41,11 @@ defmodule ElixirScript.Translator.Struct do
   end
 
   def make_defexception(attributes, env) when length(attributes) == 1 do
+    exception_key_value = Map.make_property(Translator.translate(:__exception__, env), Translator.translate(true, env))
+    
     attributes = Enum.flat_map(attributes, fn(x) -> x end)
 
-    defaults = Enum.map(attributes, fn
+    defaults = [exception_key_value] ++ Enum.map(attributes, fn
       ({x, y}) ->
         Map.make_property(
           Translator.translate(x, env),
@@ -61,7 +63,9 @@ defmodule ElixirScript.Translator.Struct do
   end
 
   def make_defexceptions(attributes, env) do
-    defaults = Enum.map(attributes, fn
+    exception_key_value = Map.make_property(Translator.translate(:__exception__, env), Translator.translate(true, env))
+
+    defaults = [exception_key_value] ++ Enum.map(attributes, fn
       (x) ->
         Map.make_property(
           Translator.translate(x, env),
