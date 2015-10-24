@@ -15,7 +15,7 @@ defmodule ElixirScript.Mixfile do
       test_coverage: [tool: ExCoveralls],
       preferred_cli_env: [coveralls: :test],
       docs: [
-        extras: ["README.md", "GettingStarted.md", "FAQ.md"]
+        extras: ["GettingStarted.md", "FAQ.md"]
       ]
     ]
   end
