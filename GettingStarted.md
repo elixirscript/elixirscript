@@ -73,7 +73,7 @@ The intent of this guide is to get you started with ElixirScript. It will give y
     The last option we will show is the root option. This option is for defining a root path for the import statements. By default your import statement will not have anything prepended to it. For example, the elixir import will look like this:
     
     ```javascript
-    import { Patterns, Kernel, Atom, Enum, Integer, JS, List, Range, Tuple, Agent, Keyword, BitString } from 'elixir';
+    import * as Elixir from 'elixir';
     ```
     
     If we wanted to prepend "js" to the root, we can like this:
@@ -85,7 +85,7 @@ The intent of this guide is to get you started with ElixirScript. It will give y
     Now the import will look like this:
     
     ```javascript
-    import { Patterns, Kernel, Atom, Enum, Integer, JS, List, Range, Tuple, Agent, Keyword, BitString } from 'js/elixir';
+    import * as Elixir from 'js/elixir';
     ```
     
     That concludes the walkthrough on options, as well as the walkthrough on using the ex2js escript.
