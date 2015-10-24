@@ -6,7 +6,7 @@ function __new__(){
 }
 
 function size(map){
-  return keys(map.set).length;
+  return map.set.length;
 }
 
 function to_list(map){
@@ -63,7 +63,7 @@ function union(set1, set2){
   let new_map = set1;
 
   for(let val of set2.set){
-      new_map = put(set, val);
+      new_map = put(new_map, val);
   }
 
   return SpecialForms.map(new_map); 
@@ -81,7 +81,7 @@ function disjoin__qmark__(set1, set2){
 }
 
 function member__qmark__(set, value){
-  return set.set.indexof(value) >= 0;
+  return set.set.indexOf(value) >= 0;
 }
 
 function equal__qmark__(set1, set2){
