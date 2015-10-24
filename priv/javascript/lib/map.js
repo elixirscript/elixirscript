@@ -252,7 +252,6 @@ export default {
   has_key__qmark__,
   split,
   take,
-  drop,
   put_new,
   put_new_lazy,
   get_and_update,
