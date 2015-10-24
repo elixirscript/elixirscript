@@ -77,11 +77,8 @@ defmodule ElixirScript.Translator do
     Function.make_anonymous_function([{:->, [], [params, body]}], env)
   end
 
-  defp do_translate({:@, _, [{:doc, _, _}]}, env) do
-    %ElixirScript.Translator.Group{}
-  end
-
-  defp do_translate({:@, _, [{:moduledoc, _, _}]}, env) do
+  defp do_translate({:@, _, [{name, _, _}]}, env) 
+  when name in [:doc, :moduledoc, :type, :typep, :spec, :opaque, :callback, :macrocallback] do
     %ElixirScript.Translator.Group{}
   end
 
