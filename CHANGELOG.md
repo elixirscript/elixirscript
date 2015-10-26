@@ -1,4 +1,4 @@
-# v0.13.0-dev
+# v0.13.0
 * Enhancements
   * Added `Base` module with function: encode64, decode64, and decode64!
   * Added `String` module
