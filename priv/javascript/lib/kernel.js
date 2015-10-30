@@ -149,6 +149,55 @@ function match__qmark__(pattern, expr, guard = () => true){
   return Patterns.match_no_throw(pattern, expr, guard) != null;  
 }
 
+function defstruct(defaults){
+  return class {
+    constructor(update = {}){
+      let the_values = Object.assign(defaults, update);
+      Object.assign(this, the_values);
+    }
+    
+    static update(obj, updates = {}){
+      let x = Object.assign(new this(), obj);
+      x = Object.assign(x, updates);
+      return Object.freeze(x);
+    }
+    
+    static create(updates = {}){
+      let x = new this(updates);
+      return Object.freeze(x);
+    }
+  }
+}
+
+
+function defexception(defaults){
+  return class extends Error {
+    constructor(update = {}){
+      let message = update.message || "";
+      super(message);
+
+      let the_values = Object.assign(defaults, update);
+      Object.assign(this, the_values);
+
+      this.name = this.constructor.name;
+      this.message = message; 
+      this[SpecialForms.atom("__exception__")] = true;
+      Error.captureStackTrace(this, this.constructor.name);
+    }
+    
+    static update(obj, updates = {}){
+      let x = Object.assign(new this(), obj);
+      x = Object.assign(x, updates);
+      return Object.freeze(x);
+    }
+    
+    static create(updates = {}){
+      let x = new this(updates);
+      return Object.freeze(x);
+    }
+  }
+}
+
 function defstruct(defaults, values){
   return SpecialForms.map_update(defaults, values);
 }

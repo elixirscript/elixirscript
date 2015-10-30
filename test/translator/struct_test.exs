@@ -11,13 +11,12 @@ defmodule ElixirScript.Translator.Struct.Test do
 
     js_code = """
          const __MODULE__ = Elixir.Kernel.SpecialForms.atom('User');
-         function defstruct(values = {})        {
-                 return Elixir.Kernel.defstruct({
+          const User = Elixir.Kernel.defstruct({
              [Elixir.Kernel.SpecialForms.atom('__struct__')]: __MODULE__,     [Elixir.Kernel.SpecialForms.atom('name')]: 'john',     [Elixir.Kernel.SpecialForms.atom('age')]: 27
-       },values);
-               }
+          });
+               
          export {
-             defstruct
+             User
        };
     """
 

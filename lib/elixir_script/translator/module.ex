@@ -29,6 +29,8 @@ defmodule ElixirScript.Translator.Module do
     {imports, body} = extract_imports_from_body(body)
     {structs, body} = extract_structs_from_body(body)
 
+    structs = process_struct(module_name_list, structs)
+
 
     #Add imports found from walking the ast
     #and make sure to only put one declaration per alias    
@@ -48,7 +50,7 @@ defmodule ElixirScript.Translator.Module do
     body = Utils.inflate_groups(body)
 
     exported_object = JS.object_expression(
-      make_defstruct_property(structs) ++
+      make_defstruct_property(module_name_list, structs) ++
       Enum.map(exported_functions, fn({key, _value}) -> 
         JS.property(JS.identifier(key), JS.identifier(key), :init, true)
       end)
@@ -141,7 +143,9 @@ defmodule ElixirScript.Translator.Module do
   def extract_structs_from_body(body) do
     Enum.partition(body, fn(x) ->
       case x do
-        %ESTree.FunctionDeclaration{} ->
+        %ESTree.CallExpression{callee: %ESTree.MemberExpression{property: %ESTree.Identifier{name: "defstruct"}}} ->
+          true
+        %ESTree.CallExpression{callee: %ESTree.MemberExpression{property: %ESTree.Identifier{name: "defexception"}}} ->
           true
         _ ->
           false
@@ -149,16 +153,29 @@ defmodule ElixirScript.Translator.Module do
     end)
   end
 
-  defp make_defstruct_property([]) do
+  defp process_struct(module_name, []) do
     []
   end
 
-  defp make_defstruct_property([the_struct]) do
+  defp process_struct(module_name, [the_struct]) do
+    declarator = JS.variable_declarator(
+      JS.identifier(List.last(module_name)),
+      the_struct
+    )
+
+    [JS.variable_declaration([declarator], :const)]
+  end
+
+  defp make_defstruct_property(module_name, []) do
+    []
+  end
+
+  defp make_defstruct_property(module_name, [the_struct]) do
     case the_struct do
-      %ESTree.FunctionDeclaration{id: %ESTree.Identifier{name: :defstruct}} ->
-        [JS.property(JS.identifier(:defstruct), JS.identifier(:defstruct), :init, true )]
-      %ESTree.FunctionDeclaration{id: %ESTree.Identifier{name: :defexception}} ->
-        [JS.property(JS.identifier(:defexception), JS.identifier(:defexception), :init, true )]    
+      %ESTree.CallExpression{callee: %ESTree.MemberExpression{property: %ESTree.Identifier{name: "defstruct"}}} ->
+        [List.last(module_name), the_struct]
+      %ESTree.CallExpression{callee: %ESTree.MemberExpression{property: %ESTree.Identifier{name: "defexception"}}} ->
+        [List.last(module_name), the_struct]    
     end
   end
 
