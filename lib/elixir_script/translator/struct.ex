@@ -82,6 +82,25 @@ defmodule ElixirScript.Translator.Struct do
 
     defaults = %{ defaults | properties: [struct_name]  ++ defaults.properties }
 
+    JS.function_declaration(
+      JS.identifier(name),
+      [JS.identifier(:values)],
+      [JS.object_expression([])],
+      JS.block_statement([
+        JS.return_statement(
+          JS.call_expression(
+            JS.member_expression(
+              JS.member_expression(
+                JS.identifier("Elixir"),
+                JS.identifier("Kernel")
+              ),
+              JS.identifier("defstruct")
+            ),
+            [defaults, JS.identifier(:values)]
+          )
+        )
+      ])
+
     JS.call_expression(
       JS.member_expression(
         JS.member_expression(

@@ -10,14 +10,15 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-         const __MODULE__ = Elixir.Kernel.SpecialForms.atom('User');
-          const User = Elixir.Kernel.defstruct({
-             [Elixir.Kernel.SpecialForms.atom('__struct__')]: __MODULE__,     [Elixir.Kernel.SpecialForms.atom('name')]: 'john',     [Elixir.Kernel.SpecialForms.atom('age')]: 27
-          });
+        const __MODULE__ = Elixir.Kernel.SpecialForms.atom('User');
+        
+        const User = Elixir.Kernel.defstruct({
+          [Elixir.Kernel.SpecialForms.atom('__struct__')]: __MODULE__,     [Elixir.Kernel.SpecialForms.atom('name')]: 'john',     [Elixir.Kernel.SpecialForms.atom('age')]: 27
+        });
                
-         export {
-             User
-       };
+        export {
+          User
+        };
     """
 
     assert_translation(ex_ast, js_code)
