@@ -26,13 +26,13 @@ defmodule ElixirScript.State do
   def module_listed?(module_name) do
     Agent.get(__MODULE__, fn(state) ->
       Enum.any?(state.modules, fn(x) -> x.name == module_name end) ||
-      Enum.any?(state.protocols, fn({key, value}) -> key == module_name end)
+      Enum.any?(state.protocols, fn({key, _}) -> key == module_name end)
     end)
   end
 
   def protocol_listed?(module_name) do
     Agent.get(__MODULE__, fn(state) ->
-      Enum.any?(state.protocols, fn({key, value}) -> key == module_name end)
+      Enum.any?(state.protocols, fn({key, _}) -> key == module_name end)
     end)
   end
 
@@ -77,13 +77,24 @@ defmodule ElixirScript.State do
   end
 
   def get_module(module_name_list) do
-    state = Agent.get(__MODULE__, fn(state) ->
-      state
-    end)
+    state = get()
 
     Enum.find(Set.to_list(state.modules), fn(x) ->
       x.name == module_name_list
     end)
+  end
+
+  def get_macro({:__aliases__, _, module_name_list}, macro_name) do
+    get_macro(module_name_list, macro_name)
+  end
+
+  def get_macro(module_name_list, macro_name) do
+    module = get_module(module_name_list)
+    if(module) do
+      Enum.find(module.macros, fn(%ElixirScript.Macro{ name: name }) -> name == macro_name end)
+    else
+      nil
+    end
   end
 
   def stop() do
