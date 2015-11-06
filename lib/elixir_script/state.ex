@@ -88,6 +88,17 @@ defmodule ElixirScript.State do
     get_macro(module_name_list, macro_name)
   end
 
+  def get_macro(module, macro_name) when is_atom(module) do
+    case Atom.to_string(module) do
+      "Elixir." <> mod_name ->
+        String.split(mod_name, ".")
+        |> Enum.map(&String.to_atom(&1))
+        |> get_macro(macro_name)
+      _ ->
+        nil
+    end
+  end
+
   def get_macro(module_name_list, macro_name) do
     module = get_module(module_name_list)
     if(module) do

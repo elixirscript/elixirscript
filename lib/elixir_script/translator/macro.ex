@@ -1,10 +1,25 @@
 defmodule ElixirScript.Translator.Macro do
+  alias ElixirScript.Translator.Utils
+  alias ElixirScript.Translator.Function
 
-  def expand(macro, macro_param_values) do
+  def expand_using( %ElixirScript.Macro{ name: :__using__ } = macro, macro_param_values) do
+    do_expand(macro, macro_param_values)
+  end
 
-    {ast, _} = Macro.prewalk(macro.body, %{ parameters: macro.parameters, bound: [] }, fn
+  def expand(macro, macro_param_values, env) do
+    do_expand(macro, macro_param_values)
+    |> Function.make_function_body(env)
+    |> Utils.wrap_in_function_closure
+  end
+
+  defp do_expand(macro, macro_param_values) do
+    Macro.prewalk(macro.body, %{ parameters: macro.parameters, bound: [] }, fn
       {:unquote, _, [x]}, macro_params ->
         { translate_variable(x, macro_params.parameters, macro_param_values), macro_params }
+
+      {:unquote_splicing, _, elements }, macro_params ->
+        { Enum.map(elements, &translate_variable(&1, macro_params.parameters, macro_param_values)), macro_params }
+
       {:quote, _, [[do: ast ]]}, macro_params ->
         { ast, macro_params }
 
@@ -24,12 +39,12 @@ defmodule ElixirScript.Translator.Macro do
         bound_params = %{ macro_params | bound: bound_params }
 
         { ast,  bound_params }
+
       x, macro_params ->
         { translate_variable(x, macro_params.bound, macro_param_values), macro_params }
 
     end)
-
-    ast
+    |> elem(0)
   end
 
   defp translate_variable(x, macro_params, macro_param_values) do
