@@ -96,7 +96,7 @@ defmodule ElixirScript.PatternMatching.Match do
       [value]
     )
   end
-  
+
   def build_match(params, env) do
     Enum.map(params, &do_build_match(&1, env))
     |> reduce_patterns
@@ -165,7 +165,7 @@ defmodule ElixirScript.PatternMatching.Match do
     |> Enum.map(&build_match([&1], env))
     |> reduce_patterns
 
-    {[Primitive.make_tuple_no_translate(patterns)], params}   
+    {[Primitive.make_tuple_no_translate(patterns)], params}
   end
 
   defp do_build_match({name, _, _}, env) do

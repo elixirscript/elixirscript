@@ -8,8 +8,8 @@ defmodule ElixirScript.Translator.Function do
   alias ElixirScript.Translator.Map
 
   @standard_libs [
-    :Patterns, :Kernel, :Atom, :Enum, :Integer, :JS, 
-    :List, :Range, :Tuple, :Agent, :Keyword, :BitString, 
+    :Patterns, :Kernel, :Atom, :Enum, :Integer, :JS,
+    :List, :Range, :Tuple, :Agent, :Keyword, :BitString,
     :Base, :String, :Bitwise, :Collectable, :Enumerable,
     :Inspect, :Map, :MapSet, :Set
   ]
@@ -60,6 +60,7 @@ defmodule ElixirScript.Translator.Function do
     |> Stream.map(fn(x) -> Variables.process(x) end)
     |> Stream.map(fn
       {:->, _, [ [{:when, _, [params | guards]}], body ]} ->
+        params = wrap_params(params)
         { patterns, params } = Match.build_match(List.wrap(params), env)
         params = make_params(params)
         body = make_function_body(body, env)
@@ -67,12 +68,14 @@ defmodule ElixirScript.Translator.Function do
         do_make_function_clause(patterns, params, body, guard_body)
 
       ({:->, _, [params, body]}) ->
+        params = wrap_params(params)
         { patterns, params } = Match.build_match(params, env)
         params = make_params(params)
         body = make_function_body(body, env)
-        do_make_function_clause(patterns, params, body)        
+        do_make_function_clause(patterns, params, body)
 
       ({_, _, [{:when, _, [{_, _, params} | guards] }, [do: body]]}) ->
+        params = wrap_params(params)
         { patterns, params } = Match.build_match(params, env)
         params = make_params(params)
         body = make_function_body(body, env)
@@ -80,12 +83,14 @@ defmodule ElixirScript.Translator.Function do
         do_make_function_clause(patterns, params, body, guard_body)
 
       ({_, _, [{_, _, params}, [do: body]]}) ->
+        params = wrap_params(params)
         { patterns, params } = Match.build_match(params, env)
         params = make_params(params)
         body = make_function_body(body, env)
         do_make_function_clause(patterns, params, body)
 
       ({_, _, [{_, _, params}]}) ->
+        params = wrap_params(params)
         { patterns, params } = Match.build_match(params, env)
         params = make_params(params)
         body = make_function_body([], env)
@@ -107,6 +112,14 @@ defmodule ElixirScript.Translator.Function do
       ),
       clauses
     )
+  end
+
+  def wrap_params(params) when is_atom(params) do
+    []
+  end
+
+  def wrap_params(params) do
+    params
   end
 
   def make_function_body(body, env) do
@@ -138,7 +151,7 @@ defmodule ElixirScript.Translator.Function do
         )
       ),
       [
-        JS.array_expression(patterns), 
+        JS.array_expression(patterns),
         JS.function_expression(params, [], body),
         JS.function_expression(params, [], guard_body)
       ]
@@ -155,7 +168,7 @@ defmodule ElixirScript.Translator.Function do
         )
       ),
       [
-        JS.array_expression(patterns), 
+        JS.array_expression(patterns),
         JS.function_expression(params, [], body)
       ]
     )
@@ -255,9 +268,9 @@ defmodule ElixirScript.Translator.Function do
 
     last_item = case last_item do
       %ESTree.Literal{} ->
-        JS.return_statement(last_item) 
+        JS.return_statement(last_item)
       %ESTree.Identifier{} ->
-        JS.return_statement(last_item) 
+        JS.return_statement(last_item)
       %ESTree.VariableDeclaration{} ->
         declaration = hd(last_item.declarations).id
 
@@ -269,7 +282,7 @@ defmodule ElixirScript.Translator.Function do
               JS.return_statement(JS.array_expression(declaration.elements))
             end
           _ ->
-            JS.return_statement(declaration)  
+            JS.return_statement(declaration)
         end
 
         [last_item, return_statement]
@@ -277,14 +290,14 @@ defmodule ElixirScript.Translator.Function do
         last_item = %ESTree.BlockStatement{ last_item | body: return_last_expression(last_item.body) }
       _ ->
         if String.contains?(last_item.type, "Expression") do
-          JS.return_statement(last_item) 
+          JS.return_statement(last_item)
         else
           [last_item, JS.return_statement(JS.literal(nil))]
-        end    
+        end
     end
 
 
-    list = Enum.take(list, length(list)-1) 
+    list = Enum.take(list, length(list)-1)
     |> Enum.map(fn(x) ->
       case x do
         %ESTree.MemberExpression{} ->
