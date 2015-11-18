@@ -2,6 +2,7 @@ defmodule ElixirScript.Translator do
   @moduledoc """
   Translates the given Elixir AST into JavaScript AST
   """
+  alias ElixirScript.State
   alias ElixirScript.Translator.Primitive
   alias ElixirScript.Translator.Assignment
   alias ElixirScript.Translator.Map
@@ -134,14 +135,25 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({{:., _, [function_name]}, _, params}, env) do
-    Function.make_function_call(function_name, params, env)
+    macro = State.get_macro(Process.get(:current_module), function_name)
+
+    if(macro) do
+      translate_macro(macro, params, env)
+    else
+      Function.make_function_call(function_name, params, env)
+    end
   end
 
   defp do_translate({:., _, [module_name, function_name]} = ast, env) do
     expanded_ast = Macro.expand(ast, env)
 
     if expanded_ast == ast do
-      Function.make_function_or_property_call(module_name, function_name, env)
+      macro = State.get_macro(module_name, function_name)
+      if(macro) do
+          translate_macro(macro, [], env)
+      else
+        Function.make_function_or_property_call(module_name, function_name, env)
+      end
     else
       translate(expanded_ast, env)
     end
@@ -151,7 +163,12 @@ defmodule ElixirScript.Translator do
     expanded_ast = Macro.expand(ast, env)
 
     if expanded_ast == ast do
-      Function.make_function_or_property_call(module_name, function_name, env)
+      macro = State.get_macro(module_name, function_name)
+      if(macro) do
+          translate_macro(macro, [], env)
+      else
+        Function.make_function_or_property_call(module_name, function_name, env)
+      end
     else
       translate(expanded_ast, env)
     end
@@ -175,7 +192,12 @@ defmodule ElixirScript.Translator do
       _ ->
         expanded_ast = Macro.expand(ast, env)
         if expanded_ast == ast do
-          Function.make_function_call(module_name, function_name, params, env)
+          macro = State.get_macro(module_name, function_name)
+          if(macro) do
+            translate_macro(macro, params, env)
+          else
+            Function.make_function_call(module_name, function_name, params, env)
+          end
         else
           translate(expanded_ast, env)
         end
@@ -300,6 +322,10 @@ defmodule ElixirScript.Translator do
     Module.make_module(module_name_list, body, env)
   end
 
+  defp do_translate({:defmacro, _, _}, _) do
+    %ElixirScript.Translator.Group{}
+  end
+
   defp do_translate({:defprotocol, _, _}, _) do
     %ElixirScript.Translator.Group{}
   end
@@ -330,7 +356,12 @@ defmodule ElixirScript.Translator do
     else
       expanded_ast = Macro.expand(ast, env)
       if expanded_ast == ast do
-        Function.make_function_call(name, params, env)
+        macro = State.get_macro(Process.get(:current_module), name)
+        if(macro) do
+          translate_macro(macro, params, env)
+        else
+          Function.make_function_call(name, params, env)
+        end
       else
         translate(expanded_ast, env)
       end
@@ -340,6 +371,21 @@ defmodule ElixirScript.Translator do
   defp do_translate({ name, _, _ }, _) do
     name = Utils.filter_name(name)
     Primitive.make_identifier(name)
+  end
+
+  defp translate_macro(%ElixirScript.Macro{ name: :__using__ } = macro, params, env) do
+    ast = ElixirScript.Translator.Macro.expand_using(macro, params)
+
+    case ast do
+      {:__block__, _, list } ->
+        %ElixirScript.Translator.Group{ body: Enum.map(list, &translate(&1, env)) }
+      _ ->
+        translate(ast, env)
+    end
+  end
+
+  defp translate_macro(macro, params, env) do
+    ElixirScript.Translator.Macro.expand(macro, params, env)
   end
 
 end

@@ -1,5 +1,4 @@
 defmodule ElixirScript do
-  alias ElixirScript.Translator
   alias ElixirScript.Translator.JSModule
   alias ESTree.Tools.Builder
   alias ESTree.Tools.Generator
@@ -47,8 +46,6 @@ defmodule ElixirScript do
 
     ElixirScript.State.start_link(root, env)
     build_environment([quoted])
-
-    state = ElixirScript.State.get()
     create_code(include_path, import_standard_libs?)
   end
 
@@ -65,7 +62,7 @@ defmodule ElixirScript do
 
     path
     |> Path.wildcard
-    |> Enum.map(fn(x) -> 
+    |> Enum.map(fn(x) ->
       File.read!(x)
       |> Code.string_to_quoted!
     end)
@@ -77,7 +74,7 @@ defmodule ElixirScript do
 
   defp build_environment(code_list) do
     code_list
-    |> ElixirScript.Preprocess.Modules.get_info   
+    |> ElixirScript.Preprocess.Modules.get_info
   end
 
   defp custom_env() do
@@ -94,12 +91,15 @@ defmodule ElixirScript do
 
     result = state.modules
     |> Enum.map(fn(x) ->
-      result = ElixirScript.Translator.Module.make_module(x.name, x.body, state.env)
-      |> Enum.map(fn(x) ->
-        convert_to_code(x, state.root, include_path, state.env, import_standard_libs?)
-      end)
+      spawn_link fn ->
+        Process.put(:current_module, x.name)
 
-      spawn_link fn -> (send current, { self, result }) end
+        result = ElixirScript.Translator.Module.make_module(x.name, x.body, state.env)
+        |> Enum.map(fn(x) ->
+          convert_to_code(x, state.root, include_path, state.env, import_standard_libs?)
+        end)
+        send current, { self, result }
+      end
     end)
     |> Enum.map(fn (pid) ->
       receive do { ^pid, x } -> x end
@@ -133,7 +133,7 @@ defmodule ElixirScript do
     File.read!(operating_path <> "/dist/elixir.js")
   end
 
-  defp convert_to_code(js_ast, root, include_path, env, import_standard_libs \\ true) do
+  defp convert_to_code(js_ast, root, include_path, env, import_standard_libs) do
       js_ast
       |> process_module(root, env, import_standard_libs)
       |> javascript_ast_to_code
@@ -190,7 +190,7 @@ defmodule ElixirScript do
         Enum.reduce(modules, [], fn(x, list) -> list ++ x.body end)
         |> Builder.program
       %ElixirScript.Translator.Group{body: body} ->
-        Builder.program(body)      
+        Builder.program(body)
       _ ->
         js_ast
     end
@@ -207,6 +207,6 @@ defmodule ElixirScript do
         Path.join(replaced_path)
     end
   end
-  
+
 
 end

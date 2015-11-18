@@ -28,13 +28,13 @@ defmodule ElixirScript.Mixfile do
 
   defp deps do
     [
-      {:inflex, "~> 1.4" },
+      {:inflex, "~> 1.5" },
       {:estree, "~> 2.0"},
       {:shouldi, only: :test },
       {:earmark, "~> 0.1", only: :dev },
       {:ex_doc, "~> 0.10", only: :dev },
       {:benchfella, "~> 0.2", only: :test},
-      {:excoveralls, "~> 0.3", only: :test}  
+      {:excoveralls, "~> 0.4", only: :test}
     ]
   end
 
@@ -106,5 +106,5 @@ defmodule ElixirScript.Mixfile do
 
     IO.puts("installed at /usr/local/ex2js")
   end
-  
+
 end
