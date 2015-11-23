@@ -1,5 +1,4 @@
 defmodule ElixirScript do
-  alias ElixirScript.Translator
   alias ElixirScript.Translator.JSModule
   alias ESTree.Tools.Builder
   alias ESTree.Tools.Generator
@@ -48,7 +47,6 @@ defmodule ElixirScript do
     ElixirScript.State.start_link(root, env)
     build_environment([quoted])
 
-    state = ElixirScript.State.get()
     create_code(include_path, import_standard_libs?)
   end
 
@@ -65,7 +63,7 @@ defmodule ElixirScript do
 
     path
     |> Path.wildcard
-    |> Enum.map(fn(x) -> 
+    |> Enum.map(fn(x) ->
       File.read!(x)
       |> Code.string_to_quoted!
     end)
@@ -77,7 +75,7 @@ defmodule ElixirScript do
 
   defp build_environment(code_list) do
     code_list
-    |> ElixirScript.Preprocess.Modules.get_info   
+    |> ElixirScript.Preprocess.Modules.get_info
   end
 
   defp custom_env() do
@@ -133,7 +131,7 @@ defmodule ElixirScript do
     File.read!(operating_path <> "/dist/elixir.js")
   end
 
-  defp convert_to_code(js_ast, root, include_path, env, import_standard_libs \\ true) do
+  defp convert_to_code(js_ast, root, include_path, env, import_standard_libs) do
       js_ast
       |> process_module(root, env, import_standard_libs)
       |> javascript_ast_to_code
@@ -190,7 +188,7 @@ defmodule ElixirScript do
         Enum.reduce(modules, [], fn(x, list) -> list ++ x.body end)
         |> Builder.program
       %ElixirScript.Translator.Group{body: body} ->
-        Builder.program(body)      
+        Builder.program(body)
       _ ->
         js_ast
     end
@@ -201,12 +199,12 @@ defmodule ElixirScript do
       Mix.Project.build_path <> "/lib/elixir_script/priv/javascript"
     rescue
       UndefinedFunctionError ->
-        split_path = Path.split(Application.app_dir(:ex2js))
+        split_path = Path.split(Application.app_dir(:elixirscript))
         replaced_path = List.delete_at(split_path, length(split_path) - 1)
         replaced_path = List.delete_at(replaced_path, length(replaced_path) - 1)
         Path.join(replaced_path)
     end
   end
-  
+
 
 end

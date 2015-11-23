@@ -3,9 +3,11 @@
 erl_crash.dump
 *.ez
 ex2js
+elixirscript
 node_modules
 priv/test_project/dest
 priv/javascript/build
+priv/javascript/test_build
 priv/javascript/dist
 priv/javascript/dist_build
 /dist
@@ -17,4 +19,3 @@ fprof.trace
 index.js
 /doc
 /bench/snapshots
-
