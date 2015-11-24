@@ -232,12 +232,8 @@ defmodule ElixirScript.Translator do
     Quote.make_quote(opts, expr, env)
   end
 
-  defp do_translate({:import, _, [{:__aliases__, _, module_name_list}, params ]}, env) do
-    Import.make_import(module_name_list, params, env)
-  end
-
-  defp do_translate({:import, _, [{:__aliases__, _, module_name_list}]}, env) do
-    Import.make_import(module_name_list, [], env)
+  defp do_translate({:import, _, _}, _) do
+    %ElixirScript.Translator.Group{}
   end
 
   defp do_translate({:alias, _, [alias_info, options]}, _) when is_tuple(alias_info) do
@@ -330,7 +326,15 @@ defmodule ElixirScript.Translator do
     else
       expanded_ast = Macro.expand(ast, env)
       if expanded_ast == ast do
-        Function.make_function_call(name, params, env)
+        module = ElixirScript.State.get_module(Process.get(:current_module))
+        imported_module = ElixirScript.Module.imported?(module, name)
+
+        if imported_module do
+          imported_module = ElixirScript.State.get_module(imported_module)
+          Function.make_function_call({:__aliases__, [], List.last(imported_module.name) |> List.wrap }, name, params, env)
+        else
+          Function.make_function_call(name, params, env)
+        end
       else
         translate(expanded_ast, env)
       end

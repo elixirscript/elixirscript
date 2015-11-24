@@ -34,8 +34,7 @@ defmodule ElixirScript.Translator.Protocol do
   end
 
   defp define_spec(name, spec, env) do
-
-    { body, aliases } = Aliases.process(spec, env)
+    { body, aliases } = Aliases.process(name, spec, env)
 
     { body, functions } = extract_function_from_spec(body)
 
@@ -48,8 +47,8 @@ defmodule ElixirScript.Translator.Protocol do
     imports = Module.process_imports(imports, aliases)
     imports = imports.imports
 
-    object = Enum.map(exported_functions, fn({key, value}) -> 
-      Map.make_property(JS.identifier(Utils.filter_name(key)), value) 
+    object = Enum.map(exported_functions, fn({key, value}) ->
+      Map.make_property(JS.identifier(Utils.filter_name(key)), value)
     end)
     |> JS.object_expression
 
@@ -77,7 +76,7 @@ defmodule ElixirScript.Translator.Protocol do
   defp define_impls(name, impls, env) do
     Enum.map(impls, fn({type, impl}) ->
       type = map_to_js(type)
-      { body, aliases } = Aliases.process(impl, env)
+      { body, aliases } = Aliases.process(name, impl, env)
       { body, functions } = Module.extract_functions_from_module(body)
       { exported_functions, _ } = process_functions(functions, env)
 
@@ -88,8 +87,8 @@ defmodule ElixirScript.Translator.Protocol do
       imports = Module.process_imports(imports, aliases)
       imports = imports.imports
 
-      object = Enum.map(exported_functions, fn({key, value}) -> 
-        Map.make_property(JS.identifier(Utils.filter_name(key)), value) 
+      object = Enum.map(exported_functions, fn({key, value}) ->
+        Map.make_property(JS.identifier(Utils.filter_name(key)), value)
       end)
       |> JS.object_expression
 
@@ -108,7 +107,7 @@ defmodule ElixirScript.Translator.Protocol do
 
     end)
     |> Enum.reduce({[], [], []}, fn({impl_imports, impl_body, impl}, acc) ->
-      { 
+      {
         elem(acc, 0) ++ impl_imports,
         elem(acc, 1) ++ impl_body,
         elem(acc, 2) ++ impl
@@ -121,10 +120,10 @@ defmodule ElixirScript.Translator.Protocol do
     protocol = Translator.translate(protocol, env)
 
     { _, functions } = Module.extract_functions_from_module(impl)
-    { exported_functions, _ } = process_functions(functions, env)  
+    { exported_functions, _ } = process_functions(functions, env)
 
-    object = Enum.map(exported_functions, fn({key, value}) -> 
-      Map.make_property(JS.identifier(Utils.filter_name(key)), value) 
+    object = Enum.map(exported_functions, fn({key, value}) ->
+      Map.make_property(JS.identifier(Utils.filter_name(key)), value)
     end)
     |> JS.object_expression
 
@@ -156,7 +155,7 @@ defmodule ElixirScript.Translator.Protocol do
           {
             nil,
             %{ state | exported: HashDict.put(state.exported, name, HashDict.get(state.exported, name, []) ++ [function]) }
-          }          
+          }
         (x, state) ->
           { x, state }
       end)
