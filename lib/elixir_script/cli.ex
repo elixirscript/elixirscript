@@ -1,12 +1,12 @@
 defmodule ElixirScript.CLI do
   @moduledoc false
 
-  @switches [ 
-    output: :binary, elixir: :boolean, root: :binary, 
+  @switches [
+    output: :binary, elixir: :boolean, root: :binary,
     help: :boolean, stdlib: :boolean
   ]
 
-  @aliases [ 
+  @aliases [
     o: :output, ex: :elixir, h: :help, r: :root, st: :stdlib
   ]
 
@@ -16,7 +16,7 @@ defmodule ElixirScript.CLI do
     |> process
   end
 
-  def parse_args(args) do    
+  def parse_args(args) do
     parse = OptionParser.parse(args, switches: @switches, aliases: @aliases)
 
     case parse do
@@ -30,8 +30,8 @@ defmodule ElixirScript.CLI do
 
   def process(:help) do
     IO.write """
-      usage: ex2js <input> [options]
-      <input> path to elixir files or 
+      usage: elixirscript <input> [options]
+      <input> path to elixir files or
               the elixir code string if the -ex flag is used
       options:
       -o  --output [path]   places output at the given path
@@ -55,8 +55,8 @@ defmodule ElixirScript.CLI do
   end
 
   def do_process(input, options) do
-    compile_opts = [ 
-      root: options[:root], 
+    compile_opts = [
+      root: options[:root],
       include_path: options[:output] != nil
     ]
 
@@ -64,19 +64,19 @@ defmodule ElixirScript.CLI do
       true ->
         ElixirScript.compile(input, compile_opts)
       _ ->
-        ElixirScript.compile_path(input, compile_opts)  
+        ElixirScript.compile_path(input, compile_opts)
     end
 
     case options[:output] do
       nil ->
-        Enum.each(compile_output, 
+        Enum.each(compile_output,
           fn
-          ({_path, code})-> IO.write(code) 
-          (code)-> IO.write(code) 
+          ({_path, code})-> IO.write(code)
+          (code)-> IO.write(code)
         end)
       output_path ->
         Enum.each(compile_output, fn(x) ->
-          write_to_file(x, output_path) 
+          write_to_file(x, output_path)
         end)
 
         ElixirScript.copy_standard_libs_to_destination(output_path)

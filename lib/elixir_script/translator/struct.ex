@@ -42,7 +42,7 @@ defmodule ElixirScript.Translator.Struct do
 
   def make_defexception(attributes, env) when length(attributes) == 1 do
     exception_key_value = Map.make_property(Translator.translate(:__exception__, env), Translator.translate(true, env))
-    
+
     attributes = Enum.flat_map(attributes, fn(x) -> x end)
 
     defaults = [exception_key_value] ++ Enum.map(attributes, fn
@@ -82,35 +82,23 @@ defmodule ElixirScript.Translator.Struct do
 
     defaults = %{ defaults | properties: [struct_name]  ++ defaults.properties }
 
-    JS.function_declaration(
-      JS.identifier(name),
-      [JS.identifier(:values)],
-      [JS.object_expression([])],
-      JS.block_statement([
-        JS.return_statement(
-          JS.call_expression(
-            JS.member_expression(
-              JS.member_expression(
-                JS.identifier("Elixir"),
-                JS.identifier("Kernel")
-              ),
-              JS.identifier("defstruct")
-            ),
-            [defaults, JS.identifier(:values)]
-          )
-        )
-      ])
+    ref = JS.identifier(name)
 
-    JS.call_expression(
-      JS.member_expression(
+    ref_declarator = JS.variable_declarator(
+      ref,
+      JS.call_expression(
         JS.member_expression(
-          JS.identifier("Elixir"),
-          JS.identifier("Kernel")
+          JS.member_expression(
+            JS.identifier("Elixir"),
+            JS.identifier("Kernel")
+          ),
+          JS.identifier(name)
         ),
-        JS.identifier(name)
-      ),
-      [defaults]
+        [defaults]
+      )
     )
+
+    JS.variable_declaration([ref_declarator], :const)
   end
 
 end

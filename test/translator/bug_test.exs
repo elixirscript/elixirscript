@@ -2,6 +2,22 @@ defmodule ElixirScript.Translator.Bug.Test do
   use ShouldI
   import ElixirScript.TestHelper
 
+  should "Translate function with 0 arguments" do
+    ex_ast = quote do
+        def test do
+          :atom
+        end
+    end
+
+    js_code = """
+      const test = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([],function(){
+        return Elixir.Kernel.SpecialForms.atom('atom');
+      }));
+    """
+
+    assert_translation(ex_ast, js_code)
+  end
+
   should "Translate react element" do
     ex_ast = quote do
       React.createElement(
@@ -17,7 +33,7 @@ defmodule ElixirScript.Translator.Bug.Test do
        }),'Welcome to React Native!')
     """
 
-    assert_translation(ex_ast, js_code) 
+    assert_translation(ex_ast, js_code)
 
   end
 
@@ -32,12 +48,12 @@ defmodule ElixirScript.Translator.Bug.Test do
     js_code = """
      import { default as JQuery } from 'jquery';
      const __MODULE__ = Elixir.Kernel.SpecialForms.atom('App.Todo');
-     
+
      JQuery(Elixir.JS.call_property(e, 'target'));
      export {};
     """
 
-    assert_translation(ex_ast, js_code)   
+    assert_translation(ex_ast, js_code)
   end
 
   should "correctly translate module names when used" do
@@ -50,9 +66,9 @@ defmodule ElixirScript.Translator.Bug.Test do
 
     """
 
-    assert_translation(ex_ast, js_code)   
+    assert_translation(ex_ast, js_code)
   end
-  
+
   should "replace !" do
     ex_ast = quote do
       Elixir.Enum.fetch!(data, i)
@@ -62,7 +78,7 @@ defmodule ElixirScript.Translator.Bug.Test do
       Elixir.Enum.fetch__emark__(data, i)
     """
 
-    assert_translation(ex_ast, js_code) 
+    assert_translation(ex_ast, js_code)
   end
 
   should "chain calls correctly" do
@@ -74,7 +90,7 @@ defmodule ElixirScript.Translator.Bug.Test do
       Elixir.JS.call_property(this, 'getRawCanvas').getContext('2d')
     """
 
-    assert_translation(ex_ast, js_code) 
+    assert_translation(ex_ast, js_code)
 
 
     ex_ast = quote do
@@ -85,7 +101,7 @@ defmodule ElixirScript.Translator.Bug.Test do
       this.getRawCanvas(one).get('fg').getContext('2d')
     """
 
-    assert_translation(ex_ast, js_code)   
+    assert_translation(ex_ast, js_code)
   end
 
   should "correctly call multi-module functions" do

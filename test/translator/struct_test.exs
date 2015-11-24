@@ -11,13 +11,13 @@ defmodule ElixirScript.Translator.Struct.Test do
 
     js_code = """
         const __MODULE__ = Elixir.Kernel.SpecialForms.atom('User');
-        
-        const User = Elixir.Kernel.defstruct({
+
+        const defstruct = Elixir.Kernel.defstruct({
           [Elixir.Kernel.SpecialForms.atom('__struct__')]: __MODULE__,     [Elixir.Kernel.SpecialForms.atom('name')]: 'john',     [Elixir.Kernel.SpecialForms.atom('age')]: 27
         });
-               
+
         export {
-          User
+          User: defstruct
         };
     """
 
@@ -40,7 +40,7 @@ defmodule ElixirScript.Translator.Struct.Test do
        },values);
                }
          export {
-             defstruct
+             User: defstruct
        };
     """
 
@@ -54,7 +54,7 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-      let [user] = Elixir.Patterns.match(Elixir.Patterns.variable(),User.defstruct(Elixir.Kernel.SpecialForms.map({})));
+      let [user] = Elixir.Patterns.match(Elixir.Patterns.variable(), User.User.create(Elixir.Kernel.SpecialForms.map({})));
     """
 
     assert_translation(ex_ast, js_code)
@@ -64,7 +64,7 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-     let [user] = Elixir.Patterns.match(Elixir.Patterns.variable(),User.defstruct(Elixir.Kernel.SpecialForms.map({
+     let [user] = Elixir.Patterns.match(Elixir.Patterns.variable(), User.User.create(Elixir.Kernel.SpecialForms.map({
              [Elixir.Kernel.SpecialForms.atom('name')]: 'John'
        })));
     """
@@ -110,13 +110,13 @@ defmodule ElixirScript.Translator.Struct.Test do
          const __MODULE__ = Elixir.Kernel.SpecialForms.atom('MyAppError');
          function defexception(values = {})        {
                  return Elixir.Kernel.defstruct({
-             [Elixir.Kernel.SpecialForms.atom('__struct__')]: __MODULE__, 
+             [Elixir.Kernel.SpecialForms.atom('__struct__')]: __MODULE__,
              [Elixir.Kernel.SpecialForms.atom('__exception__')]: true,
              [Elixir.Kernel.SpecialForms.atom('message')]: 'This is a message'
        },values);
                }
          export {
-             defexception
+             MyAppError: defexception
        };
      """
 
@@ -133,7 +133,7 @@ defmodule ElixirScript.Translator.Struct.Test do
          function defexception(values = {})        {
                  return  Elixir.Kernel.defstruct({
              [Elixir.Kernel.SpecialForms.atom('__struct__')]: __MODULE__,
-             [Elixir.Kernel.SpecialForms.atom('__exception__')]: true,     
+             [Elixir.Kernel.SpecialForms.atom('__exception__')]: true,
              [Elixir.Kernel.SpecialForms.atom('message')]: null
        },values);
                }

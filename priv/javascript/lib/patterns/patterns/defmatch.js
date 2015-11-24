@@ -7,9 +7,12 @@ export class MatchError extends Error {
     super();
 
     if(typeof arg === 'symbol'){
-      this.message = 'No match for: ' + arg.toString(); 
+      this.message = 'No match for: ' + arg.toString();
+    } else if(Array.isArray(arg)){
+      let mappedValues = arg.map((x) => x.toString());
+      this.message = 'No match for: ' + mappedValues;
     }else{
-      this.message = 'No match for: ' + arg;      
+      this.message = 'No match for: ' + arg;
     }
 
     this.stack = (new Error()).stack;
@@ -32,7 +35,7 @@ export class Case {
 
 export function make_case(pattern: Array<any>, fn: Function, guard: Function = () => true): Case {
   return new Case(pattern, fn, guard);
-}    
+}
 
 export function defmatch(...cases: Array<Case>): Function {
   return function(...args: Array<any>): any {
@@ -75,7 +78,7 @@ export function patternMap(collection: Array<any>, pattern: any, fun: Function, 
   for(let elem of collection){
     try{
       let result = fun.apply(this, match(pattern, elem, guard));
-      ret = ret.concat(result);       
+      ret = ret.concat(result);
     }catch(e){
     if(!(e instanceof MatchError)){
         throw e;

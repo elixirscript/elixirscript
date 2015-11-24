@@ -56,8 +56,11 @@ let SpecialForms = {
   },
 
   map_update: function(map, values){
-    let obj = Object.assign({}, map);
-    return Object.freeze(Object.assign(obj, values));
+    return Object.freeze(
+      Object.assign(
+        Object.create(map.constructor.prototype), map, values
+      )
+    );
   },
 
   _for: function(collections, fun, filter = () => true, into = [], previousValues = []){
@@ -148,7 +151,7 @@ let SpecialForms = {
       if(catch_fun){
         try{
           ex_result = catch_fun(e);
-          return ex_result;             
+          return ex_result;
         }catch(ex){
           if(ex instanceof Patterns.MatchError){
             throw ex;
@@ -165,7 +168,7 @@ let SpecialForms = {
     }
 
     if(else_function){
-      try{  
+      try{
         return else_function(result);
       }catch(ex){
           if(ex instanceof Patterns.MatchError){

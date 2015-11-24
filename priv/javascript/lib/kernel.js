@@ -54,15 +54,15 @@ function is_number(x){
 }
 
 function is_tuple(x){
-  return x instanceof Tuple; 
+  return x instanceof Tuple;
 }
 
 function length(x){
-  return x.length;  
+  return x.length;
 }
 
 function is_pid(x){
-  return x instanceof PID; 
+  return x instanceof PID;
 }
 
 function is_port(x){
@@ -84,7 +84,7 @@ function __in__(left, right){
     }
   }
 
-  return false; 
+  return false;
 }
 
 function abs(number){
@@ -100,19 +100,19 @@ function elem(tuple, index){
     return tuple[index];
   }
 
-  return tuple.get(index);  
+  return tuple.get(index);
 }
 
 function rem(left, right){
-  return left % right;  
+  return left % right;
 }
 
 function div(left, right){
-  return left / right;  
+  return left / right;
 }
 
 function and(left, right){
-  return left && right;  
+  return left && right;
 }
 
 function or(left, right){
@@ -142,11 +142,11 @@ function to_string(arg){
     return Tuple.to_string(arg);
   }
 
-  return arg.toString();  
+  return arg.toString();
 }
 
 function match__qmark__(pattern, expr, guard = () => true){
-  return Patterns.match_no_throw(pattern, expr, guard) != null;  
+  return Patterns.match_no_throw(pattern, expr, guard) != null;
 }
 
 function defstruct(defaults){
@@ -155,13 +155,7 @@ function defstruct(defaults){
       let the_values = Object.assign(defaults, update);
       Object.assign(this, the_values);
     }
-    
-    static update(obj, updates = {}){
-      let x = Object.assign(new this(), obj);
-      x = Object.assign(x, updates);
-      return Object.freeze(x);
-    }
-    
+
     static create(updates = {}){
       let x = new this(updates);
       return Object.freeze(x);
@@ -180,26 +174,16 @@ function defexception(defaults){
       Object.assign(this, the_values);
 
       this.name = this.constructor.name;
-      this.message = message; 
+      this.message = message;
       this[SpecialForms.atom("__exception__")] = true;
       Error.captureStackTrace(this, this.constructor.name);
     }
-    
-    static update(obj, updates = {}){
-      let x = Object.assign(new this(), obj);
-      x = Object.assign(x, updates);
-      return Object.freeze(x);
-    }
-    
+
     static create(updates = {}){
       let x = new this(updates);
       return Object.freeze(x);
     }
   }
-}
-
-function defstruct(defaults, values){
-  return SpecialForms.map_update(defaults, values);
 }
 
 function is_struct_fn(__struct__){
@@ -253,5 +237,3 @@ export default {
   defprotocol,
   defimpl
 };
-
-

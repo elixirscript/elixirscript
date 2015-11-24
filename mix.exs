@@ -28,18 +28,19 @@ defmodule ElixirScript.Mixfile do
 
   defp deps do
     [
-      {:inflex, "~> 1.4" },
+      {:inflex, "~> 1.5" },
       {:estree, "~> 2.0"},
       {:shouldi, only: :test },
       {:earmark, "~> 0.1", only: :dev },
       {:ex_doc, "~> 0.10", only: :dev },
       {:benchfella, "~> 0.2", only: :test},
-      {:excoveralls, "~> 0.3", only: :test}  
+      {:excoveralls, "~> 0.3", only: :test},
+      {:credo, "~> 0.1.9", only: [:dev, :test]}
     ]
   end
 
   defp escript_config do
-    [main_module: ElixirScript.CLI, name: "ex2js"]
+    [main_module: ElixirScript.CLI, name: "elixirscript"]
   end
 
   defp description do
@@ -69,8 +70,8 @@ defmodule ElixirScript.Mixfile do
     Mix.Task.run "app.start"
 
     dist_folder = "dist"
-    folder_name = "#{dist_folder}/ex2js"
-    archive_file_name = "#{dist_folder}/ex2js.tar.gz"
+    folder_name = "#{dist_folder}/elixirscript"
+    archive_file_name = "#{dist_folder}/elixirscript.tar.gz"
 
     File.mkdir_p("priv/javascript/dist")
 
@@ -86,7 +87,7 @@ defmodule ElixirScript.Mixfile do
     { _ , _ } = System.cmd("node", ["node_modules/gulp/bin/gulp.js", "dist_add_source_map"])
 
     File.mkdir_p(folder_name <> "/bin")
-    File.cp!("ex2js", "#{folder_name}/bin/ex2js")
+    File.cp!("elixirscript", "#{folder_name}/bin/elixirscript")
     File.cp_r!("priv/javascript/dist", "#{folder_name}/dist")
     File.cp_r!("LICENSE", "#{folder_name}/LICENSE")
 
@@ -98,13 +99,13 @@ defmodule ElixirScript.Mixfile do
   def install(_) do
     Mix.Task.run "app.start"
 
-    System.cmd("tar", ["-zxvf", "dist/ex2js.tar.gz"])
+    System.cmd("tar", ["-zxvf", "dist/elixirscript.tar.gz"])
 
-    File.rm_rf!("/usr/local/ex2js")
+    File.rm_rf!("/usr/local/elixirscript")
 
-    System.cmd("mv", ["dist/ex2js", "/usr/local/ex2js"])
+    System.cmd("mv", ["dist/elixirscript", "/usr/local/elixirscript"])
 
-    IO.puts("installed at /usr/local/ex2js")
+    IO.puts("installed at /usr/local/elixirscript")
   end
-  
+
 end
