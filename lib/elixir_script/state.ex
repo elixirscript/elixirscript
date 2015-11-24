@@ -26,13 +26,13 @@ defmodule ElixirScript.State do
   def module_listed?(module_name) do
     Agent.get(__MODULE__, fn(state) ->
       Enum.any?(state.modules, fn(x) -> x.name == module_name end) ||
-      Enum.any?(state.protocols, fn({key, value}) -> key == module_name end)
+      Enum.any?(state.protocols, fn({key, _}) -> key == module_name end)
     end)
   end
 
   def protocol_listed?(module_name) do
     Agent.get(__MODULE__, fn(state) ->
-      Enum.any?(state.protocols, fn({key, value}) -> key == module_name end)
+      Enum.any?(state.protocols, fn({key, _}) -> key == module_name end)
     end)
   end
 
@@ -76,14 +76,88 @@ defmodule ElixirScript.State do
     end)
   end
 
+  def get_module(module) when is_atom(module) do
+    module_name_list = Atom.to_string(module)
+    |> String.split(".")
+    |> tl
+    |> Enum.map(fn(x) -> String.to_atom(x) end)
+
+    get_module(module_name_list)
+  end
+
+
   def get_module(module_name_list) do
     state = Agent.get(__MODULE__, fn(state) ->
       state
     end)
 
+    do_get_module(state, module_name_list)
+  end
+
+  defp do_get_module(state, module) when is_atom(module) do
+    module_name_list = Atom.to_string(module)
+    |> String.split(".")
+    |> tl
+    |> Enum.map(fn(x) -> String.to_atom(x) end)
+
+    do_get_module(state, module_name_list)
+  end
+
+  defp do_get_module(state, module_name_list) do
     Enum.find(Set.to_list(state.modules), fn(x) ->
       x.name == module_name_list
     end)
+  end
+
+
+  def add_alias(module_name_list, name) do
+    module = get_module(module_name_list)
+
+    if module do
+      {main, _} = Code.eval_quoted(name)
+      {:__aliases__, _, aliases } = name
+      {the_alias, _} = Code.eval_quoted({:__aliases__, [alias: false], List.last(aliases) |> List.wrap })
+
+      delete_module(module)
+
+      module = %{module | aliases: Set.put(module.aliases, {the_alias, main}) }
+      add_module(module)
+    end
+  end
+
+  def process_imports() do
+    Agent.update(__MODULE__, fn(state) ->
+      modules = state.modules
+      |> Enum.map(fn(x) ->
+        %{x | imports: Enum.map(x.imports, fn({y, options}) -> {y, get_imported_functions(state, y, options)}  end)}
+      end)
+
+      %{ state | modules: Enum.into(modules, HashSet.new) }
+    end)
+  end
+
+  defp get_imported_functions(state, module_name, []) do
+    module = do_get_module(state, module_name)
+    ElixirScript.Module.functions(module) ++ ElixirScript.Module.macros(module)
+  end
+
+  defp get_imported_functions(_, _, [only: list]) do
+    Keyword.keys(list)
+  end
+
+  defp get_imported_functions(state, module_name, [only: :functions]) do
+    module = do_get_module(state, module_name)
+    ElixirScript.Module.functions(module)
+  end
+
+  defp get_imported_functions(state, module_name, [only: :macros]) do
+    module = do_get_module(state, module_name)
+    ElixirScript.Module.macros(module)
+  end
+
+  defp get_imported_functions(state, module_name, [except: list]) do
+    module = do_get_module(state, module_name)
+    ElixirScript.Module.functions(module) ++ ElixirScript.Module.macros(module) -- Keyword.keys(list)
   end
 
   def stop() do

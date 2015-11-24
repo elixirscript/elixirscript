@@ -11,51 +11,52 @@ defmodule ElixirScript.Translator.Import do
     if State.protocol_listed?(name) do
       default = true
     end
-    
+
      import_specifier = if default == false do
       if options[:as] do
         {_, _, alt} = options[:as]
-        
+
         JS.import_namespace_specifier(
           JS.identifier(List.last(alt))
         )
-      else      
+      else
       JS.import_namespace_specifier(
         JS.identifier(List.last(name))
-      )  
+      )
       end
     else
       if options[:as] do
         {_, _, alt} = options[:as]
-        
+
         JS.import_specifier(
           JS.identifier("default"),
           JS.identifier(List.last(alt))
         )
-      else      
+      else
       JS.import_default_specifier(
         JS.identifier(List.last(name)),
         JS.identifier(List.last(name))
-      )  
+      )
       end
     end
-    
+
     import_path = make_source(name)
 
     JS.import_declaration(
-      [import_specifier], 
+      [import_specifier],
       JS.identifier(import_path)
     )
   end
 
   def make_import(module_name_list, [], _) do
-    functions = State.get_module(module_name_list).functions
+    module = State.get_module(module_name_list)
+    functions = ElixirScript.Module.functions(module)
 
     functions = Enum.map(functions, fn
       ({name, _arity}) ->
         name
       (name) ->
-        name 
+        name
     end)
 
     specifiers = Enum.map(functions, fn
@@ -70,7 +71,7 @@ defmodule ElixirScript.Translator.Import do
         JS.import_specifier(
           name,
           name
-        )   
+        )
     end)
 
     import_path = make_source(module_name_list)
@@ -79,13 +80,14 @@ defmodule ElixirScript.Translator.Import do
   end
 
   def make_import(module_name_list, [only: :functions], _) do
-    functions = State.get_module(module_name_list).functions
+    module = State.get_module(module_name_list)
+    functions = ElixirScript.Module.functions(module)
 
     functions = Enum.map(functions, fn
       ({name, _arity}) ->
         name
       (name) ->
-        name 
+        name
     end)
 
     specifiers = Enum.map(functions, fn
@@ -94,7 +96,7 @@ defmodule ElixirScript.Translator.Import do
         JS.import_specifier(
           name,
           name
-        )   
+        )
     end)
 
     import_path = make_source(module_name_list)
@@ -107,10 +109,12 @@ defmodule ElixirScript.Translator.Import do
       ({name, _arity}) ->
         name
       (name) ->
-        name 
+        name
     end)
 
-    functions = State.get_module(module_name_list)
+    module = State.get_module(module_name_list)
+
+    functions = ElixirScript.Module.functions(module)
     |> get_functions_from_module([only: only])
 
     specifiers = Enum.map(functions, fn
@@ -119,7 +123,7 @@ defmodule ElixirScript.Translator.Import do
         JS.import_specifier(
           name,
           name
-        )  
+        )
     end)
 
     import_path = make_source(module_name_list)
@@ -132,10 +136,11 @@ defmodule ElixirScript.Translator.Import do
       ({name, _arity}) ->
         name
       (name) ->
-        name 
+        name
     end)
 
-    functions = State.get_module(module_name_list)
+    module = State.get_module(module_name_list)
+    functions = ElixirScript.Module.functions(module)
     |> get_functions_from_module([except: except])
 
     specifiers = Enum.map(functions, fn
@@ -144,7 +149,7 @@ defmodule ElixirScript.Translator.Import do
         JS.import_specifier(
           name,
           name
-        )   
+        )
     end)
 
     import_path = make_source(module_name_list)
@@ -158,21 +163,21 @@ defmodule ElixirScript.Translator.Import do
   end
 
   def make_file_path(name) do
-    Enum.map(name, fn(x) -> 
+    Enum.map(name, fn(x) ->
       x
-      |> Atom.to_string 
-      |> Inflex.underscore 
-      |> String.downcase 
-    end) 
+      |> Atom.to_string
+      |> Inflex.underscore
+      |> String.downcase
+    end)
     |> Enum.join("/")
   end
 
-  def get_functions_from_module(module, [only: only]) do
-    Set.intersection(Enum.into(only, HashSet.new), Enum.into(module.functions, HashSet.new))
+  def get_functions_from_module(functions, [only: only]) do
+    Set.intersection(Enum.into(only, HashSet.new), Enum.into(functions, HashSet.new))
   end
 
-  def get_functions_from_module(module, [except: except]) do
-    Set.difference(Enum.into(module.functions, HashSet.new), Enum.into(except, HashSet.new))    
+  def get_functions_from_module(functions, [except: except]) do
+    Set.difference(Enum.into(functions, HashSet.new), Enum.into(except, HashSet.new))
   end
 
   def create_standard_lib_imports(root, _) do
@@ -181,7 +186,7 @@ defmodule ElixirScript.Translator.Import do
     )
 
     import_declaration = JS.import_declaration(
-      [import_specifier], 
+      [import_specifier],
       JS.identifier("'#{root(root) <> "elixir"}'")
     )
 
