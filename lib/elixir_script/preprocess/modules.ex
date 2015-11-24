@@ -72,6 +72,7 @@ defmodule ElixirScript.Preprocess.Modules do
     aliases = get_aliases_from_module(body)
     requires = get_requires_from_module(body)
     imports = get_imports_from_module(body)
+    js_imports = get_js_imports_from_module(body)
 
     body = case body do
       {:__block__, _, _ } ->
@@ -85,7 +86,7 @@ defmodule ElixirScript.Preprocess.Modules do
     mod = %ElixirScript.Module{ name: module_name_list, body: body,
     functions: functions, macros: macros,
     aliases: aliases, requires: requires.requires,
-    imports: imports.imports }
+    imports: imports.imports, js_imports: js_imports }
 
     State.add_module(mod)
 
@@ -137,6 +138,7 @@ defmodule ElixirScript.Preprocess.Modules do
     aliases = get_aliases_from_module(body2)
     requires = get_requires_from_module(body2)
     imports = get_imports_from_module(body2)
+    js_imports = get_js_imports_from_module(body2)
 
     inner_alias = {:alias, [], [{:__aliases__, [alias: false], module_name_list ++ module_name_list2}]}
     {inner_alias_atom, _ } = Code.eval_quoted({:__aliases__, [alias: false], module_name_list ++ module_name_list2})
@@ -146,7 +148,7 @@ defmodule ElixirScript.Preprocess.Modules do
 
     mod = %ElixirScript.Module{ name: module_name_list2, body: body2,
     functions: functions, macros: macros, aliases: aliases,
-    requires: requires.requires, imports: imports.imports }
+    requires: requires.requires, imports: imports.imports, js_imports: js_imports }
 
     if State.module_listed?(module_name_list2) do
       State.delete_module(mod)
@@ -288,5 +290,22 @@ defmodule ElixirScript.Preprocess.Modules do
 
   defp get_imports_from_module(_) do
     %{ imports: HashSet.new, aliases: HashSet.new }
+  end
+
+
+  defp get_js_imports_from_module({:__block__, _, list}) do
+    Enum.reduce(list, HashSet.new, fn
+      ({{:., _, [{:__aliases__, _, [:JS]}, :import]}, _, [name, path]}, state) ->
+        {name, _} = Code.eval_quoted(name)
+        Set.put(state, {name, path})
+
+      _, state ->
+        state
+    end)
+  end
+
+
+  defp get_js_imports_from_module(_) do
+    HashSet.new
   end
 end
