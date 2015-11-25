@@ -167,14 +167,14 @@ defmodule ElixirScript.Preprocess.Modules do
   defp get_functions_from_module({:__block__, _, list}) do
     Enum.reduce(list, Keyword.new, fn
       ({:def, _, [{:when, _, [{name, _, params} | _guards] }, [do: _body]] }, state) ->
-        arity = length(params)
+        arity = if is_nil(params), do: 0, else: length(params)
 
         unless Enum.member?(Keyword.get_values([], name), arity) do
           Keyword.put(state, name, arity);
         end
 
       ({:def, _, [{name, _, params}, [do: _body]]}, state) ->
-        arity = length(params)
+        arity = if is_nil(params), do: 0, else: length(params)
 
         unless Enum.member?(Keyword.get_values([], name), arity) do
           Keyword.put(state, name, arity);
