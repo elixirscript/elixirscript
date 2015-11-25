@@ -3,12 +3,14 @@ import Atom from "../atom";
 import Integer from "../integer";
 import List from "../list";
 import Tuple from "../tuple";
+import BitString from "../bit_string";
+import { IntegerType, FloatType } from "../protocol";
 
 let Chars = Kernel.defprotocol({
   to_string: function(thing){}
 });
 
-Kernel.defimpl(Chars, Kernel.is_bitstring, {
+Kernel.defimpl(Chars, BitString, {
   to_string: function(thing){
     if(Kernel.is_binary(thing)){
       return thing;
@@ -18,7 +20,7 @@ Kernel.defimpl(Chars, Kernel.is_bitstring, {
   }
 });
 
-Kernel.defimpl(Chars, Kernel.is_atom, {
+Kernel.defimpl(Chars, Symbol, {
   to_string: function(thing){
     if(nil){
       return "";
@@ -28,25 +30,25 @@ Kernel.defimpl(Chars, Kernel.is_atom, {
   }
 });
 
-Kernel.defimpl(Chars, Kernel.is_integer, {
+Kernel.defimpl(Chars, IntegerType, {
   to_string: function(thing){
     return Integer.to_string(thing);
   }
 });
 
-Kernel.defimpl(Chars, Kernel.is_float, {
+Kernel.defimpl(Chars, FloatType, {
   to_string: function(thing){
     return thing.toString;
   }
 });
 
-Kernel.defimpl(Chars, Kernel.is_list, {
+Kernel.defimpl(Chars, Array, {
   to_string: function(thing){
     return thing.toString();
   }
 });
 
-Kernel.defimpl(Chars, Kernel.is_tuple, {
+Kernel.defimpl(Chars, Tuple, {
   to_string: function(thing){
     return Tuple.to_string(thing);
   }

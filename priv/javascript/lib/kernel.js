@@ -2,7 +2,7 @@ import SpecialForms from './kernel/special_forms';
 import Patterns from './patterns/patterns';
 import Tuple from './tuple';
 import BitString from './bit_string';
-import Protocol from './protocol';
+import { Protocol } from './protocol';
 import { PID } from './processes/processes';
 
 function tl(list){
@@ -186,12 +186,6 @@ function defexception(defaults){
   }
 }
 
-function is_struct_fn(__struct__){
-  return function(x){
-    return is_map && x[SpecialForms.atom("__struct__")] === __struct__;
-  }
-}
-
 function defprotocol(spec){
   return new Protocol(spec);
 }
@@ -233,7 +227,6 @@ export default {
   to_string,
   match__qmark__,
   defstruct,
-  is_struct_fn,
   defprotocol,
   defimpl
 };

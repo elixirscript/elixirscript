@@ -1,7 +1,10 @@
+class IntegerType {}
+class FloatType {}
+
 //https://github.com/airportyh/protomorphism
 class Protocol{
   constructor(spec){
-    this.registry = [];
+    this.registry = new Map();
     this.fallback = null;
 
     for (let funName in spec){
@@ -12,23 +15,24 @@ class Protocol{
 
       return function(...args) {
         let thing = args[0];
+        let fun = null;
 
-        for(let [check, implementation] of this.registry){
-
-          if(check(thing)){
-            let fun = implementation[funName];
-            let retval = fun.apply(this, args);
-            return retval;            
-          }
+        if(Number.isInteger(thing) && this.hasImplementation(IntegerType)){
+          fun = this.registry.get(IntegerType)[funName];
+        }else if(typeof thing === "number" && !Number.isInteger(thing) && this.hasImplementation(FloatType)){
+          fun = this.registry.get(FloatType)[funName];
+        }else if(this.hasImplementation(thing.constructor)){
+          fun = this.registry.get(thing.constructor)[funName];
+        }else if(this.fallback){
+          fun = this.fallback[funName];
         }
 
-        if(this.fallback){
-          let fun = fallback;
+        if(fun != null){
           let retval = fun.apply(this, args);
-          return retval;           
+          return retval;
         }
 
-        throw new Error("No implementation found for " + thing); 
+        throw new Error("No implementation found for " + thing);
       }
     }
   }
@@ -37,10 +41,18 @@ class Protocol{
     if(type === null){
       this.fallback = implementation;
     }else{
-      this.registry.push([type, implementation]);
+      this.registry.set(type, implementation);
     }
+  }
+
+  hasImplementation(thing) {
+    return this.registry.has(thing.constructor);
   }
 }
 
 
-export default Protocol;
+export {
+  Protocol,
+  IntegerType,
+  FloatType
+}

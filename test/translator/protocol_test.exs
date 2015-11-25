@@ -34,7 +34,7 @@ defmodule ElixirScript.Translator.Protocol.Test do
     end
 
     js_code = """
-     Elixir.Kernel.defimpl(Elixir.String.Chars, Elixir.Kernel.is_struct_fn(Elixir.Kernel.SpecialForms.atom('Duck')),{
+     Elixir.Kernel.defimpl(Elixir.String.Chars, Duck, {
              to_string: Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.variable()],function(duck)    {
              return     'quack';
            }))
@@ -74,14 +74,14 @@ defmodule ElixirScript.Translator.Protocol.Test do
              return     null;
            }))
        });
-         Elixir.Kernel.defimpl(Blank,Elixir.Kernel.is_list,{
+         Elixir.Kernel.defimpl(Blank, Array,{
              blank__qmark__: Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Kernel.SpecialForms.list()],function()    {
              return     true;
            }),Elixir.Patterns.make_case([Elixir.Patterns.wildcard()],function()    {
              return     false;
            }))
        })
-         Elixir.Kernel.defimpl(Blank,Elixir.Kernel.is_atom,{
+         Elixir.Kernel.defimpl(Blank,Symbol,{
              blank__qmark__: Elixir.Patterns.defmatch(Elixir.Patterns.make_case([false],function()    {
              return     true;
            }),Elixir.Patterns.make_case([null],function()    {
@@ -90,7 +90,7 @@ defmodule ElixirScript.Translator.Protocol.Test do
              return     false;
            }))
        })
-         Elixir.Kernel.defimpl(Blank,Elixir.Kernel.is_integer,{
+         Elixir.Kernel.defimpl(Blank,Elixir.IntegerType,{
              blank__qmark__: Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.variable()],function(number)    {
              return     false;
            }))
