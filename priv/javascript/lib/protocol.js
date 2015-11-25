@@ -21,7 +21,7 @@ class Protocol{
           fun = this.registry.get(IntegerType)[funName];
         }else if(typeof thing === "number" && !Number.isInteger(thing) && this.hasImplementation(FloatType)){
           fun = this.registry.get(FloatType)[funName];
-        }else if(this.hasImplementation(thing.constructor)){
+        }else if(this.hasImplementation(thing)){
           fun = this.registry.get(thing.constructor)[funName];
         }else if(this.fallback){
           fun = this.fallback[funName];
