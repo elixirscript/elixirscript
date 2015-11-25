@@ -2,13 +2,40 @@ defmodule ElixirScript.Translator.Struct do
   @moduledoc false
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
+  alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.Map
 
-  def make_struct(module_name, data, env) do
-    JS.call_expression(
+  def get_struct_class(module_name, env) do
+    current_module = ElixirScript.State.get_module(Process.get(:current_module))
+
+    name = List.last(module_name)
+
+    the_alias = ElixirScript.Module.get_alias(current_module, module_name)
+
+    if the_alias do
+      { _, name } = the_alias
+
+      name = Atom.to_string(name)
+      |> String.split(".")
+      |> List.last
+    end
+
+    if the_alias == nil && ElixirScript.State.get_module(module_name) == nil do
+      Utils.make_module_expression_tree(module_name, false, env)
+    else
       JS.member_expression(
         JS.identifier(List.last(module_name)),
-        JS.identifier(:defstruct)
+        JS.identifier(name)
+      )
+    end
+
+  end
+
+  def new_struct(module_name, data, env) do
+    JS.call_expression(
+      JS.member_expression(
+        get_struct_class(module_name, env),
+        JS.identifier(:create)
       ),
       [Translator.translate(data, env)]
     )

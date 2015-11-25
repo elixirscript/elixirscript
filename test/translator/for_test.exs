@@ -70,7 +70,7 @@ defmodule ElixirScript.Translator.For.Test do
 
   should "translate multiple generator for, assignment, and do block" do
     ex_ast = quote do
-      r = for x <- [1, 2], y <- [2, 3] do 
+      r = for x <- [1, 2], y <- [2, 3] do
         x*y
       end
     end
@@ -110,18 +110,13 @@ defmodule ElixirScript.Translator.For.Test do
     end
 
     js_code = """
-     Elixir.Kernel.SpecialForms._for(Elixir.Kernel.SpecialForms.list(
-      Elixir.Kernel.SpecialForms.list(
-        Elixir.Kernel.SpecialForms.tuple(Elixir.Kernel.SpecialForms.atom('user'),Elixir.Patterns.variable()),
-        Elixir.Kernel.SpecialForms.list(
-          Elixir.Kernel.SpecialForms.tuple(Elixir.Kernel.SpecialForms.atom('user'),'john'),
-          Elixir.Kernel.SpecialForms.tuple(Elixir.Kernel.SpecialForms.atom('admin'),'john'),
-          Elixir.Kernel.SpecialForms.tuple(Elixir.Kernel.SpecialForms.atom('user'),'meg')))),function(name)    {
-             return     Elixir.String.upcase(name);
-           },function()    {
-             return     true;
-           },Elixir.Kernel.SpecialForms.list()
-      )
+    Elixir.Kernel.SpecialForms._for(Elixir.Kernel.SpecialForms.list(Elixir.Kernel.SpecialForms.list(Elixir.Patterns.type(Elixir.Tuple,{
+        values: [Elixir.Kernel.SpecialForms.atom('user'), Elixir.Patterns.variable()]
+  }),Elixir.Kernel.SpecialForms.list(Elixir.Kernel.SpecialForms.tuple(Elixir.Kernel.SpecialForms.atom('user'),'john'),Elixir.Kernel.SpecialForms.tuple(Elixir.Kernel.SpecialForms.atom('admin'),'john'),Elixir.Kernel.SpecialForms.tuple(Elixir.Kernel.SpecialForms.atom('user'),'meg')))),function(name)    {
+        return     Elixir.String.upcase(name);
+      },function()    {
+        return     true;
+      },Elixir.Kernel.SpecialForms.list())
     """
 
     assert_translation(ex_ast, js_code)
