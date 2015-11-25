@@ -1,3 +1,10 @@
+# v0.14.0-dev
+* Enhancements
+  * Structs are now translated into classes
+  * Structs and Tuples now match on their types
+  * Can now match on JavaScript classes
+  * Can now implement protocols using JavaScript types
+
 # v0.13.0
 * Enhancements
   * Added `Base` module with function: encode64, decode64, and decode64!
@@ -84,7 +91,7 @@
     * Improved function chaining
     * added `from` clause to `import`, `alias`, and `require` so that the import path can be overridden
     * `alias` now acts like `require` in that it is translated into an import default statement
-    * modules now export a default object with def functions added as properties on it. 
+    * modules now export a default object with def functions added as properties on it.
     * for function closures, now calling by using `.call(this)` so that `this` is available inside of it
 
 # v0.4.0
