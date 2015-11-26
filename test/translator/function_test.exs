@@ -11,7 +11,7 @@ defmodule ElixirScript.Translator.Function.Test do
     fun(Elixir.Kernel.SpecialForms.atom('atom'))
     """
 
-    assert_translation(ex_ast, js_code) 
+    assert_translation(ex_ast, js_code)
 
   end
 
@@ -140,11 +140,13 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-     const test1 = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.variable(), Elixir.Patterns.variable()],function(alpha,beta)    {
-             let [a0,b0] = Elixir.Patterns.match(Elixir.Kernel.SpecialForms.tuple(Elixir.Patterns.variable(),Elixir.Patterns.variable()),Elixir.Kernel.SpecialForms.tuple(1,2));
-             let _ref = Elixir.Kernel.SpecialForms.tuple(a0,b0);
-             return     _ref;
-           }));
+    const test1 = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.variable(), Elixir.Patterns.variable()], function(alpha, beta) {
+        let [a0, b0] = Elixir.Patterns.match(Elixir.Patterns.type(Elixir.Tuple, {
+            values: [Elixir.Patterns.variable(), Elixir.Patterns.variable()]
+        }), Elixir.Kernel.SpecialForms.tuple(1, 2));
+        let _ref = Elixir.Kernel.SpecialForms.tuple(a0, b0);
+        return _ref;
+    }));
     """
 
     assert_translation(ex_ast, js_code)
@@ -179,7 +181,7 @@ defmodule ElixirScript.Translator.Function.Test do
       Taco.test1()
     end
 
-    js_code = "Elixir.JS.call_property(Taco, 'test1')"   
+    js_code = "Elixir.JS.call_property(Taco, 'test1')"
 
     assert_translation(ex_ast, js_code)
 
@@ -187,7 +189,7 @@ defmodule ElixirScript.Translator.Function.Test do
       Taco.test1(3, 2)
     end
 
-    js_code = "Taco.test1(3,2)"   
+    js_code = "Taco.test1(3,2)"
 
     assert_translation(ex_ast, js_code)
 
@@ -195,7 +197,7 @@ defmodule ElixirScript.Translator.Function.Test do
       Taco.test1(Taco.test2(1), 2)
     end
 
-    js_code = "Taco.test1(Taco.test2(1),2)"   
+    js_code = "Taco.test1(Taco.test2(1),2)"
 
     assert_translation(ex_ast, js_code)
   end
@@ -234,7 +236,7 @@ defmodule ElixirScript.Translator.Function.Test do
         defp example(oneArg, twoArg, redArg, blueArg) do
         end
       end
-    end 
+    end
 
     js_code = """
          const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Example');
@@ -250,7 +252,7 @@ defmodule ElixirScript.Translator.Function.Test do
              return     null;
            }));
          export {};
-    """  
+    """
     assert_translation(ex_ast, js_code)
 
 
@@ -271,7 +273,7 @@ defmodule ElixirScript.Translator.Function.Test do
         def example(oneArg, twoArg, redArg, blueArg) do
         end
       end
-    end 
+    end
 
     js_code = """
          const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Example');
@@ -289,7 +291,7 @@ defmodule ElixirScript.Translator.Function.Test do
          export {
              example
        };
-    """  
+    """
     assert_translation(ex_ast, js_code)
 
 
@@ -298,7 +300,7 @@ defmodule ElixirScript.Translator.Function.Test do
         def example(oneArg) do
         end
       end
-    end 
+    end
 
     js_code = """
          const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Example');
@@ -308,7 +310,7 @@ defmodule ElixirScript.Translator.Function.Test do
          export {
              example
        };
-    """  
+    """
     assert_translation(ex_ast, js_code)
 
   end
@@ -416,7 +418,7 @@ defmodule ElixirScript.Translator.Function.Test do
         def something(one) when is_number(one) or is_atom(one) do
         end
       end
-    end 
+    end
 
     js_code = """
          const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Example');
@@ -432,7 +434,7 @@ defmodule ElixirScript.Translator.Function.Test do
          export {
              something
        };
-    """  
+    """
     assert_translation(ex_ast, js_code)
 
   end
@@ -493,9 +495,11 @@ defmodule ElixirScript.Translator.Function.Test do
 
 
     js_code = """
-     const something = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Kernel.SpecialForms.tuple(Elixir.Patterns.variable(),Elixir.Patterns.variable())],function(apple,fruits)    {
-             return     null;
-           }));
+    const something = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.type(Elixir.Tuple, {
+        values: [Elixir.Patterns.variable(), Elixir.Patterns.variable()]
+    })], function(apple, fruits) {
+        return null;
+    }));
     """
 
     assert_translation(ex_ast, js_code)
@@ -509,11 +513,9 @@ defmodule ElixirScript.Translator.Function.Test do
 
 
     js_code = """
-     const something = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([{
-             [Elixir.Kernel.SpecialForms.atom('__struct__')]: Elixir.Kernel.SpecialForms.atom('AStruct')
-       }],function()    {
-             return     null;
-           }));
+    const something = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.type(AStruct, {})], function() {
+        return null;
+    }));
     """
 
     assert_translation(ex_ast, js_code)
@@ -526,11 +528,9 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-     const something = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.capture({
-             [Elixir.Kernel.SpecialForms.atom('__struct__')]: Elixir.Kernel.SpecialForms.atom('AStruct')
-       })],function(a)    {
-             return     null;
-           }));
+    const something = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.capture(Elixir.Patterns.type(AStruct, {}))], function(a) {
+        return null;
+    }));
     """
     assert_translation(ex_ast, js_code)
   end
@@ -560,11 +560,11 @@ defmodule ElixirScript.Translator.Function.Test do
 
 
     js_code = """
-     const something = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([{
-             [Elixir.Kernel.SpecialForms.atom('__struct__')]: Elixir.Kernel.SpecialForms.atom('AStruct'),     [Elixir.Kernel.SpecialForms.atom('key')]: Elixir.Patterns.variable(),     [Elixir.Kernel.SpecialForms.atom('key1')]: 2
-       }],function(value)    {
-             return     null;
-           }));
+    const something = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.type(AStruct, {
+        [Elixir.Kernel.SpecialForms.atom('key')]: Elixir.Patterns.variable(), [Elixir.Kernel.SpecialForms.atom('key1')]: 2
+    })], function(value) {
+        return null;
+    }));
     """
 
     assert_translation(ex_ast, js_code)
@@ -576,13 +576,13 @@ defmodule ElixirScript.Translator.Function.Test do
 
 
     js_code = """
-     const something = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([{
-             [Elixir.Kernel.SpecialForms.atom('__struct__')]: Elixir.Kernel.SpecialForms.atom('AStruct'),     [Elixir.Kernel.SpecialForms.atom('key')]: Elixir.Patterns.variable(),     [Elixir.Kernel.SpecialForms.atom('key1')]: 2
-       }],function(value)    {
-             return     null;
-           },function(value)    {
-             return     Elixir.Kernel.is_number(value);
-           }));
+    const something = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.type(AStruct, {
+        [Elixir.Kernel.SpecialForms.atom('key')]: Elixir.Patterns.variable(), [Elixir.Kernel.SpecialForms.atom('key1')]: 2
+    })], function(value) {
+        return null;
+    }, function(value) {
+        return Elixir.Kernel.is_number(value);
+    }));
     """
 
     assert_translation(ex_ast, js_code)
@@ -645,7 +645,7 @@ defmodule ElixirScript.Translator.Function.Test do
         end
 
         def something(one) do
-        end        
+        end
       end
 
     end
@@ -668,7 +668,7 @@ defmodule ElixirScript.Translator.Function.Test do
              something
        };
     """
-    
+
     assert_translation(ex_ast, js_code)
 
   end
@@ -748,5 +748,5 @@ defmodule ElixirScript.Translator.Function.Test do
 
     assert_translation(ex_ast, js_code)
   end
-  
+
 end

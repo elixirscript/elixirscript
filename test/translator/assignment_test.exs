@@ -19,16 +19,20 @@ defmodule ElixirScript.Translator.Assignment.Test do
       {a, b} = {1, 2}
     end
     js_code = """
-        let [a, b] = Elixir.Patterns.match(Elixir.Kernel.SpecialForms.tuple(Elixir.Patterns.variable(), Elixir.Patterns.variable()), Elixir.Kernel.SpecialForms.tuple(1, 2));
-        let _ref = Elixir.Kernel.SpecialForms.tuple(a, b);
+    let [a, b] = Elixir.Patterns.match(Elixir.Patterns.type(Elixir.Tuple, {
+        values: [Elixir.Patterns.variable(), Elixir.Patterns.variable()]
+    }), Elixir.Kernel.SpecialForms.tuple(1, 2));
+    let _ref = Elixir.Kernel.SpecialForms.tuple(a, b);
     """
 
     assert_translation(ex_ast, js_code)
 
     ex_ast = quote do: {a, _, c} = {1, 2, 3}
     js_code = """
-        let [a, undefined, c] = Elixir.Patterns.match(Elixir.Kernel.SpecialForms.tuple(Elixir.Patterns.variable(), Elixir.Patterns.wildcard(), Elixir.Patterns.variable()), Elixir.Kernel.SpecialForms.tuple(1, 2, 3));
-        let _ref = Elixir.Kernel.SpecialForms.tuple(a, undefined, c);
+    let [a, undefined, c] = Elixir.Patterns.match(Elixir.Patterns.type(Elixir.Tuple, {
+        values: [Elixir.Patterns.variable(), Elixir.Patterns.wildcard(), Elixir.Patterns.variable()]
+    }), Elixir.Kernel.SpecialForms.tuple(1, 2, 3));
+    let _ref = Elixir.Kernel.SpecialForms.tuple(a, undefined, c);
     """
 
     assert_translation(ex_ast, js_code)
@@ -36,8 +40,10 @@ defmodule ElixirScript.Translator.Assignment.Test do
 
     ex_ast = quote do: {^a, _, c} = {1, 2, 3}
     js_code = """
-         let [,undefined,c] = Elixir.Patterns.match(Elixir.Kernel.SpecialForms.tuple(Elixir.Patterns.bound(a),Elixir.Patterns.wildcard(),Elixir.Patterns.variable()),Elixir.Kernel.SpecialForms.tuple(1,2,3));
-         let _ref = Elixir.Kernel.SpecialForms.tuple(undefined,undefined,c);
+    let [, undefined, c] = Elixir.Patterns.match(Elixir.Patterns.type(Elixir.Tuple, {
+        values: [Elixir.Patterns.bound(a), Elixir.Patterns.wildcard(), Elixir.Patterns.variable()]
+    }), Elixir.Kernel.SpecialForms.tuple(1, 2, 3));
+    let _ref = Elixir.Kernel.SpecialForms.tuple(undefined, undefined, c);
     """
 
     assert_translation(ex_ast, js_code)
@@ -45,7 +51,7 @@ defmodule ElixirScript.Translator.Assignment.Test do
 
   should "translate bound assignment" do
     ex_ast = quote do: ^a = 1
-    js_code = """ 
+    js_code = """
      let [] = Elixir.Patterns.match(Elixir.Patterns.bound(a),1);
     """
 

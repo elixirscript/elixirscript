@@ -15,6 +15,13 @@ defmodule ElixirScript.Translator.Primitive do
     )
   end
 
+  def tuple_class() do
+    JS.member_expression(
+      JS.identifier("Elixir"),
+      JS.identifier("Tuple")
+    )
+  end
+
   def scheduler() do
     JS.member_expression(
       JS.identifier("self"),
@@ -55,7 +62,7 @@ defmodule ElixirScript.Translator.Primitive do
     )
   end
 
-  def make_list([{:|, _, [elem, list]} = ast], env) do
+  def make_list([{:|, _, [_, _]} = ast], env) do
     Translator.translate(ast, env)
   end
 

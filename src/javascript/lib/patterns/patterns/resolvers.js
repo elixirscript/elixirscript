@@ -27,37 +27,37 @@ function resolveTuple(pattern: any): Function {
 function resolveSymbol(pattern: any): Function {
   return function(value: any): boolean {
     return Checks.is_symbol(value) && value === pattern;
-  }; 
+  };
 }
 
 function resolveString(pattern: any): Function {
   return function(value: any): boolean {
     return Checks.is_string(value) && value === pattern
-  }; 
+  };
 }
 
 function resolveNumber(pattern: any): Function {
   return function(value: any): boolean {
     return Checks.is_number(value) && value === pattern;
-  }; 
+  };
 }
 
 function resolveBoolean(pattern: any): Function {
   return function(value: any): boolean {
     return Checks.is_boolean(value) && value === pattern
-  }; 
+  };
 }
 
 function resolveFunction(pattern: any): Function {
   return function(value: any): boolean {
     return Checks.is_function(value) && value === pattern
-  }; 
+  };
 }
 
 function resolveNull(pattern: any): Function {
   return function(value: any): boolean {
     return Checks.is_null(value);
-  }; 
+  };
 }
 
 function resolveBound(pattern: Types.Bound): Function {
@@ -74,14 +74,14 @@ function resolveBound(pattern: Types.Bound): Function {
 function resolveWildcard(): Function {
   return function(): boolean {
     return true;
-  }; 
+  };
 }
 
 function resolveVariable(): Function {
   return function(value: any, args: Array<any>): boolean {
     args.push(value);
     return true;
-  }; 
+  };
 }
 
 function resolveHeadTail(): Function {
@@ -92,7 +92,7 @@ function resolveHeadTail(): Function {
 
     const head = value[0];
     const tail = value.slice(1);
-    
+
     args.push(head);
     args.push(tail);
 
@@ -128,12 +128,12 @@ function resolveStartsWith(pattern: Types.StartsWith): Function {
 
 function resolveType(pattern: Types.Type): Function {
   return function(value: any, args: Array<any>): boolean {
-    if(!value instanceof pattern.type){
-      return false;
+    if(value instanceof pattern.type){
+      const matches = buildMatch(pattern.objPattern);
+      return matches(value, args) && args.push(value) > 0;
     }
 
-    const matches = buildMatch(pattern.objPattern);
-    return matches(value, args) && args.push(value) > 0;
+    return false;
   };
 }
 
@@ -166,7 +166,7 @@ function resolveObject(pattern: Object): Function {
     for(let key of Object.keys(pattern)){
       if(!(key in value) || !matches[key](value[key], args) ){
         return false;
-      }      
+      }
     }
 
     return true;

@@ -67,29 +67,26 @@ defmodule ElixirScript.Test do
     """, env: make_custom_env)
 
     assert_js_matches """
-      import * as Elixir from 'elixir';
-      import * as Elephant from 'animals/elephant';
-
-       const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Animals');
-       const something = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([],function()    {
-           return     Elephant.defstruct(Elixir.Kernel.SpecialForms.map({}));
-         }));
-       export {
-           something
-        };
+    import * as Elixir from 'elixir';
+    import * as Elephant from 'animals/elephant';
+    const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Animals.Elephant');
+    const defstruct = Elixir.Kernel.defstruct({
+        [Elixir.Kernel.SpecialForms.atom('__struct__')]: __MODULE__, [Elixir.Kernel.SpecialForms.atom('trunk')]: true
+    });
+    export {
+        Elephant: defstruct
+    };
      """, hd(js_code)
 
      assert_js_matches """
-         import * as Elixir from 'elixir';
-         const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Animals.Elephant');
-         function defstruct(values = {})        {
-                 return  Elixir.Kernel.defstruct({
-             [Elixir.Kernel.SpecialForms.atom('__struct__')]: __MODULE__,     [Elixir.Kernel.SpecialForms.atom('trunk')]: true
-       },values);
-               }
-         export {
-             defstruct
-       };   
+     import * as Elixir from 'elixir';
+     const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elephant');
+     const defstruct = Elixir.Kernel.defstruct({
+         [Elixir.Kernel.SpecialForms.atom('__struct__')]: __MODULE__, [Elixir.Kernel.SpecialForms.atom('trunk')]: true
+     });
+     export {
+         Elephant: defstruct
+     };
        """, Enum.fetch!(js_code, 1)
   end
 

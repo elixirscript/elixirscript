@@ -181,47 +181,68 @@ defmodule ElixirScript.Translator.Protocol do
   end
 
   defp map_to_js({:__aliases__, _, [:Integer]}) do
-    do_map_to_js(:is_integer)
+    JS.member_expression(
+      JS.identifier(:Elixir),
+      JS.identifier(:IntegerType)
+    )
   end
 
   defp map_to_js({:__aliases__, _, [:Tuple]}) do
-    do_map_to_js(:is_tuple)
+    JS.member_expression(
+      JS.identifier(:Elixir),
+      JS.identifier(:Tuple)
+    )
   end
 
   defp map_to_js({:__aliases__, _, [:Atom]}) do
-    do_map_to_js(:is_atom)
+    JS.identifier(:Symbol)
   end
 
   defp map_to_js({:__aliases__, _, [:List]}) do
-    do_map_to_js(:is_list)
+    JS.identifier(:Array)
   end
 
   defp map_to_js({:__aliases__, _, [:BitString]}) do
-    do_map_to_js(:is_bitstring)
+    JS.member_expression(
+      JS.identifier(:Elixir),
+      JS.identifier(:BitString)
+    )
   end
 
   defp map_to_js({:__aliases__, _, [:Float]}) do
-    do_map_to_js(:is_float)
+    JS.member_expression(
+      JS.identifier(:Elixir),
+      JS.identifier(:FloatType)
+    )
   end
 
   defp map_to_js({:__aliases__, _, [:Function]}) do
-    do_map_to_js(:is_function)
+    JS.identifier(:Function)
   end
 
   defp map_to_js({:__aliases__, _, [:PID]}) do
-    do_map_to_js(:is_pid)
+    JS.member_expression(
+      JS.identifier(:Elixir),
+      JS.identifier(:Reference)
+    )
   end
 
   defp map_to_js({:__aliases__, _, [:Port]}) do
-    do_map_to_js(:is_port)
+    JS.member_expression(
+      JS.identifier(:Elixir),
+      JS.identifier(:Port)
+    )
   end
 
   defp map_to_js({:__aliases__, _, [:Reference]}) do
-    do_map_to_js(:is_reference)
+    JS.member_expression(
+      JS.identifier(:Elixir),
+      JS.identifier(:Reference)
+    )
   end
 
   defp map_to_js({:__aliases__, _, [:Map]}) do
-    do_map_to_js(:is_map)
+    JS.identifier(:Object)
   end
 
   defp map_to_js({:__aliases__, _, [:Any]}) do
@@ -234,25 +255,9 @@ defmodule ElixirScript.Translator.Protocol do
 
 
   defp map_to_js({:__aliases__, _, struct}) do
-    module_name = Enum.map(struct, &Atom.to_string(&1))
-    |> Enum.join(".")
-    |> String.to_atom
-
-    quoted = quote do
-      Kernel.is_struct_fn(unquote(module_name))
-    end
-
-    Translator.translate(quoted, ElixirScript.State.get().env)
-  end
-
-
-  defp do_map_to_js(identifier) do
-    JS.member_expression(
-      JS.identifier(:Elixir),
-      JS.member_expression(
-        JS.identifier(:Kernel),
-        JS.identifier(identifier)
-      )
+    ElixirScript.Translator.Struct.get_struct_class(
+      struct,
+      ElixirScript.State.get().env
     )
   end
 

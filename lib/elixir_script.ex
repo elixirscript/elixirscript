@@ -126,14 +126,14 @@ defmodule ElixirScript do
   to the specified location
   """
   def copy_standard_libs_to_destination(destination) do
-    File.cp_r!(operating_path <> "/dist", destination)
+    File.cp_r!(operating_path, destination)
   end
 
   @doc """
   Returns the standard lib js code
   """
   def standard_libs() do
-    File.read!(operating_path <> "/dist/elixir.js")
+    File.read!(operating_path <> "/elixir.js")
   end
 
   defp convert_to_code(js_ast, root, include_path, env, import_standard_libs) do
@@ -201,7 +201,7 @@ defmodule ElixirScript do
 
   defp operating_path() do
     try do
-      Mix.Project.build_path <> "/lib/elixir_script/priv/javascript"
+      Mix.Project.build_path <> "/lib/elixir_script/priv"
     rescue
       UndefinedFunctionError ->
         split_path = Path.split(Application.app_dir(:elixirscript))

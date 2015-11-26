@@ -2,7 +2,7 @@ import SpecialForms from './kernel/special_forms';
 import Patterns from './patterns/patterns';
 import Tuple from './tuple';
 import BitString from './bit_string';
-import Protocol from './protocol';
+import { Protocol } from './protocol';
 import { PID } from './processes/processes';
 
 function tl(list){
@@ -54,15 +54,15 @@ function is_number(x){
 }
 
 function is_tuple(x){
-  return x instanceof Tuple; 
+  return x instanceof Tuple;
 }
 
 function length(x){
-  return x.length;  
+  return x.length;
 }
 
 function is_pid(x){
-  return x instanceof PID; 
+  return x instanceof PID;
 }
 
 function is_port(x){
@@ -84,7 +84,7 @@ function __in__(left, right){
     }
   }
 
-  return false; 
+  return false;
 }
 
 function abs(number){
@@ -100,19 +100,19 @@ function elem(tuple, index){
     return tuple[index];
   }
 
-  return tuple.get(index);  
+  return tuple.get(index);
 }
 
 function rem(left, right){
-  return left % right;  
+  return left % right;
 }
 
 function div(left, right){
-  return left / right;  
+  return left / right;
 }
 
 function and(left, right){
-  return left && right;  
+  return left && right;
 }
 
 function or(left, right){
@@ -142,20 +142,47 @@ function to_string(arg){
     return Tuple.to_string(arg);
   }
 
-  return arg.toString();  
+  return arg.toString();
 }
 
 function match__qmark__(pattern, expr, guard = () => true){
-  return Patterns.match_no_throw(pattern, expr, guard) != null;  
+  return Patterns.match_no_throw(pattern, expr, guard) != null;
 }
 
-function defstruct(defaults, values){
-  return SpecialForms.map_update(defaults, values);
+function defstruct(defaults){
+  return class {
+    constructor(update = {}){
+      let the_values = Object.assign(defaults, update);
+      Object.assign(this, the_values);
+    }
+
+    static create(updates = {}){
+      let x = new this(updates);
+      return Object.freeze(x);
+    }
+  }
 }
 
-function is_struct_fn(__struct__){
-  return function(x){
-    return is_map && x[SpecialForms.atom("__struct__")] === __struct__;
+
+function defexception(defaults){
+  return class extends Error {
+    constructor(update = {}){
+      let message = update.message || "";
+      super(message);
+
+      let the_values = Object.assign(defaults, update);
+      Object.assign(this, the_values);
+
+      this.name = this.constructor.name;
+      this.message = message;
+      this[SpecialForms.atom("__exception__")] = true;
+      Error.captureStackTrace(this, this.constructor.name);
+    }
+
+    static create(updates = {}){
+      let x = new this(updates);
+      return Object.freeze(x);
+    }
   }
 }
 
@@ -200,9 +227,6 @@ export default {
   to_string,
   match__qmark__,
   defstruct,
-  is_struct_fn,
   defprotocol,
   defimpl
 };
-
-

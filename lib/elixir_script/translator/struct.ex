@@ -2,13 +2,40 @@ defmodule ElixirScript.Translator.Struct do
   @moduledoc false
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
+  alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.Map
 
-  def make_struct(module_name, data, env) do
-    JS.call_expression(
+  def get_struct_class(module_name, env) do
+    current_module = ElixirScript.State.get_module(Process.get(:current_module))
+
+    name = List.last(module_name)
+
+    the_alias = ElixirScript.Module.get_alias(current_module, module_name)
+
+    if the_alias do
+      { _, name } = the_alias
+
+      name = Atom.to_string(name)
+      |> String.split(".")
+      |> List.last
+    end
+
+    if the_alias == nil && ElixirScript.State.get_module(module_name) == nil do
+      Utils.make_module_expression_tree(module_name, false, env)
+    else
       JS.member_expression(
         JS.identifier(List.last(module_name)),
-        JS.identifier(:defstruct)
+        JS.identifier(name)
+      )
+    end
+
+  end
+
+  def new_struct(module_name, data, env) do
+    JS.call_expression(
+      JS.member_expression(
+        get_struct_class(module_name, env),
+        JS.identifier(:create)
       ),
       [Translator.translate(data, env)]
     )
@@ -42,7 +69,7 @@ defmodule ElixirScript.Translator.Struct do
 
   def make_defexception(attributes, env) when length(attributes) == 1 do
     exception_key_value = Map.make_property(Translator.translate(:__exception__, env), Translator.translate(true, env))
-    
+
     attributes = Enum.flat_map(attributes, fn(x) -> x end)
 
     defaults = [exception_key_value] ++ Enum.map(attributes, fn
@@ -82,25 +109,23 @@ defmodule ElixirScript.Translator.Struct do
 
     defaults = %{ defaults | properties: [struct_name]  ++ defaults.properties }
 
-    JS.function_declaration(
-      JS.identifier(name),
-      [JS.identifier(:values)],
-      [JS.object_expression([])],
-      JS.block_statement([
-        JS.return_statement(
-          JS.call_expression(
-            JS.member_expression(
-              JS.member_expression(
-                JS.identifier("Elixir"),
-                JS.identifier("Kernel")
-              ),
-              JS.identifier("defstruct")
-            ),
-            [defaults, JS.identifier(:values)]
-          )
-        )
-      ])
+    ref = JS.identifier(name)
+
+    ref_declarator = JS.variable_declarator(
+      ref,
+      JS.call_expression(
+        JS.member_expression(
+          JS.member_expression(
+            JS.identifier("Elixir"),
+            JS.identifier("Kernel")
+          ),
+          JS.identifier(name)
+        ),
+        [defaults]
+      )
     )
+
+    JS.variable_declaration([ref_declarator], :const)
   end
 
 end

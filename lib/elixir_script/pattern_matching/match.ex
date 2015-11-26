@@ -6,6 +6,7 @@ defmodule ElixirScript.PatternMatching.Match do
   alias ElixirScript.Translator.Primitive
   alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.Map
+  alias ElixirScript.Translator.Struct
 
   @wildcard JS.member_expression(
     JS.identifier("Elixir"),
@@ -55,6 +56,14 @@ defmodule ElixirScript.PatternMatching.Match do
       )
   )
 
+  @_type JS.member_expression(
+    JS.identifier("Elixir"),
+    JS.member_expression(
+        JS.identifier(:Patterns),
+        JS.identifier(:type)
+      )
+  )
+
   def wildcard() do
     JS.call_expression(
       @wildcard,
@@ -97,6 +106,13 @@ defmodule ElixirScript.PatternMatching.Match do
     )
   end
 
+  def type(prototype, value) do
+    JS.call_expression(
+      @_type,
+      [prototype, value]
+    )
+  end
+
   def build_match(params, env) do
     Enum.map(params, &do_build_match(&1, env))
     |> reduce_patterns
@@ -106,7 +122,7 @@ defmodule ElixirScript.PatternMatching.Match do
     { [bound(Translator.translate(value, env))], [nil] }
   end
 
-  defp do_build_match({:_, _, _}, env) do
+  defp do_build_match({:_, _, _}, _) do
     { [wildcard()], [JS.identifier(:undefined)] }
   end
 
@@ -132,8 +148,10 @@ defmodule ElixirScript.PatternMatching.Match do
   end
 
   defp do_build_match({:%, _, [{:__aliases__, _, name}, {:%{}, meta, props}]}, env) do
-    props = [{:__struct__ , List.last(name)}] ++ props
-    do_build_match({:%{}, meta, props}, env)
+    struct_name = Struct.get_struct_class(name, env)
+    {pattern, params} = do_build_match({:%{}, meta, props}, env)
+
+    { [type(struct_name, pattern)], params }
   end
 
   defp do_build_match({:=, _, [{name, _, _}, right]}, env) when not name in [:%, :{}, :__aliases__, :^, :%{}] do
@@ -165,10 +183,17 @@ defmodule ElixirScript.PatternMatching.Match do
     |> Enum.map(&build_match([&1], env))
     |> reduce_patterns
 
-    {[Primitive.make_tuple_no_translate(patterns)], params}
+    pattern = JS.object_expression([
+      JS.property(
+        JS.identifier("values"),
+        JS.array_expression(patterns)
+      )
+      ])
+
+    { [type(Primitive.tuple_class, pattern)], params }
   end
 
-  defp do_build_match({name, _, _}, env) do
+  defp do_build_match({name, _, _}, _) do
     name = Utils.filter_name(name)
     { [parameter()], [JS.identifier(name)] }
   end
