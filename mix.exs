@@ -51,7 +51,7 @@ defmodule ElixirScript.Mixfile do
 
   defp package do
     [
-      files: ["lib", "priv/javascript/dist", "mix.exs", "README*", "readme*", "LICENSE*", "license*", "CHANGELOG*"],
+      files: ["lib", "priv/elixir.js", "mix.exs", "README*", "readme*", "LICENSE*", "license*", "CHANGELOG*"],
       maintainers: ["Bryan Joseph"],
       licenses: ["MIT"],
       links: %{
@@ -73,8 +73,6 @@ defmodule ElixirScript.Mixfile do
     folder_name = "#{dist_folder}/elixirscript"
     archive_file_name = "#{dist_folder}/elixirscript.tar.gz"
 
-    File.mkdir_p("priv/javascript/dist")
-
     Mix.Tasks.Escript.Build.run([])
 
     if File.exists?(dist_folder) do
@@ -82,13 +80,13 @@ defmodule ElixirScript.Mixfile do
     end
 
     { _ , _ } = System.cmd("node", ["node_modules/gulp/bin/gulp.js", "dist_build"])
-    { elixir_js, _ } = System.cmd("node", ["node_modules/rollup/bin/rollup", "./priv/javascript/dist_build/elixir.js"])
-    File.write!("priv/javascript/dist/elixir.js", elixir_js)
+    { elixir_js, _ } = System.cmd("node", ["node_modules/rollup/bin/rollup", "./src/javascript/dist_build/elixir.js"])
+    File.write!("priv/elixir.js", elixir_js)
     { _ , _ } = System.cmd("node", ["node_modules/gulp/bin/gulp.js", "dist_add_source_map"])
 
     File.mkdir_p(folder_name <> "/bin")
     File.cp!("elixirscript", "#{folder_name}/bin/elixirscript")
-    File.cp_r!("priv/javascript/dist", "#{folder_name}/dist")
+    File.cp_r!("priv", "#{folder_name}")
     File.cp_r!("LICENSE", "#{folder_name}/LICENSE")
 
     System.cmd("tar", ["czf", archive_file_name, folder_name])

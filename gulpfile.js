@@ -8,21 +8,21 @@ var sourcemaps = require('gulp-sourcemaps');
 
 require("babel/polyfill");
 
-var path = './priv/javascript';
+var path = './src/javascript';
 var stdLibPath = path + '/lib/**/*.js';
 var testPath = path + '/test_build/tests/**/*.spec.js';
 var libPath = path + '/lib';
 
 gulp.task('test_build', function() {
-  return gulp.src(['./priv/javascript/lib/**/*.js'])
+  return gulp.src([path + '/lib/**/*.js'])
       .pipe(babel({sourceMap: false, modules:'common'}))
-      .pipe(gulp.dest('./priv/javascript/test_build/lib'));
+      .pipe(gulp.dest(path + '/test_build/lib'));
 });
 
 gulp.task('test_build_tests', function() {
-  return gulp.src(['./priv/javascript/tests/**/*.spec.js'])
+  return gulp.src([path + '/tests/**/*.spec.js'])
       .pipe(babel({sourceMap: false, modules:'common'}))
-      .pipe(gulp.dest('./priv/javascript/test_build/tests'));
+      .pipe(gulp.dest(path + '/test_build/tests'));
 });
 
 gulp.task('test', ['test_build', 'test_build_tests'], function () {
@@ -31,23 +31,23 @@ gulp.task('test', ['test_build', 'test_build_tests'], function () {
 });
 
 gulp.task('lint', function () {
-    return gulp.src([stdLibPath, testPath, '!./priv/javascript/build/**/*.js'])
+    return gulp.src([stdLibPath, testPath, '!' + path + '/build/**/*.js'])
         .pipe(eslint())
         .pipe(eslint.format())
         .pipe(eslint.failOnError());
 });
 
 gulp.task('dist_build', function() {
-  return gulp.src(['./priv/javascript/**/*.js', '!./priv/javascript/build/**/*.js', '!./priv/javascript/dist/**/*.js',  '!./priv/javascript/dist_build/**/*.js', '!./priv/javascript/tests/**/*.js'])
+  return gulp.src([path + '/**/*.js', '!' + path + '/build/**/*.js', '!' + path + '/dist/**/*.js',  '!' + path + '/dist_build/**/*.js', '!' + path + '/tests/**/*.js'])
       .pipe(babel({whitelist: ['flow'], optional: ["minification.deadCodeElimination"]}))
-      .pipe(gulp.dest('./priv/javascript/dist_build'));
+      .pipe(gulp.dest(path + '/dist_build'));
 });
 
 gulp.task('dist_add_source_map', function() {
-  return gulp.src(['./priv/javascript/dist/elixir.js'])
+  return gulp.src(['./priv/elixir.js'])
       .pipe(sourcemaps.init())
       .pipe(sourcemaps.write())
-      .pipe(gulp.dest('./priv/javascript/dist'));
+      .pipe(gulp.dest('./priv'));
 });
 
 
