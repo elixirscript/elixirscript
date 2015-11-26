@@ -27,7 +27,6 @@ defmodule ElixirScript.TestHelper do
     require Logger
     require ElixirScript.Math
     require ElixirScript.Using
-
     __ENV__
   end
 
@@ -36,7 +35,7 @@ defmodule ElixirScript.TestHelper do
   end
 
   def strip_spaces(js) do
-    js |> strip_new_lines |> String.replace(" ", "") 
+    js |> strip_new_lines |> String.replace(" ", "")
   end
 
   def strip_new_lines(js) do

@@ -1,4 +1,4 @@
-defmodule ElixirScript.Lib.JS do
+defmodule ElixirScript.JS do
 
   @doc """
   Creates new JavaScript objects.
@@ -25,8 +25,8 @@ defmodule ElixirScript.Lib.JS do
   but JavaScript modules work differently and have to be imported
   using this.
 
-  If module is not a list, then it is treated as a default import, 
-  otherwise it is not. 
+  If module is not a list, then it is treated as a default import,
+  otherwise it is not.
 
   ex:
     JS.import A, "a" #translates to "import {default as A} from 'a'"
