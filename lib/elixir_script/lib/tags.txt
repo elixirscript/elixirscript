@@ -1,4 +1,3 @@
-doctype!
 a
 abbr
 acronym
@@ -31,6 +30,7 @@ dd
 del
 details
 dfn
+dialog
 dir
 div
 dl
@@ -62,9 +62,11 @@ label
 legend
 li
 link
+main
 map
 mark
 menu
+menuitem
 meta
 meter
 nav
