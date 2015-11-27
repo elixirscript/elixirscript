@@ -5,13 +5,12 @@ defmodule ElixirScript.Translator.Function do
   alias ElixirScript.Translator.Utils
   alias ElixirScript.PatternMatching.Match
   alias ElixirScript.Preprocess.Variables
-  alias ElixirScript.Translator.Map
 
   @standard_libs [
     :Patterns, :Kernel, :Atom, :Enum, :Integer, :JS,
     :List, :Range, :Tuple, :Agent, :Keyword, :BitString,
     :Base, :String, :Bitwise, :Collectable, :Enumerable,
-    :Inspect, :Map, :MapSet, :Set, :VirtualDom, :ViewAgent
+    :Inspect, :Map, :MapSet, :Set, :VirtualDom, :View
   ]
 
   def update_alias({:__aliases__, context, [:List, :Chars]}) do

@@ -30,24 +30,40 @@ defmodule ElixirScript.Html do
     @doc """
     Defines a macro for the html element, #{tag}
     """
-    defmacro unquote(tag)(attributes \\ [], block \\ [do: nil]) do
+    defmacro unquote(tag)(attrs, do: inner) do
       tag = Atom.to_string(unquote(tag))
-
-      inner = case Keyword.get(block, :do) do
-        {:__block__, [], params} ->
-          params
-        nil ->
-          []
-        x ->
-          [x]
-      end
-
-      attributes = config_to_map(attributes)
+      { inner, attributes } = do_tag(inner, attrs)
 
       quote do
          Elixir.VirtualDOM.h(unquote(tag), unquote(attributes), unquote_splicing(inner))
       end
     end
+
+    defmacro unquote(tag)(attrs \\ []) do
+      tag = Atom.to_string(unquote(tag))
+
+      { inner, attributes } = Dict.pop(attrs, :do)
+      { inner, attributes } = do_tag(inner, attributes)
+
+      quote do
+         Elixir.VirtualDOM.h(unquote(tag), unquote(attributes), unquote_splicing(inner))
+      end
+    end
+  end
+
+  defp do_tag(inner, attributes) do
+    inner = case inner do
+      {:__block__, [], params} ->
+        params
+      nil ->
+        []
+      x ->
+        [x]
+    end
+
+    attributes = config_to_map(attributes)
+
+    {inner, attributes}
   end
 
   defp config_to_map(config) do
