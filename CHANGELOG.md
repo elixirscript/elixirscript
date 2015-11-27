@@ -4,6 +4,11 @@
   * Structs and Tuples now match on their types
   * Can now match on JavaScript classes
   * Can now implement protocols using JavaScript types
+  * Added virtual-dom JavaScript library
+  * Added ElixirScript.Html module for defining a virtual-dom tree
+  * Added ElixirScript.VDom module for manipulating the virtual-dom tree created
+  using the ElixirScript.Html module
+
 
 # v0.13.0
 * Enhancements
