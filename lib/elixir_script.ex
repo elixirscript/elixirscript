@@ -82,6 +82,7 @@ defmodule ElixirScript do
     require Logger
     require ElixirScript.JS, as: JS
     require ElixirScript.Html, as: Html
+    require ElixirScript.VDom, as: VDom
     __ENV__
   end
 

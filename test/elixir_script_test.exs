@@ -132,7 +132,7 @@ defmodule ElixirScript.Test do
         end
       end
 
-      rootNode = Html.create(tree)
+      rootNode = VDom.create(tree)
       :document.getElementById("main").appendChild(rootNode)
       """)
 

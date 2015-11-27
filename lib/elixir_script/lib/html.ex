@@ -1,4 +1,25 @@
 defmodule ElixirScript.Html do
+  @moduledoc """
+  Defines macros for HTML elements to be used to build up a virtual dom tree.
+  The virtual dom tree defined here can then be used with macros defined in the
+  VDom module
+
+      tree = Html.div [id: "hello"] do
+              Html.span do
+                "Hello"
+              end
+            end
+
+      rootNode = VDom.create(tree)
+      :document.getElementById("main").appendChild(rootNode)
+
+      newTree = Html.div [id: "world"]
+
+
+      patches = VDom.diff(tree, newTree)
+      rootNode = VDom.patch(rootNode, patches)
+
+  """
 
   @external_resource tags_path = Path.join([__DIR__, "tags.txt"])
   @tags (for line <- File.stream!(tags_path, [], :line) do
@@ -6,7 +27,10 @@ defmodule ElixirScript.Html do
   end)
 
   for tag <- @tags do
-    defmacro unquote(tag)(config \\ [], block \\ [do: nil]) do
+    @doc """
+    Defines a macro for the html element, #{tag}
+    """
+    defmacro unquote(tag)(attributes \\ [], block \\ [do: nil]) do
       tag = Atom.to_string(unquote(tag))
 
       inner = case Keyword.get(block, :do) do
@@ -18,10 +42,10 @@ defmodule ElixirScript.Html do
           [x]
       end
 
-      config = config_to_map(config)
+      attributes = config_to_map(attributes)
 
       quote do
-         Elixir.VirtualDOM.h(unquote(tag), unquote(config), unquote_splicing(inner))
+         Elixir.VirtualDOM.h(unquote(tag), unquote(attributes), unquote_splicing(inner))
       end
     end
   end
@@ -36,24 +60,6 @@ defmodule ElixirScript.Html do
     end)
 
     {:%{}, [], config}
-  end
-
-  defmacro create(element) do
-    quote do
-       Elixir.VirtualDOM.create(unquote(element))
-    end
-  end
-
-  defmacro diff(tree, newTree) do
-    quote do
-       Elixir.VirtualDOM.diff(unquote(tree), unquote(newTree))
-    end
-  end
-
-  defmacro patch(root, patches) do
-    quote do
-       Elixir.VirtualDOM.patch(unquote(root), unquote(patches))
-    end
   end
 
 end
