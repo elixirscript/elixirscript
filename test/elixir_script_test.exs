@@ -119,4 +119,26 @@ defmodule ElixirScript.Test do
      """, hd(js_code)
   end
 
+
+  should "expand Html macros" do
+      js_code = ElixirScript.compile("""
+      tree = Html.div [id: "myDiv"] do
+        Html.span do
+          "Hello"
+        end
+
+        Html.span do
+          "World"
+        end
+      end
+
+      rootNode = VDom.create(tree)
+      :document.getElementById("main").appendChild(rootNode)
+      """)
+
+      assert hd(js_code) =~ "Elixir.VirtualDOM.h('div'"
+      assert hd(js_code) =~ "Elixir.VirtualDOM.h('span'"
+      assert hd(js_code) =~ "Elixir.VirtualDOM.create"
+  end
+
 end

@@ -24,3 +24,4 @@ export { default as Map } from './lib/map';
 export { default as Set } from './lib/set';
 export { default as MapSet } from './lib/map_set';
 export { IntegerType, FloatType } from './lib/protocol';
+export { default as VirtualDOM } from './lib/virtual-dom';

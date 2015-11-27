@@ -58,6 +58,13 @@ defmodule ElixirScript.Preprocess.Modules do
   end
 
   def do_get_info({:defmodule, _, [{:__aliases__, _, [:ElixirScript, :Temp]}, [do: body]]} = ast) do
+    body = case body do
+      {:__block__, _, _ } ->
+        Macro.expand(body, State.get().env)
+      _ ->
+        body
+    end
+
     mod = %ElixirScript.Module{ name: [:ElixirScript, :Temp] , body: body }
     State.add_module(mod)
 
