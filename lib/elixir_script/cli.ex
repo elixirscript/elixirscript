@@ -3,11 +3,11 @@ defmodule ElixirScript.CLI do
 
   @switches [
     output: :binary, elixir: :boolean, root: :binary,
-    help: :boolean, stdlib: :boolean
+    help: :boolean, stdlib: :boolean, stdlib_path: :binary
   ]
 
   @aliases [
-    o: :output, ex: :elixir, h: :help, r: :root, st: :stdlib
+    o: :output, ex: :elixir, h: :help, r: :root, st: :stdlib, stp: :stdlib_path
   ]
 
   def main(argv) do
@@ -23,7 +23,7 @@ defmodule ElixirScript.CLI do
       { [help: true] , _ , _ } -> :help
       { [stdlib: true] , _ , _ } -> :stdlib
       { options , [input], _ } -> { input, options }
-      { [], [], [] } -> :help
+      _ -> :help
     end
 
   end
@@ -36,8 +36,10 @@ defmodule ElixirScript.CLI do
       options:
       -o  --output [path]   places output at the given path
       -ex --elixir          read input as elixir code string
-      -r  --root [path]     root path for standard libs
+      -r  --root [path]     root import path for all exported modules
       -st  --stdlib         outputs the standard lib js file
+      -stp --stdlib_path    es6 import path to the elixirscript standard lib
+      only used with the [output] option. When used, elixir.js is not exported
       -h  --help            this message
     """
   end
@@ -57,7 +59,8 @@ defmodule ElixirScript.CLI do
   def do_process(input, options) do
     compile_opts = [
       root: options[:root],
-      include_path: options[:output] != nil
+      include_path: options[:output] != nil,
+      stdlib_path: Dict.get(options, :stdlib_path, "elixir")
     ]
 
     compile_output = case options[:elixir] do
@@ -79,7 +82,9 @@ defmodule ElixirScript.CLI do
           write_to_file(x, output_path)
         end)
 
-        ElixirScript.copy_standard_libs_to_destination(output_path)
+        if Dict.get(options, :stdlib_path) == nil do
+          ElixirScript.copy_standard_libs_to_destination(output_path)
+        end
     end
   end
 

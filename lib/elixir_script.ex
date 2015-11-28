@@ -17,10 +17,10 @@ defmodule ElixirScript do
   Available options are:
   * `:include_path` - a boolean controlling whether to return just the JavaScript code
   or a tuple of the file name and the JavaScript code
-
   * `:root` - a binary path prepended to the path of the standard lib imports if needed
   * `:env` - a Macro.env struct to use. This is most useful when using macros. Make sure that the
-  given env has the macros required. Defaults to __ENV__.
+  * `:stdlib_path` - The es6 import path used to import the elixirscript standard lib.
+  When using this option, the elixir.js file is not exported
   """
 
   @doc """
@@ -42,11 +42,12 @@ defmodule ElixirScript do
     root = Dict.get(opts, :root)
     env = Dict.get(opts, :env, custom_env)
     import_standard_libs? = Dict.get(opts, :import_standard_libs, true)
+    stdlib_path = Dict.get(opts, :stdlib_path, "elixir")
 
     ElixirScript.State.start_link(root, env)
 
     build_environment([quoted])
-    create_code(include_path, import_standard_libs?)
+    create_code(include_path, import_standard_libs?, stdlib_path)
   end
 
   @doc """
@@ -57,6 +58,7 @@ defmodule ElixirScript do
     include_path = Dict.get(opts, :include_path, false)
     root = Dict.get(opts, :root)
     env = Dict.get(opts, :env, custom_env)
+    stdlib_path = Dict.get(opts, :stdlib_path, "elixir")
 
     ElixirScript.State.start_link(root, env)
 
@@ -65,7 +67,7 @@ defmodule ElixirScript do
     |> Enum.map(&file_to_quoted/1)
     |> build_environment
 
-    create_code(include_path, true)
+    create_code(include_path, true, stdlib_path)
   end
 
   defp file_to_quoted(file) do
@@ -87,7 +89,7 @@ defmodule ElixirScript do
     __ENV__
   end
 
-  defp create_code(include_path, import_standard_libs?) do
+  defp create_code(include_path, import_standard_libs?, stdlib_path) do
 
     ElixirScript.State.process_imports
 
@@ -103,7 +105,7 @@ defmodule ElixirScript do
 
           result =
             ElixirScript.Translator.Module.make_module(ast.name, ast.body, state.env)
-            |> Enum.map(&(convert_to_code(&1, state.root, include_path, state.env, import_standard_libs?)))
+            |> Enum.map(&(convert_to_code(&1, state.root, include_path, state.env, import_standard_libs?, stdlib_path)))
           send parent, {self, result}
         end
       end)
@@ -118,7 +120,7 @@ defmodule ElixirScript do
       state.protocols
       |> Dict.to_list
       |> ElixirScript.Translator.Protocol.consolidate(state.env)
-      |> Enum.map(&(convert_to_code(&1, state.root, include_path, state.env, import_standard_libs?)))
+      |> Enum.map(&(convert_to_code(&1, state.root, include_path, state.env, import_standard_libs?, stdlib_path)))
       |> List.flatten
 
     ElixirScript.State.stop
@@ -141,19 +143,19 @@ defmodule ElixirScript do
     File.read!(operating_path <> "/elixir.js")
   end
 
-  defp convert_to_code(js_ast, root, include_path, env, import_standard_libs) do
+  defp convert_to_code(js_ast, root, include_path, env, import_standard_libs, stdlib_path) do
     js_ast
-    |> process_module(root, env, import_standard_libs)
+    |> process_module(root, env, import_standard_libs, stdlib_path)
     |> javascript_ast_to_code
     |> process_include_path(include_path)
   end
 
-  defp process_module(%JSModule{} = module, root, env, import_standard_libs) do
+  defp process_module(%JSModule{} = module, root, env, import_standard_libs, stdlib_path) do
     file_path = create_file_name(module)
 
     standard_libs_import =
       if import_standard_libs do
-        ElixirScript.Translator.Import.create_standard_lib_imports(root, env)
+        ElixirScript.Translator.Import.create_standard_lib_imports(root, stdlib_path)
       else
         []
       end
