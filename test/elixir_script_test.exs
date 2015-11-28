@@ -141,4 +141,33 @@ defmodule ElixirScript.Test do
       assert hd(js_code) =~ "Elixir.VirtualDOM.create"
   end
 
+
+  should "set standard lib path" do
+
+    js_code = ElixirScript.compile("""
+      defmodule Animals do
+        use ElixirScript.Using
+
+        defp something_else() do
+          ElixirScript.Math.squared(1)
+        end
+
+      end
+    """, env: make_custom_env, stdlib_path: "elixirscript")
+
+    assert_js_matches """
+         import * as Elixir from 'elixirscript';
+         const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Animals');
+         const something_else = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([],function()    {
+             return     1 * 1;
+           }));
+         const sandwich = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([],function()    {
+             return     null;
+           }));
+         export {
+             sandwich
+       };
+     """, hd(js_code)
+  end
+
 end

@@ -8,6 +8,8 @@
   * Added ElixirScript.Html module for defining a virtual-dom tree
   * Added ElixirScript.VDom module for manipulating the virtual-dom tree created
   using the ElixirScript.Html module
+  * Added `stdlib_path` compiler option to specify the es6 path to the standard library.
+  If used, elixir.js will not be exported with the compiled modules
 
 
 # v0.13.0

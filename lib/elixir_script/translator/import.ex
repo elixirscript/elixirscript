@@ -159,7 +159,7 @@ defmodule ElixirScript.Translator.Import do
 
   defp make_source(name) do
     root = ElixirScript.State.get().root
-    "'#{root(root)}#{make_file_path(name)}'"
+    "'#{make_root(root)}#{make_file_path(name)}'"
   end
 
   def make_file_path(name) do
@@ -180,24 +180,25 @@ defmodule ElixirScript.Translator.Import do
     Set.difference(Enum.into(functions, HashSet.new), Enum.into(except, HashSet.new))
   end
 
-  def create_standard_lib_imports(root, _) do
+  def create_standard_lib_imports(root, name) do
+
     import_specifier = JS.import_namespace_specifier(
       JS.identifier(:Elixir)
     )
 
     import_declaration = JS.import_declaration(
       [import_specifier],
-      JS.identifier("'#{root(root) <> "elixir"}'")
+      JS.identifier("'#{make_root(root) <> name}'")
     )
 
     [import_declaration]
   end
 
-  defp root(nil) do
+  defp make_root(nil) do
     ""
   end
 
-  defp root(root) do
+  defp make_root(root) do
     root <> "/"
   end
 
