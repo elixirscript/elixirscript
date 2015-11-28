@@ -4,10 +4,6 @@ import Resolvers from "./resolvers";
 
 export function buildMatch(pattern: any): Function {
 
-  if(Checks.is_tuple(pattern)){
-    return Resolvers.resolveTuple(pattern);
-  }
-
   if(Checks.is_variable(pattern)){
     return Resolvers.resolveVariable(pattern);
   }

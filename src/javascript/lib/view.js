@@ -22,8 +22,7 @@ const stop = function(agent, timeout = 5000){
   return Kernel.SpecialForms.atom("ok");
 }
 
-
-const update = function(agent, state){
+const render = function(agent, state){
 
   const current_state = self.post_office.receive(agent);
 
@@ -46,5 +45,5 @@ const update = function(agent, state){
 export default {
   start,
   stop,
-  update
+  render
 }

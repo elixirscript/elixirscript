@@ -1,7 +1,6 @@
 /* @flow */
 
 import { Variable, Wildcard, HeadTail, Capture, Type, StartsWith, Bound } from "./types";
-import Tuple from '../../tuple';
 
 function is_number(value: any): boolean {
   return typeof value === 'number';
@@ -9,10 +8,6 @@ function is_number(value: any): boolean {
 
 function is_string(value: any): boolean{
   return typeof value === 'string';
-}
-
-function is_tuple(value: any): boolean{
-  return value instanceof Tuple;
 }
 
 function is_boolean(value: any): boolean {
@@ -71,10 +66,6 @@ function is_array(value: any): boolean {
   return Array.isArray(value);
 }
 
-function is_struct(__struct__: Symbol, value: any): boolean {
-  return is_object(value) && value[Symbol.for("__struct__")] === __struct__;
-}
-
 export default {
   is_number,
   is_string,
@@ -91,6 +82,5 @@ export default {
   is_startsWith,
   is_bound,
   is_object,
-  is_array,
-  is_tuple
+  is_array
 };

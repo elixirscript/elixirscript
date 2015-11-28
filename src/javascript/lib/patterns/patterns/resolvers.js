@@ -3,26 +3,6 @@
 import Checks from "./checks";
 import * as Types from "./types";
 import { buildMatch } from "./match";
-import Tuple from '../../tuple';
-
-function resolveTuple(pattern: any): Function {
-  let matches = [];
-
-  for(let elem of pattern){
-    matches.push(buildMatch(elem));
-  }
-
-  return function(value: any, args: Array<any>): boolean {
-    if(!Checks.is_tuple(value) || value.count() != pattern.count()){
-      return false;
-    }
-
-
-    return value.values.every(function(v, i) {
-      return matches[i](value.get(i), args);
-    });
-  };
-}
 
 function resolveSymbol(pattern: any): Function {
   return function(value: any): boolean {
@@ -195,6 +175,5 @@ export default {
   resolveNumber,
   resolveBoolean,
   resolveFunction,
-  resolveNull,
-  resolveTuple
+  resolveNull
 }

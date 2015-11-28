@@ -111,7 +111,7 @@ describe('defmatch', () => {
 
     fn = Patterns.defmatch(
       Patterns.make_case(
-        [Patterns.capture([1, Patterns.capture({a: {b: {c: $} } }), 3, $])], 
+        [Patterns.capture([1, Patterns.capture({a: {b: {c: $} } }), 3, $])],
         (c, two, four, arg) =>  two["a"]["b"]["c"]
       )
     );
@@ -123,7 +123,7 @@ describe('defmatch', () => {
 
     let fn = Patterns.defmatch(
       Patterns.make_case(
-        [Patterns.headTail()], 
+        [Patterns.headTail()],
         (head, tail) => tail
       )
     );
@@ -135,7 +135,7 @@ describe('defmatch', () => {
 
     let fn = Patterns.defmatch(
       Patterns.make_case(
-        [new Tuple(1, 2, 3)], 
+        [Patterns.type(Tuple, {values: [1, 2, 3]})],
         () => 3
       )
     );
