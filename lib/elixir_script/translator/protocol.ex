@@ -189,7 +189,10 @@ defmodule ElixirScript.Translator.Protocol do
 
   defp map_to_js({:__aliases__, _, [:Tuple]}) do
     JS.member_expression(
-      JS.identifier(:Elixir),
+      JS.member_expression(
+        JS.identifier(:Elixir),
+        JS.identifier(:Core)
+      ),
       JS.identifier(:Tuple)
     )
   end
@@ -222,8 +225,11 @@ defmodule ElixirScript.Translator.Protocol do
 
   defp map_to_js({:__aliases__, _, [:PID]}) do
     JS.member_expression(
-      JS.identifier(:Elixir),
-      JS.identifier(:Reference)
+      JS.member_expression(
+        JS.identifier(:Elixir),
+        JS.identifier(:Core)
+      ),
+      JS.identifier(:PID)
     )
   end
 

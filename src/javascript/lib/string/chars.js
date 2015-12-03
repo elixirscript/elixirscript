@@ -2,6 +2,7 @@ import Kernel from "../kernel";
 import Atom from "../atom";
 import Integer from "../integer";
 import List from "../list";
+import { Core } from "../core";
 import Tuple from "../tuple";
 import BitString from "../bit_string";
 import { IntegerType, FloatType } from "../protocol";
@@ -48,7 +49,7 @@ Kernel.defimpl(Chars, Array, {
   }
 });
 
-Kernel.defimpl(Chars, Tuple, {
+Kernel.defimpl(Chars, Core.Tuple, {
   to_string: function(thing){
     return Tuple.to_string(thing);
   }

@@ -5,10 +5,7 @@ import { variable, wildcard, startsWith, capture, headTail, type, bound } from "
 
 
 export default {
-  defmatch, match, MatchError, match_no_throw, patternMap,
-  variable, wildcard, startsWith, 
+  defmatch, match, MatchError, match_no_throw,
+  variable, wildcard, startsWith,
   capture, headTail, type, bound, Case, make_case
 };
-
-
-

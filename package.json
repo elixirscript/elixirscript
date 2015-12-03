@@ -29,6 +29,6 @@
     "gulp-rollup": "^1.0.1",
     "gulp-sourcemaps": "^1.5.2",
     "mocha": "^2.3.3",
-    "rollup": "^0.14.1"
+    "rollup": "^0.21.1"
   }
 }

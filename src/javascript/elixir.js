@@ -1,7 +1,8 @@
-import PostOffice from './lib/post_office';
+import {ProcessSystem} from './lib/core';
 
-self.post_office = self.post_office || new PostOffice();
+self.processes = self.processes || new ProcessSystem();
 
+export { Core } from './lib/core';
 export { default as Patterns } from './lib/patterns/patterns';
 export { default as BitString } from './lib/bit_string';
 export { default as Kernel } from './lib/kernel';

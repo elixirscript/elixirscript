@@ -118,7 +118,7 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-    Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.type(Elixir.Tuple, {
+    Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.type(Elixir.Core.Tuple, {
         values: [Elixir.Patterns.variable(), Elixir.Patterns.variable()]
     })], function(one, two) {
         return console.info(one);
@@ -141,8 +141,8 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-    Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.type(Elixir.Tuple, {
-        values: [Elixir.Patterns.type(Elixir.Tuple, {
+    Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.type(Elixir.Core.Tuple, {
+        values: [Elixir.Patterns.type(Elixir.Core.Tuple, {
             values: [Elixir.Patterns.variable(), Elixir.Patterns.variable()]
         }), Elixir.Patterns.variable()]
     })], function(one, two, three) {
@@ -164,8 +164,8 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-    Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.type(Elixir.Tuple, {
-        values: [Elixir.Patterns.variable(), Elixir.Patterns.type(Elixir.Tuple, {
+    Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.type(Elixir.Core.Tuple, {
+        values: [Elixir.Patterns.variable(), Elixir.Patterns.type(Elixir.Core.Tuple, {
             values: [Elixir.Patterns.variable(), Elixir.Patterns.variable()]
         })]
     })], function(one, two, three) {

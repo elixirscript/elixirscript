@@ -1,5 +1,5 @@
 import BitString from '../bit_string';
-import Tuple from '../tuple';
+import { Core } from '../core';
 import Enum from '../enum';
 import * as Patterns from '../patterns/patterns';
 
@@ -125,7 +125,7 @@ let SpecialForms = {
   },
 
   tuple: function(...args){
-    return new Tuple(...args);
+    return new Core.Tuple(...args);
   },
 
 

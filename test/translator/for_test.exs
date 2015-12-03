@@ -110,7 +110,7 @@ defmodule ElixirScript.Translator.For.Test do
     end
 
     js_code = """
-    Elixir.Kernel.SpecialForms._for(Elixir.Kernel.SpecialForms.list(Elixir.Kernel.SpecialForms.list(Elixir.Patterns.type(Elixir.Tuple,{
+    Elixir.Kernel.SpecialForms._for(Elixir.Kernel.SpecialForms.list(Elixir.Kernel.SpecialForms.list(Elixir.Patterns.type(Elixir.Core.Tuple,{
         values: [Elixir.Kernel.SpecialForms.atom('user'), Elixir.Patterns.variable()]
   }),Elixir.Kernel.SpecialForms.list(Elixir.Kernel.SpecialForms.tuple(Elixir.Kernel.SpecialForms.atom('user'),'john'),Elixir.Kernel.SpecialForms.tuple(Elixir.Kernel.SpecialForms.atom('admin'),'john'),Elixir.Kernel.SpecialForms.tuple(Elixir.Kernel.SpecialForms.atom('user'),'meg')))),function(name)    {
         return     Elixir.String.upcase(name);
