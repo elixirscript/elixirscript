@@ -141,7 +141,7 @@ defmodule ElixirScript.Translator.Function.Test do
 
     js_code = """
     const test1 = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.variable(), Elixir.Patterns.variable()], function(alpha, beta) {
-        let [a0, b0] = Elixir.Patterns.match(Elixir.Patterns.type(Elixir.Tuple, {
+        let [a0, b0] = Elixir.Patterns.match(Elixir.Patterns.type(Elixir.Core.Tuple, {
             values: [Elixir.Patterns.variable(), Elixir.Patterns.variable()]
         }), Elixir.Kernel.SpecialForms.tuple(1, 2));
         let _ref = Elixir.Kernel.SpecialForms.tuple(a0, b0);
@@ -495,7 +495,7 @@ defmodule ElixirScript.Translator.Function.Test do
 
 
     js_code = """
-    const something = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.type(Elixir.Tuple, {
+    const something = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.type(Elixir.Core.Tuple, {
         values: [Elixir.Patterns.variable(), Elixir.Patterns.variable()]
     })], function(apple, fruits) {
         return null;

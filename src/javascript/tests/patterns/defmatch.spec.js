@@ -1,6 +1,6 @@
 var expect = require('chai').expect;
 var Patterns = require("../../lib/patterns/patterns");
-var Tuple = require("../../lib/tuple");
+var Tuple = require("../../lib/core").Core.Tuple;
 
 const _ = Patterns.wildcard();
 const $ = Patterns.variable();

@@ -19,7 +19,7 @@ defmodule ElixirScript.Translator.Assignment.Test do
       {a, b} = {1, 2}
     end
     js_code = """
-    let [a, b] = Elixir.Patterns.match(Elixir.Patterns.type(Elixir.Tuple, {
+    let [a, b] = Elixir.Patterns.match(Elixir.Patterns.type(Elixir.Core.Tuple, {
         values: [Elixir.Patterns.variable(), Elixir.Patterns.variable()]
     }), Elixir.Kernel.SpecialForms.tuple(1, 2));
     let _ref = Elixir.Kernel.SpecialForms.tuple(a, b);
@@ -29,7 +29,7 @@ defmodule ElixirScript.Translator.Assignment.Test do
 
     ex_ast = quote do: {a, _, c} = {1, 2, 3}
     js_code = """
-    let [a, undefined, c] = Elixir.Patterns.match(Elixir.Patterns.type(Elixir.Tuple, {
+    let [a, undefined, c] = Elixir.Patterns.match(Elixir.Patterns.type(Elixir.Core.Tuple, {
         values: [Elixir.Patterns.variable(), Elixir.Patterns.wildcard(), Elixir.Patterns.variable()]
     }), Elixir.Kernel.SpecialForms.tuple(1, 2, 3));
     let _ref = Elixir.Kernel.SpecialForms.tuple(a, undefined, c);
@@ -40,7 +40,7 @@ defmodule ElixirScript.Translator.Assignment.Test do
 
     ex_ast = quote do: {^a, _, c} = {1, 2, 3}
     js_code = """
-    let [, undefined, c] = Elixir.Patterns.match(Elixir.Patterns.type(Elixir.Tuple, {
+    let [, undefined, c] = Elixir.Patterns.match(Elixir.Patterns.type(Elixir.Core.Tuple, {
         values: [Elixir.Patterns.bound(a), Elixir.Patterns.wildcard(), Elixir.Patterns.variable()]
     }), Elixir.Kernel.SpecialForms.tuple(1, 2, 3));
     let _ref = Elixir.Kernel.SpecialForms.tuple(undefined, undefined, c);

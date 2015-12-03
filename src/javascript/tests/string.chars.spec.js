@@ -1,5 +1,5 @@
 var String = require('../lib/string');
-var Tuple = require('../lib/tuple');
+var Tuple = require('../lib/core').Core.Tuple;
 var expect = require('chai').expect;
 
 describe('String.Chars', function(){

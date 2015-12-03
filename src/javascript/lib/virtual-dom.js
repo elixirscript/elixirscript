@@ -1,4 +1,4 @@
-let virtualDom = function(e) {
+let VirtualDOM = function(e) {
   return e();
 }(function() {
         var define, module, exports;
@@ -1696,4 +1696,4 @@ function appendPatch(apply, patch) {
 },{"../vnode/handle-thunk":24,"../vnode/is-thunk":25,"../vnode/is-vnode":27,"../vnode/is-vtext":28,"../vnode/is-widget":29,"../vnode/vpatch":32,"./diff-props":34,"x-is-array":12}]},{},[4])(4)
 });
 
-export default virtualDom;
+export default VirtualDOM;

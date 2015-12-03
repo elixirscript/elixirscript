@@ -1,9 +1,9 @@
 import SpecialForms from './kernel/special_forms';
 import Patterns from './patterns/patterns';
-import Tuple from './tuple';
+import { Core } from "./core";
+import Tuple from "./tuple";
 import BitString from './bit_string';
 import { Protocol } from './protocol';
-import { PID } from './processes/processes';
 
 function tl(list){
   return SpecialForms.list(...list.slice(1));
@@ -54,7 +54,7 @@ function is_number(x){
 }
 
 function is_tuple(x){
-  return x instanceof Tuple;
+  return x instanceof Core.Tuple;
 }
 
 function length(x){
@@ -62,7 +62,7 @@ function length(x){
 }
 
 function is_pid(x){
-  return x instanceof PID;
+  return x instanceof Core.PID;
 }
 
 function is_port(x){

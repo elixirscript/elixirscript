@@ -17,7 +17,10 @@ defmodule ElixirScript.Translator.Primitive do
 
   def tuple_class() do
     JS.member_expression(
-      JS.identifier("Elixir"),
+      JS.member_expression(
+        JS.identifier("Elixir"),
+        JS.identifier("Core")
+      ),
       JS.identifier("Tuple")
     )
   end
