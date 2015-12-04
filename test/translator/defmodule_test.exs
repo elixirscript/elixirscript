@@ -32,10 +32,10 @@ defmodule ElixirScript.Translator.Defmodule.Test do
 
     js_code = """
          const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elephant');
-         const something_else = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([],function()    {
+         const something_else = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
              return     null;
            }));
-         const something = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([],function()    {
+         const something = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
              return     ul;
            }));
          const ul = JQuery('#todo-list');
@@ -61,10 +61,10 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     js_code = """
          import * as Crane from 'icabod/crane';
          const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elephant');
-         const something_else = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([],function()    {
+         const something_else = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
              return     null;
            }));
-         const something = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([],function()    {
+         const something = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
              return     null;
            }));
          export {
@@ -105,10 +105,10 @@ defmodule ElixirScript.Translator.Defmodule.Test do
 
     import * as Elephant from 'animals/elephant';
     const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Animals');
-    const something_else = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([], function() {
+    const something_else = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([], function() {
         return null;
     }));
-    const something = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([], function() {
+    const something = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([], function() {
         return Elephant.Elephant.create(Elixir.Kernel.SpecialForms.map({}));
     }));
     export {
@@ -174,10 +174,10 @@ defmodule ElixirScript.Translator.Defmodule.Test do
 
     import * as Elephant from 'animals/elephant';
     const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Animals');
-    const something_else = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([], function() {
+    const something_else = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([], function() {
         return null;
     }));
-    const something = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([], function() {
+    const something = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([], function() {
         return Elephant.Elephant.create(Elixir.Kernel.SpecialForms.map({}));
     }));
     export {
@@ -219,11 +219,11 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     js_code = """
      import * as Tigers from 'lions/tigers';
      const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Animals');
-     Elixir.JS.call_property(Tigers,'oh_my');
+     Elixir.Core.call_property(Tigers,'oh_my');
      export {};
 
      const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Lions.Tigers');
-     Elixir.JS.call_property(Lions.Tigers.Bears,'oh_my');
+     Elixir.Core.call_property(Lions.Tigers.Bears,'oh_my');
      export {};
     """
 
@@ -248,17 +248,17 @@ defmodule ElixirScript.Translator.Defmodule.Test do
 
     js_code = """
          const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Lions.Tigers');
-         const oh_my = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([],function()    {
+         const oh_my = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
              return     null;
            }));
-         Elixir.JS.call_property(Lions.Tigers.Bears,'oh_my');
+         Elixir.Core.call_property(Lions.Tigers.Bears,'oh_my');
          export {
              oh_my
        };
 
          import * as Tigers from 'lions/tigers';
          const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Animals');
-         Elixir.JS.call_property(Tigers,'oh_my');
+         Elixir.Core.call_property(Tigers,'oh_my');
          export {};
     """
 
@@ -291,10 +291,10 @@ defmodule ElixirScript.Translator.Defmodule.Test do
 
 
     const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Lions.Tigers');
-    const oh_my2 = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([], function() {
+    const oh_my2 = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([], function() {
         return null;
     }));
-    const oh_my = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([], function() {
+    const oh_my = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([], function() {
         return null;
     }));
     export {
@@ -333,11 +333,11 @@ defmodule ElixirScript.Translator.Defmodule.Test do
 
     const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Lions.Tigers');
 
-    const oh_my2 = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([], function() {
+    const oh_my2 = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([], function() {
         return null;
     }));
 
-    const oh_my = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([], function() {
+    const oh_my = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([], function() {
         return null;
     }));
 

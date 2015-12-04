@@ -2,16 +2,15 @@ import Kernel from "../kernel";
 import Atom from "../atom";
 import Integer from "../integer";
 import List from "../list";
-import { Core } from "../core";
+import * as Core from '../core';
 import Tuple from "../tuple";
-import BitString from "../bit_string";
 import { IntegerType, FloatType } from "../protocol";
 
 let Chars = Kernel.defprotocol({
   to_string: function(thing){}
 });
 
-Kernel.defimpl(Chars, BitString, {
+Kernel.defimpl(Chars, Core.BitString, {
   to_string: function(thing){
     if(Kernel.is_binary(thing)){
       return thing;

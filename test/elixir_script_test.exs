@@ -36,10 +36,10 @@ defmodule ElixirScript.Test do
     assert_js_matches """
          import * as Elixir from 'elixir';
          const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elephant');
-         const something_else = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([],function()    {
+         const something_else = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
              return     Elixir.String.Chars.to_string(10);
            }));
-         const something = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([],function()    {
+         const something = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
              return     ul;
            }));
          const ul = JQuery('#todo-list');
@@ -107,10 +107,10 @@ defmodule ElixirScript.Test do
     assert_js_matches """
          import * as Elixir from 'elixir';
          const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Animals');
-         const something_else = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([],function()    {
+         const something_else = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
              return     1 * 1;
            }));
-         const sandwich = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([],function()    {
+         const sandwich = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
              return     null;
            }));
          export {
@@ -158,10 +158,10 @@ defmodule ElixirScript.Test do
     assert_js_matches """
          import * as Elixir from 'elixirscript';
          const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Animals');
-         const something_else = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([],function()    {
+         const something_else = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
              return     1 * 1;
            }));
-         const sandwich = Elixir.Patterns.defmatch(Elixir.Patterns.make_case([],function()    {
+         const sandwich = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
              return     null;
            }));
          export {

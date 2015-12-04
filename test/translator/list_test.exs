@@ -31,7 +31,7 @@ defmodule ElixirScript.Translator.List.Test do
     assert_translation(ex_ast, js_code)
 
     ex_ast = quote do: this.list ++ [4, 5, 6]
-    js_code = "Elixir.JS.call_property(this,'list').concat(Elixir.Kernel.SpecialForms.list(4,5,6))"
+    js_code = "Elixir.Core.call_property(this,'list').concat(Elixir.Kernel.SpecialForms.list(4,5,6))"
 
     assert_translation(ex_ast, js_code)    
   end
@@ -50,7 +50,7 @@ defmodule ElixirScript.Translator.List.Test do
     end
 
     js_code = """
-    Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.wildcard()],function(){
+    Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.wildcard()],function(){
       return Elixir.List.prepend(list, x);
     }))
     """

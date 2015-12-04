@@ -44,4 +44,7 @@ class PID {
   }
 }
 
-export default { PID, Tuple };
+class IntegerType {}
+class FloatType {}
+
+export default { PID, Tuple, IntegerType, FloatType };

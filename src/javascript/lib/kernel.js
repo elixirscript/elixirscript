@@ -1,9 +1,7 @@
 import SpecialForms from './kernel/special_forms';
-import Patterns from './patterns/patterns';
-import { Core } from "./core";
+import * as Core from './core';
 import Tuple from "./tuple";
-import BitString from './bit_string';
-import { Protocol } from './protocol';
+import Protocol from './protocol';
 
 function tl(list){
   return SpecialForms.list(...list.slice(1));
@@ -74,7 +72,7 @@ function is_reference(x){
 }
 
 function is_bitstring(x){
-  return is_binary(x) || x instanceof BitString;
+  return is_binary(x) || x instanceof Core.BitString;
 }
 
 function __in__(left, right){
@@ -146,7 +144,7 @@ function to_string(arg){
 }
 
 function match__qmark__(pattern, expr, guard = () => true){
-  return Patterns.match_no_throw(pattern, expr, guard) != null;
+  return Core.Patterns.match_no_throw(pattern, expr, guard) != null;
 }
 
 function defstruct(defaults){

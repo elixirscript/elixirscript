@@ -1,7 +1,5 @@
-import BitString from '../bit_string';
-import { Core } from '../core';
+import * as Core from '../core';
 import Enum from '../enum';
-import * as Patterns from '../patterns/patterns';
 
 let SpecialForms = {
 
@@ -26,15 +24,15 @@ let SpecialForms = {
   },
 
   bitstring: function(...args){
-    return new BitString(...args);
+    return new Core.BitString(...args);
   },
 
   bound: function(_var){
-    return Patterns.bound(_var);
+    return Core.Patterns.bound(_var);
   },
 
   _case: function(condition, clauses){
-    return Patterns.defmatch(...clauses)(condition);
+    return Core.Patterns.defmatch(...clauses)(condition);
   },
 
   cond: function(clauses){
@@ -48,7 +46,7 @@ let SpecialForms = {
   },
 
   fn: function(clauses){
-    return Patterns.defmatch(clauses);
+    return Core.Patterns.defmatch(clauses);
   },
 
   map: function(obj){
@@ -70,7 +68,7 @@ let SpecialForms = {
     if(collections.length === 1){
 
       for(let elem of collection){
-        let r = Patterns.match_no_throw(pattern, elem);
+        let r = Core.Patterns.match_no_throw(pattern, elem);
         let args = previousValues.concat(r);
 
         if(r && filter.apply(this, args)){
@@ -83,7 +81,7 @@ let SpecialForms = {
       let _into = []
 
       for(let elem of collection){
-        let r = Patterns.match_no_throw(pattern, elem);
+        let r = Core.Patterns.match_no_throw(pattern, elem);
         if(r){
           _into = Enum.into(this._for(collections.slice(1), fun, filter, _into, previousValues.concat(r)), into);
         }
@@ -142,7 +140,7 @@ let SpecialForms = {
           ex_result = rescue_function(e);
           return ex_result;
         }catch(ex){
-          if(ex instanceof Patterns.MatchError){
+          if(ex instanceof Core.Patterns.MatchError){
             throw ex;
           }
         }
@@ -153,7 +151,7 @@ let SpecialForms = {
           ex_result = catch_fun(e);
           return ex_result;
         }catch(ex){
-          if(ex instanceof Patterns.MatchError){
+          if(ex instanceof Core.Patterns.MatchError){
             throw ex;
           }
         }
@@ -171,7 +169,7 @@ let SpecialForms = {
       try{
         return else_function(result);
       }catch(ex){
-          if(ex instanceof Patterns.MatchError){
+          if(ex instanceof Core.Patterns.MatchError){
             throw new Error("No Match Found in Else");
           }
 
