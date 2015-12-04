@@ -1,4 +1,4 @@
-var Patterns = require("../lib/patterns/patterns");
+var Patterns = require("../lib/core/patterns");
 var Enum = require('../lib/enum');
 var Kernel = require('../lib/kernel');
 var expect = require('chai').expect;
@@ -16,7 +16,7 @@ describe('case', () => {
       Patterns.make_case(
         [Patterns.variable()],
         function(value){ return value; }
-      )   
+      )
     ];
 
     let result = Kernel.SpecialForms._case("thing", clauses);
