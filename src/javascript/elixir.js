@@ -1,9 +1,10 @@
-import * as Core from "./lib/core";
+import * as C from './lib/core';
 
-self.processes = self.processes || new Core.ProcessSystem();
+self.processes = self.processes || new C.ProcessSystem();
 
-export Core;
-export { default as Patterns } from './lib/patterns/patterns';
+
+
+export const Core = C;
 export { default as Kernel } from './lib/kernel';
 export { default as Atom } from './lib/atom';
 export { default as Enum } from './lib/enum';

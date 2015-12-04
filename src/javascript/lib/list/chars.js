@@ -3,7 +3,6 @@ import Atom from "../atom";
 import Integer from "../integer";
 import String from "../string";
 import * as Core from '../core';
-import { IntegerType, FloatType } from "../protocol";
 
 let Chars = Kernel.defprotocol({
   to_char_list: function(thing){}
@@ -25,7 +24,7 @@ Kernel.defimpl(Chars, Symbol, {
   }
 });
 
-Kernel.defimpl(Chars, IntegerType, {
+Kernel.defimpl(Chars, Core.IntegerType, {
   to_char_list: function(thing){
     return Integer.to_char_list(thing);
   }

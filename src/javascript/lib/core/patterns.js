@@ -4,7 +4,7 @@ import { defmatch, match, MatchError, match_no_throw, patternMap, Case, make_cas
 import { variable, wildcard, startsWith, capture, headTail, type, bound } from "./patterns/types";
 
 
-export default {
+export {
   defmatch, match, MatchError, match_no_throw,
   variable, wildcard, startsWith,
   capture, headTail, type, bound, Case, make_case

@@ -19,6 +19,6 @@ function call_property(item, property){
   throw new Error(`Property ${property} not found in ${item}`);
 }
 
-export default {
+export {
   call_property
 };

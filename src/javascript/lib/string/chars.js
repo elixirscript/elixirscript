@@ -4,7 +4,6 @@ import Integer from "../integer";
 import List from "../list";
 import * as Core from '../core';
 import Tuple from "../tuple";
-import { IntegerType, FloatType } from "../protocol";
 
 let Chars = Kernel.defprotocol({
   to_string: function(thing){}
@@ -30,13 +29,13 @@ Kernel.defimpl(Chars, Symbol, {
   }
 });
 
-Kernel.defimpl(Chars, IntegerType, {
+Kernel.defimpl(Chars, Core.IntegerType, {
   to_string: function(thing){
     return Integer.to_string(thing);
   }
 });
 
-Kernel.defimpl(Chars, FloatType, {
+Kernel.defimpl(Chars, Core.FloatType, {
   to_string: function(thing){
     return thing.toString;
   }
