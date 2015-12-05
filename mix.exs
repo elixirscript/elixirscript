@@ -45,7 +45,7 @@ defmodule ElixirScript.Mixfile do
 
   defp description do
     """
-    converts Elixir to JavaScript
+    ElixirScript: compiles Elixir code to JavaScript
     """
   end
 
