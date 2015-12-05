@@ -2,7 +2,7 @@ defmodule ElixirScript.Html do
   @moduledoc """
   Defines macros for HTML elements to be used to build up a virtual dom tree.
   The virtual dom tree defined here can then be used with macros defined in the
-  VDom module
+  VDom module or with the View module
 
       tree = Html.div [id: "hello"] do
               Html.span do
@@ -19,6 +19,8 @@ defmodule ElixirScript.Html do
       patches = VDom.diff(tree, newTree)
       rootNode = VDom.patch(rootNode, patches)
 
+  Instead of patching and diffing manually, the `View` module can also be used
+  instead.
   """
 
   @external_resource tags_path = Path.join([__DIR__, "tags.txt"])
