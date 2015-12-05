@@ -1,5 +1,5 @@
 var expect = require('chai').expect;
-var Patterns = require("../../lib/patterns/patterns");
+var Patterns = require("../../lib/core").Patterns;
 
 const _ = Patterns.wildcard();
 const $ = Patterns.variable();

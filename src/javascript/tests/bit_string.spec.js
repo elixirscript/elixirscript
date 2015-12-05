@@ -1,4 +1,4 @@
-var BitString = require('../lib/bit_string');
+var BitString = require('../lib/core').BitString;
 var Kernel = require('../lib/kernel');
 var expect = require('chai').expect;
 
@@ -52,4 +52,3 @@ describe('BitString', function(){
     });
   });
 });
-

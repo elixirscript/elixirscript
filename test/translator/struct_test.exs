@@ -69,7 +69,7 @@ defmodule ElixirScript.Translator.Struct.Test do
         User: defstruct
     };
 
-    let [user] = Elixir.Patterns.match(Elixir.Patterns.variable(), User.User.create(Elixir.Kernel.SpecialForms.map({})));
+    let [user] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(), User.User.create(Elixir.Kernel.SpecialForms.map({})));
     """
 
     assert_translation(ex_ast, js_code)
@@ -93,7 +93,7 @@ defmodule ElixirScript.Translator.Struct.Test do
         User: defstruct
     };
 
-     let [user] = Elixir.Patterns.match(Elixir.Patterns.variable(), User.User.create(Elixir.Kernel.SpecialForms.map({
+     let [user] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(), User.User.create(Elixir.Kernel.SpecialForms.map({
              [Elixir.Kernel.SpecialForms.atom('name')]: 'John'
        })));
     """
@@ -107,7 +107,7 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-     let [user] = Elixir.Patterns.match(Elixir.Patterns.variable(),Elixir.Kernel.SpecialForms.map_update(map,{
+     let [user] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),Elixir.Kernel.SpecialForms.map_update(map,{
              [Elixir.Kernel.SpecialForms.atom('key')]: value
        }));
     """
@@ -120,7 +120,7 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-     let [user] = Elixir.Patterns.match(Elixir.Patterns.variable(),Elixir.Kernel.SpecialForms.map_update(map,{
+     let [user] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),Elixir.Kernel.SpecialForms.map_update(map,{
              [Elixir.Kernel.SpecialForms.atom('key')]: value,     [Elixir.Kernel.SpecialForms.atom('key1')]: value1
        }));
     """

@@ -32,13 +32,6 @@ defmodule ElixirScript.Translator.Primitive do
     )
   end
 
-  def make_wildcard() do
-    JS.member_expression(
-      JS.identifier("fun"),
-      JS.identifier("wildcard")
-    )
-  end
-
   def make_identifier({:__aliases__, _, aliases}) do
     Utils.make_module_expression_tree(aliases, false, __ENV__)
   end

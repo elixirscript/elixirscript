@@ -1,5 +1,4 @@
-class IntegerType {}
-class FloatType {}
+import * as Core from './core';
 
 //https://github.com/airportyh/protomorphism
 class Protocol{
@@ -17,10 +16,10 @@ class Protocol{
         let thing = args[0];
         let fun = null;
 
-        if(Number.isInteger(thing) && this.hasImplementation(IntegerType)){
-          fun = this.registry.get(IntegerType)[funName];
-        }else if(typeof thing === "number" && !Number.isInteger(thing) && this.hasImplementation(FloatType)){
-          fun = this.registry.get(FloatType)[funName];
+        if(Number.isInteger(thing) && this.hasImplementation(Core.IntegerType)){
+          fun = this.registry.get(Core.IntegerType)[funName];
+        }else if(typeof thing === "number" && !Number.isInteger(thing) && this.hasImplementation(Core.FloatType)){
+          fun = this.registry.get(Core.FloatType)[funName];
         }else if(this.hasImplementation(thing)){
           fun = this.registry.get(thing.constructor)[funName];
         }else if(this.fallback){
@@ -51,8 +50,4 @@ class Protocol{
 }
 
 
-export {
-  Protocol,
-  IntegerType,
-  FloatType
-}
+export default Protocol;

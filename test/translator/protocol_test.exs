@@ -13,8 +13,8 @@ defmodule ElixirScript.Translator.Protocol.Test do
     const __MODULE__ = Elixir.Kernel.SpecialForms.atom('ElixirScript.Collectable');
 
     let Collectable = Elixir.Kernel.defprotocol({
-      into: Elixir.Patterns.defmatch(
-        Elixir.Patterns.make_case([Elixir.Patterns.variable()], function(collectable){
+      into: Elixir.Core.Patterns.defmatch(
+        Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()], function(collectable){
           return null;
         })
       )
@@ -35,7 +35,7 @@ defmodule ElixirScript.Translator.Protocol.Test do
 
     js_code = """
      Elixir.Kernel.defimpl(Elixir.String.Chars, Duck, {
-             to_string: Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.variable()],function(duck)    {
+             to_string: Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(duck)    {
              return     'quack';
            }))
        })
@@ -70,28 +70,28 @@ defmodule ElixirScript.Translator.Protocol.Test do
     js_code = """
          const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Blank');
          let Blank = Elixir.Kernel.defprotocol({
-             blank__qmark__: Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.variable()],function(data)    {
+             blank__qmark__: Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(data)    {
              return     null;
            }))
        });
          Elixir.Kernel.defimpl(Blank, Array,{
-             blank__qmark__: Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Kernel.SpecialForms.list()],function()    {
+             blank__qmark__: Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Kernel.SpecialForms.list()],function()    {
              return     true;
-           }),Elixir.Patterns.make_case([Elixir.Patterns.wildcard()],function()    {
+           }),Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.wildcard()],function()    {
              return     false;
            }))
        })
          Elixir.Kernel.defimpl(Blank,Symbol,{
-             blank__qmark__: Elixir.Patterns.defmatch(Elixir.Patterns.make_case([false],function()    {
+             blank__qmark__: Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([false],function()    {
              return     true;
-           }),Elixir.Patterns.make_case([null],function()    {
+           }),Elixir.Core.Patterns.make_case([null],function()    {
              return     true;
-           }),Elixir.Patterns.make_case([Elixir.Patterns.wildcard()],function()    {
+           }),Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.wildcard()],function()    {
              return     false;
            }))
        })
          Elixir.Kernel.defimpl(Blank,Elixir.IntegerType,{
-             blank__qmark__: Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Patterns.variable()],function(number)    {
+             blank__qmark__: Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(number)    {
              return     false;
            }))
        })

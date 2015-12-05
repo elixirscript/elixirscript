@@ -207,7 +207,10 @@ defmodule ElixirScript.Translator.Protocol do
 
   defp map_to_js({:__aliases__, _, [:BitString]}) do
     JS.member_expression(
-      JS.identifier(:Elixir),
+      JS.member_expression(
+        JS.identifier(:Elixir),
+        JS.identifier(:Core)
+      ),
       JS.identifier(:BitString)
     )
   end

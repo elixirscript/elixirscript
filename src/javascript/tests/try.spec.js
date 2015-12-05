@@ -1,4 +1,4 @@
-var Patterns = require("../lib/patterns/patterns");
+var Patterns = require("../lib/core/patterns");
 var Enum = require('../lib/enum');
 var Kernel = require('../lib/kernel');
 var expect = require('chai').expect;

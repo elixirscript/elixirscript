@@ -4,7 +4,7 @@
 import Mailbox from "./mailbox";
 import Process from "./process";
 import States from "./states";
-import Core from "./primitives";
+import * as Primitives from "./primitives";
 
 class ProcessSystem {
 
@@ -48,7 +48,7 @@ class ProcessSystem {
   }
 
   add_proc(linked){
-    let newpid = new Core.PID();
+    let newpid = new Primitives.PID();
     let mailbox = new Mailbox();
     let newproc = new Process(newpid, mailbox);
 
@@ -107,7 +107,7 @@ class ProcessSystem {
   }
 
   pidof(id){
-    if (id instanceof Core.PID) {
+    if (id instanceof Primitives.PID) {
        return this.pids.has(id) ? id : null;
     } else if (id instanceof Process) {
        return id.pid;

@@ -16,11 +16,11 @@ defmodule ElixirScript.Translator.Receive.Test do
 
     js_code = """
      yield self.system.receive(function(message)    {
-             return     Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Kernel.SpecialForms.atom('ok')],function()    {
+             return     Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Kernel.SpecialForms.atom('ok')],function()    {
              return     value;
-           }),Elixir.Patterns.make_case([Elixir.Kernel.SpecialForms.atom('error')],function()    {
+           }),Elixir.Core.Patterns.make_case([Elixir.Kernel.SpecialForms.atom('error')],function()    {
              return     value;
-           }),Elixir.Patterns.make_case([Elixir.Patterns.wildcard()],function()    {
+           }),Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.wildcard()],function()    {
              return     IO.puts('Unexpected message received');
            })).call(this,message);
            })
@@ -46,14 +46,14 @@ defmodule ElixirScript.Translator.Receive.Test do
 
     js_code = """
      yield self.system.receive(function(message)    {
-             return     Elixir.Patterns.defmatch(Elixir.Patterns.make_case([Elixir.Kernel.SpecialForms.atom('ok')],function()    {
+             return     Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Kernel.SpecialForms.atom('ok')],function()    {
              return     value;
-           }),Elixir.Patterns.make_case([Elixir.Kernel.SpecialForms.atom('error')],function()    {
+           }),Elixir.Core.Patterns.make_case([Elixir.Kernel.SpecialForms.atom('error')],function()    {
              return     value;
-           }),Elixir.Patterns.make_case([Elixir.Patterns.wildcard()],function()    {
+           }),Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.wildcard()],function()    {
              return     IO.puts('Unexpected message received');
            })).call(this,message);
-           },5000,Elixir.Patterns.defmatch(Elixir.Patterns.make_case([5000],function()    {
+           },5000,Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([5000],function()    {
              return     IO.puts('No message in 5 seconds');
            })))
     """

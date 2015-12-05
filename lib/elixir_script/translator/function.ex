@@ -6,9 +6,17 @@ defmodule ElixirScript.Translator.Function do
   alias ElixirScript.PatternMatching.Match
   alias ElixirScript.Preprocess.Variables
 
+  @patterns JS.member_expression(
+    JS.member_expression(
+    JS.identifier("Elixir"),
+    JS.identifier("Core")
+    ),
+    JS.identifier("Patterns")
+  )
+
   @standard_libs [
     :Patterns, :Kernel, :Atom, :Enum, :Integer, :JS,
-    :List, :Range, :Tuple, :Agent, :Keyword, :BitString,
+    :List, :Range, :Tuple, :Agent, :Keyword,
     :Base, :String, :Bitwise, :Collectable, :Enumerable,
     :Inspect, :Map, :MapSet, :Set, :VirtualDom, :View
   ]
@@ -103,11 +111,8 @@ defmodule ElixirScript.Translator.Function do
   def make_defmatch(clauses) do
     JS.call_expression(
       JS.member_expression(
-        JS.identifier("Elixir"),
-        JS.member_expression(
-          JS.identifier("Patterns"),
-          JS.identifier("defmatch")
-        )
+        @patterns,
+        JS.identifier("defmatch")
       ),
       clauses
     )
@@ -143,11 +148,8 @@ defmodule ElixirScript.Translator.Function do
   def do_make_function_clause(patterns, params, body, guard_body) do
     JS.call_expression(
       JS.member_expression(
-        JS.identifier("Elixir"),
-        JS.member_expression(
-          JS.identifier("Patterns"),
-          JS.identifier("make_case")
-        )
+        @patterns,
+        JS.identifier("make_case")
       ),
       [
         JS.array_expression(patterns),
@@ -160,11 +162,8 @@ defmodule ElixirScript.Translator.Function do
   def do_make_function_clause(patterns, params, body) do
     JS.call_expression(
       JS.member_expression(
-        JS.identifier("Elixir"),
-        JS.member_expression(
-          JS.identifier("Patterns"),
-          JS.identifier("make_case")
-        )
+        @patterns,
+        JS.identifier("make_case")
       ),
       [
         JS.array_expression(patterns),
@@ -192,11 +191,11 @@ defmodule ElixirScript.Translator.Function do
 
     JS.call_expression(
       JS.member_expression(
-        JS.identifier("Elixir"),
         JS.member_expression(
-          JS.identifier("JS"),
-          JS.identifier("call_property")
-        )
+        JS.identifier("Elixir"),
+        JS.identifier("Core")
+        ),
+        JS.identifier("call_property")
       ),
       [
         Utils.make_module_expression_tree(the_name, false, env),
