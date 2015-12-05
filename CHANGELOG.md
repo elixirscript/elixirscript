@@ -10,6 +10,8 @@
   using the ElixirScript.Html module
   * Added `stdlib_path` compiler option to specify the es6 path to the standard library.
   If used, elixir.js will not be exported with the compiled modules
+  * Moved non-elixir JavaScript code into `core` es6 module. This will hopefully
+  make it so ElixirScript Standard Library modules can be defined in Elixir soon.
 
 
 # v0.13.0

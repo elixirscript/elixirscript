@@ -142,7 +142,7 @@ The intent of this guide is to get you started with ElixirScript. It will give y
      * `:root` - a binary path prepended to the path of the standard lib imports if needed
     * `:env` - a Macro.env struct to use. This is most useful when using macros. Make sure that the  given env has the macros required. Defaults to `__ENV__`.
 
-    You may notice the mention of macros. Using the module in your code allows you to use macros. As long as you pass in an evironment with the macros loaded. By default, it uses the current environment.
+    You may notice the mention of macros. Using the module in your code allows you to use macros. As long as you pass in an environment with the macros loaded. By default, it uses the current environment.
 
     For example, if I have a module with a macro in it
 
@@ -210,4 +210,4 @@ I am a gulp user and I use elixirscript with gulp. Here is a snippet of how I my
         });
         ```
 
-This is also the setup I use when using ElixirScript with Phoenix. If you are a brunch user, there is n [ElixirScript runch plugin](https://www.npmjs.com/package/elixirscript-brunch)
+This is also the setup I use when using ElixirScript with Phoenix. If you are a brunch user, there is n [ElixirScript brunch plugin](https://www.npmjs.com/package/elixirscript-brunch)
