@@ -23,19 +23,19 @@ defmodule ElixirScript.View do
   Starts the View state. This will render the initial view using the
   render_func and the args
   """
-  defmacro start(dom_root, render_func, args, options \\ []) do
+  def start(dom_root, render_func, args, options \\ []) do
   end
 
   @doc """
   Stops the View state
   """
-  defmacro stop(view) do
+  def stop(view) do
   end
 
   @doc """
   Updates the view by passing the args to the render_func
   """
-  defmacro render(view, args) do
+  def render(view, args) do
   end
 
 end
