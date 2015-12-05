@@ -5,7 +5,6 @@ defmodule ElixirScript.Translator.Cond do
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Primitive
   alias ElixirScript.Translator.Function
-  alias ElixirScript.Translator.Utils
 
   def make_cond(clauses, env) do
     JS.call_expression(
@@ -27,5 +26,5 @@ defmodule ElixirScript.Translator.Cond do
       Primitive.make_list_no_translate([translated_clause, function])
     end)
   end
-  
+
 end

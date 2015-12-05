@@ -12,7 +12,7 @@ defmodule ElixirScript.Translator.Quote do
   def make_quote(opts, expr, env) when is_list(expr) do
     has_unquote_splicing = Enum.any?(expr, fn
       ({:unquote_splicing, _, _}) -> true
-      (_) -> false 
+      (_) -> false
     end)
 
     if(has_unquote_splicing) do
@@ -47,8 +47,8 @@ defmodule ElixirScript.Translator.Quote do
     Primitive.make_tuple_quoted(opts, [:unquote, context, params], env)
   end
 
-  def make_quote(_, {:alias!, _, [_alias]}, _) do
-    _alias
+  def make_quote(_, {:alias!, _, [the_alias]}, _) do
+    the_alias
   end
 
   def make_quote(_, {:unquote, _, [param]}, env) do

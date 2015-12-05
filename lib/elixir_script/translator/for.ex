@@ -2,7 +2,6 @@ defmodule ElixirScript.Translator.For do
   @moduledoc false
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
-  alias ElixirScript.Translator.Utils
   alias ElixirScript.PatternMatching.Match
   alias ElixirScript.Translator.Primitive
   alias ElixirScript.Translator.Function
@@ -40,7 +39,7 @@ defmodule ElixirScript.Translator.For do
           state.args,
           [],
           Function.make_function_body(expression2, env)
-        ) 
+        )
 
         %{ state | into: Translator.translate(expression, env), fun: fun }
 
@@ -50,7 +49,7 @@ defmodule ElixirScript.Translator.For do
           state.args,
           [],
           Function.make_function_body(expression, env)
-        ) 
+        )
 
         %{ state | fun: fun }
       (filter, state) ->
@@ -60,7 +59,7 @@ defmodule ElixirScript.Translator.For do
           Function.make_function_body(filter, env)
         )
 
-        %{ state | filter: fun }  
+        %{ state | filter: fun }
     end)
-  end  
+  end
 end

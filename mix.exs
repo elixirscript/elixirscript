@@ -34,8 +34,8 @@ defmodule ElixirScript.Mixfile do
       {:earmark, "~> 0.1", only: :dev },
       {:ex_doc, "~> 0.10", only: :dev },
       {:benchfella, "~> 0.2", only: :test},
-      {:excoveralls, "~> 0.3", only: :test},
-      {:credo, "~> 0.1.9", only: [:dev, :test]}
+      {:excoveralls, "~> 0.4", only: :test},
+      {:credo, "~> 0.1.0", only: [:dev, :test]}
     ]
   end
 

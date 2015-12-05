@@ -312,9 +312,9 @@ defmodule ElixirScript.Translator do
     %ElixirScript.Translator.Group{}
   end
 
-  defp do_translate({:|, _, [elem, list]}, env) do
+  defp do_translate({:|, _, [item, list]}, env) do
     quoted = quote do
-      List.prepend(unquote(list), unquote(elem))
+      List.prepend(unquote(list), unquote(item))
     end
 
     translate(quoted, env)

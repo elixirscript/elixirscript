@@ -3,7 +3,6 @@ defmodule ElixirScript.Translator.Map do
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Primitive
-  alias ElixirScript.Translator.Utils
 
   def make_map(object_expression) do
     JS.call_expression(
@@ -24,38 +23,38 @@ defmodule ElixirScript.Translator.Map do
   end
 
   def make_object(properties, env) do
-    object = properties
+    properties
     |> Enum.map(fn
-      ({x, {:__aliases__, _, [value]}}) -> make_property(Translator.translate(x, env), JS.identifier(value)) 
-      ({x, y}) -> make_property(Translator.translate(x, env), Translator.translate(y, env)) 
+      ({x, {:__aliases__, _, [value]}}) -> make_property(Translator.translate(x, env), JS.identifier(value))
+      ({x, y}) -> make_property(Translator.translate(x, env), Translator.translate(y, env))
     end)
     |> JS.object_expression
     |> make_map
   end
 
   def make_property(%ESTree.Identifier{} = key, value) do
-    JS.property(key, value) 
+    JS.property(key, value)
   end
 
-  def make_property(%ESTree.Literal{value: k} = key, value) when is_binary(k) do
-    JS.property(JS.identifier(k), value) 
+  def make_property(%ESTree.Literal{value: k}, value) when is_binary(k) do
+    JS.property(JS.identifier(k), value)
   end
 
   def make_property(key, value) do
-    JS.property(key, value, :init, false, false, true) 
+    JS.property(key, value, :init, false, false, true)
   end
 
   def make_shorthand_property(%ESTree.Identifier{} = key) do
-    JS.property(key, key, :init, true) 
+    JS.property(key, key, :init, true)
   end
 
   def make_map_update(map, data, env) do
     map = Translator.translate(map, env)
 
     map_update = JS.object_expression(
-      Enum.map(data, 
-        fn({key, value}) -> 
-          make_property(Translator.translate(key, env), Translator.translate(value, env))   
+      Enum.map(data,
+        fn({key, value}) ->
+          make_property(Translator.translate(key, env), Translator.translate(value, env))
         end
       )
     )

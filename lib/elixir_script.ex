@@ -150,7 +150,7 @@ defmodule ElixirScript do
     |> process_include_path(include_path)
   end
 
-  defp process_module(%JSModule{} = module, root, env, import_standard_libs, stdlib_path) do
+  defp process_module(%JSModule{} = module, root, _, import_standard_libs, stdlib_path) do
     file_path = create_file_name(module)
 
     standard_libs_import =
@@ -166,9 +166,6 @@ defmodule ElixirScript do
 
     {file_path, program}
   end
-
-  defp process_module(module, _root, _, _),
-    do: {"", module}
 
   defp create_file_name(%JSModule{name: module_list}) do
     name = ElixirScript.Translator.Import.make_file_path(module_list)

@@ -263,9 +263,9 @@ defmodule ElixirScript.Translator.Protocol do
   end
 
 
-  defp map_to_js({:__aliases__, _, struct}) do
+  defp map_to_js({:__aliases__, _, module}) do
     ElixirScript.Translator.Struct.get_struct_class(
-      struct,
+      module,
       ElixirScript.State.get().env
     )
   end

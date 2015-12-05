@@ -216,16 +216,16 @@ defmodule ElixirScript.Translator.Kernel do
     |> Translator.translate(env)
   end
 
-  defp do_translate({:throw, _, [params]} = ast, env) do
+  defp do_translate({:throw, _, [params]}, env) do
     JS.throw_statement(Translator.translate(params, env))
   end
 
   defp do_translate({:|>, _, [left, right]}, env) do
     case right do
       {{:., meta, [module, fun]}, meta2, params} ->
-        Translator.translate({{:., meta, [module, fun]}, meta2, [left] ++ params}, env)  
+        Translator.translate({{:., meta, [module, fun]}, meta2, [left] ++ params}, env)
       {fun, meta, params} ->
-        Translator.translate({fun, meta, [left] ++ params}, env)     
+        Translator.translate({fun, meta, [left] ++ params}, env)
     end
   end
 
@@ -292,7 +292,7 @@ defmodule ElixirScript.Translator.Kernel do
   end
 
   defp do_translate({name, _, params}, env) do
-    Function.make_function_call({:__aliases__, [], [:Elixir, :Kernel]}, name, params, env) 
+    Function.make_function_call({:__aliases__, [], [:Elixir, :Kernel]}, name, params, env)
   end
 
 end

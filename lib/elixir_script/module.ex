@@ -51,12 +51,12 @@ defmodule ElixirScript.Module do
   end
 
   def imported?(module, function_name) do
-    imports = Enum.find(module.imports, fn({_, functions}) ->
-      Enum.member?(functions, function_name)
+    imported_modules = Enum.find(module.imports, fn({_, funcs}) ->
+      Enum.member?(funcs, function_name)
     end)
 
-    if imports do
-      elem(imports, 0)
+    if imported_modules do
+      elem(imported_modules, 0)
     end
   end
 
