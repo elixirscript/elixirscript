@@ -16,10 +16,10 @@ class Protocol{
         let thing = args[0];
         let fun = null;
 
-        if(Number.isInteger(thing) && this.hasImplementation(Core.IntegerType)){
-          fun = this.registry.get(Core.IntegerType)[funName];
-        }else if(typeof thing === "number" && !Number.isInteger(thing) && this.hasImplementation(Core.FloatType)){
-          fun = this.registry.get(Core.FloatType)[funName];
+        if(Number.isInteger(thing) && this.hasImplementation(Core.Integer)){
+          fun = this.registry.get(Core.Integer)[funName];
+        }else if(typeof thing === "number" && !Number.isInteger(thing) && this.hasImplementation(Core.Float)){
+          fun = this.registry.get(Core.Float)[funName];
         }else if(this.hasImplementation(thing)){
           fun = this.registry.get(thing.constructor)[funName];
         }else if(this.fallback){

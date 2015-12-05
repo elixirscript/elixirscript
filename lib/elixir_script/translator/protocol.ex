@@ -182,8 +182,11 @@ defmodule ElixirScript.Translator.Protocol do
 
   defp map_to_js({:__aliases__, _, [:Integer]}) do
     JS.member_expression(
-      JS.identifier(:Elixir),
-      JS.identifier(:IntegerType)
+      JS.member_expression(
+        JS.identifier(:Elixir),
+        JS.identifier(:Core)
+      ),
+      JS.identifier(:Integer)
     )
   end
 
@@ -217,8 +220,11 @@ defmodule ElixirScript.Translator.Protocol do
 
   defp map_to_js({:__aliases__, _, [:Float]}) do
     JS.member_expression(
-      JS.identifier(:Elixir),
-      JS.identifier(:FloatType)
+      JS.member_expression(
+        JS.identifier(:Elixir),
+        JS.identifier(:Core)
+      ),
+      JS.identifier(:Float)
     )
   end
 

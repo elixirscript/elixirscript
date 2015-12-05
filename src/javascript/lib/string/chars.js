@@ -29,13 +29,13 @@ Kernel.defimpl(Chars, Symbol, {
   }
 });
 
-Kernel.defimpl(Chars, Core.IntegerType, {
+Kernel.defimpl(Chars, Core.Integer, {
   to_string: function(thing){
     return Integer.to_string(thing);
   }
 });
 
-Kernel.defimpl(Chars, Core.FloatType, {
+Kernel.defimpl(Chars, Core.Float, {
   to_string: function(thing){
     return thing.toString;
   }

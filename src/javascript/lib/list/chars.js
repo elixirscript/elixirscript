@@ -24,7 +24,7 @@ Kernel.defimpl(Chars, Symbol, {
   }
 });
 
-Kernel.defimpl(Chars, Core.IntegerType, {
+Kernel.defimpl(Chars, Core.Integer, {
   to_char_list: function(thing){
     return Integer.to_char_list(thing);
   }

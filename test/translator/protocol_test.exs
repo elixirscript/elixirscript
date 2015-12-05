@@ -90,7 +90,7 @@ defmodule ElixirScript.Translator.Protocol.Test do
              return     false;
            }))
        })
-         Elixir.Kernel.defimpl(Blank,Elixir.IntegerType,{
+         Elixir.Kernel.defimpl(Blank, Elixir.Core.Integer, {
              blank__qmark__: Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(number)    {
              return     false;
            }))
