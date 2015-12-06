@@ -1,4 +1,7 @@
 # v0.14.0
+* Breaking
+  * Renamed `ex2js` to `elixirscript`. This effects the escript as well as the
+  mix task
 * Enhancements
   * Structs are now translated into classes
   * Structs and Tuples now match on their types
