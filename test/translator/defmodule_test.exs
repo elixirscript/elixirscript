@@ -9,7 +9,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
-    const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elephant');
+    const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elixir.Elephant');
     export {};
     """
 
@@ -31,7 +31,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
-         const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elephant');
+         const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elixir.Elephant');
          const something_else = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
              return     null;
            }));
@@ -60,7 +60,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
 
     js_code = """
          import * as Crane from 'icabod/crane';
-         const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elephant');
+         const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elixir.Elephant');
          const something_else = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
              return     null;
            }));
@@ -95,7 +95,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
-    const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elephant');
+    const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elixir.Elephant');
     const defstruct = Elixir.Kernel.defstruct({
         [Elixir.Kernel.SpecialForms.atom('__struct__')]: __MODULE__, [Elixir.Kernel.SpecialForms.atom('trunk')]: true
     });
@@ -104,7 +104,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     };
 
     import * as Elephant from 'animals/elephant';
-    const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Animals');
+    const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elixir.Animals');
     const something_else = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([], function() {
         return null;
     }));
@@ -116,7 +116,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     };
 
     import * as Elephant from 'animals/elephant';
-    const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Animals.Elephant');
+    const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elixir.Animals.Elephant');
     const defstruct = Elixir.Kernel.defstruct({
         [Elixir.Kernel.SpecialForms.atom('__struct__')]: __MODULE__, [Elixir.Kernel.SpecialForms.atom('trunk')]: true
     });
@@ -154,7 +154,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
 
     js_code = """
     import * as Bear from 'elephant/bear';
-    const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elephant.Bear');
+    const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elixir.Elephant.Bear');
     const defstruct = Elixir.Kernel.defstruct({
         [Elixir.Kernel.SpecialForms.atom('__struct__')]: __MODULE__, [Elixir.Kernel.SpecialForms.atom('trunk')]: true
     });
@@ -164,7 +164,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
 
     import * as Bear from 'elephant/bear';
     import * as Elephant from 'animals/elephant';
-    const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Animals.Elephant');
+    const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elixir.Animals.Elephant');
     const defstruct = Elixir.Kernel.defstruct({
         [Elixir.Kernel.SpecialForms.atom('__struct__')]: __MODULE__, [Elixir.Kernel.SpecialForms.atom('trunk')]: true
     });
@@ -173,7 +173,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     };
 
     import * as Elephant from 'animals/elephant';
-    const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Animals');
+    const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elixir.Animals');
     const something_else = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([], function() {
         return null;
     }));
@@ -184,7 +184,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
         something
     };
 
-    const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Bear');
+    const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elixir.Bear');
     const defstruct = Elixir.Kernel.defstruct({
         [Elixir.Kernel.SpecialForms.atom('__struct__')]: __MODULE__, [Elixir.Kernel.SpecialForms.atom('trunk')]: true
     });
@@ -193,7 +193,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     };
 
     import * as Bear from 'elephant/bear';
-    const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elephant');
+    const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elixir.Elephant');
     const defstruct = Elixir.Kernel.defstruct({
         [Elixir.Kernel.SpecialForms.atom('__struct__')]: __MODULE__, [Elixir.Kernel.SpecialForms.atom('trunk')]: true
     });
@@ -218,11 +218,11 @@ defmodule ElixirScript.Translator.Defmodule.Test do
 
     js_code = """
      import * as Tigers from 'lions/tigers';
-     const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Animals');
+     const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elixir.Animals');
      Elixir.Core.call_property(Tigers,'oh_my');
      export {};
 
-     const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Lions.Tigers');
+     const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elixir.Lions.Tigers');
      Elixir.Core.call_property(Lions.Tigers.Bears,'oh_my');
      export {};
     """
@@ -247,7 +247,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
-         const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Lions.Tigers');
+         const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elixir.Lions.Tigers');
          const oh_my = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
              return     null;
            }));
@@ -257,7 +257,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
        };
 
          import * as Tigers from 'lions/tigers';
-         const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Animals');
+         const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elixir.Animals');
          Elixir.Core.call_property(Tigers,'oh_my');
          export {};
     """
@@ -284,13 +284,13 @@ defmodule ElixirScript.Translator.Defmodule.Test do
 
     js_code = """
     import * as Tigers from 'lions/tigers';
-    const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Animals');
+    const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elixir.Animals');
     Tigers.oh_my();
     export {};
 
 
 
-    const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Lions.Tigers');
+    const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elixir.Lions.Tigers');
     const oh_my2 = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([], function() {
         return null;
     }));
@@ -325,13 +325,13 @@ defmodule ElixirScript.Translator.Defmodule.Test do
 
     js_code = """
     import * as Tigers from 'lions/tigers';
-    const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Animals');
+    const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elixir.Animals');
     Tigers.oh_my2();
     export {};
 
 
 
-    const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Lions.Tigers');
+    const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elixir.Lions.Tigers');
 
     const oh_my2 = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([], function() {
         return null;

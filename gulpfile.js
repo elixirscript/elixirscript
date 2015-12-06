@@ -44,7 +44,7 @@ gulp.task('dist_build', function() {
 });
 
 gulp.task('dist_add_source_map', function() {
-  return gulp.src(['./priv/elixir.js'])
+  return gulp.src(['./priv/Elixir.js'])
       .pipe(sourcemaps.init())
       .pipe(sourcemaps.write())
       .pipe(gulp.dest('./priv'));

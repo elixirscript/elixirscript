@@ -239,7 +239,7 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-         const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Example');
+         const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elixir.Example');
          const example = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
              return     null;
            }),Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(oneArg)    {
@@ -276,7 +276,7 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-         const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Example');
+         const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elixir.Example');
          const example = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
              return     null;
            }),Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(oneArg)    {
@@ -303,7 +303,7 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-         const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Example');
+         const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elixir.Example');
          const example = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(oneArg)    {
              return     null;
            }));
@@ -421,7 +421,7 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-         const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Example');
+         const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elixir.Example');
          const something = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(one)    {
              return     null;
            },function(one)    {
@@ -652,7 +652,7 @@ defmodule ElixirScript.Translator.Function.Test do
 
 
     js_code = """
-         const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Example');
+         const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elixir.Example');
          const something = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([1],function()    {
              return     null;
            }),Elixir.Core.Patterns.make_case([2],function()    {

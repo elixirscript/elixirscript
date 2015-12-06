@@ -4,7 +4,7 @@ defmodule ElixirScript.Translator.Utils do
   alias ElixirScript.Translator
 
   def inflate_groups(body) do
-    Enum.map(body, fn(x) -> 
+    Enum.map(body, fn(x) ->
       case x do
         %ElixirScript.Translator.Group{body: group_body} ->
           group_body
@@ -102,26 +102,26 @@ defmodule ElixirScript.Translator.Utils do
         JS.member_expression(
           Translator.translate(ast, env),
           build_function_name_ast(function_name),
-          computed                 
+          computed
         )
       {{:., _, [{:__aliases__, _, _}]}, _, _} = ast ->
         JS.member_expression(
           Translator.translate(ast, env),
           build_function_name_ast(function_name),
-          computed                 
+          computed
         )
       {:., _, _} = ast ->
         JS.member_expression(
           Translator.translate(ast, env),
           build_function_name_ast(function_name),
-          computed                 
+          computed
         )
       _ ->
         JS.member_expression(
           JS.identifier(module_name),
           build_function_name_ast(function_name),
           computed
-        )              
+        )
     end
   end
 

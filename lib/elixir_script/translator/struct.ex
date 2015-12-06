@@ -8,24 +8,19 @@ defmodule ElixirScript.Translator.Struct do
   def get_struct_class(module_name, env) do
     current_module = ElixirScript.State.get_module(Process.get(:current_module))
 
-    name = List.last(module_name)
-
-    the_alias = ElixirScript.Module.get_alias(current_module, module_name)
+    name = ElixirScript.Module.quoted_to_name(module_name)
+    the_alias = ElixirScript.Module.get_alias(current_module, name)
 
     if the_alias do
       { _, name } = the_alias
-
-      name = Atom.to_string(name)
-      |> String.split(".")
-      |> List.last
     end
 
-    if the_alias == nil && ElixirScript.State.get_module(module_name) == nil do
+    if the_alias == nil && ElixirScript.State.get_module(ElixirScript.Module.quoted_to_name(module_name)) == nil do
       Utils.make_module_expression_tree(module_name, false, env)
     else
       JS.member_expression(
-        JS.identifier(List.last(module_name)),
-        JS.identifier(name)
+        JS.identifier(ElixirScript.Module.name_to_js_name(name)),
+        JS.identifier(ElixirScript.Module.name_to_js_name(name))
       )
     end
 

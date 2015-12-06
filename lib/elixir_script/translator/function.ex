@@ -174,19 +174,18 @@ defmodule ElixirScript.Translator.Function do
 
   def make_function_or_property_call(module_name, function_name, env) do
     the_name = case update_alias(module_name) do
-      {:__aliases__, _, name} ->
-        name
+      {:__aliases__, _, _} = name  ->
+        module_name = ElixirScript.Module.quoted_to_name(name)
+        get_name_js_ast(module_name)
+
       {name, _, _} when is_atom(name) ->
-        name
+        get_name_js_ast(name)
+
       {{:., _, [_module_name, _function_name]}, _, _params } = ast ->
         ast
+
       name ->
-        case to_string(name) do
-          "Elixir." <> actual_name ->
-            actual_name
-          _ ->
-            name
-        end
+        name
     end
 
     JS.call_expression(
@@ -215,20 +214,16 @@ defmodule ElixirScript.Translator.Function do
   def make_function_call(module_name, function_name, params, env) do
     the_name = case update_alias(module_name) do
       {:__aliases__, _, name} ->
-        name
+        module_name = ElixirScript.Module.quoted_to_name(name)
+        get_name_js_ast(module_name)
       {name, _, _} when is_atom(name) ->
-        name
+        get_name_js_ast(name)
       {{:., _, [_, _]}, _, _ } = ast ->
         ast
       {{:., _, [{:__aliases__, _, _}]}, _, _} = ast ->
         ast
       name ->
-        case to_string(name) do
-          "Elixir." <> actual_name ->
-            actual_name
-          _ ->
-            name
-        end
+        name
     end
 
     Utils.make_call_expression(the_name, Utils.filter_name(function_name), params, env)
@@ -311,6 +306,38 @@ defmodule ElixirScript.Translator.Function do
       list ++ last_item
     else
       list ++ [last_item]
+    end
+  end
+
+  defp get_name_js_ast([Elixir | _] = list) do
+    list
+  end
+
+  defp get_name_js_ast(module_name) when is_list(module_name) do
+    ElixirScript.Module.quoted_to_name({:__aliases__, [], module_name})
+    |> get_name_js_ast
+  end
+
+  defp get_name_js_ast(module_name) do
+    cond do
+      ElixirScript.State.get_module(module_name) ->
+        ElixirScript.State.add_module_reference(Process.get(:current_module), module_name)
+        ElixirScript.Module.name_to_js_name(module_name)
+
+      ElixirScript.Module.has_alias?(ElixirScript.State.get_module(Process.get(:current_module)), module_name) ->
+        module = ElixirScript.State.get_module(Process.get(:current_module))
+        {_, module_name } = ElixirScript.Module.get_alias(module, module_name)
+        ElixirScript.State.add_module_reference(Process.get(:current_module), module_name)
+        ElixirScript.Module.name_to_js_name(module_name)
+
+      true ->
+        case Atom.to_string(module_name) do
+          "Elixir." <> _ ->
+            {:__aliases__, _, name } = ElixirScript.Module.name_to_quoted(module_name)
+            name
+          _ ->
+            module_name
+        end
     end
   end
 end

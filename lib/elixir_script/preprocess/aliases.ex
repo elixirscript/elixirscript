@@ -29,7 +29,7 @@ defmodule ElixirScript.Preprocess.Aliases do
 
   def process_aliases({{:., meta1, [{:__aliases__, meta2, aliases}, function]}, meta3, params}, _, module_name_list) when aliases in [[:Collectable], [:Enumerable], [:Inspect], [:List, :Chars], [:String, :Chars]] do
       new_ast = {{:., meta1, [{:__aliases__, meta2, List.last(aliases) |> List.wrap }, function]}, meta3, params}
-      ElixirScript.State.add_alias(module_name_list, {:__aliases__, meta2, [:Elixir] ++ aliases})
+      ElixirScript.State.add_alias(ElixirScript.Module.quoted_to_name({:__aliases__, [], module_name_list}), {:__aliases__, meta2, [:Elixir] ++ aliases})
       new_ast
   end
 
@@ -41,7 +41,7 @@ defmodule ElixirScript.Preprocess.Aliases do
       module = ElixirScript.State.get_module(module_name_list)
 
       if !ElixirScript.Module.has_alias?(module, {:__aliases__, meta2, List.last(aliases) |> List.wrap }) do
-        ElixirScript.State.add_alias(module_name_list, {:__aliases__, meta2, aliases})
+        ElixirScript.State.add_alias(ElixirScript.Module.quoted_to_name({:__aliases__, [], module_name_list}), {:__aliases__, meta2, aliases})
       end
 
       new_ast

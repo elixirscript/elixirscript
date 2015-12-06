@@ -20,7 +20,7 @@ defmodule ElixirScript do
   * `:root` - a binary path prepended to the path of the standard lib imports if needed
   * `:env` - a Macro.env struct to use. This is most useful when using macros. Make sure that the
   * `:stdlib_path` - The es6 import path used to import the elixirscript standard lib.
-  When using this option, the elixir.js file is not exported
+  When using this option, the Elixir.js file is not exported
   """
 
   @doc """
@@ -42,7 +42,7 @@ defmodule ElixirScript do
     root = Dict.get(opts, :root)
     env = Dict.get(opts, :env, custom_env)
     import_standard_libs? = Dict.get(opts, :import_standard_libs, true)
-    stdlib_path = Dict.get(opts, :stdlib_path, "elixir")
+    stdlib_path = Dict.get(opts, :stdlib_path, "Elixir")
 
     ElixirScript.State.start_link(root, env)
 
@@ -58,7 +58,7 @@ defmodule ElixirScript do
     include_path = Dict.get(opts, :include_path, false)
     root = Dict.get(opts, :root)
     env = Dict.get(opts, :env, custom_env)
-    stdlib_path = Dict.get(opts, :stdlib_path, "elixir")
+    stdlib_path = Dict.get(opts, :stdlib_path, "Elixir")
 
     ElixirScript.State.start_link(root, env)
 
@@ -133,14 +133,14 @@ defmodule ElixirScript do
   to the specified location
   """
   def copy_standard_libs_to_destination(destination) do
-    File.cp_r!(operating_path, destination)
+    File.cp!(operating_path <> "/Elixir.js", destination <> "/Elixir.js")
   end
 
   @doc """
   Returns the standard lib js code
   """
   def standard_libs() do
-    File.read!(operating_path <> "/elixir.js")
+    File.read!(operating_path <> "/Elixir.js")
   end
 
   defp convert_to_code(js_ast, root, include_path, env, import_standard_libs, stdlib_path) do
@@ -167,8 +167,8 @@ defmodule ElixirScript do
     {file_path, program}
   end
 
-  defp create_file_name(%JSModule{name: module_list}) do
-    name = ElixirScript.Translator.Import.make_file_path(module_list)
+  defp create_file_name(%JSModule{name: module}) do
+    name = ElixirScript.Module.name_to_js_file_name(module)
     "#{name}.js"
   end
 
