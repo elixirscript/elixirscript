@@ -1,13 +1,20 @@
-# v0.14.0-dev
+# v0.14.0
 * Enhancements
   * Structs are now translated into classes
   * Structs and Tuples now match on their types
-  * Can now match on JavaScript classes
+  * Can now match on JavaScript classes. Works just like matching on structs:
+  ```elixir
+    def my_func(%HTMLElement{id: "myId"})
+  ```
   * Can now implement protocols using JavaScript types
+  ```elixir
+    defimpl MyProtocol, for: HTMLElement
+  ```
   * Added virtual-dom JavaScript library
   * Added ElixirScript.Html module for defining a virtual-dom tree
   * Added ElixirScript.VDom module for manipulating the virtual-dom tree created
   using the ElixirScript.Html module
+  * Added ElixirScript.View module for handling view state and rendering virtual-dom
   * Added `stdlib_path` compiler option to specify the es6 path to the standard library.
   If used, elixir.js will not be exported with the compiled modules
   * Moved non-elixir JavaScript code into `core` es6 module. This will hopefully
@@ -149,7 +156,7 @@
       * Logger
 
   * Implemented language features:
-      * All primatives except bitstrings
+      * All primitives except bitstrings
       * defmodule
       * import, alias, and require
       * case, cond, if
