@@ -113,9 +113,10 @@ defmodule ElixirScript.Preprocess.Modules do
           case x do
             {:defmodule, _, [{:__aliases__, _, module_name_list2}, [do: body2]]} ->
               body2 = make_inner_module_aliases(module_name_list2, body2)
-              add_module_to_state(module_name_list, module_name_list2, body2)
+              inner_alias = add_module_to_state(module_name_list, module_name_list2, body2)
 
-              []
+
+              [ inner_alias ]
             _ ->
               x
           end
@@ -125,9 +126,9 @@ defmodule ElixirScript.Preprocess.Modules do
         {:__block__, meta2, list2}
       {:defmodule, _, [{:__aliases__, meta2, module_name_list2}, [do: body2]]} ->
         body2 = make_inner_module_aliases(module_name_list2, body2)
-        add_module_to_state(module_name_list, module_name_list2, body2)
+        inner_alias = add_module_to_state(module_name_list, module_name_list2, body2)
 
-        {:__block__, meta2, [] }
+        {:__block__, meta2, [ inner_alias ] }
       _ ->
         body
     end
@@ -141,24 +142,27 @@ defmodule ElixirScript.Preprocess.Modules do
     imports = get_imports_from_module(body2)
     js_imports = get_js_imports_from_module(body2)
 
+    inner_alias = {:alias, [], [{:__aliases__, [alias: false], module_name_list ++ module_name_list2}]}
     {inner_alias_atom, _ } = Code.eval_quoted({:__aliases__, [alias: false], module_name_list ++ module_name_list2})
 
     aliases = Set.put(aliases, {inner_alias_atom, inner_alias_atom})
     aliases = Set.union(aliases, requires.aliases) |> Set.union(imports.aliases)
 
-    mod = %ElixirScript.Module{ name: ElixirScript.Module.quoted_to_name({:__aliases__, [], module_name_list2}), body: body2,
-    functions: functions, macros: macros, aliases: aliases,
-    requires: requires.requires, imports: imports.imports, js_imports: js_imports }
+    module_name = ElixirScript.Module.quoted_to_name({:__aliases__, [], module_name_list2})
 
-    if State.module_listed?(module_name_list2) do
-      State.delete_module(mod)
+    if State.module_listed?(module_name) do
+      State.delete_module_by_name(module_name)
     end
 
-    mod = %ElixirScript.Module{ name: ElixirScript.Module.quoted_to_name({:__aliases__, [], module_name_list ++ module_name_list2}), body: body2,
+    module_name = ElixirScript.Module.quoted_to_name({:__aliases__, [], module_name_list ++ module_name_list2})
+
+    mod = %ElixirScript.Module{ name: module_name, body: body2,
     functions: functions, macros: macros, aliases: aliases,
-    requires: requires.requires }
+    requires: requires.requires, js_imports: js_imports  }
 
     State.add_module(mod)
+
+    inner_alias
   end
 
 

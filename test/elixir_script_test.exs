@@ -34,7 +34,7 @@ defmodule ElixirScript.Test do
     """)
 
     assert_js_matches """
-         import * as Elixir from 'elixir';
+         import * as Elixir from 'Elixir';
          const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elixir.Elephant');
          const something_else = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
              return     Elixir.String.Chars.to_string(10);
@@ -67,26 +67,25 @@ defmodule ElixirScript.Test do
     """, env: make_custom_env)
 
     assert_js_matches """
-    import * as Elixir from 'elixir';
-    import * as Elephant from 'animals/elephant';
-    const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elixir.Animals.Elephant');
-    const defstruct = Elixir.Kernel.defstruct({
-        [Elixir.Kernel.SpecialForms.atom('__struct__')]: __MODULE__, [Elixir.Kernel.SpecialForms.atom('trunk')]: true
-    });
+    import * as Elixir from 'Elixir';
+    const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elixir.Animals');
+    const something = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
+        return     Elixir$Animals$Elephant.Elixir$Animals$Elephant.create(Elixir.Kernel.SpecialForms.map({}));
+      }));
     export {
-        Elephant: defstruct
-    };
+        something
+  };
      """, hd(js_code)
 
      assert_js_matches """
-     import * as Elixir from 'elixir';
-     const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elixir.Elephant');
+     import * as Elixir from 'Elixir';
+     const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elixir.Animals.Elephant');
      const defstruct = Elixir.Kernel.defstruct({
-         [Elixir.Kernel.SpecialForms.atom('__struct__')]: __MODULE__, [Elixir.Kernel.SpecialForms.atom('trunk')]: true
-     });
+         [Elixir.Kernel.SpecialForms.atom('__struct__')]: __MODULE__,     [Elixir.Kernel.SpecialForms.atom('trunk')]: true
+   });
      export {
-         Elephant: defstruct
-     };
+         Elixir$Animals$Elephant: defstruct
+   };
        """, Enum.fetch!(js_code, 1)
   end
 
@@ -105,7 +104,7 @@ defmodule ElixirScript.Test do
     """, env: make_custom_env)
 
     assert_js_matches """
-         import * as Elixir from 'elixir';
+         import * as Elixir from 'Elixir';
          const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elixir.Animals');
          const something_else = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
              return     1 * 1;

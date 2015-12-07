@@ -25,6 +25,17 @@ defmodule ElixirScript.State do
     end)
   end
 
+  def delete_module_by_name(module_name) do
+    Agent.update(__MODULE__, fn state ->
+      set = state.modules
+      |> Set.to_list()
+      |> Enum.filter(fn(x) -> x.name != module_name end)
+      |> Enum.into(HashSet.new)
+
+      %{state | modules: set }
+    end)
+  end
+
   def module_listed?(module_name) do
     Agent.get(__MODULE__, fn state ->
       Enum.any?(state.modules, fn(x) -> x.name == module_name end) ||
@@ -166,9 +177,7 @@ defmodule ElixirScript.State do
 
   def list_modules() do
     Agent.get(__MODULE__, fn(x) ->
-      Enum.map(x.modules, fn(y) ->
-        y.name
-      end)
+      Enum.map(x.modules, fn(y) -> y.name end) ++ Enum.map(x.protocols, fn({key, _}) -> key end)
     end)
   end
 
