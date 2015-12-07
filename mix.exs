@@ -4,7 +4,7 @@ defmodule ElixirScript.Mixfile do
   def project do
     [
       app: :elixir_script,
-      version: "0.14.0",
+      version: "0.14.1",
       elixir: "~> 1.0",
       escript: escript_config,
       deps: deps,
@@ -86,8 +86,8 @@ defmodule ElixirScript.Mixfile do
 
     File.mkdir_p(folder_name <> "/bin")
     File.cp!("elixirscript", "#{folder_name}/bin/elixirscript")
-    File.cp_r!("priv", "#{folder_name}")
-    File.cp_r!("LICENSE", "#{folder_name}/LICENSE")
+    File.cp!("priv/elixir.js", "#{folder_name}/elixir.js")
+    File.cp!("LICENSE", "#{folder_name}/LICENSE")
 
     System.cmd("tar", ["czf", archive_file_name, folder_name])
 

@@ -133,7 +133,7 @@ defmodule ElixirScript do
   to the specified location
   """
   def copy_standard_libs_to_destination(destination) do
-    File.cp_r!(operating_path, destination)
+    File.cp!(operating_path <> "/elixir.js", destination <> "/elixir.js")
   end
 
   @doc """
