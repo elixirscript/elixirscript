@@ -112,7 +112,7 @@ defmodule ElixirScript.Preprocess.Modules do
         list2 = Enum.map(list2, fn(x) ->
           case x do
             {:defmodule, _, [{:__aliases__, _, module_name_list2}, [do: body2]]} ->
-              body2 = make_inner_module_aliases(module_name_list2, body2)
+              body2 = make_inner_module_aliases( module_name_list ++ module_name_list2, body2)
               inner_alias = add_module_to_state(module_name_list, module_name_list2, body2)
 
 
@@ -125,7 +125,7 @@ defmodule ElixirScript.Preprocess.Modules do
 
         {:__block__, meta2, list2}
       {:defmodule, _, [{:__aliases__, meta2, module_name_list2}, [do: body2]]} ->
-        body2 = make_inner_module_aliases(module_name_list2, body2)
+        body2 = make_inner_module_aliases(module_name_list ++ module_name_list2, body2)
         inner_alias = add_module_to_state(module_name_list, module_name_list2, body2)
 
         {:__block__, meta2, [ inner_alias ] }
@@ -148,11 +148,8 @@ defmodule ElixirScript.Preprocess.Modules do
     aliases = Set.put(aliases, {inner_alias_atom, inner_alias_atom})
     aliases = Set.union(aliases, requires.aliases) |> Set.union(imports.aliases)
 
-    module_name = ElixirScript.Module.quoted_to_name({:__aliases__, [], module_name_list2})
-
-    if State.module_listed?(module_name) do
-      State.delete_module_by_name(module_name)
-    end
+    module_name = ElixirScript.Module.quoted_to_name({:__aliases__, [], tl(module_name_list) ++ module_name_list2})
+    State.delete_module_by_name(module_name)
 
     module_name = ElixirScript.Module.quoted_to_name({:__aliases__, [], module_name_list ++ module_name_list2})
 
