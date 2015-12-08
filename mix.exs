@@ -86,11 +86,7 @@ defmodule ElixirScript.Mixfile do
 
     File.mkdir_p(folder_name <> "/bin")
     File.cp!("elixirscript", "#{folder_name}/bin/elixirscript")
-<<<<<<< HEAD
     File.cp!("priv/Elixir.js", "#{folder_name}/Elixir.js")
-=======
-    File.cp!("priv/elixir.js", "#{folder_name}/elixir.js")
->>>>>>> master
     File.cp!("LICENSE", "#{folder_name}/LICENSE")
 
     System.cmd("tar", ["czf", archive_file_name, folder_name])
