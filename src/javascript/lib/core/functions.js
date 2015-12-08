@@ -19,6 +19,11 @@ function call_property(item, property){
   throw new Error(`Property ${property} not found in ${item}`);
 }
 
+function is_instance_of(value, type){
+  return value instanceof type;
+}
+
 export {
-  call_property
+  call_property,
+  is_instance_of
 };

@@ -23,6 +23,19 @@ defmodule ElixirScript do
   When using this option, the Elixir.js file is not exported
   """
 
+  @kernel_functions [abs: 1, apply: 2, apply: 3, binary_part: 3, div: 2, hd: 1, tl: 1]
+
+  defmacro __using__(_) do
+    quote do
+      import Kernel, except: @kernel_functions
+      import ElixirScript.Kernel, only: @kernel_functions
+      require Logger
+      require ElixirScript.JS, as: JS
+      require ElixirScript.Html, as: Html
+      require ElixirScript.VDom, as: VDom
+    end
+  end
+
   @doc """
   Compiles the given Elixir code string
   """
@@ -81,11 +94,8 @@ defmodule ElixirScript do
     |> ElixirScript.Preprocess.Modules.get_info
   end
 
-  defp custom_env() do
-    require Logger
-    require ElixirScript.JS, as: JS
-    require ElixirScript.Html, as: Html
-    require ElixirScript.VDom, as: VDom
+  def custom_env() do
+    __using__([])
     __ENV__
   end
 

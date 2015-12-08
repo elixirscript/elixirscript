@@ -2,6 +2,7 @@ class Tuple {
 
   constructor(...args){
     this.values = Object.freeze(args);
+    this.length = this.values.length;
   }
 
   get(index) {

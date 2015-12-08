@@ -2,7 +2,7 @@ import ProcessSystem from './core/process_system';
 import { Tuple, PID, Integer, Float } from './core/primitives';
 import BitString from './core/bit_string';
 import Patterns from './core/patterns';
-import { call_property } from './core/functions';
+import { call_property, is_instance_of } from './core/functions';
 
 export {
   ProcessSystem,
@@ -12,5 +12,6 @@ export {
   Patterns,
   Integer,
   Float,
-  call_property
+  call_property,
+  is_instance_of
 }
