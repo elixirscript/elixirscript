@@ -1,3 +1,7 @@
+# v0.14.1
+* Enhancements
+  * Removed .DS_Store and LICENSE from output
+
 # v0.14.0
 * Breaking
   * Renamed `ex2js` to `elixirscript`. This effects the escript as well as the
