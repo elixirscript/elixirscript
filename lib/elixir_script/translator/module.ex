@@ -9,29 +9,29 @@ defmodule ElixirScript.Translator.Module do
   alias ElixirScript.Translator.Function
   alias ElixirScript.Translator.Primitive
 
-  def make_module([:ElixirScript, :Temp], body, env) do
-    [%JSModule{ name: [:ElixirScript, :Temp], body: translate_body(body, env) |> Utils.inflate_groups }]
+  def make_module(ElixirScript.Temp, body, env) do
+    [%JSModule{ name: ElixirScript.Temp, body: translate_body(body, env) |> Utils.inflate_groups }]
   end
 
-  def make_module(module_name_list, nil, env) do
-    [%JSModule{ name: module_name_list, body: List.wrap(create__module__(module_name_list, env)) }]
+  def make_module(module, nil, env) do
+    [%JSModule{ name: module, body: List.wrap(create__module__(module, env)) }]
   end
 
-  def make_module(module_name_list, body, env) do
+  def make_module(module, body, env) do
     body = Using.process(body, env)
-    { body, aliases } = Aliases.process(module_name_list, body, env)
-
     { body, functions } = extract_functions_from_module(body)
     { exported_functions, private_functions } = process_functions(functions, env)
 
     body = translate_body(body, env)
+
+    modules_refs = ElixirScript.State.get_module_references(module)
 
     {imports, body} = extract_imports_from_body(body)
     {structs, body} = extract_structs_from_body(body)
 
     #Add imports found from walking the ast
     #and make sure to only put one declaration per alias
-    imports = process_imports(imports, aliases)
+    imports = process_imports(imports, modules_refs)
     imports = imports.imports
 
     #Collect all the functions so that we can process their arity
@@ -47,7 +47,7 @@ defmodule ElixirScript.Translator.Module do
     body = Utils.inflate_groups(body)
 
     exported_object = JS.object_expression(
-      make_defstruct_property(module_name_list, structs) ++
+      make_defstruct_property(module, structs) ++
       Enum.map(exported_functions, fn({key, _value}) ->
         JS.property(JS.identifier(key), JS.identifier(key), :init, true)
       end)
@@ -68,8 +68,8 @@ defmodule ElixirScript.Translator.Module do
 
     result = [
       %JSModule{
-        name: module_name_list,
-        body: imports ++ List.wrap(create__module__(module_name_list, env)) ++ structs ++ private_functions ++ exported_functions ++ body ++ [default]
+        name: ElixirScript.Module.quoted_to_name({:__aliases__, [], module }),
+        body: imports ++ List.wrap(create__module__(module, env)) ++ structs ++ private_functions ++ exported_functions ++ body ++ [default]
       }
     ] ++ List.flatten(modules)
 
@@ -155,12 +155,12 @@ defmodule ElixirScript.Translator.Module do
   defp make_defstruct_property(module_name, [the_struct]) do
     case the_struct do
       %ESTree.VariableDeclaration{declarations: [%ESTree.VariableDeclarator{id: %ESTree.Identifier{name: name} } ] } when name in [:defstruct, :defexception] ->
-        [JS.property(JS.identifier(List.last(module_name)), JS.identifier(name), :init)]
+        [JS.property(JS.identifier(ElixirScript.Module.name_to_js_name(module_name)), JS.identifier(name), :init)]
     end
   end
 
-  def process_imports(imports, aliases) do
-    imports ++ make_imports(aliases)
+  def process_imports(imports, module_refs) do
+    imports ++ make_imports(module_refs)
     |> Enum.into(HashSet.new)
     |> Enum.reduce(HashSet.new, fn(x, acc)->
       HashSet.put(acc, x)
@@ -209,29 +209,17 @@ defmodule ElixirScript.Translator.Module do
     JS.variable_declaration([declarator], :const)
   end
 
-  def create__module__(module_name_list, _) do
-    module_name = Enum.map(module_name_list, &Atom.to_string(&1))
-    |> Enum.join(".")
-    |> String.to_atom
-
+  def create__module__(module, _) do
     declarator = JS.variable_declarator(
       JS.identifier(:__MODULE__),
-      Primitive.make_atom(module_name)
+      Primitive.make_atom(module)
     )
 
     JS.variable_declaration([declarator], :const)
   end
 
   def make_imports(enum) do
-    Enum.map(enum, fn
-
-    {as, name} ->
-      name = Atom.to_string(name) |> String.split(".") |> tl |> Enum.map(fn(x) -> String.to_atom(x) end)
-      as = Atom.to_string(as) |> String.split(".") |> tl |> Enum.map(fn(x) -> String.to_atom(x) end)
-      ElixirScript.Translator.Import.make_alias_import({ nil, nil, name }, [as: { nil, nil, as }])
-    x ->
-      ElixirScript.Translator.Import.make_alias_import({ nil, nil, List.wrap(x) }, [])
-    end)
+    Enum.map(enum, fn(x) -> ElixirScript.Translator.Import.make_import(x) end)
   end
 
 end

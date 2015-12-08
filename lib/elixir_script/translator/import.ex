@@ -3,7 +3,19 @@ defmodule ElixirScript.Translator.Import do
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.State
 
+  def make_import(module_name) do
+    import_specifier = JS.import_namespace_specifier(
+      JS.identifier(ElixirScript.Module.name_to_js_name(module_name))
+    )
+
+    JS.import_declaration(
+      [import_specifier],
+      JS.literal("#{ElixirScript.Module.name_to_js_file_name(module_name)}")
+    )
+  end
+
   def make_alias_import(alias_info, options) do
+
     {_, _, name} = alias_info
 
     default = Dict.get(options, :default, false)

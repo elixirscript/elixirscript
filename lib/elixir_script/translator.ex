@@ -93,8 +93,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:%, _, [alias_info, data]}, env) do
-    {_, _, name} = alias_info
-    Struct.new_struct(name, data, env)
+    Struct.new_struct(alias_info, data, env)
   end
 
   defp do_translate({:%{}, _, [{:|, _, [map, data]}]}, env) do
@@ -236,20 +235,12 @@ defmodule ElixirScript.Translator do
     %ElixirScript.Translator.Group{}
   end
 
-  defp do_translate({:alias, _, [alias_info, options]}, _) when is_tuple(alias_info) do
-    Import.make_alias_import(alias_info, options)
+  defp do_translate({:alias, _, _}, _) do
+    %ElixirScript.Translator.Group{}
   end
 
-  defp do_translate({:alias, _, [alias_info]}, _) when is_tuple(alias_info) do
-    Import.make_alias_import(alias_info, [])
-  end
-
-  defp do_translate({:require, _, [alias_info, options]}, _) do
-    Import.make_alias_import(alias_info, options)
-  end
-
-  defp do_translate({:require, _, [alias_info]}, _) do
-    Import.make_alias_import(alias_info, [])
+  defp do_translate({:require, _, _}, _) do
+    %ElixirScript.Translator.Group{}
   end
 
   defp do_translate({:case, _, [condition, [do: clauses]]}, env) do
@@ -331,7 +322,7 @@ defmodule ElixirScript.Translator do
 
         if imported_module do
           imported_module = ElixirScript.State.get_module(imported_module)
-          Function.make_function_call({:__aliases__, [], List.last(imported_module.name) |> List.wrap }, name, params, env)
+          Function.make_function_call(ElixirScript.Module.name_to_quoted(imported_module.name) , name, params, env)
         else
           Function.make_function_call(name, params, env)
         end

@@ -10,9 +10,9 @@ defmodule ElixirScript.Translator.Protocol.Test do
     end
 
     js_code = """
-    const __MODULE__ = Elixir.Kernel.SpecialForms.atom('ElixirScript.Collectable');
+    const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elixir.ElixirScript.Collectable');
 
-    let Collectable = Elixir.Kernel.defprotocol({
+    let Elixir$ElixirScript$Collectable = Elixir.Kernel.defprotocol({
       into: Elixir.Core.Patterns.defmatch(
         Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()], function(collectable){
           return null;
@@ -20,7 +20,7 @@ defmodule ElixirScript.Translator.Protocol.Test do
       )
     });
 
-    export default Collectable;
+    export default Elixir$ElixirScript$Collectable;
     """
 
     assert_translation(ex_ast, js_code)
@@ -68,20 +68,20 @@ defmodule ElixirScript.Translator.Protocol.Test do
     end
 
     js_code = """
-         const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Blank');
-         let Blank = Elixir.Kernel.defprotocol({
+         const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elixir.Blank');
+         let Elixir$Blank = Elixir.Kernel.defprotocol({
              blank__qmark__: Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(data)    {
              return     null;
            }))
        });
-         Elixir.Kernel.defimpl(Blank, Array,{
+         Elixir.Kernel.defimpl(Elixir$Blank, Array,{
              blank__qmark__: Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Kernel.SpecialForms.list()],function()    {
              return     true;
            }),Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.wildcard()],function()    {
              return     false;
            }))
        })
-         Elixir.Kernel.defimpl(Blank,Symbol,{
+         Elixir.Kernel.defimpl(Elixir$Blank,Symbol,{
              blank__qmark__: Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([false],function()    {
              return     true;
            }),Elixir.Core.Patterns.make_case([null],function()    {
@@ -90,12 +90,12 @@ defmodule ElixirScript.Translator.Protocol.Test do
              return     false;
            }))
        })
-         Elixir.Kernel.defimpl(Blank, Elixir.Core.Integer, {
+         Elixir.Kernel.defimpl(Elixir$Blank, Elixir.Core.Integer, {
              blank__qmark__: Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(number)    {
              return     false;
            }))
        })
-         export default Blank;
+         export default Elixir$Blank;
     """
 
     assert_translation(ex_ast, js_code)

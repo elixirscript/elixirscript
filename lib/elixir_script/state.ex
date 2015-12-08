@@ -25,6 +25,17 @@ defmodule ElixirScript.State do
     end)
   end
 
+  def delete_module_by_name(module_name) do
+    Agent.update(__MODULE__, fn state ->
+      set = state.modules
+      |> Set.to_list()
+      |> Enum.filter(fn(x) -> x.name != module_name end)
+      |> Enum.into(HashSet.new)
+
+      %{state | modules: set }
+    end)
+  end
+
   def module_listed?(module_name) do
     Agent.get(__MODULE__, fn state ->
       Enum.any?(state.modules, fn(x) -> x.name == module_name end) ||
@@ -77,49 +88,50 @@ defmodule ElixirScript.State do
   end
 
   def get_module(module) when is_atom(module) do
-    module
-    |> Atom.to_string
-    |> String.split(".")
-    |> tl
-    |> Enum.map(fn x -> String.to_atom(x) end)
-    |> get_module
-  end
-
-
-  def get_module(module_name_list) do
     state = Agent.get(__MODULE__, &(&1))
-    do_get_module(state, module_name_list)
+    do_get_module(state, module)
   end
 
-  defp do_get_module(state, module) when is_atom(module) do
-    module_name_list =
-      module
-      |> Atom.to_string
-      |> String.split(".")
-      |> tl
-      |> Enum.map(fn x -> String.to_atom(x) end)
 
-    do_get_module(state, module_name_list)
+  def get_module(module_name_list) when is_list(module_name_list) do
+    state = Agent.get(__MODULE__, &(&1))
+    do_get_module(state, ElixirScript.Module.quoted_to_name({:__aliases__, [], module_name_list}))
   end
 
-  defp do_get_module(state, module_name_list) do
+  defp do_get_module(state, name) do
     Enum.find(Set.to_list(state.modules), fn x ->
-      x.name == module_name_list
+      x.name == name
     end)
   end
 
-  def add_alias(module_name_list, name) do
-    module = get_module(module_name_list)
+  def add_alias(module_name, module_alias) do
+    module = get_module(module_name)
 
     if module do
-      {main, _} = Code.eval_quoted(name)
-      {:__aliases__, _, aliases } = name
-      {the_alias, _} = Code.eval_quoted({:__aliases__, [alias: false], List.last(aliases) |> List.wrap })
-
       delete_module(module)
-
-      module = %{module | aliases: Set.put(module.aliases, {the_alias, main}) }
+      module = %{module | aliases: Set.put(module.aliases, {module_alias, module_name}) }
       add_module(module)
+    end
+  end
+
+  def add_module_reference(module_name, module_ref) do
+    module = get_module(module_name)
+
+    if module do
+      delete_module(module)
+      module = %{ module | module_refs: module.module_refs ++ [module_ref] }
+      add_module(module)
+    end
+  end
+
+  def get_module_references(module_name) do
+    module = get_module(module_name)
+
+    if module do
+      module.module_refs
+      |> Enum.uniq
+    else
+      []
     end
   end
 
@@ -161,6 +173,12 @@ defmodule ElixirScript.State do
   defp get_imported_functions(state, module_name, [except: list]) do
     module = do_get_module(state, module_name)
     ElixirScript.Module.functions(module) ++ ElixirScript.Module.macros(module) -- Keyword.keys(list)
+  end
+
+  def list_modules() do
+    Agent.get(__MODULE__, fn(x) ->
+      Enum.map(x.modules, fn(y) -> y.name end) ++ Enum.map(x.protocols, fn({key, _}) -> key end)
+    end)
   end
 
   def stop do

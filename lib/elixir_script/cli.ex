@@ -39,7 +39,7 @@ defmodule ElixirScript.CLI do
       -r  --root [path]     root import path for all exported modules
       -st  --stdlib         outputs the standard lib js file
       -stp --stdlib_path    es6 import path to the elixirscript standard lib
-      only used with the [output] option. When used, elixir.js is not exported
+      only used with the [output] option. When used, Elixir.js is not exported
       -h  --help            this message
     """
   end
@@ -60,7 +60,7 @@ defmodule ElixirScript.CLI do
     compile_opts = [
       root: options[:root],
       include_path: options[:output] != nil,
-      stdlib_path: Dict.get(options, :stdlib_path, "elixir")
+      stdlib_path: Dict.get(options, :stdlib_path, "Elixir")
     ]
 
     compile_output = case options[:elixir] do

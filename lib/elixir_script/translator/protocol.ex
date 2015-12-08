@@ -53,7 +53,7 @@ defmodule ElixirScript.Translator.Protocol do
     |> JS.object_expression
 
     declarator = JS.variable_declarator(
-      JS.identifier(List.last(name)),
+      JS.identifier(ElixirScript.Module.name_to_js_name(name)),
       JS.call_expression(
         JS.member_expression(
           JS.identifier(:Elixir),
@@ -100,7 +100,7 @@ defmodule ElixirScript.Translator.Protocol do
             JS.identifier(:defimpl)
           )
         ),
-        [JS.identifier(List.last(name)), type, object]
+        [JS.identifier(ElixirScript.Module.name_to_js_name(name)), type, object]
       )
 
       {imports, body, [impl]}
@@ -140,7 +140,7 @@ defmodule ElixirScript.Translator.Protocol do
   end
 
   defp create_module(name, spec, impls, imports, body, env) do
-    default = JS.export_default_declaration(JS.identifier(List.last(name)))
+    default = JS.export_default_declaration(JS.identifier(ElixirScript.Module.name_to_js_name(name)))
 
     %JSModule{
       name: name,
