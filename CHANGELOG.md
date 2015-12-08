@@ -1,3 +1,5 @@
+# v0.15.0
+
 # v0.14.1
 * Enhancements
   * Removed .DS_Store and LICENSE from output
