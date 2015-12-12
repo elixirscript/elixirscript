@@ -3,7 +3,6 @@ defmodule ElixirScript.Translator.Capture do
 
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.PatternMatching.Match
-  alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.Function
 
   def make_capture(function_name, arity, env) do
@@ -12,38 +11,35 @@ defmodule ElixirScript.Translator.Capture do
     { patterns, params } = Match.build_match(params, env)
 
     body = JS.block_statement([
-          JS.return_statement(
-            JS.call_expression(
-              JS.identifier(function_name),
-              params
-            )
-          )
-        ])
-
-
-    Function.make_defmatch([
-      Function.do_make_function_clause(patterns, params, body)
-    ])
-  end  
-
-  def make_capture(module_name, function_name, arity, env) do
-    params = Enum.map(1..arity, fn(x) -> {String.to_atom("__#{x}"), [], ElixirScript.Translator.Capture} end)
-
-    if Function.module_in_standard_libs?(module_name) do
-      module_name = [:Elixir, module_name]
-    end
-
-    { patterns, params } = Match.build_match(params, env)
-
-    body = JS.block_statement([
       JS.return_statement(
         JS.call_expression(
-          Utils.make_member_expression(module_name, function_name, env),
+          JS.identifier(function_name),
           params
         )
       )
     ])
 
+    Function.make_defmatch([
+      Function.do_make_function_clause(patterns, params, body)
+    ])
+  end
+
+  def make_capture(module_name, function_name, arity, env) do
+    arity_params = Enum.map(1..arity, fn(x) -> {String.to_atom("__#{x}"), [], ElixirScript.Translator.Capture} end)
+
+    {_, _, name} = module_name
+
+    if name == [:Kernel] or name == [Elixir, :Kernel] do
+      name = [:ElixirScript, :Kernel]
+    end
+
+    { patterns, params } = Match.build_match(arity_params, env)
+
+    body = JS.block_statement([
+      JS.return_statement(
+        Function.make_function_call({:__aliases__, [], name }, function_name, arity_params, env)
+      )
+    ])
 
     Function.make_defmatch([
       Function.do_make_function_clause(patterns, params, body)

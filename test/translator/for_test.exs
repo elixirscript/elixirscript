@@ -95,7 +95,7 @@ defmodule ElixirScript.Translator.For.Test do
      Elixir.Kernel.SpecialForms._for(Elixir.Kernel.SpecialForms.list(Elixir.Kernel.SpecialForms.list(Elixir.Core.Patterns.variable(),Elixir.Kernel.SpecialForms.list(1,2,3,4,5,6))),function(n)    {
              return     n;
            },function(n)    {
-             return     n % 2 == 0;
+             return     Elixir$ElixirScript$Kernel.rem(n, 2) == 0;
            },Elixir.Kernel.SpecialForms.list())
     """
 

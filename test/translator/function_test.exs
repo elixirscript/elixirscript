@@ -89,7 +89,7 @@ defmodule ElixirScript.Translator.Function.Test do
              return     Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(x)    {
              return     2;
            },function(x)    {
-             return     Elixir.Kernel.in(x,Elixir.Kernel.SpecialForms.list(false,null));
+             return     Elixir.Enum.member__qmark__(Elixir.Kernel.SpecialForms.list(false,null), x);
            }),Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.wildcard()],function()    {
              return     1;
            })).call(this,1 == 1);
@@ -113,22 +113,22 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-     const test1 = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable()],function(alpha,beta)    {
-             return     Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(x)    {
-             return     2;
-           },function(x)    {
-             return     Elixir.Kernel.in(x,Elixir.Kernel.SpecialForms.list(false,null));
-           }),Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.wildcard()],function()    {
-             return     Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(x)    {
-             let [a000] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),1);
-             return     a000;
-           },function(x)    {
-             return     Elixir.Kernel.in(x,Elixir.Kernel.SpecialForms.list(false,null));
-           }),Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.wildcard()],function()    {
-             return     4;
-           })).call(this,2 == 2);
-           })).call(this,1 == 1);
-           }));
+    const test1 = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable()],function(alpha,beta)    {
+        return     Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(x)    {
+        return     2;
+      },function(x)    {
+        return     Elixir.Enum.member__qmark__(Elixir.Kernel.SpecialForms.list(false,null),x);
+      }),Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.wildcard()],function()    {
+        return     Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(x)    {
+        let [a000] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),1);
+        return     a000;
+      },function(x)    {
+        return     Elixir.Enum.member__qmark__(Elixir.Kernel.SpecialForms.list(false,null),x);
+      }),Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.wildcard()],function()    {
+        return     4;
+      })).call(this,2 == 2);
+      })).call(this,1 == 1);
+      }));
     """
 
     assert_translation(ex_ast, js_code)
@@ -239,7 +239,6 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-         const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elixir.Example');
          const example = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
              return     null;
            }),Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(oneArg)    {
@@ -276,7 +275,6 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-         const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elixir.Example');
          const example = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
              return     null;
            }),Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(oneArg)    {
@@ -303,7 +301,6 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-         const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elixir.Example');
          const example = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(oneArg)    {
              return     null;
            }));
@@ -339,7 +336,7 @@ defmodule ElixirScript.Translator.Function.Test do
       is_atom(:atom)
     end
 
-    js_code = "Elixir.Kernel.is_atom(Elixir.Kernel.SpecialForms.atom('atom'))"
+    js_code = "Elixir$ElixirScript$Kernel.is_atom(Elixir.Kernel.SpecialForms.atom('atom'))"
 
     assert_translation(ex_ast, js_code)
   end
@@ -355,7 +352,7 @@ defmodule ElixirScript.Translator.Function.Test do
      const something = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(one)    {
              return     null;
            },function(one)    {
-             return     Elixir.Kernel.is_number(one);
+             return     Elixir$ElixirScript$Kernel.is_number(one);
            }));
     """
 
@@ -372,7 +369,7 @@ defmodule ElixirScript.Translator.Function.Test do
      const something = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(one)    {
              return     null;
            },function(one)    {
-             return     Elixir.Kernel.is_number(one) || Elixir.Kernel.is_atom(one);
+             return Elixir$ElixirScript$Kernel.or(Elixir$ElixirScript$Kernel.is_number(one),Elixir$ElixirScript$Kernel.is_atom(one));
            }));
     """
 
@@ -388,7 +385,7 @@ defmodule ElixirScript.Translator.Function.Test do
      const something = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(one)    {
              return     null;
            },function(one)    {
-             return     Elixir.Kernel.is_number(one) || Elixir.Kernel.is_atom(one);
+             return     Elixir$ElixirScript$Kernel.or(Elixir$ElixirScript$Kernel.is_number(one),Elixir$ElixirScript$Kernel.is_atom(one));
            }));
     """
 
@@ -404,7 +401,7 @@ defmodule ElixirScript.Translator.Function.Test do
      const something = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable()],function(one,two)    {
              return     null;
            },function(one,two)    {
-             return     Elixir.Kernel.in(one,Elixir.Kernel.SpecialForms.list(1,2,3));
+             return     Elixir$ElixirScript$Kernel.in(one,Elixir.Kernel.SpecialForms.list(1,2,3));
            }));
     """
 
@@ -421,15 +418,15 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-         const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elixir.Example');
+         import * as Elixir$ElixirScript$Kernel from 'Elixir.ElixirScript.Kernel';
          const something = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(one)    {
              return     null;
            },function(one)    {
-             return     Elixir.Kernel.in(one,Elixir.Kernel.SpecialForms.list(1,2,3));
+             return     Elixir$ElixirScript$Kernel.in(one,Elixir.Kernel.SpecialForms.list(1,2,3));
            }),Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(one)    {
              return     null;
            },function(one)    {
-             return     Elixir.Kernel.is_number(one) || Elixir.Kernel.is_atom(one);
+             return     Elixir$ElixirScript$Kernel.or(Elixir$ElixirScript$Kernel.is_number(one),Elixir$ElixirScript$Kernel.is_atom(one));
            }));
          export {
              something
@@ -581,7 +578,7 @@ defmodule ElixirScript.Translator.Function.Test do
     })], function(value) {
         return null;
     }, function(value) {
-        return Elixir.Kernel.is_number(value);
+        return Elixir$ElixirScript$Kernel.is_number(value);
     }));
     """
 
@@ -652,7 +649,7 @@ defmodule ElixirScript.Translator.Function.Test do
 
 
     js_code = """
-         const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elixir.Example');
+         import * as Elixir$ElixirScript$Kernel from 'Elixir.ElixirScript.Kernel';
          const something = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([1],function()    {
              return     null;
            }),Elixir.Core.Patterns.make_case([2],function()    {
@@ -660,7 +657,7 @@ defmodule ElixirScript.Translator.Function.Test do
            }),Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(one)    {
              return     null;
            },function(one)    {
-             return     Elixir.Kernel.is_binary(one);
+             return     Elixir$ElixirScript$Kernel.is_binary(one);
            }),Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(one)    {
              return     null;
            }));

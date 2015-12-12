@@ -255,22 +255,8 @@ defmodule ElixirScript.Translator.Kernel do
   end
 
   defp do_translate({:raise, _, [alias_info, attributes]}, env) do
-    {_, _, name} = alias_info
-
     JS.throw_statement(
-      JS.call_expression(
-        JS.member_expression(
-          JS.identifier(List.last(name)),
-          JS.identifier(:defexception)
-        ),
-        Enum.map(attributes, fn({k, v})->
-          JS.assignment_expression(
-            :=,
-            JS.identifier(k),
-            Translator.translate(v, env)
-          )
-        end)
-      )
+      Struct.new_struct(alias_info, attributes, env)
     )
   end
 

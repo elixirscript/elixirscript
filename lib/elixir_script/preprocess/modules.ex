@@ -265,7 +265,7 @@ defmodule ElixirScript.Preprocess.Modules do
 
 
   defp get_imports_from_module({:__block__, _, list}) do
-    Enum.reduce(list, %{ imports: HashSet.new, aliases: HashSet.new }, fn
+    Enum.reduce(list, %{ imports: HashSet.new |> Set.put({ ElixirScript.Kernel, [] }), aliases: HashSet.new |> Set.put({ Kernel, ElixirScript.Kernel })}, fn
       ({:import, _, [name]}, state) ->
         {main, _} = Code.eval_quoted(name)
         {:__aliases__, _, aliases } = name

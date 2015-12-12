@@ -3,11 +3,11 @@ defmodule ElixirScript.Translator do
   Translates the given Elixir AST into JavaScript AST
   """
   alias ElixirScript.Translator.Primitive
+  alias ElixirScript.Translator.Expression
   alias ElixirScript.Translator.Assignment
   alias ElixirScript.Translator.Map
   alias ElixirScript.Translator.Function
   alias ElixirScript.Translator.Capture
-  alias ElixirScript.Translator.Import
   alias ElixirScript.Translator.Cond
   alias ElixirScript.Translator.Case
   alias ElixirScript.Translator.For
@@ -58,13 +58,40 @@ defmodule ElixirScript.Translator do
     Primitive.make_tuple({one, two}, env)
   end
 
+  defp do_translate({operator, _, [value]}, env) when operator in [:-, :!, :+] do
+    Expression.make_unary_expression(operator, value, env)
+  end
+
+  defp do_translate({operator, _, [left, right]}, env) when operator in [:+, :-, :/, :*, :==, :!=, :&&, :||, :>, :<, :>=, :<=, :===, :!==] do
+    Expression.make_binary_expression(operator, left, right, env)
+  end
+
+  defp do_translate({:<>, context, [left, right]}, env) do
+    translate({:+, context, [left, right]}, env)
+  end
+
+  defp do_translate({:++, _, [left, right]}, env) do
+    JS.call_expression(
+      JS.member_expression(
+        translate(left, env),
+        JS.identifier(:concat)
+      ),
+      [translate(right, env)]
+    )
+  end
+
+  defp do_translate({:.., _, [first, last]}, env) do
+    quoted_range = quote do: Range.(unquote(first), unquote(last))
+    translate(quoted_range, env)
+  end
+
   defp do_translate({:&, [], [number]}, _) when is_number(number) do
     Primitive.make_identifier(String.to_atom("__#{number}"))
   end
 
-  defp do_translate({:&, _, [{:/, _, [{{:., _, [{:__aliases__, _, module_name}, function_name]}, _, []}, arity]}]}, env) do
+  defp do_translate({:&, _, [{:/, _, [{{:., _, [module_name, function_name]}, _, []}, arity]}]}, env) do
     function_name = Utils.filter_name(function_name)
-    Capture.make_capture(List.last(module_name), function_name, arity, env)
+    Capture.make_capture(module_name, function_name, arity, env)
   end
 
   defp do_translate({:&, _, [{:/, _, [{function_name, _, _}, arity]}]}, env) do
@@ -137,6 +164,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:., _, [module_name, function_name]} = ast, env) do
+
     expanded_ast = Macro.expand(ast, env)
 
     if expanded_ast == ast do
@@ -147,6 +175,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({{:., _, [module_name, function_name]}, _, [] } = ast, env) do
+
     expanded_ast = Macro.expand(ast, env)
 
     if expanded_ast == ast do
@@ -157,6 +186,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({{:., _, [{:__aliases__, _, module_name}]}, _, params} = ast, env) do
+
     expanded_ast = Macro.expand(ast, env)
     if expanded_ast == ast do
       Function.make_function_call(hd(module_name), params, env)
@@ -166,6 +196,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({{:., _, [module_name, function_name]}, _, params } = ast, env) do
+
     case module_name do
       Kernel ->
         KernelLib.translate_kernel_function(function_name, params, env)
@@ -187,6 +218,10 @@ defmodule ElixirScript.Translator do
 
   defp do_translate({:__aliases__, _, aliases}, _) do
     Primitive.make_identifier({:__aliases__, [], aliases})
+  end
+
+  defp do_translate({:__MODULE__, _, _ }, env) do
+    translate(Process.get(:current_module), env)
   end
 
   defp do_translate({:__block__, _, expressions }, env) do
@@ -291,6 +326,14 @@ defmodule ElixirScript.Translator do
     %ElixirScript.Translator.Group{}
   end
 
+  defp do_translate({:defmacro, _, _}, _) do
+    %ElixirScript.Translator.Group{}
+  end
+
+  defp do_translate({:defmacrop, _, _}, _) do
+    %ElixirScript.Translator.Group{}
+  end
+
   defp do_translate({:defimpl, _, [ {:__aliases__, _, protocol}, [for: type],  [do: {:__block__, context, spec}] ]}, env) when protocol in @standard_lib_protocols do
     Protocol.make_standard_lib_impl({:__aliases__, [], [:Elixir] ++ protocol}, type, {:__block__, context, spec}, env)
   end
@@ -311,25 +354,47 @@ defmodule ElixirScript.Translator do
     translate(quoted, env)
   end
 
-  defp do_translate({name, _, params} = ast, env) when is_list(params) do
-    if KernelLib.is_defined_in_kernel(name, length(params)) do
-      KernelLib.translate_kernel_function(name, params, env)
-    else
+  defp do_translate({:raise, _, [alias_info, attributes]}, env) do
+    JS.throw_statement(
+      Struct.new_struct(alias_info, {:%{}, [], attributes }, env)
+    )
+  end
+
+  defp do_translate({:raise, _, [message]}, env) do
+    JS.throw_statement(
+      JS.object_expression(
+        [
+          Map.make_property(translate(:__struct__, env), translate(:RuntimeError, env)),
+          Map.make_property(translate(:__exception__, env), translate(true, env)),
+          Map.make_property(translate(:message, env), JS.literal(message))
+        ]
+      )
+    )
+  end
+
+  defp do_translate({name, context, params} = ast, env) when is_list(params) do
+
       expanded_ast = Macro.expand(ast, env)
       if expanded_ast == ast do
-        module = ElixirScript.State.get_module(Process.get(:current_module))
-        imported_module = ElixirScript.Module.imported?(module, name)
+        imported_module = ElixirScript.State.get_module(context[:import])
+
+        unless imported_module do
+          module = ElixirScript.State.get_module(Process.get(:current_module))
+          imported_module_name = ElixirScript.Module.imported?(module, name)
+          if imported_module_name do
+            imported_module = ElixirScript.State.get_module(imported_module_name)
+          end
+        end
 
         if imported_module do
-          imported_module = ElixirScript.State.get_module(imported_module)
-          Function.make_function_call(ElixirScript.Module.name_to_quoted(imported_module.name) , name, params, env)
+          ElixirScript.State.add_module_reference(Process.get(:current_module), imported_module.name)
+          Function.make_function_call(ElixirScript.Module.name_to_quoted(imported_module.name), name, params, env)
         else
           Function.make_function_call(name, params, env)
         end
       else
         translate(expanded_ast, env)
       end
-    end
   end
 
   defp do_translate({ name, _, _ }, _) do

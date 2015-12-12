@@ -4,17 +4,15 @@ defmodule ElixirScript.Translator.Module do
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.JSModule
-  alias ElixirScript.Preprocess.Aliases
   alias ElixirScript.Preprocess.Using
   alias ElixirScript.Translator.Function
-  alias ElixirScript.Translator.Primitive
 
   def make_module(ElixirScript.Temp, body, env) do
     [%JSModule{ name: ElixirScript.Temp, body: translate_body(body, env) |> Utils.inflate_groups }]
   end
 
-  def make_module(module, nil, env) do
-    [%JSModule{ name: module, body: List.wrap(create__module__(module, env)) }]
+  def make_module(module, nil, _) do
+    [%JSModule{ name: module, body: [] }]
   end
 
   def make_module(module, body, env) do
@@ -69,7 +67,7 @@ defmodule ElixirScript.Translator.Module do
     result = [
       %JSModule{
         name: ElixirScript.Module.quoted_to_name({:__aliases__, [], module }),
-        body: imports ++ List.wrap(create__module__(module, env)) ++ structs ++ private_functions ++ exported_functions ++ body ++ [default]
+        body: imports ++ structs ++ private_functions ++ exported_functions ++ body ++ [default]
       }
     ] ++ List.flatten(modules)
 
@@ -204,15 +202,6 @@ defmodule ElixirScript.Translator.Module do
     declarator = JS.variable_declarator(
       JS.identifier(name),
       ElixirScript.Translator.translate(value, env)
-    )
-
-    JS.variable_declaration([declarator], :const)
-  end
-
-  def create__module__(module, _) do
-    declarator = JS.variable_declarator(
-      JS.identifier(:__MODULE__),
-      Primitive.make_atom(module)
     )
 
     JS.variable_declaration([declarator], :const)

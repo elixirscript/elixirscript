@@ -4,7 +4,6 @@ defmodule ElixirScript.Translator.Protocol do
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Module
-  alias ElixirScript.Preprocess.Aliases
   alias ElixirScript.Translator.JSModule
   alias ElixirScript.Translator.Map
   alias ElixirScript.Translator.Function
@@ -34,17 +33,16 @@ defmodule ElixirScript.Translator.Protocol do
   end
 
   defp define_spec(name, spec, env) do
-    { body, aliases } = Aliases.process(name, spec, env)
-
-    { body, functions } = extract_function_from_spec(body)
+    { body, functions } = extract_function_from_spec(spec)
 
     { exported_functions, _ } = process_functions(functions, env)
 
     body = Module.translate_body(body, env)
+    modules_refs = ElixirScript.State.get_module_references(name)
 
     {imports, body} = Module.extract_imports_from_body(body)
 
-    imports = Module.process_imports(imports, aliases)
+    imports = Module.process_imports(imports, modules_refs)
     imports = imports.imports
 
     object = Enum.map(exported_functions, fn({key, value}) ->
@@ -76,15 +74,15 @@ defmodule ElixirScript.Translator.Protocol do
   defp define_impls(name, impls, env) do
     Enum.map(impls, fn({type, impl}) ->
       type = map_to_js(type)
-      { body, aliases } = Aliases.process(name, impl, env)
-      { body, functions } = Module.extract_functions_from_module(body)
+      { body, functions } = Module.extract_functions_from_module(impl)
       { exported_functions, _ } = process_functions(functions, env)
 
       body = Module.translate_body(body, env)
+      modules_refs = ElixirScript.State.get_module_references(name)
 
       {imports, body} = Module.extract_imports_from_body(body)
 
-      imports = Module.process_imports(imports, aliases)
+      imports = Module.process_imports(imports, modules_refs)
       imports = imports.imports
 
       object = Enum.map(exported_functions, fn({key, value}) ->
@@ -139,12 +137,12 @@ defmodule ElixirScript.Translator.Protocol do
     )
   end
 
-  defp create_module(name, spec, impls, imports, body, env) do
+  defp create_module(name, spec, impls, imports, body, _) do
     default = JS.export_default_declaration(JS.identifier(ElixirScript.Module.name_to_js_name(name)))
 
     %JSModule{
       name: name,
-      body: imports ++ List.wrap(Module.create__module__(name, env)) ++ body ++ spec ++ impls ++ [default]
+      body: imports ++ body ++ spec ++ impls ++ [default]
     }
   end
 

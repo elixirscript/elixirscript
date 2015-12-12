@@ -24,7 +24,7 @@ defmodule ElixirScript.TestHelper do
   require Logger
 
   def make_custom_env do
-    require Logger
+    use ElixirScript
     require ElixirScript.Math
     require ElixirScript.Using
     __ENV__

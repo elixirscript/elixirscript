@@ -119,7 +119,7 @@ defmodule ElixirScript.State do
 
     if module do
       delete_module(module)
-      module = %{ module | module_refs: module.module_refs ++ [module_ref] }
+      module = %{ module | module_refs: Enum.uniq(module.module_refs ++ [module_ref]) }
       add_module(module)
     end
   end

@@ -10,8 +10,6 @@ defmodule ElixirScript.Translator.Protocol.Test do
     end
 
     js_code = """
-    const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elixir.ElixirScript.Collectable');
-
     let Elixir$ElixirScript$Collectable = Elixir.Kernel.defprotocol({
       into: Elixir.Core.Patterns.defmatch(
         Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()], function(collectable){
@@ -68,7 +66,6 @@ defmodule ElixirScript.Translator.Protocol.Test do
     end
 
     js_code = """
-         const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elixir.Blank');
          let Elixir$Blank = Elixir.Kernel.defprotocol({
              blank__qmark__: Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(data)    {
              return     null;

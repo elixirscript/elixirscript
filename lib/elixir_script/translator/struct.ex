@@ -100,7 +100,7 @@ defmodule ElixirScript.Translator.Struct do
   end
 
   defp do_make_defstruct(name, defaults, env) do
-    struct_name = Map.make_property(Translator.translate(:__struct__, env), JS.identifier(:__MODULE__))
+    struct_name = Map.make_property(Translator.translate(:__struct__, env), Translator.translate({:__MODULE__, [], []}, env))
 
     defaults = %{ defaults | properties: [struct_name]  ++ defaults.properties }
 

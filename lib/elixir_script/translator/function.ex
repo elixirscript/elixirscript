@@ -29,6 +29,10 @@ defmodule ElixirScript.Translator.Function do
     {:__aliases__, context, [:Elixir] ++ [:String, :Chars] }
   end
 
+  def update_alias({:__aliases__, context, [:Kernel]}) do
+    {:__aliases__, context, [:ElixirScript, :Kernel] }
+  end
+
   def update_alias({:__aliases__, context, [name | rest]}) when name in @standard_libs do
     {:__aliases__, context, [:Elixir, name] ++ rest }
   end
@@ -176,10 +180,10 @@ defmodule ElixirScript.Translator.Function do
     the_name = case update_alias(module_name) do
       {:__aliases__, _, _} = name  ->
         module_name = ElixirScript.Module.quoted_to_name(name)
-        get_name_js_ast(module_name)
+        get_js_name(module_name)
 
       {name, _, _} when is_atom(name) ->
-        get_name_js_ast(name)
+        get_js_name(name)
 
       {{:., _, [_module_name, _function_name]}, _, _params } = ast ->
         ast
@@ -215,9 +219,9 @@ defmodule ElixirScript.Translator.Function do
     the_name = case update_alias(module_name) do
       {:__aliases__, _, name} ->
         module_name = ElixirScript.Module.quoted_to_name(name)
-        get_name_js_ast(module_name)
+        get_js_name(module_name)
       {name, _, _} when is_atom(name) ->
-        get_name_js_ast(name)
+        get_js_name(name)
       {{:., _, [_, _]}, _, _ } = ast ->
         ast
       {{:., _, [{:__aliases__, _, _}]}, _, _} = ast ->
@@ -309,16 +313,16 @@ defmodule ElixirScript.Translator.Function do
     end
   end
 
-  defp get_name_js_ast([Elixir | _] = list) do
+  defp get_js_name([Elixir | _] = list) do
     list
   end
 
-  defp get_name_js_ast(module_name) when is_list(module_name) do
+  defp get_js_name(module_name) when is_list(module_name) do
     ElixirScript.Module.quoted_to_name({:__aliases__, [], module_name})
-    |> get_name_js_ast
+    |> get_js_name
   end
 
-  defp get_name_js_ast(module_name) do
+  defp get_js_name(module_name) do
     cond do
       ElixirScript.State.get_module(module_name) ->
         ElixirScript.State.add_module_reference(Process.get(:current_module), module_name)
