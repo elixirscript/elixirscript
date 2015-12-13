@@ -32,8 +32,7 @@ defmodule ElixirScript do
     end
   end
 
-  @external_resource libs_path = Path.join([__DIR__, "elixir_script", "universal", "*.ex"])
-
+  @external_resource libs_path = Path.join([__DIR__, "elixir_script", "universal", "**", "*.ex"])
   @libs (for path <- Path.wildcard(libs_path) do
     path
     |> File.read!
@@ -133,40 +132,42 @@ defmodule ElixirScript do
     parent = self
 
     result =
-      state.modules
+      Map.values(state.modules)
       |> Enum.map(fn ast ->
         spawn_link fn ->
           Process.put(:current_module, ast.name)
 
-          result =
-            ElixirScript.Translator.Module.make_module(ast.name, ast.body, state.env)
-            |> Enum.map(&(convert_to_code(&1, state.root, state.env, import_standard_libs?, stdlib_path)))
+          result = case ast.type do
+            :module ->
+              ElixirScript.Translator.Module.make_module(ast.name, ast.body, state.env)
+              |> Enum.map(&(convert_to_code(&1, state.root, state.env, import_standard_libs?, stdlib_path)))
+            :protocol ->
+              ElixirScript.Translator.Protocol.consolidate([ast], state.env)
+              |> Enum.map(&(convert_to_code(&1, state.root, state.env, import_standard_libs?, stdlib_path)))
+          end
 
-          send parent, {self, result }
+          send parent, { self, result }
         end
       end)
       |> Enum.map(fn pid ->
         receive do
-          {^pid, x} -> x
+          { ^pid, x } -> x
         end
       end)
       |> List.flatten
 
-    protocol_result =
-      state.protocols
-      |> Dict.to_list
-      |> ElixirScript.Translator.Protocol.consolidate(state.env)
-      |> Enum.map(&(convert_to_code(&1, state.root, state.env, import_standard_libs?, stdlib_path)))
-      |> List.flatten
-
     ElixirScript.State.stop
 
-    result ++ protocol_result
+    result
     |> Enum.sort(fn({name1, _, _}, {name2, _, _}) ->
       Atom.to_string(name1) < Atom.to_string(name2)
     end)
     |> Enum.reject(fn({name, _, _}) ->
-      import_standard_libs? == false && name in [ElixirScript.Kernel, ElixirScript.Tuple]
+      import_standard_libs? == false && name in [
+        ElixirScript.Kernel, ElixirScript.Tuple, ElixirScript.Collectable,
+        ElixirScript.Atom, ElixirScript.String.Chars, ElixirScript.Enumerable,
+        ElixirScript.Integer
+      ]
     end)
     |> Enum.map(fn({_, path, code}) ->
       if(include_path) do

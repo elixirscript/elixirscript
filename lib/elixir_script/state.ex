@@ -3,7 +3,7 @@ defmodule ElixirScript.State do
 
   def start_link(root, env \\ __ENV__) do
     Agent.start_link(fn ->
-      %ElixirScript.Env{root: root, env: env}
+      %ElixirScript.Env{ root: root, env: env }
     end, name: __MODULE__)
   end
 
@@ -15,51 +15,45 @@ defmodule ElixirScript.State do
 
   def add_module(module) do
     Agent.update(__MODULE__, fn state ->
-      %{state | modules: Set.put(state.modules, module)}
+      %{ state | modules: Map.put(state.modules, module.name, module) }
     end)
   end
 
   def delete_module(module) do
     Agent.update(__MODULE__, fn state ->
-      %{state | modules: Set.delete(state.modules, module)}
+      %{ state | modules: Map.delete(state.modules, module.name ) }
     end)
   end
 
   def delete_module_by_name(module_name) do
     Agent.update(__MODULE__, fn state ->
-      set = state.modules
-      |> Set.to_list()
-      |> Enum.filter(fn(x) -> x.name != module_name end)
-      |> Enum.into(HashSet.new)
-
-      %{state | modules: set }
+      %{ state | modules: Map.delete(state.modules, module_name ) }
     end)
   end
 
   def module_listed?(module_name) do
     Agent.get(__MODULE__, fn state ->
-      Enum.any?(state.modules, fn(x) -> x.name == module_name end) ||
-      Enum.any?(state.protocols, fn({key, _}) -> key == module_name end)
+      Map.has_key?(state.modules, module_name)
     end)
   end
 
   def protocol_listed?(module_name) do
     Agent.get(__MODULE__, fn state ->
-      Enum.any?(state.protocols, fn({key, _}) -> key == module_name end)
+      Map.has_key?(state.modules, module_name) && Map.get(state.modules, module_name).type == :protocol
     end)
   end
 
   def add_protocol(name, spec) do
     Agent.update(__MODULE__, fn state ->
-      proto = Dict.get(state.protocols, name)
+      proto = do_get_module(state, name)
 
       if proto == nil do
-        proto = %{name: name, spec: spec, impls: HashDict.new}
+        proto = %ElixirScript.Module{ name: name, spec: spec, impls: HashDict.new, type: :protocol }
       else
-        proto = %{proto | spec: spec}
+        proto = %{proto | spec: spec, type: :protocol }
       end
 
-      %{state | protocols: Dict.put(state.protocols, name, proto)}
+      %{ state | modules: Map.put(state.modules, name, proto) }
     end)
   end
 
@@ -71,15 +65,15 @@ defmodule ElixirScript.State do
 
   def add_protocol_impl(protocol, type, impl) do
     Agent.update(__MODULE__, fn state ->
-      proto = Dict.get(state.protocols, protocol)
+      proto = do_get_module(state, protocol)
 
       if proto == nil do
-        proto = %{name: protocol, spec: nil, impls: HashDict.new}
+        proto = %ElixirScript.Module{ name: protocol, spec: nil, impls: HashDict.new, type: :protocol }
       end
 
-      proto = %{proto | impls: Dict.put(proto.impls, type, impl)}
+      proto = %{ proto | impls: Dict.put(proto.impls, type, impl), type: :protocol }
 
-      %{state | protocols: Dict.put(state.protocols, protocol, proto)}
+      %{ state | modules: Map.put(state.modules, protocol, proto) }
     end)
   end
 
@@ -92,16 +86,13 @@ defmodule ElixirScript.State do
     do_get_module(state, module)
   end
 
-
   def get_module(module_name_list) when is_list(module_name_list) do
     state = Agent.get(__MODULE__, &(&1))
     do_get_module(state, ElixirScript.Module.quoted_to_name({:__aliases__, [], module_name_list}))
   end
 
   defp do_get_module(state, name) do
-    Enum.find(Set.to_list(state.modules), fn x ->
-      x.name == name
-    end)
+    Map.get(state.modules, name)
   end
 
   def add_alias(module_name, module_alias) do
@@ -109,7 +100,7 @@ defmodule ElixirScript.State do
 
     if module do
       delete_module(module)
-      module = %{module | aliases: Set.put(module.aliases, {module_alias, module_name}) }
+      module = %{ module | aliases: MapSet.put(module.aliases, {module_alias, module_name}) }
       add_module(module)
     end
   end
@@ -138,16 +129,16 @@ defmodule ElixirScript.State do
   def process_imports do
     Agent.update(__MODULE__, fn state ->
       modules =
-        state.modules
-        |> Enum.map(fn x ->
-          imports =
-            Enum.map(x.imports, fn {y, options} ->
-              {y, get_imported_functions(state, y, options)}
-            end)
-          %{x | imports: imports}
+        Map.values(state.modules)
+        |> Enum.reduce(Map.new, fn x, map ->
+          imports = Enum.map(x.imports, fn {y, options} ->
+            { y, get_imported_functions(state, y, options) }
+          end)
+
+          Map.put(map, x.name, %{ x | imports: imports })
         end)
 
-      %{state | modules: Enum.into(modules, HashSet.new)}
+      %{ state | modules: modules }
     end)
   end
 
@@ -177,7 +168,7 @@ defmodule ElixirScript.State do
 
   def list_modules() do
     Agent.get(__MODULE__, fn(x) ->
-      Enum.map(x.modules, fn(y) -> y.name end) ++ Enum.map(x.protocols, fn({key, _}) -> key end)
+      Map.values(x.modules)
     end)
   end
 

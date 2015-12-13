@@ -57,28 +57,6 @@ defmodule ElixirScript.Translator.JS do
     build_import_declaration([import_specifier], from)
   end
 
-  defp do_translate({:to_js, _, [value]}, env) do
-    quoted = quote do
-      if is_list(unquote(value)) || is_map(unquote(value)) || is_tuple(unquote(value)) do
-        value.toJS()
-      else
-        value
-      end
-    end
-
-    Translator.translate(quoted, env)
-  end
-
-
-  defp do_translate({:to_json, _, [value]}, env) do
-    quoted = quote do
-      JSON.stringify(JS.to_js(unquote(value)))
-    end
-
-    Translator.translate(quoted, env)
-  end
-
-
   defp build_import_declaration(import_specifiers, from) do
     Builder.import_declaration(
       import_specifiers,

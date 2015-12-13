@@ -1,6 +1,6 @@
 defmodule ElixirScript.Kernel do
   import Kernel, only: [defmodule: 2, def: 1, def: 2, defp: 2,
-  defmacro: 1, defmacro: 2, defmacrop: 2, ||: 2, !: 1, ++: 2, in: 2]
+  defmacro: 1, defmacro: 2, defmacrop: 2, ||: 2, !: 1, ++: 2, in: 2, &&: 2]
 
   defmacro if(condition, clauses) do
     build_if(condition, clauses)
@@ -21,16 +21,22 @@ defmodule ElixirScript.Kernel do
     end
   end
 
+  defmacro unless(condition, clauses) do
+    build_unless(condition, clauses)
+  end
+
+  defp build_unless(condition, do: do_clause) do
+    build_unless(condition, do: do_clause, else: nil)
+  end
+
+  defp build_unless(condition, do: do_clause, else: else_clause) do
+    quote do
+      if(unquote(condition), do: unquote(else_clause), else: unquote(do_clause))
+    end
+  end
+
   def abs(number) do
     Math.abs(number)
-  end
-
-  def first and second do
-    Elixir.Core.and(first, second)
-  end
-
-  def first or second do
-    Elixir.Core.or(first, second)
   end
 
   def apply(fun, args) do
@@ -134,10 +140,6 @@ defmodule ElixirScript.Kernel do
     Elixir.Core.size(tuple)
   end
 
-  def not(arg) do
-    !arg
-  end
-
   def elem(tuple, index) do
     Elixir.Core.apply(tuple, "get", [index])
   end
@@ -169,5 +171,11 @@ defmodule ElixirScript.Kernel do
 
   defmacro left |> {fun, context, params} do
     {fun, context, [left] ++ params }
+  end
+
+  defmacro left in right do
+    quote do
+      Elixir.Core.contains(unquote(left), unquote(right))
+    end
   end
 end

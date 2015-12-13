@@ -17,6 +17,7 @@ function decode64(data){
   }catch(e){
     return Kernel.SpecialForms.atom("error");
   }
+
   return btoa(data);
 }
 

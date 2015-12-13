@@ -14,46 +14,6 @@ defmodule ElixirScript.Translator.Function do
     JS.identifier("Patterns")
   )
 
-  @standard_libs [
-    :Patterns, :Kernel, :Atom, :Enum, :Integer, :JS,
-    :List, :Range, :Tuple, :Agent, :Keyword,
-    :Base, :String, :Bitwise, :Collectable, :Enumerable,
-    :Inspect, :Map, :MapSet, :Set, :VirtualDom, :View
-  ]
-
-  def update_alias({:__aliases__, context, [:List, :Chars]}) do
-    {:__aliases__, context, [:Elixir] ++ [:List, :Chars] }
-  end
-
-  def update_alias({:__aliases__, context, [:String, :Chars]}) do
-    {:__aliases__, context, [:Elixir] ++ [:String, :Chars] }
-  end
-
-  def update_alias({:__aliases__, context, [:Kernel]}) do
-    {:__aliases__, context, [:ElixirScript, :Kernel] }
-  end
-
-  def update_alias({:__aliases__, context, [name | rest]}) when name in @standard_libs do
-    {:__aliases__, context, [:Elixir, name] ++ rest }
-  end
-
-  def update_alias({:__aliases__, context, [name]}) when name in @standard_libs do
-    {:__aliases__, context, [:Elixir, name] }
-  end
-
-  def update_alias({{:., context, [module_name, function_name]}, context2, params }) do
-    {{:., context, [update_alias(module_name), function_name]}, context2, params }
-  end
-
-  def update_alias(ast) do
-    ast
-  end
-
-  def module_in_standard_libs?(name) do
-    name in @standard_libs
-  end
-
-
   def process_function(name, functions, env) do
     result = make_anonymous_function(functions, env)
 
@@ -177,7 +137,7 @@ defmodule ElixirScript.Translator.Function do
   end
 
   def make_function_or_property_call(module_name, function_name, env) do
-    the_name = case update_alias(module_name) do
+    the_name = case module_name do
       {:__aliases__, _, _} = name  ->
         module_name = ElixirScript.Module.quoted_to_name(name)
         get_js_name(module_name)
@@ -216,7 +176,7 @@ defmodule ElixirScript.Translator.Function do
   end
 
   def make_function_call(module_name, function_name, params, env) do
-    the_name = case update_alias(module_name) do
+    the_name = case module_name do
       {:__aliases__, _, name} ->
         module_name = ElixirScript.Module.quoted_to_name(name)
         get_js_name(module_name)

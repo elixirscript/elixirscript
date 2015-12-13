@@ -21,7 +21,6 @@ end
 
 defmodule ElixirScript.TestHelper do
   use ShouldI
-  require Logger
 
   def make_custom_env do
     use ElixirScript

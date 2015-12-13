@@ -1,5 +1,6 @@
 import { PID, Tuple, Integer, Float } from './primitives';
 import BitString from './bit_string';
+import Patterns from './patterns';
 
 function call_property(item, property){
   if(property in item){
@@ -170,16 +171,28 @@ function delete_at(tuple, index){
   return new Tuple(...new_list);
 };
 
-function and(first, second){
-  return first && second;
+function contains(left, right){
+  for(let x of right){
+    if(Patterns.match_no_throw(left, x) != null){
+      return true;
+    }
+  }
+
+  return false;
 }
 
-function or(first, second){
-  return first || second;
+function reverse(list){
+  return list.concat([]).reverse();
 }
 
-function raise(value){
-  throw value;
+function get_global(){
+  if(typeof(self) !== "undefined"){
+    return self;
+  }else if(typeof(global) !== "undefined"){
+    return global;
+  }
+
+  throw "No global state found";
 }
 
 export {
@@ -209,7 +222,7 @@ export {
   apply,
   new_tuple,
   duplicate,
-  and,
-  or,
-  raise
+  contains,
+  reverse,
+  get_global
 };

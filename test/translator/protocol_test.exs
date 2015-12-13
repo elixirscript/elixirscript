@@ -2,47 +2,6 @@ defmodule ElixirScript.Translator.Protocol.Test do
   use ShouldI
   import ElixirScript.TestHelper
 
-  test "parse protocol spec" do
-    ex_ast = quote do
-      defprotocol ElixirScript.Collectable do
-        def into(collectable)
-      end
-    end
-
-    js_code = """
-    let Elixir$ElixirScript$Collectable = Elixir.Kernel.defprotocol({
-      into: Elixir.Core.Patterns.defmatch(
-        Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()], function(collectable){
-          return null;
-        })
-      )
-    });
-
-    export default Elixir$ElixirScript$Collectable;
-    """
-
-    assert_translation(ex_ast, js_code)
-  end
-
-  test "translate standard lib protocol defimpl" do
-    ex_ast = quote do
-      defimpl String.Chars, for: Duck do
-        def to_string(duck), do: "quack"
-      end
-    end
-
-    js_code = """
-     Elixir.Kernel.defimpl(Elixir.String.Chars, Duck, {
-             to_string: Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(duck)    {
-             return     'quack';
-           }))
-       })
-    """
-
-    assert_translation(ex_ast, js_code)
-  end
-
-
   test "parse protocol spec with implementations" do
     ex_ast = quote do
       defprotocol Blank do

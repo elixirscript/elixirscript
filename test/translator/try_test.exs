@@ -60,7 +60,7 @@ defmodule ElixirScript.Translator.Try.Test do
     }, Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()], function(x) {
         return IO.puts('Invalid argument given');
     }, function(x) {
-        return Elixir$ElixirScript$Kernel.in(x, Elixir.Kernel.SpecialForms.list(ArgumentError.create(Elixir.Kernel.SpecialForms.map({}))));
+        return Elixir.Core.contains(x,Elixir.Kernel.SpecialForms.list(ArgumentError.create(Elixir.Kernel.SpecialForms.map({}))));
     })), null, null, null)
     """
 
@@ -177,7 +177,7 @@ defmodule ElixirScript.Translator.Try.Test do
            },null,null,Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(y)    {
              return     Elixir.Kernel.SpecialForms.atom('small');
            },function(y)    {
-             return     Elixir$ElixirScript$Kernel.and(y < 1,y > -1);
+             return     (y < 1) && (y > -1);
            }),Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.wildcard()],function()    {
              return     Elixir.Kernel.SpecialForms.atom('large');
            })),null)

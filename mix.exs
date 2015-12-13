@@ -22,13 +22,12 @@ defmodule ElixirScript.Mixfile do
 
   def application do
     [
-      applications: [:inflex, :estree]
+      applications: [:logger, :estree]
     ]
   end
 
   defp deps do
     [
-      {:inflex, "~> 1.5" },
       {:estree, "~> 2.0"},
       {:shouldi, only: :test },
       {:earmark, "~> 0.1", only: :dev },

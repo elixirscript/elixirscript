@@ -25,9 +25,11 @@ import { call_property, is_instance_of, size, is_nil,
   apply,
   new_tuple,
   duplicate,
-  and,
-  or,
-  raise } from './core/functions';
+  contains,
+  reverse,
+  get_global } from './core/functions';
+
+get_global().processes = get_global().processes || new ProcessSystem();
 
 export {
   ProcessSystem,
@@ -63,7 +65,7 @@ export {
   apply,
   new_tuple,
   duplicate,
-  and,
-  or,
-  raise
+  contains,
+  reverse,
+  get_global
 }

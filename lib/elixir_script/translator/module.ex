@@ -159,24 +159,24 @@ defmodule ElixirScript.Translator.Module do
 
   def process_imports(imports, module_refs) do
     imports ++ make_imports(module_refs)
-    |> Enum.into(HashSet.new)
-    |> Enum.reduce(HashSet.new, fn(x, acc)->
-      HashSet.put(acc, x)
+    |> Enum.into(MapSet.new)
+    |> Enum.reduce(MapSet.new, fn(x, acc)->
+      MapSet.put(acc, x)
     end)
-    |> HashSet.to_list
-    |> Enum.reduce(%{ identifiers: HashSet.new, imports: [] }, fn(x, state) ->
+    |> MapSet.to_list
+    |> Enum.reduce(%{ identifiers: MapSet.new, imports: [] }, fn(x, state) ->
       case x do
         %ESTree.ImportDeclaration{ specifiers: [%ESTree.ImportSpecifier{ local: id }] } ->
-          if HashSet.member?(state.identifiers, id.name) do
+          if MapSet.member?(state.identifiers, id.name) do
             state
           else
-            %{ state | identifiers: HashSet.put(state.identifiers, id.name), imports: state.imports ++ [x] }
+            %{ state | identifiers: MapSet.put(state.identifiers, id.name), imports: state.imports ++ [x] }
           end
         %ESTree.ImportDeclaration{ specifiers: [%ESTree.ImportDefaultSpecifier{ local: id }] } ->
-          if HashSet.member?(state.identifiers, id.name) do
+          if MapSet.member?(state.identifiers, id.name) do
             state
           else
-            %{ state | identifiers: HashSet.put(state.identifiers, id.name), imports: state.imports ++ [x] }
+            %{ state | identifiers: MapSet.put(state.identifiers, id.name), imports: state.imports ++ [x] }
           end
         _ ->
           %{ state | imports: state.imports ++ [x] }

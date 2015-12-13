@@ -20,19 +20,8 @@ defmodule ElixirScript.Translator do
   alias ElixirScript.Translator.Receive
   alias ElixirScript.Translator.Quote
   alias ElixirScript.Translator.Utils
-  alias ElixirScript.Translator.Protocol
-  alias ElixirScript.Translator.Kernel, as: KernelLib
-  alias ElixirScript.Translator.Logger
   alias ElixirScript.Translator.JS, as: JSLib
   alias ESTree.Tools.Builder, as: JS
-
-  @standard_lib_protocols [
-    [:Enumerable],
-    [:Inspect],
-    [:String, :Chars],
-    [:List, :Chars],
-    [:Collectable]
-  ]
 
 
   @doc """
@@ -62,8 +51,32 @@ defmodule ElixirScript.Translator do
     Expression.make_unary_expression(operator, value, env)
   end
 
+  defp do_translate({:not, _, [value]}, env) do
+    Expression.make_unary_expression(:!, value, env)
+  end
+
   defp do_translate({operator, _, [left, right]}, env) when operator in [:+, :-, :/, :*, :==, :!=, :&&, :||, :>, :<, :>=, :<=, :===, :!==] do
     Expression.make_binary_expression(operator, left, right, env)
+  end
+
+  defp do_translate({:and, _, [left, right]}, env) do
+    Expression.make_binary_expression(:&&, left, right, env)
+  end
+
+  defp do_translate({:or, _, [left, right]}, env) do
+    Expression.make_binary_expression(:||, left, right, env)
+  end
+
+  defp do_translate({:div, _, [left, right]}, env) do
+    Expression.make_binary_expression(:/, left, right, env)
+  end
+
+  defp do_translate({:rem, _, [left, right]}, env) do
+    Expression.make_binary_expression(:%, left, right, env)
+  end
+
+  defp do_translate({:throw, _, [params]}, env) do
+    JS.throw_statement(Translator.translate(params, env))
   end
 
   defp do_translate({:<>, context, [left, right]}, env) do
@@ -151,10 +164,6 @@ defmodule ElixirScript.Translator do
     end
   end
 
-  defp do_translate({{:., _, [{:__aliases__, _, [:Logger]}, function_name]}, _, params }, env) do
-    Logger.make_logger(function_name, params, env)
-  end
-
   defp do_translate({{:., _, [Access, :get]}, _, [target, property]}, env) do
     Map.make_get_property(target, property, env)
   end
@@ -195,20 +204,16 @@ defmodule ElixirScript.Translator do
     end
   end
 
-  defp do_translate({{:., _, [module_name, function_name]}, _, params } = ast, env) do
+  defp do_translate({{:., _, [{:__aliases__, _, [:JS]}, function_name]}, _, params }, env) do
+    JSLib.translate_js_function(function_name, params, env)
+  end
 
-    case module_name do
-      Kernel ->
-        KernelLib.translate_kernel_function(function_name, params, env)
-      {:__aliases__, _, [:JS]} ->
-        JSLib.translate_js_function(function_name, params, env)
-      _ ->
-        expanded_ast = Macro.expand(ast, env)
-        if expanded_ast == ast do
-          Function.make_function_call(module_name, function_name, params, env)
-        else
-          translate(expanded_ast, env)
-        end
+  defp do_translate({{:., _, [module_name, function_name]}, _, params } = ast, env) do
+    expanded_ast = Macro.expand(ast, env)
+    if expanded_ast == ast do
+      Function.make_function_call(module_name, function_name, params, env)
+    else
+      translate(expanded_ast, env)
     end
   end
 
@@ -334,14 +339,6 @@ defmodule ElixirScript.Translator do
     %ElixirScript.Translator.Group{}
   end
 
-  defp do_translate({:defimpl, _, [ {:__aliases__, _, protocol}, [for: type],  [do: {:__block__, context, spec}] ]}, env) when protocol in @standard_lib_protocols do
-    Protocol.make_standard_lib_impl({:__aliases__, [], [:Elixir] ++ protocol}, type, {:__block__, context, spec}, env)
-  end
-
-  defp do_translate({:defimpl, _, [ {:__aliases__, _, protocol}, [for: type],  [do: spec] ]}, env) when protocol in @standard_lib_protocols do
-    Protocol.make_standard_lib_impl({:__aliases__, [], [:Elixir] ++ protocol}, type, {:__block__, [], [spec]}, env)
-  end
-
   defp do_translate({:defimpl, _, _}, _) do
     %ElixirScript.Translator.Group{}
   end
@@ -373,7 +370,6 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({name, context, params} = ast, env) when is_list(params) do
-
       expanded_ast = Macro.expand(ast, env)
       if expanded_ast == ast do
         imported_module = ElixirScript.State.get_module(context[:import])

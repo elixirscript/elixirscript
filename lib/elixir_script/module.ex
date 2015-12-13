@@ -2,26 +2,52 @@ defmodule ElixirScript.Module do
   @moduledoc false
 
   defstruct name: nil, functions: Keyword.new, macros: Keyword.new, body: nil,
-  aliases: [], requires: [], imports: [], js_imports: [], module_refs: []
+  aliases: [], requires: [], imports: [], js_imports: [], module_refs: [], type: :module,
+  spec: nil, impls: HashDict.new
+
+  def functions(nil) do
+    []
+  end
 
   def functions(module) do
     Keyword.keys(module.functions) |> Enum.uniq
+  end
+
+  def macros(nil) do
+    []
   end
 
   def macros(module) do
     Keyword.keys(module.macros) |> Enum.uniq
   end
 
+
+  def aliases(nil) do
+    []
+  end
+
   def aliases(module) do
     module.aliases
+  end
+
+  def requires(nil) do
+    []
   end
 
   def requires(module) do
     module.requires
   end
 
+  def imports(nil) do
+    []
+  end
+
   def imports(module) do
     module.imports
+  end
+
+  def has_alias?(nil, _) do
+    false
   end
 
   def has_alias?(module, name) do
@@ -51,6 +77,10 @@ defmodule ElixirScript.Module do
   def get_alias(module, {:__aliases__, _, _} = ast) do
     name = quoted_to_name(ast)
     get_alias(module, name)
+  end
+
+  def imported?(nil, _) do
+    false
   end
 
   def imported?(module, function_name) do

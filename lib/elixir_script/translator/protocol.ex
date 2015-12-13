@@ -13,7 +13,7 @@ defmodule ElixirScript.Translator.Protocol do
   Takes a list of protocols and turns them into modules
   """
   def consolidate(protocols, env) when is_list(protocols) do
-    Enum.map(protocols, fn({_, protocol}) ->
+    Enum.map(protocols, fn(protocol) ->
       do_consolidate(protocol, env)
     end)
   end

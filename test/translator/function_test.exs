@@ -369,7 +369,7 @@ defmodule ElixirScript.Translator.Function.Test do
      const something = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(one)    {
              return     null;
            },function(one)    {
-             return Elixir$ElixirScript$Kernel.or(Elixir$ElixirScript$Kernel.is_number(one),Elixir$ElixirScript$Kernel.is_atom(one));
+             return Elixir$ElixirScript$Kernel.is_number(one) || Elixir$ElixirScript$Kernel.is_atom(one);
            }));
     """
 
@@ -385,7 +385,7 @@ defmodule ElixirScript.Translator.Function.Test do
      const something = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(one)    {
              return     null;
            },function(one)    {
-             return     Elixir$ElixirScript$Kernel.or(Elixir$ElixirScript$Kernel.is_number(one),Elixir$ElixirScript$Kernel.is_atom(one));
+             return     Elixir$ElixirScript$Kernel.is_number(one) || Elixir$ElixirScript$Kernel.is_atom(one);
            }));
     """
 
@@ -398,11 +398,11 @@ defmodule ElixirScript.Translator.Function.Test do
 
 
     js_code = """
-     const something = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable()],function(one,two)    {
-             return     null;
-           },function(one,two)    {
-             return     Elixir$ElixirScript$Kernel.in(one,Elixir.Kernel.SpecialForms.list(1,2,3));
-           }));
+    const something = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable()],function(one,two)    {
+      return null;
+    },function(one,two)    {
+      return Elixir.Core.contains(one,Elixir.Kernel.SpecialForms.list(1,2,3));
+    }));
     """
 
     assert_translation(ex_ast, js_code)
@@ -422,11 +422,11 @@ defmodule ElixirScript.Translator.Function.Test do
          const something = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(one)    {
              return     null;
            },function(one)    {
-             return     Elixir$ElixirScript$Kernel.in(one,Elixir.Kernel.SpecialForms.list(1,2,3));
+             return     Elixir.Core.contains(one,Elixir.Kernel.SpecialForms.list(1,2,3));
            }),Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(one)    {
              return     null;
            },function(one)    {
-             return     Elixir$ElixirScript$Kernel.or(Elixir$ElixirScript$Kernel.is_number(one),Elixir$ElixirScript$Kernel.is_atom(one));
+             return     Elixir$ElixirScript$Kernel.is_number(one) || Elixir$ElixirScript$Kernel.is_atom(one);
            }));
          export {
              something
