@@ -50,5 +50,13 @@ gulp.task('dist_add_source_map', function() {
       .pipe(gulp.dest('./priv'));
 });
 
+gulp.task('npm_build', function() {
+  npmDistPath = 'dist/npm'
+  gulp.src('./package.json').pipe(gulp.dest(npmDistPath));
+  gulp.src('./elixirscript').pipe(gulp.dest(npmDistPath));
+  return gulp.src([path + '/**/*.js', '!' + path + '/build/**/*.js', '!' + path + '/dist/**/*.js',  '!' + path + '/dist_build/**/*.js', '!' + path + '/tests/**/*.js'])
+      .pipe(babel({sourceMap: false, modules:'common'}))
+      .pipe(gulp.dest(npmDistPath));
+});
 
 gulp.task('default', ['lint', 'test']);
