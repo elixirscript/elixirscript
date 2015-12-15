@@ -125,6 +125,12 @@ defmodule ElixirScript do
 
   defp create_code(include_path, import_standard_libs?, stdlib_path) do
 
+    standard_lib_modules = ElixirScript.Preprocess.Modules.build_standard_aliases()
+    |> MapSet.to_list()
+    |> Enum.map(fn({_, module_name}) ->
+      module_name
+    end)
+
     ElixirScript.State.process_imports
 
     state = ElixirScript.State.get
@@ -163,11 +169,7 @@ defmodule ElixirScript do
       Atom.to_string(name1) < Atom.to_string(name2)
     end)
     |> Enum.reject(fn({name, _, _}) ->
-      import_standard_libs? == false && name in [
-        ElixirScript.Kernel, ElixirScript.Tuple, ElixirScript.Collectable,
-        ElixirScript.Atom, ElixirScript.String.Chars, ElixirScript.Enumerable,
-        ElixirScript.Integer, ElixirScript.View
-      ]
+      import_standard_libs? == false && name in standard_lib_modules
     end)
     |> Enum.map(fn({_, path, code}) ->
       if(include_path) do

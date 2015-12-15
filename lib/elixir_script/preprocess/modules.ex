@@ -312,7 +312,7 @@ defmodule ElixirScript.Preprocess.Modules do
   end
 
 
-  defp build_standard_aliases() do
+  def build_standard_aliases() do
     MapSet.new
     |> MapSet.put({ Kernel, ElixirScript.Kernel })
     |> MapSet.put({ Tuple, ElixirScript.Tuple })
