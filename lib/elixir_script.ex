@@ -166,7 +166,7 @@ defmodule ElixirScript do
       import_standard_libs? == false && name in [
         ElixirScript.Kernel, ElixirScript.Tuple, ElixirScript.Collectable,
         ElixirScript.Atom, ElixirScript.String.Chars, ElixirScript.Enumerable,
-        ElixirScript.Integer
+        ElixirScript.Integer, ElixirScript.View
       ]
     end)
     |> Enum.map(fn({_, path, code}) ->

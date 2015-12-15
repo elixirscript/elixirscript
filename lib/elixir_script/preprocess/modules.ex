@@ -321,5 +321,6 @@ defmodule ElixirScript.Preprocess.Modules do
     |> MapSet.put({ String.Chars, ElixirScript.String.Chars })
     |> MapSet.put({ Enumerable, ElixirScript.Enumerable })
     |> MapSet.put({ Integer, ElixirScript.Integer })
+    |> MapSet.put({ View, ElixirScript.View })
   end
 end
