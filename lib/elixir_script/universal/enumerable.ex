@@ -43,8 +43,8 @@ end
 
 
 defimpl ElixirScript.Enumerable, for: Function do
-  def reduce(function, acc, fun) when is_function(function, 2),
-    do: function.(acc, fun)
+  def reduce(func, acc, fun) when is_function(func, 2),
+    do: func.(acc, fun)
   def member?(_function, _value),
     do: {:error, __MODULE__}
   def count(_function),
