@@ -35,8 +35,9 @@ defmodule ElixirScript.Test do
 
     assert_js_matches """
          import * as Elixir from 'Elixir';
+         import * as Elixir$ElixirScript$String$Chars from 'Elixir.ElixirScript.String.Chars';
          const something_else = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
-             return     Elixir.String.Chars.to_string(10);
+             return     Elixir$ElixirScript$String$Chars.to_string(10);
            }));
          const something = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
              return     ul;

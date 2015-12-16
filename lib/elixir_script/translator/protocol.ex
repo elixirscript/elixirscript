@@ -10,15 +10,9 @@ defmodule ElixirScript.Translator.Protocol do
   alias ElixirScript.Translator.Utils
 
   @doc """
-  Takes a list of protocols and turns them into modules
+  Takes a protocol and turns them into modules
   """
-  def consolidate(protocols, env) when is_list(protocols) do
-    Enum.map(protocols, fn(protocol) ->
-      do_consolidate(protocol, env)
-    end)
-  end
-
-  defp do_consolidate(protocol, env) do
+  def consolidate(protocol, env) do
     name = protocol.name
     spec = protocol.spec
     impls = protocol.impls |> Dict.to_list

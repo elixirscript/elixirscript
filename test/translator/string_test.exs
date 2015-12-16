@@ -38,6 +38,6 @@ defmodule ElixirScript.Translator.String.Test do
     Hello #{length([])}
     How are you, #{length([])}?
     """
-    assert_translation(ex_ast, "'Hello ' + (Elixir$ElixirScript$String$Chars.to_string(Elixir$ElixirScript$Kernel.length(Elixir.Kernel.SpecialForms.list())) + ('\\nHow are you, ' + (Elixir.String.Chars.to_string(Elixir$ElixirScript$Kernel.length(Elixir.Kernel.SpecialForms.list())) + '?\\n')))")
+    assert_translation(ex_ast, "'Hello ' + (Elixir$ElixirScript$String$Chars.to_string(Elixir$ElixirScript$Kernel.length(Elixir.Kernel.SpecialForms.list())) + ('\\nHow are you, ' + (Elixir$ElixirScript$String$Chars.to_string(Elixir$ElixirScript$Kernel.length(Elixir.Kernel.SpecialForms.list())) + '?\\n')))")
   end
 end

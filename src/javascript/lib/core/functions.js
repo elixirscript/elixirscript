@@ -195,6 +195,14 @@ function get_global(){
   throw "No global state found";
 }
 
+function concat_lists(left, right){
+  return left.concat(right);
+}
+
+function prepend_to_list(list, item){
+  return [item].concat(list);
+}
+
 export {
   call_property,
   is_instance_of,
@@ -224,5 +232,7 @@ export {
   duplicate,
   contains,
   reverse,
-  get_global
+  get_global,
+  concat_lists,
+  prepend_to_list
 };

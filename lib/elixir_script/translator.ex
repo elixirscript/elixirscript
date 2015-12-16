@@ -84,13 +84,11 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:++, _, [left, right]}, env) do
-    JS.call_expression(
-      JS.member_expression(
-        translate(left, env),
-        JS.identifier(:concat)
-      ),
-      [translate(right, env)]
-    )
+    quoted = quote do
+      Elixir.Core.concat_lists(unquote(left),unquote(right))
+    end
+
+    translate(quoted, env)
   end
 
   defp do_translate({:.., _, [first, last]}, env) do
@@ -173,7 +171,6 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:., _, [module_name, function_name]} = ast, env) do
-
     expanded_ast = Macro.expand(ast, env)
 
     if expanded_ast == ast do
@@ -184,7 +181,6 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({{:., _, [module_name, function_name]}, _, [] } = ast, env) do
-
     expanded_ast = Macro.expand(ast, env)
 
     if expanded_ast == ast do
@@ -194,11 +190,11 @@ defmodule ElixirScript.Translator do
     end
   end
 
-  defp do_translate({{:., _, [{:__aliases__, _, module_name}]}, _, params} = ast, env) do
-
+  defp do_translate({{:., _, [{:__aliases__, _, _} = module_name]}, _, params} = ast, env) do
     expanded_ast = Macro.expand(ast, env)
+
     if expanded_ast == ast do
-      Function.make_function_call(hd(module_name), params, env)
+      Function.make_function_call(module_name, params, env)
     else
       translate(expanded_ast, env)
     end
@@ -210,6 +206,7 @@ defmodule ElixirScript.Translator do
 
   defp do_translate({{:., _, [module_name, function_name]}, _, params } = ast, env) do
     expanded_ast = Macro.expand(ast, env)
+
     if expanded_ast == ast do
       Function.make_function_call(module_name, function_name, params, env)
     else
@@ -345,7 +342,7 @@ defmodule ElixirScript.Translator do
 
   defp do_translate({:|, _, [item, list]}, env) do
     quoted = quote do
-      List.prepend(unquote(list), unquote(item))
+      Elixir.Core.prepend_to_list(unquote(list), unquote(item))
     end
 
     translate(quoted, env)
@@ -371,6 +368,7 @@ defmodule ElixirScript.Translator do
 
   defp do_translate({name, context, params} = ast, env) when is_list(params) do
       expanded_ast = Macro.expand(ast, env)
+
       if expanded_ast == ast do
         imported_module = ElixirScript.State.get_module(context[:import])
 
@@ -393,7 +391,8 @@ defmodule ElixirScript.Translator do
       end
   end
 
-  defp do_translate({ name, _, _ }, _) do
+  defp do_translate({ name, _, params }, _) when is_atom(params) do
+    #TODO: check if function
     name = Utils.filter_name(name)
     Primitive.make_identifier(name)
   end

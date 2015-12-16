@@ -27,7 +27,8 @@ import { call_property, is_instance_of, size, is_nil,
   duplicate,
   contains,
   reverse,
-  get_global } from './core/functions';
+  get_global,
+  concat_lists } from './core/functions';
 
 get_global().processes = get_global().processes || new ProcessSystem();
 
@@ -67,5 +68,7 @@ export {
   duplicate,
   contains,
   reverse,
-  get_global
+  get_global,
+  concat_lists,
+  prepend_to_list
 }

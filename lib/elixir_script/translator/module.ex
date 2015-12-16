@@ -8,11 +8,11 @@ defmodule ElixirScript.Translator.Module do
   alias ElixirScript.Translator.Function
 
   def make_module(ElixirScript.Temp, body, env) do
-    [%JSModule{ name: ElixirScript.Temp, body: translate_body(body, env) |> Utils.inflate_groups }]
+    %JSModule{ name: ElixirScript.Temp, body: translate_body(body, env) |> Utils.inflate_groups }
   end
 
   def make_module(module, nil, _) do
-    [%JSModule{ name: module, body: [] }]
+    %JSModule{ name: module, body: [] }
   end
 
   def make_module(module, body, env) do
@@ -55,21 +55,11 @@ defmodule ElixirScript.Translator.Module do
     private_functions = Enum.map(private_functions, fn({_key, value}) -> value end)
 
     default = JS.export_named_declaration(exported_object)
-    {modules, body} = Enum.partition(body, fn(x) ->
-      case x do
-        %JSModule{} ->
-          true
-        _ ->
-          false
-      end
-    end)
 
-    result = [
-      %JSModule{
+    result = %JSModule{
         name: ElixirScript.Module.quoted_to_name({:__aliases__, [], module }),
         body: imports ++ structs ++ private_functions ++ exported_functions ++ body ++ [default]
       }
-    ] ++ List.flatten(modules)
 
     result
   end

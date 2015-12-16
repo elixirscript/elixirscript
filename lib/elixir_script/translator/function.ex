@@ -284,13 +284,13 @@ defmodule ElixirScript.Translator.Function do
 
   defp get_js_name(module_name) do
     cond do
-      ElixirScript.State.get_module(module_name) ->
-        ElixirScript.State.add_module_reference(Process.get(:current_module), module_name)
-        ElixirScript.Module.name_to_js_name(module_name)
-
       ElixirScript.Module.has_alias?(ElixirScript.State.get_module(Process.get(:current_module)), module_name) ->
         module = ElixirScript.State.get_module(Process.get(:current_module))
         {_, module_name } = ElixirScript.Module.get_alias(module, module_name)
+        ElixirScript.State.add_module_reference(Process.get(:current_module), module_name)
+        ElixirScript.Module.name_to_js_name(module_name)
+
+      ElixirScript.State.get_module(module_name) ->
         ElixirScript.State.add_module_reference(Process.get(:current_module), module_name)
         ElixirScript.Module.name_to_js_name(module_name)
 

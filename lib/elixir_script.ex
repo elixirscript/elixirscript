@@ -146,11 +146,10 @@ defmodule ElixirScript do
           result = case ast.type do
             :module ->
               ElixirScript.Translator.Module.make_module(ast.name, ast.body, state.env)
-              |> Enum.map(&(convert_to_code(&1, state.root, state.env, import_standard_libs?, stdlib_path)))
             :protocol ->
-              ElixirScript.Translator.Protocol.consolidate([ast], state.env)
-              |> Enum.map(&(convert_to_code(&1, state.root, state.env, import_standard_libs?, stdlib_path)))
+              ElixirScript.Translator.Protocol.consolidate(ast, state.env)
           end
+          |> convert_to_code(state.root, state.env, import_standard_libs?, stdlib_path)
 
           send parent, { self, result }
         end
@@ -160,7 +159,6 @@ defmodule ElixirScript do
           { ^pid, x } -> x
         end
       end)
-      |> List.flatten
 
     ElixirScript.State.stop
 
