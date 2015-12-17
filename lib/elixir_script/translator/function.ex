@@ -140,10 +140,10 @@ defmodule ElixirScript.Translator.Function do
     the_name = case module_name do
       {:__aliases__, _, _} = name  ->
         module_name = ElixirScript.Module.quoted_to_name(name)
-        get_js_name(module_name)
+        get_js_name(module_name, env)
 
       {name, _, _} when is_atom(name) ->
-        get_js_name(name)
+        get_js_name(name, env)
 
       {{:., _, [_module_name, _function_name]}, _, _params } = ast ->
         ast
@@ -179,9 +179,9 @@ defmodule ElixirScript.Translator.Function do
     the_name = case module_name do
       {:__aliases__, _, name} ->
         module_name = ElixirScript.Module.quoted_to_name(name)
-        get_js_name(module_name)
+        get_js_name(module_name, env)
       {name, _, _} when is_atom(name) ->
-        get_js_name(name)
+        get_js_name(name, env)
       {{:., _, [_, _]}, _, _ } = ast ->
         ast
       {{:., _, [{:__aliases__, _, _}]}, _, _} = ast ->
@@ -273,25 +273,25 @@ defmodule ElixirScript.Translator.Function do
     end
   end
 
-  defp get_js_name([Elixir | _] = list) do
+  defp get_js_name([Elixir | _] = list, _) do
     list
   end
 
-  defp get_js_name(module_name) when is_list(module_name) do
+  defp get_js_name(module_name, env) when is_list(module_name) do
     ElixirScript.Module.quoted_to_name({:__aliases__, [], module_name})
-    |> get_js_name
+    |> get_js_name(env)
   end
 
-  defp get_js_name(module_name) do
+  defp get_js_name(module_name, env) do
     cond do
-      ElixirScript.Module.has_alias?(ElixirScript.State.get_module(Process.get(:current_module)), module_name) ->
-        module = ElixirScript.State.get_module(Process.get(:current_module))
+      ElixirScript.Module.has_alias?(ElixirScript.State.get_module(env.module), module_name) ->
+        module = ElixirScript.State.get_module(env.module)
         {_, module_name } = ElixirScript.Module.get_alias(module, module_name)
-        ElixirScript.State.add_module_reference(Process.get(:current_module), module_name)
+        ElixirScript.State.add_module_reference(env.module, module_name)
         ElixirScript.Module.name_to_js_name(module_name)
 
       ElixirScript.State.get_module(module_name) ->
-        ElixirScript.State.add_module_reference(Process.get(:current_module), module_name)
+        ElixirScript.State.add_module_reference(env.module, module_name)
         ElixirScript.Module.name_to_js_name(module_name)
 
       true ->

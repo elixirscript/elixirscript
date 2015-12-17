@@ -171,7 +171,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:., _, [module_name, function_name]} = ast, env) do
-    expanded_ast = Macro.expand(ast, env)
+    expanded_ast = Macro.expand(ast, ElixirScript.State.get().elixir_env)
 
     if expanded_ast == ast do
       Function.make_function_or_property_call(module_name, function_name, env)
@@ -181,7 +181,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({{:., _, [module_name, function_name]}, _, [] } = ast, env) do
-    expanded_ast = Macro.expand(ast, env)
+    expanded_ast = Macro.expand(ast, ElixirScript.State.get().elixir_env)
 
     if expanded_ast == ast do
       Function.make_function_or_property_call(module_name, function_name, env)
@@ -191,7 +191,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({{:., _, [{:__aliases__, _, _} = module_name]}, _, params} = ast, env) do
-    expanded_ast = Macro.expand(ast, env)
+    expanded_ast = Macro.expand(ast, ElixirScript.State.get().elixir_env)
 
     if expanded_ast == ast do
       Function.make_function_call(module_name, params, env)
@@ -205,7 +205,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({{:., _, [module_name, function_name]}, _, params } = ast, env) do
-    expanded_ast = Macro.expand(ast, env)
+    expanded_ast = Macro.expand(ast, ElixirScript.State.get().elixir_env)
 
     if expanded_ast == ast do
       Function.make_function_call(module_name, function_name, params, env)
@@ -223,7 +223,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:__MODULE__, _, _ }, env) do
-    translate(Process.get(:current_module), env)
+    translate(env.module, env)
   end
 
   defp do_translate({:__block__, _, expressions }, env) do
@@ -252,12 +252,14 @@ defmodule ElixirScript.Translator do
     raise ElixirScript.UnsupportedError, "super"
   end
 
-  defp do_translate({:__CALLER__, _, _expressions }, _) do
-    raise ElixirScript.UnsupportedError, "__CALLER__"
+  defp do_translate({:__CALLER__, _, _expressions }, env) do
+    quoted = quote do: unquote(env.caller)
+    translate(quoted, env)
   end
 
-  defp do_translate({:__ENV__, _, _expressions }, _) do
-    raise ElixirScript.UnsupportedError, "__ENV__"
+  defp do_translate({:__ENV__, _, _expressions }, env) do
+    quoted = quote do: unquote(env)
+    translate(quoted, env)
   end
 
   defp do_translate({:quote, _, [[do: expr]]}, env) do
@@ -293,6 +295,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:fn, _, clauses}, env) do
+    env = ElixirScript.Env.function_env(nil, env)
     Function.make_anonymous_function(clauses, env)
   end
 
@@ -304,11 +307,18 @@ defmodule ElixirScript.Translator do
     Assignment.make_assignment(left, right, env)
   end
 
-  defp do_translate({function, _, [{:when, _, [{name, _, _params} | _guards] }, [do: _body]] } = ast, env) when function in [:def, :defp] do
+  defp do_translate({function, _, [{:when, _, [{name, _, params} | _guards] }, [do: _body]] } = ast, env) when function in [:def, :defp] do
+    env = ElixirScript.Env.function_env({name, length(params)}, env)
     Function.process_function(Utils.filter_name(name), [ast], env)
   end
 
-  defp do_translate({function, _, [{name, _, _params}, [do: _body]]} = ast, env) when function in [:def, :defp] do
+  defp do_translate({function, _, [{name, _, params}, [do: _body]]} = ast, env) when function in [:def, :defp] and is_atom(params) do
+    env = ElixirScript.Env.function_env({ name, 0 }, env)
+    Function.process_function(Utils.filter_name(name), [ast], env)
+  end
+
+  defp do_translate({function, _, [{name, _, params}, [do: _body]]} = ast, env) when function in [:def, :defp] do
+    env = ElixirScript.Env.function_env({ name, length(params) }, env)
     Function.process_function(Utils.filter_name(name), [ast], env)
   end
 
@@ -367,13 +377,15 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({name, context, params} = ast, env) when is_list(params) do
-      expanded_ast = Macro.expand(ast, env)
+      env = ElixirScript.Env.function_env({name, length(params)}, env)
+
+      expanded_ast = Macro.expand(ast, ElixirScript.State.get().elixir_env)
 
       if expanded_ast == ast do
         imported_module = ElixirScript.State.get_module(context[:import])
 
         unless imported_module do
-          module = ElixirScript.State.get_module(Process.get(:current_module))
+          module = ElixirScript.State.get_module(env.module)
           imported_module_name = ElixirScript.Module.imported?(module, name)
           if imported_module_name do
             imported_module = ElixirScript.State.get_module(imported_module_name)
@@ -381,7 +393,7 @@ defmodule ElixirScript.Translator do
         end
 
         if imported_module do
-          ElixirScript.State.add_module_reference(Process.get(:current_module), imported_module.name)
+          ElixirScript.State.add_module_reference(env.module, imported_module.name)
           Function.make_function_call(ElixirScript.Module.name_to_quoted(imported_module.name), name, params, env)
         else
           Function.make_function_call(name, params, env)

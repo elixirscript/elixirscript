@@ -16,7 +16,7 @@ defmodule ElixirScript.Translator.Module do
   end
 
   def make_module(module, body, env) do
-    body = Using.process(body, env)
+    body = Using.process(body)
     { body, functions } = extract_functions_from_module(body)
     { exported_functions, private_functions } = process_functions(functions, env)
 

@@ -27,11 +27,11 @@ defmodule ElixirScript.View do
     pid = Elixir.Core.global().processes.spawn()
 
     tree = render_func.apply(nil, args);
-    rootNode = Elixir.VirtualDOM.create(tree);
+    root_node = Elixir.VirtualDOM.create(tree);
 
-    dom_root.appendChild(rootNode);
+    dom_root.appendChild(root_node);
 
-    Elixir.Core.global().processes.put(pid, "state", { rootNode, tree, render_func });
+    Elixir.Core.global().processes.put(pid, "state", { root_node, tree, render_func });
     { :ok, pid }
   end
 
@@ -43,11 +43,11 @@ defmodule ElixirScript.View do
     end
 
     tree = render_func.apply(nil, args);
-    rootNode = Elixir.VirtualDOM.create(tree);
+    root_node = Elixir.VirtualDOM.create(tree);
 
-    dom_root.appendChild(rootNode);
+    dom_root.appendChild(root_node);
 
-    Elixir.Core.global().processes.put(pid, "state", { rootNode, tree, render_func })
+    Elixir.Core.global().processes.put(pid, "state", { root_node, tree, render_func })
     { :ok, pid }
   end
 
@@ -63,14 +63,14 @@ defmodule ElixirScript.View do
   Updates the view by passing the args to the render_func
   """
   def render(view, args) do
-    { rootNode, tree, render_func } = Elixir.Core.global().processes.get(view, "state")
+    { root_node, tree, render_func } = Elixir.Core.global().processes.get(view, "state")
 
-    newTree = render_func.apply(nil, args);
+    new_tree = render_func.apply(nil, args);
 
-    patches = Elixir.VirtualDOM.diff(tree, newTree)
-    rootNode = Elixir.VirtualDOM.patch(rootNode, patches)
+    patches = Elixir.VirtualDOM.diff(tree, new_tree)
+    root_node = Elixir.VirtualDOM.patch(root_node, patches)
 
-    Elixir.Core.global().processes.put(view, "state", { rootNode, newTree, render_func });
+    Elixir.Core.global().processes.put(view, "state", { root_node, new_tree, render_func });
 
     :ok
   end

@@ -48,8 +48,8 @@ defmodule ElixirScript.Kernel do
     Elixir.Core.apply(module, fun, args)
   end
 
-  def binary_part(binary, start, length) do
-    binary.substring(start, length)
+  def binary_part(binary, start, len) do
+    binary.substring(start, len)
   end
 
   def hd(list) do

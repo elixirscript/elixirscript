@@ -12,7 +12,7 @@ defmodule ElixirScript.Preprocess.Variables do
       #becomes
 
       a0 = 1
-      a1 = 2 
+      a1 = 2
   """
   def process(ast) do
     {new_ast, _ } = Macro.prewalk(ast, %{}, fn(x, acc) ->
@@ -35,14 +35,8 @@ defmodule ElixirScript.Preprocess.Variables do
 
     { value, _ } = process_variables(value, state)
 
-    { [var1, var2], state } = Enum.map_reduce([var1, var2], state, fn(x, current_state) ->
-      case x do
-        {variable_name, meta2, context} when not(variable_name in [:%, :{}, :^, :&, :%{}]) ->
-          {new_variable_name, new_state} = get_new_variable_name(variable_name, current_state)
-          { {new_variable_name, meta2, context} , new_state }
-        _ ->
-          {x, current_state}
-      end
+    { [var1, var2], state } = Enum.map_reduce([var1, var2], state, fn(variable, current_state) ->
+      update_variable_name_and_state(variable, current_state)
     end)
 
     { {:=, meta, [{var1, var2}, value]}, state }
@@ -52,14 +46,8 @@ defmodule ElixirScript.Preprocess.Variables do
 
     { value, _ } = process_variables(value, state)
 
-    { variables, state } = Enum.map_reduce(variables, state, fn(x, current_state) ->
-      case x do
-        {variable_name, meta3, context} when not(variable_name in [:%, :{}, :^, :&, :_, :%{}]) ->
-          {new_variable_name, new_state} = get_new_variable_name(variable_name, current_state)
-          { {new_variable_name, meta3, context} , new_state }
-        _ ->
-          {x, current_state}
-      end
+    { variables, state } = Enum.map_reduce(variables, state, fn(variable, current_state) ->
+      update_variable_name_and_state(variable, current_state)
     end)
 
     { {:=, meta, [{:{}, meta2, variables}, value]}, state }
@@ -69,14 +57,8 @@ defmodule ElixirScript.Preprocess.Variables do
 
     { value, _ } = process_variables(value, state)
 
-    { variables, state } = Enum.map_reduce(variables, state, fn(x, current_state) ->
-      case x do
-        {variable_name, meta3, context} when not(variable_name in [:%, :{}, :^, :&, :_, :%{}]) ->
-          {new_variable_name, new_state} = get_new_variable_name(variable_name, current_state)
-          { {new_variable_name, meta3, context} , new_state }
-        _ ->
-          {x, current_state}
-      end
+    { variables, state } = Enum.map_reduce(variables, state, fn(variable, current_state) ->
+      update_variable_name_and_state(variable, current_state)
     end)
 
     { {:=, meta, [variables, value]}, state }
@@ -94,9 +76,9 @@ defmodule ElixirScript.Preprocess.Variables do
       {value, _} = process_variables(x, state)
       value
     end)
-    
+
     { {:<<>>, meta, params}, state }
-  end  
+  end
 
   def process_variables({{:., meta, [{:__aliases__, context, module}, function]}, meta2, params}, state) do
     params = Enum.map(params, fn(x) ->
@@ -123,8 +105,8 @@ defmodule ElixirScript.Preprocess.Variables do
       {value, _} = process_variables(x, state)
       value
     end)
-    
-    { variables, state }   
+
+    { variables, state }
   end
 
   def process_variables({variable_name, meta, context}, state) do
@@ -148,5 +130,15 @@ defmodule ElixirScript.Preprocess.Variables do
 
     { new_variable_name, new_state }
   end
-  
+
+  defp update_variable_name_and_state(variable, current_state) do
+    case variable do
+      {variable_name, context, params} when not(variable_name in [:%, :{}, :^, :&, :_, :%{}]) ->
+        {new_variable_name, new_state} = get_new_variable_name(variable_name, current_state)
+        { {new_variable_name, context, params} , new_state }
+      _ ->
+        {variable, current_state}
+    end
+  end
+
 end

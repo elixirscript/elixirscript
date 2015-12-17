@@ -6,7 +6,7 @@ defmodule ElixirScript.Translator.Struct do
   alias ElixirScript.Translator.Map
 
   def get_struct_class(module_name, env) do
-    current_module = ElixirScript.State.get_module(Process.get(:current_module))
+    current_module = ElixirScript.State.get_module(env.module)
 
     name = ElixirScript.Module.quoted_to_name(module_name)
     the_alias = ElixirScript.Module.get_alias(current_module, name)

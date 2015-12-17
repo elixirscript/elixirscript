@@ -141,15 +141,15 @@ defmodule ElixirScript do
       Map.values(state.modules)
       |> Enum.map(fn ast ->
         spawn_link fn ->
-          Process.put(:current_module, ast.name)
+          env = ElixirScript.Env.module_env(ast.name, "file.ex")
 
           result = case ast.type do
             :module ->
-              ElixirScript.Translator.Module.make_module(ast.name, ast.body, state.env)
+              ElixirScript.Translator.Module.make_module(ast.name, ast.body, env)
             :protocol ->
-              ElixirScript.Translator.Protocol.consolidate(ast, state.env)
+              ElixirScript.Translator.Protocol.consolidate(ast, env)
           end
-          |> convert_to_code(state.root, state.env, import_standard_libs?, stdlib_path)
+          |> convert_to_code(state.root, state.elixir_env, import_standard_libs?, stdlib_path)
 
           send parent, { self, result }
         end

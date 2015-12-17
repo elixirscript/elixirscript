@@ -72,7 +72,7 @@ defmodule ElixirScript.Preprocess.Modules do
   defp make_module(body, module_name_list) do
     body = case body do
       {:__block__, _, _ } ->
-        Macro.expand(body, State.get().env)
+        Macro.expand(body, State.get().elixir_env)
       _ ->
         body
     end
