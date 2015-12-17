@@ -295,7 +295,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:fn, _, clauses}, env) do
-    env = ElixirScript.Env.function_env(nil, env)
+    env = ElixirScript.Env.function_env(env, nil)
     Function.make_anonymous_function(clauses, env)
   end
 
@@ -308,17 +308,17 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({function, _, [{:when, _, [{name, _, params} | _guards] }, [do: _body]] } = ast, env) when function in [:def, :defp] do
-    env = ElixirScript.Env.function_env({name, length(params)}, env)
+    env = ElixirScript.Env.function_env(env, {name, length(params)})
     Function.process_function(Utils.filter_name(name), [ast], env)
   end
 
   defp do_translate({function, _, [{name, _, params}, [do: _body]]} = ast, env) when function in [:def, :defp] and is_atom(params) do
-    env = ElixirScript.Env.function_env({ name, 0 }, env)
+    env = ElixirScript.Env.function_env(env, { name, 0 })
     Function.process_function(Utils.filter_name(name), [ast], env)
   end
 
   defp do_translate({function, _, [{name, _, params}, [do: _body]]} = ast, env) when function in [:def, :defp] do
-    env = ElixirScript.Env.function_env({ name, length(params) }, env)
+    env = ElixirScript.Env.function_env(env, { name, length(params) })
     Function.process_function(Utils.filter_name(name), [ast], env)
   end
 
@@ -377,7 +377,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({name, context, params} = ast, env) when is_list(params) do
-      env = ElixirScript.Env.function_env({name, length(params)}, env)
+      env = ElixirScript.Env.function_env(env, {name, length(params)})
 
       expanded_ast = Macro.expand(ast, ElixirScript.State.get().elixir_env)
 
