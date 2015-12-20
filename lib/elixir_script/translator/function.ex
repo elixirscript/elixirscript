@@ -8,8 +8,8 @@ defmodule ElixirScript.Translator.Function do
 
   @patterns JS.member_expression(
     JS.member_expression(
-    JS.identifier("Elixir"),
-    JS.identifier("Core")
+      JS.identifier("Elixir"),
+      JS.identifier("Core")
     ),
     JS.identifier("Patterns")
   )
@@ -68,7 +68,7 @@ defmodule ElixirScript.Translator.Function do
     |> Stream.map(fn
       {:->, _, [ [{:when, _, [params | guards]}], body ]} ->
         params = wrap_params(params)
-        { patterns, params } = Match.build_match(List.wrap(params), env)
+        { patterns, params } = Match.build_match(params, env)
         params = make_params(params)
         body = make_function_body(body, env)
         guard_body = make_guards(guards, env)
@@ -118,13 +118,9 @@ defmodule ElixirScript.Translator.Function do
     )
   end
 
-  def wrap_params(params) when is_atom(params) do
-    []
-  end
-
-  def wrap_params(params) do
-    params
-  end
+  def wrap_params(params) when is_atom(params), do: []
+  def wrap_params(params) when is_list(params), do: params
+  def wrap_params(params), do: List.wrap(params)
 
   def make_function_body(body, env) do
     body

@@ -729,7 +729,6 @@ defmodule ElixirScript.Translator.Function.Test do
     assert_translation(ex_ast, js_code)
   end
 
-
   should "translate function variables with ? or !" do
     ex_ast = quote do
       def test1(alpha?, beta!) do
@@ -749,4 +748,33 @@ defmodule ElixirScript.Translator.Function.Test do
     assert_translation(ex_ast, js_code)
   end
 
+  should "translate function params with defaults" do
+    ex_ast = quote do
+      def test1(alpha, beta \\ 0) do
+      end
+    end
+
+    js_code = """
+      const test1 = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable()],function(alpha,beta = 0)    {
+             return     null;
+           }));
+    """
+
+    assert_translation(ex_ast, js_code)
+
+    ex_ast = quote do
+      def test1(alpha \\ fn x -> x end) do
+      end
+    end
+
+    js_code = """
+     const test1 = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(alpha = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(x)    {
+         return     x;
+       })))    {
+         return     null;
+       }));
+    """
+
+    assert_translation(ex_ast, js_code)
+  end
 end
