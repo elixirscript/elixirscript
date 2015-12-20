@@ -180,6 +180,12 @@ defmodule ElixirScript.PatternMatching.Match do
     { [type(Primitive.tuple_class, pattern)], params }
   end
 
+  defp do_build_match({:\\, _, [{name, _, _}, default]}, env) do
+    name = Utils.filter_name(name)
+    { [parameter()], [ JS.assignment_expression(:=, JS.identifier(name), Translator.translate(default, env))] }
+  end
+
+
   defp do_build_match({name, _, _}, _) do
     name = Utils.filter_name(name)
     { [parameter()], [JS.identifier(name)] }
