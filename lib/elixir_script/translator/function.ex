@@ -127,9 +127,8 @@ defmodule ElixirScript.Translator.Function do
 
   defp process_params(params, env) do
     params = wrap_params(params)
-
-    { patterns, params, env } = Match.build_match(params, env)
-    |> Match.update_env(env)
+    
+    { patterns, params, env } = Match.process_match(params, env)
 
     { patterns, make_params(params), env }
   end

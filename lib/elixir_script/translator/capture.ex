@@ -8,8 +8,7 @@ defmodule ElixirScript.Translator.Capture do
   def make_capture(function_name, arity, env) do
     params = Enum.map(1..arity, fn(x) -> {String.to_atom("__#{x}"), [], ElixirScript.Translator.Capture} end)
 
-    { patterns, params, _ } = Match.build_match(params, env)
-    |> Match.update_env(env)
+    { patterns, params, _ } = Match.process_match(params, env)
 
     body = JS.block_statement([
       JS.return_statement(
@@ -34,8 +33,7 @@ defmodule ElixirScript.Translator.Capture do
       name = [:ElixirScript, :Kernel]
     end
 
-    { patterns, params, env } = Match.build_match(arity_params, env)
-    |> Match.update_env(env)
+    { patterns, params, env } = Match.process_match(arity_params, env)
 
     {func, _} = Function.make_function_call({:__aliases__, [], name }, function_name, arity_params, env)
 

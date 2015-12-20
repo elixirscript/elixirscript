@@ -207,7 +207,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({{:., _, [{:__aliases__, _, [:JS]}, function_name]}, _, params }, env) do
-    { JSLib.translate_js_function(function_name, params, env), env }
+    JSLib.translate_js_function(function_name, params, env)
   end
 
   defp do_translate({{:., _, [module_name, function_name]}, _, params } = ast, env) do
@@ -336,20 +336,20 @@ defmodule ElixirScript.Translator do
     { Module.make_module(module_name_list, body, env), env }
   end
 
-  defp do_translate({:defprotocol, _, _}, _) do
-    %ElixirScript.Translator.Group{}
+  defp do_translate({:defprotocol, _, _}, env) do
+    { %ElixirScript.Translator.Group{}, env }
   end
 
-  defp do_translate({:defmacro, _, _}, _) do
-    %ElixirScript.Translator.Group{}
+  defp do_translate({:defmacro, _, _}, env) do
+    { %ElixirScript.Translator.Group{}, env }
   end
 
-  defp do_translate({:defmacrop, _, _}, _) do
-    %ElixirScript.Translator.Group{}
+  defp do_translate({:defmacrop, _, _}, env) do
+    { %ElixirScript.Translator.Group{}, env }
   end
 
-  defp do_translate({:defimpl, _, _}, _) do
-    %ElixirScript.Translator.Group{}
+  defp do_translate({:defimpl, _, _}, env) do
+    { %ElixirScript.Translator.Group{}, env }
   end
 
   defp do_translate({:|, _, [item, list]}, env) do

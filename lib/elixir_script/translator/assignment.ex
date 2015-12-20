@@ -8,8 +8,7 @@ defmodule ElixirScript.Translator.Assignment do
   def make_assignment(left, right, env) do
     { right_ast, env } = Translator.translate(right, env)
 
-    { patterns, params, env } = Match.build_match([left], env)
-    |> Match.update_env(env)
+    { patterns, params, env } = Match.process_match([left], env)
 
       declarator = JS.variable_declarator(
         JS.array_pattern(params),

@@ -36,8 +36,6 @@ defmodule ElixirScript.Translator.Try do
 
     if else_block do
       { else_block, _ } = Function.make_anonymous_function(else_block, env)
-
-      else_block = Function.make_anonymous_function(else_block, env)
     else
       else_block = JS.identifier(:null)
     end
@@ -92,7 +90,9 @@ defmodule ElixirScript.Translator.Try do
   end
 
   defp process_after_block(after_block, env) do
-    { translated_body, _ } = Function.prepare_function_body(after_block, env) |> JS.block_statement
+    { translated_body, _ } = Function.prepare_function_body(after_block, env)
+    translated_body = JS.block_statement(translated_body)
+    
     JS.function_expression([], [], translated_body)
   end
 

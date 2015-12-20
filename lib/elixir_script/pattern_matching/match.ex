@@ -100,9 +100,17 @@ defmodule ElixirScript.PatternMatching.Match do
     )
   end
 
-  def update_env({ patterns, params }, env) do
+  def process_match(params, env) do
+    build_match(params, env)
+    |> update_env(env)
+  end
+
+  defp update_env({ patterns, params }, env) do
 
     { params, env } = Enum.map_reduce(params, env, fn
+      (%ESTree.Identifier{name: :undefined} = param, env) ->
+        { param, env }
+
       (%ESTree.Identifier{} = param, env) ->
        env = ElixirScript.Env.add_var(env, param.name)
        new_name = ElixirScript.Env.get_var(env, param.name)

@@ -29,15 +29,14 @@ defmodule ElixirScript.Translator.For do
   defp handle_args(generators, env) do
     Enum.reduce(generators, %{collections: [], args: [], filter: nil, fun: nil, into: nil}, fn
       ({:<-, [], [identifier, enum]}, state) ->
-        { patterns, params, env } = Match.build_match([identifier], env)
-        |> Match.update_env(env)
+        { patterns, params, env } = Match.process_match([identifier], env)
 
         list = Primitive.make_list_no_translate([hd(patterns), Translator.translate!(enum, env)])
 
         %{state | collections: state.collections ++ [list], args: state.args ++ params }
       ([into: expression], state) ->
         %{ state | into: Translator.translate(expression, env) }
-        
+
       ([into: expression, do: expression2], state) ->
         fun = create_function_expression(expression2, env, state)
 

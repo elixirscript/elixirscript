@@ -62,9 +62,8 @@ defmodule ElixirScript do
 
     ElixirScript.State.start_link(root, env)
 
-    libs = []
-    #libs = @libs
-    #|> updated_quoted
+    libs = @libs
+    |> updated_quoted
 
     build_environment(libs ++ [updated_quoted(quoted)])
     create_code(include_path, import_standard_libs?, stdlib_path)
