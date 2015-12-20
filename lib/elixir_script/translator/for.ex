@@ -15,51 +15,53 @@ defmodule ElixirScript.Translator.For do
     filter = args.filter || JS.function_expression([], [], JS.block_statement([JS.return_statement(JS.identifier("true"))]))
     fun = args.fun
 
-    JS.call_expression(
+    js_ast = JS.call_expression(
       JS.member_expression(
         Primitive.special_forms(),
         JS.identifier("_for")
       ),
       [collections, fun, filter, into]
     )
+
+    { js_ast, env }
   end
 
   defp handle_args(generators, env) do
     Enum.reduce(generators, %{collections: [], args: [], filter: nil, fun: nil, into: nil}, fn
       ({:<-, [], [identifier, enum]}, state) ->
-        { patterns, params } = Match.build_match([identifier], env)
+        { patterns, params, env } = Match.build_match([identifier], env)
+        |> Match.update_env(env)
 
-        list = Primitive.make_list_no_translate([hd(patterns), Translator.translate(enum, env)])
+        list = Primitive.make_list_no_translate([hd(patterns), Translator.translate!(enum, env)])
 
         %{state | collections: state.collections ++ [list], args: state.args ++ params }
       ([into: expression], state) ->
         %{ state | into: Translator.translate(expression, env) }
+        
       ([into: expression, do: expression2], state) ->
-        fun = JS.function_expression(
-          state.args,
-          [],
-          Function.make_function_body(expression2, env)
-        )
+        fun = create_function_expression(expression2, env, state)
 
-        %{ state | into: Translator.translate(expression, env), fun: fun }
+        %{ state | into: Translator.translate!(expression, env), fun: fun }
 
       ([do: expression], state) ->
-
-        fun = JS.function_expression(
-          state.args,
-          [],
-          Function.make_function_body(expression, env)
-        )
+        fun = create_function_expression(expression, env, state)
 
         %{ state | fun: fun }
       (filter, state) ->
-        fun = JS.function_expression(
-          state.args,
-          [],
-          Function.make_function_body(filter, env)
-        )
+        fun = create_function_expression(filter, env, state)
 
         %{ state | filter: fun }
     end)
+  end
+
+
+  defp create_function_expression(ast, env, state) do
+    { ast, _ } = Function.make_function_body(ast, env)
+
+    JS.function_expression(
+      state.args,
+      [],
+      ast
+    )
   end
 end

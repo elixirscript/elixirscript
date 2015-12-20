@@ -16,8 +16,8 @@ defmodule ElixirScript.Translator.Map do
 
   def make_get_property(target, property, env) do
     JS.member_expression(
-      Translator.translate(target, env),
-      Translator.translate(property, env),
+      Translator.translate!(target, env),
+      Translator.translate!(property, env),
       true
     )
   end
@@ -25,8 +25,8 @@ defmodule ElixirScript.Translator.Map do
   def make_object(properties, env) do
     properties
     |> Enum.map(fn
-      ({x, {:__aliases__, _, [value]}}) -> make_property(Translator.translate(x, env), JS.identifier(value))
-      ({x, y}) -> make_property(Translator.translate(x, env), Translator.translate(y, env))
+      ({x, {:__aliases__, _, [value]}}) -> make_property(Translator.translate!(x, env), JS.identifier(value))
+      ({x, y}) -> make_property(Translator.translate!(x, env), Translator.translate!(y, env))
     end)
     |> JS.object_expression
     |> make_map
@@ -49,12 +49,12 @@ defmodule ElixirScript.Translator.Map do
   end
 
   def make_map_update(map, data, env) do
-    map = Translator.translate(map, env)
+    map = Translator.translate!(map, env)
 
     map_update = JS.object_expression(
       Enum.map(data,
         fn({key, value}) ->
-          make_property(Translator.translate(key, env), Translator.translate(value, env))
+          make_property(Translator.translate!(key, env), Translator.translate!(value, env))
         end
       )
     )

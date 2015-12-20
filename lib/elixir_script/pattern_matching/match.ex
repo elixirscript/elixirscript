@@ -100,13 +100,29 @@ defmodule ElixirScript.PatternMatching.Match do
     )
   end
 
+  def update_env({ patterns, params }, env) do
+
+    { params, env } = Enum.map_reduce(params, env, fn
+      (%ESTree.Identifier{} = param, env) ->
+       env = ElixirScript.Env.add_var(env, param.name)
+       new_name = ElixirScript.Env.get_var(env, param.name)
+
+       { %{ param | name: new_name }, env }
+
+      (param, env) ->
+        { param, env }
+    end)
+
+    { patterns, params, env }
+  end
+
   def build_match(params, env) do
     Enum.map(params, &do_build_match(&1, env))
     |> reduce_patterns
   end
 
   defp do_build_match({:^, _, [value]}, env) do
-    { [bound(Translator.translate(value, env))], [nil] }
+    { [bound(Translator.translate!(value, env))], [nil] }
   end
 
   defp do_build_match({:_, _, _}, _) do
@@ -114,17 +130,17 @@ defmodule ElixirScript.PatternMatching.Match do
   end
 
   defp do_build_match([{:|, _, [head, tail]}], env) do
-    { [head_tail()], [Translator.translate(head, env), Translator.translate(tail, env)] }
+    { [head_tail()], [Translator.translate!(head, env), Translator.translate!(tail, env)] }
   end
 
   defp do_build_match({:<>, _, [prefix, value]}, env) do
-    { [starts_with(prefix)], [Translator.translate(value, env)] }
+    { [starts_with(prefix)], [Translator.translate!(value, env)] }
   end
 
   defp do_build_match({:%{}, _, props}, env) do
     properties = Enum.map(props, fn({key, value}) ->
       {pattern, params} = do_build_match(value, env)
-      { Map.make_property(Translator.translate(key, env), hd(List.wrap(pattern))), params }
+      { Map.make_property(Translator.translate!(key, env), hd(List.wrap(pattern))), params }
     end)
 
     {props, params} = Enum.reduce(properties, {[], []}, fn({prop, param}, {props, params}) ->
@@ -158,7 +174,7 @@ defmodule ElixirScript.PatternMatching.Match do
   end
 
   defp do_build_match(term, env) when is_number(term) or is_binary(term) or is_boolean(term) or is_atom(term) or is_nil(term) do
-    { [Translator.translate(term, env)], [] }
+    { [Translator.translate!(term, env)], [] }
   end
 
   defp do_build_match({ one, two }, env) do
@@ -193,7 +209,7 @@ defmodule ElixirScript.PatternMatching.Match do
   end
 
   defp unify(target, source, env) do
-    {patterns, params} = build_match([source], env)
+    { patterns, params } = build_match([source], env)
     { [capture(hd(patterns))], params ++ [JS.identifier(Utils.filter_name(target))] }
   end
 

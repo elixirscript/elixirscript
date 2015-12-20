@@ -65,7 +65,7 @@ defmodule ElixirScript.Translator.Module do
   end
 
   def translate_body(body, env) do
-    body = Translator.translate(body, env)
+    body = Translator.translate!(body, env)
 
     case body do
       [%ESTree.BlockStatement{ body: body }] ->
@@ -177,12 +177,15 @@ defmodule ElixirScript.Translator.Module do
   def process_functions(%{ exported: exported, private: private }, env) do
     exported_functions = Enum.map(Dict.keys(exported), fn(key) ->
       functions = Dict.get(exported, key)
-      { key, Function.process_function(key, functions, env) }
+
+      { functions, _ } = Function.process_function(key, functions, env)
+      { key, functions }
     end)
 
     private_functions = Enum.map(Dict.keys(private), fn(key) ->
       functions = Dict.get(private, key)
-      { key, Function.process_function(key, functions, env) }
+      { functions, _ } = Function.process_function(key, functions, env)
+      { key, functions }
     end)
 
     { exported_functions, private_functions }
@@ -191,7 +194,7 @@ defmodule ElixirScript.Translator.Module do
   def make_attribute(name, value, env) do
     declarator = JS.variable_declarator(
       JS.identifier(name),
-      ElixirScript.Translator.translate(value, env)
+      ElixirScript.Translator.translate!(value, env)
     )
 
     JS.variable_declaration([declarator], :const)

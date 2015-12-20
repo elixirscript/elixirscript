@@ -8,7 +8,8 @@ defmodule ElixirScript.Translator.Capture do
   def make_capture(function_name, arity, env) do
     params = Enum.map(1..arity, fn(x) -> {String.to_atom("__#{x}"), [], ElixirScript.Translator.Capture} end)
 
-    { patterns, params } = Match.build_match(params, env)
+    { patterns, params, _ } = Match.build_match(params, env)
+    |> Match.update_env(env)
 
     body = JS.block_statement([
       JS.return_statement(
@@ -20,7 +21,7 @@ defmodule ElixirScript.Translator.Capture do
     ])
 
     Function.make_defmatch([
-      Function.do_make_function_clause(patterns, params, body)
+      Function.make_function_clause(patterns, params, body)
     ])
   end
 
@@ -33,19 +34,20 @@ defmodule ElixirScript.Translator.Capture do
       name = [:ElixirScript, :Kernel]
     end
 
-    { patterns, params } = Match.build_match(arity_params, env)
+    { patterns, params, env } = Match.build_match(arity_params, env)
+    |> Match.update_env(env)
+
+    {func, _} = Function.make_function_call({:__aliases__, [], name }, function_name, arity_params, env)
 
     body = JS.block_statement([
       JS.return_statement(
-        Function.make_function_call({:__aliases__, [], name }, function_name, arity_params, env)
+        func
       )
     ])
 
     Function.make_defmatch([
-      Function.do_make_function_clause(patterns, params, body)
+      Function.make_function_clause(patterns, params, body)
     ])
-
-
   end
 
   def find_value_placeholders(ast) do

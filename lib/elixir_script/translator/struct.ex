@@ -32,7 +32,7 @@ defmodule ElixirScript.Translator.Struct do
         get_struct_class(module_name, env),
         JS.identifier(:create)
       ),
-      [Translator.translate(data, env)]
+      [Translator.translate!(data, env)]
     )
   end
 
@@ -41,8 +41,8 @@ defmodule ElixirScript.Translator.Struct do
 
     defaults = Enum.map(attributes, fn({x, y}) ->
       Map.make_property(
-        Translator.translate(x, env),
-        Translator.translate(y, env)
+        Translator.translate!(x, env),
+        Translator.translate!(y, env)
       )
     end)
     |> JS.object_expression
@@ -53,8 +53,8 @@ defmodule ElixirScript.Translator.Struct do
   def make_defstruct(attributes, env) do
     defaults = Enum.map(attributes, fn(x) ->
       Map.make_property(
-        Translator.translate(x, env),
-        Translator.translate(nil, env)
+        Translator.translate!(x, env),
+        Translator.translate!(nil, env)
       )
     end)
     |> JS.object_expression
@@ -63,20 +63,20 @@ defmodule ElixirScript.Translator.Struct do
   end
 
   def make_defexception(attributes, env) when length(attributes) == 1 do
-    exception_key_value = Map.make_property(Translator.translate(:__exception__, env), Translator.translate(true, env))
+    exception_key_value = Map.make_property(Translator.translate!(:__exception__, env), Translator.translate!(true, env))
 
     attributes = Enum.flat_map(attributes, fn(x) -> x end)
 
     defaults = [exception_key_value] ++ Enum.map(attributes, fn
       ({x, y}) ->
         Map.make_property(
-          Translator.translate(x, env),
-          Translator.translate(y, env)
+          Translator.translate!(x, env),
+          Translator.translate!(y, env)
         )
       (x) ->
         Map.make_property(
-          Translator.translate(x, env),
-          Translator.translate(nil, env)
+          Translator.translate!(x, env),
+          Translator.translate!(nil, env)
         )
     end)
     |> JS.object_expression
@@ -85,13 +85,13 @@ defmodule ElixirScript.Translator.Struct do
   end
 
   def make_defexceptions(attributes, env) do
-    exception_key_value = Map.make_property(Translator.translate(:__exception__, env), Translator.translate(true, env))
+    exception_key_value = Map.make_property(Translator.translate!(:__exception__, env), Translator.translate!(true, env))
 
     defaults = [exception_key_value] ++ Enum.map(attributes, fn
       (x) ->
         Map.make_property(
-          Translator.translate(x, env),
-          Translator.translate(nil, env)
+          Translator.translate!(x, env),
+          Translator.translate!(nil, env)
         )
     end)
     |> JS.object_expression
@@ -100,7 +100,7 @@ defmodule ElixirScript.Translator.Struct do
   end
 
   defp do_make_defstruct(name, defaults, env) do
-    struct_name = Map.make_property(Translator.translate(:__struct__, env), Translator.translate({:__MODULE__, [], []}, env))
+    struct_name = Map.make_property(Translator.translate!(:__struct__, env), Translator.translate!({:__MODULE__, [], []}, env))
 
     defaults = %{ defaults | properties: [struct_name]  ++ defaults.properties }
 

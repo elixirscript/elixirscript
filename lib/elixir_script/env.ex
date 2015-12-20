@@ -19,7 +19,6 @@ defmodule ElixirScript.Env do
     caller: nil
   ]
 
-
   def module_env(module, filename) do
     %ElixirScript.Env{ module: module, file: filename }
   end
@@ -32,8 +31,37 @@ defmodule ElixirScript.Env do
     %{ env |  function: nil, caller: env, vars: [] }
   end
 
+  def add_var(env, variable_name) when is_binary(variable_name) do
+    add_var(env, String.to_atom(variable_name))
+  end
+
   def add_var(env, variable_name) do
-    %{ env |  vars: Keyword.update!(env.vars, variable_name, 0, &(&1 + 1)) }
+    %{ env |  vars: Keyword.update(env.vars, variable_name, 0, &(&1 + 1)) }
+  end
+
+  def get_var(env, variable_name) when is_binary(variable_name) do
+    get_var(env, String.to_atom(variable_name))
+  end
+
+  def get_var(env, variable_name) do
+    count = Keyword.get(env.vars, variable_name, nil)
+
+    case count do
+      nil ->
+        nil
+      0 ->
+        String.to_atom(Atom.to_string(variable_name))
+      _ ->
+        String.to_atom(Atom.to_string(variable_name) <> to_string(count))
+    end
+  end
+
+  def has_var?(env, variable_name) when is_binary(variable_name) do
+    has_var?(env, String.to_atom(variable_name))
+  end
+
+  def has_var?(env, variable_name) do
+    Keyword.get(env.vars, variable_name, nil) != nil
   end
 
   def add_alias(env, module_name, alias_name) do

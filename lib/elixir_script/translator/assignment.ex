@@ -6,7 +6,10 @@ defmodule ElixirScript.Translator.Assignment do
   alias ElixirScript.PatternMatching.Match
 
   def make_assignment(left, right, env) do
-    { patterns, params } = Match.build_match([left], env)
+    { right_ast, env } = Translator.translate(right, env)
+
+    { patterns, params, env } = Match.build_match([left], env)
+    |> Match.update_env(env)
 
       declarator = JS.variable_declarator(
         JS.array_pattern(params),
@@ -21,13 +24,13 @@ defmodule ElixirScript.Translator.Assignment do
             ),
             JS.identifier("match")
           ),
-          [hd(patterns), Translator.translate(right, env)]
+          [hd(patterns), right_ast]
         )
       )
 
     array_pattern = JS.variable_declaration([declarator], :let)
 
-    case left do
+    js_ast = case left do
       list when is_list(list) ->
         make_ref(array_pattern, params, "list")
       {_left1, _left2} ->
@@ -37,6 +40,8 @@ defmodule ElixirScript.Translator.Assignment do
       _ ->
         array_pattern
     end
+
+    { js_ast, env }
   end
 
   defp make_ref(array_pattern, params, type) do

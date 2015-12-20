@@ -107,30 +107,6 @@ defmodule ElixirScript.Translator.Protocol do
     end)
   end
 
-  def make_standard_lib_impl(protocol, type, impl, env) do
-    type = map_to_js(type)
-    protocol = Translator.translate(protocol, env)
-
-    { _, functions } = Module.extract_functions_from_module(impl)
-    { exported_functions, _ } = process_functions(functions, env)
-
-    object = Enum.map(exported_functions, fn({key, value}) ->
-      Map.make_property(JS.identifier(Utils.filter_name(key)), value)
-    end)
-    |> JS.object_expression
-
-    JS.call_expression(
-      JS.member_expression(
-        JS.identifier(:Elixir),
-        JS.member_expression(
-          JS.identifier(:Kernel),
-          JS.identifier(:defimpl)
-        )
-      ),
-      [protocol, type, object]
-    )
-  end
-
   defp create_module(name, spec, impls, imports, body, _) do
     default = JS.export_default_declaration(JS.identifier(ElixirScript.Module.name_to_js_name(name)))
 
@@ -161,12 +137,17 @@ defmodule ElixirScript.Translator.Protocol do
   defp process_functions(%{ exported: exported, private: private }, env) do
     exported_functions = Enum.map(Dict.keys(exported), fn(key) ->
       functions = Dict.get(exported, key)
-      { key, Function.make_anonymous_function(functions, env) }
+
+      { functions, _ } = Function.make_anonymous_function(functions, env)
+
+      { key, functions }
     end)
 
     private_functions = Enum.map(Dict.keys(private), fn(key) ->
       functions = Dict.get(private, key)
-      { key, Function.make_anonymous_function(functions, env) }
+      { functions, _ } = Function.make_anonymous_function(functions, env)
+
+      { key, functions }
     end)
 
     { exported_functions, private_functions }
@@ -257,7 +238,7 @@ defmodule ElixirScript.Translator.Protocol do
       nil
     end
 
-    Translator.translate(quoted, ElixirScript.State.get().env)
+    Translator.translate!(quoted, ElixirScript.State.get().env)
   end
 
 

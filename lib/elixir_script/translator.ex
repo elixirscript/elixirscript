@@ -17,7 +17,6 @@ defmodule ElixirScript.Translator do
   alias ElixirScript.Translator.Module
   alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.Bitstring
-  alias ElixirScript.Translator.Receive
   alias ElixirScript.Translator.Quote
   alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.JS, as: JSLib
@@ -31,12 +30,17 @@ defmodule ElixirScript.Translator do
     do_translate(ast, env)
   end
 
-  defp do_translate(ast, _) when is_number(ast) or is_binary(ast) or is_boolean(ast) or is_nil(ast) do
-    Primitive.make_literal(ast)
+  def translate!(ast, env) do
+    { js_ast, _ } = translate(ast, env)
+    js_ast
   end
 
-  defp do_translate(ast, _) when is_atom(ast) do
-    Primitive.make_atom(ast)
+  defp do_translate(ast, env) when is_number(ast) or is_binary(ast) or is_boolean(ast) or is_nil(ast) do
+    { Primitive.make_literal(ast), env }
+  end
+
+  defp do_translate(ast, env) when is_atom(ast) do
+    { Primitive.make_atom(ast), env }
   end
 
   defp do_translate(ast, env) when is_list(ast) do
@@ -76,7 +80,8 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:throw, _, [params]}, env) do
-    JS.throw_statement(Translator.translate(params, env))
+    { result, env } = translate(params, env)
+    { JS.throw_statement(result), env }
   end
 
   defp do_translate({:<>, context, [left, right]}, env) do
@@ -93,21 +98,22 @@ defmodule ElixirScript.Translator do
 
   defp do_translate({:.., _, [first, last]}, env) do
     quoted_range = quote do: Range.(unquote(first), unquote(last))
+
     translate(quoted_range, env)
   end
 
-  defp do_translate({:&, [], [number]}, _) when is_number(number) do
-    Primitive.make_identifier(String.to_atom("__#{number}"))
+  defp do_translate({:&, _, [number]}, env) when is_number(number) do
+    { Primitive.make_identifier(String.to_atom("__#{number}")), env }
   end
 
   defp do_translate({:&, _, [{:/, _, [{{:., _, [module_name, function_name]}, _, []}, arity]}]}, env) do
     function_name = Utils.filter_name(function_name)
-    Capture.make_capture(module_name, function_name, arity, env)
+    { Capture.make_capture(module_name, function_name, arity, env), env }
   end
 
   defp do_translate({:&, _, [{:/, _, [{function_name, _, _}, arity]}]}, env) do
     function_name = Utils.filter_name(function_name)
-    Capture.make_capture(function_name, arity, env)
+    { Capture.make_capture(function_name, arity, env), env }
   end
 
   defp do_translate({:&, _, body}, env) do
@@ -115,31 +121,31 @@ defmodule ElixirScript.Translator do
     Function.make_anonymous_function([{:->, [], [params, body]}], env)
   end
 
-  defp do_translate({:@, _, [{name, _, _}]}, _)
+  defp do_translate({:@, _, [{name, _, _}]}, env)
   when name in [:doc, :moduledoc, :type, :typep, :spec, :opaque, :callback, :macrocallback] do
-    %ElixirScript.Translator.Group{}
+    { %ElixirScript.Translator.Group{}, env }
   end
 
   defp do_translate({:@, _, [{name, _, [value]}]}, env) do
     name = Utils.filter_name(name)
-    Module.make_attribute(name, value, env)
+    { Module.make_attribute(name, value, env), env }
   end
 
-  defp do_translate({:@, _, [{name, _, _}]}, _) do
+  defp do_translate({:@, _, [{name, _, _}]}, env) do
     name = Utils.filter_name(name)
-    Primitive.make_identifier(name)
+    { Primitive.make_identifier(name), env }
   end
 
   defp do_translate({:%, _, [alias_info, data]}, env) do
-    Struct.new_struct(alias_info, data, env)
+    { Struct.new_struct(alias_info, data, env), env }
   end
 
   defp do_translate({:%{}, _, [{:|, _, [map, data]}]}, env) do
-    Map.make_map_update(map, data, env);
+    { Map.make_map_update(map, data, env), env }
   end
 
   defp do_translate({:%{}, _, properties}, env) do
-    Map.make_object(properties, env)
+    { Map.make_object(properties, env), env }
   end
 
   defp do_translate({:<<>>, _, elements}, env) do
@@ -163,7 +169,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({{:., _, [Access, :get]}, _, [target, property]}, env) do
-    Map.make_get_property(target, property, env)
+    { Map.make_get_property(target, property, env), env }
   end
 
   defp do_translate({{:., _, [function_name]}, _, params}, env) do
@@ -201,7 +207,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({{:., _, [{:__aliases__, _, [:JS]}, function_name]}, _, params }, env) do
-    JSLib.translate_js_function(function_name, params, env)
+    { JSLib.translate_js_function(function_name, params, env), env }
   end
 
   defp do_translate({{:., _, [module_name, function_name]}, _, params } = ast, env) do
@@ -214,12 +220,12 @@ defmodule ElixirScript.Translator do
     end
   end
 
-  defp do_translate({:_, _, _}, _env) do
-    Primitive.make_identifier(:undefined)
+  defp do_translate({:_, _, _}, env) do
+    { Primitive.make_identifier(:undefined), env }
   end
 
-  defp do_translate({:__aliases__, _, aliases}, _) do
-    Primitive.make_identifier({:__aliases__, [], aliases})
+  defp do_translate({:__aliases__, _, aliases}, env) do
+    { Primitive.make_identifier({:__aliases__, [], aliases}), env }
   end
 
   defp do_translate({:__MODULE__, _, _ }, env) do
@@ -230,25 +236,24 @@ defmodule ElixirScript.Translator do
     Block.make_block(expressions, env)
   end
 
-  defp do_translate({:__DIR__, _, _}, _) do
-    JS.call_expression(
-      JS.member_expression(
-        Primitive.special_forms(),
-        JS.identifier(:__DIR__)
-      ),
-      []
-    )
+  defp do_translate({:__DIR__, _, _}, env) do
+    case env.file do
+      nil ->
+        { JS.identifier(:null), env }
+      filepath ->
+        { JS.literal(Path.dirname(filepath)), env }
+    end
   end
 
   defp do_translate({:try, _, [ blocks ]}, env) do
     Try.make_try(blocks, env)
   end
 
-  defp do_translate({:receive, _, [expressions] }, env) do
-    Receive.make_receive(expressions, env);
+  defp do_translate({:receive, _, _ }, _ ) do
+    raise ElixirScript.UnsupportedError, "receive"
   end
 
-  defp do_translate({:super, _, _expressions }, _) do
+  defp do_translate({:super, _, _expressions }, _ ) do
     raise ElixirScript.UnsupportedError, "super"
   end
 
@@ -263,23 +268,23 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:quote, _, [[do: expr]]}, env) do
-    Quote.make_quote([], expr, env)
+    { Quote.make_quote([], expr, env), env }
   end
 
   defp do_translate({:quote, _, [opts, [do: expr]]}, env) do
-    Quote.make_quote(opts, expr, env)
+    { Quote.make_quote(opts, expr, env), env }
   end
 
-  defp do_translate({:import, _, _}, _) do
-    %ElixirScript.Translator.Group{}
+  defp do_translate({:import, _, _}, env) do
+    { %ElixirScript.Translator.Group{}, env }
   end
 
-  defp do_translate({:alias, _, _}, _) do
-    %ElixirScript.Translator.Group{}
+  defp do_translate({:alias, _, _}, env) do
+    { %ElixirScript.Translator.Group{}, env }
   end
 
-  defp do_translate({:require, _, _}, _) do
-    %ElixirScript.Translator.Group{}
+  defp do_translate({:require, _, _}, env) do
+    { %ElixirScript.Translator.Group{}, env }
   end
 
   defp do_translate({:case, _, [condition, [do: clauses]]}, env) do
@@ -307,31 +312,28 @@ defmodule ElixirScript.Translator do
     Assignment.make_assignment(left, right, env)
   end
 
-  defp do_translate({function, _, [{:when, _, [{name, _, params} | _guards] }, [do: _body]] } = ast, env) when function in [:def, :defp] do
-    env = ElixirScript.Env.function_env(env, {name, length(params)})
+  defp do_translate({function, _, [{:when, _, [{name, _, _params} | _guards] }, [do: _body]] } = ast, env) when function in [:def, :defp] do
     Function.process_function(Utils.filter_name(name), [ast], env)
   end
 
   defp do_translate({function, _, [{name, _, params}, [do: _body]]} = ast, env) when function in [:def, :defp] and is_atom(params) do
-    env = ElixirScript.Env.function_env(env, { name, 0 })
     Function.process_function(Utils.filter_name(name), [ast], env)
   end
 
-  defp do_translate({function, _, [{name, _, params}, [do: _body]]} = ast, env) when function in [:def, :defp] do
-    env = ElixirScript.Env.function_env(env, { name, length(params) })
+  defp do_translate({function, _, [{name, _, _params}, [do: _body]]} = ast, env) when function in [:def, :defp] do
     Function.process_function(Utils.filter_name(name), [ast], env)
   end
 
   defp do_translate({:defstruct, _, attributes}, env) do
-    Struct.make_defstruct(attributes, env)
+    { Struct.make_defstruct(attributes, env), env }
   end
 
   defp do_translate({:defexception, _, attributes}, env) do
-    Struct.make_defexception(attributes, env)
+    { Struct.make_defexception(attributes, env), env }
   end
 
   defp do_translate({:defmodule, _, [{:__aliases__, _, module_name_list}, [do: body]]}, env) do
-    Module.make_module(module_name_list, body, env)
+    { Module.make_module(module_name_list, body, env), env }
   end
 
   defp do_translate({:defprotocol, _, _}, _) do
@@ -359,21 +361,25 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:raise, _, [alias_info, attributes]}, env) do
-    JS.throw_statement(
+    js_ast = JS.throw_statement(
       Struct.new_struct(alias_info, {:%{}, [], attributes }, env)
     )
+
+    { js_ast, env }
   end
 
   defp do_translate({:raise, _, [message]}, env) do
-    JS.throw_statement(
+    js_ast = JS.throw_statement(
       JS.object_expression(
         [
-          Map.make_property(translate(:__struct__, env), translate(:RuntimeError, env)),
-          Map.make_property(translate(:__exception__, env), translate(true, env)),
-          Map.make_property(translate(:message, env), JS.literal(message))
+          Map.make_property(translate!(:__struct__, env), translate!(:RuntimeError, env)),
+          Map.make_property(translate!(:__exception__, env), translate!(true, env)),
+          Map.make_property(translate!(:message, env), JS.literal(message))
         ]
       )
     )
+
+    { js_ast, env }
   end
 
   defp do_translate({name, context, params} = ast, env) when is_list(params) do
@@ -403,10 +409,10 @@ defmodule ElixirScript.Translator do
       end
   end
 
-  defp do_translate({ name, _, params }, _) when is_atom(params) do
-    #TODO: check if function
+  defp do_translate({ name, _, params }, env) when is_atom(params) do
+    #TODO: check if name is function
     name = Utils.filter_name(name)
-    Primitive.make_identifier(name)
+    { Primitive.make_identifier(name), env }
   end
 
 end

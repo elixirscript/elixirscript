@@ -62,8 +62,9 @@ defmodule ElixirScript do
 
     ElixirScript.State.start_link(root, env)
 
-    libs = @libs
-    |> updated_quoted
+    libs = []
+    #libs = @libs
+    #|> updated_quoted
 
     build_environment(libs ++ [updated_quoted(quoted)])
     create_code(include_path, import_standard_libs?, stdlib_path)
@@ -235,16 +236,18 @@ defmodule ElixirScript do
   end
 
   defp prepare_js_ast(js_ast) do
-    case js_ast do
+    js_ast = case js_ast do
       modules when is_list(modules) ->
         modules
         |> Enum.reduce([], &(&2 ++ &1.body))
         |> Builder.program
-      %ElixirScript.Translator.Group{body: body} ->
+      %ElixirScript.Translator.Group{ body: body } ->
         Builder.program(body)
       _ ->
         js_ast
     end
+
+    js_ast
   end
 
   defp operating_path do
