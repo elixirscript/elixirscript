@@ -119,4 +119,9 @@ defmodule ElixirScript.Module do
     Enum.join([:Elixir] ++ name, ".")
   end
 
+  def has_function?(module_name, name_arity) do
+    module = ElixirScript.State.get_module(module_name)
+    name_arity in module.functions or name_arity in module.private_functions
+  end
+
 end

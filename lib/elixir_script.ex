@@ -138,7 +138,7 @@ defmodule ElixirScript do
       Map.values(state.modules)
       |> Enum.map(fn ast ->
         spawn_link fn ->
-          env = ElixirScript.Env.module_env(ast.name, "file.ex")
+          env = ElixirScript.Env.module_env(ast.name, "#{create_file_name(ast.name)}")
 
           result = case ast.type do
             :module ->
@@ -215,6 +215,11 @@ defmodule ElixirScript do
 
   defp create_file_name(%JSModule{name: module}) do
     name = ElixirScript.Module.name_to_js_file_name(module)
+    "#{name}.js"
+  end
+
+  defp create_file_name(name) do
+    name = ElixirScript.Module.name_to_js_file_name(name)
     "#{name}.js"
   end
 

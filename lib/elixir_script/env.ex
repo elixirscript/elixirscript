@@ -39,6 +39,19 @@ defmodule ElixirScript.Env do
     %{ env |  function: nil, caller: env, vars: [] }
   end
 
+  def find_module(env, name_arity) do
+    result = Enum.find(env.functions ++ env.macros, fn({_, functions}) ->
+      name_arity in functions
+    end)
+
+    if result == nil do
+      nil
+    else
+      elem(result, 0)
+    end
+
+  end
+
   def add_var(env, variable_name) when is_binary(variable_name) do
     add_var(env, String.to_atom(variable_name))
   end
@@ -86,6 +99,7 @@ defmodule ElixirScript.Env do
   def add_import(env, module_name) do
     module = get_module(env, module_name)
 
+
     %{ env | requires: env.requires ++ [module.name],
     functions: env.functions ++ [{ module.name, module.functions }],
     macros: env.macros ++ [{ module.name, module.macros }] }
@@ -94,6 +108,7 @@ defmodule ElixirScript.Env do
   def add_import(env, module_name, [only: :functions]) do
     module = get_module(env, module_name)
 
+
     %{ env | requires: env.requires ++ [module.name],
     functions: env.functions ++ [{ module.name, module.functions }] }
   end
@@ -101,12 +116,14 @@ defmodule ElixirScript.Env do
   def add_import(env, module_name, [only: :macros]) do
     module = get_module(env, module_name)
 
+
     %{ env | requires: env.requires ++ [module.name],
     macros: env.macros ++ [{ module.name, module.macros }] }
   end
 
   def add_import(env, module_name, [only: only]) do
     module = get_module(env, module_name)
+
 
     macros = Enum.filter(module.macros, fn(mac) -> mac in only end)
     functions = Enum.filter(module.functions, fn(func) -> func in only end)
@@ -118,6 +135,7 @@ defmodule ElixirScript.Env do
 
   def add_import(env, module_name, [except: except]) do
     module = get_module(env, module_name)
+
 
     macros = Enum.filter(module.macros, fn(mac) -> not(mac in except) end)
     functions = Enum.filter(module.functions, fn(func) -> not(func in except) end)
@@ -136,14 +154,27 @@ defmodule ElixirScript.Env do
   def add_require(env, module_name) do
     module = get_module(env, module_name)
 
+
     %{ env | requires: env.requires ++ [module.name] }
   end
 
   def add_require(env, module_name, alias_name) do
     module = get_module(env, module_name)
 
+
     %{ env | aliases: env.aliases ++ [{alias_name, module.name}],
     requires: env.requires ++ [module.name] }
+  end
+
+  def get_module_name(env, module_name) do
+    module_name = ElixirScript.Preprocess.Modules.get_module_name(module_name)
+
+    if Keyword.has_key?(env.aliases, module_name) do
+      Keyword.fetch!(env.aliases, module_name)
+    else
+      module_name
+    end
+
   end
 
 end

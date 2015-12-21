@@ -178,6 +178,13 @@ defmodule ElixirScript.State do
     end)
   end
 
+  def list_module_names() do
+    Agent.get(__MODULE__, fn(x) ->
+      Map.values(x.modules)
+      |> Enum.map(fn(x) -> x.name end)
+    end)
+  end
+
   def stop do
     Agent.stop(__MODULE__)
   end

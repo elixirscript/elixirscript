@@ -213,7 +213,7 @@ defmodule ElixirScript.Translator.Function do
       {{:., _, [{:__aliases__, _, _}]}, _, _} = ast ->
         ast
       name ->
-        name
+        get_js_name(name, env)
     end
 
     { Utils.make_call_expression(the_name, Utils.filter_name(function_name), params, env), env }
@@ -318,17 +318,13 @@ defmodule ElixirScript.Translator.Function do
   end
 
   defp get_js_name(module_name, env) do
+
     cond do
-      ElixirScript.Module.has_alias?(ElixirScript.State.get_module(env.module), module_name) ->
-        module = ElixirScript.State.get_module(env.module)
-        {_, module_name } = ElixirScript.Module.get_alias(module, module_name)
-        ElixirScript.State.add_module_reference(env.module, module.name)
+      module_name in env.requires ->
         ElixirScript.Module.name_to_js_name(module_name)
 
-      ElixirScript.State.get_module(module_name) ->
-        module = ElixirScript.State.get_module(module_name)
-
-        ElixirScript.State.add_module_reference(env.module, module.name)
+      module_name in ElixirScript.State.list_module_names ->
+        ElixirScript.State.add_module_reference(env.module, module_name)
         ElixirScript.Module.name_to_js_name(module_name)
 
       true ->

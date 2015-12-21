@@ -183,10 +183,12 @@ defmodule ElixirScript.Preprocess.Modules do
   end
 
   defp add_function_to_map(map, type, name, arity) do
-    unless Enum.member?(Keyword.get_values(Map.get(map, type), name), arity) do
-      Map.put(map, type, Keyword.put(Map.get(map, type), name, arity))
-    else
+    list = Map.get(map, type)
+
+    if {name, arity} in list do
       map
+    else
+      Map.put(map, type, list ++ [{ name, arity }])
     end
   end
 
