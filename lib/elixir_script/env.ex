@@ -19,8 +19,16 @@ defmodule ElixirScript.Env do
     caller: nil
   ]
 
-  def module_env(module, filename) do
-    %ElixirScript.Env{ module: module, file: filename }
+  def module_env(module_name, filename) do
+    module = ElixirScript.State.get_module(module_name)
+
+    env = %ElixirScript.Env{
+      module: module_name, file: filename, requires: [],
+      functions: [{ module.name, module.functions}],
+      macros: [{ module.name, module.macros}]
+    }
+
+    add_import(env, ElixirScript.Kernel)
   end
 
   def function_env(env, { _, _ } = func) do
@@ -64,17 +72,78 @@ defmodule ElixirScript.Env do
     Keyword.get(env.vars, variable_name, nil) != nil
   end
 
-  def add_alias(env, module_name, alias_name) do
-    %{ env |  aliases: env.aliases ++ [{alias_name, module_name}] }
+  defp get_module(env, module_name) do
+    module = ElixirScript.State.get_module(module_name)
+
+    unless module do
+      raise "Module #{module_name} not found"
+    end
+
+    ElixirScript.State.add_module_reference(env.module, module.name)
+    module
   end
 
-  def add_import(env, module_name, functions, macros) do
-    %{ env |  functions: env.functions ++ [{module_name, functions}],
-              macros: env.macros ++ [{module_name, macros}] }
+  def add_import(env, module_name) do
+    module = get_module(env, module_name)
+
+    %{ env | requires: env.requires ++ [module.name],
+    functions: env.functions ++ [{ module.name, module.functions }],
+    macros: env.macros ++ [{ module.name, module.macros }] }
+  end
+
+  def add_import(env, module_name, [only: :functions]) do
+    module = get_module(env, module_name)
+
+    %{ env | requires: env.requires ++ [module.name],
+    functions: env.functions ++ [{ module.name, module.functions }] }
+  end
+
+  def add_import(env, module_name, [only: :macros]) do
+    module = get_module(env, module_name)
+
+    %{ env | requires: env.requires ++ [module.name],
+    macros: env.macros ++ [{ module.name, module.macros }] }
+  end
+
+  def add_import(env, module_name, [only: only]) do
+    module = get_module(env, module_name)
+
+    macros = Enum.filter(module.macros, fn(mac) -> mac in only end)
+    functions = Enum.filter(module.functions, fn(func) -> func in only end)
+
+    %{ env | requires: env.requires ++ [module.name],
+    functions: env.functions ++ [{ module.name, functions }],
+    macros: env.macros ++ [{ module.name, macros }] }
+  end
+
+  def add_import(env, module_name, [except: except]) do
+    module = get_module(env, module_name)
+
+    macros = Enum.filter(module.macros, fn(mac) -> not(mac in except) end)
+    functions = Enum.filter(module.functions, fn(func) -> not(func in except) end)
+
+    %{ env | requires: env.requires ++ [module.name],
+    functions: env.functions ++ [{ module.name, functions }],
+    macros: env.macros ++ [{ module.name, macros }] }
+  end
+
+  def add_alias(env, module_name, alias_name) do
+    module = get_module(env, module_name)
+
+    %{ env | aliases: env.aliases ++ [{alias_name, module.name}] }
   end
 
   def add_require(env, module_name) do
-    %{ env |  requires: env.requires ++ [module_name] }
+    module = get_module(env, module_name)
+
+    %{ env | requires: env.requires ++ [module.name] }
+  end
+
+  def add_require(env, module_name, alias_name) do
+    module = get_module(env, module_name)
+
+    %{ env | aliases: env.aliases ++ [{alias_name, module.name}],
+    requires: env.requires ++ [module.name] }
   end
 
 end

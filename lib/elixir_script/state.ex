@@ -86,12 +86,18 @@ defmodule ElixirScript.State do
     do_get_module(state, module)
   end
 
+  def get_module({:__aliases__, _, _} = name) do
+    state = Agent.get(__MODULE__, &(&1))
+    do_get_module(state, ElixirScript.Module.quoted_to_name(name))
+  end
+
   def get_module(module_name_list) when is_list(module_name_list) do
     state = Agent.get(__MODULE__, &(&1))
     do_get_module(state, ElixirScript.Module.quoted_to_name({:__aliases__, [], module_name_list}))
   end
 
   defp do_get_module(state, name) do
+    name = ElixirScript.Preprocess.Modules.get_module_name(name)
     Map.get(state.modules, name)
   end
 

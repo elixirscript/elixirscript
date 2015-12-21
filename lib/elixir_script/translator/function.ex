@@ -127,7 +127,7 @@ defmodule ElixirScript.Translator.Function do
 
   defp process_params(params, env) do
     params = wrap_params(params)
-    
+
     { patterns, params, env } = Match.process_match(params, env)
 
     { patterns, make_params(params), env }
@@ -322,11 +322,13 @@ defmodule ElixirScript.Translator.Function do
       ElixirScript.Module.has_alias?(ElixirScript.State.get_module(env.module), module_name) ->
         module = ElixirScript.State.get_module(env.module)
         {_, module_name } = ElixirScript.Module.get_alias(module, module_name)
-        ElixirScript.State.add_module_reference(env.module, module_name)
+        ElixirScript.State.add_module_reference(env.module, module.name)
         ElixirScript.Module.name_to_js_name(module_name)
 
       ElixirScript.State.get_module(module_name) ->
-        ElixirScript.State.add_module_reference(env.module, module_name)
+        module = ElixirScript.State.get_module(module_name)
+
+        ElixirScript.State.add_module_reference(env.module, module.name)
         ElixirScript.Module.name_to_js_name(module_name)
 
       true ->

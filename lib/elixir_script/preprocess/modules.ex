@@ -77,18 +77,13 @@ defmodule ElixirScript.Preprocess.Modules do
         body
     end
 
-    functions = get_functions_from_module(body)
-    macros = get_macros_from_module(body)
-    aliases = get_aliases_from_module(body)
-    requires = get_requires_from_module(body)
-    imports = get_imports_from_module(body)
+    %{def: functions, defp: private_functions, defmacro: macros, defmacrop: private_macros } = get_functions_from_module(body)
     js_imports = get_js_imports_from_module(body)
 
-    aliases = MapSet.union(aliases, requires.aliases) |> MapSet.union(imports.aliases)
     %ElixirScript.Module{ name: ElixirScript.Module.quoted_to_name({:__aliases__, [], module_name_list}) , body: body,
-    functions: functions, macros: macros,
-    aliases: aliases, requires: requires.requires,
-    imports: imports.imports, js_imports: js_imports }
+    functions: functions, private_functions: private_functions,
+    macros: macros, private_macros: private_macros,
+    js_imports: js_imports }
   end
 
   defp make_inner_module_aliases(module_name_list, body) do
@@ -123,18 +118,10 @@ defmodule ElixirScript.Preprocess.Modules do
   end
 
   defp add_module_to_state(module_name_list, module_name_list2, body2) do
-    functions = get_functions_from_module(body2)
-    macros = get_macros_from_module(body2)
-    aliases = get_aliases_from_module(body2)
-    requires = get_requires_from_module(body2)
-    imports = get_imports_from_module(body2)
+    %{def: functions, defp: private_functions, defmacro: macros, defmacrop: private_macros } = get_functions_from_module(body2)
     js_imports = get_js_imports_from_module(body2)
 
     inner_alias = {:alias, [], [{:__aliases__, [alias: false], module_name_list ++ module_name_list2}]}
-    {inner_alias_atom, _ } = Code.eval_quoted({:__aliases__, [alias: false], module_name_list ++ module_name_list2})
-
-    aliases = MapSet.put(aliases, {inner_alias_atom, inner_alias_atom})
-    aliases = MapSet.union(aliases, requires.aliases) |> MapSet.union(imports.aliases)
 
     module_name = ElixirScript.Module.quoted_to_name({:__aliases__, [], tl(module_name_list) ++ module_name_list2})
     State.delete_module_by_name(module_name)
@@ -142,8 +129,9 @@ defmodule ElixirScript.Preprocess.Modules do
     module_name = ElixirScript.Module.quoted_to_name({:__aliases__, [], module_name_list ++ module_name_list2})
 
     mod = %ElixirScript.Module{ name: module_name, body: body2,
-    functions: functions, macros: macros, aliases: aliases,
-    requires: requires.requires, js_imports: js_imports  }
+    functions: functions, private_functions: private_functions,
+    macros: macros, private_macros: private_macros,
+    js_imports: js_imports  }
 
     State.add_module(mod)
 
@@ -152,35 +140,37 @@ defmodule ElixirScript.Preprocess.Modules do
 
 
   defp get_functions_from_module({:__block__, _, list}) do
-    Enum.reduce(list, Keyword.new, fn
-    ({:def, _, [{:when, _, [{name, _, params} | _guards] }, [do: _body]] }, state) when is_atom(params) ->
+    Enum.reduce(list, %{ def: Keyword.new, defp: Keyword.new, defmacro: Keyword.new, defmacrop: Keyword.new }, fn
+    ({type, _, [{:when, _, [{name, _, params} | _guards] }, [do: _body]] }, state) when type in [:def, :defp] and is_atom(params) ->
       arity = 0
 
-      unless Enum.member?(Keyword.get_values([], name), arity) do
-        Keyword.put(state, name, arity);
-      end
+      add_function_to_map(state, type, name, arity)
 
-    ({:def, _, [{:when, _, [{name, _, params} | _guards] }, [do: _body]] }, state) ->
+    ({type, _, [{:when, _, [{name, _, params} | _guards] }, [do: _body]] }, state) when type in [:def, :defp] ->
       arity = if is_nil(params), do: 0, else: length(params)
 
-      unless Enum.member?(Keyword.get_values([], name), arity) do
-        Keyword.put(state, name, arity);
-      end
+      add_function_to_map(state, type, name, arity)
 
-    ({:def, _, [{name, _, params}, [do: _body]]}, state) when is_atom(params) ->
+    ({type, _, [{name, _, params}, [do: _body]]}, state) when type in [:def, :defp] and is_atom(params) ->
       arity = 0
 
-      unless Enum.member?(Keyword.get_values([], name), arity) do
-        Keyword.put(state, name, arity);
-      end
+      add_function_to_map(state, type, name, arity)
 
 
-    ({:def, _, [{name, _, params}, [do: _body]]}, state) ->
+    ({type, _, [{name, _, params}, [do: _body]]}, state) when type in [:def, :defp] ->
       arity = if is_nil(params), do: 0, else: length(params)
 
-      unless Enum.member?(Keyword.get_values([], name), arity) do
-        Keyword.put(state, name, arity);
-      end
+      add_function_to_map(state, type, name, arity)
+
+    ({type, _, [{:when, _, [{name, _, params} | _guards] }, [do: _body]] }, state) when type in [:defmacro, :defmacrop] ->
+      arity = length(params)
+
+      add_function_to_map(state, type, name, arity)
+
+    ({type, _, [{name, _, params}, [do: _body]]}, state)  when type in [:defmacro, :defmacrop]  ->
+      arity = length(params)
+
+      add_function_to_map(state, type, name, arity)
 
       _, state ->
         state
@@ -189,111 +179,16 @@ defmodule ElixirScript.Preprocess.Modules do
   end
 
   defp get_functions_from_module(_) do
-    Keyword.new
+    %{ def: Keyword.new, defp: Keyword.new, defmacro: Keyword.new, defmacrop: Keyword.new }
   end
 
-  defp get_macros_from_module({:__block__, _, list}) do
-    Enum.reduce(list, Keyword.new, fn
-      ({:defmacro, _, [{:when, _, [{name, _, params} | _guards] }, [do: _body]] }, state) ->
-        arity = length(params)
-
-        unless Enum.member?(Keyword.get_values([], name), arity) do
-          Keyword.put(state, name, arity);
-        end
-
-      ({:defmacro, _, [{name, _, params}, [do: _body]]}, state) ->
-        arity = length(params)
-
-        unless Enum.member?(Keyword.get_values([], name), arity) do
-          Keyword.put(state, name, arity);
-        end
-
-      _, state ->
-        state
-    end)
+  defp add_function_to_map(map, type, name, arity) do
+    unless Enum.member?(Keyword.get_values(Map.get(map, type), name), arity) do
+      Map.put(map, type, Keyword.put(Map.get(map, type), name, arity))
+    else
+      map
+    end
   end
-
-  defp get_macros_from_module(_) do
-    Keyword.new
-  end
-
-
-  defp get_aliases_from_module({:__block__, _, list}) do
-    Enum.reduce(list, build_standard_aliases(), fn
-      ({:alias, _, [name]}, state) ->
-        {main, _} = Code.eval_quoted(name)
-        {:__aliases__, _, aliases } = name
-        {the_alias, _} = Code.eval_quoted({:__aliases__, [alias: false], List.last(aliases) |> List.wrap })
-        MapSet.put(state, {the_alias, main})
-      ({:alias, _, [name, [as: the_alias]]}, state) ->
-        {name, _} = Code.eval_quoted(name)
-        {the_alias, _} = Code.eval_quoted(the_alias)
-
-        MapSet.put(state, {the_alias, name})
-
-      _, state ->
-        state
-    end)
-  end
-
-
-  defp get_aliases_from_module(_) do
-    MapSet.new
-  end
-
-
-  defp get_requires_from_module({:__block__, _, list}) do
-    Enum.reduce(list, %{ requires: MapSet.new, aliases: MapSet.new }, fn
-      ({:require, _, [name]}, state) ->
-        {main, _} = Code.eval_quoted(name)
-        {:__aliases__, _, aliases } = name
-        {the_alias, _} = Code.eval_quoted({:__aliases__, [alias: false], List.last(aliases) |> List.wrap })
-
-        %{ state | requires: MapSet.put(state.requires, main), aliases: MapSet.put(state.aliases, {the_alias, main})  }
-      ({:require, _, [name, [as: the_alias]]}, state) ->
-        {name, _} = Code.eval_quoted(name)
-        {the_alias, _} = Code.eval_quoted(the_alias)
-
-        %{ state | requires: MapSet.put(state.requires, name), aliases: MapSet.put(state.aliases, {the_alias, name}) }
-
-      _, state ->
-        state
-    end)
-  end
-
-
-  defp get_requires_from_module(_) do
-    %{ requires: MapSet.new, aliases: MapSet.new }
-  end
-
-
-  defp get_imports_from_module({:__block__, _, list}) do
-    Enum.reduce(list, %{ imports: MapSet.new |> MapSet.put({ ElixirScript.Kernel, [] }), aliases: MapSet.new }, fn
-      ({:import, _, [name]}, state) ->
-        {main, _} = Code.eval_quoted(name)
-        {:__aliases__, _, aliases } = name
-        {the_alias, _} = Code.eval_quoted({:__aliases__, [alias: false], List.last(aliases) |> List.wrap })
-
-        %{ state | imports: MapSet.put(state.imports, {main, []}), aliases: MapSet.put(state.aliases, {the_alias, main})  }
-
-      ({:import, _, [name, options]}, state) ->
-        {main, _} = Code.eval_quoted(name)
-        {:__aliases__, _, aliases } = name
-        {the_alias, _} = Code.eval_quoted({:__aliases__, [alias: false], List.last(aliases) |> List.wrap })
-
-        %{ state | imports: MapSet.put(state.imports, {main, options}), aliases: MapSet.put(state.aliases, {the_alias, main})  }
-
-
-      _, state ->
-        state
-    end)
-  end
-
-
-  defp get_imports_from_module(_) do
-    %{ imports: MapSet.new, aliases: MapSet.new }
-  end
-
 
   defp get_js_imports_from_module({:__block__, _, list}) do
     Enum.reduce(list, MapSet.new, fn
@@ -313,14 +208,23 @@ defmodule ElixirScript.Preprocess.Modules do
 
 
   def build_standard_aliases() do
-    MapSet.new
-    |> MapSet.put({ Kernel, ElixirScript.Kernel })
-    |> MapSet.put({ Tuple, ElixirScript.Tuple })
-    |> MapSet.put({ Atom, ElixirScript.Atom })
-    |> MapSet.put({ Collectable, ElixirScript.Collectable })
-    |> MapSet.put({ String.Chars, ElixirScript.String.Chars })
-    |> MapSet.put({ Enumerable, ElixirScript.Enumerable })
-    |> MapSet.put({ Integer, ElixirScript.Integer })
-    |> MapSet.put({ View, ElixirScript.View })
+    Map.new
+    |> Map.put(Kernel, ElixirScript.Kernel)
+    |> Map.put(Tuple, ElixirScript.Tuple)
+    |> Map.put(Atom, ElixirScript.Atom)
+    |> Map.put(Collectable, ElixirScript.Collectable)
+    |> Map.put(String.Chars, ElixirScript.String.Chars)
+    |> Map.put(Enumerable, ElixirScript.Enumerable)
+    |> Map.put(Integer, ElixirScript.Integer)
+    |> Map.put(View, ElixirScript.View)
+  end
+
+  def get_module_name(module_name) do
+    case Map.get(build_standard_aliases, module_name) do
+      nil ->
+        module_name
+      actual_module_name ->
+        actual_module_name
+    end
   end
 end

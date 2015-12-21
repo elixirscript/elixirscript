@@ -23,6 +23,7 @@ defmodule ElixirScript.Translator do
   alias ESTree.Tools.Builder, as: JS
 
 
+
   @doc """
   Translates Elixir AST to JavaScript AST
   """
@@ -275,15 +276,48 @@ defmodule ElixirScript.Translator do
     { Quote.make_quote(opts, expr, env), env }
   end
 
-  defp do_translate({:import, _, _}, env) do
+  defp do_translate({:import, _, [{:__aliases__, _, _} = module_name]}, env) do
+    env = ElixirScript.Env.add_import(env, module_name)
     { %ElixirScript.Translator.Group{}, env }
   end
 
-  defp do_translate({:alias, _, _}, env) do
+  defp do_translate({:import, _, [{:__aliases__, _, _} = module_name, options]}, env) do
+    module_name = ElixirScript.Module.quoted_to_name(module_name)
+    env = ElixirScript.Env.add_import(env, module_name, options)
+
     { %ElixirScript.Translator.Group{}, env }
   end
 
-  defp do_translate({:require, _, _}, env) do
+  defp do_translate({:alias, _, [{:__aliases__, _, _} = module_name] }, env) do
+    {_, _, name} = module_name
+    name = [List.last(name)]
+
+    module_name = ElixirScript.Module.quoted_to_name(module_name)
+    alias_name = ElixirScript.Module.quoted_to_name({:__aliases__, [], name })
+
+    env = ElixirScript.Env.add_alias(env, module_name, alias_name)
+    { %ElixirScript.Translator.Group{}, env }
+  end
+
+  defp do_translate({:alias, _, [{:__aliases__, _, _} = module_name, [as: {:__aliases__, _, _} = alias_name]]}, env) do
+    module_name = ElixirScript.Module.quoted_to_name(module_name)
+    alias_name = ElixirScript.Module.quoted_to_name(alias_name)
+
+    env = ElixirScript.Env.add_alias(env, module_name, alias_name)
+    { %ElixirScript.Translator.Group{}, env }
+  end
+
+  defp do_translate({:require, _, [{:__aliases__, _, _} = module_name] }, env) do
+    module_name = ElixirScript.Module.quoted_to_name(module_name)
+    env = ElixirScript.Env.add_require(env, module_name)
+    { %ElixirScript.Translator.Group{}, env }
+  end
+
+  defp do_translate({:require, _, [{:__aliases__, _, _} = module_name, [as: {:__aliases__, _, _} = alias_name]]}, env) do
+    module_name = ElixirScript.Module.quoted_to_name(module_name)
+    alias_name = ElixirScript.Module.quoted_to_name(alias_name)
+
+    env = ElixirScript.Env.add_require(env, module_name, alias_name)
     { %ElixirScript.Translator.Group{}, env }
   end
 
@@ -399,7 +433,6 @@ defmodule ElixirScript.Translator do
         end
 
         if imported_module do
-          ElixirScript.State.add_module_reference(env.module, imported_module.name)
           Function.make_function_call(ElixirScript.Module.name_to_quoted(imported_module.name), name, params, env)
         else
           Function.make_function_call(name, params, env)

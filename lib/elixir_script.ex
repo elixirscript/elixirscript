@@ -126,10 +126,7 @@ defmodule ElixirScript do
   defp create_code(include_path, import_standard_libs?, stdlib_path) do
 
     standard_lib_modules = ElixirScript.Preprocess.Modules.build_standard_aliases()
-    |> MapSet.to_list()
-    |> Enum.map(fn({_, module_name}) ->
-      module_name
-    end)
+    |> Map.values
 
     ElixirScript.State.process_imports
 
