@@ -5,7 +5,7 @@ defmodule ElixirScript.Translator.Block do
 
   def make_block(expressions, env) do
     { list, env } = Enum.map_reduce(expressions, env, fn(x, updated_env) ->
-       Translator.translate(x, updated_env)
+      Translator.translate(x, updated_env)
     end)
 
     { Builder.block_statement(list), env }

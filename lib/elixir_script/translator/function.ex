@@ -161,20 +161,7 @@ defmodule ElixirScript.Translator.Function do
   end
 
   def make_function_or_property_call(module_name, function_name, env) do
-    the_name = case module_name do
-      {:__aliases__, _, _} = name  ->
-        module_name = ElixirScript.Module.quoted_to_name(name)
-        get_js_name(module_name, env)
-
-      {name, _, _} when is_atom(name) ->
-        get_js_name(name, env)
-
-      {{:., _, [_module_name, _function_name]}, _, _params } = ast ->
-        ast
-
-      name ->
-        name
-    end
+    the_name = get_module_name_for_function(module_name, env)
 
     js_ast = JS.call_expression(
       JS.member_expression(
@@ -193,16 +180,8 @@ defmodule ElixirScript.Translator.Function do
     { js_ast, env }
   end
 
-  def make_function_call(function_name, params, env) when is_tuple(function_name) do
-    { Utils.make_call_expression(function_name, params, env), env }
-  end
-
-  def make_function_call(function_name, params, env) do
-    { Utils.make_call_expression(Utils.filter_name(function_name), params, env), env }
-  end
-
-  def make_function_call(module_name, function_name, params, env) do
-    the_name = case module_name do
+  defp get_module_name_for_function(module_name, env) do
+    case module_name do
       {:__aliases__, _, name} ->
         module_name = ElixirScript.Module.quoted_to_name(name)
         get_js_name(module_name, env)
@@ -215,7 +194,18 @@ defmodule ElixirScript.Translator.Function do
       name ->
         get_js_name(name, env)
     end
+  end
 
+  def make_function_call(function_name, params, env) when is_tuple(function_name) do
+    { Utils.make_call_expression(function_name, params, env), env }
+  end
+
+  def make_function_call(function_name, params, env) do
+    { Utils.make_call_expression(Utils.filter_name(function_name), params, env), env }
+  end
+
+  def make_function_call(module_name, function_name, params, env) do
+    the_name = get_module_name_for_function(module_name, env)
     { Utils.make_call_expression(the_name, Utils.filter_name(function_name), params, env), env }
   end
 

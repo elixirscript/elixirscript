@@ -6,22 +6,19 @@ defmodule ElixirScript.Translator.Struct do
   alias ElixirScript.Translator.Map
 
   def get_struct_class(module_name, env) do
-    current_module = ElixirScript.State.get_module(env.module)
+    candiate_module_name = ElixirScript.Module.quoted_to_name(module_name)
+    |> ElixirScript.Preprocess.Modules.get_module_name
 
-    name = ElixirScript.Module.quoted_to_name(module_name)
-    the_alias = ElixirScript.Module.get_alias(current_module, name)
+    if ElixirScript.Env.get_module_name(env, candiate_module_name) in ElixirScript.State.list_module_names() do
+      name = ElixirScript.Env.get_module_name(env, candiate_module_name)
 
-    if the_alias do
-      { _, name } = the_alias
-    end
-
-    if the_alias == nil && ElixirScript.State.get_module(ElixirScript.Module.quoted_to_name(module_name)) == nil do
-      Utils.make_module_expression_tree(module_name, false, env)
-    else
       JS.member_expression(
         JS.identifier(ElixirScript.Module.name_to_js_name(name)),
         JS.identifier(ElixirScript.Module.name_to_js_name(name))
       )
+
+    else
+      Utils.make_module_expression_tree(module_name, false, env)
     end
 
   end

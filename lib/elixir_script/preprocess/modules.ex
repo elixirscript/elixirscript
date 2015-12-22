@@ -58,8 +58,9 @@ defmodule ElixirScript.Preprocess.Modules do
   end
 
   def do_get_info({:defmodule, _, [{:__aliases__, _, module_name_list}, [do: body]]} = ast) do
-    make_inner_module_aliases(module_name_list, body)
-    |> make_module(module_name_list)
+    body = make_inner_module_aliases(module_name_list, body)
+
+    make_module(body, module_name_list)
     |> State.add_module
 
     ast

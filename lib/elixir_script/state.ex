@@ -132,46 +132,6 @@ defmodule ElixirScript.State do
     end
   end
 
-  def process_imports do
-    Agent.update(__MODULE__, fn state ->
-      modules =
-        Map.values(state.modules)
-        |> Enum.reduce(Map.new, fn x, map ->
-          imports = Enum.map(x.imports, fn {y, options} ->
-            { y, get_imported_functions(state, y, options) }
-          end)
-
-          Map.put(map, x.name, %{ x | imports: imports })
-        end)
-
-      %{ state | modules: modules }
-    end)
-  end
-
-  defp get_imported_functions(state, module_name, []) do
-    module = do_get_module(state, module_name)
-    ElixirScript.Module.functions(module) ++ ElixirScript.Module.macros(module)
-  end
-
-  defp get_imported_functions(_, _, [only: list]) do
-    Keyword.keys(list)
-  end
-
-  defp get_imported_functions(state, module_name, [only: :functions]) do
-    module = do_get_module(state, module_name)
-    ElixirScript.Module.functions(module)
-  end
-
-  defp get_imported_functions(state, module_name, [only: :macros]) do
-    module = do_get_module(state, module_name)
-    ElixirScript.Module.macros(module)
-  end
-
-  defp get_imported_functions(state, module_name, [except: list]) do
-    module = do_get_module(state, module_name)
-    ElixirScript.Module.functions(module) ++ ElixirScript.Module.macros(module) -- Keyword.keys(list)
-  end
-
   def list_modules() do
     Agent.get(__MODULE__, fn(x) ->
       Map.values(x.modules)

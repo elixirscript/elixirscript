@@ -19,6 +19,17 @@ defmodule ElixirScript.Env do
     caller: nil
   ]
 
+  def module_env(ElixirScript.Temp, filename) do
+
+    env = %ElixirScript.Env{
+      module: ElixirScript.Temp, file: filename, requires: [],
+      functions: [],
+      macros: []
+    }
+
+    add_import(env, ElixirScript.Kernel)
+  end
+
   def module_env(module_name, filename) do
     module = ElixirScript.State.get_module(module_name)
 
@@ -85,6 +96,10 @@ defmodule ElixirScript.Env do
     Keyword.get(env.vars, variable_name, nil) != nil
   end
 
+  defp get_module(env, Kernel) do
+    get_module(env, ElixirScript.Kernel)
+  end
+
   defp get_module(env, module_name) do
     module = ElixirScript.State.get_module(module_name)
 
@@ -100,7 +115,7 @@ defmodule ElixirScript.Env do
     module = get_module(env, module_name)
 
 
-    %{ env | requires: env.requires ++ [module.name],
+    %{ env | requires: Enum.uniq(env.requires ++ [module.name]),
     functions: env.functions ++ [{ module.name, module.functions }],
     macros: env.macros ++ [{ module.name, module.macros }] }
   end
@@ -109,7 +124,7 @@ defmodule ElixirScript.Env do
     module = get_module(env, module_name)
 
 
-    %{ env | requires: env.requires ++ [module.name],
+    %{ env | requires: Enum.uniq(env.requires ++ [module.name]),
     functions: env.functions ++ [{ module.name, module.functions }] }
   end
 
@@ -117,25 +132,27 @@ defmodule ElixirScript.Env do
     module = get_module(env, module_name)
 
 
-    %{ env | requires: env.requires ++ [module.name],
+    %{ env | requires: Enum.uniq(env.requires ++ [module.name]),
     macros: env.macros ++ [{ module.name, module.macros }] }
   end
 
   def add_import(env, module_name, [only: only]) do
     module = get_module(env, module_name)
 
+    macros = Enum.filter(module.macros, fn(mac) ->
+      mac in only
+    end)
+    functions = Enum.filter(module.functions, fn(func) ->
+      func in only
+    end)
 
-    macros = Enum.filter(module.macros, fn(mac) -> mac in only end)
-    functions = Enum.filter(module.functions, fn(func) -> func in only end)
-
-    %{ env | requires: env.requires ++ [module.name],
+    %{ env | requires: Enum.uniq(env.requires ++ [module.name]),
     functions: env.functions ++ [{ module.name, functions }],
     macros: env.macros ++ [{ module.name, macros }] }
   end
 
   def add_import(env, module_name, [except: except]) do
     module = get_module(env, module_name)
-
 
     macros = Enum.filter(module.macros, fn(mac) -> not(mac in except) end)
     functions = Enum.filter(module.functions, fn(func) -> not(func in except) end)
@@ -148,22 +165,20 @@ defmodule ElixirScript.Env do
   def add_alias(env, module_name, alias_name) do
     module = get_module(env, module_name)
 
-    %{ env | aliases: env.aliases ++ [{alias_name, module.name}] }
+    %{ env | aliases: Enum.uniq(env.aliases ++ [{alias_name, module.name}]) }
   end
 
   def add_require(env, module_name) do
     module = get_module(env, module_name)
 
-
-    %{ env | requires: env.requires ++ [module.name] }
+    %{ env | requires: Enum.uniq(env.requires ++ [module.name]) }
   end
 
   def add_require(env, module_name, alias_name) do
     module = get_module(env, module_name)
 
-
-    %{ env | aliases: env.aliases ++ [{alias_name, module.name}],
-    requires: env.requires ++ [module.name] }
+    %{ env | aliases: Enum.uniq(env.aliases ++ [{alias_name, module.name}]),
+    requires: Enum.uniq(env.requires ++ [module.name]) }
   end
 
   def get_module_name(env, module_name) do

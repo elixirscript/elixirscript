@@ -181,19 +181,7 @@ defmodule ElixirScript.Translator do
     expanded_ast = Macro.expand(ast, ElixirScript.State.get().elixir_env)
 
     if expanded_ast == ast do
-      module_name = case module_name do
-        {:__aliases__, _, _} ->
-          candiate_module_name = ElixirScript.Module.quoted_to_name(module_name)
-
-          if candiate_module_name in ElixirScript.State.list_module_names() do
-            ElixirScript.Env.get_module_name(env, candiate_module_name)
-          else
-            module_name
-          end
-        _ ->
-          module_name
-      end
-
+      module_name = create_module_name(module_name, env)
       Function.make_function_or_property_call(module_name, function_name, env)
     else
       translate(expanded_ast, env)
@@ -204,19 +192,7 @@ defmodule ElixirScript.Translator do
     expanded_ast = Macro.expand(ast, ElixirScript.State.get().elixir_env)
 
     if expanded_ast == ast do
-      module_name = case module_name do
-        {:__aliases__, _, _} ->
-          candiate_module_name = ElixirScript.Module.quoted_to_name(module_name)
-
-          if candiate_module_name in ElixirScript.State.list_module_names() do
-            ElixirScript.Env.get_module_name(env, candiate_module_name)
-          else
-            module_name
-          end
-        _ ->
-          module_name
-      end
-
+      module_name = create_module_name(module_name, env)
       Function.make_function_or_property_call(module_name, function_name, env)
     else
       translate(expanded_ast, env)
@@ -227,14 +203,7 @@ defmodule ElixirScript.Translator do
     expanded_ast = Macro.expand(ast, ElixirScript.State.get().elixir_env)
 
     if expanded_ast == ast do
-      candiate_module_name = ElixirScript.Module.quoted_to_name(module_name)
-
-      module_name = if candiate_module_name in ElixirScript.State.list_module_names() do
-        ElixirScript.Env.get_module_name(env, candiate_module_name)
-      else
-        module_name
-      end
-
+      module_name = create_module_name(module_name, env)
       Function.make_function_call(module_name, params, env)
     else
       translate(expanded_ast, env)
@@ -250,19 +219,7 @@ defmodule ElixirScript.Translator do
     expanded_ast = Macro.expand(ast, ElixirScript.State.get().elixir_env)
 
     if expanded_ast == ast do
-      module_name = case module_name do
-        {:__aliases__, _, _} ->
-          candiate_module_name = ElixirScript.Module.quoted_to_name(module_name)
-
-          if candiate_module_name in ElixirScript.State.list_module_names() do
-            ElixirScript.Env.get_module_name(env, candiate_module_name)
-          else
-            module_name
-          end
-        _ ->
-          module_name
-      end
-
+      module_name = create_module_name(module_name, env)
       Function.make_function_call(module_name, function_name, params, env)
     else
       translate(expanded_ast, env)
@@ -331,6 +288,7 @@ defmodule ElixirScript.Translator do
 
   defp do_translate({:import, _, [{:__aliases__, _, _} = module_name, options]}, env) do
     module_name = ElixirScript.Module.quoted_to_name(module_name)
+
     env = ElixirScript.Env.add_import(env, module_name, options)
 
     { %ElixirScript.Translator.Group{}, env }
@@ -465,6 +423,8 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({name, _, params} = ast, env) when is_list(params) do
+
+
       expanded_ast = Macro.expand(ast, ElixirScript.State.get().elixir_env)
 
       if expanded_ast == ast do
@@ -499,6 +459,23 @@ defmodule ElixirScript.Translator do
       true ->
         name = Utils.filter_name(name)
         { Primitive.make_identifier(name), env }
+    end
+  end
+
+
+  defp create_module_name(module_name, env) do
+    case module_name do
+      {:__aliases__, _, _} ->
+        candiate_module_name = ElixirScript.Module.quoted_to_name(module_name)
+        |> ElixirScript.Preprocess.Modules.get_module_name
+
+        if ElixirScript.Env.get_module_name(env, candiate_module_name) in ElixirScript.State.list_module_names() do
+          ElixirScript.Env.get_module_name(env, candiate_module_name)
+        else
+          module_name
+        end
+      _ ->
+        module_name
     end
   end
 

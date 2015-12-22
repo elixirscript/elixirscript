@@ -21,17 +21,16 @@ defmodule ElixirScript.Translator.Protocol do
     {impl_imports, impl_body, impls} = define_impls(name, impls, env)
 
     body = spec_body ++ impl_body
-    imports = spec_imports ++ impl_imports
+    imports = Enum.uniq(spec_imports ++ impl_imports)
 
     create_module(name, spec, impls, imports, body, env)
   end
 
   defp define_spec(name, spec, env) do
     { body, functions } = extract_function_from_spec(spec)
-
+    { body, env } = Module.translate_body(body, env)
     { exported_functions, _ } = process_functions(functions, env)
 
-    body = Module.translate_body(body, env)
     modules_refs = ElixirScript.State.get_module_references(name)
 
     {imports, body} = Module.extract_imports_from_body(body)
@@ -58,7 +57,7 @@ defmodule ElixirScript.Translator.Protocol do
       )
     )
 
-    {imports, body, [JS.variable_declaration([declarator], :let)]}
+    {imports, body, [JS.variable_declaration([declarator], :const)]}
   end
 
   defp define_impls(_, [], _) do
@@ -69,9 +68,10 @@ defmodule ElixirScript.Translator.Protocol do
     Enum.map(impls, fn({type, impl}) ->
       type = map_to_js(type)
       { body, functions } = Module.extract_functions_from_module(impl)
+      { body, env } = Module.translate_body(body, env)
+
       { exported_functions, _ } = process_functions(functions, env)
 
-      body = Module.translate_body(body, env)
       modules_refs = ElixirScript.State.get_module_references(name)
 
       {imports, body} = Module.extract_imports_from_body(body)
@@ -234,15 +234,11 @@ defmodule ElixirScript.Translator.Protocol do
   end
 
   defp map_to_js({:__aliases__, _, [:Any]}) do
-    quoted = quote do
-      nil
-    end
-
-    Translator.translate!(quoted, ElixirScript.State.get().env)
+    JS.identifier(:null)
   end
 
 
-  defp map_to_js({:__aliases__, _, module}) do
+  defp map_to_js({:__aliases__, _, _} = module) do
     ElixirScript.Translator.Struct.get_struct_class(
       module,
       ElixirScript.State.get().env

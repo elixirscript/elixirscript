@@ -158,7 +158,7 @@ defmodule ElixirScript.PatternMatching.Match do
     { JS.object_expression(List.wrap(props)), params }
   end
 
-  defp do_build_match({:%, _, [{:__aliases__, _, name}, {:%{}, meta, props}]}, env) do
+  defp do_build_match({:%, _, [{:__aliases__, _, _} = name, {:%{}, meta, props}]}, env) do
     struct_name = Struct.get_struct_class(name, env)
     {pattern, params} = do_build_match({:%{}, meta, props}, env)
 

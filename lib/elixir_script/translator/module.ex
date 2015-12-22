@@ -8,7 +8,8 @@ defmodule ElixirScript.Translator.Module do
   alias ElixirScript.Translator.Function
 
   def make_module(ElixirScript.Temp, body, env) do
-    %JSModule{ name: ElixirScript.Temp, body: translate_body(body, env) |> Utils.inflate_groups }
+    { body, _ } = translate_body(body, env)
+    %JSModule{ name: ElixirScript.Temp, body: body |> Utils.inflate_groups }
   end
 
   def make_module(module, nil, _) do
@@ -18,9 +19,9 @@ defmodule ElixirScript.Translator.Module do
   def make_module(module, body, env) do
     body = Using.process(body)
     { body, functions } = extract_functions_from_module(body)
-    { exported_functions, private_functions } = process_functions(functions, env)
+    { body, env } = translate_body(body, env)
 
-    body = translate_body(body, env)
+    { exported_functions, private_functions } = process_functions(functions, env)
 
     modules_refs = ElixirScript.State.get_module_references(module)
 
@@ -65,9 +66,9 @@ defmodule ElixirScript.Translator.Module do
   end
 
   def translate_body(body, env) do
-    body = Translator.translate!(body, env)
+    { body, env } = Translator.translate(body, env)
 
-    case body do
+    body = case body do
       [%ESTree.BlockStatement{ body: body }] ->
         body
       %ESTree.BlockStatement{ body: body } ->
@@ -75,6 +76,8 @@ defmodule ElixirScript.Translator.Module do
       _ ->
         List.wrap(body)
     end
+
+    { body, env }
   end
 
   def extract_functions_from_module({:__block__, meta, body_list}) do

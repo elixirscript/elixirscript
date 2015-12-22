@@ -128,45 +128,29 @@ defmodule ElixirScript do
     standard_lib_modules = ElixirScript.Preprocess.Modules.build_standard_aliases()
     |> Map.values
 
-    ElixirScript.State.process_imports
-
     state = ElixirScript.State.get
-
-    parent = self
 
     result =
       Map.values(state.modules)
+      |> Enum.reject(fn(ast) ->
+        import_standard_libs? == false && ast.name in standard_lib_modules
+      end)
       |> Enum.map(fn ast ->
-        spawn_link fn ->
           env = ElixirScript.Env.module_env(ast.name, "#{create_file_name(ast.name)}")
 
-          result = case ast.type do
+          case ast.type do
             :module ->
               ElixirScript.Translator.Module.make_module(ast.name, ast.body, env)
             :protocol ->
               ElixirScript.Translator.Protocol.consolidate(ast, env)
           end
           |> convert_to_code(state.root, state.elixir_env, import_standard_libs?, stdlib_path)
-
-          send parent, { self, result }
-        end
-      end)
-      |> Enum.map(fn pid ->
-        receive do
-          { ^pid, x } -> x
-        end
       end)
 
     ElixirScript.State.stop
 
     result
-    |> Enum.sort(fn({name1, _, _}, {name2, _, _}) ->
-      Atom.to_string(name1) < Atom.to_string(name2)
-    end)
-    |> Enum.reject(fn({name, _, _}) ->
-      import_standard_libs? == false && name in standard_lib_modules
-    end)
-    |> Enum.map(fn({_, path, code}) ->
+    |> Enum.map(fn({path, code}) ->
       if(include_path) do
         { path, code }
       else
@@ -210,7 +194,7 @@ defmodule ElixirScript do
       standard_libs_import ++ module.body
       |> ESTree.Tools.Builder.program
 
-    {module.name, file_path, program}
+    {file_path, program}
   end
 
   defp create_file_name(%JSModule{name: module}) do
@@ -224,9 +208,9 @@ defmodule ElixirScript do
   end
 
   @doc false
-  def javascript_ast_to_code({name, path, js_ast}) do
+  def javascript_ast_to_code({path, js_ast}) do
     js_code = javascript_ast_to_code(js_ast)
-    {name, path, js_code}
+    {path, js_code}
   end
 
   @doc false

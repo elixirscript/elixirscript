@@ -105,7 +105,7 @@ defmodule ElixirScript.Translator.For.Test do
   should "translate for with pattern matched input" do
     ex_ast = quote do
       for {:user, name} <- [user: "john", admin: "john", user: "meg"] do
-        String.upcase(name)
+        Elixir.String.upcase(name)
       end
     end
 
