@@ -7,8 +7,8 @@ defmodule ElixirScript.Translator.Function do
 
   @patterns JS.member_expression(
     JS.member_expression(
-    JS.identifier("Elixir"),
-    JS.identifier("Core")
+      JS.identifier("Elixir"),
+      JS.identifier("Core")
     ),
     JS.identifier("Patterns")
   )
@@ -78,17 +78,8 @@ defmodule ElixirScript.Translator.Function do
     )
   end
 
-  def wrap_params(params) when is_atom(params) do
-    []
-  end
-
-  def wrap_params(params) when is_tuple(params) do
-    [params]
-  end
-
-  def wrap_params(params) do
-    params
-  end
+  def wrap_params(params) when is_atom(params), do: []
+  def wrap_params(params), do: List.wrap(params)
 
   def make_function_body(body, env) do
     { body, _ } = body
