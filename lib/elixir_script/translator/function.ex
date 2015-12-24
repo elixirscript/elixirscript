@@ -28,41 +28,18 @@ defmodule ElixirScript.Translator.Function do
     clauses = functions
     |> Enum.map(fn
       {:->, _, [ [{:when, _, [params | guards]}], body ]} ->
-        env = ElixirScript.Env.function_env(env, {name, get_arity(params)})
-
-        { patterns, params, env } = process_params(params, env)
-        { body, _ } = make_function_body(body, env)
-        guard_body = make_guards(guards, env)
-        make_function_clause(patterns, params, body, guard_body)
-
+        process_function_body(params, body, env, name, guards)
       ({:->, _, [params, body]}) ->
-        env = ElixirScript.Env.function_env(env, {name, get_arity(params)})
-
-        { patterns, params, env } = process_params(params, env)
-        { body, _ } = make_function_body(body, env)
-        make_function_clause(patterns, params, body)
+        process_function_body(params, body, env, name)
 
       ({_, _, [{:when, _, [{_, _, params} | guards] }, [do: body]]}) ->
-        env = ElixirScript.Env.function_env(env, {name, get_arity(params)})
-
-        { patterns, params, env } = process_params(params, env)
-        { body, env } = make_function_body(body, env)
-        guard_body = make_guards(guards, env)
-        make_function_clause(patterns, params, body, guard_body)
+        process_function_body(params, body, env, name, guards)
 
       ({_, _, [{_, _, params}, [do: body]]}) ->
-        env = ElixirScript.Env.function_env(env, {name, get_arity(params)})
-
-        { patterns, params, env } = process_params(params, env)
-        { body, _ } = make_function_body(body, env)
-        make_function_clause(patterns, params, body)
+        process_function_body(params, body, env, name)
 
       ({_, _, [{_, _, params}]}) ->
-        env = ElixirScript.Env.function_env(env, {name, get_arity(params)})
-
-        { patterns, params, env } = process_params(params, env)
-        { body, _ } = make_function_body([], env)
-        make_function_clause(patterns, params, body)
+        process_function_body(params, [], env, name)
     end)
 
     { make_defmatch(clauses), env }
@@ -78,6 +55,23 @@ defmodule ElixirScript.Translator.Function do
     )
   end
 
+  defp process_function_body(params, body, env, name, guards \\ nil) do
+    env = ElixirScript.Env.function_env(env, {name, get_arity(params)})
+
+    { patterns, params, env } = process_params(params, env)
+    { body, _ } = make_function_body(body, env)
+
+    if guards do
+      { guard_body, _ } = hd(List.wrap(guards))
+      |> prepare_function_body(env)
+
+      guard_body = JS.block_statement(guard_body)
+      make_function_clause(patterns, params, body, guard_body)
+    else
+      make_function_clause(patterns, params, body, nil)
+    end
+  end
+
   def wrap_params(params) when is_atom(params), do: []
   def wrap_params(params), do: List.wrap(params)
 
@@ -89,25 +83,9 @@ defmodule ElixirScript.Translator.Function do
     { JS.block_statement(body), env }
   end
 
-  defp get_arity(params) when is_atom(params) do
-    0
-  end
-
-  defp get_arity(params) when is_tuple(params) do
-    1
-  end
-
-  defp get_arity(params) do
-    length(params)
-  end
-
-  defp make_guards(guards, env) do
-    { body, _ } = hd(List.wrap(guards))
-    |> prepare_function_body(env)
-
-
-    JS.block_statement(body)
-  end
+  defp get_arity(params) when is_atom(params), do: 0
+  defp get_arity(params) when is_tuple(params), do: 1
+  defp get_arity(params), do: length(params)
 
   defp make_params(params) do
     Enum.filter(params, fn
@@ -118,36 +96,26 @@ defmodule ElixirScript.Translator.Function do
 
   defp process_params(params, env) do
     params = wrap_params(params)
-
     { patterns, params, env } = Match.process_match(params, env)
-
     { patterns, make_params(params), env }
   end
 
   def make_function_clause(patterns, params, body, guard_body) do
-    JS.call_expression(
-      JS.member_expression(
-        @patterns,
-        JS.identifier("make_case")
-      ),
-      [
-        JS.array_expression(patterns),
-        JS.function_expression(params, [], body),
-        JS.function_expression(params, [], guard_body)
-      ]
-    )
-  end
+    arguments = [
+            JS.array_expression(patterns),
+            JS.function_expression(params, [], body),
+          ]
 
-  def make_function_clause(patterns, params, body) do
+    if guard_body do
+      arguments = arguments ++ [JS.function_expression(params, [], guard_body)]
+    end
+
     JS.call_expression(
       JS.member_expression(
         @patterns,
         JS.identifier("make_case")
       ),
-      [
-        JS.array_expression(patterns),
-        JS.function_expression(params, [], body)
-      ]
+      arguments
     )
   end
 
@@ -157,8 +125,8 @@ defmodule ElixirScript.Translator.Function do
     js_ast = JS.call_expression(
       JS.member_expression(
         JS.member_expression(
-        JS.identifier("Elixir"),
-        JS.identifier("Core")
+          JS.identifier("Elixir"),
+          JS.identifier("Core")
         ),
         JS.identifier("call_property")
       ),

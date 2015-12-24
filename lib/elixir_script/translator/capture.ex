@@ -6,9 +6,7 @@ defmodule ElixirScript.Translator.Capture do
   alias ElixirScript.Translator.Function
 
   def make_capture(function_name, arity, env) do
-    params = Enum.map(1..arity, fn(x) -> {String.to_atom("__#{x}"), [], ElixirScript.Translator.Capture} end)
-
-    { patterns, params, _ } = Match.process_match(params, env)
+    { patterns, params, _ } = process_params(arity, env)
 
     body = JS.block_statement([
       JS.return_statement(
@@ -19,23 +17,21 @@ defmodule ElixirScript.Translator.Capture do
       )
     ])
 
-    Function.make_defmatch([
-      Function.make_function_clause(patterns, params, body)
-    ])
+    make_capture_function(patterns, params, body)
   end
 
   def make_capture(module_name, function_name, arity, env) do
     arity_params = Enum.map(1..arity, fn(x) -> {String.to_atom("__#{x}"), [], ElixirScript.Translator.Capture} end)
 
-    {_, _, name} = module_name
+    { patterns, params, env } = process_params(arity, env)
+
+    { _, _, name } = module_name
 
     if name == [:Kernel] or name == [Elixir, :Kernel] do
       name = [:ElixirScript, :Kernel]
     end
 
-    { patterns, params, env } = Match.process_match(arity_params, env)
-
-    {func, _} = Function.make_function_call({:__aliases__, [], name }, function_name, arity_params, env)
+    { func, _ } = Function.make_function_call({:__aliases__, [], name }, function_name, arity_params, env)
 
     body = JS.block_statement([
       JS.return_statement(
@@ -43,8 +39,17 @@ defmodule ElixirScript.Translator.Capture do
       )
     ])
 
+    make_capture_function(patterns, params, body)
+  end
+
+  defp process_params(arity, env) do
+    params = Enum.map(1..arity, fn(x) -> {String.to_atom("__#{x}"), [], ElixirScript.Translator.Capture} end)
+    Match.process_match(params, env)
+  end
+
+  defp make_capture_function(patterns, params, body) do
     Function.make_defmatch([
-      Function.make_function_clause(patterns, params, body)
+      Function.make_function_clause(patterns, params, body, nil)
     ])
   end
 
