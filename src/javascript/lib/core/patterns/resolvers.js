@@ -134,7 +134,7 @@ function resolveArray(pattern: Array<any>): Function {
 function resolveObject(pattern: Object): Function {
   let matches = {};
 
-  for(let key of Object.keys(pattern)){
+  for(let key of Object.keys(pattern).concat(Object.getOwnPropertySymbols(pattern))){
     matches[key] = buildMatch(pattern[key]);
   }
 
@@ -143,7 +143,7 @@ function resolveObject(pattern: Object): Function {
       return false;
     }
 
-    for(let key of Object.keys(pattern)){
+    for(let key of Object.keys(pattern).concat(Object.getOwnPropertySymbols(pattern))){
       if(!(key in value) || !matches[key](value[key], args) ){
         return false;
       }

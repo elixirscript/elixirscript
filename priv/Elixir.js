@@ -354,7 +354,7 @@ function resolveArray(pattern) {
 function resolveObject(pattern) {
   let matches = {};
 
-  for (let key of Object.keys(pattern)) {
+  for (let key of Object.keys(pattern).concat(Object.getOwnPropertySymbols(pattern))) {
     matches[key] = buildMatch(pattern[key]);
   }
 
@@ -363,7 +363,7 @@ function resolveObject(pattern) {
       return false;
     }
 
-    for (let key of Object.keys(pattern)) {
+    for (let key of Object.keys(pattern).concat(Object.getOwnPropertySymbols(pattern))) {
       if (!(key in value) || !matches[key](value[key], args)) {
         return false;
       }
@@ -1013,7 +1013,7 @@ class ProcessSystem {
     let pid = this.pidof(id);
     let process = this.pids.get(pid);
 
-    return Object.keys(process.dict);
+    return Object.keys(process.dict).concat(Object.getOwnPropertySymbols(process.dict));
   }
 
   erase(id, key) {
@@ -2505,7 +2505,7 @@ function __new__() {
 }
 
 function keys(map) {
-  return Object.keys(map);
+  return Object.keys(map).concat(Object.getOwnPropertySymbols(map));
 }
 
 function size(map) {
@@ -2577,7 +2577,7 @@ function split$1(map, keys) {
   let split1 = {};
   let split2 = {};
 
-  for (let key of Object.keys(map)) {
+  for (let key of Object.keys(map).concat(Object.getOwnPropertySymbols(map))) {
     if (keys.indexOf(key) > -1) {
       split1[key] = map[key];
     } else {
@@ -2591,7 +2591,7 @@ function split$1(map, keys) {
 function take(map, keys) {
   let split1 = {};
 
-  for (let key of Object.keys(map)) {
+  for (let key of Object.keys(map).concat(Object.getOwnPropertySymbols(map))) {
     if (keys.indexOf(key) > -1) {
       split1[key] = map[key];
     }
@@ -2603,7 +2603,7 @@ function take(map, keys) {
 function drop(map, keys) {
   let split1 = {};
 
-  for (let key of Object.keys(map)) {
+  for (let key of Object.keys(map).concat(Object.getOwnPropertySymbols(map))) {
     if (keys.indexOf(key) === -1) {
       split1[key] = map[key];
     }

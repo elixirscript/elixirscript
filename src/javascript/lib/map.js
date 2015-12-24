@@ -5,7 +5,7 @@ function __new__(){
 }
 
 function keys(map){
-  return Object.keys(map);
+  return Object.keys(map).concat(Object.getOwnPropertySymbols(map));
 }
 
 function size(map){
@@ -92,7 +92,7 @@ function split(map, keys){
   let split1 = {};
   let split2 = {};
 
-  for(let key of Object.keys(map)){
+  for(let key of Object.keys(map).concat(Object.getOwnPropertySymbols(map))){
     if(keys.indexOf(key) > -1){
       split1[key] = map[key];
     }else{
@@ -109,7 +109,7 @@ function split(map, keys){
 function take(map, keys){
   let split1 = {};
 
-  for(let key of Object.keys(map)){
+  for(let key of Object.keys(map).concat(Object.getOwnPropertySymbols(map))){
     if(keys.indexOf(key) > -1){
       split1[key] = map[key];
     }
@@ -121,7 +121,7 @@ function take(map, keys){
 function drop(map, keys){
   let split1 = {};
 
-  for(let key of Object.keys(map)){
+  for(let key of Object.keys(map).concat(Object.getOwnPropertySymbols(map))){
     if(keys.indexOf(key) === -1){
       split1[key] = map[key];
     }
