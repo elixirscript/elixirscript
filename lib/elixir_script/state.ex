@@ -97,7 +97,7 @@ defmodule ElixirScript.State do
   end
 
   defp do_get_module(state, name) do
-    name = ElixirScript.Preprocess.Modules.get_module_name(name)
+    name = ElixirScript.Module.get_module_name(name)
     Map.get(state.modules, name)
   end
 

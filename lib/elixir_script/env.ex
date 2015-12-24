@@ -1,27 +1,9 @@
 defmodule ElixirScript.Env do
   @moduledoc false
 
-  defstruct [
-    module: nil,
-    file: nil,
-    line: 0,
-    function: nil,
-    context: nil,
-    aliases: [],
-    requires: [],
-    functions: [],
-    macros: [],
-    macro_aliases: [],
-    context_modules: [],
-    vars: [],
-    export_vars: nil,
-    lexical_tracker: nil,
-    caller: nil
-  ]
-
   def module_env(ElixirScript.Temp, filename) do
 
-    env = %ElixirScript.Env{
+    env = %ElixirScript.Macro.Env {
       module: ElixirScript.Temp, file: filename, requires: [],
       functions: [],
       macros: []
@@ -33,7 +15,7 @@ defmodule ElixirScript.Env do
   def module_env(module_name, filename) do
     module = ElixirScript.State.get_module(module_name)
 
-    env = %ElixirScript.Env{
+    env = %ElixirScript.Macro.Env {
       module: module_name, file: filename, requires: [],
       functions: [{ module.name, module.functions}],
       macros: [{ module.name, module.macros}]
@@ -182,7 +164,7 @@ defmodule ElixirScript.Env do
   end
 
   def get_module_name(env, module_name) do
-    module_name = ElixirScript.Preprocess.Modules.get_module_name(module_name)
+    module_name = ElixirScript.Module.get_module_name(module_name)
 
     if Keyword.has_key?(env.aliases, module_name) do
       Keyword.fetch!(env.aliases, module_name)

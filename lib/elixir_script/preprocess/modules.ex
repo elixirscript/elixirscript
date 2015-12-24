@@ -208,26 +208,4 @@ defmodule ElixirScript.Preprocess.Modules do
   defp get_js_imports_from_module(_) do
     MapSet.new
   end
-
-
-  def build_standard_aliases() do
-    Map.new
-    |> Map.put(Kernel, ElixirScript.Kernel)
-    |> Map.put(Tuple, ElixirScript.Tuple)
-    |> Map.put(Atom, ElixirScript.Atom)
-    |> Map.put(Collectable, ElixirScript.Collectable)
-    |> Map.put(String.Chars, ElixirScript.String.Chars)
-    |> Map.put(Enumerable, ElixirScript.Enumerable)
-    |> Map.put(Integer, ElixirScript.Integer)
-    |> Map.put(View, ElixirScript.View)
-  end
-
-  def get_module_name(module_name) do
-    case Map.get(build_standard_aliases, module_name) do
-      nil ->
-        module_name
-      actual_module_name ->
-        actual_module_name
-    end
-  end
 end

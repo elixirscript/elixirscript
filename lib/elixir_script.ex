@@ -125,7 +125,7 @@ defmodule ElixirScript do
 
   defp create_code(include_path, import_standard_libs?, stdlib_path) do
 
-    standard_lib_modules = ElixirScript.Preprocess.Modules.build_standard_aliases()
+    standard_lib_modules = ElixirScript.Module.build_standard_lib_map()
     |> Map.values
 
     state = ElixirScript.State.get

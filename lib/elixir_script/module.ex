@@ -38,4 +38,26 @@ defmodule ElixirScript.Module do
     name_arity in module.functions or name_arity in module.private_functions
   end
 
+  def build_standard_lib_map() do
+    Map.new
+    |> Map.put(Kernel, ElixirScript.Kernel)
+    |> Map.put(Tuple, ElixirScript.Tuple)
+    |> Map.put(Atom, ElixirScript.Atom)
+    |> Map.put(Collectable, ElixirScript.Collectable)
+    |> Map.put(String.Chars, ElixirScript.String.Chars)
+    |> Map.put(Enumerable, ElixirScript.Enumerable)
+    |> Map.put(Integer, ElixirScript.Integer)
+    |> Map.put(Macro.Env, ElixirScript.Macro.Env)
+    |> Map.put(View, ElixirScript.View)
+  end
+
+  def get_module_name(module_name) do
+    case Map.get(build_standard_lib_map, module_name) do
+      nil ->
+        module_name
+      actual_module_name ->
+        actual_module_name
+    end
+  end
+
 end

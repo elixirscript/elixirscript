@@ -264,12 +264,16 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:__CALLER__, _, _expressions }, env) do
-    quoted = quote do: unquote(env.caller)
+    env_to_translate = %{ env.caller | vars: Enum.map(env.caller.vars, fn({key, _}) -> {key, nil} end), caller: nil }
+
+    quoted = quote do: unquote(env_to_translate)
     translate(quoted, env)
   end
 
   defp do_translate({:__ENV__, _, _expressions }, env) do
-    quoted = quote do: unquote(env)
+    env_to_translate = %{ env | vars: Enum.map(env.vars, fn({key, _}) -> {key, nil} end), caller: nil }
+
+    quoted = quote do: unquote(env_to_translate)
     translate(quoted, env)
   end
 
@@ -467,7 +471,7 @@ defmodule ElixirScript.Translator do
     case module_name do
       {:__aliases__, _, _} ->
         candiate_module_name = ElixirScript.Module.quoted_to_name(module_name)
-        |> ElixirScript.Preprocess.Modules.get_module_name
+        |> ElixirScript.Module.get_module_name
 
         if ElixirScript.Env.get_module_name(env, candiate_module_name) in ElixirScript.State.list_module_names() do
           ElixirScript.Env.get_module_name(env, candiate_module_name)

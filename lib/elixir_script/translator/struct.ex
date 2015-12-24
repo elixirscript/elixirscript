@@ -7,7 +7,7 @@ defmodule ElixirScript.Translator.Struct do
 
   def get_struct_class(module_name, env) do
     candiate_module_name = ElixirScript.Module.quoted_to_name(module_name)
-    |> ElixirScript.Preprocess.Modules.get_module_name
+    |> ElixirScript.Module.get_module_name
 
     if ElixirScript.Env.get_module_name(env, candiate_module_name) in ElixirScript.State.list_module_names() do
       name = ElixirScript.Env.get_module_name(env, candiate_module_name)
