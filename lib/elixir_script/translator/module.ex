@@ -26,7 +26,7 @@ defmodule ElixirScript.Translator.Module do
     modules_refs = ElixirScript.State.get_module_references(module)
 
     {imports, body} = extract_imports_from_body(body)
-    {structs, body} = extract_structs_from_body(body)
+    {structs, body} = extract_structs_from_body(body, env)
 
     #Add imports found from walking the ast
     #and make sure to only put one declaration per alias
@@ -128,10 +128,12 @@ defmodule ElixirScript.Translator.Module do
     end)
   end
 
-  def extract_structs_from_body(body) do
+  def extract_structs_from_body(body, env) do
+    module_js_name = ElixirScript.Module.name_to_js_name(env.module)
+
     Enum.partition(body, fn(x) ->
       case x do
-        %ESTree.VariableDeclaration{declarations: [%ESTree.VariableDeclarator{id: %ESTree.Identifier{name: name} } ] } when name in [:defstruct, :defexception] ->
+        %ESTree.VariableDeclaration{declarations: [%ESTree.VariableDeclarator{id: %ESTree.Identifier{name: ^module_js_name} } ] } ->
           true
         _ ->
           false
@@ -144,9 +146,11 @@ defmodule ElixirScript.Translator.Module do
   end
 
   defp make_defstruct_property(module_name, [the_struct]) do
+    module_js_name = ElixirScript.Module.name_to_js_name(module_name)
+
     case the_struct do
-      %ESTree.VariableDeclaration{declarations: [%ESTree.VariableDeclarator{id: %ESTree.Identifier{name: name} } ] } when name in [:defstruct, :defexception] ->
-        [JS.property(JS.identifier(ElixirScript.Module.name_to_js_name(module_name)), JS.identifier(name), :init)]
+      %ESTree.VariableDeclaration{declarations: [%ESTree.VariableDeclarator{id: %ESTree.Identifier{name: ^module_js_name} } ] } ->
+        [JS.property(JS.identifier(module_js_name), JS.identifier(module_js_name), :init, true)]
     end
   end
 

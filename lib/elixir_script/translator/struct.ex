@@ -101,7 +101,7 @@ defmodule ElixirScript.Translator.Struct do
 
     defaults = %{ defaults | properties: [struct_name]  ++ defaults.properties }
 
-    ref = JS.identifier(name)
+    ref = JS.identifier(ElixirScript.Module.name_to_js_name(env.module))
 
     ref_declarator = JS.variable_declarator(
       ref,

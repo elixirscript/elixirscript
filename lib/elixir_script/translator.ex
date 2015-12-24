@@ -266,14 +266,14 @@ defmodule ElixirScript.Translator do
   defp do_translate({:__CALLER__, _, _expressions }, env) do
     env_to_translate = %{ env.caller | vars: Enum.map(env.caller.vars, fn({key, _}) -> {key, nil} end), caller: nil }
 
-    quoted = quote do: unquote(env_to_translate)
+    quoted = Macro.escape(env_to_translate)
     translate(quoted, env)
   end
 
   defp do_translate({:__ENV__, _, _expressions }, env) do
     env_to_translate = %{ env | vars: Enum.map(env.vars, fn({key, _}) -> {key, nil} end), caller: nil }
 
-    quoted = quote do: unquote(env_to_translate)
+    quoted = Macro.escape(env_to_translate)
     translate(quoted, env)
   end
 

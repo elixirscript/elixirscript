@@ -82,12 +82,12 @@ defmodule ElixirScript.Test do
      assert_js_matches """
      import * as Elixir from 'Elixir';
      import * as Elixir$ElixirScript$Kernel from 'Elixir.ElixirScript.Kernel';
-     const defstruct = Elixir.Kernel.defstruct({
+     const Elixir$Animals$Elephant = Elixir.Kernel.defstruct({
          [Elixir.Kernel.SpecialForms.atom('__struct__')]: Elixir.Kernel.SpecialForms.atom('Elixir.Animals.Elephant'),
          [Elixir.Kernel.SpecialForms.atom('trunk')]: true
    });
      export {
-         Elixir$Animals$Elephant: defstruct
+         Elixir$Animals$Elephant
    };
        """, Enum.fetch!(js_code, 1)
   end

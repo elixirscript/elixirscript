@@ -2,7 +2,6 @@ defmodule ElixirScript.Translator.Protocol do
   @moduledoc false
 
   alias ESTree.Tools.Builder, as: JS
-  alias ElixirScript.Translator
   alias ElixirScript.Translator.Module
   alias ElixirScript.Translator.JSModule
   alias ElixirScript.Translator.Map

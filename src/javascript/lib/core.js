@@ -28,7 +28,8 @@ import { call_property, is_instance_of, size, is_nil,
   contains,
   reverse,
   get_global,
-  concat_lists } from './core/functions';
+  concat_lists,
+  prepend_to_list } from './core/functions';
 
 get_global().processes = get_global().processes || new ProcessSystem();
 

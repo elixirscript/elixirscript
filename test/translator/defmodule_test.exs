@@ -82,12 +82,12 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     };
 
     import * as Elixir$ElixirScript$Kernel from 'Elixir.ElixirScript.Kernel';
-    const defstruct = Elixir.Kernel.defstruct({
+    const Elixir$Animals$Elephant = Elixir.Kernel.defstruct({
         [Elixir.Kernel.SpecialForms.atom('__struct__')]: Elixir.Kernel.SpecialForms.atom('Elixir.Animals.Elephant'),     [Elixir.Kernel.SpecialForms.atom('trunk')]: true
     });
 
     export {
-      Elixir$Animals$Elephant: defstruct
+      Elixir$Animals$Elephant
     };
     """
 
@@ -134,22 +134,22 @@ defmodule ElixirScript.Translator.Defmodule.Test do
 
   import * as Elixir$Animals$Elephant$Bear from 'Elixir.Animals.Elephant.Bear';
   import * as Elixir$ElixirScript$Kernel from 'Elixir.ElixirScript.Kernel';
-    const defstruct = Elixir.Kernel.defstruct({
+    const Elixir$Animals$Elephant = Elixir.Kernel.defstruct({
         [Elixir.Kernel.SpecialForms.atom('__struct__')]: Elixir.Kernel.SpecialForms.atom('Elixir.Animals.Elephant'),
         [Elixir.Kernel.SpecialForms.atom('trunk')]: true
   });
     export {
-        Elixir$Animals$Elephant: defstruct
+        Elixir$Animals$Elephant
   };
 
     import * as Elixir$ElixirScript$Kernel from 'Elixir.ElixirScript.Kernel';
-    const defstruct = Elixir.Kernel.defstruct({
+    const Elixir$Animals$Elephant$Bear = Elixir.Kernel.defstruct({
         [Elixir.Kernel.SpecialForms.atom('__struct__')]: Elixir.Kernel.SpecialForms.atom('Elixir.Animals.Elephant.Bear'),
         [Elixir.Kernel.SpecialForms.atom('trunk')]: true
   });
 
     export {
-        Elixir$Animals$Elephant$Bear: defstruct
+        Elixir$Animals$Elephant$Bear
   };
     """
 
