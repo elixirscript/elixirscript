@@ -6,46 +6,49 @@ defmodule ElixirScript.Translator.Bitstring do
 
 
   def make_bitstring(elements, env) do
-    JS.call_expression(
+    js_ast = JS.call_expression(
       JS.member_expression(
         Primitive.special_forms(),
         JS.identifier("bitstring")
       ),
       Enum.map(elements, &make_bitstring_element(&1, env))
     )
+
+    { js_ast, env }
   end
 
   defp make_bitstring_element(element, env) when is_number(element) do
-    do_make_bitstring_element({:integer, Translator.translate(element, env)})
+    do_make_bitstring_element({:integer, Translator.translate!(element, env)})
   end
 
   defp make_bitstring_element(element, env) when is_binary(element) do
-    do_make_bitstring_element({:binary, Translator.translate(element, env)})
+    do_make_bitstring_element({:binary, Translator.translate!(element, env)})
   end
 
   defp make_bitstring_element({:<<>>, [], elements}, env) do
-    make_bitstring(elements, env)
+    {ast, _} = make_bitstring(elements, env)
+    ast
   end
 
   defp make_bitstring_element({:::, _, [element, {type, _, _}]}, env) when type in [:integer, :float, :bitstring, :bits, :binary, :bytes, :utf8, :utf16, :utf32] do
-    do_make_bitstring_element({type, Translator.translate(element, env)})
+    do_make_bitstring_element({type, Translator.translate!(element, env)})
   end
 
   defp make_bitstring_element({:::, _, [element, {type, _, params}]}, env) when type in [:size, :unit] do
-    do_make_bitstring_element({type, Translator.translate(element, env), Enum.map(params, &Translator.translate(&1, env))})
+    do_make_bitstring_element({type, Translator.translate!(element, env), Enum.map(params, &Translator.translate!(&1, env))})
   end
 
   defp make_bitstring_element({:::, _, [element, {:*, _, [size, unit]}]}, env) do
-    size_ast = do_make_bitstring_element({:size, Translator.translate(element, env), [Translator.translate(size, env)]})
-    do_make_bitstring_element({:unit, size_ast, [Translator.translate(unit, env)]})
+    size_ast = do_make_bitstring_element({:size, Translator.translate!(element, env), [Translator.translate!(size, env)]})
+    do_make_bitstring_element({:unit, size_ast, [Translator.translate!(unit, env)]})
   end
 
   defp make_bitstring_element({:::, _, [element, {:-, _, types}]}, env) do
-    handle_type_adjectives({:-, [], types}, Translator.translate(element, env), env)
+    handle_type_adjectives({:-, [], types}, Translator.translate!(element, env), env)
   end
 
   defp make_bitstring_element({:::, _, [element, size]}, env) do
-    do_make_bitstring_element({:size, Translator.translate(element, env), [Translator.translate(size, env)]})
+    do_make_bitstring_element({:size, Translator.translate!(element, env), [Translator.translate!(size, env)]})
   end
 
   defp handle_type_adjectives({:-, _, types}, ast, env) do
@@ -54,10 +57,10 @@ defmodule ElixirScript.Translator.Bitstring do
         {:-, _, sub_types} ->
           handle_type_adjectives({:-, [], sub_types}, current_ast, env)
         {:*, _, [size, unit]} ->
-          size_ast = do_make_bitstring_element({:size, current_ast, [Translator.translate(size, env)]})
-          do_make_bitstring_element({:unit, size_ast, [Translator.translate(unit, env)]})
+          size_ast = do_make_bitstring_element({:size, current_ast, [Translator.translate!(size, env)]})
+          do_make_bitstring_element({:unit, size_ast, [Translator.translate!(unit, env)]})
         {the_type, _, params} when is_list(params) ->
-          do_make_bitstring_element({the_type, current_ast, Enum.map(params, &Translator.translate(&1, env))})
+          do_make_bitstring_element({the_type, current_ast, Enum.map(params, &Translator.translate!(&1, env))})
         {the_type, _, _} ->
           do_make_bitstring_element({the_type, current_ast})
       end
@@ -102,20 +105,20 @@ defmodule ElixirScript.Translator.Bitstring do
     translated_elements = Enum.map(elements, fn(x)->
       case x do
         elem when is_binary(elem) ->
-          Translator.translate(elem, env)
+          Translator.translate!(elem, env)
         {:::, _, data} ->
-          Translator.translate(hd(data), env)
+          Translator.translate!(hd(data), env)
       end
     end)
 
-    do_make_interpolated_string(tl(translated_elements), hd(translated_elements), env)
+    { do_make_interpolated_string(tl(translated_elements), hd(translated_elements), env), env }
   end
 
-  def do_make_interpolated_string([], ast, _) do
+  defp do_make_interpolated_string([], ast, _) do
     ast
   end
 
-  def do_make_interpolated_string(elements, ast, env) do
+  defp do_make_interpolated_string(elements, ast, env) do
     JS.binary_expression(
       :+,
       ast,

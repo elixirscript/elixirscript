@@ -2,7 +2,6 @@ defmodule ElixirScript do
   alias ElixirScript.Translator.JSModule
   alias ESTree.Tools.Builder
   alias ESTree.Tools.Generator
-  require Logger
 
   @moduledoc """
   Translates Elixir into JavaScript.
@@ -22,6 +21,23 @@ defmodule ElixirScript do
   * `:stdlib_path` - The es6 import path used to import the elixirscript standard lib.
   When using this option, the Elixir.js file is not exported
   """
+
+  defmacro __using__(_) do
+    quote do
+      import Kernel, only: [&&: 2, use: 2, use: 1]
+      import ElixirScript.Kernel
+      require ElixirScript.JS, as: JS
+      require ElixirScript.Html, as: Html
+      require ElixirScript.VDom, as: VDom
+    end
+  end
+
+  @external_resource libs_path = Path.join([__DIR__, "elixir_script", "universal", "**", "*.ex"])
+  @libs (for path <- Path.wildcard(libs_path) do
+    path
+    |> File.read!
+    |> Code.string_to_quoted!
+  end)
 
   @doc """
   Compiles the given Elixir code string
@@ -46,7 +62,10 @@ defmodule ElixirScript do
 
     ElixirScript.State.start_link(root, env)
 
-    build_environment([quoted])
+    libs = @libs
+    |> updated_quoted
+
+    build_environment(libs ++ [updated_quoted(quoted)])
     create_code(include_path, import_standard_libs?, stdlib_path)
   end
 
@@ -62,10 +81,14 @@ defmodule ElixirScript do
 
     ElixirScript.State.start_link(root, env)
 
-    path
+    libs = @libs
+    |> updated_quoted
+
+    code = path
     |> Path.wildcard
     |> Enum.map(&file_to_quoted/1)
-    |> build_environment
+
+    build_environment(libs ++ code)
 
     create_code(include_path, true, stdlib_path)
   end
@@ -74,6 +97,7 @@ defmodule ElixirScript do
     file
     |> File.read!
     |> Code.string_to_quoted!
+    |> updated_quoted
   end
 
   defp build_environment(code_list) do
@@ -81,51 +105,58 @@ defmodule ElixirScript do
     |> ElixirScript.Preprocess.Modules.get_info
   end
 
-  defp custom_env() do
-    require Logger
-    require ElixirScript.JS, as: JS
-    require ElixirScript.Html, as: Html
-    require ElixirScript.VDom, as: VDom
+  defp updated_quoted(quoted) do
+    Macro.prewalk(quoted, fn
+    ({name, context, parms}) ->
+      if context[:import] == Kernel do
+        context = Keyword.update!(context, :import, fn(_) -> ElixirScript.Kernel end)
+      end
+
+      {name, context, parms}
+    (x) ->
+      x
+    end)
+  end
+
+  def custom_env() do
+    __using__([])
     __ENV__
   end
 
   defp create_code(include_path, import_standard_libs?, stdlib_path) do
 
-    ElixirScript.State.process_imports
+    standard_lib_modules = ElixirScript.Module.build_standard_lib_map()
+    |> Map.values
 
     state = ElixirScript.State.get
 
-    parent = self
-
     result =
-      state.modules
+      Map.values(state.modules)
+      |> Enum.reject(fn(ast) ->
+        import_standard_libs? == false && ast.name in standard_lib_modules
+      end)
       |> Enum.map(fn ast ->
-        spawn_link fn ->
-          Process.put(:current_module, ast.name)
+          env = ElixirScript.Env.module_env(ast.name, "#{create_file_name(ast.name)}")
 
-          result =
-            ElixirScript.Translator.Module.make_module(ast.name, ast.body, state.env)
-            |> Enum.map(&(convert_to_code(&1, state.root, include_path, state.env, import_standard_libs?, stdlib_path)))
-          send parent, {self, result}
-        end
+          case ast.type do
+            :module ->
+              ElixirScript.Translator.Module.make_module(ast.name, ast.body, env)
+            :protocol ->
+              ElixirScript.Translator.Protocol.consolidate(ast, env)
+          end
+          |> convert_to_code(state.root, state.elixir_env, import_standard_libs?, stdlib_path)
       end)
-      |> Enum.map(fn pid ->
-        receive do
-          {^pid, x} -> x
-        end
-      end)
-      |> List.flatten
-
-    protocol_result =
-      state.protocols
-      |> Dict.to_list
-      |> ElixirScript.Translator.Protocol.consolidate(state.env)
-      |> Enum.map(&(convert_to_code(&1, state.root, include_path, state.env, import_standard_libs?, stdlib_path)))
-      |> List.flatten
 
     ElixirScript.State.stop
 
-    result ++ protocol_result
+    result
+    |> Enum.map(fn({path, code}) ->
+      if(include_path) do
+        { path, code }
+      else
+        code
+      end
+    end)
   end
 
   @doc """
@@ -143,11 +174,10 @@ defmodule ElixirScript do
     File.read!(operating_path <> "/Elixir.js")
   end
 
-  defp convert_to_code(js_ast, root, include_path, env, import_standard_libs, stdlib_path) do
+  defp convert_to_code(js_ast, root, env, import_standard_libs, stdlib_path) do
     js_ast
     |> process_module(root, env, import_standard_libs, stdlib_path)
     |> javascript_ast_to_code
-    |> process_include_path(include_path)
   end
 
   defp process_module(%JSModule{} = module, root, _, import_standard_libs, stdlib_path) do
@@ -172,11 +202,10 @@ defmodule ElixirScript do
     "#{name}.js"
   end
 
-  defp process_include_path({_, _} = pair, true),
-    do: pair
-
-  defp process_include_path({_, code}, false),
-    do: code
+  defp create_file_name(name) do
+    name = ElixirScript.Module.name_to_js_file_name(name)
+    "#{name}.js"
+  end
 
   @doc false
   def javascript_ast_to_code({path, js_ast}) do
@@ -192,16 +221,18 @@ defmodule ElixirScript do
   end
 
   defp prepare_js_ast(js_ast) do
-    case js_ast do
+    js_ast = case js_ast do
       modules when is_list(modules) ->
         modules
         |> Enum.reduce([], &(&2 ++ &1.body))
         |> Builder.program
-      %ElixirScript.Translator.Group{body: body} ->
+      %ElixirScript.Translator.Group{ body: body } ->
         Builder.program(body)
       _ ->
         js_ast
     end
+
+    js_ast
   end
 
   defp operating_path do

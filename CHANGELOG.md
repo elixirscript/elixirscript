@@ -1,4 +1,9 @@
-# v0.15.0
+# v0.15.0-dev
+* Enhancements
+  * Now tracking environment scopes
+  * `alias`, `require`, and `import` now work inside lexical scopes
+  * `__ENV__` and `__CALLER__` are now supported
+  * Began writing some of the standard libraries in Elixir instead of JavaScript
 
 # v0.14.1
 * Enhancements

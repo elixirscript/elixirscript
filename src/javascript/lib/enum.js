@@ -148,7 +148,7 @@ let Enum = {
     return Kernel.SpecialForms.tuple(mapped, the_acc);
   },
 
-  member: function(collection, value){
+  member__qmark__: function(collection, value){
     return collection.includes(value);
   },
 

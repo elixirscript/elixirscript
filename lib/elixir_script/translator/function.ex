@@ -4,7 +4,6 @@ defmodule ElixirScript.Translator.Function do
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Utils
   alias ElixirScript.PatternMatching.Match
-  alias ElixirScript.Preprocess.Variables
 
   @patterns JS.member_expression(
     JS.member_expression(
@@ -14,98 +13,36 @@ defmodule ElixirScript.Translator.Function do
     JS.identifier("Patterns")
   )
 
-  @standard_libs [
-    :Patterns, :Kernel, :Atom, :Enum, :Integer, :JS,
-    :List, :Range, :Tuple, :Agent, :Keyword,
-    :Base, :String, :Bitwise, :Collectable, :Enumerable,
-    :Inspect, :Map, :MapSet, :Set, :VirtualDom, :View
-  ]
-
-  def update_alias({:__aliases__, context, [:List, :Chars]}) do
-    {:__aliases__, context, [:Elixir] ++ [:List, :Chars] }
-  end
-
-  def update_alias({:__aliases__, context, [:String, :Chars]}) do
-    {:__aliases__, context, [:Elixir] ++ [:String, :Chars] }
-  end
-
-  def update_alias({:__aliases__, context, [name | rest]}) when name in @standard_libs do
-    {:__aliases__, context, [:Elixir, name] ++ rest }
-  end
-
-  def update_alias({:__aliases__, context, [name]}) when name in @standard_libs do
-    {:__aliases__, context, [:Elixir, name] }
-  end
-
-  def update_alias({{:., context, [module_name, function_name]}, context2, params }) do
-    {{:., context, [update_alias(module_name), function_name]}, context2, params }
-  end
-
-  def update_alias(ast) do
-    ast
-  end
-
-  def module_in_standard_libs?(name) do
-    name in @standard_libs
-  end
-
-
   def process_function(name, functions, env) do
-    result = make_anonymous_function(functions, env)
+    { result, _ } = make_anonymous_function(functions, env, name)
 
     declarator = JS.variable_declarator(
       JS.identifier(name),
       result
     )
 
-    JS.variable_declaration([declarator], :const)
+    { JS.variable_declaration([declarator], :const), env }
   end
 
-  def make_anonymous_function(functions, env) do
-
+  def make_anonymous_function(functions, env, name \\ nil) do
     clauses = functions
-    |> Stream.map(fn(x) -> Variables.process(x) end)
-    |> Stream.map(fn
+    |> Enum.map(fn
       {:->, _, [ [{:when, _, [params | guards]}], body ]} ->
-        params = wrap_params(params)
-        { patterns, params } = Match.build_match(params, env)
-        params = make_params(params)
-        body = make_function_body(body, env)
-        guard_body = make_guards(guards, env)
-        do_make_function_clause(patterns, params, body, guard_body)
-
+        process_function_body(params, body, env, name, guards)
       ({:->, _, [params, body]}) ->
-        params = wrap_params(params)
-        { patterns, params } = Match.build_match(params, env)
-        params = make_params(params)
-        body = make_function_body(body, env)
-        do_make_function_clause(patterns, params, body)
+        process_function_body(params, body, env, name)
 
       ({_, _, [{:when, _, [{_, _, params} | guards] }, [do: body]]}) ->
-        params = wrap_params(params)
-        { patterns, params } = Match.build_match(params, env)
-        params = make_params(params)
-        body = make_function_body(body, env)
-        guard_body = make_guards(guards, env)
-        do_make_function_clause(patterns, params, body, guard_body)
+        process_function_body(params, body, env, name, guards)
 
       ({_, _, [{_, _, params}, [do: body]]}) ->
-        params = wrap_params(params)
-        { patterns, params } = Match.build_match(params, env)
-        params = make_params(params)
-        body = make_function_body(body, env)
-        do_make_function_clause(patterns, params, body)
+        process_function_body(params, body, env, name)
 
       ({_, _, [{_, _, params}]}) ->
-        params = wrap_params(params)
-        { patterns, params } = Match.build_match(params, env)
-        params = make_params(params)
-        body = make_function_body([], env)
-        do_make_function_clause(patterns, params, body)
+        process_function_body(params, [], env, name)
     end)
-    |> Enum.to_list
 
-    make_defmatch(clauses)
+    { make_defmatch(clauses), env }
   end
 
   def make_defmatch(clauses) do
@@ -118,21 +55,37 @@ defmodule ElixirScript.Translator.Function do
     )
   end
 
+  defp process_function_body(params, body, env, name, guards \\ nil) do
+    env = ElixirScript.Env.function_env(env, {name, get_arity(params)})
+
+    { patterns, params, env } = process_params(params, env)
+    { body, _ } = make_function_body(body, env)
+
+    if guards do
+      { guard_body, _ } = hd(List.wrap(guards))
+      |> prepare_function_body(env)
+
+      guard_body = JS.block_statement(guard_body)
+      make_function_clause(patterns, params, body, guard_body)
+    else
+      make_function_clause(patterns, params, body, nil)
+    end
+  end
+
   def wrap_params(params) when is_atom(params), do: []
-  def wrap_params(params) when is_list(params), do: params
   def wrap_params(params), do: List.wrap(params)
 
   def make_function_body(body, env) do
-    body
+    { body, _ } = body
     |> prepare_function_body(env)
-    |> JS.block_statement
+
+
+    { JS.block_statement(body), env }
   end
 
-  defp make_guards(guards, env) do
-    hd(List.wrap(guards))
-    |> prepare_function_body(env)
-    |> JS.block_statement
-  end
+  defp get_arity(params) when is_atom(params), do: 0
+  defp get_arity(params) when is_tuple(params), do: 1
+  defp get_arity(params), do: length(params)
 
   defp make_params(params) do
     Enum.filter(params, fn
@@ -141,103 +94,102 @@ defmodule ElixirScript.Translator.Function do
     end)
   end
 
-  def do_make_function_clause(patterns, params, body, guard_body) do
-    JS.call_expression(
-      JS.member_expression(
-        @patterns,
-        JS.identifier("make_case")
-      ),
-      [
-        JS.array_expression(patterns),
-        JS.function_expression(params, [], body),
-        JS.function_expression(params, [], guard_body)
-      ]
-    )
+  defp process_params(params, env) do
+    params = wrap_params(params)
+    { patterns, params, env } = Match.process_match(params, env)
+    { patterns, make_params(params), env }
   end
 
-  def do_make_function_clause(patterns, params, body) do
-    JS.call_expression(
-      JS.member_expression(
-        @patterns,
-        JS.identifier("make_case")
-      ),
-      [
-        JS.array_expression(patterns),
-        JS.function_expression(params, [], body)
-      ]
-    )
-  end
+  def make_function_clause(patterns, params, body, guard_body) do
+    arguments = [
+            JS.array_expression(patterns),
+            JS.function_expression(params, [], body),
+          ]
 
-  def make_function_or_property_call(module_name, function_name, env) do
-    the_name = case update_alias(module_name) do
-      {:__aliases__, _, _} = name  ->
-        module_name = ElixirScript.Module.quoted_to_name(name)
-        get_name_js_ast(module_name)
-
-      {name, _, _} when is_atom(name) ->
-        get_name_js_ast(name)
-
-      {{:., _, [_module_name, _function_name]}, _, _params } = ast ->
-        ast
-
-      name ->
-        name
+    if guard_body do
+      arguments = arguments ++ [JS.function_expression(params, [], guard_body)]
     end
 
     JS.call_expression(
       JS.member_expression(
+        @patterns,
+        JS.identifier("make_case")
+      ),
+      arguments
+    )
+  end
+
+  def make_function_or_property_call(module_name, function_name, env) do
+    the_name = get_module_name_for_function(module_name, env)
+
+    js_ast = JS.call_expression(
+      JS.member_expression(
         JS.member_expression(
-        JS.identifier("Elixir"),
-        JS.identifier("Core")
+          JS.identifier("Elixir"),
+          JS.identifier("Core")
         ),
         JS.identifier("call_property")
       ),
       [
         Utils.make_module_expression_tree(the_name, false, env),
-        Translator.translate(to_string(function_name), env)
+        Translator.translate!(to_string(function_name), env)
       ]
     )
+
+    { js_ast, env }
   end
 
-  def make_function_call(function_name, params, env) when is_tuple(function_name) do
-    Utils.make_call_expression(function_name, params, env)
-  end
-
-  def make_function_call(function_name, params, env) do
-    Utils.make_call_expression(Utils.filter_name(function_name), params, env)
-  end
-
-  def make_function_call(module_name, function_name, params, env) do
-    the_name = case update_alias(module_name) do
+  defp get_module_name_for_function(module_name, env) do
+    case module_name do
       {:__aliases__, _, name} ->
         module_name = ElixirScript.Module.quoted_to_name(name)
-        get_name_js_ast(module_name)
+        get_js_name(module_name, env)
       {name, _, _} when is_atom(name) ->
-        get_name_js_ast(name)
+        get_js_name(name, env)
       {{:., _, [_, _]}, _, _ } = ast ->
         ast
       {{:., _, [{:__aliases__, _, _}]}, _, _} = ast ->
         ast
       name ->
-        name
+        get_js_name(name, env)
     end
+  end
 
-    Utils.make_call_expression(the_name, Utils.filter_name(function_name), params, env)
+  def make_function_call(function_name, params, env) when is_tuple(function_name) do
+    { Utils.make_call_expression(function_name, params, env), env }
+  end
+
+  def make_function_call(function_name, params, env) do
+    { Utils.make_call_expression(Utils.filter_name(function_name), params, env), env }
+  end
+
+  def make_function_call(module_name, function_name, params, env) do
+    the_name = get_module_name_for_function(module_name, env)
+    { Utils.make_call_expression(the_name, Utils.filter_name(function_name), params, env), env }
   end
 
   def prepare_function_body(body, env) do
-    case body do
+    { list, env } = case body do
       nil ->
-        []
+        { [], env }
       list when is_list(list) ->
-        Enum.map(list, &Translator.translate(&1, env))
+        Enum.map_reduce(list, env, fn(x, env) ->
+          Translator.translate(x, env)
+        end)
       {:__block__, _, list} ->
-        Enum.map(list, &Translator.translate(&1, env))
+        Enum.map_reduce(list, env, fn(x, env) ->
+          Translator.translate(x, env)
+        end)
       _ ->
-        [Translator.translate(body, env)]
+        Enum.map_reduce(List.wrap(body), env, fn(x, env) ->
+          Translator.translate(x, env)
+        end)
     end
-    |> Utils.inflate_groups
+
+    list = Utils.inflate_groups(list)
     |> return_last_expression
+
+    { list, env }
   end
 
   def return_last_expression(nil) do
@@ -305,25 +257,23 @@ defmodule ElixirScript.Translator.Function do
     end
   end
 
-  defp get_name_js_ast([Elixir | _] = list) do
+  defp get_js_name([Elixir | _] = list, _) do
     list
   end
 
-  defp get_name_js_ast(module_name) when is_list(module_name) do
+  defp get_js_name(module_name, env) when is_list(module_name) do
     ElixirScript.Module.quoted_to_name({:__aliases__, [], module_name})
-    |> get_name_js_ast
+    |> get_js_name(env)
   end
 
-  defp get_name_js_ast(module_name) do
+  defp get_js_name(module_name, env) do
+
     cond do
-      ElixirScript.State.get_module(module_name) ->
-        ElixirScript.State.add_module_reference(Process.get(:current_module), module_name)
+      module_name in env.requires ->
         ElixirScript.Module.name_to_js_name(module_name)
 
-      ElixirScript.Module.has_alias?(ElixirScript.State.get_module(Process.get(:current_module)), module_name) ->
-        module = ElixirScript.State.get_module(Process.get(:current_module))
-        {_, module_name } = ElixirScript.Module.get_alias(module, module_name)
-        ElixirScript.State.add_module_reference(Process.get(:current_module), module_name)
+      module_name in ElixirScript.State.list_module_names ->
+        ElixirScript.State.add_module_reference(env.module, module_name)
         ElixirScript.Module.name_to_js_name(module_name)
 
       true ->

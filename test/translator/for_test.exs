@@ -93,9 +93,9 @@ defmodule ElixirScript.Translator.For.Test do
 
     js_code = """
      Elixir.Kernel.SpecialForms._for(Elixir.Kernel.SpecialForms.list(Elixir.Kernel.SpecialForms.list(Elixir.Core.Patterns.variable(),Elixir.Kernel.SpecialForms.list(1,2,3,4,5,6))),function(n)    {
-             return     n;
+             return n;
            },function(n)    {
-             return     n % 2 == 0;
+             return n % 2 == 0;
            },Elixir.Kernel.SpecialForms.list())
     """
 
@@ -105,7 +105,7 @@ defmodule ElixirScript.Translator.For.Test do
   should "translate for with pattern matched input" do
     ex_ast = quote do
       for {:user, name} <- [user: "john", admin: "john", user: "meg"] do
-        String.upcase(name)
+        Elixir.String.upcase(name)
       end
     end
 

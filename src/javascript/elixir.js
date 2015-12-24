@@ -1,9 +1,5 @@
 import * as C from './lib/core';
 
-self.processes = self.processes || new C.ProcessSystem();
-
-
-
 export const Core = C;
 export { default as Kernel } from './lib/kernel';
 export { default as Atom } from './lib/atom';

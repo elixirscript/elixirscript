@@ -30,8 +30,8 @@ defmodule ElixirScript.Translator.Case.Test do
 
     js_code = """
      Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([false],function()    {
-             let [value0] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),13);
-             return     value0;
+             let [value] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),13);
+             return     value;
            }),Elixir.Core.Patterns.make_case([true],function()    {
              return     true;
            })).call(this,data)
@@ -50,8 +50,8 @@ defmodule ElixirScript.Translator.Case.Test do
 
     js_code = """
      Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([false],function()    {
-             let [value0] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),13);
-             return     value0;
+             let [value] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),13);
+             return     value;
            }),Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.wildcard()],function()    {
              return     true;
            })).call(this,data)
@@ -72,10 +72,10 @@ defmodule ElixirScript.Translator.Case.Test do
 
     js_code = """
      Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(number)    {
-             let [value0] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),13);
-             return     value0;
+             let [value] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),13);
+             return     value;
            },function(number)    {
-             return     Elixir.Kernel.in(number,Elixir.Kernel.SpecialForms.list(1,2,3,4));
+             return     Elixir.Core.contains(number,Elixir.Kernel.SpecialForms.list(1,2,3,4));
            }),Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.wildcard()],function()    {
              return     true;
            })).call(this,data)
@@ -88,7 +88,7 @@ defmodule ElixirScript.Translator.Case.Test do
     ex_ast = quote do
       case data do
         :ok ->
-          Logger.info("info")
+          :console.info("info")
           Todo.add(data)
         :error ->
           nil
@@ -111,7 +111,7 @@ defmodule ElixirScript.Translator.Case.Test do
     ex_ast = quote do
       case data do
         { one, two } ->
-          Logger.info(one)
+          :console.info(one)
         :error ->
           nil
       end
@@ -134,7 +134,7 @@ defmodule ElixirScript.Translator.Case.Test do
     ex_ast = quote do
       case data do
         { {one, two} , three } ->
-          Logger.info(one)
+          :console.info(one)
         :error ->
           nil
       end
@@ -157,7 +157,7 @@ defmodule ElixirScript.Translator.Case.Test do
     ex_ast = quote do
       case data do
         { one, {two, three} } ->
-          Logger.info(one)
+          :console.info(one)
         :error ->
           nil
       end
@@ -181,7 +181,7 @@ defmodule ElixirScript.Translator.Case.Test do
     ex_ast = quote do
       case data do
         %AStruct{key: %BStruct{ key2: value }} ->
-          Logger.info(value)
+          :console.info(value)
         :error ->
           nil
       end
@@ -205,7 +205,7 @@ defmodule ElixirScript.Translator.Case.Test do
     ex_ast = quote do
       case data do
         %AStruct{key: %BStruct{ key2: value, key3: %CStruct{ key4: value2 } }} ->
-          Logger.info(value)
+          :console.info(value)
         :error ->
           nil
       end

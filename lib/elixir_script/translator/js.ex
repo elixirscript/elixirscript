@@ -7,20 +7,20 @@ defmodule ElixirScript.Translator.JS do
 
   @doc false
   def translate_js_function(name, params, env) do
-    do_translate({name, [], params}, env)
+    { do_translate({name, [], params}, env), env }
   end
 
   defp do_translate({:new, _, [{:__aliases__, _, module_name}, params]}, env) do
     Builder.new_expression(
       Utils.make_module_expression_tree(module_name, false, env),
-      Enum.map(params, &Translator.translate(&1, env))
+      Enum.map(params, &Translator.translate!(&1, env))
     )
   end
 
   defp do_translate({:new, _, [module_name, params]}, env) do
     Builder.new_expression(
       Translator.translate(module_name, env),
-      Enum.map(params, &Translator.translate(&1, env))
+      Enum.map(params, &Translator.translate!(&1, env))
     )
   end
 
@@ -28,19 +28,19 @@ defmodule ElixirScript.Translator.JS do
     Builder.assignment_expression(
       :=,
       Builder.member_expression(
-        Translator.translate(object, env),
-        Translator.translate(property, env),
+        Translator.translate!(object, env),
+        Translator.translate!(property, env),
         true
       ),
-      Translator.translate(value, env)
+      Translator.translate!(value, env)
     )
   end
 
   defp do_translate({:import, _, [module_names, from]}, env) when is_list(module_names) do
     import_specifiers = Enum.map(module_names, fn(x) ->
         Builder.import_specifier(
-          Translator.translate(x, env),
-          Translator.translate(x, env)
+          Translator.translate!(x, env),
+          Translator.translate!(x, env)
         )
     end)
 
@@ -51,33 +51,11 @@ defmodule ElixirScript.Translator.JS do
 
     import_specifier = Builder.import_specifier(
       Builder.identifier("default"),
-      Translator.translate(module_name, env)
+      Translator.translate!(module_name, env)
     )
 
     build_import_declaration([import_specifier], from)
   end
-
-  defp do_translate({:to_js, _, [value]}, env) do
-    quoted = quote do
-      if is_list(unquote(value)) || is_map(unquote(value)) || is_tuple(unquote(value)) do
-        value.toJS()
-      else
-        value
-      end
-    end
-
-    Translator.translate(quoted, env)
-  end
-
-
-  defp do_translate({:to_json, _, [value]}, env) do
-    quoted = quote do
-      JSON.stringify(JS.to_js(unquote(value)))
-    end
-
-    Translator.translate(quoted, env)
-  end
-
 
   defp build_import_declaration(import_specifiers, from) do
     Builder.import_declaration(

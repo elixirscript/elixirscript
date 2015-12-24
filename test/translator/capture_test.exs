@@ -9,7 +9,7 @@ defmodule ElixirScript.Translator.Capture.Test do
 
     js_code = """
      let [fun] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(__1)    {
-             return     Elixir.Kernel.is_atom(__1);
+             return     Elixir$ElixirScript$Kernel.is_atom(__1);
            })));
     """
 
@@ -25,7 +25,7 @@ defmodule ElixirScript.Translator.Capture.Test do
 
     js_code = """
      let [fun] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(__1)    {
-             return     Elixir.Kernel.is_atom(__1);
+             return     Elixir$ElixirScript$Kernel.is_atom(__1);
            })));
     """
 
@@ -50,7 +50,7 @@ defmodule ElixirScript.Translator.Capture.Test do
 
   end
 
-  should "translate capture operator with anonymous function" do  
+  should "translate capture operator with anonymous function" do
 
     ex_ast = quote do
       fun = &(&1 * 2)
@@ -66,7 +66,7 @@ defmodule ElixirScript.Translator.Capture.Test do
 
   end
 
-  should "translate capture operator with anonymous function tuple" do  
+  should "translate capture operator with anonymous function tuple" do
 
     ex_ast = quote do
       fun = &{&1, &2}
@@ -95,7 +95,7 @@ defmodule ElixirScript.Translator.Capture.Test do
 
   end
 
-  should "translate capture operator with anonymous functions as parameters" do  
+  should "translate capture operator with anonymous functions as parameters" do
 
     ex_ast = quote do
       Elixir.Enum.map(items, &process(&1))

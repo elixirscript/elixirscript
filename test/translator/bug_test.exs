@@ -46,11 +46,10 @@ defmodule ElixirScript.Translator.Bug.Test do
     end
 
     js_code = """
-     import { default as JQuery } from 'jquery';
-     const __MODULE__ = Elixir.Kernel.SpecialForms.atom('Elixir.App.Todo');
-
-     JQuery(Elixir.Core.call_property(e, 'target'));
-     export {};
+    import { default as JQuery } from 'jquery';
+    import * as Elixir$ElixirScript$Kernel from 'Elixir.ElixirScript.Kernel';
+    JQuery(Elixir.Core.call_property(e,'target'));
+    export {};
     """
 
     assert_translation(ex_ast, js_code)

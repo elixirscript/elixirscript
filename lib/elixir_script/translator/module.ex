@@ -4,30 +4,29 @@ defmodule ElixirScript.Translator.Module do
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.JSModule
-  alias ElixirScript.Preprocess.Aliases
   alias ElixirScript.Preprocess.Using
   alias ElixirScript.Translator.Function
-  alias ElixirScript.Translator.Primitive
 
   def make_module(ElixirScript.Temp, body, env) do
-    [%JSModule{ name: ElixirScript.Temp, body: translate_body(body, env) |> Utils.inflate_groups }]
+    { body, _ } = translate_body(body, env)
+    %JSModule{ name: ElixirScript.Temp, body: body |> Utils.inflate_groups }
   end
 
-  def make_module(module, nil, env) do
-    [%JSModule{ name: module, body: List.wrap(create__module__(module, env)) }]
+  def make_module(module, nil, _) do
+    %JSModule{ name: module, body: [] }
   end
 
   def make_module(module, body, env) do
-    body = Using.process(body, env)
+    body = Using.process(body)
     { body, functions } = extract_functions_from_module(body)
-    { exported_functions, private_functions } = process_functions(functions, env)
+    { body, env } = translate_body(body, env)
 
-    body = translate_body(body, env)
+    { exported_functions, private_functions } = process_functions(functions, env)
 
     modules_refs = ElixirScript.State.get_module_references(module)
 
     {imports, body} = extract_imports_from_body(body)
-    {structs, body} = extract_structs_from_body(body)
+    {structs, body} = extract_structs_from_body(body, env)
 
     #Add imports found from walking the ast
     #and make sure to only put one declaration per alias
@@ -57,29 +56,19 @@ defmodule ElixirScript.Translator.Module do
     private_functions = Enum.map(private_functions, fn({_key, value}) -> value end)
 
     default = JS.export_named_declaration(exported_object)
-    {modules, body} = Enum.partition(body, fn(x) ->
-      case x do
-        %JSModule{} ->
-          true
-        _ ->
-          false
-      end
-    end)
 
-    result = [
-      %JSModule{
+    result = %JSModule{
         name: ElixirScript.Module.quoted_to_name({:__aliases__, [], module }),
-        body: imports ++ List.wrap(create__module__(module, env)) ++ structs ++ private_functions ++ exported_functions ++ body ++ [default]
+        body: imports ++ structs ++ private_functions ++ exported_functions ++ body ++ [default]
       }
-    ] ++ List.flatten(modules)
 
     result
   end
 
   def translate_body(body, env) do
-    body = Translator.translate(body, env)
+    { body, env } = Translator.translate(body, env)
 
-    case body do
+    body = case body do
       [%ESTree.BlockStatement{ body: body }] ->
         body
       %ESTree.BlockStatement{ body: body } ->
@@ -87,6 +76,8 @@ defmodule ElixirScript.Translator.Module do
       _ ->
         List.wrap(body)
     end
+
+    { body, env }
   end
 
   def extract_functions_from_module({:__block__, meta, body_list}) do
@@ -137,10 +128,12 @@ defmodule ElixirScript.Translator.Module do
     end)
   end
 
-  def extract_structs_from_body(body) do
+  def extract_structs_from_body(body, env) do
+    module_js_name = ElixirScript.Module.name_to_js_name(env.module)
+
     Enum.partition(body, fn(x) ->
       case x do
-        %ESTree.VariableDeclaration{declarations: [%ESTree.VariableDeclarator{id: %ESTree.Identifier{name: name} } ] } when name in [:defstruct, :defexception] ->
+        %ESTree.VariableDeclaration{declarations: [%ESTree.VariableDeclarator{id: %ESTree.Identifier{name: ^module_js_name} } ] } ->
           true
         _ ->
           false
@@ -153,32 +146,34 @@ defmodule ElixirScript.Translator.Module do
   end
 
   defp make_defstruct_property(module_name, [the_struct]) do
+    module_js_name = ElixirScript.Module.name_to_js_name(module_name)
+
     case the_struct do
-      %ESTree.VariableDeclaration{declarations: [%ESTree.VariableDeclarator{id: %ESTree.Identifier{name: name} } ] } when name in [:defstruct, :defexception] ->
-        [JS.property(JS.identifier(ElixirScript.Module.name_to_js_name(module_name)), JS.identifier(name), :init)]
+      %ESTree.VariableDeclaration{declarations: [%ESTree.VariableDeclarator{id: %ESTree.Identifier{name: ^module_js_name} } ] } ->
+        [JS.property(JS.identifier(module_js_name), JS.identifier(module_js_name), :init, true)]
     end
   end
 
   def process_imports(imports, module_refs) do
     imports ++ make_imports(module_refs)
-    |> Enum.into(HashSet.new)
-    |> Enum.reduce(HashSet.new, fn(x, acc)->
-      HashSet.put(acc, x)
+    |> Enum.into(MapSet.new)
+    |> Enum.reduce(MapSet.new, fn(x, acc)->
+      MapSet.put(acc, x)
     end)
-    |> HashSet.to_list
-    |> Enum.reduce(%{ identifiers: HashSet.new, imports: [] }, fn(x, state) ->
+    |> MapSet.to_list
+    |> Enum.reduce(%{ identifiers: MapSet.new, imports: [] }, fn(x, state) ->
       case x do
         %ESTree.ImportDeclaration{ specifiers: [%ESTree.ImportSpecifier{ local: id }] } ->
-          if HashSet.member?(state.identifiers, id.name) do
+          if MapSet.member?(state.identifiers, id.name) do
             state
           else
-            %{ state | identifiers: HashSet.put(state.identifiers, id.name), imports: state.imports ++ [x] }
+            %{ state | identifiers: MapSet.put(state.identifiers, id.name), imports: state.imports ++ [x] }
           end
         %ESTree.ImportDeclaration{ specifiers: [%ESTree.ImportDefaultSpecifier{ local: id }] } ->
-          if HashSet.member?(state.identifiers, id.name) do
+          if MapSet.member?(state.identifiers, id.name) do
             state
           else
-            %{ state | identifiers: HashSet.put(state.identifiers, id.name), imports: state.imports ++ [x] }
+            %{ state | identifiers: MapSet.put(state.identifiers, id.name), imports: state.imports ++ [x] }
           end
         _ ->
           %{ state | imports: state.imports ++ [x] }
@@ -189,12 +184,15 @@ defmodule ElixirScript.Translator.Module do
   def process_functions(%{ exported: exported, private: private }, env) do
     exported_functions = Enum.map(Dict.keys(exported), fn(key) ->
       functions = Dict.get(exported, key)
-      { key, Function.process_function(key, functions, env) }
+
+      { functions, _ } = Function.process_function(key, functions, env)
+      { key, functions }
     end)
 
     private_functions = Enum.map(Dict.keys(private), fn(key) ->
       functions = Dict.get(private, key)
-      { key, Function.process_function(key, functions, env) }
+      { functions, _ } = Function.process_function(key, functions, env)
+      { key, functions }
     end)
 
     { exported_functions, private_functions }
@@ -203,16 +201,7 @@ defmodule ElixirScript.Translator.Module do
   def make_attribute(name, value, env) do
     declarator = JS.variable_declarator(
       JS.identifier(name),
-      ElixirScript.Translator.translate(value, env)
-    )
-
-    JS.variable_declaration([declarator], :const)
-  end
-
-  def create__module__(module, _) do
-    declarator = JS.variable_declarator(
-      JS.identifier(:__MODULE__),
-      Primitive.make_atom(module)
+      ElixirScript.Translator.translate!(value, env)
     )
 
     JS.variable_declaration([declarator], :const)

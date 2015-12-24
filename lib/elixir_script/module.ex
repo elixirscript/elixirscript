@@ -1,67 +1,12 @@
 defmodule ElixirScript.Module do
   @moduledoc false
 
-  defstruct name: nil, functions: Keyword.new, macros: Keyword.new, body: nil,
-  aliases: [], requires: [], imports: [], js_imports: [], module_refs: []
+  defstruct name: nil,
+  functions: Keyword.new, private_functions: Keyword.new,
+  macros: Keyword.new, private_macros: Keyword.new,
+  body: nil, js_imports: [], module_refs: [], type: :module,
+  spec: nil, impls: HashDict.new
 
-  def functions(module) do
-    Keyword.keys(module.functions) |> Enum.uniq
-  end
-
-  def macros(module) do
-    Keyword.keys(module.macros) |> Enum.uniq
-  end
-
-  def aliases(module) do
-    module.aliases
-  end
-
-  def requires(module) do
-    module.requires
-  end
-
-  def imports(module) do
-    module.imports
-  end
-
-  def has_alias?(module, name) do
-    case module.aliases do
-      aliases when is_list(aliases) ->
-        List.keymember?(module.aliases, name, 0)
-      _ ->
-        List.keymember?(Set.to_list(module.aliases), name, 0)
-    end
-  end
-
-  def get_alias(nil, _) do
-    nil
-  end
-
-  def get_alias(module, name) when is_list(name) do
-    name = {:__aliases__, [], name } |> quoted_to_name
-    get_alias(module, name)
-  end
-
-  def get_alias(module, name) when is_atom(name) do
-    Enum.find(module.aliases, fn({the_alias, _}) ->
-      name == the_alias
-    end)
-  end
-
-  def get_alias(module, {:__aliases__, _, _} = ast) do
-    name = quoted_to_name(ast)
-    get_alias(module, name)
-  end
-
-  def imported?(module, function_name) do
-    imported_modules = Enum.find(module.imports, fn({_, funcs}) ->
-      Enum.member?(funcs, function_name)
-    end)
-
-    if imported_modules do
-      elem(imported_modules, 0)
-    end
-  end
 
   def quoted_to_name(the_alias) do
     {name, _} = Code.eval_quoted(the_alias)
@@ -86,6 +31,33 @@ defmodule ElixirScript.Module do
   def name_to_js_file_name(name) do
     { :__aliases__, _, name } = name_to_quoted(name)
     Enum.join([:Elixir] ++ name, ".")
+  end
+
+  def has_function?(module_name, name_arity) do
+    module = ElixirScript.State.get_module(module_name)
+    name_arity in module.functions or name_arity in module.private_functions
+  end
+
+  def build_standard_lib_map() do
+    Map.new
+    |> Map.put(Kernel, ElixirScript.Kernel)
+    |> Map.put(Tuple, ElixirScript.Tuple)
+    |> Map.put(Atom, ElixirScript.Atom)
+    |> Map.put(Collectable, ElixirScript.Collectable)
+    |> Map.put(String.Chars, ElixirScript.String.Chars)
+    |> Map.put(Enumerable, ElixirScript.Enumerable)
+    |> Map.put(Integer, ElixirScript.Integer)
+    |> Map.put(Macro.Env, ElixirScript.Macro.Env)
+    |> Map.put(View, ElixirScript.View)
+  end
+
+  def get_module_name(module_name) do
+    case Map.get(build_standard_lib_map, module_name) do
+      nil ->
+        module_name
+      actual_module_name ->
+        actual_module_name
+    end
   end
 
 end

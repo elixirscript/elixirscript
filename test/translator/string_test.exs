@@ -25,19 +25,19 @@ defmodule ElixirScript.Translator.String.Test do
     assert_translation(ex_ast, "'Hello ' + 'world'")
 
     ex_ast = quote do: "Hello #{length([])}"
-    assert_translation(ex_ast, "'Hello ' + Elixir.String.Chars.to_string(Elixir.Kernel.SpecialForms.list().length)")
+    assert_translation(ex_ast, "'Hello ' + Elixir$ElixirScript$String$Chars.to_string(Elixir$ElixirScript$Kernel.length(Elixir.Kernel.SpecialForms.list()))")
   end
 
   should "translate multiline string interpolation" do
     ex_ast = quote do: """
     Hello #{length([])}
     """
-    assert_translation(ex_ast, "'Hello ' + (Elixir.String.Chars.to_string(Elixir.Kernel.SpecialForms.list().length) + '\\n')")
+    assert_translation(ex_ast, "'Hello ' + (Elixir$ElixirScript$String$Chars.to_string(Elixir$ElixirScript$Kernel.length(Elixir.Kernel.SpecialForms.list())) + '\\n')")
 
     ex_ast = quote do: """
     Hello #{length([])}
     How are you, #{length([])}?
     """
-    assert_translation(ex_ast, "'Hello ' + (Elixir.String.Chars.to_string(Elixir.Kernel.SpecialForms.list().length) + ('\\nHow are you, ' + (Elixir.String.Chars.to_string(Elixir.Kernel.SpecialForms.list().length) + '?\\n')))")
+    assert_translation(ex_ast, "'Hello ' + (Elixir$ElixirScript$String$Chars.to_string(Elixir$ElixirScript$Kernel.length(Elixir.Kernel.SpecialForms.list())) + ('\\nHow are you, ' + (Elixir$ElixirScript$String$Chars.to_string(Elixir$ElixirScript$Kernel.length(Elixir.Kernel.SpecialForms.list())) + '?\\n')))")
   end
 end

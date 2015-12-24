@@ -3,53 +3,54 @@ defmodule ElixirScript.Translator.Capture do
 
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.PatternMatching.Match
-  alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.Function
 
   def make_capture(function_name, arity, env) do
-    params = Enum.map(1..arity, fn(x) -> {String.to_atom("__#{x}"), [], ElixirScript.Translator.Capture} end)
-
-    { patterns, params } = Match.build_match(params, env)
-
-    body = JS.block_statement([
-          JS.return_statement(
-            JS.call_expression(
-              JS.identifier(function_name),
-              params
-            )
-          )
-        ])
-
-
-    Function.make_defmatch([
-      Function.do_make_function_clause(patterns, params, body)
-    ])
-  end  
-
-  def make_capture(module_name, function_name, arity, env) do
-    params = Enum.map(1..arity, fn(x) -> {String.to_atom("__#{x}"), [], ElixirScript.Translator.Capture} end)
-
-    if Function.module_in_standard_libs?(module_name) do
-      module_name = [:Elixir, module_name]
-    end
-
-    { patterns, params } = Match.build_match(params, env)
+    { patterns, params, _ } = process_params(arity, env)
 
     body = JS.block_statement([
       JS.return_statement(
         JS.call_expression(
-          Utils.make_member_expression(module_name, function_name, env),
+          JS.identifier(function_name),
           params
         )
       )
     ])
 
+    make_capture_function(patterns, params, body)
+  end
 
-    Function.make_defmatch([
-      Function.do_make_function_clause(patterns, params, body)
+  def make_capture(module_name, function_name, arity, env) do
+    arity_params = Enum.map(1..arity, fn(x) -> {String.to_atom("__#{x}"), [], ElixirScript.Translator.Capture} end)
+
+    { patterns, params, env } = process_params(arity, env)
+
+    { _, _, name } = module_name
+
+    if name == [:Kernel] or name == [Elixir, :Kernel] do
+      name = [:ElixirScript, :Kernel]
+    end
+
+    { func, _ } = Function.make_function_call({:__aliases__, [], name }, function_name, arity_params, env)
+
+    body = JS.block_statement([
+      JS.return_statement(
+        func
+      )
     ])
 
+    make_capture_function(patterns, params, body)
+  end
 
+  defp process_params(arity, env) do
+    params = Enum.map(1..arity, fn(x) -> {String.to_atom("__#{x}"), [], ElixirScript.Translator.Capture} end)
+    Match.process_match(params, env)
+  end
+
+  defp make_capture_function(patterns, params, body) do
+    Function.make_defmatch([
+      Function.make_function_clause(patterns, params, body, nil)
+    ])
   end
 
   def find_value_placeholders(ast) do

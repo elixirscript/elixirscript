@@ -60,7 +60,7 @@ defmodule ElixirScript.Translator.Try.Test do
     }, Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()], function(x) {
         return IO.puts('Invalid argument given');
     }, function(x) {
-        return Elixir.Kernel.in(x, Elixir.Kernel.SpecialForms.list(ArgumentError.create(Elixir.Kernel.SpecialForms.map({}))));
+        return Elixir.Core.contains(x,Elixir.Kernel.SpecialForms.list(ArgumentError.create(Elixir.Kernel.SpecialForms.map({}))));
     })), null, null, null)
     """
 

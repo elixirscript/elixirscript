@@ -1,7 +1,7 @@
 %{"benchfella": {:hex, :benchfella, "0.3.0"},
   "bunt": {:hex, :bunt, "0.1.4"},
   "certifi": {:hex, :certifi, "0.3.0"},
-  "credo": {:hex, :credo, "0.1.10"},
+  "credo": {:hex, :credo, "0.2.2"},
   "dogma": {:hex, :dogma, "0.0.7"},
   "earmark": {:hex, :earmark, "0.1.19"},
   "estree": {:hex, :estree, "2.1.1"},

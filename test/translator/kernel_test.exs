@@ -8,10 +8,10 @@ defmodule ElixirScript.Translator.Kernel.Test do
     end
 
     js_code = """
-    Math.max(1, 2)
+    Elixir$ElixirScript$Kernel.max(1, 2)
     """
 
-    assert_translation(ex_ast, js_code) 
+    assert_translation(ex_ast, js_code)
 
   end
 
@@ -21,10 +21,10 @@ defmodule ElixirScript.Translator.Kernel.Test do
     end
 
     js_code = """
-    fun(1,2,3)
+    Elixir$ElixirScript$Kernel.apply(fun, Elixir.Kernel.SpecialForms.list(1,2,3))
     """
 
-    assert_translation(ex_ast, js_code) 
+    assert_translation(ex_ast, js_code)
 
   end
 
@@ -34,10 +34,10 @@ defmodule ElixirScript.Translator.Kernel.Test do
     end
 
     js_code = """
-    Elixir.Enum.reverse(1,2,3)
+    Elixir$ElixirScript$Kernel.apply(Enum,Elixir.Kernel.SpecialForms.atom('reverse'),Elixir.Kernel.SpecialForms.list(1,2,3))
     """
 
-    assert_translation(ex_ast, js_code) 
+    assert_translation(ex_ast, js_code)
 
   end
 
@@ -47,10 +47,10 @@ defmodule ElixirScript.Translator.Kernel.Test do
     end
 
     js_code = """
-    Elixir.Kernel.SpecialForms.list(1,2,3)[0]
+    Elixir$ElixirScript$Kernel.hd(Elixir.Kernel.SpecialForms.list(1,2,3))
     """
 
-    assert_translation(ex_ast, js_code) 
+    assert_translation(ex_ast, js_code)
 
   end
 
@@ -60,10 +60,10 @@ defmodule ElixirScript.Translator.Kernel.Test do
     end
 
     js_code = """
-    Elixir.Kernel.SpecialForms.list(1,2,3).slice(1)
+    Elixir$ElixirScript$Kernel.tl(Elixir.Kernel.SpecialForms.list(1,2,3))
     """
 
-    assert_translation(ex_ast, js_code) 
+    assert_translation(ex_ast, js_code)
 
   end
 end

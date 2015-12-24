@@ -4,7 +4,7 @@
 
 ### A. Because you may reference JavaScript code in your ElixirScript modules that the Elixir compiler may not know about.
 
-For instance, if you are writing an ElixirScript module that references JQuery or React. Since the Elixir compiler won't know about the existence of these, you may end up with some compiler errors. The main purpose is to sort of hide it from the Elixir compiler. You can feed normal `.ex` files to the ElixirScript compiler and it can turn them into JavaScript however. 
+For instance, if you are writing an ElixirScript module that references JQuery or React. Since the Elixir compiler won't know about the existence of these, you may end up with some compiler errors. The main purpose is to sort of hide it from the Elixir compiler. You can feed normal `.ex` files to the ElixirScript compiler and it can turn them into JavaScript however.
 
 In the future, the added file extension may not be needed as much as ElixirScript continues to support more of the Elixir standard library. An eventual goal would be to use standard `.ex` files in both Elixir and ElixirScript, while leaving `exjs` files strictly for JavaScript related code.
 
@@ -40,11 +40,13 @@ The compiler to this point has been focused on translating Kernel.SpecialForms a
     * `require`
     * `left :: right`
     * `alias`
-
-* Missing
     * `__CALLER__`
     * `__ENV__`
+
+* Missing
     * `super(args)`
+    * `receive`
+    * `with`
 
 * Caveats
     * `<<args>>` - not supported in pattern matching yet
@@ -52,10 +54,10 @@ The compiler to this point has been focused on translating Kernel.SpecialForms a
     * `left = right` does not support full unification yet.
         ```elixir
         a = 1 # works as expected
-        
+
         1 = a # may not work currently, but in some cases it will
         ```
-        
+
 
 #### Completed Modules
 
@@ -66,7 +68,7 @@ The compiler to this point has been focused on translating Kernel.SpecialForms a
     * Logger
     * Map
     * MapSet
-    
+
 #### Incomplete Modules
 
     * Kernel
@@ -78,7 +80,7 @@ The compiler to this point has been focused on translating Kernel.SpecialForms a
     * String
     * Bitwise
     * Set
-    
+
 #### Missing Modules
     * Everything else
 

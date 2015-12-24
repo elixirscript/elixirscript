@@ -25,13 +25,6 @@ defmodule ElixirScript.Translator.Primitive do
     )
   end
 
-  def scheduler() do
-    JS.member_expression(
-      JS.identifier("self"),
-      JS.identifier("system")
-    )
-  end
-
   def make_identifier({:__aliases__, _, aliases}) do
     Utils.make_module_expression_tree(aliases, false, __ENV__)
   end
@@ -63,13 +56,17 @@ defmodule ElixirScript.Translator.Primitive do
   end
 
   def make_list(ast, env) when is_list(ast) do
-    JS.call_expression(
+    list = Enum.map(ast, &Translator.translate!(&1, env))
+
+    js_ast = JS.call_expression(
       JS.member_expression(
         special_forms(),
         JS.identifier("list")
       ),
-      Enum.map(ast, fn(x) -> Translator.translate(x, env) end)
+      list
     )
+
+    { js_ast, env }
   end
 
   def make_list_quoted(opts, ast, env) when is_list(ast) do
@@ -97,13 +94,17 @@ defmodule ElixirScript.Translator.Primitive do
   end
 
   def make_tuple(elements, env) do
-    JS.call_expression(
+    list = Enum.map(elements, &Translator.translate!(&1, env))
+
+    js_ast = JS.call_expression(
       JS.member_expression(
         special_forms(),
         JS.identifier("tuple")
       ),
-      Enum.map(elements, fn(x) -> Translator.translate(x, env) end)
+      list
     )
+
+    { js_ast, env }
   end
 
   def make_tuple_no_translate(elements) do
