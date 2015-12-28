@@ -188,11 +188,13 @@ function reverse(list){
 function get_global(){
   if(typeof(self) !== "undefined"){
     return self;
+  }else if(typeof(window) !== "undefined"){
+    return window;
   }else if(typeof(global) !== "undefined"){
     return global;
   }
 
-  throw "No global state found";
+  throw new Error("No global state found");
 }
 
 function concat_lists(left, right){
