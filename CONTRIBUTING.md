@@ -61,16 +61,21 @@ Contributions to ElixirScript are welcomed! These contributions can be
 in the form or code changes, documentation, or ideas of how to implement features
 found in Elixir in ElixirScript.
 
-ElixirScript is broken up into 2 parts:
+ElixirScript is broken up into the following parts:
 
 * The compiler, written in Elixir
-* The runtime, written in JavaScript
+* The standard library modules, mostly written in Elixir
+* The javascript core
 
 The ElixirScript compiler is in the `lib` folder of the project. 
 Here is where Elixir code is converted into JavaScript.
 
-The JavaScript code is in the `priv/javascript`. 
+The standard library modules are in the `lib/elixir_script/prelude` folder.
+
+The JavaScript code is in the `src/javascript`. 
 This is where features such as pattern matching and the standard library are implemented.
+
+Please look at [this issue](https://github.com/bryanjos/elixirscript/issues/143) for information on how to add modules to the standard library.
 
 The ElixirScript tests can be run using `mix test`
 
