@@ -37,7 +37,14 @@ defmodule ElixirScript.Translator.Map do
   end
 
   def make_property(%ESTree.Literal{value: k}, value) when is_binary(k) do
-    JS.property(JS.identifier(k), value)
+    key = case String.contains?(k, "-") do
+      true ->
+        JS.literal(k)
+      false ->
+        JS.identifier(k)
+    end
+
+    JS.property(key, value)
   end
 
   def make_property(key, value) do
