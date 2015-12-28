@@ -17,7 +17,7 @@ defmodule ElixirScript.Translator.Quote.Test do
         quote do: :time
     end
 
-    js_code = "Elixir.Kernel.SpecialForms.atom('time')"
+    js_code = "Symbol.for('time')"
 
     assert_translation(ex_ast, js_code)
   end
@@ -28,7 +28,7 @@ defmodule ElixirScript.Translator.Quote.Test do
         quote do: {1, 2}
     end
 
-    js_code = "Elixir.Kernel.SpecialForms.tuple(1, 2)"
+    js_code = "Elixir.Core.Functions.new_tuple(1, 2)"
 
     assert_translation(ex_ast, js_code)
   end
@@ -39,7 +39,7 @@ defmodule ElixirScript.Translator.Quote.Test do
         quote do: {1, 2, 3}
     end
 
-    js_code = "Elixir.Kernel.SpecialForms.tuple(Elixir.Kernel.SpecialForms.atom('{}'), Elixir.Kernel.SpecialForms.list(), Elixir.Kernel.SpecialForms.list(1, 2, 3))"
+    js_code = "Elixir.Core.Functions.new_tuple(Symbol.for('{}'), Elixir.Core.List(), Elixir.Core.List(1, 2, 3))"
 
     assert_translation(ex_ast, js_code)
   end
@@ -50,9 +50,9 @@ defmodule ElixirScript.Translator.Quote.Test do
         quote do: test(1)
     end
 
-    js_code = "Elixir.Kernel.SpecialForms.tuple(Elixir.Kernel.SpecialForms.atom('test'),
-      Elixir.Kernel.SpecialForms.list(Elixir.Kernel.SpecialForms.tuple(Elixir.Kernel.SpecialForms.atom('context'),Elixir.Kernel.SpecialForms.atom('Elixir.ElixirScript.Translator.Quote.Test')),Elixir.Kernel.SpecialForms.tuple(Elixir.Kernel.SpecialForms.atom('import'),Elixir.Kernel.SpecialForms.atom('Elixir.ExUnit.Case'))),
-      Elixir.Kernel.SpecialForms.list(1))"
+    js_code = "Elixir.Core.Functions.new_tuple(Symbol.for('test'),
+      Elixir.Core.List(Elixir.Core.Functions.new_tuple(Symbol.for('context'),Symbol.for('Elixir.ElixirScript.Translator.Quote.Test')),Elixir.Core.Functions.new_tuple(Symbol.for('import'),Symbol.for('Elixir.ExUnit.Case'))),
+      Elixir.Core.List(1))"
 
     assert_translation(ex_ast, js_code)
   end
@@ -63,10 +63,10 @@ defmodule ElixirScript.Translator.Quote.Test do
         quote do: test(x)
     end
 
-    js_code = "Elixir.Kernel.SpecialForms.tuple(
-      Elixir.Kernel.SpecialForms.atom('test'),
-      Elixir.Kernel.SpecialForms.list(Elixir.Kernel.SpecialForms.tuple(Elixir.Kernel.SpecialForms.atom('context'),Elixir.Kernel.SpecialForms.atom('Elixir.ElixirScript.Translator.Quote.Test')),Elixir.Kernel.SpecialForms.tuple(Elixir.Kernel.SpecialForms.atom('import'),Elixir.Kernel.SpecialForms.atom('Elixir.ExUnit.Case'))),
-      Elixir.Kernel.SpecialForms.list(Elixir.Kernel.SpecialForms.tuple(Elixir.Kernel.SpecialForms.atom('x'),Elixir.Kernel.SpecialForms.list(),Elixir.Kernel.SpecialForms.atom('Elixir.ElixirScript.Translator.Quote.Test')))
+    js_code = "Elixir.Core.Functions.new_tuple(
+      Symbol.for('test'),
+      Elixir.Core.List(Elixir.Core.Functions.new_tuple(Symbol.for('context'),Symbol.for('Elixir.ElixirScript.Translator.Quote.Test')),Elixir.Core.Functions.new_tuple(Symbol.for('import'),Symbol.for('Elixir.ExUnit.Case'))),
+      Elixir.Core.List(Elixir.Core.Functions.new_tuple(Symbol.for('x'),Elixir.Core.List(),Symbol.for('Elixir.ElixirScript.Translator.Quote.Test')))
     )"
 
     assert_translation(ex_ast, js_code)
@@ -78,10 +78,10 @@ defmodule ElixirScript.Translator.Quote.Test do
         quote do: test(unquote(x))
     end
 
-    js_code = "Elixir.Kernel.SpecialForms.tuple(
-      Elixir.Kernel.SpecialForms.atom('test'),
-      Elixir.Kernel.SpecialForms.list(Elixir.Kernel.SpecialForms.tuple(Elixir.Kernel.SpecialForms.atom('context'),Elixir.Kernel.SpecialForms.atom('Elixir.ElixirScript.Translator.Quote.Test')),Elixir.Kernel.SpecialForms.tuple(Elixir.Kernel.SpecialForms.atom('import'),Elixir.Kernel.SpecialForms.atom('Elixir.ExUnit.Case'))),
-      Elixir.Kernel.SpecialForms.list(x)
+    js_code = "Elixir.Core.Functions.new_tuple(
+      Symbol.for('test'),
+      Elixir.Core.List(Elixir.Core.Functions.new_tuple(Symbol.for('context'),Symbol.for('Elixir.ElixirScript.Translator.Quote.Test')),Elixir.Core.Functions.new_tuple(Symbol.for('import'),Symbol.for('Elixir.ExUnit.Case'))),
+      Elixir.Core.List(x)
     )"
 
     assert_translation(ex_ast, js_code)
@@ -93,7 +93,7 @@ defmodule ElixirScript.Translator.Quote.Test do
         quote do: sum(1, unquote_splicing(values), 5)
     end
 
-    js_code = "Elixir.Kernel.SpecialForms.tuple(Elixir.Kernel.SpecialForms.atom('sum'), Elixir.Kernel.SpecialForms.list(), Elixir.Enum.concat(Elixir.Kernel.SpecialForms.list(1), values, Elixir.Kernel.SpecialForms.list(5)))"
+    js_code = "Elixir.Core.Functions.new_tuple(Symbol.for('sum'), Elixir.Core.List(), Elixir.Enum.concat(Elixir.Core.List(1), values, Elixir.Core.List(5)))"
 
     assert_translation(ex_ast, js_code)
   end
@@ -105,10 +105,10 @@ defmodule ElixirScript.Translator.Quote.Test do
       end
     end
 
-    js_code = "Elixir.Kernel.SpecialForms.tuple(
-      Elixir.Kernel.SpecialForms.atom('*'),
-      Elixir.Kernel.SpecialForms.list(Elixir.Kernel.SpecialForms.tuple(Elixir.Kernel.SpecialForms.atom('context'),Elixir.Kernel.SpecialForms.atom('Elixir.ElixirScript.Translator.Quote.Test')),Elixir.Kernel.SpecialForms.tuple(Elixir.Kernel.SpecialForms.atom('import'),Elixir.Kernel.SpecialForms.atom('Elixir.ElixirScript.Kernel'))),
-      Elixir.Kernel.SpecialForms.list(x, x)
+    js_code = "Elixir.Core.Functions.new_tuple(
+      Symbol.for('*'),
+      Elixir.Core.List(Elixir.Core.Functions.new_tuple(Symbol.for('context'),Symbol.for('Elixir.ElixirScript.Translator.Quote.Test')),Elixir.Core.Functions.new_tuple(Symbol.for('import'),Symbol.for('Elixir.ElixirScript.Kernel'))),
+      Elixir.Core.List(x, x)
     )"
 
     assert_translation(ex_ast, js_code)

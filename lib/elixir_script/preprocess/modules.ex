@@ -1,12 +1,13 @@
 defmodule ElixirScript.Preprocess.Modules do
   @moduledoc false
 
-  alias ElixirScript.State
+  alias ElixirScript.Translator.State
+  alias ElixirScript.Translator.Utils
 
-  def get_info(modules) do
+  def process_modules(modules) do
     Enum.map(modules, fn
       { :__block__, _, list } ->
-        {mods, no_mods} = Enum.partition(list, fn
+        {modules, not_modules} = Enum.partition(list, fn
           ({:defprotocol, _, _ }) ->
             true
           ({:defimpl, _, _ }) ->
@@ -17,7 +18,8 @@ defmodule ElixirScript.Preprocess.Modules do
             false
         end)
 
-        mods ++ [{:defmodule, [], [{:__aliases__, [], [:ElixirScript, :Temp]}, [do: { :__block__, [], no_mods }]]}]
+        temp_module = [{:defmodule, [], [{:__aliases__, [], [:ElixirScript, :Temp]}, [do: { :__block__, [], not_modules }]]}]
+        modules ++ temp_module
       ({:defprotocol, _, _ }) = x ->
         x
       ({:defimpl, _, _}) = x ->
@@ -29,27 +31,27 @@ defmodule ElixirScript.Preprocess.Modules do
     end)
     |> List.flatten
     |> Enum.each(fn(m) ->
-      Macro.postwalk(m, &do_get_info(&1))
+      Macro.postwalk(m, &do_process_modules(&1))
     end)
   end
 
-  def do_get_info({:defprotocol, _, [{:__aliases__, _, _} = the_alias, [do: {:__block__, context, spec}]]}) do
-    ElixirScript.State.add_protocol(ElixirScript.Module.quoted_to_name(the_alias), {:__block__, context, spec})
+  def do_process_modules({:defprotocol, _, [{:__aliases__, _, _} = the_alias, [do: {:__block__, context, spec}]]}) do
+    ElixirScript.Translator.State.add_protocol(Utils.quoted_to_name(the_alias), {:__block__, context, spec})
   end
 
-  def do_get_info({:defprotocol, _, [{:__aliases__, _, _} = the_alias, [do: spec]]}) do
-    ElixirScript.State.add_protocol(ElixirScript.Module.quoted_to_name(the_alias), {:__block__, [], [spec]})
+  def do_process_modules({:defprotocol, _, [{:__aliases__, _, _} = the_alias, [do: spec]]}) do
+    ElixirScript.Translator.State.add_protocol(Utils.quoted_to_name(the_alias), {:__block__, [], [spec]})
   end
 
-  def do_get_info({:defimpl, _, [ {:__aliases__, _, _} = the_alias, [for: type],  [do: {:__block__, context, spec}] ]}) do
-    ElixirScript.State.add_protocol_impl(ElixirScript.Module.quoted_to_name(the_alias), type, {:__block__, context, spec})
+  def do_process_modules({:defimpl, _, [ {:__aliases__, _, _} = the_alias, [for: type],  [do: {:__block__, context, spec}] ]}) do
+    ElixirScript.Translator.State.add_protocol_impl(Utils.quoted_to_name(the_alias), type, {:__block__, context, spec})
   end
 
-  def do_get_info({:defimpl, _, [ {:__aliases__, _, _} = the_alias, [for: type],  [do: spec] ]}) do
-    ElixirScript.State.add_protocol_impl(ElixirScript.Module.quoted_to_name(the_alias), type, {:__block__, [], [spec]})
+  def do_process_modules({:defimpl, _, [ {:__aliases__, _, _} = the_alias, [for: type],  [do: spec] ]}) do
+    ElixirScript.Translator.State.add_protocol_impl(Utils.quoted_to_name(the_alias), type, {:__block__, [], [spec]})
   end
 
-  def do_get_info({:defmodule, _, [{:__aliases__, _, [:ElixirScript, :Temp]}, [do: body]]} = ast) do
+  def do_process_modules({:defmodule, _, [{:__aliases__, _, [:ElixirScript, :Temp]}, [do: body]]} = ast) do
     body
     |> make_module([:ElixirScript, :Temp])
     |> State.add_module
@@ -57,23 +59,23 @@ defmodule ElixirScript.Preprocess.Modules do
     ast
   end
 
-  def do_get_info({:defmodule, _, [{:__aliases__, _, module_name_list}, [do: body]]} = ast) do
-    body = make_inner_module_aliases(module_name_list, body)
+  def do_process_modules({:defmodule, _, [{:__aliases__, _, name}, [do: body]]} = ast) do
+    body = make_inner_module_aliases(name, body)
 
-    make_module(body, module_name_list)
+    make_module(body, name)
     |> State.add_module
 
     ast
   end
 
-  def do_get_info(ast) do
+  def do_process_modules(ast) do
     ast
   end
 
-  defp make_module(body, module_name_list) do
+  defp make_module(body, name) do
     body = case body do
       {:__block__, _, _ } ->
-        Macro.expand(body, State.get().elixir_env)
+        Macro.expand(body, State.get().compiler_opts.env)
       _ ->
         body
     end
@@ -81,23 +83,23 @@ defmodule ElixirScript.Preprocess.Modules do
     %{def: functions, defp: private_functions, defmacro: macros, defmacrop: private_macros } = get_functions_from_module(body)
     js_imports = get_js_imports_from_module(body)
 
-    %ElixirScript.Module{ name: ElixirScript.Module.quoted_to_name({:__aliases__, [], module_name_list}) , body: body,
+    %ElixirScript.Module{ name: Utils.quoted_to_name({:__aliases__, [], name}) , body: body,
     functions: functions, private_functions: private_functions,
     macros: macros, private_macros: private_macros,
     js_imports: js_imports }
   end
 
-  defp make_inner_module_aliases(module_name_list, body) do
+  defp make_inner_module_aliases(name, body) do
     case body do
       nil ->
         { :__block__, [], [] }
 
-      {:__block__, meta2, list2 } ->
+      {:__block__, context, list2 } ->
         list2 = Enum.map(list2, fn(x) ->
           case x do
-            {:defmodule, _, [{:__aliases__, _, module_name_list2}, [do: body2]]} ->
-              body2 = make_inner_module_aliases( module_name_list ++ module_name_list2, body2)
-              inner_alias = add_module_to_state(module_name_list, module_name_list2, body2)
+            {:defmodule, _, [{:__aliases__, _, inner_module_name}, [do: inner_module_body]]} ->
+              inner_module_body = make_inner_module_aliases( name ++ inner_module_name, inner_module_body)
+              inner_alias = add_module_to_state(name, inner_module_name, inner_module_body)
 
 
               [ inner_alias ]
@@ -107,29 +109,29 @@ defmodule ElixirScript.Preprocess.Modules do
         end)
         |> List.flatten
 
-        {:__block__, meta2, list2}
-      {:defmodule, _, [{:__aliases__, meta2, module_name_list2}, [do: body2]]} ->
-        body2 = make_inner_module_aliases(module_name_list ++ module_name_list2, body2)
-        inner_alias = add_module_to_state(module_name_list, module_name_list2, body2)
+        {:__block__, context, list2}
+      {:defmodule, _, [{:__aliases__, context, inner_module_name}, [do: inner_module_body]]} ->
+        inner_module_body = make_inner_module_aliases(name ++ inner_module_name, inner_module_body)
+        inner_alias = add_module_to_state(name, inner_module_name, inner_module_body)
 
-        {:__block__, meta2, [ inner_alias ] }
+        {:__block__, context, [ inner_alias ] }
       _ ->
         body
     end
   end
 
-  defp add_module_to_state(module_name_list, module_name_list2, body2) do
-    %{def: functions, defp: private_functions, defmacro: macros, defmacrop: private_macros } = get_functions_from_module(body2)
-    js_imports = get_js_imports_from_module(body2)
+  defp add_module_to_state(name, inner_module_name, inner_module_body) do
+    %{def: functions, defp: private_functions, defmacro: macros, defmacrop: private_macros } = get_functions_from_module(inner_module_body)
+    js_imports = get_js_imports_from_module(inner_module_body)
 
-    inner_alias = {:alias, [], [{:__aliases__, [alias: false], module_name_list ++ module_name_list2}]}
+    inner_alias = {:alias, [], [{:__aliases__, [alias: false], name ++ inner_module_name}]}
 
-    module_name = ElixirScript.Module.quoted_to_name({:__aliases__, [], tl(module_name_list) ++ module_name_list2})
+    module_name = Utils.quoted_to_name({:__aliases__, [], tl(name) ++ inner_module_name})
     State.delete_module_by_name(module_name)
 
-    module_name = ElixirScript.Module.quoted_to_name({:__aliases__, [], module_name_list ++ module_name_list2})
+    module_name = Utils.quoted_to_name({:__aliases__, [], name ++ inner_module_name})
 
-    mod = %ElixirScript.Module{ name: module_name, body: body2,
+    mod = %ElixirScript.Module{ name: module_name, body: inner_module_body,
     functions: functions, private_functions: private_functions,
     macros: macros, private_macros: private_macros,
     js_imports: js_imports  }

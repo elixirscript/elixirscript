@@ -8,7 +8,10 @@ defmodule ElixirScript.Lib.Elixir.Kernel.Test do
     end
 
     js_code = """
-      Range(1,4)
+    Elixir$ElixirScript$Range.Elixir$ElixirScript$Range.create(Elixir.Kernel.SpecialForms.map({
+      [Symbol.for('first')]: 1,
+      [Symbol.for('last')]: 4
+    }))
     """
 
     assert_translation(ex_ast, js_code)

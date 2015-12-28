@@ -5,6 +5,9 @@
   * `__ENV__` and `__CALLER__` are now supported
   * Began writing some of the standard libraries in Elixir instead of JavaScript
 
+* Breaking
+  * `compile`, `compile_path`, and `compile_quoted` opts parameter now expects a map
+
 # v0.14.1
 * Enhancements
   * Removed .DS_Store and LICENSE from output

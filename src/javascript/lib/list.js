@@ -1,9 +1,7 @@
 import Kernel from './kernel';
-import Chars from './list/chars';
+import * as Core from './core';
 
 let List = {};
-
-List.Chars = Chars;
 
 List.delete = function(list, item){
   let new_value = [];
@@ -18,7 +16,7 @@ List.delete = function(list, item){
     }
   }
 
-  return Kernel.SpecialForms.list(...new_value);
+  return Core.List(...new_value);
 };
 
 List.delete_at = function(list, index){
@@ -30,7 +28,7 @@ List.delete_at = function(list, index){
     }
   }
 
-  return Kernel.SpecialForms.list(...new_value);
+  return Core.List(...new_value);
 };
 
 List.duplicate = function(elem, n){
@@ -40,14 +38,14 @@ List.duplicate = function(elem, n){
     new_value.push(elem);
   }
 
-  return Kernel.SpecialForms.list(...new_value);
+  return Core.List(...new_value);
 };
 
 List.first = function(list){
   return list[0];
 };
 
-List.flatten = function(list, tail = Kernel.SpecialForms.list()){
+List.flatten = function(list, tail = Core.List()){
   let new_value = [];
 
   for(let x of list){
@@ -60,7 +58,7 @@ List.flatten = function(list, tail = Kernel.SpecialForms.list()){
 
   new_value = new_value.concat(tail);
 
-  return Kernel.SpecialForms.list(...new_value);
+  return Core.List(...new_value);
 };
 
 List.foldl = function(list, acc, func){
@@ -89,7 +87,7 @@ List.insert_at = function(list, index, value){
     }
   }
 
-  return Kernel.SpecialForms.list(...new_value);
+  return Core.List(...new_value);
 };
 
 List.keydelete = function(list, key, position){
@@ -101,7 +99,7 @@ List.keydelete = function(list, key, position){
     }
   }
 
-  return Kernel.SpecialForms.list(...new_list);
+  return Core.List(...new_list);
 };
 
 List.keyfind = function(list, key, position, _default = null){
@@ -137,7 +135,7 @@ List.keyreplace = function(list, key, position, new_tuple){
     }
   }
 
-  return Kernel.SpecialForms.list(...new_list);
+  return Core.List(...new_list);
 };
 
 
@@ -169,7 +167,7 @@ List.keysort = function(list, position){
 
   });
 
-  return Kernel.SpecialForms.list(...new_list);
+  return Core.List(...new_list);
 };
 
 List.keystore = function(list, key, position, new_tuple){
@@ -189,7 +187,7 @@ List.keystore = function(list, key, position, new_tuple){
     new_list.push(new_tuple);
   }
 
-  return Kernel.SpecialForms.list(...new_list);
+  return Core.List(...new_list);
 };
 
 List.last = function(list){
@@ -207,7 +205,7 @@ List.replace_at = function(list, index, value){
     }
   }
 
-  return Kernel.SpecialForms.list(...new_value);
+  return Core.List(...new_value);
 };
 
 List.update_at = function(list, index, fun){
@@ -228,15 +226,15 @@ List.wrap = function(list){
   if(Kernel.is_list(list)){
     return list;
   }else if(list == null){
-    return Kernel.SpecialForms.list();
+    return Core.List();
   }else{
-    return Kernel.SpecialForms.list(list);
+    return Core.List(list);
   }
 };
 
 List.zip = function(list_of_lists){
   if(list_of_lists.length === 0){
-    return Kernel.SpecialForms.list();
+    return Core.List();
   }
 
   let new_value = [];
@@ -254,22 +252,22 @@ List.zip = function(list_of_lists){
       current_value.push(list_of_lists[j][i]);
     }
 
-    new_value.push(Kernel.SpecialForms.tuple(...current_value));
+    new_value.push(new Core.Tuple(...current_value));
   }
 
-  return Kernel.SpecialForms.list(...new_value);
+  return Core.List(...new_value);
 };
 
 List.to_tuple = function(list){
-  return Kernel.SpecialForms.tuple.apply(null, list);
+  return new Core.Tuple(...list);
 };
 
 List.append = function(list, value){
-  return Kernel.SpecialForms.list(...list.concat([value]));
+  return Core.List(...list.concat([value]));
 };
 
 List.prepend = function(list, value){
-  return Kernel.SpecialForms.list(...[value].concat(list));
+  return Core.List(...[value].concat(list));
 };
 
 List.concat = function(left, right){

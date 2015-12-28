@@ -10,11 +10,11 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-      import * as Elixir$ElixirScript$Kernel from 'Elixir.ElixirScript.Kernel';
-        const Elixir$User = Elixir.Kernel.defstruct({
-          [Elixir.Kernel.SpecialForms.atom('__struct__')]: Elixir.Kernel.SpecialForms.atom('Elixir.User'),
-          [Elixir.Kernel.SpecialForms.atom('name')]: 'john',
-          [Elixir.Kernel.SpecialForms.atom('age')]: 27
+      import * as Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+        const Elixir$User = Elixir.Core.Functions.defstruct({
+          [Symbol.for('__struct__')]: Symbol.for('Elixir.User'),
+          [Symbol.for('name')]: 'john',
+          [Symbol.for('age')]: 27
         });
 
         export {
@@ -34,11 +34,11 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-    import * as Elixir$ElixirScript$Kernel from 'Elixir.ElixirScript.Kernel';
-    const Elixir$User = Elixir.Kernel.defstruct({
-      [Elixir.Kernel.SpecialForms.atom('__struct__')]: Elixir.Kernel.SpecialForms.atom('Elixir.User'),
-      [Elixir.Kernel.SpecialForms.atom('name')]: null,
-      [Elixir.Kernel.SpecialForms.atom('age')]: null
+    import * as Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+    const Elixir$User = Elixir.Core.Functions.defstruct({
+      [Symbol.for('__struct__')]: Symbol.for('Elixir.User'),
+      [Symbol.for('name')]: null,
+      [Symbol.for('age')]: null
     });
       export {
           Elixir$User
@@ -61,11 +61,11 @@ defmodule ElixirScript.Translator.Struct.Test do
     js_code = """
     let [user] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(), Elixir$User.Elixir$User.create(Elixir.Kernel.SpecialForms.map({})));
 
-    import * as Elixir$ElixirScript$Kernel from 'Elixir.ElixirScript.Kernel';
-    const Elixir$User = Elixir.Kernel.defstruct({
-        [Elixir.Kernel.SpecialForms.atom('__struct__')]: Elixir.Kernel.SpecialForms.atom('Elixir.User'),
-        [Elixir.Kernel.SpecialForms.atom('name')]: null,
-        [Elixir.Kernel.SpecialForms.atom('age')]: null
+    import * as Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+    const Elixir$User = Elixir.Core.Functions.defstruct({
+        [Symbol.for('__struct__')]: Symbol.for('Elixir.User'),
+        [Symbol.for('name')]: null,
+        [Symbol.for('age')]: null
     });
 
     export {
@@ -85,14 +85,14 @@ defmodule ElixirScript.Translator.Struct.Test do
 
     js_code = """
     let [user] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),Elixir$User.Elixir$User.create(Elixir.Kernel.SpecialForms.map({
-        [Elixir.Kernel.SpecialForms.atom('name')]: 'John'
+        [Symbol.for('name')]: 'John'
   })));
 
-    import * as Elixir$ElixirScript$Kernel from 'Elixir.ElixirScript.Kernel';
-    const Elixir$User = Elixir.Kernel.defstruct({
-      [Elixir.Kernel.SpecialForms.atom('__struct__')]: Elixir.Kernel.SpecialForms.atom('Elixir.User'),
-      [Elixir.Kernel.SpecialForms.atom('name')]: null,
-      [Elixir.Kernel.SpecialForms.atom('age')]: null
+    import * as Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+    const Elixir$User = Elixir.Core.Functions.defstruct({
+      [Symbol.for('__struct__')]: Symbol.for('Elixir.User'),
+      [Symbol.for('name')]: null,
+      [Symbol.for('age')]: null
     });
     export {
         Elixir$User
@@ -109,7 +109,7 @@ defmodule ElixirScript.Translator.Struct.Test do
 
     js_code = """
      let [user] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),Elixir.Kernel.SpecialForms.map_update(map,{
-             [Elixir.Kernel.SpecialForms.atom('key')]: value
+             [Symbol.for('key')]: value
        }));
     """
 
@@ -122,7 +122,7 @@ defmodule ElixirScript.Translator.Struct.Test do
 
     js_code = """
      let [user] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),Elixir.Kernel.SpecialForms.map_update(map,{
-             [Elixir.Kernel.SpecialForms.atom('key')]: value,     [Elixir.Kernel.SpecialForms.atom('key1')]: value1
+             [Symbol.for('key')]: value,     [Symbol.for('key1')]: value1
        }));
     """
 
@@ -137,11 +137,11 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-    import * as Elixir$ElixirScript$Kernel from 'Elixir.ElixirScript.Kernel';
-     const Elixir$MyAppError = Elixir.Kernel.defexception({
-          [Elixir.Kernel.SpecialForms.atom('__struct__')]: Elixir.Kernel.SpecialForms.atom('Elixir.MyAppError'),
-          [Elixir.Kernel.SpecialForms.atom('__exception__')]: true,
-          [Elixir.Kernel.SpecialForms.atom('message')]: 'This is a message'
+    import * as Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+     const Elixir$MyAppError = Elixir.Core.Functions.defexception({
+          [Symbol.for('__struct__')]: Symbol.for('Elixir.MyAppError'),
+          [Symbol.for('__exception__')]: true,
+          [Symbol.for('message')]: 'This is a message'
      });
      export {
        Elixir$MyAppError
@@ -157,11 +157,11 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-    import * as Elixir$ElixirScript$Kernel from 'Elixir.ElixirScript.Kernel';
-      const Elixir$MyAppError = Elixir.Kernel.defexception({
-             [Elixir.Kernel.SpecialForms.atom('__struct__')]: Elixir.Kernel.SpecialForms.atom('Elixir.MyAppError'),
-             [Elixir.Kernel.SpecialForms.atom('__exception__')]: true,
-             [Elixir.Kernel.SpecialForms.atom('message')]: null
+    import * as Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+      const Elixir$MyAppError = Elixir.Core.Functions.defexception({
+             [Symbol.for('__struct__')]: Symbol.for('Elixir.MyAppError'),
+             [Symbol.for('__exception__')]: true,
+             [Symbol.for('message')]: null
       });
 
       export {
@@ -184,14 +184,14 @@ defmodule ElixirScript.Translator.Struct.Test do
 
     js_code = """
     throw Elixir$MyAppError.Elixir$MyAppError.create(Elixir.Kernel.SpecialForms.map({
-        [Elixir.Kernel.SpecialForms.atom('message')]: 'did not get what was expected'
+        [Symbol.for('message')]: 'did not get what was expected'
     }));
 
-import * as Elixir$ElixirScript$Kernel from 'Elixir.ElixirScript.Kernel';
-    const Elixir$MyAppError = Elixir.Kernel.defexception({
-        [Elixir.Kernel.SpecialForms.atom('__struct__')]: Elixir.Kernel.SpecialForms.atom('Elixir.MyAppError'),
-        [Elixir.Kernel.SpecialForms.atom('__exception__')]: true,
-        [Elixir.Kernel.SpecialForms.atom('message')]: null
+import * as Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+    const Elixir$MyAppError = Elixir.Core.Functions.defexception({
+        [Symbol.for('__struct__')]: Symbol.for('Elixir.MyAppError'),
+        [Symbol.for('__exception__')]: true,
+        [Symbol.for('message')]: null
     });
 
     export {
@@ -208,9 +208,9 @@ import * as Elixir$ElixirScript$Kernel from 'Elixir.ElixirScript.Kernel';
 
     js_code = """
      throw {
-      [Elixir.Kernel.SpecialForms.atom('__struct__')]: Elixir.Kernel.SpecialForms.atom('RuntimeError'),
-      [Elixir.Kernel.SpecialForms.atom('__exception__')]: true,
-      [Elixir.Kernel.SpecialForms.atom('message')]: 'did not get what was expected'
+      [Symbol.for('__struct__')]: Symbol.for('RuntimeError'),
+      [Symbol.for('__exception__')]: true,
+      [Symbol.for('message')]: 'did not get what was expected'
      };
     """
 

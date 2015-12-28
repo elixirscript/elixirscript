@@ -2,7 +2,7 @@ import Kernel from './kernel';
 
 let Keyword = {};
 
-Keyword.has_key__qm__ = function(keywords, key){
+Keyword.has_key__qmark__ = function(keywords, key){
   for(let keyword of keywords){
     if(Kernel.elem(keyword, 0) == key){
       return true;

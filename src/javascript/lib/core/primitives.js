@@ -48,4 +48,8 @@ class PID {
 class Integer {}
 class Float {}
 
-export { PID, Tuple, Integer, Float };
+function List(...args){
+  return Object.freeze(args);
+}
+
+export { PID, Tuple, Integer, Float, List };

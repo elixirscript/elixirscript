@@ -1,8 +1,9 @@
 import SpecialForms from './kernel/special_forms';
 import List from './list';
+import * as Core from './core';
 
 function __new__(){
-  return SpecialForms.map({ [Symbol.for("__struct__")]: Symbol.for("MapSet"), set: SpecialForms.list() });
+  return SpecialForms.map({ [Symbol.for("__struct__")]: Symbol.for("MapSet"), set: Core.List() });
 }
 
 function size(map){
@@ -18,7 +19,7 @@ function __delete__(set, term){
 
   let new_map = Object.assign({}, set);
   new_map.set = new_list;
-  return SpecialForms.map(new_map); 
+  return SpecialForms.map(new_map);
 }
 
 function put(set, term){
@@ -27,7 +28,7 @@ function put(set, term){
 
     let new_map = Object.assign({}, set);
     new_map.set = new_list;
-    return SpecialForms.map(new_map); 
+    return SpecialForms.map(new_map);
   }
 
   return set;
@@ -42,7 +43,7 @@ function difference(set1, set2){
     }
   }
 
-  return SpecialForms.map(new_map); 
+  return SpecialForms.map(new_map);
 }
 
 
@@ -55,7 +56,7 @@ function intersection(set1, set2){
     }
   }
 
-  return SpecialForms.map(new_map); 
+  return SpecialForms.map(new_map);
 }
 
 
@@ -66,7 +67,7 @@ function union(set1, set2){
       new_map = put(new_map, val);
   }
 
-  return SpecialForms.map(new_map); 
+  return SpecialForms.map(new_map);
 }
 
 

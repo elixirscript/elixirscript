@@ -21,8 +21,8 @@ describe('Kernel', function(){
     });
 
     it('match atoms', function(){
-      expect(Kernel.match__qmark__(Kernel.SpecialForms.atom("test"), Kernel.SpecialForms.atom("test"))).to.equal(true);
-      expect(Kernel.match__qmark__(Kernel.SpecialForms.atom("test"), Kernel.SpecialForms.atom("notest"))).to.equal(false);
+      expect(Kernel.match__qmark__(Symbol.for("test"), Symbol.for("test"))).to.equal(true);
+      expect(Kernel.match__qmark__(Symbol.for("test"), Symbol.for("notest"))).to.equal(false);
     });
 
     it('match tuples', function(){

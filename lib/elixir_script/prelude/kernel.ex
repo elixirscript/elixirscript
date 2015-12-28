@@ -40,12 +40,12 @@ defmodule ElixirScript.Kernel do
   end
 
   def apply(fun, args) do
-    Elixir.Core.apply(fun, args)
+    Elixir.Core.Functions.apply(fun, args)
   end
 
   def apply(module, fun, args) do
     fun = if Elixir.Core.is_atom(fun), do: Atom.to_string(fun), else: fun
-    Elixir.Core.apply(module, fun, args)
+    Elixir.Core.Functions.apply(module, fun, args)
   end
 
   def binary_part(binary, start, len) do
@@ -61,63 +61,63 @@ defmodule ElixirScript.Kernel do
   end
 
   def is_atom(term) do
-    Elixir.Core.is_atom(term)
+    Elixir.Core.Functions.is_atom(term)
   end
 
   def is_binary(term) do
-    Elixir.Core.is_binary(term)
+    Elixir.Core.Functions.is_binary(term)
   end
 
   def is_bitstring(term) do
-    Elixir.Core.is_bitstring(term)
+    Elixir.Core.Functions.is_bitstring(term)
   end
 
   def is_boolean(term) do
-    Elixir.Core.is_boolean(term)
+    Elixir.Core.Functions.is_boolean(term)
   end
 
   def is_float(term) do
-    Elixir.Core.is_float(term)
+    Elixir.Core.Functions.is_float(term)
   end
 
   def is_function(term) do
-    Elixir.Core.is_function(term)
+    Elixir.Core.Functions.is_function(term)
   end
 
   def is_function(term, arity) do
-    Elixir.Core.is_function(term, arity)
+    Elixir.Core.Functions.is_function(term, arity)
   end
 
   def is_integer(term) do
-    Elixir.Core.is_integer(term)
+    Elixir.Core.Functions.is_integer(term)
   end
 
   def is_list(term) do
-    Elixir.Core.is_list(term)
+    Elixir.Core.Functions.is_list(term)
   end
 
   def is_number(term) do
-    Elixir.Core.is_integer(term) || Elixir.Core.is_float(term)
+    Elixir.Core.Functions.is_integer(term) || Elixir.Core.Functions.is_float(term)
   end
 
   def is_pid(term) do
-    Elixir.Core.is_pid(term)
+    Elixir.Core.Functions.is_pid(term)
   end
 
   def is_tuple(term) do
-    Elixir.Core.is_tuple(term)
+    Elixir.Core.Functions.is_tuple(term)
   end
 
   def is_map(term) do
-    Elixir.Core.is_map(term)
+    Elixir.Core.Functions.is_map(term)
   end
 
   def length(term) do
-    Elixir.Core.size(term)
+    Elixir.Core.Functions.size(term)
   end
 
   def map_size(term) do
-    Elixir.Core.size(Object.keys(term))
+    Elixir.Core.Functions.size(Object.keys(term))
   end
 
   def max(first, second) do
@@ -137,15 +137,15 @@ defmodule ElixirScript.Kernel do
   end
 
   def tuple_size(tuple) do
-    Elixir.Core.size(tuple)
+    Elixir.Core.Functions.size(tuple)
   end
 
   def elem(tuple, index) do
-    Elixir.Core.apply(tuple, "get", [index])
+    Elixir.Core.Functions.apply(tuple, "get", [index])
   end
 
   def is_nil(term) do
-    Elixir.Core.is_nil(term)
+    Elixir.Core.Functions.is_nil(term)
   end
 
   defmacro match?(left, right) do
@@ -175,7 +175,13 @@ defmodule ElixirScript.Kernel do
 
   defmacro left in right do
     quote do
-      Elixir.Core.contains(unquote(left), unquote(right))
+      Elixir.Core.Functions.contains(unquote(left), unquote(right))
+    end
+  end
+
+  defmacro first .. last do
+    quote do
+      %ElixirScript.Range{ first: unquote(first), last: unquote(last) }
     end
   end
 end

@@ -28,9 +28,9 @@ describe('List', function(){
 
   describe('delete', function(){
     it('delete item in list', function(){
-      let t = Kernel.SpecialForms.list(Kernel.SpecialForms.atom("a"), Kernel.SpecialForms.atom("b"), Kernel.SpecialForms.atom("c"));
-      t = List.delete(t, Kernel.SpecialForms.atom("b"));
-      expect(t[1]).to.equal(Kernel.SpecialForms.atom("c"));
+      let t = Kernel.SpecialForms.list(Symbol.for("a"), Symbol.for("b"), Symbol.for("c"));
+      t = List.delete(t, Symbol.for("b"));
+      expect(t[1]).to.equal(Symbol.for("c"));
     })
   })
 

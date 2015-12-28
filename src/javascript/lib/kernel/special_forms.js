@@ -3,18 +3,6 @@ import Enum from '../enum';
 
 let SpecialForms = {
 
-  __DIR__: function(){
-    if(__dirname){
-      return __dirname;
-    }
-
-    if(document.currentScript){
-      return document.currentScript.src;
-    }
-
-    return null;
-  },
-
   atom: function(_value) {
     return Symbol.for(_value);
   },

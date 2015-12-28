@@ -24,14 +24,14 @@ describe('try', () => {
     let value = Kernel.SpecialForms._try(function() {
         return 1 / x;
     }, null, null, Patterns.defmatch(Patterns.make_case([Patterns.variable()], function(y) {
-        return Kernel.SpecialForms.atom('small');
+        return Symbol.for('small');
     }, function(y) {
         return (y < 1) && (y > -1);
     }), Patterns.make_case([Patterns.wildcard()], function() {
-        return Kernel.SpecialForms.atom('large');
+        return Symbol.for('large');
     })), null)
 
-    expect(value).to.equal(Kernel.SpecialForms.atom('large'));
+    expect(value).to.equal(Symbol.for('large'));
   });
 
 });

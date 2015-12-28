@@ -74,7 +74,7 @@ defmodule ElixirScript.Translator.Capture.Test do
 
     js_code = """
      let [fun] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable()],function(__1,__2)    {
-             return     Elixir.Kernel.SpecialForms.tuple(__1,__2);
+             return     Elixir.Core.Functions.new_tuple(__1,__2);
            })));
     """
 
@@ -86,7 +86,7 @@ defmodule ElixirScript.Translator.Capture.Test do
 
     js_code = """
      let [fun] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable()],function(__1,__2,__3)    {
-             return     Elixir.Kernel.SpecialForms.tuple(__1,__2,__3);
+             return     Elixir.Core.Functions.new_tuple(__1,__2,__3);
            })));
     """
 

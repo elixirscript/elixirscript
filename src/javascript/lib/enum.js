@@ -1,4 +1,5 @@
 import Kernel from './kernel';
+import * as Core from './core';
 
 let Enum = {
 
@@ -73,9 +74,9 @@ let Enum = {
   fetch: function(collection, n){
     if(Kernel.is_list(collection)){
       if(n < this.count(collection) && n >= 0){
-        return Kernel.SpecialForms.tuple(Kernel.SpecialForms.atom("ok"), collection[n]);
+        return new Core.Tuple(Symbol.for("ok"), collection[n]);
       }else{
-        return Kernel.SpecialForms.atom("error");
+        return Symbol.for("error");
       }
     }
 
@@ -135,17 +136,17 @@ let Enum = {
   },
 
   map_reduce: function(collection, acc, fun){
-    let mapped = Kernel.SpecialForms.list();
+    let mapped = Core.List();
     let the_acc = acc;
 
     for (var i = 0; i < this.count(collection); i++) {
       let tuple = fun(collection[i], the_acc);
 
-      the_acc = Kernel.elem(tuple, 1);
-      mapped = Kernel.SpecialForms.list(...mapped.concat([Kernel.elem(tuple, 0)]));
+      the_acc = tuple.get(1);
+      mapped = Core.List(...mapped.concat([tuple.get(0)]));
     }
 
-    return Kernel.SpecialForms.tuple(mapped, the_acc);
+    return new Core.Tuple(mapped, the_acc);
   },
 
   member__qmark__: function(collection, value){
@@ -158,7 +159,7 @@ let Enum = {
     for (var i = 0; i < this.count(collection); i++) {
       let tuple = fun(collection[i], the_acc);
 
-      the_acc = Kernel.elem(tuple, 1);
+      the_acc = tuple.get(1);
     }
 
     return the_acc;
@@ -178,7 +179,7 @@ let Enum = {
       }
     }
 
-    return Kernel.SpecialForms.list(...result);
+    return Core.List(...result);
   },
 
   take_while: function(collection, fun){

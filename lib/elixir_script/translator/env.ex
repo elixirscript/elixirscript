@@ -1,4 +1,4 @@
-defmodule ElixirScript.Env do
+defmodule ElixirScript.Translator.Env do
   @moduledoc false
 
   def module_env(ElixirScript.Temp, filename) do
@@ -13,7 +13,7 @@ defmodule ElixirScript.Env do
   end
 
   def module_env(module_name, filename) do
-    module = ElixirScript.State.get_module(module_name)
+    module = ElixirScript.Translator.State.get_module(module_name)
 
     env = %ElixirScript.Macro.Env {
       module: module_name, file: filename, requires: [],
@@ -83,13 +83,13 @@ defmodule ElixirScript.Env do
   end
 
   defp get_module(env, module_name) do
-    module = ElixirScript.State.get_module(module_name)
+    module = ElixirScript.Translator.State.get_module(module_name)
 
     unless module do
       raise "Module #{module_name} not found"
     end
 
-    ElixirScript.State.add_module_reference(env.module, module.name)
+    ElixirScript.Translator.State.add_module_reference(env.module, module.name)
     module
   end
 
@@ -105,17 +105,17 @@ defmodule ElixirScript.Env do
   def add_import(env, module_name, [only: :functions]) do
     module = get_module(env, module_name)
 
-
-    %{ env | requires: Enum.uniq(env.requires ++ [module.name]),
-    functions: env.functions ++ [{ module.name, module.functions }] }
+    %{ env | functions: List.keydelete(env.functions, module_name, 0) ++ [{ module.name, module.functions }],
+    macros: List.keydelete(env.macros, module_name, 0),
+    requires: Enum.uniq(env.requires ++ [module.name]) }
   end
 
   def add_import(env, module_name, [only: :macros]) do
     module = get_module(env, module_name)
 
-
-    %{ env | requires: Enum.uniq(env.requires ++ [module.name]),
-    macros: env.macros ++ [{ module.name, module.macros }] }
+    %{ env | macros: List.keydelete(env.macros, module_name, 0) ++ [{ module.name, module.macros }],
+    functions: List.keydelete(env.functions, module_name, 0),
+    requires: Enum.uniq(env.requires ++ [module.name]) }
   end
 
   def add_import(env, module_name, [only: only]) do
@@ -129,19 +129,22 @@ defmodule ElixirScript.Env do
     end)
 
     %{ env | requires: Enum.uniq(env.requires ++ [module.name]),
-    functions: env.functions ++ [{ module.name, functions }],
-    macros: env.macros ++ [{ module.name, macros }] }
+    functions: List.keydelete(env.functions, module_name, 0) ++ [{ module.name, functions }],
+    macros: List.keydelete(env.macros, module_name, 0) ++ [{ module.name, macros }] }
   end
 
   def add_import(env, module_name, [except: except]) do
     module = get_module(env, module_name)
 
-    macros = Enum.filter(module.macros, fn(mac) -> not(mac in except) end)
-    functions = Enum.filter(module.functions, fn(func) -> not(func in except) end)
+    {_, current_functions } = List.keyfind(env.functions, module_name, 0, { module_name, module.functions })
+    {_, current_macros } = List.keyfind(env.macros, module_name, 0, { module_name, module.macros })
+
+    macros = Enum.filter(current_macros, fn(mac) -> not(mac in except) end)
+    functions = Enum.filter(current_functions, fn(func) -> not(func in except) end)
 
     %{ env | requires: env.requires ++ [module.name],
-    functions: env.functions ++ [{ module.name, functions }],
-    macros: env.macros ++ [{ module.name, macros }] }
+    functions: List.keydelete(env.functions, module_name, 0) ++ [{ module.name, functions }],
+    macros: List.keydelete(env.macros, module_name, 0) ++ [{ module.name, macros }] }
   end
 
   def add_alias(env, module_name, alias_name) do
@@ -164,7 +167,7 @@ defmodule ElixirScript.Env do
   end
 
   def get_module_name(env, module_name) do
-    module_name = ElixirScript.Module.get_module_name(module_name)
+    module_name = ElixirScript.Translator.State.get_module_name(module_name)
 
     if Keyword.has_key?(env.aliases, module_name) do
       Keyword.fetch!(env.aliases, module_name)

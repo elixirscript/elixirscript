@@ -1,37 +1,10 @@
-import ProcessSystem from './core/process_system';
-import { Tuple, PID, Integer, Float } from './core/primitives';
+import ProcessSystem from './core/processes/process_system';
+import { Tuple, PID, Integer, Float, List } from './core/primitives';
 import BitString from './core/bit_string';
 import Patterns from './core/patterns';
-import { call_property, is_instance_of, size, is_nil,
-  is_atom,
-  is_binary,
-  is_boolean,
-  is_function,
-  is_float,
-  is_integer,
-  is_list,
-  is_map,
-  is_number,
-  is_tuple,
-  is_pid,
-  is_port,
-  is_reference,
-  is_bitstring,
-  add,
-  subtract,
-  multiply,
-  divide,
-  remainder,
-  apply,
-  new_tuple,
-  duplicate,
-  contains,
-  reverse,
-  get_global,
-  concat_lists,
-  prepend_to_list } from './core/functions';
+import Functions from './core/functions';
 
-get_global().processes = get_global().processes || new ProcessSystem();
+Functions.get_global().processes = Functions.get_global().processes || new ProcessSystem();
 
 export {
   ProcessSystem,
@@ -41,35 +14,6 @@ export {
   Patterns,
   Integer,
   Float,
-  call_property,
-  is_instance_of,
-  size,
-  is_nil,
-  is_atom,
-  is_binary,
-  is_boolean,
-  is_function,
-  is_float,
-  is_integer,
-  is_list,
-  is_map,
-  is_number,
-  is_tuple,
-  is_pid,
-  is_port,
-  is_reference,
-  is_bitstring,
-  add,
-  subtract,
-  multiply,
-  divide,
-  remainder,
-  apply,
-  new_tuple,
-  duplicate,
-  contains,
-  reverse,
-  get_global,
-  concat_lists,
-  prepend_to_list
+  Functions,
+  List
 }

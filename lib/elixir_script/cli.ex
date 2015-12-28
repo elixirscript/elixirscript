@@ -57,11 +57,11 @@ defmodule ElixirScript.CLI do
   end
 
   def do_process(input, options) do
-    compile_opts = [
+    compile_opts = %{
       root: options[:root],
       include_path: options[:output] != nil,
-      stdlib_path: Dict.get(options, :stdlib_path, "Elixir")
-    ]
+      stdlib_path: Keyword.get(options, :stdlib_path, "Elixir")
+    }
 
     compile_output = case options[:elixir] do
       true ->
@@ -82,7 +82,7 @@ defmodule ElixirScript.CLI do
           write_to_file(x, output_path)
         end)
 
-        if Dict.get(options, :stdlib_path) == nil do
+        if options[:stdlib_path] == nil do
           ElixirScript.copy_standard_libs_to_destination(output_path)
         end
     end

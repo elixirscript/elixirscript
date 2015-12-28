@@ -3,35 +3,30 @@ defmodule ElixirScript.Translator.Module do
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Utils
-  alias ElixirScript.Translator.JSModule
-  alias ElixirScript.Preprocess.Using
   alias ElixirScript.Translator.Function
 
   def make_module(ElixirScript.Temp, body, env) do
     { body, _ } = translate_body(body, env)
-    %JSModule{ name: ElixirScript.Temp, body: body |> Utils.inflate_groups }
+    %{ name: ElixirScript.Temp, body: body |> Utils.inflate_groups }
   end
 
   def make_module(module, nil, _) do
-    %JSModule{ name: module, body: [] }
+    %{ name: module, body: [] }
   end
 
   def make_module(module, body, env) do
-    body = Using.process(body)
+    body = process_use(body)
     { body, functions } = extract_functions_from_module(body)
     { body, env } = translate_body(body, env)
 
     { exported_functions, private_functions } = process_functions(functions, env)
 
-    modules_refs = ElixirScript.State.get_module_references(module)
+    module_refs = ElixirScript.Translator.State.get_module_references(module) -- [env.module]
 
     {imports, body} = extract_imports_from_body(body)
     {structs, body} = extract_structs_from_body(body, env)
 
-    #Add imports found from walking the ast
-    #and make sure to only put one declaration per alias
-    imports = process_imports(imports, modules_refs)
-    imports = imports.imports
+    imports = imports ++ make_std_lib_import() ++ make_imports(module_refs)
 
     #Collect all the functions so that we can process their arity
     body = Enum.map(body, fn(x) ->
@@ -48,7 +43,7 @@ defmodule ElixirScript.Translator.Module do
     exported_object = JS.object_expression(
       make_defstruct_property(module, structs) ++
       Enum.map(exported_functions, fn({key, _value}) ->
-        JS.property(JS.identifier(key), JS.identifier(key), :init, true)
+        JS.property(JS.identifier(Utils.filter_name(key)), JS.identifier(Utils.filter_name(key)), :init, true)
       end)
     )
 
@@ -57,12 +52,30 @@ defmodule ElixirScript.Translator.Module do
 
     default = JS.export_named_declaration(exported_object)
 
-    result = %JSModule{
-        name: ElixirScript.Module.quoted_to_name({:__aliases__, [], module }),
+    result = %{
+        name: Utils.quoted_to_name({:__aliases__, [], module }),
         body: imports ++ structs ++ private_functions ++ exported_functions ++ body ++ [default]
       }
 
     result
+  end
+
+  defp process_use(ast) do
+    Macro.prewalk(ast, &do_process_use(&1))
+  end
+
+  defp do_process_use({:use, _, _} = ast) do
+    ast
+    |> Macro.expand(ElixirScript.Translator.State.get().compiler_opts.env)
+    |> expand__using__
+  end
+
+  defp do_process_use(ast) do
+    ast
+  end
+
+  defp expand__using__({:__block__, _, [{:require, _, _}, {{:., _, [_, :__using__]}, _, _} = using_ast]}) do
+    Macro.expand_once(using_ast, ElixirScript.Translator.State.get().compiler_opts.env)
   end
 
   def translate_body(body, env) do
@@ -129,7 +142,7 @@ defmodule ElixirScript.Translator.Module do
   end
 
   def extract_structs_from_body(body, env) do
-    module_js_name = ElixirScript.Module.name_to_js_name(env.module)
+    module_js_name = Utils.name_to_js_name(env.module)
 
     Enum.partition(body, fn(x) ->
       case x do
@@ -146,7 +159,7 @@ defmodule ElixirScript.Translator.Module do
   end
 
   defp make_defstruct_property(module_name, [the_struct]) do
-    module_js_name = ElixirScript.Module.name_to_js_name(module_name)
+    module_js_name = Utils.name_to_js_name(module_name)
 
     case the_struct do
       %ESTree.VariableDeclaration{declarations: [%ESTree.VariableDeclarator{id: %ESTree.Identifier{name: ^module_js_name} } ] } ->
@@ -154,31 +167,14 @@ defmodule ElixirScript.Translator.Module do
     end
   end
 
-  def process_imports(imports, module_refs) do
-    imports ++ make_imports(module_refs)
-    |> Enum.into(MapSet.new)
-    |> Enum.reduce(MapSet.new, fn(x, acc)->
-      MapSet.put(acc, x)
-    end)
-    |> MapSet.to_list
-    |> Enum.reduce(%{ identifiers: MapSet.new, imports: [] }, fn(x, state) ->
-      case x do
-        %ESTree.ImportDeclaration{ specifiers: [%ESTree.ImportSpecifier{ local: id }] } ->
-          if MapSet.member?(state.identifiers, id.name) do
-            state
-          else
-            %{ state | identifiers: MapSet.put(state.identifiers, id.name), imports: state.imports ++ [x] }
-          end
-        %ESTree.ImportDeclaration{ specifiers: [%ESTree.ImportDefaultSpecifier{ local: id }] } ->
-          if MapSet.member?(state.identifiers, id.name) do
-            state
-          else
-            %{ state | identifiers: MapSet.put(state.identifiers, id.name), imports: state.imports ++ [x] }
-          end
-        _ ->
-          %{ state | imports: state.imports ++ [x] }
-      end
-    end)
+  def make_std_lib_import() do
+    compiler_opts = ElixirScript.Translator.State.get().compiler_opts
+    case compiler_opts.import_standard_libs do
+      true ->
+        [ElixirScript.Translator.Import.create_standard_lib_imports(compiler_opts.stdlib_path)]
+      false ->
+        []
+    end
   end
 
   def process_functions(%{ exported: exported, private: private }, env) do

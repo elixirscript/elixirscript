@@ -1,16 +1,29 @@
-defmodule ElixirScript.State do
+defmodule ElixirScript.Translator.State do
   @moduledoc false
+  alias ElixirScript.Translator.Utils
 
-  def start_link(root, elixir_env \\ __ENV__) do
+  def start_link(compiler_opts \\ []) do
     Agent.start_link(fn ->
-      %{ root: root, elixir_env: elixir_env, modules: Map.new }
+      %{ compiler_opts: compiler_opts, modules: Map.new, std_lib_map: build_standard_lib_map() }
     end, name: __MODULE__)
   end
 
-  def update_env(env) do
-    Agent.update(__MODULE__, fn state ->
-      %{state | env: env}
-    end)
+  defp build_standard_lib_map() do
+    Map.new
+    |> Map.put(Kernel, ElixirScript.Kernel)
+    |> Map.put(Tuple, ElixirScript.Tuple)
+    |> Map.put(Atom, ElixirScript.Atom)
+    |> Map.put(Collectable, ElixirScript.Collectable)
+    |> Map.put(String.Chars, ElixirScript.String.Chars)
+    |> Map.put(Enumerable, ElixirScript.Enumerable)
+    |> Map.put(Integer, ElixirScript.Integer)
+    |> Map.put(Macro.Env, ElixirScript.Macro.Env)
+    |> Map.put(View, ElixirScript.View)
+    |> Map.put(Agent, ElixirScript.Agent)
+    |> Map.put(Range, ElixirScript.Range)
+    |> Map.put(String, ElixirScript.String)
+    |> Map.put(Base, ElixirScript.Base)
+    |> Map.put(Module, ElixirScript.Module)
   end
 
   def add_module(module) do
@@ -19,27 +32,9 @@ defmodule ElixirScript.State do
     end)
   end
 
-  def delete_module(module) do
-    Agent.update(__MODULE__, fn state ->
-      %{ state | modules: Map.delete(state.modules, module.name ) }
-    end)
-  end
-
   def delete_module_by_name(module_name) do
     Agent.update(__MODULE__, fn state ->
       %{ state | modules: Map.delete(state.modules, module_name ) }
-    end)
-  end
-
-  def module_listed?(module_name) do
-    Agent.get(__MODULE__, fn state ->
-      Map.has_key?(state.modules, module_name)
-    end)
-  end
-
-  def protocol_listed?(module_name) do
-    Agent.get(__MODULE__, fn state ->
-      Map.has_key?(state.modules, module_name) && Map.get(state.modules, module_name).type == :protocol
     end)
   end
 
@@ -81,6 +76,15 @@ defmodule ElixirScript.State do
     Agent.get(__MODULE__, &(&1))
   end
 
+  def get_module_name(module_name) do
+    case Map.get(build_standard_lib_map, module_name) do
+      nil ->
+        module_name
+      actual_module_name ->
+        actual_module_name
+    end
+  end
+
   def get_module(module) when is_atom(module) do
     state = Agent.get(__MODULE__, &(&1))
     do_get_module(state, module)
@@ -88,47 +92,33 @@ defmodule ElixirScript.State do
 
   def get_module({:__aliases__, _, _} = name) do
     state = Agent.get(__MODULE__, &(&1))
-    do_get_module(state, ElixirScript.Module.quoted_to_name(name))
+    do_get_module(state, Utils.quoted_to_name(name))
   end
 
   def get_module(module_name_list) when is_list(module_name_list) do
     state = Agent.get(__MODULE__, &(&1))
-    do_get_module(state, ElixirScript.Module.quoted_to_name({:__aliases__, [], module_name_list}))
+    do_get_module(state, Utils.quoted_to_name({:__aliases__, [], module_name_list}))
   end
 
   defp do_get_module(state, name) do
-    name = ElixirScript.Module.get_module_name(name)
-    Map.get(state.modules, name)
-  end
-
-  def add_alias(module_name, module_alias) do
-    module = get_module(module_name)
-
-    if module do
-      delete_module(module)
-      module = %{ module | aliases: MapSet.put(module.aliases, {module_alias, module_name}) }
-      add_module(module)
-    end
+    Map.get(state.modules, get_module_name(name))
   end
 
   def add_module_reference(module_name, module_ref) do
     module = get_module(module_name)
 
     if module do
-      delete_module(module)
       module = %{ module | module_refs: Enum.uniq(module.module_refs ++ [module_ref]) }
       add_module(module)
     end
   end
 
   def get_module_references(module_name) do
-    module = get_module(module_name)
-
-    if module do
-      module.module_refs
-      |> Enum.uniq
-    else
-      []
+    case get_module(module_name) do
+      nil ->
+        []
+      module ->
+        module.module_refs
     end
   end
 

@@ -2,8 +2,8 @@ defmodule ElixirScript.Translator.Assignment do
   @moduledoc false
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
-  alias ElixirScript.Translator.Primitive
   alias ElixirScript.PatternMatching.Match
+  alias ElixirScript.Translator.Primitive
 
   def make_assignment(left, right, env) do
     { right_ast, env } = Translator.translate(right, env)
@@ -31,11 +31,11 @@ defmodule ElixirScript.Translator.Assignment do
 
     js_ast = case left do
       list when is_list(list) ->
-        make_ref(array_pattern, params, "list")
+        make_ref(array_pattern, params, Primitive.list_ast())
       {_left1, _left2} ->
-        make_ref(array_pattern, params, "tuple")
+        make_ref(array_pattern, params, Primitive.new_tuple_function())
       {:{}, _, _} ->
-        make_ref(array_pattern, params, "tuple")
+        make_ref(array_pattern, params, Primitive.new_tuple_function())
       _ ->
         array_pattern
     end
@@ -43,7 +43,7 @@ defmodule ElixirScript.Translator.Assignment do
     { js_ast, env }
   end
 
-  defp make_ref(array_pattern, params, type) do
+  defp make_ref(array_pattern, params, ast) do
     ref = JS.identifier("_ref")
 
     params = Enum.map(params, fn
@@ -54,10 +54,7 @@ defmodule ElixirScript.Translator.Assignment do
     ref_declarator = JS.variable_declarator(
       ref,
       JS.call_expression(
-        JS.member_expression(
-          Primitive.special_forms(),
-          JS.identifier(type)
-        ),
+        ast,
         params
       )
     )

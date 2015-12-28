@@ -91,16 +91,10 @@ defmodule ElixirScript.Translator do
 
   defp do_translate({:++, _, [left, right]}, env) do
     quoted = quote do
-      Elixir.Core.concat_lists(unquote(left),unquote(right))
+      Elixir.Core.Functions.concat_lists(unquote(left),unquote(right))
     end
 
     translate(quoted, env)
-  end
-
-  defp do_translate({:.., _, [first, last]}, env) do
-    quoted_range = quote do: Range.(unquote(first), unquote(last))
-
-    translate(quoted_range, env)
   end
 
   defp do_translate({:&, _, [number]}, env) when is_number(number) do
@@ -178,7 +172,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:., _, [module_name, function_name]} = ast, env) do
-    expanded_ast = Macro.expand(ast, ElixirScript.State.get().elixir_env)
+    expanded_ast = Macro.expand(ast, ElixirScript.Translator.State.get().compiler_opts.env)
 
     if expanded_ast == ast do
       module_name = create_module_name(module_name, env)
@@ -189,7 +183,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({{:., _, [module_name, function_name]}, _, [] } = ast, env) do
-    expanded_ast = Macro.expand(ast, ElixirScript.State.get().elixir_env)
+    expanded_ast = Macro.expand(ast, ElixirScript.Translator.State.get().compiler_opts.env)
 
     if expanded_ast == ast do
       module_name = create_module_name(module_name, env)
@@ -200,7 +194,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({{:., _, [{:__aliases__, _, _} = module_name]}, _, params} = ast, env) do
-    expanded_ast = Macro.expand(ast, ElixirScript.State.get().elixir_env)
+    expanded_ast = Macro.expand(ast, ElixirScript.Translator.State.get().compiler_opts.env)
 
     if expanded_ast == ast do
       module_name = create_module_name(module_name, env)
@@ -216,7 +210,7 @@ defmodule ElixirScript.Translator do
 
 
   defp do_translate({{:., _, [module_name, function_name]}, _, params } = ast, env) do
-    expanded_ast = Macro.expand(ast, ElixirScript.State.get().elixir_env)
+    expanded_ast = Macro.expand(ast, ElixirScript.Translator.State.get().compiler_opts.env)
 
     if expanded_ast == ast do
       module_name = create_module_name(module_name, env)
@@ -256,11 +250,11 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:receive, _, _ }, _ ) do
-    raise ElixirScript.UnsupportedError, "receive"
+    raise ElixirScript.Translator.UnsupportedError, "receive"
   end
 
   defp do_translate({:super, _, _expressions }, _ ) do
-    raise ElixirScript.UnsupportedError, "super"
+    raise ElixirScript.Translator.UnsupportedError, "super"
   end
 
   defp do_translate({:__CALLER__, _, _expressions }, env) do
@@ -286,14 +280,14 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:import, _, [{:__aliases__, _, _} = module_name]}, env) do
-    env = ElixirScript.Env.add_import(env, module_name)
+    env = ElixirScript.Translator.Env.add_import(env, module_name)
     { %ElixirScript.Translator.Group{}, env }
   end
 
   defp do_translate({:import, _, [{:__aliases__, _, _} = module_name, options]}, env) do
-    module_name = ElixirScript.Module.quoted_to_name(module_name)
+    module_name = Utils.quoted_to_name(module_name)
 
-    env = ElixirScript.Env.add_import(env, module_name, options)
+    env = ElixirScript.Translator.Env.add_import(env, module_name, options)
 
     { %ElixirScript.Translator.Group{}, env }
   end
@@ -302,32 +296,32 @@ defmodule ElixirScript.Translator do
     {_, _, name} = module_name
     name = [List.last(name)]
 
-    module_name = ElixirScript.Module.quoted_to_name(module_name)
-    alias_name = ElixirScript.Module.quoted_to_name({:__aliases__, [], name })
+    module_name = Utils.quoted_to_name(module_name)
+    alias_name = Utils.quoted_to_name({:__aliases__, [], name })
 
-    env = ElixirScript.Env.add_alias(env, module_name, alias_name)
+    env = ElixirScript.Translator.Env.add_alias(env, module_name, alias_name)
     { %ElixirScript.Translator.Group{}, env }
   end
 
   defp do_translate({:alias, _, [{:__aliases__, _, _} = module_name, [as: {:__aliases__, _, _} = alias_name]]}, env) do
-    module_name = ElixirScript.Module.quoted_to_name(module_name)
-    alias_name = ElixirScript.Module.quoted_to_name(alias_name)
+    module_name = Utils.quoted_to_name(module_name)
+    alias_name = Utils.quoted_to_name(alias_name)
 
-    env = ElixirScript.Env.add_alias(env, module_name, alias_name)
+    env = ElixirScript.Translator.Env.add_alias(env, module_name, alias_name)
     { %ElixirScript.Translator.Group{}, env }
   end
 
   defp do_translate({:require, _, [{:__aliases__, _, _} = module_name] }, env) do
-    module_name = ElixirScript.Module.quoted_to_name(module_name)
-    env = ElixirScript.Env.add_require(env, module_name)
+    module_name = Utils.quoted_to_name(module_name)
+    env = ElixirScript.Translator.Env.add_require(env, module_name)
     { %ElixirScript.Translator.Group{}, env }
   end
 
   defp do_translate({:require, _, [{:__aliases__, _, _} = module_name, [as: {:__aliases__, _, _} = alias_name]]}, env) do
-    module_name = ElixirScript.Module.quoted_to_name(module_name)
-    alias_name = ElixirScript.Module.quoted_to_name(alias_name)
+    module_name = Utils.quoted_to_name(module_name)
+    alias_name = Utils.quoted_to_name(alias_name)
 
-    env = ElixirScript.Env.add_require(env, module_name, alias_name)
+    env = ElixirScript.Translator.Env.add_require(env, module_name, alias_name)
     { %ElixirScript.Translator.Group{}, env }
   end
 
@@ -344,7 +338,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:fn, _, clauses}, env) do
-    env = ElixirScript.Env.function_env(env, nil)
+    env = ElixirScript.Translator.Env.function_env(env, nil)
     Function.make_anonymous_function(clauses, env)
   end
 
@@ -429,17 +423,17 @@ defmodule ElixirScript.Translator do
   defp do_translate({name, _, params} = ast, env) when is_list(params) do
 
 
-      expanded_ast = Macro.expand(ast, ElixirScript.State.get().elixir_env)
+      expanded_ast = Macro.expand(ast, ElixirScript.Translator.State.get().compiler_opts.env)
 
       if expanded_ast == ast do
         name_arity = {name, length(params)}
-        module = ElixirScript.State.get_module(env.module)
+        module = ElixirScript.Translator.State.get_module(env.module)
 
         cond do
           name_arity in module.functions or name_arity in module.private_functions ->
             Function.make_function_call(name, params, env)
-          ElixirScript.Env.find_module(env, name_arity) ->
-             imported_module_name = ElixirScript.Env.find_module(env, name_arity)
+          ElixirScript.Translator.Env.find_module(env, name_arity) ->
+             imported_module_name = ElixirScript.Translator.Env.find_module(env, name_arity)
              Function.make_function_call(imported_module_name, name, params, env)
           true ->
             Function.make_function_call(name, params, env)
@@ -452,13 +446,13 @@ defmodule ElixirScript.Translator do
 
   defp do_translate({ name, _, params }, env) when is_atom(params) do
     cond do
-      ElixirScript.Env.has_var?(env, name) ->
+      ElixirScript.Translator.Env.has_var?(env, name) ->
         name = Utils.filter_name(name)
         { Primitive.make_identifier(name), env }
-      ElixirScript.Module.has_function?(env.module, {name, 0}) ->
+      has_function?(env.module, {name, 0}) ->
         Function.make_function_call(name, [], env)
-      ElixirScript.Env.find_module(env, {name, 0}) ->
-         imported_module_name = ElixirScript.Env.find_module(env, {name, 0})
+      ElixirScript.Translator.Env.find_module(env, {name, 0}) ->
+         imported_module_name = ElixirScript.Translator.Env.find_module(env, {name, 0})
          Function.make_function_call(imported_module_name, name, params, env)
       true ->
         name = Utils.filter_name(name)
@@ -470,17 +464,22 @@ defmodule ElixirScript.Translator do
   defp create_module_name(module_name, env) do
     case module_name do
       {:__aliases__, _, _} ->
-        candiate_module_name = ElixirScript.Module.quoted_to_name(module_name)
-        |> ElixirScript.Module.get_module_name
+        candiate_module_name = Utils.quoted_to_name(module_name)
+        |> ElixirScript.Translator.State.get_module_name
 
-        if ElixirScript.Env.get_module_name(env, candiate_module_name) in ElixirScript.State.list_module_names() do
-          ElixirScript.Env.get_module_name(env, candiate_module_name)
+        if ElixirScript.Translator.Env.get_module_name(env, candiate_module_name) in ElixirScript.Translator.State.list_module_names() do
+          ElixirScript.Translator.Env.get_module_name(env, candiate_module_name)
         else
           module_name
         end
       _ ->
         module_name
     end
+  end
+
+  def has_function?(module_name, name_arity) do
+    module = ElixirScript.Translator.State.get_module(module_name)
+    name_arity in module.functions or name_arity in module.private_functions
   end
 
 end

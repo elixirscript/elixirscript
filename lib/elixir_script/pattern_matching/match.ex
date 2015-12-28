@@ -112,8 +112,8 @@ defmodule ElixirScript.PatternMatching.Match do
         { param, env }
 
       (%ESTree.Identifier{} = param, env) ->
-       env = ElixirScript.Env.add_var(env, param.name)
-       new_name = ElixirScript.Env.get_var(env, param.name)
+       env = ElixirScript.Translator.Env.add_var(env, param.name)
+       new_name = ElixirScript.Translator.Env.get_var(env, param.name)
 
        { %{ param | name: new_name }, env }
 

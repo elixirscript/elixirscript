@@ -44,16 +44,16 @@ The intent of this guide is to get you started with ElixirScript. It will give y
 
     ```bash
     $ elixirscript ":atom" -ex
-    Kernel.SpecialForms.atom('atom')
+    Symbol.for('atom')
     ```
 
-    The elixirscript escript changed the elixir code, `:atom` into the JavaScript code `Kernel.SpecialForms.atom('atom')`. The `-ex` parameter lets the script know that the input is an Elixir code string instead of a file.
+    The elixirscript escript changed the elixir code, `:atom` into the JavaScript code `Symbol.for('atom')`. The `-ex` parameter lets the script know that the input is an Elixir code string instead of a file.
 
     What if we wanted to give it a file? You would simply do the following:
 
     ```bash
     $ elixirscript "example.exjs"
-    Kernel.SpecialForms.atom('atom')
+    Symbol.for('atom')
     ```
 
     What you will have noticed by now is that it has output everything we've done so far to the terminal. What about if we want to place the output to a path? The next example takes a file as input and outputs the result in another directory.

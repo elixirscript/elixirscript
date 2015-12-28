@@ -11,7 +11,7 @@ defmodule ElixirScript.Translator.Map.Test do
 
   should "translate map with elements" do
     ex_ast = quote do: %{one: "one", two: "two"}
-    js_code = "Elixir.Kernel.SpecialForms.map({[Elixir.Kernel.SpecialForms.atom('one')]: 'one', [Elixir.Kernel.SpecialForms.atom('two')]: 'two'})"
+    js_code = "Elixir.Kernel.SpecialForms.map({[Symbol.for('one')]: 'one', [Symbol.for('two')]: 'two'})"
 
     assert_translation(ex_ast, js_code)
   end
@@ -20,9 +20,9 @@ defmodule ElixirScript.Translator.Map.Test do
     ex_ast = quote do: %{one: "one", two: %{three: "three"}}
     js_code = """
       Elixir.Kernel.SpecialForms.map({
-        [Elixir.Kernel.SpecialForms.atom('one')]: 'one',
-        [Elixir.Kernel.SpecialForms.atom('two')]: Elixir.Kernel.SpecialForms.map({
-             [Elixir.Kernel.SpecialForms.atom('three')]: 'three'
+        [Symbol.for('one')]: 'one',
+        [Symbol.for('two')]: Elixir.Kernel.SpecialForms.map({
+             [Symbol.for('three')]: 'three'
         })
       })
     """
@@ -46,7 +46,7 @@ defmodule ElixirScript.Translator.Map.Test do
     ex_ast = quote do: %{ map | value: 1 }
     js_code = """
      Elixir.Kernel.SpecialForms.map_update(map,{
-             [Elixir.Kernel.SpecialForms.atom('value')]: 1
+             [Symbol.for('value')]: 1
        })
     """
 

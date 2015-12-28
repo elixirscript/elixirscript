@@ -11,7 +11,7 @@ defmodule ElixirScript.Translator.Bug.Test do
 
     js_code = """
       const test = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function(){
-        return Elixir.Kernel.SpecialForms.atom('atom');
+        return Symbol.for('atom');
       }));
     """
 
@@ -29,7 +29,7 @@ defmodule ElixirScript.Translator.Bug.Test do
 
     js_code = """
      React.createElement(React.Text,Elixir.Kernel.SpecialForms.map({
-             style: Elixir.Core.call_property(styles,'welcome')
+             style: Elixir.Core.Functions.call_property(styles,'welcome')
        }),'Welcome to React Native!')
     """
 
@@ -47,8 +47,8 @@ defmodule ElixirScript.Translator.Bug.Test do
 
     js_code = """
     import { default as JQuery } from 'jquery';
-    import * as Elixir$ElixirScript$Kernel from 'Elixir.ElixirScript.Kernel';
-    JQuery(Elixir.Core.call_property(e,'target'));
+    import * as Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+    JQuery(Elixir.Core.Functions.call_property(e,'target'));
     export {};
     """
 
@@ -61,7 +61,7 @@ defmodule ElixirScript.Translator.Bug.Test do
     end
 
     js_code = """
-      const graphic_store = Elixir.Core.call_property(App.Stores.GraphicStore, 'create_store');
+      const graphic_store = Elixir.Core.Functions.call_property(App.Stores.GraphicStore, 'create_store');
 
     """
 
@@ -86,7 +86,7 @@ defmodule ElixirScript.Translator.Bug.Test do
     end
 
     js_code = """
-      Elixir.Core.call_property(this, 'getRawCanvas').getContext('2d')
+      Elixir.Core.Functions.call_property(this, 'getRawCanvas').getContext('2d')
     """
 
     assert_translation(ex_ast, js_code)
@@ -119,15 +119,15 @@ defmodule ElixirScript.Translator.Bug.Test do
     js_code = """
      const getDispatcher = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
              return     DeLorean.Flux.createDispatcher(Elixir.Kernel.SpecialForms.map({
-             [Elixir.Kernel.SpecialForms.atom('startPainting')]: Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
+             [Symbol.for('startPainting')]: Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
              return     this.dispatch('startPainting');
-           })),     [Elixir.Kernel.SpecialForms.atom('stopPainting')]: Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
+           })),     [Symbol.for('stopPainting')]: Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
              return     this.dispatch('stopPainting');
-           })),     [Elixir.Kernel.SpecialForms.atom('addPoint')]: Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(data)    {
+           })),     [Symbol.for('addPoint')]: Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(data)    {
              return     this.dispatch('addPoint',data);
-           })),     [Elixir.Kernel.SpecialForms.atom('getStores')]: Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
+           })),     [Symbol.for('getStores')]: Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
              return     Elixir.Kernel.SpecialForms.map({
-             [Elixir.Kernel.SpecialForms.atom('graphic')]: GraphicStore
+             [Symbol.for('graphic')]: GraphicStore
        });
            }))
        }));

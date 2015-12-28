@@ -1,7 +1,5 @@
 import SpecialForms from './kernel/special_forms';
 import * as Core from './core';
-import Tuple from "./tuple";
-import Protocol from './protocol';
 
 function tl(list){
   return SpecialForms.list(...list.slice(1));
@@ -137,7 +135,7 @@ function apply(...args){
 
 function to_string(arg){
   if(is_tuple(arg)){
-    return Tuple.to_string(arg);
+    return arg.toString();
   }
 
   return arg.toString();
@@ -145,51 +143,6 @@ function to_string(arg){
 
 function match__qmark__(pattern, expr, guard = () => true){
   return Core.Patterns.match_no_throw(pattern, expr, guard) != null;
-}
-
-function defstruct(defaults){
-  return class {
-    constructor(update = {}){
-      let the_values = Object.assign(defaults, update);
-      Object.assign(this, the_values);
-    }
-
-    static create(updates = {}){
-      let x = new this(updates);
-      return Object.freeze(x);
-    }
-  }
-}
-
-
-function defexception(defaults){
-  return class extends Error {
-    constructor(update = {}){
-      let message = update.message || "";
-      super(message);
-
-      let the_values = Object.assign(defaults, update);
-      Object.assign(this, the_values);
-
-      this.name = this.constructor.name;
-      this.message = message;
-      this[SpecialForms.atom("__exception__")] = true;
-      Error.captureStackTrace(this, this.constructor.name);
-    }
-
-    static create(updates = {}){
-      let x = new this(updates);
-      return Object.freeze(x);
-    }
-  }
-}
-
-function defprotocol(spec){
-  return new Protocol(spec);
-}
-
-function defimpl(protocol, type, impl){
-  protocol.implementation(type, impl);
 }
 
 export default {
@@ -223,8 +176,5 @@ export default {
   not,
   apply,
   to_string,
-  match__qmark__,
-  defstruct,
-  defprotocol,
-  defimpl
+  match__qmark__
 };

@@ -25,20 +25,20 @@ defmodule ElixirScript.Translator.Protocol.Test do
     end
 
     js_code = """
-    import * as Elixir$ElixirScript$Kernel from 'Elixir.ElixirScript.Kernel';
-         const Elixir$Blank = Elixir.Kernel.defprotocol({
+    import * as Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+         const Elixir$Blank = Elixir.Core.Functions.defprotocol({
              blank__qmark__: Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(data)    {
              return     null;
            }))
        });
-         Elixir.Kernel.defimpl(Elixir$Blank, Array,{
-             blank__qmark__: Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Kernel.SpecialForms.list()],function()    {
+         Elixir.Core.Functions.defimpl(Elixir$Blank, Array,{
+             blank__qmark__: Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.List()],function()    {
              return     true;
            }),Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.wildcard()],function()    {
              return     false;
            }))
        })
-         Elixir.Kernel.defimpl(Elixir$Blank,Symbol,{
+         Elixir.Core.Functions.defimpl(Elixir$Blank,Symbol,{
              blank__qmark__: Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([false],function()    {
              return     true;
            }),Elixir.Core.Patterns.make_case([null],function()    {
@@ -47,7 +47,7 @@ defmodule ElixirScript.Translator.Protocol.Test do
              return     false;
            }))
        })
-         Elixir.Kernel.defimpl(Elixir$Blank, Elixir.Core.Integer, {
+         Elixir.Core.Functions.defimpl(Elixir$Blank, Elixir.Core.Integer, {
              blank__qmark__: Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(number)    {
              return     false;
            }))

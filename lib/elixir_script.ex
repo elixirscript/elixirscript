@@ -1,7 +1,7 @@
 defmodule ElixirScript do
-  alias ElixirScript.Translator.JSModule
   alias ESTree.Tools.Builder
   alias ESTree.Tools.Generator
+  alias ElixirScript.Translator.Utils
 
   @moduledoc """
   Translates Elixir into JavaScript.
@@ -32,7 +32,7 @@ defmodule ElixirScript do
     end
   end
 
-  @external_resource libs_path = Path.join([__DIR__, "elixir_script", "universal", "**", "*.ex"])
+  @external_resource libs_path = Path.join([__DIR__, "elixir_script", "prelude", "**", "*.ex"])
   @libs (for path <- Path.wildcard(libs_path) do
     path
     |> File.read!
@@ -42,8 +42,8 @@ defmodule ElixirScript do
   @doc """
   Compiles the given Elixir code string
   """
-  @spec compile(binary, Dict.t) :: [binary | {binary, binary}]
-  def compile(elixir_code, opts \\ []) do
+  @spec compile(binary, Map.t) :: [binary | {binary, binary}]
+  def compile(elixir_code, opts \\ %{}) do
     elixir_code
     |> Code.string_to_quoted!
     |> compile_quoted(opts)
@@ -52,34 +52,27 @@ defmodule ElixirScript do
   @doc """
   Compiles the given Elixir code in quoted form
   """
-  @spec compile_quoted(Macro.t, Dict.t) :: [binary | {binary, binary}]
-  def compile_quoted(quoted, opts \\ []) do
-    include_path = Dict.get(opts, :include_path, false)
-    root = Dict.get(opts, :root)
-    env = Dict.get(opts, :env, custom_env)
-    import_standard_libs? = Dict.get(opts, :import_standard_libs, true)
-    stdlib_path = Dict.get(opts, :stdlib_path, "Elixir")
+  @spec compile_quoted(Macro.t, Map.t) :: [binary | {binary, binary}]
+  def compile_quoted(quoted, opts \\ %{}) do
 
-    ElixirScript.State.start_link(root, env)
+    compiler_opts = build_compiler_options(opts)
+    ElixirScript.Translator.State.start_link(compiler_opts)
 
     libs = @libs
     |> updated_quoted
 
     build_environment(libs ++ [updated_quoted(quoted)])
-    create_code(include_path, import_standard_libs?, stdlib_path)
+    create_code(compiler_opts)
   end
 
   @doc """
   Compiles the elixir files found at the given path
   """
-  @spec compile_path(binary, Dict.t) :: [binary | {binary, binary}]
-  def compile_path(path, opts \\ []) do
-    include_path = Dict.get(opts, :include_path, false)
-    root = Dict.get(opts, :root)
-    env = Dict.get(opts, :env, custom_env)
-    stdlib_path = Dict.get(opts, :stdlib_path, "Elixir")
+  @spec compile_path(binary, Map.t) :: [binary | {binary, binary}]
+  def compile_path(path, opts \\ %{}) do
 
-    ElixirScript.State.start_link(root, env)
+    compiler_opts = build_compiler_options(opts)
+    ElixirScript.Translator.State.start_link(compiler_opts)
 
     libs = @libs
     |> updated_quoted
@@ -90,7 +83,18 @@ defmodule ElixirScript do
 
     build_environment(libs ++ code)
 
-    create_code(include_path, true, stdlib_path)
+    create_code(compiler_opts)
+  end
+
+  defp build_compiler_options(opts) do
+    default_options = Map.new
+    |> Map.put(:include_path, false)
+    |> Map.put(:root, nil)
+    |> Map.put(:env, custom_env)
+    |> Map.put(:import_standard_libs, true)
+    |> Map.put(:stdlib_path, "Elixir")
+
+    Map.merge(default_options, opts)
   end
 
   defp file_to_quoted(file) do
@@ -102,7 +106,7 @@ defmodule ElixirScript do
 
   defp build_environment(code_list) do
     code_list
-    |> ElixirScript.Preprocess.Modules.get_info
+    |> ElixirScript.Preprocess.Modules.process_modules
   end
 
   defp updated_quoted(quoted) do
@@ -123,20 +127,20 @@ defmodule ElixirScript do
     __ENV__
   end
 
-  defp create_code(include_path, import_standard_libs?, stdlib_path) do
+  defp create_code(compiler_opts) do
 
-    standard_lib_modules = ElixirScript.Module.build_standard_lib_map()
+    state = ElixirScript.Translator.State.get
+
+    standard_lib_modules = state.std_lib_map
     |> Map.values
-
-    state = ElixirScript.State.get
 
     result =
       Map.values(state.modules)
       |> Enum.reject(fn(ast) ->
-        import_standard_libs? == false && ast.name in standard_lib_modules
+        compiler_opts.import_standard_libs == false && ast.name in standard_lib_modules
       end)
       |> Enum.map(fn ast ->
-          env = ElixirScript.Env.module_env(ast.name, "#{create_file_name(ast.name)}")
+          env = ElixirScript.Translator.Env.module_env(ast.name,  Utils.name_to_js_file_name(ast.name) <> ".js")
 
           case ast.type do
             :module ->
@@ -144,14 +148,14 @@ defmodule ElixirScript do
             :protocol ->
               ElixirScript.Translator.Protocol.consolidate(ast, env)
           end
-          |> convert_to_code(state.root, state.elixir_env, import_standard_libs?, stdlib_path)
+          |> convert_to_code()
       end)
 
-    ElixirScript.State.stop
+    ElixirScript.Translator.State.stop
 
     result
     |> Enum.map(fn({path, code}) ->
-      if(include_path) do
+      if(compiler_opts.include_path) do
         { path, code }
       else
         code
@@ -174,37 +178,15 @@ defmodule ElixirScript do
     File.read!(operating_path <> "/Elixir.js")
   end
 
-  defp convert_to_code(js_ast, root, env, import_standard_libs, stdlib_path) do
-    js_ast
-    |> process_module(root, env, import_standard_libs, stdlib_path)
+  defp convert_to_code(js_ast) do
+    process_module(js_ast)
     |> javascript_ast_to_code
   end
 
-  defp process_module(%JSModule{} = module, root, _, import_standard_libs, stdlib_path) do
-    file_path = create_file_name(module)
+  defp process_module(module) do
+    file_path = Utils.name_to_js_file_name(module.name) <> ".js"
 
-    standard_libs_import =
-      if import_standard_libs do
-        ElixirScript.Translator.Import.create_standard_lib_imports(root, stdlib_path)
-      else
-        []
-      end
-
-    program =
-      standard_libs_import ++ module.body
-      |> ESTree.Tools.Builder.program
-
-    {file_path, program}
-  end
-
-  defp create_file_name(%JSModule{name: module}) do
-    name = ElixirScript.Module.name_to_js_file_name(module)
-    "#{name}.js"
-  end
-
-  defp create_file_name(name) do
-    name = ElixirScript.Module.name_to_js_file_name(name)
-    "#{name}.js"
+    { file_path, ESTree.Tools.Builder.program(module.body) }
   end
 
   @doc false

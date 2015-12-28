@@ -4,34 +4,34 @@ defmodule ElixirScript.Translator.List.Test do
 
   should "translate list" do
     ex_ast = quote do: [1, 2, 3]
-    js_code = "Elixir.Kernel.SpecialForms.list(1, 2, 3)"
+    js_code = "Elixir.Core.List(1, 2, 3)"
 
     assert_translation(ex_ast, js_code)
 
     ex_ast = quote do: ["a", "b", "c"]
-    js_code = "Elixir.Kernel.SpecialForms.list('a', 'b', 'c')"
+    js_code = "Elixir.Core.List('a', 'b', 'c')"
 
     assert_translation(ex_ast, js_code)
 
     ex_ast = quote do: [:a, :b, :c]
-    js_code = "Elixir.Kernel.SpecialForms.list(Elixir.Kernel.SpecialForms.atom('a'), Elixir.Kernel.SpecialForms.atom('b'), Elixir.Kernel.SpecialForms.atom('c'))"
+    js_code = "Elixir.Core.List(Symbol.for('a'), Symbol.for('b'), Symbol.for('c'))"
 
     assert_translation(ex_ast, js_code)
 
     ex_ast = quote do: [:a, 2, "c"]
-    js_code = "Elixir.Kernel.SpecialForms.list(Elixir.Kernel.SpecialForms.atom('a'), 2, 'c')"
+    js_code = "Elixir.Core.List(Symbol.for('a'), 2, 'c')"
 
     assert_translation(ex_ast, js_code)
   end
 
   should "concatenate lists" do
     ex_ast = quote do: [1, 2, 3] ++ [4, 5, 6]
-    js_code = "Elixir.Core.concat_lists(Elixir.Kernel.SpecialForms.list(1,2,3),Elixir.Kernel.SpecialForms.list(4,5,6))"
+    js_code = "Elixir.Core.Functions.concat_lists(Elixir.Core.List(1,2,3),Elixir.Core.List(4,5,6))"
 
     assert_translation(ex_ast, js_code)
 
     ex_ast = quote do: this.list ++ [4, 5, 6]
-    js_code = "Elixir.Core.concat_lists(Elixir.Core.call_property(this,'list'),Elixir.Kernel.SpecialForms.list(4,5,6))"
+    js_code = "Elixir.Core.Functions.concat_lists(Elixir.Core.Functions.call_property(this,'list'),Elixir.Core.List(4,5,6))"
 
     assert_translation(ex_ast, js_code)
   end

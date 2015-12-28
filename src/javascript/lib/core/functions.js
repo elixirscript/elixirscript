@@ -119,7 +119,7 @@ function apply(...args){
   }
 }
 
-function new_tuple(args){
+function new_tuple(...args){
   return new Tuple(...args);
 }
 
@@ -203,7 +203,80 @@ function prepend_to_list(list, item){
   return [item].concat(list);
 }
 
-export {
+function defstruct(defaults){
+  return class {
+    constructor(update = {}){
+      let the_values = Object.assign(defaults, update);
+      Object.assign(this, the_values);
+    }
+
+    static create(updates = {}){
+      let x = new this(updates);
+      return Object.freeze(x);
+    }
+  }
+}
+
+
+function defexception(defaults){
+  return class extends Error {
+    constructor(update = {}){
+      let message = update.message || "";
+      super(message);
+
+      let the_values = Object.assign(defaults, update);
+      Object.assign(this, the_values);
+
+      this.name = this.constructor.name;
+      this.message = message;
+      this[SpecialForms.atom("__exception__")] = true;
+      Error.captureStackTrace(this, this.constructor.name);
+    }
+
+    static create(updates = {}){
+      let x = new this(updates);
+      return Object.freeze(x);
+    }
+  }
+}
+
+function defprotocol(spec){
+  return new Protocol(spec);
+}
+
+function defimpl(protocol, type, impl){
+  protocol.implementation(type, impl);
+}
+
+function get_object_keys(obj){
+  return Object.keys(obj).concat(Object.getOwnPropertySymbols(obj))
+}
+
+function is_valid_character(codepoint){
+  try{
+    return String.fromCodePoint(codepoint) != null;
+  }catch(e){
+    return false;
+  }
+}
+
+//https://developer.mozilla.org/en-US/docs/Web/API/WindowBase64/Base64_encoding_and_decoding#Solution_2_%E2%80%93_rewrite_the_DOMs_atob()_and_btoa()_using_JavaScript's_TypedArrays_and_UTF-8
+function b64EncodeUnicode(str) {
+    return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, function(match, p1) {
+        return String.fromCharCode('0x' + p1);
+    }));
+}
+
+function can_decode64(data) {
+  try{
+    atob(data);
+    return true;
+  }catch(e){
+    return false;
+  }
+}
+
+export default {
   call_property,
   is_instance_of,
   size,
@@ -234,5 +307,12 @@ export {
   reverse,
   get_global,
   concat_lists,
-  prepend_to_list
+  prepend_to_list,
+  defstruct,
+  defexception,
+  defprotocol,
+  defimpl,
+  get_object_keys,
+  is_valid_character,
+  b64EncodeUnicode
 };

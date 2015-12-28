@@ -9,7 +9,7 @@ describe('case', () => {
   it('case', () => {
     let clauses = [
       Patterns.make_case(
-        [Kernel.SpecialForms.tuple(Kernel.SpecialForms.atom("selector"), Patterns.variable(), Patterns.variable())],
+        [Kernel.SpecialForms.tuple(Symbol.for("selector"), Patterns.variable(), Patterns.variable())],
         function(i, value){ return value; },
         function(i){ return Kernel.is_integer(i); }
       ),

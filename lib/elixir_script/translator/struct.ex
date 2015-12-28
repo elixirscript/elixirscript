@@ -6,15 +6,15 @@ defmodule ElixirScript.Translator.Struct do
   alias ElixirScript.Translator.Map
 
   def get_struct_class(module_name, env) do
-    candiate_module_name = ElixirScript.Module.quoted_to_name(module_name)
-    |> ElixirScript.Module.get_module_name
+    candiate_module_name = Utils.quoted_to_name(module_name)
+    |> ElixirScript.Translator.State.get_module_name
 
-    if ElixirScript.Env.get_module_name(env, candiate_module_name) in ElixirScript.State.list_module_names() do
-      name = ElixirScript.Env.get_module_name(env, candiate_module_name)
+    if ElixirScript.Translator.Env.get_module_name(env, candiate_module_name) in ElixirScript.Translator.State.list_module_names() do
+      name = ElixirScript.Translator.Env.get_module_name(env, candiate_module_name)
 
       JS.member_expression(
-        JS.identifier(ElixirScript.Module.name_to_js_name(name)),
-        JS.identifier(ElixirScript.Module.name_to_js_name(name))
+        JS.identifier(Utils.name_to_js_name(name)),
+        JS.identifier(Utils.name_to_js_name(name))
       )
 
     else
@@ -101,7 +101,7 @@ defmodule ElixirScript.Translator.Struct do
 
     defaults = %{ defaults | properties: [struct_name]  ++ defaults.properties }
 
-    ref = JS.identifier(ElixirScript.Module.name_to_js_name(env.module))
+    ref = JS.identifier(Utils.name_to_js_name(env.module))
 
     ref_declarator = JS.variable_declarator(
       ref,
@@ -109,7 +109,10 @@ defmodule ElixirScript.Translator.Struct do
         JS.member_expression(
           JS.member_expression(
             JS.identifier("Elixir"),
-            JS.identifier("Kernel")
+              JS.member_expression(
+                JS.identifier("Core"),
+                JS.identifier("Functions")
+              )
           ),
           JS.identifier(name)
         ),

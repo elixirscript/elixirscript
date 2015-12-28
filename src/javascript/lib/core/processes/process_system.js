@@ -4,7 +4,7 @@
 import Mailbox from "./mailbox";
 import Process from "./process";
 import States from "./states";
-import * as Primitives from "./primitives";
+import * as Primitives from "../primitives";
 
 class ProcessSystem {
 

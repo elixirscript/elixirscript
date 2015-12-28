@@ -60,7 +60,7 @@ defmodule ElixirScript.Translator.Try.Test do
     }, Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()], function(x) {
         return IO.puts('Invalid argument given');
     }, function(x) {
-        return Elixir.Core.contains(x,Elixir.Kernel.SpecialForms.list(ArgumentError.create(Elixir.Kernel.SpecialForms.map({}))));
+        return Elixir.Core.Functions.contains(x,Elixir.Core.List(ArgumentError.create(Elixir.Kernel.SpecialForms.map({}))));
     })), null, null, null)
     """
 
@@ -175,11 +175,11 @@ defmodule ElixirScript.Translator.Try.Test do
      Elixir.Kernel.SpecialForms._try(function()    {
              return     1 / x;
            },null,null,Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(y)    {
-             return     Elixir.Kernel.SpecialForms.atom('small');
+             return     Symbol.for('small');
            },function(y)    {
              return     (y < 1) && (y > -1);
            }),Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.wildcard()],function()    {
-             return     Elixir.Kernel.SpecialForms.atom('large');
+             return     Symbol.for('large');
            })),null)
     """
 
@@ -204,7 +204,7 @@ defmodule ElixirScript.Translator.Try.Test do
         return do_something_that_may_fail(some_arg);
     }, Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.type(ArgumentError, {})], function() {
         return IO.puts('Invalid argument given');
-    })), Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Kernel.SpecialForms.atom('throw'), Elixir.Kernel.SpecialForms.atom('Error')], function() {
+    })), Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Symbol.for('throw'), Symbol.for('Error')], function() {
         return IO.puts('caught error');
     })), null, null)
     """

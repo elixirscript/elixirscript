@@ -17,7 +17,7 @@ defmodule ElixirScript.Translator.Function do
     { result, _ } = make_anonymous_function(functions, env, name)
 
     declarator = JS.variable_declarator(
-      JS.identifier(name),
+      JS.identifier(Utils.filter_name(name)),
       result
     )
 
@@ -56,7 +56,7 @@ defmodule ElixirScript.Translator.Function do
   end
 
   defp process_function_body(params, body, env, name, guards \\ nil) do
-    env = ElixirScript.Env.function_env(env, {name, get_arity(params)})
+    env = ElixirScript.Translator.Env.function_env(env, {name, get_arity(params)})
 
     { patterns, params, env } = process_params(params, env)
     { body, _ } = make_function_body(body, env)
@@ -126,7 +126,10 @@ defmodule ElixirScript.Translator.Function do
       JS.member_expression(
         JS.member_expression(
           JS.identifier("Elixir"),
-          JS.identifier("Core")
+          JS.member_expression(
+            JS.identifier("Core"),
+            JS.identifier("Functions")
+          )
         ),
         JS.identifier("call_property")
       ),
@@ -142,7 +145,7 @@ defmodule ElixirScript.Translator.Function do
   defp get_module_name_for_function(module_name, env) do
     case module_name do
       {:__aliases__, _, name} ->
-        module_name = ElixirScript.Module.quoted_to_name(name)
+        module_name = Utils.quoted_to_name(name)
         get_js_name(module_name, env)
       {name, _, _} when is_atom(name) ->
         get_js_name(name, env)
@@ -262,7 +265,7 @@ defmodule ElixirScript.Translator.Function do
   end
 
   defp get_js_name(module_name, env) when is_list(module_name) do
-    ElixirScript.Module.quoted_to_name({:__aliases__, [], module_name})
+    Utils.quoted_to_name({:__aliases__, [], module_name})
     |> get_js_name(env)
   end
 
@@ -270,16 +273,16 @@ defmodule ElixirScript.Translator.Function do
 
     cond do
       module_name in env.requires ->
-        ElixirScript.Module.name_to_js_name(module_name)
+        Utils.name_to_js_name(module_name)
 
-      module_name in ElixirScript.State.list_module_names ->
-        ElixirScript.State.add_module_reference(env.module, module_name)
-        ElixirScript.Module.name_to_js_name(module_name)
+      module_name in ElixirScript.Translator.State.list_module_names ->
+        ElixirScript.Translator.State.add_module_reference(env.module, module_name)
+        Utils.name_to_js_name(module_name)
 
       true ->
         case Atom.to_string(module_name) do
           "Elixir." <> _ ->
-            {:__aliases__, _, name } = ElixirScript.Module.name_to_quoted(module_name)
+            {:__aliases__, _, name } = Utils.name_to_quoted(module_name)
             name
           _ ->
             module_name
