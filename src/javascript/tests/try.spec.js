@@ -1,6 +1,7 @@
 var Patterns = require("../lib/core/patterns");
 var Enum = require('../lib/enum');
 var Kernel = require('../lib/kernel');
+var SpecialForms = require('../lib/core').SpecialForms;
 var expect = require('chai').expect;
 
 
@@ -21,7 +22,7 @@ describe('try', () => {
 
     let x = 1;
 
-    let value = Kernel.SpecialForms._try(function() {
+    let value = SpecialForms._try(function() {
         return 1 / x;
     }, null, null, Patterns.defmatch(Patterns.make_case([Patterns.variable()], function(y) {
         return Symbol.for('small');

@@ -13,7 +13,7 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-    Elixir.Kernel.SpecialForms._try(function() {
+    Elixir.Core.SpecialForms._try(function() {
         return do_something_that_may_fail(some_arg);
     }, Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.type(ArgumentError, {})], function() {
         return IO.puts('Invalid argument given');
@@ -34,7 +34,7 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-    Elixir.Kernel.SpecialForms._try(function() {
+    Elixir.Core.SpecialForms._try(function() {
         return do_something_that_may_fail(some_arg);
     }, Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.type(ArgumentError, {})], function() {
         return IO.puts('Invalid argument given');
@@ -55,12 +55,12 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-    Elixir.Kernel.SpecialForms._try(function() {
+    Elixir.Core.SpecialForms._try(function() {
         return do_something_that_may_fail(some_arg);
     }, Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()], function(x) {
         return IO.puts('Invalid argument given');
     }, function(x) {
-        return Elixir.Core.Functions.contains(x,Elixir.Core.List(ArgumentError.create(Elixir.Kernel.SpecialForms.map({}))));
+        return Elixir.Core.Functions.contains(x,Elixir.Core.SpecialForms.list(ArgumentError.create(Elixir.Core.SpecialForms.map({}))));
     })), null, null, null)
     """
 
@@ -78,7 +78,7 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-     Elixir.Kernel.SpecialForms._try(function()    {
+     Elixir.Core.SpecialForms._try(function()    {
              return     do_something_that_may_fail(some_arg);
            },Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(x)    {
              return     IO.puts('Invalid argument given');
@@ -102,7 +102,7 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-    Elixir.Kernel.SpecialForms._try(function() {
+    Elixir.Core.SpecialForms._try(function() {
         return do_something_that_may_fail(some_arg);
     }, Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.type(ArgumentError, {})], function() {
         return IO.puts('ArgumentError');
@@ -127,7 +127,7 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-    Elixir.Kernel.SpecialForms._try(function() {
+    Elixir.Core.SpecialForms._try(function() {
         return do_something_that_may_fail(some_arg);
     }, Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.type(ArgumentError, {})], function() {
         return IO.puts('Invalid argument given');
@@ -149,7 +149,7 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-     Elixir.Kernel.SpecialForms._try(function()    {
+     Elixir.Core.SpecialForms._try(function()    {
              return     do_something_that_may_fail(some_arg);
            },null,null,null,function()    {
              return     IO.puts('This is printed regardless if it failed or succeed');
@@ -172,7 +172,7 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-     Elixir.Kernel.SpecialForms._try(function()    {
+     Elixir.Core.SpecialForms._try(function()    {
              return     1 / x;
            },null,null,Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(y)    {
              return     Symbol.for('small');
@@ -200,7 +200,7 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-    Elixir.Kernel.SpecialForms._try(function() {
+    Elixir.Core.SpecialForms._try(function() {
         return do_something_that_may_fail(some_arg);
     }, Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.type(ArgumentError, {})], function() {
         return IO.puts('Invalid argument given');

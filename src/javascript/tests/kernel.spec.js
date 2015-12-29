@@ -1,4 +1,5 @@
 var Kernel = require('../lib/kernel');
+var SpecialForms = require('../lib/core').SpecialForms;
 var expect = require('chai').expect;
 
 describe('Kernel', function(){
@@ -26,9 +27,9 @@ describe('Kernel', function(){
     });
 
     it('match tuples', function(){
-      expect(Kernel.match__qmark__(Kernel.SpecialForms.tuple(1, 2, 3), Kernel.SpecialForms.tuple(1, 2, 3))).to.equal(true);
-      expect(Kernel.match__qmark__(Kernel.SpecialForms.tuple(1, undefined, 3), Kernel.SpecialForms.tuple(1, 2, 3))).to.equal(true);
-      expect(Kernel.match__qmark__(Kernel.SpecialForms.tuple(1, 2, 3), Kernel.SpecialForms.tuple(1, 2))).to.equal(false);
+      expect(Kernel.match__qmark__(SpecialForms.tuple(1, 2, 3), SpecialForms.tuple(1, 2, 3))).to.equal(true);
+      expect(Kernel.match__qmark__(SpecialForms.tuple(1, undefined, 3), SpecialForms.tuple(1, 2, 3))).to.equal(true);
+      expect(Kernel.match__qmark__(SpecialForms.tuple(1, 2, 3), SpecialForms.tuple(1, 2))).to.equal(false);
     });
 
     it('match list', function(){
@@ -50,4 +51,3 @@ describe('Kernel', function(){
     });
   });
 });
-

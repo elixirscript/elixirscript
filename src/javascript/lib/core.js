@@ -3,6 +3,7 @@ import { Tuple, PID, Integer, Float, List } from './core/primitives';
 import BitString from './core/bit_string';
 import Patterns from './core/patterns';
 import Functions from './core/functions';
+import SpecialForms from './core/special_forms';
 
 Functions.get_global().processes = Functions.get_global().processes || new ProcessSystem();
 
@@ -15,5 +16,6 @@ export {
   Integer,
   Float,
   Functions,
-  List
+  List,
+  SpecialForms
 }

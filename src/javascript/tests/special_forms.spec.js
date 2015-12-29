@@ -1,4 +1,4 @@
-var SpecialForms = require('../lib/kernel/special_forms');
+var SpecialForms = require('../lib/core').SpecialForms;
 var expect = require('chai').expect;
 
 describe('SpecialForms', function(){

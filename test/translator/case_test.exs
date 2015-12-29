@@ -75,7 +75,7 @@ defmodule ElixirScript.Translator.Case.Test do
              let [value] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),13);
              return     value;
            },function(number)    {
-             return     Elixir.Core.Functions.contains(number,Elixir.Core.List(1,2,3,4));
+             return     Elixir.Core.Functions.contains(number,Elixir.Core.SpecialForms.list(1,2,3,4));
            }),Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.wildcard()],function()    {
              return     true;
            })).call(this,data)

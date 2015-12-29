@@ -1,8 +1,7 @@
-import SpecialForms from './kernel/special_forms';
 import * as Core from './core';
 
 function __new__(){
-  return SpecialForms.map({});
+  return Core.SpecialForms.map({});
 }
 
 function keys(map){
@@ -18,10 +17,10 @@ function to_list(map){
   let list = [];
 
   for(let key of map_keys){
-    list.push(new Core.Tuple(key, map[key]));
+    list.push(Core.SpecialForms.tuple(key, map[key]));
   }
 
-  return Core.List(...list);
+  return Core.SpecialForms.list(...list);
 }
 
 function values(map){
@@ -32,14 +31,14 @@ function values(map){
     list.push(map[key]);
   }
 
-  return Core.List(...list);
+  return Core.SpecialForms.list(...list);
 }
 
 function from_struct(struct){
   let map = Object.assign({}, struct);
   delete map[Symbol.for("__struct__")];
 
-  return SpecialForms.map(map);
+  return Core.SpecialForms.map(map);
 }
 
 function __delete__(map, key){
@@ -47,7 +46,7 @@ function __delete__(map, key){
 
   delete new_map[key];
 
-  return SpecialForms.map(new_map);
+  return Core.SpecialForms.map(new_map);
 }
 
 function drop(map, keys){
@@ -57,7 +56,7 @@ function drop(map, keys){
     delete new_map[key];
   }
 
-  return SpecialForms.map(new_map);
+  return Core.SpecialForms.map(new_map);
 }
 
 
@@ -75,7 +74,7 @@ function fetch__emark__(map, key){
 
 function fetch(map, key){
   if(key in map){
-    return new Core.Tuple(Symbol.for("ok"), map[key]);
+    return Core.SpecialForms.tuple(Symbol.for("ok"), map[key]);
   }
 
   return Symbol.for("error");
@@ -86,7 +85,7 @@ function has_key__qmark__(map, key){
 }
 
 function merge(map1, map2){
-  return SpecialForms.map_update(map1, map2);
+  return Core.SpecialForms.map_update(map1, map2);
 }
 
 function split(map, keys){
@@ -101,9 +100,9 @@ function split(map, keys){
     }
   }
 
-  return new Core.Tuple(
-    SpecialForms.map(split1),
-    SpecialForms.map(split2)
+  return Core.SpecialForms.tuple(
+    Core.SpecialForms.map(split1),
+    Core.SpecialForms.map(split2)
   );
 }
 
@@ -116,7 +115,7 @@ function take(map, keys){
     }
   }
 
-  return SpecialForms.map(split1);
+  return Core.SpecialForms.map(split1);
 }
 
 function drop(map, keys){
@@ -128,7 +127,7 @@ function drop(map, keys){
     }
   }
 
-  return SpecialForms.map(split1);
+  return Core.SpecialForms.map(split1);
 }
 
 function put_new(map, key, value){
@@ -139,7 +138,7 @@ function put_new(map, key, value){
   let new_map = Object.assign({}, map);
   new_map[key] = value;
 
-  return SpecialForms.map(new_map);
+  return Core.SpecialForms.map(new_map);
 }
 
 function put_new_lazy(map, key, fun){
@@ -150,7 +149,7 @@ function put_new_lazy(map, key, fun){
   let new_map = Object.assign({}, map);
   new_map[key] = fun();
 
-  return SpecialForms.map(new_map);
+  return Core.SpecialForms.map(new_map);
 }
 
 function get_and_update(map, key, fun){
@@ -161,32 +160,32 @@ function get_and_update(map, key, fun){
   let new_map = Object.assign({}, map);
   new_map[key] = fun(map[key]);
 
-  return SpecialForms.map(new_map);
+  return Core.SpecialForms.map(new_map);
 }
 
 function pop_lazy(map, key, fun){
   if(!key in map){
-    return new Core.Tuple(fun(), map);
+    return Core.SpecialForms.tuple(fun(), map);
   }
 
   let new_map = Object.assign({}, map);
   let value = fun(new_map[key]);
   delete new_map[key];
 
-  return new Core.Tuple(value, new_map);
+  return Core.SpecialForms.tuple(value, new_map);
 }
 
 
 function pop(map, key, _default = null){
   if(!key in map){
-    return new Core.Tuple(_default, map);
+    return Core.SpecialForms.tuple(_default, map);
   }
 
   let new_map = Object.assign({}, map);
   let value = new_map[key];
   delete new_map[key];
 
-  return new Core.Tuple(value, new_map);
+  return Core.SpecialForms.tuple(value, new_map);
 }
 
 function get_lazy(map, key, fun){
@@ -210,7 +209,7 @@ function put(map, key, val){
   let new_map = Object({}, map);
   new_map[key] = val;
 
-  return SpecialForms.map(new_map);
+  return Core.SpecialForms.map(new_map);
 }
 
 function update__emark__(map, key, fun){
@@ -221,7 +220,7 @@ function update__emark__(map, key, fun){
   let new_map = Object({}, map);
   new_map[key] = fun(map[key]);
 
-  return SpecialForms.map(new_map);
+  return Core.SpecialForms.map(new_map);
 }
 
 function update(map, key, initial, fun){
@@ -233,7 +232,7 @@ function update(map, key, initial, fun){
     new_map[key] = fun(map[key]);
   }
 
-  return SpecialForms.map(new_map);
+  return Core.SpecialForms.map(new_map);
 }
 
 

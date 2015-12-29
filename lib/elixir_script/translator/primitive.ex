@@ -9,7 +9,7 @@ defmodule ElixirScript.Translator.Primitive do
     JS.member_expression(
       JS.identifier("Elixir"),
       JS.member_expression(
-        JS.identifier("Kernel"),
+        JS.identifier("Core"),
         JS.identifier("SpecialForms")
       )
     )
@@ -21,10 +21,10 @@ defmodule ElixirScript.Translator.Primitive do
         JS.identifier("Elixir"),
         JS.member_expression(
           JS.identifier("Core"),
-          JS.identifier("Functions")
+          JS.identifier("SpecialForms")
         )
       ),
-      JS.identifier("new_tuple")
+      JS.identifier("tuple")
     )
   end
 
@@ -42,9 +42,12 @@ defmodule ElixirScript.Translator.Primitive do
     JS.member_expression(
       JS.member_expression(
         JS.identifier("Elixir"),
-        JS.identifier("Core")
+        JS.member_expression(
+          JS.identifier("Core"),
+          JS.identifier("SpecialForms")
+        )
       ),
-      JS.identifier("List")
+      JS.identifier("list")
     )
   end
 

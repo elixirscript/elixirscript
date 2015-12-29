@@ -1,8 +1,7 @@
-import SpecialForms from './kernel/special_forms';
 import * as Core from './core';
 
 function tl(list){
-  return SpecialForms.list(...list.slice(1));
+  return Core.SpecialForms.list(...list.slice(1));
 }
 
 function hd(list){
@@ -146,7 +145,6 @@ function match__qmark__(pattern, expr, guard = () => true){
 }
 
 export default {
-  SpecialForms,
   tl,
   hd,
   is_nil,

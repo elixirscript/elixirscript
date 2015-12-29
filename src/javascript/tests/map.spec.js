@@ -1,5 +1,6 @@
 var Map = require('../lib/map');
 var Kernel = require('../lib/kernel');
+var SpecialForms = require('../lib/core').SpecialForms;
 var expect = require('chai').expect;
 
 describe('Map', function(){
@@ -22,7 +23,7 @@ describe('Map', function(){
     let map = Map.new();
 
     map = Map.put(map, "hello", "world");
-    expect(Map.to_list(map)).to.deep.equal([Kernel.SpecialForms.tuple("hello", "world")]);
+    expect(Map.to_list(map)).to.deep.equal([SpecialForms.tuple("hello", "world")]);
   });
 
   it('delete', function(){
@@ -32,8 +33,7 @@ describe('Map', function(){
     expect(Map.keys(map).length).to.equal(1);
 
     map = Map.delete(map, "hello")
-    expect(Map.keys(map).length).to.equal(0);    
+    expect(Map.keys(map).length).to.equal(0);
   });
 
 })
-

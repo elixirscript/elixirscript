@@ -1,6 +1,6 @@
 var Patterns = require("../lib/core/patterns");
 var Enum = require('../lib/enum');
-var Kernel = require('../lib/kernel');
+var SpecialForms = require('../lib/core').SpecialForms;
 var expect = require('chai').expect;
 
 
@@ -13,7 +13,7 @@ describe('cond', () => {
       [ true,  () => "This will"],
     ];
 
-    let result = Kernel.SpecialForms.cond(clauses);
+    let result = SpecialForms.cond(clauses);
 
     expect(result).to.equal("This will");
   });

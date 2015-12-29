@@ -1,24 +1,25 @@
 var BitString = require('../lib/core').BitString;
 var Kernel = require('../lib/kernel');
+var SpecialForms = require('../lib/core').SpecialForms;
 var expect = require('chai').expect;
 
 describe('BitString', function(){
 
   describe('creation', function(){
     it('create properly', function(){
-      let bs = Kernel.SpecialForms.bitstring(BitString.integer(1));
+      let bs = SpecialForms.bitstring(BitString.integer(1));
       expect(Kernel.match__qmark__(bs.value, [1])).to.equal(true);
 
-      bs = Kernel.SpecialForms.bitstring(BitString.binary("foo"));
+      bs = SpecialForms.bitstring(BitString.binary("foo"));
       expect(Kernel.match__qmark__(bs.value, [102, 111, 111])).to.equal(true);
 
-      bs = Kernel.SpecialForms.bitstring(BitString.integer(0), BitString.binary("foo"));
+      bs = SpecialForms.bitstring(BitString.integer(0), BitString.binary("foo"));
       expect(Kernel.match__qmark__(bs.value, [0, 102, 111, 111])).to.equal(true);
 
-      bs = Kernel.SpecialForms.bitstring(BitString.float(3.14));
+      bs = SpecialForms.bitstring(BitString.float(3.14));
       expect(Kernel.match__qmark__(bs.value, [64, 9, 30, 184, 81, 235, 133, 31])).to.equal(true);
 
-      bs = Kernel.SpecialForms.bitstring(BitString.signed(BitString.integer(-100)));
+      bs = SpecialForms.bitstring(BitString.signed(BitString.integer(-100)));
       expect(Kernel.match__qmark__(bs.value, [156])).to.equal(true);
     });
   });

@@ -28,7 +28,7 @@ defmodule ElixirScript.Translator.Bug.Test do
     end
 
     js_code = """
-     React.createElement(React.Text,Elixir.Kernel.SpecialForms.map({
+     React.createElement(React.Text,Elixir.Core.SpecialForms.map({
              style: Elixir.Core.Functions.call_property(styles,'welcome')
        }),'Welcome to React Native!')
     """
@@ -118,7 +118,7 @@ defmodule ElixirScript.Translator.Bug.Test do
 
     js_code = """
      const getDispatcher = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
-             return     DeLorean.Flux.createDispatcher(Elixir.Kernel.SpecialForms.map({
+             return     DeLorean.Flux.createDispatcher(Elixir.Core.SpecialForms.map({
              [Symbol.for('startPainting')]: Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
              return     this.dispatch('startPainting');
            })),     [Symbol.for('stopPainting')]: Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
@@ -126,7 +126,7 @@ defmodule ElixirScript.Translator.Bug.Test do
            })),     [Symbol.for('addPoint')]: Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(data)    {
              return     this.dispatch('addPoint',data);
            })),     [Symbol.for('getStores')]: Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
-             return     Elixir.Kernel.SpecialForms.map({
+             return     Elixir.Core.SpecialForms.map({
              [Symbol.for('graphic')]: GraphicStore
        });
            }))

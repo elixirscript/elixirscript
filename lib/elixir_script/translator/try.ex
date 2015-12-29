@@ -92,7 +92,7 @@ defmodule ElixirScript.Translator.Try do
   defp process_after_block(after_block, env) do
     { translated_body, _ } = Function.prepare_function_body(after_block, env)
     translated_body = JS.block_statement(translated_body)
-    
+
     JS.function_expression([], [], translated_body)
   end
 
