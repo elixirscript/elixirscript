@@ -25,6 +25,7 @@ defmodule ElixirScript.Translator.State do
     |> Map.put(Base, ElixirScript.Base)
     |> Map.put(Module, ElixirScript.Module)
     |> Map.put(Map, ElixirScript.Map)
+    |> Map.put(Keyword, ElixirScript.Keyword)
   end
 
   def add_module(module) do
