@@ -31,11 +31,11 @@ defmodule ElixirScript.Translator.Assignment do
 
     js_ast = case left do
       list when is_list(list) ->
-        make_ref(array_pattern, params, Primitive.list_ast())
-      {_left1, _left2} ->
-        make_ref(array_pattern, params, Primitive.new_tuple_function())
-      {:{}, _, _} ->
-        make_ref(array_pattern, params, Primitive.new_tuple_function())
+        make_list_ref(array_pattern, params)
+      { _, _ } ->
+        make_tuple_ref(array_pattern, params)
+      {:{}, _, _ } ->
+        make_tuple_ref(array_pattern, params)
       _ ->
         array_pattern
     end
@@ -43,7 +43,42 @@ defmodule ElixirScript.Translator.Assignment do
     { js_ast, env }
   end
 
-  defp make_ref(array_pattern, params, ast) do
+  defp make_list_ref(array_pattern, params) do
+    {ref, params} = make_params(params)
+
+    ref_declarator = JS.variable_declarator(
+      ref,
+      JS.call_expression(
+        Primitive.list_ast(),
+        params
+      )
+    )
+
+    make_variable_declaration_and_group(ref_declarator, array_pattern)
+  end
+
+  defp make_tuple_ref(array_pattern, params) do
+    {ref, params} = make_params(params)
+
+    ref_declarator = JS.variable_declarator(
+      ref,
+      JS.new_expression(
+        JS.member_expression(
+          JS.identifier("Elixir"),
+          JS.member_expression(
+            JS.identifier("Core"),
+            JS.identifier("Tuple")
+          )
+        ),
+        params
+      )
+    )
+
+    make_variable_declaration_and_group(ref_declarator, array_pattern)
+  end
+
+
+  defp make_params(params) do
     ref = JS.identifier("_ref")
 
     params = Enum.map(params, fn
@@ -51,14 +86,10 @@ defmodule ElixirScript.Translator.Assignment do
       (x) -> x
     end)
 
-    ref_declarator = JS.variable_declarator(
-      ref,
-      JS.call_expression(
-        ast,
-        params
-      )
-    )
+    { ref, params }
+  end
 
+  defp make_variable_declaration_and_group(ref_declarator, array_pattern) do
     ref_declaration = JS.variable_declaration([ref_declarator], :let)
     %ElixirScript.Translator.Group{ body: [array_pattern, ref_declaration] }
   end

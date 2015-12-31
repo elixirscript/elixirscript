@@ -278,6 +278,24 @@ function can_decode64(data) {
   }
 }
 
+function delete_property_from_map(map, property){
+  let new_map = Object.assign(Object.create(map.constructor.prototype), map)
+  delete new_map[property]
+
+  return Object.freeze(new_map);
+}
+
+function class_to_obj(map){
+  let new_map = Object.assign({}, map)
+  return Object.freeze(new_map);
+}
+
+function add_property_to_map(map, property, value){
+  let new_map = Object.assign({}, map);
+  new_map[property] = value;
+  return Object.freeze(new_map);
+}
+
 export default {
   call_property,
   is_instance_of,
@@ -316,5 +334,8 @@ export default {
   defimpl,
   get_object_keys,
   is_valid_character,
-  b64EncodeUnicode
+  b64EncodeUnicode,
+  delete_property_from_map,
+  add_property_to_map,
+  class_to_obj
 };

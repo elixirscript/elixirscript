@@ -41,7 +41,13 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate(ast, env) when is_atom(ast) do
-    { Primitive.make_atom(ast), env }
+    str = Atom.to_string(ast)
+
+    quoted = quote do
+      Symbol.for(unquote(str))
+    end
+
+    translate(quoted, env)
   end
 
   defp do_translate(ast, env) when is_list(ast) do
@@ -49,7 +55,11 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({ one, two }, env) do
-    Primitive.make_tuple({one, two}, env)
+    quoted = quote do
+      JS.new(Elixir.Core.Tuple, [unquote(one), unquote(two)])
+    end
+
+    translate(quoted, env)
   end
 
   defp do_translate({operator, _, [value]}, env) when operator in [:-, :!, :+] do
@@ -343,7 +353,11 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:{}, _, elements}, env) do
-    Primitive.make_tuple(elements, env)
+    quoted = quote do
+      JS.new(Elixir.Core.Tuple, unquote(elements))
+    end
+
+    translate(quoted, env)
   end
 
   defp do_translate({:=, _, [left, right]}, env) do
