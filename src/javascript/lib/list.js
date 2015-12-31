@@ -49,7 +49,7 @@ List.flatten = function(list, tail = Core.SpecialForms.list()){
   let new_value = [];
 
   for(let x of list){
-    if(Kernel.is_list(x)){
+    if(Array.isArray(x)){
       new_value = new_value.concat(List.flatten(x));
     }else{
       new_value.push(x);
@@ -223,7 +223,7 @@ List.update_at = function(list, index, fun){
 };
 
 List.wrap = function(list){
-  if(Kernel.is_list(list)){
+  if(Array.isArray(list)){
     return list;
   }else if(list == null){
     return Core.SpecialForms.list();

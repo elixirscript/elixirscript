@@ -1,4 +1,3 @@
-import Kernel from './kernel';
 import * as Core from './core';
 
 let Enum = {
@@ -72,7 +71,7 @@ let Enum = {
   },
 
   fetch: function(collection, n){
-    if(Kernel.is_list(collection)){
+    if(Array.isArray(collection)){
       if(n < this.count(collection) && n >= 0){
         return new Core.Tuple(Symbol.for("ok"), collection[n]);
       }else{
@@ -84,7 +83,7 @@ let Enum = {
   },
 
   fetch__emark__: function(collection, n){
-    if(Kernel.is_list(collection)){
+    if(Array.isArray(collection)){
       if(n < this.count(collection) && n >= 0){
         return collection[n];
       }else{

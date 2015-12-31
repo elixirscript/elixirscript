@@ -296,6 +296,30 @@ function add_property_to_map(map, property, value){
   return Object.freeze(new_map);
 }
 
+function bnot(expr){
+  return ~expr;
+}
+
+function band(left, right){
+  return left & right;
+}
+
+function bor(left, right){
+  return left | right;
+}
+
+function bsl(left, right){
+  return left << right;
+}
+
+function bsr(left, right){
+  return left >> right;
+}
+
+function bxor(left, right){
+  return left ^ right;
+}
+
 export default {
   call_property,
   is_instance_of,
@@ -337,5 +361,11 @@ export default {
   b64EncodeUnicode,
   delete_property_from_map,
   add_property_to_map,
-  class_to_obj
+  class_to_obj,
+  bnot,
+  band,
+  bor,
+  bsl,
+  bsr,
+  bxor
 };
