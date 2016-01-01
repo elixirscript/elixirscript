@@ -51,7 +51,7 @@ defmodule ElixirScript.Map do
       true ->
         map[key]
       false ->
-        raise ""
+        raise "#{key} not found in map"
     end
   end
 
@@ -185,7 +185,7 @@ defmodule ElixirScript.Map do
       true ->
         Map.put(map, key, func.(map[key]))
       false ->
-        raise ""
+        raise "#{key} not found in map"
     end
   end
 

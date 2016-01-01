@@ -426,7 +426,7 @@ defmodule ElixirScript.Translator do
         [
           Map.make_property(translate!(:__struct__, env), translate!(:RuntimeError, env)),
           Map.make_property(translate!(:__exception__, env), translate!(true, env)),
-          Map.make_property(translate!(:message, env), JS.literal(message))
+          Map.make_property(translate!(:message, env), translate!(message, env))
         ]
       )
     )
