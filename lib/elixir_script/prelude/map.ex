@@ -129,12 +129,12 @@ defmodule ElixirScript.Map do
     get(map, key, nil)
   end
 
-  def get(map, key, default) do
+  def get(map, key, default_value) do
     case key in keys(map) do
       true ->
         map[key]
       false ->
-        default
+        default_value
     end
   end
 
@@ -161,12 +161,12 @@ defmodule ElixirScript.Map do
     pop(map, key, nil)
   end
 
-  def pop(map, key, default) do
+  def pop(map, key, default_value) do
     case key in keys(map) do
       true ->
         { map[key], Map.delete(map, key) }
       false ->
-        { default, map }
+        { default_value, map }
     end
   end
 

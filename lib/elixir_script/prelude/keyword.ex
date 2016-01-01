@@ -21,12 +21,12 @@ defmodule ElixirScript.Keyword do
     get(kw, key, nil)
   end
 
-  def get(kw, key, default) do
+  def get(kw, key, default_value) do
     case has_key?(kw, key) do
       true ->
         do_get(kw, key)
       false ->
-        default
+        default_value
     end
   end
 
