@@ -1,8 +1,8 @@
 defmodule ElixirScript.Translator.Access.Test do
-  use ShouldI
+  use ExUnit.Case
   import ElixirScript.TestHelper
 
-  should "translate access" do
+  test "translate access" do
     ex_ast = quote do: a[:b]
     js_code = "a[Symbol.for('b')]"
 

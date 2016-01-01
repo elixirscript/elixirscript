@@ -1,6 +1,6 @@
 exclude = if Node.alive?, do: [], else: [skip: true]
 
-ExUnit.start(exclude: exclude, formatters: [ShouldI.CLIFormatter])
+ExUnit.start(exclude: exclude)
 
 defmodule ElixirScript.Math do
   defmacro squared(x) do
@@ -20,7 +20,7 @@ defmodule ElixirScript.Using do
 end
 
 defmodule ElixirScript.TestHelper do
-  use ShouldI
+  use ExUnit.Case
 
   def make_custom_env do
     use ElixirScript

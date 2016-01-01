@@ -1,8 +1,8 @@
 defmodule ElixirScript.Translator.Defmodule.Test do
-  use ShouldI
+  use ExUnit.Case
   import ElixirScript.TestHelper
 
-  should "translate empty module" do
+  test "translate empty module" do
     ex_ast = quote do
       defmodule Elephant do
       end
@@ -16,7 +16,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "translate defmodules" do
+  test "translate defmodules" do
     ex_ast = quote do
       defmodule Elephant do
         @ul JQuery.("#todo-list")
@@ -48,7 +48,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "translate modules with inner modules" do
+  test "translate modules with inner modules" do
     ex_ast = quote do
       defmodule Animals do
 
@@ -95,7 +95,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
   end
 
 
-  should "translate modules with inner module that has inner module" do
+  test "translate modules with inner module that has inner module" do
     ex_ast = quote do
       defmodule Animals do
 
@@ -156,7 +156,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "Pull out module references and make them into imports if modules listed" do
+  test "Pull out module references and make them into imports if modules listed" do
     ex_ast = quote do
       defmodule Animals do
         Lions.Tigers.oh_my()
@@ -181,7 +181,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "ignore aliases already added" do
+  test "ignore aliases already added" do
     ex_ast = quote do
       defmodule Animals do
         alias Lions.Tigers
@@ -216,7 +216,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "import only" do
+  test "import only" do
     ex_ast = quote do
       defmodule Lions.Tigers do
         def oh_my() do
@@ -256,7 +256,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "import except" do
+  test "import except" do
     ex_ast = quote do
       defmodule Lions.Tigers do
         def oh_my() do

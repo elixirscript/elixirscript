@@ -114,7 +114,7 @@ defmodule ElixirScript.Translator.Primitive do
   def make_tuple(elements, env) do
     list = Enum.map(elements, &Translator.translate!(&1, env))
 
-    js_ast = JS.call_expression(new_tuple_function, list)
+    js_ast = JS.new_expression(tuple_class, list)
 
     { js_ast, env }
   end
@@ -124,8 +124,8 @@ defmodule ElixirScript.Translator.Primitive do
   end
 
   def make_tuple_quoted(opts, elements, env) do
-    JS.call_expression(
-      new_tuple_function,
+    JS.new_expression(
+      tuple_class,
       Enum.map(elements, fn(x) -> Quote.make_quote(opts, x, env) end)
     )
   end

@@ -1,8 +1,8 @@
 defmodule ElixirScript.Translator.Bitstring.Test do
-  use ShouldI
+  use ExUnit.Case
   import ElixirScript.TestHelper
 
-  should "translate bitstring" do
+  test "translate bitstring" do
     ex_ast = quote do: <<1, 2, 3>>
     assert_translation(ex_ast, "Elixir.Core.SpecialForms.bitstring(Elixir.Core.BitString.integer(1), Elixir.Core.BitString.integer(2), Elixir.Core.BitString.integer(3))")
 

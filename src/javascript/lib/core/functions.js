@@ -320,6 +320,32 @@ function bxor(left, right){
   return left ^ right;
 }
 
+function zip(list_of_lists){
+  if(list_of_lists.length === 0){
+    return Object.freeze([]);
+  }
+
+  let new_value = [];
+  let smallest_length = list_of_lists[0];
+
+  for(let x of list_of_lists){
+    if(x.length < smallest_length){
+      smallest_length = x.length;
+    }
+  }
+
+  for(let i = 0; i < smallest_length; i++){
+    let current_value = [];
+    for(let j = 0; j < list_of_lists.length; j++){
+      current_value.push(list_of_lists[j][i]);
+    }
+
+    new_value.push(new Tuple(...current_value));
+  }
+
+  return Object.freeze(new_value);
+}
+
 export default {
   call_property,
   is_instance_of,
@@ -367,5 +393,6 @@ export default {
   bor,
   bsl,
   bsr,
-  bxor
+  bxor,
+  zip
 };

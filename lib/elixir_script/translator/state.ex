@@ -28,6 +28,7 @@ defmodule ElixirScript.Translator.State do
     |> Map.put(Keyword, ElixirScript.Keyword)
     |> Map.put(Bitwise, ElixirScript.Bitwise)
     |> Map.put(MapSet, ElixirScript.MapSet)
+    |> Map.put(List, ElixirScript.List)
   end
 
   def add_module(module) do

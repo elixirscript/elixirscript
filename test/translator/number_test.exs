@@ -1,8 +1,8 @@
 defmodule ElixirScript.Translator.Number.Test do
-  use ShouldI
+  use ExUnit.Case
   import ElixirScript.TestHelper
 
-  should "translate numbers" do
+  test "translate numbers" do
     ex_ast = quote do: 1
     assert_translation(ex_ast, "1")
 

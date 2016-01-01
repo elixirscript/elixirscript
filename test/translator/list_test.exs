@@ -1,8 +1,8 @@
 defmodule ElixirScript.Translator.List.Test do
-  use ShouldI
+  use ExUnit.Case
   import ElixirScript.TestHelper
 
-  should "translate list" do
+  test "translate list" do
     ex_ast = quote do: [1, 2, 3]
     js_code = "Elixir.Core.SpecialForms.list(1, 2, 3)"
 
@@ -24,7 +24,7 @@ defmodule ElixirScript.Translator.List.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "concatenate lists" do
+  test "concatenate lists" do
     ex_ast = quote do: [1, 2, 3] ++ [4, 5, 6]
     js_code = "Elixir.Core.Functions.concat_lists(Elixir.Core.SpecialForms.list(1,2,3),Elixir.Core.SpecialForms.list(4,5,6))"
 
@@ -36,7 +36,7 @@ defmodule ElixirScript.Translator.List.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "prepend element" do
+  test "prepend element" do
     ex_ast = quote do: [x|list]
 
     js_code = "Elixir.Core.prepend_to_list(list,x)"
@@ -44,7 +44,7 @@ defmodule ElixirScript.Translator.List.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "prepend element in function" do
+  test "prepend element in function" do
     ex_ast = quote do
        fn (_) -> [x|list] end
     end

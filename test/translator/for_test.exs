@@ -1,8 +1,8 @@
 defmodule ElixirScript.Translator.For.Test do
-  use ShouldI
+  use ExUnit.Case
   import ElixirScript.TestHelper
 
-  should "translate simple for" do
+  test "translate simple for" do
     ex_ast = quote do
       for n <- [1, 2, 3, 4], do: n * 2
     end
@@ -18,7 +18,7 @@ defmodule ElixirScript.Translator.For.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "translate simple for with into" do
+  test "translate simple for with into" do
     ex_ast = quote do
       for n <- [1, 2, 3, 4], into: [], do: n * 2
     end
@@ -34,7 +34,7 @@ defmodule ElixirScript.Translator.For.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "translate for with string" do
+  test "translate for with string" do
     ex_ast = quote do
       for n <- "Opera", do: n
     end
@@ -50,7 +50,7 @@ defmodule ElixirScript.Translator.For.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "translate multiple generator for" do
+  test "translate multiple generator for" do
     ex_ast = quote do
       for x <- [1, 2], y <- [2, 3], do: x*y
     end
@@ -68,7 +68,7 @@ defmodule ElixirScript.Translator.For.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "translate multiple generator for, assignment, and do block" do
+  test "translate multiple generator for, assignment, and do block" do
     ex_ast = quote do
       r = for x <- [1, 2], y <- [2, 3] do
         x*y
@@ -86,7 +86,7 @@ defmodule ElixirScript.Translator.For.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "translate for with filter" do
+  test "translate for with filter" do
     ex_ast = quote do
       for n <- [1, 2, 3, 4, 5, 6], rem(n, 2) == 0, do: n
     end
@@ -102,7 +102,7 @@ defmodule ElixirScript.Translator.For.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "translate for with pattern matched input" do
+  test "translate for with pattern matched input" do
     ex_ast = quote do
       for {:user, name} <- [user: "john", admin: "john", user: "meg"] do
         Elixir.String.upcase(name)
@@ -112,7 +112,7 @@ defmodule ElixirScript.Translator.For.Test do
     js_code = """
     Elixir.Core.SpecialForms._for(Elixir.Core.SpecialForms.list(Elixir.Core.SpecialForms.list(Elixir.Core.Patterns.type(Elixir.Core.Tuple,{
         values: [Symbol.for('user'), Elixir.Core.Patterns.variable()]
-  }),Elixir.Core.SpecialForms.list(Elixir.Core.SpecialForms.tuple(Symbol.for('user'),'john'),Elixir.Core.SpecialForms.tuple(Symbol.for('admin'),'john'),Elixir.Core.SpecialForms.tuple(Symbol.for('user'),'meg')))),function(name)    {
+  }),Elixir.Core.SpecialForms.list(new Elixir.Core.Tuple(Symbol.for('user'),'john'),new Elixir.Core.Tuple(Symbol.for('admin'),'john'),new Elixir.Core.Tuple(Symbol.for('user'),'meg')))),function(name)    {
         return     Elixir$ElixirScript$String.upcase(name);
       },function()    {
         return     true;

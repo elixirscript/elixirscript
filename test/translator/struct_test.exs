@@ -1,8 +1,8 @@
 defmodule ElixirScript.Translator.Struct.Test do
-  use ShouldI
+  use ExUnit.Case
   import ElixirScript.TestHelper
 
-  should "translate struct with default values" do
+  test "translate struct with default values" do
     ex_ast = quote do
       defmodule User do
         defstruct name: "john", age: 27
@@ -25,7 +25,7 @@ defmodule ElixirScript.Translator.Struct.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "translate struct without default values" do
+  test "translate struct without default values" do
 
     ex_ast = quote do
       defmodule User do
@@ -49,7 +49,7 @@ defmodule ElixirScript.Translator.Struct.Test do
 
   end
 
-  should "translate struct creation" do
+  test "translate struct creation" do
     ex_ast = quote do
       defmodule User do
         defstruct :name, :age
@@ -102,7 +102,7 @@ defmodule ElixirScript.Translator.Struct.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "translate struct update" do
+  test "translate struct update" do
     ex_ast = quote do
       user = %{ map | key: value }
     end
@@ -129,7 +129,7 @@ defmodule ElixirScript.Translator.Struct.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "translate defexception" do
+  test "translate defexception" do
     ex_ast = quote do
       defmodule MyAppError do
         defexception message: "This is a message"
@@ -173,7 +173,7 @@ defmodule ElixirScript.Translator.Struct.Test do
 
   end
 
-  should "translate raise exception" do
+  test "translate raise exception" do
     ex_ast = quote do
       defmodule MyAppError do
         defexception [:message]

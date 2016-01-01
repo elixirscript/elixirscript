@@ -1,8 +1,8 @@
 defmodule ElixirScript.Translator.Bug.Test do
-  use ShouldI
+  use ExUnit.Case
   import ElixirScript.TestHelper
 
-  should "Translate function with 0 arguments" do
+  test "Translate function with 0 arguments" do
     ex_ast = quote do
         def test do
           :atom
@@ -18,7 +18,7 @@ defmodule ElixirScript.Translator.Bug.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "Translate react element" do
+  test "Translate react element" do
     ex_ast = quote do
       React.createElement(
         React.Text,
@@ -37,7 +37,7 @@ defmodule ElixirScript.Translator.Bug.Test do
 
   end
 
-  should "correctly not create 2 imports" do
+  test "correctly not create 2 imports" do
     ex_ast = quote do
       defmodule App.Todo do
         JS.import JQuery, "jquery"
@@ -55,7 +55,7 @@ defmodule ElixirScript.Translator.Bug.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "correctly translate module names when used" do
+  test "correctly translate module names when used" do
     ex_ast = quote do
       @graphic_store App.Stores.GraphicStore.create_store()
     end
@@ -68,7 +68,7 @@ defmodule ElixirScript.Translator.Bug.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "replace !" do
+  test "replace !" do
     ex_ast = quote do
       Elixir.Enum.fetch!(data, i)
     end
@@ -80,7 +80,7 @@ defmodule ElixirScript.Translator.Bug.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "chain calls correctly" do
+  test "chain calls correctly" do
     ex_ast = quote do
       :this.getRawCanvas().getContext("2d")
     end
@@ -103,7 +103,7 @@ defmodule ElixirScript.Translator.Bug.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "correctly call multi-module functions" do
+  test "correctly call multi-module functions" do
     ex_ast = quote do
       def getDispatcher() do
         DeLorean.Flux.createDispatcher(%{

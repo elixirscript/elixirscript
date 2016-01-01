@@ -1,8 +1,8 @@
 defmodule ElixirScript.Translator.Case.Test do
-  use ShouldI
+  use ExUnit.Case
   import ElixirScript.TestHelper
 
-  should "translate case" do
+  test "translate case" do
 
     ex_ast = quote do
       case data do
@@ -60,7 +60,7 @@ defmodule ElixirScript.Translator.Case.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "translate case with guard" do
+  test "translate case with guard" do
     ex_ast = quote do
       case data do
         number when number in [1,2,3,4] ->
@@ -84,7 +84,7 @@ defmodule ElixirScript.Translator.Case.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "translate case with multiple statements in body" do
+  test "translate case with multiple statements in body" do
     ex_ast = quote do
       case data do
         :ok ->
@@ -107,7 +107,7 @@ defmodule ElixirScript.Translator.Case.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "translate case with destructing" do
+  test "translate case with destructing" do
     ex_ast = quote do
       case data do
         { one, two } ->
@@ -130,7 +130,7 @@ defmodule ElixirScript.Translator.Case.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "translate case with nested destructing" do
+  test "translate case with nested destructing" do
     ex_ast = quote do
       case data do
         { {one, two} , three } ->

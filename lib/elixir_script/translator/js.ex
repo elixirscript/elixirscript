@@ -10,16 +10,16 @@ defmodule ElixirScript.Translator.JS do
     { do_translate({name, [], params}, env), env }
   end
 
-  defp do_translate({:new, _, [{:__aliases__, _, module_name}, params]}, env) do
+  defp do_translate({:new, _, [module_name, params]}, env) when not is_list(params) do
     Builder.new_expression(
-      Utils.make_module_expression_tree(module_name, false, env),
-      Enum.map(params, &Translator.translate!(&1, env))
+      Translator.translate!(module_name, env),
+      [Builder.rest_element(Translator.translate!(params, env))]
     )
   end
 
   defp do_translate({:new, _, [module_name, params]}, env) do
     Builder.new_expression(
-      Translator.translate(module_name, env),
+      Translator.translate!(module_name, env),
       Enum.map(params, &Translator.translate!(&1, env))
     )
   end

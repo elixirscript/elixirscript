@@ -1,8 +1,8 @@
 defmodule ElixirScript.Lib.JS.Test do
-  use ShouldI
+  use ExUnit.Case
   import ElixirScript.TestHelper
 
-  should "translate new" do
+  test "translate new" do
     ex_ast = quote do
       JS.new A.B, [1, 2, 3]
     end
@@ -24,7 +24,7 @@ defmodule ElixirScript.Lib.JS.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "translate update" do
+  test "translate update" do
     ex_ast = quote do
       JS.update A, "b", [1, 2, 3]
     end

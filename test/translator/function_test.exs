@@ -1,8 +1,8 @@
 defmodule ElixirScript.Translator.Function.Test do
-  use ShouldI
+  use ExUnit.Case
   import ElixirScript.TestHelper
 
-  should "call fun" do
+  test "call fun" do
     ex_ast = quote do
       fun.(:atom)
     end
@@ -16,7 +16,7 @@ defmodule ElixirScript.Translator.Function.Test do
   end
 
 
-  should "translate function with a macro" do
+  test "translate function with a macro" do
     ex_ast = quote do
       def test1() do
         ElixirScript.Math.squared(1)
@@ -32,7 +32,7 @@ defmodule ElixirScript.Translator.Function.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "translate functions" do
+  test "translate functions" do
     ex_ast = quote do
       def test1() do
       end
@@ -143,8 +143,8 @@ defmodule ElixirScript.Translator.Function.Test do
     const test1 = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable()], function(alpha, beta) {
         let [a, b] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.type(Elixir.Core.Tuple, {
             values: [Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable()]
-        }), Elixir.Core.SpecialForms.tuple(1, 2));
-        let _ref = Elixir.Core.SpecialForms.tuple(a, b);
+        }), new Elixir.Core.Tuple(1, 2));
+        let _ref = new Elixir.Core.Tuple(a, b);
         return _ref;
     }));
     """
@@ -152,7 +152,7 @@ defmodule ElixirScript.Translator.Function.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "translate function calls" do
+  test "translate function calls" do
     ex_ast = quote do
       test1()
     end
@@ -203,7 +203,7 @@ defmodule ElixirScript.Translator.Function.Test do
   end
 
 
-  should "translate anonymous functions" do
+  test "translate anonymous functions" do
     ex_ast = quote do
       Elixir.Enum.map(list, fn(x) -> x * 2 end)
     end
@@ -217,7 +217,7 @@ defmodule ElixirScript.Translator.Function.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "translate function arity" do
+  test "translate function arity" do
     ex_ast = quote do
       defmodule Example do
 
@@ -315,7 +315,7 @@ defmodule ElixirScript.Translator.Function.Test do
 
   end
 
-  should "test |> operator" do
+  test "test |> operator" do
     ex_ast = quote do
       1 |> Taco.test
     end
@@ -334,7 +334,7 @@ defmodule ElixirScript.Translator.Function.Test do
   end
 
 
-  should "test Elixir.Kernel function" do
+  test "test Elixir.Kernel function" do
     ex_ast = quote do
       is_atom(:atom)
     end
@@ -344,7 +344,7 @@ defmodule ElixirScript.Translator.Function.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "guards" do
+  test "guards" do
     ex_ast = quote do
       def something(one) when is_number(one) do
       end
@@ -439,7 +439,7 @@ defmodule ElixirScript.Translator.Function.Test do
 
   end
 
-  should "pattern match function with literal" do
+  test "pattern match function with literal" do
     ex_ast = quote do
       def something(1) do
       end
@@ -455,7 +455,7 @@ defmodule ElixirScript.Translator.Function.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "pattern match function with list" do
+  test "pattern match function with list" do
     ex_ast = quote do
       def something([apple | fruits]) do
       end
@@ -471,7 +471,7 @@ defmodule ElixirScript.Translator.Function.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "pattern match function with multiple items in list" do
+  test "pattern match function with multiple items in list" do
     ex_ast = quote do
       def something([apple, pear, banana]) do
       end
@@ -487,7 +487,7 @@ defmodule ElixirScript.Translator.Function.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "pattern match function with tuple" do
+  test "pattern match function with tuple" do
     ex_ast = quote do
       def something({ apple , fruits }) do
       end
@@ -505,7 +505,7 @@ defmodule ElixirScript.Translator.Function.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "pattern match function with struct" do
+  test "pattern match function with struct" do
     ex_ast = quote do
       def something(%AStruct{}) do
       end
@@ -521,7 +521,7 @@ defmodule ElixirScript.Translator.Function.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "pattern match function with struct reference" do
+  test "pattern match function with struct reference" do
     ex_ast = quote do
       def something(%AStruct{} = a) do
       end
@@ -535,7 +535,7 @@ defmodule ElixirScript.Translator.Function.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "pattern match function with map reference" do
+  test "pattern match function with map reference" do
     ex_ast = quote do
       def something(%{ which: 13 } = a) do
       end
@@ -552,7 +552,7 @@ defmodule ElixirScript.Translator.Function.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "pattern match function with struct decontructed" do
+  test "pattern match function with struct decontructed" do
     ex_ast = quote do
       def something(%AStruct{key: value, key1: 2}) do
       end
@@ -588,7 +588,7 @@ defmodule ElixirScript.Translator.Function.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "pattern match function with binary part" do
+  test "pattern match function with binary part" do
     ex_ast = quote do
       def something("Bearer " <> token) do
       end
@@ -632,7 +632,7 @@ defmodule ElixirScript.Translator.Function.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "combine pattern matched functions of same arity" do
+  test "combine pattern matched functions of same arity" do
     ex_ast = quote do
       defmodule Example do
         def something(1) do
@@ -673,7 +673,7 @@ defmodule ElixirScript.Translator.Function.Test do
 
   end
 
-  should "translate varible declaration correctly" do
+  test "translate varible declaration correctly" do
     ex_ast = quote do
       def test1(alpha, beta) do
         a = 1
@@ -729,7 +729,7 @@ defmodule ElixirScript.Translator.Function.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "translate function variables with ? or !" do
+  test "translate function variables with ? or !" do
     ex_ast = quote do
       def test1(alpha?, beta!) do
         a? = 1
@@ -748,7 +748,7 @@ defmodule ElixirScript.Translator.Function.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "translate function params with defaults" do
+  test "translate function params with defaults" do
     ex_ast = quote do
       def test1(alpha, beta \\ 0) do
       end

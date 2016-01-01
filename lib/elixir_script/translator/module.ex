@@ -78,6 +78,10 @@ defmodule ElixirScript.Translator.Module do
     Macro.expand_once(using_ast, ElixirScript.Translator.State.get().compiler_opts.env)
   end
 
+  defp expand__using__({:__block__, _, [{:__block__, _, [{:require, _, _}, {{:., _, [_, :__using__]}, _, _} = using_ast]}]}) do
+    Macro.expand_once(using_ast, ElixirScript.Translator.State.get().compiler_opts.env)
+  end
+
   def translate_body(body, env) do
     { body, env } = Translator.translate(body, env)
 

@@ -1,8 +1,8 @@
 defmodule ElixirScript.Test do
-  use ShouldI
+  use ExUnit.Case
   import ElixirScript.TestHelper
 
-  should "chain methods" do
+  test "chain methods" do
     js_code = ElixirScript.compile("""
       JQuery.("<div/>").text(html)
     """)
@@ -10,12 +10,12 @@ defmodule ElixirScript.Test do
     assert Enum.join(js_code, "\n") =~ "JQuery('<div/>').text(html)"
   end
 
-  should "turn javascript ast into javascript code strings" do
+  test "turn javascript ast into javascript code strings" do
     js_code = ElixirScript.compile(":atom")
     assert Enum.join(js_code, "\n") =~ "Symbol.for('atom')"
   end
 
-  should "parse one module correctly" do
+  test "parse one module correctly" do
     js_code = ElixirScript.compile("""
 
       defmodule Elephant do
@@ -50,7 +50,7 @@ defmodule ElixirScript.Test do
     """, hd(js_code)
   end
 
-  should "parse multiple modules correctly" do
+  test "parse multiple modules correctly" do
 
     js_code = ElixirScript.compile("""
       defmodule Animals do
@@ -93,7 +93,7 @@ defmodule ElixirScript.Test do
   end
 
 
-  should "parse macros" do
+  test "parse macros" do
 
     js_code = ElixirScript.compile("""
       defmodule Animals do
@@ -122,7 +122,7 @@ defmodule ElixirScript.Test do
   end
 
 
-  should "expand Html macros" do
+  test "expand Html macros" do
       js_code = ElixirScript.compile("""
       tree = Html.div [id: "myDiv"] do
         Html.span do
@@ -146,7 +146,7 @@ defmodule ElixirScript.Test do
   end
 
 
-  should "set standard lib path" do
+  test "set standard lib path" do
 
     js_code = ElixirScript.compile("""
       defmodule Animals do

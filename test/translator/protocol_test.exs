@@ -1,5 +1,5 @@
 defmodule ElixirScript.Translator.Protocol.Test do
-  use ShouldI
+  use ExUnit.Case
   import ElixirScript.TestHelper
 
   test "parse protocol spec with implementations" do

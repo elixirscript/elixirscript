@@ -1,8 +1,8 @@
 defmodule ElixirScript.Lib.Elixir.Kernel.Test do
-  use ShouldI
+  use ExUnit.Case
   import ElixirScript.TestHelper
 
-  should "translate range" do
+  test "translate range" do
     ex_ast = quote do
       1..4
     end

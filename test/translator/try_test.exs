@@ -1,8 +1,8 @@
 defmodule ElixirScript.Translator.Try.Test do
-  use ShouldI
+  use ExUnit.Case
   import ElixirScript.TestHelper
 
-  should "translate with a rescue with one match" do
+  test "translate with a rescue with one match" do
     ex_ast = quote do
       try do
         do_something_that_may_fail(some_arg)
@@ -23,7 +23,7 @@ defmodule ElixirScript.Translator.Try.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "translate with a rescue with a list match" do
+  test "translate with a rescue with a list match" do
     ex_ast = quote do
       try do
         do_something_that_may_fail(some_arg)
@@ -44,7 +44,7 @@ defmodule ElixirScript.Translator.Try.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "translate with a rescue with an in guard" do
+  test "translate with a rescue with an in guard" do
     ex_ast = quote do
       try do
         do_something_that_may_fail(some_arg)
@@ -67,7 +67,7 @@ defmodule ElixirScript.Translator.Try.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "translate with a rescue with an identifier" do
+  test "translate with a rescue with an identifier" do
     ex_ast = quote do
       try do
         do_something_that_may_fail(some_arg)
@@ -89,7 +89,7 @@ defmodule ElixirScript.Translator.Try.Test do
   end
 
 
-  should "translate with a rescue with multiple patterns" do
+  test "translate with a rescue with multiple patterns" do
     ex_ast = quote do
       try do
         do_something_that_may_fail(some_arg)
@@ -114,7 +114,7 @@ defmodule ElixirScript.Translator.Try.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "translate with a rescue and after clause" do
+  test "translate with a rescue and after clause" do
     ex_ast = quote do
       try do
         do_something_that_may_fail(some_arg)
@@ -139,7 +139,7 @@ defmodule ElixirScript.Translator.Try.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "translate with an after clause" do
+  test "translate with an after clause" do
     ex_ast = quote do
       try do
         do_something_that_may_fail(some_arg)
@@ -159,7 +159,7 @@ defmodule ElixirScript.Translator.Try.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "translate else" do
+  test "translate else" do
     ex_ast = quote do
       try do
         1 / x
@@ -186,7 +186,7 @@ defmodule ElixirScript.Translator.Try.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  should "translate catch" do
+  test "translate catch" do
     ex_ast = quote do
       try do
         do_something_that_may_fail(some_arg)

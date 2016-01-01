@@ -1,8 +1,8 @@
 defmodule ElixirScript.Translator.Capture.Test do
-  use ShouldI
+  use ExUnit.Case
   import ElixirScript.TestHelper
 
-  should "translate capture operator with Module, function, and arity" do
+  test "translate capture operator with Module, function, and arity" do
     ex_ast = quote do
       fun = &Elixir.Kernel.is_atom/1
     end
@@ -17,7 +17,7 @@ defmodule ElixirScript.Translator.Capture.Test do
 
   end
 
-  should "translate capture operator with function, and parameters" do
+  test "translate capture operator with function, and parameters" do
 
     ex_ast = quote do
       fun = &is_atom(&1)
@@ -34,7 +34,7 @@ defmodule ElixirScript.Translator.Capture.Test do
 
   end
 
-  should "translate capture operator with function, and arity" do
+  test "translate capture operator with function, and arity" do
 
     ex_ast = quote do
       fun = &local_function/1
@@ -50,7 +50,7 @@ defmodule ElixirScript.Translator.Capture.Test do
 
   end
 
-  should "translate capture operator with anonymous function" do
+  test "translate capture operator with anonymous function" do
 
     ex_ast = quote do
       fun = &(&1 * 2)
@@ -66,7 +66,7 @@ defmodule ElixirScript.Translator.Capture.Test do
 
   end
 
-  should "translate capture operator with anonymous function tuple" do
+  test "translate capture operator with anonymous function tuple" do
 
     ex_ast = quote do
       fun = &{&1, &2}
@@ -74,7 +74,7 @@ defmodule ElixirScript.Translator.Capture.Test do
 
     js_code = """
      let [fun] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable()],function(__1,__2)    {
-             return     Elixir.Core.SpecialForms.tuple(__1,__2);
+             return     new Elixir.Core.Tuple(__1,__2);
            })));
     """
 
@@ -86,7 +86,7 @@ defmodule ElixirScript.Translator.Capture.Test do
 
     js_code = """
      let [fun] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable()],function(__1,__2,__3)    {
-             return     Elixir.Core.SpecialForms.tuple(__1,__2,__3);
+             return     new Elixir.Core.Tuple(__1,__2,__3);
            })));
     """
 
@@ -95,7 +95,7 @@ defmodule ElixirScript.Translator.Capture.Test do
 
   end
 
-  should "translate capture operator with anonymous functions as parameters" do
+  test "translate capture operator with anonymous functions as parameters" do
 
     ex_ast = quote do
       Elixir.Enum.map(items, &process(&1))

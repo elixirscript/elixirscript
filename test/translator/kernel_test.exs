@@ -1,8 +1,8 @@
 defmodule ElixirScript.Translator.Kernel.Test do
-  use ShouldI
+  use ExUnit.Case
   import ElixirScript.TestHelper
 
-  should "max" do
+  test "max" do
     ex_ast = quote do
       max(1, 2)
     end
@@ -15,7 +15,7 @@ defmodule ElixirScript.Translator.Kernel.Test do
 
   end
 
-  should "apply/2" do
+  test "apply/2" do
     ex_ast = quote do
       apply(fun, [1, 2, 3])
     end
@@ -28,7 +28,7 @@ defmodule ElixirScript.Translator.Kernel.Test do
 
   end
 
-  should "apply/3" do
+  test "apply/3" do
     ex_ast = quote do
       apply(Enum, :reverse, [1, 2, 3])
     end
@@ -41,7 +41,7 @@ defmodule ElixirScript.Translator.Kernel.Test do
 
   end
 
-  should "hd" do
+  test "hd" do
     ex_ast = quote do
       hd([1, 2, 3])
     end
@@ -54,7 +54,7 @@ defmodule ElixirScript.Translator.Kernel.Test do
 
   end
 
-  should "tl" do
+  test "tl" do
     ex_ast = quote do
       tl([1, 2, 3])
     end

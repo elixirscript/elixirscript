@@ -1,7 +1,15 @@
 defmodule ElixirScript.Tuple do
 
   def duplicate(data, size) do
-    Elixir.Core.Functions.make_tuple(size, data)
+    JS.new(Elixir.Core.Tuple, do_duplicate(data, size, []))
+  end
+
+  defp do_duplicate(_, 0, list) do
+    list
+  end
+
+  defp do_duplicate(data, size, list) do
+    do_duplicate(data, size - 1, list ++ [data])
   end
 
   def to_list(tuple) do
@@ -9,15 +17,45 @@ defmodule ElixirScript.Tuple do
   end
 
   def insert_at(tuple, index, value) do
-    Elixir.Core.Functions.insert_at(tuple, index, value)
+    JS.new(Elixir.Core.Tuple, do_insert_at(tuple, index, value, 0, []))
+  end
+
+  defp do_insert_at(tuple, index, value, current_index, list) do
+    if current_index == length(tuple) do
+      list
+    else
+      list = case index == current_index do
+        true ->
+          list ++ [value, tuple.get(current_index)]
+        false ->
+          list ++ [tuple.get(current_index)]
+      end
+
+      do_insert_at(tuple, index, value, current_index + 1, list)
+    end
   end
 
   def delete_at(tuple, index) do
-    Elixir.Core.Functions.delete_at(tuple, index)
+    JS.new(Elixir.Core.Tuple, delete_at(tuple, index, 0, []))
+  end
+
+  defp delete_at(tuple, index, current_index, list) do
+    if current_index == length(tuple) do
+      list
+    else
+      list = case index == current_index do
+        true ->
+          list
+        false ->
+          list ++ [tuple.get(current_index)]
+      end
+
+      delete_at(tuple, index, current_index + 1, list)
+    end
   end
 
   def append(tuple, value) do
-    Elixir.Core.Functions.new_tuple.apply(nil, to_list(tuple) ++ value)
+    #JS.new(Elixir.Core.Tuple, to_list(tuple) ++ [value])
   end
 
 end
