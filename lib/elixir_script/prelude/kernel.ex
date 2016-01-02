@@ -1,6 +1,6 @@
 defmodule ElixirScript.Kernel do
   import Kernel, only: [defmodule: 2, def: 1, def: 2, defp: 2,
-  defmacro: 1, defmacro: 2, defmacrop: 2, ||: 2, !: 1, ++: 2, in: 2, &&: 2]
+  defmacro: 1, defmacro: 2, defmacrop: 2, ||: 2, !: 1, ++: 2, in: 2, &&: 2, ===: 2]
 
   defmacro if(condition, clauses) do
     build_if(condition, clauses)
@@ -60,64 +60,84 @@ defmodule ElixirScript.Kernel do
     list.slice(1)
   end
 
+  def get_type(term) do
+    Elixir.Core.Functions.get_type(term)
+  end
+
+  def is_instance_of(term, type) do
+    Elixir.Core.Functions.is_instance_of(term, type)
+  end
+
+  def global() do
+    Elixir.Core.Functions.get_global()
+  end
+
   def is_atom(term) do
-    Elixir.Core.Functions.is_atom(term)
+    get_type(term) === 'symbol'
   end
 
   def is_binary(term) do
-    Elixir.Core.Functions.is_binary(term)
+    get_type(term) === 'string'
   end
 
   def is_bitstring(term) do
-    Elixir.Core.Functions.is_bitstring(term)
+    is_binary(term) || is_instance_of(term, Elixir.Core.BitString)
   end
 
   def is_boolean(term) do
-    Elixir.Core.Functions.is_boolean(term)
+    get_type(term) === 'boolean' || is_instance_of(term, Boolean)
   end
 
   def is_float(term) do
-    Elixir.Core.Functions.is_float(term)
+    is_number(term) && !Number.isInteger(term)
   end
 
   def is_function(term) do
-    Elixir.Core.Functions.is_function(term)
+    is_function(term, 0)
   end
 
-  def is_function(term, arity) do
-    Elixir.Core.Functions.is_function(term, arity)
+  def is_function(term, _) do
+    get_type(term) === 'function' || is_instance_of(term, Function)
   end
 
   def is_integer(term) do
-    Elixir.Core.Functions.is_integer(term)
+    Number.isInteger(term)
   end
 
   def is_list(term) do
-    Elixir.Core.Functions.is_list(term)
+    Array.isArray(term)
   end
 
   def is_number(term) do
-    Elixir.Core.Functions.is_integer(term) || Elixir.Core.Functions.is_float(term)
+    get_type(term) === 'number' || is_instance_of(term, Number)
   end
 
   def is_pid(term) do
-    Elixir.Core.Functions.is_pid(term)
+    is_instance_of(term, Elixir.Core.PID)
   end
 
   def is_tuple(term) do
-    Elixir.Core.Functions.is_tuple(term)
+    is_instance_of(term, Elixir.Core.Tuple)
   end
 
   def is_map(term) do
-    Elixir.Core.Functions.is_map(term)
+    get_type(term) === 'object' || is_instance_of(term, Object)
+  end
+
+  def is_port(_) do
+    false
+  end
+
+  def is_reference(_) do
+    false
   end
 
   def length(term) do
-    Elixir.Core.Functions.size(term)
+    term.length
   end
 
   def map_size(term) do
-    Elixir.Core.Functions.size(Object.keys(term))
+    Object.keys(term).length
   end
 
   def max(first, second) do
@@ -145,7 +165,7 @@ defmodule ElixirScript.Kernel do
   end
 
   def is_nil(term) do
-    Elixir.Core.Functions.is_nil(term)
+    term === nil
   end
 
   defmacro match?(left, right) do

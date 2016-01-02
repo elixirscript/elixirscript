@@ -78,10 +78,6 @@ defmodule ElixirScript.Translator.Primitive do
     )
   end
 
-  def make_list([{:|, _, [_, _]} = ast], env) do
-    Translator.translate(ast, env)
-  end
-
   def make_list(ast, env) when is_list(ast) do
     list = Enum.map(ast, &Translator.translate!(&1, env))
 

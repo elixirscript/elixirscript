@@ -153,6 +153,8 @@ defmodule ElixirScript.Translator.Function do
         ast
       {{:., _, [{:__aliases__, _, _}]}, _, _} = ast ->
         ast
+      ast when is_list(ast) ->
+        ast
       name ->
         get_js_name(name, env)
     end
@@ -164,6 +166,18 @@ defmodule ElixirScript.Translator.Function do
 
   def make_function_call(function_name, params, env) do
     { Utils.make_call_expression(Utils.filter_name(function_name), params, env), env }
+  end
+
+  def make_function_call(module_name, function_name, params, env) when is_list(module_name) do
+    call = JS.call_expression(
+      JS.member_expression(
+        Translator.translate!(module_name, env),
+        JS.identifier(Utils.filter_name(function_name))
+      ),
+      Enum.map(params, &Translator.translate!(&1, env))
+    )
+
+    { call, env }
   end
 
   def make_function_call(module_name, function_name, params, env) do

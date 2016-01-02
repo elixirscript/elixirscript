@@ -1,6 +1,5 @@
 var Patterns = require("../lib/core/patterns");
 var Enum = require('../lib/enum');
-var Kernel = require('../lib/kernel');
 var SpecialForms = require('../lib/core').SpecialForms;
 var expect = require('chai').expect;
 

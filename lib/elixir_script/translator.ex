@@ -50,6 +50,14 @@ defmodule ElixirScript.Translator do
     translate(quoted, env)
   end
 
+  defp do_translate([ {:|, _, [left, right] } ], env) do
+    quoted = quote do
+      [unquote(left)].concat(unquote(right))
+    end
+
+    translate(quoted, env)
+  end
+
   defp do_translate(ast, env) when is_list(ast) do
     Primitive.make_list(ast, env)
   end
@@ -100,11 +108,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:++, _, [left, right]}, env) do
-    quoted = quote do
-      Elixir.Core.Functions.concat_lists(unquote(left),unquote(right))
-    end
-
-    translate(quoted, env)
+    translate({{:., [], [left, :concat]}, [], [right]}, env)
   end
 
   defp do_translate({:&, _, [number]}, env) when is_number(number) do
@@ -406,7 +410,7 @@ defmodule ElixirScript.Translator do
 
   defp do_translate({:|, _, [item, list]}, env) do
     quoted = quote do
-      Elixir.Core.prepend_to_list(unquote(list), unquote(item))
+      [unquote(item)].concat(unquote(list))
     end
 
     translate(quoted, env)

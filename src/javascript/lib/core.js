@@ -1,5 +1,5 @@
 import ProcessSystem from './core/processes/process_system';
-import { Tuple, PID, Integer, Float, List } from './core/primitives';
+import { Tuple, PID, Integer, Float } from './core/primitives';
 import BitString from './core/bit_string';
 import Patterns from './core/patterns';
 import Functions from './core/functions';
@@ -16,6 +16,5 @@ export {
   Integer,
   Float,
   Functions,
-  List,
   SpecialForms
 }

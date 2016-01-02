@@ -10,10 +10,6 @@ function bitstring(...args){
   return new BitString(...args);
 }
 
-function tuple(...args){
-  return new Tuple(...args);
-}
-
 function _case(condition, clauses){
   return Patterns.defmatch(...clauses)(condition);
 }
@@ -126,7 +122,6 @@ function _try(do_fun, rescue_function, catch_fun, else_function, after_function)
 export default {
   list,
   bitstring,
-  tuple,
   _case,
   cond,
   map,
