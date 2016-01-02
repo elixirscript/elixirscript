@@ -106,7 +106,7 @@ defmodule ElixirScript do
 
   defp build_environment(code_list) do
     code_list
-    |> ElixirScript.Preprocess.Modules.process_modules
+    |> ElixirScript.Translator.ModuleCollector.process_modules
   end
 
   defp updated_quoted(quoted) do

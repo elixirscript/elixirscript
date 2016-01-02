@@ -2,7 +2,7 @@ defmodule ElixirScript.Translator.For do
   @moduledoc false
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
-  alias ElixirScript.PatternMatching.Match
+  alias ElixirScript.Translator.PatternMatching
   alias ElixirScript.Translator.Primitive
   alias ElixirScript.Translator.Function
 
@@ -29,7 +29,7 @@ defmodule ElixirScript.Translator.For do
   defp handle_args(generators, env) do
     Enum.reduce(generators, %{collections: [], args: [], filter: nil, fun: nil, into: nil}, fn
       ({:<-, [], [identifier, enum]}, state) ->
-        { patterns, params, env } = Match.process_match([identifier], env)
+        { patterns, params, env } = PatternMatching.process_match([identifier], env)
 
         list = Primitive.make_list_no_translate([hd(patterns), Translator.translate!(enum, env)])
 

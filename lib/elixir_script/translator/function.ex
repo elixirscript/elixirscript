@@ -3,7 +3,7 @@ defmodule ElixirScript.Translator.Function do
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Utils
-  alias ElixirScript.PatternMatching.Match
+  alias ElixirScript.Translator.PatternMatching
 
   @patterns JS.member_expression(
     JS.member_expression(
@@ -96,7 +96,7 @@ defmodule ElixirScript.Translator.Function do
 
   defp process_params(params, env) do
     params = wrap_params(params)
-    { patterns, params, env } = Match.process_match(params, env)
+    { patterns, params, env } = PatternMatching.process_match(params, env)
     { patterns, make_params(params), env }
   end
 

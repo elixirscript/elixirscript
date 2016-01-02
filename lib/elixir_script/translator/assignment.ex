@@ -2,13 +2,13 @@ defmodule ElixirScript.Translator.Assignment do
   @moduledoc false
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
-  alias ElixirScript.PatternMatching.Match
+  alias ElixirScript.Translator.PatternMatching
   alias ElixirScript.Translator.Primitive
 
   def make_assignment(left, right, env) do
     { right_ast, env } = Translator.translate(right, env)
 
-    { patterns, params, env } = Match.process_match([left], env)
+    { patterns, params, env } = PatternMatching.process_match([left], env)
 
       declarator = JS.variable_declarator(
         JS.array_pattern(params),

@@ -1,4 +1,4 @@
-defmodule ElixirScript.PatternMatching.Match do
+defmodule ElixirScript.Translator.PatternMatching do
   @moduledoc false
 
   alias ESTree.Tools.Builder, as: JS

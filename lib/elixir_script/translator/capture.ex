@@ -2,7 +2,7 @@ defmodule ElixirScript.Translator.Capture do
   @moduledoc false
 
   alias ESTree.Tools.Builder, as: JS
-  alias ElixirScript.PatternMatching.Match
+  alias ElixirScript.Translator.PatternMatching
   alias ElixirScript.Translator.Function
 
   def make_capture(function_name, arity, env) do
@@ -44,7 +44,7 @@ defmodule ElixirScript.Translator.Capture do
 
   defp process_params(arity, env) do
     params = Enum.map(1..arity, fn(x) -> {String.to_atom("__#{x}"), [], ElixirScript.Translator.Capture} end)
-    Match.process_match(params, env)
+    PatternMatching.process_match(params, env)
   end
 
   defp make_capture_function(patterns, params, body) do

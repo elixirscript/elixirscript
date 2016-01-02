@@ -1,4 +1,4 @@
-defmodule ElixirScript.Preprocess.Modules do
+defmodule ElixirScript.Translator.ModuleCollector do
   @moduledoc false
 
   alias ElixirScript.Translator.State
