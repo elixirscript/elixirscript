@@ -15,13 +15,13 @@ defmodule ElixirScript.Translator.Cond.Test do
     end
 
     js_code = """
-     Elixir.Core.SpecialForms.cond(Elixir.Core.SpecialForms.list(1 + 1 == 1,function()    {
+         Elixir.Core.SpecialForms.cond(Object.freeze([1 + 1 == 1, function()    {
              return     'This will never match';
-           }),Elixir.Core.SpecialForms.list(2 * 2 != 4,function()    {
+           }]),Object.freeze([2 * 2 != 4, function()    {
              return     'Nor this';
-           }),Elixir.Core.SpecialForms.list(true,function()    {
+           }]),Object.freeze([true, function()    {
              return     'This will';
-           }))
+           }]))
     """
 
     assert_translation(ex_ast, js_code)
@@ -41,16 +41,16 @@ defmodule ElixirScript.Translator.Cond.Test do
     end
 
     js_code = """
-     Elixir.Core.SpecialForms.cond(Elixir.Core.SpecialForms.list(1 + 1 == 1,function()    {
+         Elixir.Core.SpecialForms.cond(Object.freeze([1 + 1 == 1, function()    {
              let [a] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),1);
              return     'This will never match';
-           }),Elixir.Core.SpecialForms.list(2 * 2 != 4,function()    {
+           }]),Object.freeze([2 * 2 != 4, function()    {
              let [a] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),2);
              return     'Nor this';
-           }),Elixir.Core.SpecialForms.list(true,function()    {
+           }]),Object.freeze([true, function()    {
              let [a] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),3);
              return     'This will';
-           }))
+           }]))
     """
 
     assert_translation(ex_ast, js_code)

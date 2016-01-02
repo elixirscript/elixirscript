@@ -32,7 +32,7 @@ defmodule ElixirScript.Translator.Protocol.Test do
            }))
        });
          Elixir.Core.Functions.defimpl(Elixir$Blank, Array,{
-             blank__qmark__: Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.SpecialForms.list()],function()    {
+             blank__qmark__: Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Object.freeze([])],function()    {
              return     true;
            }),Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.wildcard()],function()    {
              return     false;

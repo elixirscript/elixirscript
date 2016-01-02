@@ -21,7 +21,7 @@ defmodule ElixirScript.Translator.Kernel.Test do
     end
 
     js_code = """
-    Elixir$ElixirScript$Kernel.apply(fun, Elixir.Core.SpecialForms.list(1,2,3))
+    Elixir$ElixirScript$Kernel.apply(fun, Object.freeze([1, 2, 3]))
     """
 
     assert_translation(ex_ast, js_code)
@@ -34,7 +34,7 @@ defmodule ElixirScript.Translator.Kernel.Test do
     end
 
     js_code = """
-    Elixir$ElixirScript$Kernel.apply(Enum,Symbol.for('reverse'),Elixir.Core.SpecialForms.list(1,2,3))
+    Elixir$ElixirScript$Kernel.apply(Enum,Symbol.for('reverse'),Object.freeze([1, 2, 3]))
     """
 
     assert_translation(ex_ast, js_code)
@@ -47,7 +47,7 @@ defmodule ElixirScript.Translator.Kernel.Test do
     end
 
     js_code = """
-    Elixir$ElixirScript$Kernel.hd(Elixir.Core.SpecialForms.list(1,2,3))
+    Elixir$ElixirScript$Kernel.hd(Object.freeze([1, 2, 3]))
     """
 
     assert_translation(ex_ast, js_code)
@@ -60,7 +60,7 @@ defmodule ElixirScript.Translator.Kernel.Test do
     end
 
     js_code = """
-    Elixir$ElixirScript$Kernel.tl(Elixir.Core.SpecialForms.list(1,2,3))
+    Elixir$ElixirScript$Kernel.tl(Object.freeze([1, 2, 3]))
     """
 
     assert_translation(ex_ast, js_code)

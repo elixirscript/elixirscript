@@ -135,14 +135,14 @@ let Enum = {
   },
 
   map_reduce: function(collection, acc, fun){
-    let mapped = Core.List();
+    let mapped = Object.freeze([]);
     let the_acc = acc;
 
     for (var i = 0; i < this.count(collection); i++) {
       let tuple = fun(collection[i], the_acc);
 
       the_acc = tuple.get(1);
-      mapped = Core.List(...mapped.concat([tuple.get(0)]));
+      mapped = Object.freeze(mapped.concat([tuple.get(0)]));
     }
 
     return new Core.Tuple(mapped, the_acc);
@@ -178,7 +178,7 @@ let Enum = {
       }
     }
 
-    return Core.List(...result);
+    return Object.freeze(result);
   },
 
   take_while: function(collection, fun){

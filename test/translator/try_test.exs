@@ -55,13 +55,13 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-    Elixir.Core.SpecialForms._try(function() {
-        return do_something_that_may_fail(some_arg);
-    }, Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()], function(x) {
-        return IO.puts('Invalid argument given');
-    }, function(x) {
-        return Elixir.Core.Functions.contains(x,Elixir.Core.SpecialForms.list(ArgumentError.create(Elixir.Core.SpecialForms.map({}))));
-    })), null, null, null)
+         Elixir.Core.SpecialForms._try(function()    {
+             return     do_something_that_may_fail(some_arg);
+           },Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(x)    {
+             return     IO.puts('Invalid argument given');
+           },function(x)    {
+             return     Elixir.Core.Functions.contains(x,Object.freeze([ArgumentError.create(Object.freeze({}))]));
+           })),null,null,null)
     """
 
     assert_translation(ex_ast, js_code)

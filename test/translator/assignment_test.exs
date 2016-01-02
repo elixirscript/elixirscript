@@ -61,8 +61,8 @@ defmodule ElixirScript.Translator.Assignment.Test do
   test "translate list assignment" do
     ex_ast = quote do: [a, b] = [1, 2]
     js_code = """
-        let [a, b] = Elixir.Core.Patterns.match(Elixir.Core.SpecialForms.list(Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable()), Elixir.Core.SpecialForms.list(1, 2));
-        let _ref = Elixir.Core.SpecialForms.list(a, b);
+         let [a,b] = Elixir.Core.Patterns.match(Object.freeze([Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable()]),Object.freeze([1, 2]));
+         let _ref = Object.freeze([a, b]);
     """
 
     assert_translation(ex_ast, js_code)
@@ -71,8 +71,8 @@ defmodule ElixirScript.Translator.Assignment.Test do
   test "translate head/tail assignment" do
     ex_ast = quote do: [a | b] = [1, 2, 3, 4]
     js_code = """
-         let [a,b] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.headTail(),Elixir.Core.SpecialForms.list(1,2,3,4));
-         let _ref = Elixir.Core.SpecialForms.list(a,b);
+         let [a,b] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.headTail(),Object.freeze([1, 2, 3, 4]));
+         let _ref = Object.freeze([a, b]);
     """
 
     assert_translation(ex_ast, js_code)

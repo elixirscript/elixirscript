@@ -7,8 +7,8 @@ defmodule ElixirScript.Translator.Map do
   def make_map(object_expression) do
     JS.call_expression(
       JS.member_expression(
-        Primitive.special_forms(),
-        JS.identifier("map")
+        JS.identifier(:Object),
+        JS.identifier(:freeze)
       ),
       [object_expression]
     )
@@ -57,22 +57,17 @@ defmodule ElixirScript.Translator.Map do
 
   def make_map_update(map, data, env) do
     map = Translator.translate!(map, env)
+    data = Translator.translate!({:%{}, [], data}, env)
 
-    map_update = JS.object_expression(
-      Enum.map(data,
-        fn({key, value}) ->
-          make_property(Translator.translate!(key, env), Translator.translate!(value, env))
-        end
-      )
-    )
-
-    JS.call_expression(
+    js_ast = JS.call_expression(
       JS.member_expression(
         Primitive.special_forms(),
         JS.identifier("map_update")
       ),
-      [map, map_update]
+      [map, data]
     )
+
+    { js_ast, env }
   end
 
 end

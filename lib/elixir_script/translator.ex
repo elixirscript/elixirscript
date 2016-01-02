@@ -150,7 +150,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:%{}, _, [{:|, _, [map, data]}]}, env) do
-    { Map.make_map_update(map, data, env), env }
+    Map.make_map_update(map, data, env)
   end
 
   defp do_translate({:%{}, _, properties}, env) do

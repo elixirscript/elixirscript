@@ -59,7 +59,7 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-    let [user] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(), Elixir$User.Elixir$User.create(Elixir.Core.SpecialForms.map({})));
+    let [user] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(), Elixir$User.Elixir$User.create(Object.freeze({})));
 
     import * as Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
     const Elixir$User = Elixir.Core.Functions.defstruct({
@@ -84,7 +84,7 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-    let [user] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),Elixir$User.Elixir$User.create(Elixir.Core.SpecialForms.map({
+    let [user] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),Elixir$User.Elixir$User.create(Object.freeze({
         [Symbol.for('name')]: 'John'
   })));
 
@@ -108,9 +108,9 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-     let [user] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),Elixir.Core.SpecialForms.map_update(map,{
+         let [user] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),Elixir.Core.SpecialForms.map_update(map,Object.freeze({
              [Symbol.for('key')]: value
-       }));
+       })));
     """
 
     assert_translation(ex_ast, js_code)
@@ -183,7 +183,7 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-    throw Elixir$MyAppError.Elixir$MyAppError.create(Elixir.Core.SpecialForms.map({
+    throw Elixir$MyAppError.Elixir$MyAppError.create(Object.freeze({
         [Symbol.for('message')]: 'did not get what was expected'
     }));
 

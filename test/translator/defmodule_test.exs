@@ -74,7 +74,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     }));
 
     const something = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
-      return     Elixir$Animals$Elephant.Elixir$Animals$Elephant.create(Elixir.Core.SpecialForms.map({}));
+      return     Elixir$Animals$Elephant.Elixir$Animals$Elephant.create(Object.freeze({}));
     }));
 
     export {
@@ -125,7 +125,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
         return     null;
       }));
     const something = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
-        return     Elixir$Animals$Elephant.Elixir$Animals$Elephant.create(Elixir.Core.SpecialForms.map({}));
+        return     Elixir$Animals$Elephant.Elixir$Animals$Elephant.create(Object.freeze({}));
       }));
 
     export {

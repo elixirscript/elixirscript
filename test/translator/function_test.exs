@@ -85,11 +85,11 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-     const test1 = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable()],function(alpha,beta)    {
+         const test1 = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable()],function(alpha,beta)    {
              return     Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(x)    {
              return     2;
            },function(x)    {
-             return     Elixir.Enum.member__qmark__(Elixir.Core.SpecialForms.list(false,null), x);
+             return     Elixir.Enum.member__qmark__(Object.freeze([false, null]),x);
            }),Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.wildcard()],function()    {
              return     1;
            })).call(this,1 == 1);
@@ -113,22 +113,22 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-    const test1 = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable()],function(alpha,beta)    {
-        return     Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(x)    {
-        return     2;
-      },function(x)    {
-        return     Elixir.Enum.member__qmark__(Elixir.Core.SpecialForms.list(false,null),x);
-      }),Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.wildcard()],function()    {
-        return     Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(x)    {
-        let [a] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(), 1);
-        return     a;
-      },function(x)    {
-        return     Elixir.Enum.member__qmark__(Elixir.Core.SpecialForms.list(false,null),x);
-      }),Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.wildcard()],function()    {
-        return     4;
-      })).call(this,2 == 2);
-      })).call(this,1 == 1);
-      }));
+   const test1 = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable()],function(alpha,beta)    {
+       return     Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(x)    {
+       return     2;
+     },function(x)    {
+       return     Elixir.Enum.member__qmark__(Object.freeze([false, null]),x);
+     }),Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.wildcard()],function()    {
+       return     Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(x)    {
+       let [a] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),1);
+       return     a;
+     },function(x)    {
+       return     Elixir.Enum.member__qmark__(Object.freeze([false, null]),x);
+     }),Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.wildcard()],function()    {
+       return     4;
+     })).call(this,2 == 2);
+     })).call(this,1 == 1);
+     }));
     """
 
     assert_translation(ex_ast, js_code)
@@ -404,7 +404,7 @@ defmodule ElixirScript.Translator.Function.Test do
     const something = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable()],function(one,two)    {
       return null;
     },function(one,two)    {
-      return Elixir.Core.Functions.contains(one,Elixir.Core.SpecialForms.list(1,2,3));
+      return Elixir.Core.Functions.contains(one,Object.freeze([1, 2, 3]));
     }));
     """
 
@@ -425,7 +425,7 @@ defmodule ElixirScript.Translator.Function.Test do
          const something = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(one)    {
              return     null;
            },function(one)    {
-             return     Elixir.Core.Functions.contains(one,Elixir.Core.SpecialForms.list(1,2,3));
+             return     Elixir.Core.Functions.contains(one,Object.freeze([1, 2, 3]));
            }),Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(one)    {
              return     null;
            },function(one)    {
@@ -479,9 +479,9 @@ defmodule ElixirScript.Translator.Function.Test do
 
 
     js_code = """
-     const something = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.SpecialForms.list(Elixir.Core.Patterns.variable(),Elixir.Core.Patterns.variable(),Elixir.Core.Patterns.variable())],function(apple,pear,banana)    {
-             return     null;
-           }));
+    const something = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Object.freeze([Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable()])],function(apple,pear,banana)    {
+       return     null;
+     }));
     """
 
     assert_translation(ex_ast, js_code)
@@ -719,11 +719,11 @@ defmodule ElixirScript.Translator.Function.Test do
 
     js_code = """
      const test1 = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable()],function(alpha,beta)    {
-             let [a] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),1);
-             let [a1,b,c] = Elixir.Core.Patterns.match(Elixir.Core.SpecialForms.list(Elixir.Core.Patterns.variable(),Elixir.Core.Patterns.variable(),Elixir.Core.Patterns.variable()),Elixir.Core.SpecialForms.list(a,2,3));
-             let _ref = Elixir.Core.SpecialForms.list(a1,b,c);
-             return     _ref;
-           }));
+         let [a] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),1);
+         let [a1,b,c] = Elixir.Core.Patterns.match(Object.freeze([Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable()]),Object.freeze([a, 2, 3]));
+         let _ref = Object.freeze([a1, b, c]);
+         return     _ref;
+       }));
     """
 
     assert_translation(ex_ast, js_code)

@@ -8,7 +8,7 @@ defmodule ElixirScript.Lib.Elixir.Kernel.Test do
     end
 
     js_code = """
-    Elixir$ElixirScript$Range.Elixir$ElixirScript$Range.create(Elixir.Core.SpecialForms.map({
+    Elixir$ElixirScript$Range.Elixir$ElixirScript$Range.create(Object.freeze({
       [Symbol.for('first')]: 1,
       [Symbol.for('last')]: 4
     }))

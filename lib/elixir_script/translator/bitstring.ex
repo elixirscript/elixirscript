@@ -6,13 +6,16 @@ defmodule ElixirScript.Translator.Bitstring do
 
 
   def make_bitstring(elements, env) do
-    js_ast = JS.call_expression(
-      JS.member_expression(
-        Primitive.special_forms(),
-        JS.identifier("bitstring")
-      ),
-      Enum.map(elements, &make_bitstring_element(&1, env))
-    )
+    js_ast = JS.new_expression(
+        JS.member_expression(
+          JS.member_expression(
+            JS.identifier("Elixir"),
+            JS.identifier("Core")
+          ),
+          JS.identifier("BitString")
+        ),
+        Enum.map(elements, &make_bitstring_element(&1, env))
+      )
 
     { js_ast, env }
   end

@@ -48,10 +48,7 @@ defmodule ElixirScript.Translator.Assignment do
 
     ref_declarator = JS.variable_declarator(
       ref,
-      JS.call_expression(
-        Primitive.list_ast(),
-        params
-      )
+      Primitive.do_make_list(params)
     )
 
     make_variable_declaration_and_group(ref_declarator, array_pattern)

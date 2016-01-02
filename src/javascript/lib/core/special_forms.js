@@ -2,14 +2,6 @@ import BitString from './bit_string';
 import Patterns from './patterns';
 import { Tuple } from './primitives';
 
-function list(...args){
-  return Object.freeze(args);
-}
-
-function bitstring(...args){
-  return new BitString(...args);
-}
-
 function _case(condition, clauses){
   return Patterns.defmatch(...clauses)(condition);
 }
@@ -22,10 +14,6 @@ function cond(clauses){
   }
 
   throw new Error();
-}
-
-function map(obj){
-  return Object.freeze(obj);
 }
 
 function map_update(map, values){
@@ -120,11 +108,8 @@ function _try(do_fun, rescue_function, catch_fun, else_function, after_function)
 }
 
 export default {
-  list,
-  bitstring,
   _case,
   cond,
-  map,
   map_update,
   _for,
   _try
