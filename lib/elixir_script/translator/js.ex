@@ -3,7 +3,6 @@ defmodule ElixirScript.Translator.JS do
 
   alias ESTree.Tools.Builder
   alias ElixirScript.Translator
-  alias ElixirScript.Translator.Utils
 
   @doc false
   def translate_js_function(name, params, env) do
