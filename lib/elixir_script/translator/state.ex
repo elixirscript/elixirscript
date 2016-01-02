@@ -29,6 +29,9 @@ defmodule ElixirScript.Translator.State do
     |> Map.put(Bitwise, ElixirScript.Bitwise)
     |> Map.put(MapSet, ElixirScript.MapSet)
     |> Map.put(List, ElixirScript.List)
+    |> Map.put(JS, ElixirScript.JS)
+    |> Map.put(VDom, ElixirScript.VDom)
+    |> Map.put(Html, ElixirScript.Html)
   end
 
   def add_module(module) do
