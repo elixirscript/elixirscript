@@ -4,6 +4,7 @@
   * `alias`, `require`, and `import` now work inside lexical scopes
   * `__ENV__` and `__CALLER__` are now supported
   * Began writing some of the standard libraries in Elixir instead of JavaScript
+  * Added `JS.import/1`
 
 * Breaking
   * `compile`, `compile_path`, and `compile_quoted` opts parameter now expects a map
