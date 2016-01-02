@@ -49,12 +49,28 @@ defmodule ElixirScript.Translator.JS do
 
   defp do_translate({:import, _, [module_name, from]}, env) do
 
-    import_specifier = Builder.import_specifier(
-      Builder.identifier("default"),
-      Translator.translate!(module_name, env)
+    translated = Translator.translate!(module_name, env)
+
+    import_specifier = Builder.import_default_specifier(
+      translated,
+      translated
     )
 
     build_import_declaration([import_specifier], from)
+  end
+
+  defp do_translate({:import, _, [module_name]}, env) do
+
+    translated = Translator.translate!(module_name, env)
+
+    import_specifier = Builder.import_default_specifier(
+      translated,
+      translated
+    )
+
+    {from, _ } = Code.eval_quoted(module_name)
+
+    build_import_declaration([import_specifier], Macro.underscore(from))
   end
 
   defp build_import_declaration(import_specifiers, from) do

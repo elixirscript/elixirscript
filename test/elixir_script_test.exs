@@ -10,6 +10,14 @@ defmodule ElixirScript.Test do
     assert Enum.join(js_code, "\n") =~ "JQuery('<div/>').text(html)"
   end
 
+  test "JS.import/1" do
+    js_code = ElixirScript.compile("""
+      JS.import React
+    """)
+
+    assert Enum.join(js_code, "\n") =~ "import React from 'react'"
+  end
+
   test "turn javascript ast into javascript code strings" do
     js_code = ElixirScript.compile(":atom")
     assert Enum.join(js_code, "\n") =~ "Symbol.for('atom')"

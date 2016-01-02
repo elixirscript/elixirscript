@@ -31,11 +31,24 @@ defmodule ElixirScript.JS do
   otherwise it is not.
 
   ex:
-    JS.import A, "a" #translates to "import {default as A} from 'a'"
+    JS.import A, "a" #translates to "import A from 'a'"
 
     JS.import [A, B, C], "a" #translates to "import {A, B, C} from 'a'"
   """
   defmacro import(module, from) do
+  end
+
+
+  @doc """
+  Imports a JavaScript module.
+
+  Works like import/2, but tries to infer the path to the module.
+  Only works for default imports. Uses `Macro.underscore` to infer path.
+
+  ex:
+    JS.import React #translates to "import React from 'react'"
+  """
+  defmacro import(module) do
   end
 
 end
