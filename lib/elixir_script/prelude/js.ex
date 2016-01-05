@@ -1,4 +1,10 @@
 defmodule ElixirScript.JS do
+  @moduledoc """
+  This module defines macros and functions which implement
+  JavaScript functionality that may not translate easily to
+  Elixir. For instance, creating a new object, or updating
+  an existing one.
+  """
 
   @doc """
   Creates new JavaScript objects.
@@ -63,7 +69,17 @@ defmodule ElixirScript.JS do
   end
 
 
-  defmacro type_of(type) do
+  @doc """
+  Returns the type of the given value
+  """
+  defmacro typeof(value) do
+  end
+
+
+  @doc """
+  Determines if value is an instance of type.
+  """
+  defmacro instanceof(value, type) do
   end
 
 

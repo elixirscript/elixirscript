@@ -23,14 +23,6 @@ function call_property(item, property){
   throw new Error(`Property ${property} not found in ${item}`);
 }
 
-function get_type(x){
-  return typeof x;
-}
-
-function is_instance_of(x, type){
-  return x instanceof type;
-}
-
 function apply(...args){
   if(args.length === 2){
     args[0].apply(null, args.slice(1));
