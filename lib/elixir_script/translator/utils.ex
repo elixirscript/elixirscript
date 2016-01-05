@@ -3,6 +3,40 @@ defmodule ElixirScript.Translator.Utils do
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
 
+  @js_reserved_words [
+    :break,
+    :case,
+    :class,
+    :catch,
+    :const,
+    :continue,
+    :debugger,
+    :default,
+    :delete,
+    :do,
+    :else,
+    :export,
+    :extends,
+    :finally,
+    :function,
+    :if,
+    :import,
+    :in,
+    :instanceof,
+    :new,
+    :return,
+    :super,
+    :switch,
+    :throw,
+    :try,
+    :typeof,
+    :var,
+    :void,
+    :while,
+    :with,
+    :yield
+  ]
+
   def inflate_groups(body) do
     Enum.map(body, fn(x) ->
       case x do
@@ -107,8 +141,8 @@ defmodule ElixirScript.Translator.Utils do
     end
   end
 
-  def filter_name(:new) do
-    "__new__"
+  def filter_name(reserved_word) when reserved_word in @js_reserved_words do
+    "__#{Atom.to_string(reserved_word)}__"
   end
 
   def filter_name(name) do
