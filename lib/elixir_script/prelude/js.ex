@@ -51,4 +51,20 @@ defmodule ElixirScript.JS do
   defmacro import(module) do
   end
 
+
+  @doc """
+  Returns a reference to the global object.
+
+  In browsers this would be Window or WindowProxy.
+  In node this would be the global object.
+  """
+  def global() do
+    Elixir.Core.Functions.get_global()
+  end
+
+
+  defmacro type_of(type) do
+  end
+
+
 end

@@ -9,6 +9,24 @@ defmodule ElixirScript.Translator.JS do
     { do_translate({name, [], params}, env), env }
   end
 
+  defp do_translate({:typeof, _, [param]}, env) do
+    Builder.unary_expression(
+      :typeof,
+      true,
+      Translator.translate!(param, env)
+    )
+  end
+
+
+  defp do_translate({:instanceof, _, [value, type]}, env) do
+    Builder.binary_expression(
+      :instanceof,
+      Translator.translate!(value, env),
+      Translator.translate!(type, env)
+    )
+  end
+
+
   defp do_translate({:new, _, [module_name, params]}, env) when not is_list(params) do
     Builder.new_expression(
       Translator.translate!(module_name, env),

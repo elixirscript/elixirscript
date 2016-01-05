@@ -218,10 +218,13 @@ defmodule ElixirScript.Translator do
     end
   end
 
+  defp do_translate({{:., context1, [{:__aliases__, context2, [:Enum]}, function_name]}, context3, params }, env) do
+    translate({{:., context1, [{:__aliases__, context2, [:Elixir, :Enum]}, function_name]}, context3, params }, env)
+  end
+
   defp do_translate({{:., _, [{:__aliases__, _, [:JS]}, function_name]}, _, params }, env) do
     JSLib.translate_js_function(function_name, params, env)
   end
-
 
   defp do_translate({{:., _, [module_name, function_name]}, _, params } = ast, env) do
     expanded_ast = Macro.expand(ast, ElixirScript.Translator.State.get().compiler_opts.env)

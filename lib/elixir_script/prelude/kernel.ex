@@ -60,32 +60,20 @@ defmodule ElixirScript.Kernel do
     list.slice(1)
   end
 
-  def get_type(term) do
-    Elixir.Core.Functions.get_type(term)
-  end
-
-  def is_instance_of(term, type) do
-    Elixir.Core.Functions.is_instance_of(term, type)
-  end
-
-  def global() do
-    Elixir.Core.Functions.get_global()
-  end
-
   def is_atom(term) do
-    get_type(term) === 'symbol'
+    JS.typeof(term) === "symbol"
   end
 
   def is_binary(term) do
-    get_type(term) === 'string'
+    JS.typeof(term) === "string"
   end
 
   def is_bitstring(term) do
-    is_binary(term) || is_instance_of(term, Elixir.Core.BitString)
+    is_binary(term) || JS.instanceof(term, Elixir.Core.BitString)
   end
 
   def is_boolean(term) do
-    get_type(term) === 'boolean' || is_instance_of(term, Boolean)
+    JS.typeof(term) === "boolean" || JS.instanceof(term, Boolean)
   end
 
   def is_float(term) do
@@ -97,7 +85,7 @@ defmodule ElixirScript.Kernel do
   end
 
   def is_function(term, _) do
-    get_type(term) === 'function' || is_instance_of(term, Function)
+    JS.typeof(term) === "function" || JS.instanceof(term, Function)
   end
 
   def is_integer(term) do
@@ -109,19 +97,19 @@ defmodule ElixirScript.Kernel do
   end
 
   def is_number(term) do
-    get_type(term) === 'number' || is_instance_of(term, Number)
+    JS.typeof(term) === "number" || JS.instanceof(term, Number)
   end
 
   def is_pid(term) do
-    is_instance_of(term, Elixir.Core.PID)
+    JS.instanceof(term, Elixir.Core.PID)
   end
 
   def is_tuple(term) do
-    is_instance_of(term, Elixir.Core.Tuple)
+    JS.instanceof(term, Elixir.Core.Tuple)
   end
 
   def is_map(term) do
-    get_type(term) === 'object' || is_instance_of(term, Object)
+    JS.typeof(term) === "object" || JS.instanceof(term, Object)
   end
 
   def is_port(_) do

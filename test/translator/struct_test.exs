@@ -121,9 +121,9 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-     let [user] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),Elixir.Core.SpecialForms.map_update(map,{
-             [Symbol.for('key')]: value,     [Symbol.for('key1')]: value1
-       }));
+    let [user] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),Elixir.Core.SpecialForms.map_update(map,Object.freeze({
+      [Symbol.for('key')]: value,     [Symbol.for('key1')]: value1
+    })));
     """
 
     assert_translation(ex_ast, js_code)
