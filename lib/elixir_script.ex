@@ -2,6 +2,7 @@ defmodule ElixirScript do
   alias ESTree.Tools.Builder
   alias ESTree.Tools.Generator
   alias ElixirScript.Translator.Utils
+  alias ElixirScript.Translator.ModuleCollector
 
   @moduledoc """
   Translates Elixir into JavaScript.
@@ -39,6 +40,8 @@ defmodule ElixirScript do
     |> Code.string_to_quoted!
   end)
 
+  @js_core_path "/Elixir.js"
+
   @doc """
   Compiles the given Elixir code string
   """
@@ -61,7 +64,8 @@ defmodule ElixirScript do
     libs = @libs
     |> updated_quoted
 
-    build_environment(libs ++ [updated_quoted(quoted)])
+    ModuleCollector.process_modules(libs ++ [updated_quoted(quoted)])
+
     create_code(compiler_opts)
   end
 
@@ -81,7 +85,8 @@ defmodule ElixirScript do
     |> Path.wildcard
     |> Enum.map(&file_to_quoted/1)
 
-    build_environment(libs ++ code)
+
+    ModuleCollector.process_modules(libs ++ code)
 
     create_code(compiler_opts)
   end
@@ -102,11 +107,6 @@ defmodule ElixirScript do
     |> File.read!
     |> Code.string_to_quoted!
     |> updated_quoted
-  end
-
-  defp build_environment(code_list) do
-    code_list
-    |> ElixirScript.Translator.ModuleCollector.process_modules
   end
 
   defp updated_quoted(quoted) do
@@ -168,14 +168,14 @@ defmodule ElixirScript do
   to the specified location
   """
   def copy_standard_libs_to_destination(destination) do
-    File.cp!(operating_path <> "/Elixir.js", destination <> "/Elixir.js")
+    File.cp!(operating_path <> @js_core_path, destination <> @js_core_path)
   end
 
   @doc """
   Returns the standard lib js code
   """
   def standard_libs() do
-    File.read!(operating_path <> "/Elixir.js")
+    File.read!(operating_path <> @js_core_path)
   end
 
   defp convert_to_code(js_ast) do
@@ -186,20 +186,16 @@ defmodule ElixirScript do
   defp process_module(module) do
     file_path = Utils.name_to_js_file_name(module.name) <> ".js"
 
-    { file_path, ESTree.Tools.Builder.program(module.body) }
+    { file_path, Builder.program(module.body) }
   end
 
   @doc false
   def javascript_ast_to_code({path, js_ast}) do
-    js_code = javascript_ast_to_code(js_ast)
-    {path, js_code}
-  end
-
-  @doc false
-  def javascript_ast_to_code(js_ast) do
-    js_ast
+    js_code = js_ast
     |> prepare_js_ast
     |> Generator.generate
+
+    {path, js_code}
   end
 
   defp prepare_js_ast(js_ast) do

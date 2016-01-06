@@ -304,6 +304,18 @@ defmodule ElixirScript.Translator do
     { Quote.make_quote(opts, expr, env), env }
   end
 
+  defp do_translate({:import, _, [{{:., _, [{:__aliases__, _, head_import_name}, :{}]}, _, tail_imports }]}, env) do
+    env = Enum.reduce(tail_imports, env, fn({:__aliases__, context, name}, acc) ->
+      full_module_name = { :__aliases__, context, head_import_name ++ name }
+
+      module_name = Utils.quoted_to_name(full_module_name)
+      ElixirScript.Translator.Env.add_import(acc, module_name)
+    end)
+
+    { %ElixirScript.Translator.Group{}, env }
+  end
+
+
   defp do_translate({:import, _, [{:__aliases__, _, _} = module_name]}, env) do
     env = ElixirScript.Translator.Env.add_import(env, module_name)
     { %ElixirScript.Translator.Group{}, env }
@@ -313,6 +325,19 @@ defmodule ElixirScript.Translator do
     module_name = Utils.quoted_to_name(module_name)
 
     env = ElixirScript.Translator.Env.add_import(env, module_name, options)
+
+    { %ElixirScript.Translator.Group{}, env }
+  end
+
+  defp do_translate({:alias, _, [{{:., _, [{:__aliases__, _, head_alias_name}, :{}]}, _, tail_aliases }]}, env) do
+    env = Enum.reduce(tail_aliases, env, fn({:__aliases__, context, name}, acc) ->
+      full_module_name = { :__aliases__, context, head_alias_name ++ name }
+
+      module_name = Utils.quoted_to_name(full_module_name)
+      alias_name = Utils.quoted_to_name({:__aliases__, [], [List.last(name)] })
+
+      ElixirScript.Translator.Env.add_alias(acc, module_name, alias_name)
+    end)
 
     { %ElixirScript.Translator.Group{}, env }
   end
@@ -333,6 +358,17 @@ defmodule ElixirScript.Translator do
     alias_name = Utils.quoted_to_name(alias_name)
 
     env = ElixirScript.Translator.Env.add_alias(env, module_name, alias_name)
+    { %ElixirScript.Translator.Group{}, env }
+  end
+
+  defp do_translate({:require, _, [{{:., _, [{:__aliases__, _, head_require_name}, :{}]}, _, tail_requires }]}, env) do
+    env = Enum.reduce(tail_requires, env, fn({:__aliases__, context, name}, acc) ->
+      full_module_name = { :__aliases__, context, head_require_name ++ name }
+
+      module_name = Utils.quoted_to_name(full_module_name)
+      ElixirScript.Translator.Env.add_require(acc, module_name)
+    end)
+
     { %ElixirScript.Translator.Group{}, env }
   end
 
