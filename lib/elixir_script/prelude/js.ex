@@ -57,6 +57,18 @@ defmodule ElixirScript.JS do
   defmacro import(module) do
   end
 
+  @doc """
+  Returns the type of the given value
+  """
+  defmacro typeof(value) do
+  end
+
+  @doc """
+  Determines if value is an instance of type.
+  """
+  defmacro instanceof(value, type) do
+  end
+
 
   @doc """
   Returns a reference to the global object.
@@ -67,20 +79,5 @@ defmodule ElixirScript.JS do
   def global() do
     Elixir.Core.Functions.get_global()
   end
-
-
-  @doc """
-  Returns the type of the given value
-  """
-  defmacro typeof(value) do
-  end
-
-
-  @doc """
-  Determines if value is an instance of type.
-  """
-  defmacro instanceof(value, type) do
-  end
-
 
 end

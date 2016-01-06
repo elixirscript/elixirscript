@@ -3,24 +3,21 @@ import BitString from './bit_string';
 import Patterns from './patterns';
 
 function call_property(item, property){
-  if(property in item){
-    item[property];
-    if(item[property] instanceof Function){
-      return item[property]();
-    }else{
-      return item[property];
-    }
+  let prop = null;
 
+  if(property in item){
+    prop = property
   }else if(Symbol.for(property) in item){
-    let prop = Symbol.for(property)
-    if(item[prop] instanceof Function){
-      return item[prop]();
-    }else{
-      return item[prop];
-    }
+    prop = Symbol.for(property);
+  }else{
+    throw new Error(`Property ${property} not found in ${item}`);
   }
 
-  throw new Error(`Property ${property} not found in ${item}`);
+  if(item[prop] instanceof Function){
+    return item[prop]();
+  }else{
+    return item[prop];
+  }
 }
 
 function apply(...args){
