@@ -1,4 +1,4 @@
-import { PID, Tuple, Integer, Float } from './primitives';
+import { Tuple } from './primitives';
 import BitString from './bit_string';
 import Patterns from './patterns';
 

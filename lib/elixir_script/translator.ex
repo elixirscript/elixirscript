@@ -1,6 +1,6 @@
 defmodule ElixirScript.Translator do
   @moduledoc """
-  Translates the given Elixir AST into JavaScript AST
+  Translates Elixir AST into JavaScript AST
   """
   alias ElixirScript.Translator.Primitive
   alias ElixirScript.Translator.Expression
@@ -25,12 +25,20 @@ defmodule ElixirScript.Translator do
 
 
   @doc """
-  Translates Elixir AST to JavaScript AST
+  Translates the given Elixir AST to JavaScript AST. The given `env` is a `ElixirScript.Macro.Env`
+  used to track the variables, imports, aliases, and scopes like `Macro.Env`. The JavaScript AST and
+  the an updated `ElixirScript.Macro.Env` is returned
   """
+  @spec translate(term, ElixirScript.Macro.Env.t) :: { ESTree.Node.t,  ElixirScript.Macro.Env.t }
   def translate(ast, env) do
     do_translate(ast, env)
   end
 
+
+  @doc """
+  Same as `translate/2`, but returns only the JavaScript AST
+  """
+  @spec translate!(term, ElixirScript.Macro.Env.t) :: ESTree.Node.t
   def translate!(ast, env) do
     { js_ast, _ } = translate(ast, env)
     js_ast

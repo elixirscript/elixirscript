@@ -1,5 +1,4 @@
 var BitString = require('../lib/core').BitString;
-var SpecialForms = require('../lib/core').SpecialForms;
 var Patterns = require('../lib/core').Patterns;
 var expect = require('chai').expect;
 
@@ -11,19 +10,19 @@ describe('BitString', function(){
 
   describe('creation', function(){
     it('create properly', function(){
-      let bs = SpecialForms.bitstring(BitString.integer(1));
+      let bs = new BitString(BitString.integer(1));
       expect(is_match(bs.value, [1])).to.equal(true);
 
-      bs = SpecialForms.bitstring(BitString.binary("foo"));
+      bs = new BitString(BitString.binary("foo"));
       expect(is_match(bs.value, [102, 111, 111])).to.equal(true);
 
-      bs = SpecialForms.bitstring(BitString.integer(0), BitString.binary("foo"));
+      bs = new BitString(BitString.integer(0), BitString.binary("foo"));
       expect(is_match(bs.value, [0, 102, 111, 111])).to.equal(true);
 
-      bs = SpecialForms.bitstring(BitString.float(3.14));
+      bs = new BitString(BitString.float(3.14));
       expect(is_match(bs.value, [64, 9, 30, 184, 81, 235, 133, 31])).to.equal(true);
 
-      bs = SpecialForms.bitstring(BitString.signed(BitString.integer(-100)));
+      bs = new BitString(BitString.signed(BitString.integer(-100)));
       expect(is_match(bs.value, [156])).to.equal(true);
     });
   });

@@ -5,7 +5,7 @@ describe('SpecialForms', function(){
 
   describe('map_update', function(){
     it('creates new object', function(){
-      const foo = SpecialForms.map({foo: "bar", fizz: "buzz"});
+      const foo = Object.freeze({foo: "bar", fizz: "buzz"});
       const bar = SpecialForms.map_update(foo, {baz: "bar", fizz: "fizzbuzz"});
 
       expect(foo instanceof Object).to.equal(bar instanceof Object);
