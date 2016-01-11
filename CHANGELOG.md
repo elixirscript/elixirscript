@@ -5,6 +5,7 @@
   * `__ENV__` and `__CALLER__` are now supported
   * Began writing some of the standard libraries in Elixir instead of JavaScript
   * Added `JS.import/1`
+  * Added support for multi alias/require/imports statements
 
 * Breaking
   * `compile`, `compile_path`, and `compile_quoted` opts parameter now expects a map
