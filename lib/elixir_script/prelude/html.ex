@@ -24,6 +24,7 @@ defmodule ElixirScript.Html do
   """
 
   @external_resource tags_path = Path.join([__DIR__, "tags.txt"])
+
   @tags (for line <- File.stream!(tags_path, [], :line) do
     line |> String.strip |> String.to_atom
   end)

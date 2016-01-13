@@ -72,11 +72,12 @@ defmodule ElixirScript.CLI do
 
     case options[:output] do
       nil ->
-        Enum.each(compile_output,
+        Enum.map(compile_output,
           fn
-          ({_path, code})-> IO.write(code)
-          (code)-> IO.write(code)
+          ({_path, code})-> code
+          (code)-> code
         end)
+        |> IO.write
       output_path ->
         Enum.each(compile_output, fn(x) ->
           write_to_file(x, output_path)

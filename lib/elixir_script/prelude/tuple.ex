@@ -36,10 +36,10 @@ defmodule ElixirScript.Tuple do
   end
 
   def delete_at(tuple, index) do
-    JS.new(Elixir.Core.Tuple, delete_at(tuple, index, 0, []))
+    JS.new(Elixir.Core.Tuple, do_delete_at(tuple, index, 0, []))
   end
 
-  defp delete_at(tuple, index, current_index, list) do
+  defp do_delete_at(tuple, index, current_index, list) do
     if current_index == length(tuple) do
       list
     else
@@ -50,12 +50,12 @@ defmodule ElixirScript.Tuple do
           list ++ [tuple.get(current_index)]
       end
 
-      delete_at(tuple, index, current_index + 1, list)
+      do_delete_at(tuple, index, current_index + 1, list)
     end
   end
 
   def append(tuple, value) do
-    #JS.new(Elixir.Core.Tuple, to_list(tuple) ++ [value])
+    JS.new(Elixir.Core.Tuple, to_list(tuple) ++ [value])
   end
 
 end
