@@ -139,12 +139,8 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:@, _, [{name, _, _}]}, env)
-  when name in [:doc, :moduledoc, :type, :typep, :spec, :opaque, :callback, :macrocallback, :after_compile, :before_compile, :behaviour, :compile, :file, :on_definition, :on_load, :dialyzer, :vsn] do
+  when name in [:doc, :moduledoc, :type, :typep, :spec, :opaque, :callback, :macrocallback, :after_compile, :before_compile, :behaviour, :compile, :file, :on_definition, :on_load, :dialyzer, :vsn, :external_resource] do
     { %ElixirScript.Translator.Group{}, env }
-  end
-
-  defp do_translate({:@, _, [{:external_resource, _, [param]}]}, env) do
-    translate(param, env)
   end
 
   defp do_translate({:@, _, [{name, _, [value]}]}, env) do

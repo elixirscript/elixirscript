@@ -33,12 +33,18 @@ defmodule ElixirScript do
     end
   end
 
+  # These are full of macros and would not transpile to anything significant
+  @modules_to_not_read ["v_dom.ex", "html.ex"]
+
   @external_resource libs_path = Path.join([__DIR__, "elixir_script", "prelude", "**", "*.ex"])
-  @libs (for path <- Path.wildcard(libs_path) do
-    path
-    |> File.read!
-    |> Code.string_to_quoted!
+  @libs Enum.filter(Path.wildcard(libs_path), fn(path) ->
+    !String.contains?(path, @modules_to_not_read)
   end)
+  |> Enum.map(fn(path) ->
+      path
+      |> File.read!
+      |> Code.string_to_quoted!
+    end)
 
   @js_core_path "/Elixir.js"
 
