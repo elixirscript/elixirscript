@@ -59,7 +59,7 @@ defmodule ElixirScript.CLI do
   def do_process(input, options) do
     compile_opts = %{
       root: options[:root],
-      include_path: options[:output] != nil,
+      include_path: true,
       stdlib_path: Keyword.get(options, :stdlib_path, "Elixir")
     }
 
@@ -74,9 +74,9 @@ defmodule ElixirScript.CLI do
       nil ->
         Enum.map(compile_output,
           fn
-          ({_path, code})-> code
-          (code)-> code
+          ({path, code})-> "//#{path}:ENDFILENAME\n" <> code
         end)
+        |> Enum.join("//:ENDFILE\n")
         |> IO.write
       output_path ->
         Enum.each(compile_output, fn(x) ->
