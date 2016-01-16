@@ -9,8 +9,8 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
-    import * as Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
-    export {};
+    import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+    export default {};
     """
 
     assert_translation(ex_ast, js_code)
@@ -32,7 +32,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
 
     js_code = """
 
-        import * as Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+        import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
          const something_else = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
              return     null;
            }));
@@ -40,7 +40,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
              return     ul;
            }));
          const ul = JQuery('#todo-list');
-         export {
+         export default {
              something
        };
     """
@@ -67,8 +67,8 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
-    import * as Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
-    import * as Elixir$Animals$Elephant from './Elixir.Animals.Elephant';
+    import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+    import Elixir$Animals$Elephant from './Elixir.Animals.Elephant';
     const something_else = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
       return     null;
     }));
@@ -77,16 +77,16 @@ defmodule ElixirScript.Translator.Defmodule.Test do
       return     Elixir$Animals$Elephant.Elixir$Animals$Elephant.create(Object.freeze({}));
     }));
 
-    export {
+    export default {
       something
     };
 
-    import * as Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+    import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
     const Elixir$Animals$Elephant = Elixir.Core.Functions.defstruct({
         [Symbol.for('__struct__')]: Symbol.for('Elixir.Animals.Elephant'),     [Symbol.for('trunk')]: true
     });
 
-    export {
+    export default {
       Elixir$Animals$Elephant
     };
     """
@@ -119,8 +119,8 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
-    import * as Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
-    import * as Elixir$Animals$Elephant from './Elixir.Animals.Elephant';
+    import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+    import Elixir$Animals$Elephant from './Elixir.Animals.Elephant';
     const something_else = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
         return     null;
       }));
@@ -128,27 +128,27 @@ defmodule ElixirScript.Translator.Defmodule.Test do
         return     Elixir$Animals$Elephant.Elixir$Animals$Elephant.create(Object.freeze({}));
       }));
 
-    export {
+    export default {
         something
   };
 
-  import * as Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
-  import * as Elixir$Animals$Elephant$Bear from './Elixir.Animals.Elephant.Bear';
+  import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+  import Elixir$Animals$Elephant$Bear from './Elixir.Animals.Elephant.Bear';
     const Elixir$Animals$Elephant = Elixir.Core.Functions.defstruct({
         [Symbol.for('__struct__')]: Symbol.for('Elixir.Animals.Elephant'),
         [Symbol.for('trunk')]: true
   });
-    export {
+    export default {
         Elixir$Animals$Elephant
   };
 
-    import * as Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+    import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
     const Elixir$Animals$Elephant$Bear = Elixir.Core.Functions.defstruct({
         [Symbol.for('__struct__')]: Symbol.for('Elixir.Animals.Elephant.Bear'),
         [Symbol.for('trunk')]: true
   });
 
-    export {
+    export default {
         Elixir$Animals$Elephant$Bear
   };
     """
@@ -168,14 +168,14 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
-    import * as Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
-    import * as Elixir$Lions$Tigers from './Elixir.Lions.Tigers';
+    import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+    import Elixir$Lions$Tigers from './Elixir.Lions.Tigers';
     Elixir.Core.Functions.call_property(Elixir$Lions$Tigers,'oh_my');
-    export {};
+    export default {};
 
-    import * as Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+    import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
     Elixir.Core.Functions.call_property(Lions.Tigers.Bears,'oh_my');
-    export {};
+    export default {};
     """
 
     assert_translation(ex_ast, js_code)
@@ -198,17 +198,17 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
-    import * as Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
-    import * as Elixir$Lions$Tigers from './Elixir.Lions.Tigers';
+    import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+    import Elixir$Lions$Tigers from './Elixir.Lions.Tigers';
     Elixir.Core.Functions.call_property(Elixir$Lions$Tigers,'oh_my');
-    export {};
+    export default {};
 
-    import * as Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+    import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
     const oh_my = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
         return     null;
       }));
     Elixir.Core.Functions.call_property(Lions.Tigers.Bears,'oh_my');
-    export {
+    export default {
       oh_my
     };
     """
@@ -234,12 +234,12 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
-    import * as Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
-    import * as Elixir$Lions$Tigers from './Elixir.Lions.Tigers';
+    import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+    import Elixir$Lions$Tigers from './Elixir.Lions.Tigers';
     Elixir$Lions$Tigers.oh_my();
-    export {};
+    export default {};
 
-    import * as Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+    import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
     const oh_my2 = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
       return     null;
     }));
@@ -248,7 +248,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
       return     null;
     }));
 
-    export {
+    export default {
       oh_my2,     oh_my
     };
     """
@@ -274,12 +274,12 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
-    import * as Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
-    import * as Elixir$Lions$Tigers from './Elixir.Lions.Tigers';
+    import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+    import Elixir$Lions$Tigers from './Elixir.Lions.Tigers';
     Elixir$Lions$Tigers.oh_my2();
-    export {};
+    export default {};
 
-    import * as Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+    import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
     const oh_my2 = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
       return     null;
     }));
@@ -288,7 +288,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
       return     null;
     }));
 
-    export {
+    export default {
       oh_my2,
       oh_my
     };

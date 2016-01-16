@@ -6,6 +6,7 @@
   * Began writing some of the standard libraries in Elixir instead of JavaScript
   * Added `JS.import/1`
   * Added support for multi alias/require/imports statements
+  * exports are now default exports
 
 * Breaking
   * `compile`, `compile_path`, and `compile_quoted` opts parameter now expects a map

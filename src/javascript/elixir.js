@@ -1,5 +1,9 @@
-import * as C from './lib/core';
+import Core from './lib/core';
+import Enum from './lib/enum';
+import VirtualDOM from './lib/virtual-dom';
 
-export const Core = C;
-export { default as Enum } from './lib/enum';
-export { default as VirtualDOM } from './lib/virtual-dom';
+export default {
+  Core,
+  Enum,
+  VirtualDOM
+}

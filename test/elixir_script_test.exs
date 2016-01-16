@@ -42,9 +42,9 @@ defmodule ElixirScript.Test do
     """)
 
     assert_js_matches """
-        import * as Elixir from './Elixir';
-        import * as Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
-        import * as Elixir$ElixirScript$String$Chars from './Elixir.ElixirScript.String.Chars';
+        import Elixir from './Elixir';
+        import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+        import Elixir$ElixirScript$String$Chars from './Elixir.ElixirScript.String.Chars';
          const something_else = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
              return     Elixir$ElixirScript$String$Chars.to_string(10);
            }));
@@ -52,7 +52,7 @@ defmodule ElixirScript.Test do
              return     ul;
            }));
          const ul = JQuery('#todo-list');
-         export {
+         export default {
              something
        };
     """, hd(js_code)
@@ -76,25 +76,25 @@ defmodule ElixirScript.Test do
     """, %{ env: make_custom_env })
 
     assert_js_matches """
-    import * as Elixir from './Elixir';
-    import * as Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
-    import * as Elixir$Animals$Elephant from './Elixir.Animals.Elephant';
+    import Elixir from './Elixir';
+    import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+    import Elixir$Animals$Elephant from './Elixir.Animals.Elephant';
     const something = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
         return     Elixir$Animals$Elephant.Elixir$Animals$Elephant.create(Object.freeze({}));
       }));
-    export {
+    export default {
         something
   };
      """, hd(js_code)
 
      assert_js_matches """
-     import * as Elixir from './Elixir';
-     import * as Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+     import Elixir from './Elixir';
+     import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
      const Elixir$Animals$Elephant = Elixir.Core.Functions.defstruct({
          [Symbol.for('__struct__')]: Symbol.for('Elixir.Animals.Elephant'),
          [Symbol.for('trunk')]: true
    });
-     export {
+     export default {
          Elixir$Animals$Elephant
    };
        """, Enum.fetch!(js_code, 1)
@@ -115,15 +115,15 @@ defmodule ElixirScript.Test do
     """, %{ env: make_custom_env })
 
     assert_js_matches """
-         import * as Elixir from './Elixir';
-         import * as Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+         import Elixir from './Elixir';
+         import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
          const something_else = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
              return     1 * 1;
            }));
          const sandwich = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
              return     null;
            }));
-         export {
+         export default {
              sandwich
        };
      """, hd(js_code)
@@ -168,15 +168,15 @@ defmodule ElixirScript.Test do
     """, %{ env: make_custom_env, stdlib_path: "elixirscript"} )
 
     assert_js_matches """
-         import * as Elixir from './elixirscript';
-         import * as Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+         import Elixir from './elixirscript';
+         import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
          const something_else = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
              return     1 * 1;
            }));
          const sandwich = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
              return     null;
            }));
-         export {
+         export default {
              sandwich
        };
      """, hd(js_code)

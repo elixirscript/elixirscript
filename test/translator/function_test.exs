@@ -239,7 +239,7 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-          import * as Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+          import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
          const example = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
              return     null;
            }),Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(oneArg)    {
@@ -251,7 +251,7 @@ defmodule ElixirScript.Translator.Function.Test do
            }),Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable()],function(oneArg,twoArg,redArg,blueArg)    {
              return     null;
            }));
-         export {};
+         export default {};
     """
     assert_translation(ex_ast, js_code)
 
@@ -276,7 +276,7 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-          import * as Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+          import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
          const example = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
              return     null;
            }),Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(oneArg)    {
@@ -288,7 +288,7 @@ defmodule ElixirScript.Translator.Function.Test do
            }),Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable()],function(oneArg,twoArg,redArg,blueArg)    {
              return     null;
            }));
-         export {
+         export default {
              example
        };
     """
@@ -303,11 +303,11 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-          import * as Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+          import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
          const example = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(oneArg)    {
              return     null;
            }));
-         export {
+         export default {
              example
        };
     """
@@ -421,7 +421,7 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-         import * as Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+         import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
          const something = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(one)    {
              return     null;
            },function(one)    {
@@ -431,7 +431,7 @@ defmodule ElixirScript.Translator.Function.Test do
            },function(one)    {
              return     Elixir$ElixirScript$Kernel.is_number(one) || Elixir$ElixirScript$Kernel.is_atom(one);
            }));
-         export {
+         export default {
              something
        };
     """
@@ -652,7 +652,7 @@ defmodule ElixirScript.Translator.Function.Test do
 
 
     js_code = """
-         import * as Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+         import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
          const something = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([1],function()    {
              return     null;
            }),Elixir.Core.Patterns.make_case([2],function()    {
@@ -664,7 +664,7 @@ defmodule ElixirScript.Translator.Function.Test do
            }),Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(one)    {
              return     null;
            }));
-         export {
+         export default {
              something
        };
     """

@@ -1,4 +1,4 @@
-import * as Core from './core';
+import Core from './core';
 
 let Enum = {
 

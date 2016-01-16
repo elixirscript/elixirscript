@@ -7,7 +7,7 @@ import SpecialForms from './core/special_forms';
 
 Functions.get_global().processes = Functions.get_global().processes || new ProcessSystem();
 
-export {
+export default {
   ProcessSystem,
   Tuple,
   PID,

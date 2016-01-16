@@ -14,7 +14,7 @@ defmodule ElixirScript.Translator.Import do
   defp do_make_import(import_name, file_name) do
     root = ElixirScript.Translator.State.get().compiler_opts.root
 
-    import_specifier = JS.import_namespace_specifier(
+    import_specifier = JS.import_default_specifier(
       JS.identifier(import_name)
     )
 

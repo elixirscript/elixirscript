@@ -50,7 +50,7 @@ defmodule ElixirScript.Translator.Module do
     exported_functions = Enum.map(exported_functions, fn({_key, value}) -> value end)
     private_functions = Enum.map(private_functions, fn({_key, value}) -> value end)
 
-    default = JS.export_named_declaration(exported_object)
+    default = JS.export_default_declaration(exported_object)
 
     result = %{
         name: Utils.quoted_to_name({:__aliases__, [], module }),
