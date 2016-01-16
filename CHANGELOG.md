@@ -6,7 +6,11 @@
   * Began writing some of the standard libraries in Elixir instead of JavaScript
   * Added `JS.import/1`
   * Added support for multi alias/require/imports statements
-  * exports are now default exports
+  * Exports are now default exports
+  * When output is sent to standard out, there are now markers to specify where
+    each module begins as well as what the file name would be.
+    For the end of a file, `//:ENDFILE` is used. For the file name, `//<file>:ENDFILENAME`
+    is used where `<file>` is the name of the file
 
 * Breaking
   * `compile`, `compile_path`, and `compile_quoted` opts parameter now expects a map
