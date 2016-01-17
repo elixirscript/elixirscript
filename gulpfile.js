@@ -1,9 +1,7 @@
 var gulp = require('gulp');
 var mocha = require('gulp-mocha');
-var concat = require('gulp-concat');
 var babel = require('gulp-babel');
 var eslint = require('gulp-eslint');
-var rollup = require('gulp-rollup');
 var sourcemaps = require('gulp-sourcemaps');
 
 require("babel/polyfill");
