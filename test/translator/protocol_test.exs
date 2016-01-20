@@ -27,9 +27,7 @@ defmodule ElixirScript.Translator.Protocol.Test do
     js_code = """
     import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
          const Elixir$Blank = Elixir.Core.Functions.defprotocol({
-             blank__qmark__: Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(data)    {
-             return     null;
-           }))
+             blank__qmark__: function(){}
        });
          Elixir.Core.Functions.defimpl(Elixir$Blank, Array,{
              blank__qmark__: Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Object.freeze([])],function()    {

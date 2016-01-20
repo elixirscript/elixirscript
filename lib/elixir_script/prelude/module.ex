@@ -5,6 +5,6 @@ defmodule ElixirScript.Module do
   functions: Keyword.new, private_functions: Keyword.new,
   macros: Keyword.new, private_macros: Keyword.new,
   body: nil, js_imports: [], module_refs: [], type: :module,
-  spec: nil, impls: HashDict.new
+  impls: HashDict.new
 
 end

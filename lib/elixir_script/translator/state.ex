@@ -46,14 +46,14 @@ defmodule ElixirScript.Translator.State do
     end)
   end
 
-  def add_protocol(name, spec) do
+  def add_protocol(name, functions) do
     Agent.update(__MODULE__, fn state ->
       proto = do_get_module(state, name)
 
       if proto == nil do
-        proto = %ElixirScript.Module{ name: name, spec: spec, impls: HashDict.new, type: :protocol }
+        proto = %ElixirScript.Module{ name: name, functions: functions, impls: HashDict.new, type: :protocol }
       else
-        proto = %{proto | spec: spec, type: :protocol }
+        proto = %{proto | functions: functions, type: :protocol }
       end
 
       %{ state | modules: Map.put(state.modules, name, proto) }
@@ -71,7 +71,7 @@ defmodule ElixirScript.Translator.State do
       proto = do_get_module(state, protocol)
 
       if proto == nil do
-        proto = %ElixirScript.Module{ name: protocol, spec: nil, impls: HashDict.new, type: :protocol }
+        proto = %ElixirScript.Module{ name: protocol, impls: HashDict.new, type: :protocol }
       end
 
       proto = %{ proto | impls: Dict.put(proto.impls, type, impl), type: :protocol }
@@ -85,7 +85,12 @@ defmodule ElixirScript.Translator.State do
   end
 
   def get_module_name(module_name) do
-    case Map.get(build_standard_lib_map, module_name) do
+    get_module_name(module_name, get)
+  end
+
+  def get_module_name(module_name, state) do
+    std_lib_map = state.std_lib_map
+    case Map.get(std_lib_map, module_name) do
       nil ->
         module_name
       actual_module_name ->
@@ -109,7 +114,7 @@ defmodule ElixirScript.Translator.State do
   end
 
   defp do_get_module(state, name) do
-    Map.get(state.modules, get_module_name(name))
+    Map.get(state.modules, get_module_name(name, state))
   end
 
   def add_module_reference(module_name, module_ref) do

@@ -35,12 +35,14 @@ defmodule ElixirScript.Translator.ModuleCollector do
     end)
   end
 
-  def do_process_modules({:defprotocol, _, [{:__aliases__, _, _} = the_alias, [do: {:__block__, context, spec}]]}) do
-    ElixirScript.Translator.State.add_protocol(Utils.quoted_to_name(the_alias), {:__block__, context, spec})
+  def do_process_modules({:defprotocol, _, [{:__aliases__, _, _} = the_alias, [do: {:__block__, _, _} = block]]}) do
+    %{def: functions, defp: _, defmacro: _, defmacrop: _ } = get_functions_from_module(block)
+    ElixirScript.Translator.State.add_protocol(Utils.quoted_to_name(the_alias), functions)
   end
 
   def do_process_modules({:defprotocol, _, [{:__aliases__, _, _} = the_alias, [do: spec]]}) do
-    ElixirScript.Translator.State.add_protocol(Utils.quoted_to_name(the_alias), {:__block__, [], [spec]})
+    %{def: functions, defp: _, defmacro: _, defmacrop: _ } = get_functions_from_module({:__block__, [], [spec]})
+    ElixirScript.Translator.State.add_protocol(Utils.quoted_to_name(the_alias), functions)
   end
 
   def do_process_modules({:defimpl, _, [ {:__aliases__, _, _} = the_alias, [for: type],  [do: {:__block__, context, spec}] ]}) do
@@ -175,8 +177,16 @@ defmodule ElixirScript.Translator.ModuleCollector do
 
       add_function_to_map(state, type, name, arity)
 
-      _, state ->
-        state
+    ({type, _, [{name, _, params}]}, state) when is_atom(params) and type in [:def, :defp] ->
+      arity = 0
+      add_function_to_map(state, type, name, arity)
+
+    ({type, _, [{name, _, params}]}, state) when type in [:def, :defp] ->
+      arity = length(params)
+      add_function_to_map(state, type, name, arity)
+
+    _, state ->
+      state
 
     end)
   end

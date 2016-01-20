@@ -1,6 +1,7 @@
 import { Tuple } from './primitives';
 import BitString from './bit_string';
 import Patterns from './patterns';
+import Protocol from './protocol';
 
 function call_property(item, property){
   let prop = null;

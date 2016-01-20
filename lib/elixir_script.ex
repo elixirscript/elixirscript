@@ -72,7 +72,11 @@ defmodule ElixirScript do
 
     ModuleCollector.process_modules(libs ++ [updated_quoted(quoted)])
 
-    create_code(compiler_opts)
+    code = create_code(compiler_opts)
+
+    ElixirScript.Translator.State.stop
+
+    code
   end
 
   @doc """
@@ -94,7 +98,11 @@ defmodule ElixirScript do
 
     ModuleCollector.process_modules(libs ++ code)
 
-    create_code(compiler_opts)
+    code = create_code(compiler_opts)
+
+    ElixirScript.Translator.State.stop
+
+    code
   end
 
   defp build_compiler_options(opts) do
@@ -135,10 +143,11 @@ defmodule ElixirScript do
 
   defp create_code(compiler_opts) do
 
+    parent = self
+
     state = ElixirScript.Translator.State.get
 
-    standard_lib_modules = state.std_lib_map
-    |> Map.values
+    standard_lib_modules = Map.values(state.std_lib_map)
 
     result =
       Map.values(state.modules)
@@ -146,27 +155,35 @@ defmodule ElixirScript do
         compiler_opts.import_standard_libs == false && ast.name in standard_lib_modules
       end)
       |> Enum.map(fn ast ->
+        spawn_link fn ->
           env = ElixirScript.Translator.Env.module_env(ast.name,  Utils.name_to_js_file_name(ast.name) <> ".js")
 
-          case ast.type do
+          module = case ast.type do
             :module ->
               ElixirScript.Translator.Module.make_module(ast.name, ast.body, env)
             :protocol ->
               ElixirScript.Translator.Protocol.consolidate(ast, env)
           end
-          |> convert_to_code()
+
+          { path, code } = convert_to_code(module)
+
+          result = case compiler_opts.include_path do
+            true ->
+              { path, code }
+            false ->
+              code
+          end
+
+          send parent, { self, result }
+        end
+      end)
+      |> Enum.map(fn pid ->
+        receive do
+          {^pid, result} -> result
+        end
       end)
 
-    ElixirScript.Translator.State.stop
-
     result
-    |> Enum.map(fn({path, code}) ->
-      if(compiler_opts.include_path) do
-        { path, code }
-      else
-        code
-      end
-    end)
   end
 
   @doc """

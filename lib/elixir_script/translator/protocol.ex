@@ -12,10 +12,10 @@ defmodule ElixirScript.Translator.Protocol do
   """
   def consolidate(protocol, env) do
     name = protocol.name
-    spec = protocol.spec
+    functions = protocol.functions
     impls = protocol.impls |> Dict.to_list
 
-    {spec_imports, spec_body, spec} = define_spec(name, spec, env)
+    {spec_imports, spec_body, spec} = define_spec(name, functions, env)
     {impl_imports, impl_body, impls} = define_impls(name, impls, env)
 
     body = spec_body ++ impl_body
@@ -24,18 +24,15 @@ defmodule ElixirScript.Translator.Protocol do
     create_module(name, spec, impls, imports, body, env)
   end
 
-  defp define_spec(name, spec, env) do
-    { body, functions } = extract_function_from_spec(spec)
-    { body, env } = Module.translate_body(body, env)
-    { exported_functions, _ } = process_functions(functions, env)
-
+  defp define_spec(name, functions, env) do
+    { body, _ } = Module.translate_body( {:__block__, [], [] }, env)
     module_refs = ElixirScript.Translator.State.get_module_references(name)
-
     {imports, body} = Module.extract_imports_from_body(body)
-
     imports = imports ++ Module.make_std_lib_import() ++ Module.make_imports(module_refs)
 
-    object = Enum.map(exported_functions, fn({key, value}) ->
+
+    object = process_spec_functions(functions)
+    |> Enum.map(fn({key, value}) ->
       Map.make_property(JS.identifier(Utils.filter_name(key)), value)
     end)
     |> JS.object_expression
@@ -118,22 +115,10 @@ defmodule ElixirScript.Translator.Protocol do
     }
   end
 
-  defp extract_function_from_spec({:__block__, meta, body_list}) do
-    { body_list, functions } = Enum.map_reduce(body_list,
-      %{exported: HashDict.new(), private: HashDict.new()}, fn
-        ({:def, _, [{name, _, _}]} = function, state) ->
-          {
-            nil,
-            %{ state | exported: HashDict.put(state.exported, name, HashDict.get(state.exported, name, []) ++ [function]) }
-          }
-        (x, state) ->
-          { x, state }
-      end)
-
-    body_list = Enum.filter(body_list, fn(x) -> !is_nil(x) end)
-    body = {:__block__, meta, body_list}
-
-    { body, functions }
+  defp process_spec_functions(functions) do
+    Enum.map(Keyword.keys(functions), fn(function_name) ->
+      {function_name, JS.function_expression([], [], JS.block_statement([]))}
+    end)
   end
 
   defp process_functions(%{ exported: exported, private: private }, env) do
