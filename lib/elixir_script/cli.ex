@@ -78,6 +78,7 @@ defmodule ElixirScript.CLI do
         end)
         |> Enum.join("//:ENDFILE\n")
         |> IO.write
+
       output_path ->
         Enum.each(compile_output, fn(x) ->
           write_to_file(x, output_path)

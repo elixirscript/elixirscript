@@ -2,6 +2,14 @@ defmodule ElixirScript.Translator.State do
   @moduledoc false
   alias ElixirScript.Translator.Utils
 
+  @doc """
+  This agent holds references to the compiler options, a map all of the modules, and
+  a map of modules that define the standard library.
+
+  The modules map has the module's name a the key and a ElixirScript.Module struct as the value.
+  The module struct contains properties to access the function and macro names/arities
+
+  """
   def start_link(compiler_opts \\ []) do
     Agent.start_link(fn ->
       %{ compiler_opts: compiler_opts, modules: Map.new, std_lib_map: build_standard_lib_map() }

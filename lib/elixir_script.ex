@@ -33,6 +33,10 @@ defmodule ElixirScript do
     end
   end
 
+
+  # At compile time, gathers the files containing the standard lib modules,
+  # converts them to their quoted forms and keeps them in @libs for use when compiling.
+
   # These are full of macros and would not transpile to anything significant
   @modules_to_not_read ["v_dom.ex", "html.ex"]
 
@@ -63,20 +67,7 @@ defmodule ElixirScript do
   """
   @spec compile_quoted(Macro.t, Map.t) :: [binary | {binary, binary}]
   def compile_quoted(quoted, opts \\ %{}) do
-
-    compiler_opts = build_compiler_options(opts)
-    ElixirScript.Translator.State.start_link(compiler_opts)
-
-    libs = @libs
-    |> updated_quoted
-
-    ModuleCollector.process_modules(libs ++ [updated_quoted(quoted)])
-
-    code = create_code(compiler_opts)
-
-    ElixirScript.Translator.State.stop
-
-    code
+    do_compile(opts, [quoted])
   end
 
   @doc """
@@ -84,19 +75,20 @@ defmodule ElixirScript do
   """
   @spec compile_path(binary, Map.t) :: [binary | {binary, binary}]
   def compile_path(path, opts \\ %{}) do
-
-    compiler_opts = build_compiler_options(opts)
-    ElixirScript.Translator.State.start_link(compiler_opts)
-
-    libs = @libs
-    |> updated_quoted
-
     code = path
     |> Path.wildcard
     |> Enum.map(&file_to_quoted/1)
 
+    do_compile(opts, code)
+  end
 
-    ModuleCollector.process_modules(libs ++ code)
+  defp do_compile(opts, quoted_code_list) do
+    compiler_opts = build_compiler_options(opts)
+    libs = update_quoted(@libs)
+
+    ElixirScript.Translator.State.start_link(compiler_opts)
+
+    ModuleCollector.process_modules(libs ++ Enum.map(quoted_code_list, &update_quoted(&1)))
 
     code = create_code(compiler_opts)
 
@@ -120,10 +112,9 @@ defmodule ElixirScript do
     file
     |> File.read!
     |> Code.string_to_quoted!
-    |> updated_quoted
   end
 
-  defp updated_quoted(quoted) do
+  defp update_quoted(quoted) do
     Macro.prewalk(quoted, fn
     ({name, context, parms}) ->
       if context[:import] == Kernel do
@@ -136,6 +127,7 @@ defmodule ElixirScript do
     end)
   end
 
+  @doc false
   def custom_env() do
     __using__([])
     __ENV__
@@ -212,8 +204,7 @@ defmodule ElixirScript do
     { file_path, Builder.program(module.body) }
   end
 
-  @doc false
-  def javascript_ast_to_code({path, js_ast}) do
+  defp javascript_ast_to_code({path, js_ast}) do
     js_code = js_ast
     |> prepare_js_ast
     |> Generator.generate
