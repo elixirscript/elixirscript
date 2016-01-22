@@ -71,9 +71,9 @@ defmodule ElixirScript.JS do
 
 
   @doc """
-  Returns a reference to the global object.
+  Returns a reference to the global JavaScript object.
 
-  In browsers this would be Window or WindowProxy.
+  In browsers this would be window or self.
   In node this would be the global object.
   """
   def global() do

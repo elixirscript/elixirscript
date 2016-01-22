@@ -1,12 +1,12 @@
 # v0.15.0-dev
 * Enhancements
-  * Now tracking environment scopes
   * `alias`, `require`, and `import` now work inside lexical scopes
   * `__ENV__` and `__CALLER__` are now supported
-  * Began writing some of the standard libraries in Elixir instead of JavaScript
-  * Added `JS.import/1`
+  * Some of the standard library originally written in JavaScript has been rewritten
+    in Elixir
+  * Added `JS.import/1`, `JS.typeof/1`,`JS.instanceof/1`, and JS.global/1
   * Added support for multi alias/require/imports statements
-  * Exports are now default exports
+  * Generated JavaScript export statements are now default exports
   * When output is sent to standard out, there are now markers to specify where
     each module begins as well as what the file name would be.
     For the end of a file, `//:ENDFILE` is used. For the file name, `//<file>:ENDFILENAME`
