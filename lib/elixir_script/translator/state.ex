@@ -1,15 +1,14 @@
+# This agent holds references to the compiler options, a map all of the modules, and
+# a map of modules that define the standard library.
+#
+# The modules map has the module's name a the key and a ElixirScript.Module struct as the value.
+#
+# The std_lib_map holds a mapping of the Elixir standard lib module to the
+# version implemented here in ElixirScript.
 defmodule ElixirScript.Translator.State do
   @moduledoc false
   alias ElixirScript.Translator.Utils
 
-  @doc """
-  This agent holds references to the compiler options, a map all of the modules, and
-  a map of modules that define the standard library.
-
-  The modules map has the module's name a the key and a ElixirScript.Module struct as the value.
-  The module struct contains properties to access the function and macro names/arities
-
-  """
   def start_link(compiler_opts \\ []) do
     Agent.start_link(fn ->
       %{ compiler_opts: compiler_opts, modules: Map.new, std_lib_map: build_standard_lib_map() }
@@ -56,7 +55,7 @@ defmodule ElixirScript.Translator.State do
 
   def add_protocol(name, functions) do
     Agent.update(__MODULE__, fn state ->
-      proto = do_get_module(state, name)
+      proto = Map.get(state.modules, do_get_module_name(name, state))
 
       if proto == nil do
         proto = %ElixirScript.Module{ name: name, functions: functions, impls: HashDict.new, type: :protocol }
@@ -76,7 +75,7 @@ defmodule ElixirScript.Translator.State do
 
   def add_protocol_impl(protocol, type, impl) do
     Agent.update(__MODULE__, fn state ->
-      proto = do_get_module(state, protocol)
+      proto = Map.get(state.modules, do_get_module_name(protocol, state))
 
       if proto == nil do
         proto = %ElixirScript.Module{ name: protocol, impls: HashDict.new, type: :protocol }
@@ -93,10 +92,12 @@ defmodule ElixirScript.Translator.State do
   end
 
   def get_module_name(module_name) do
-    get_module_name(module_name, get)
+    Agent.get(__MODULE__, fn(state) ->
+      do_get_module_name(module_name, state)
+    end)
   end
 
-  def get_module_name(module_name, state) do
+  defp do_get_module_name(module_name, state) do
     std_lib_map = state.std_lib_map
     case Map.get(std_lib_map, module_name) do
       nil ->
@@ -107,31 +108,33 @@ defmodule ElixirScript.Translator.State do
   end
 
   def get_module(module) when is_atom(module) do
-    state = Agent.get(__MODULE__, &(&1))
-    do_get_module(state, module)
+    do_get_module(module)
   end
 
   def get_module({:__aliases__, _, _} = name) do
-    state = Agent.get(__MODULE__, &(&1))
-    do_get_module(state, Utils.quoted_to_name(name))
+    do_get_module(name)
   end
 
   def get_module(module_name_list) when is_list(module_name_list) do
-    state = Agent.get(__MODULE__, &(&1))
-    do_get_module(state, Utils.quoted_to_name({:__aliases__, [], module_name_list}))
+    do_get_module(Utils.quoted_to_name({:__aliases__, [], module_name_list}))
   end
 
-  defp do_get_module(state, name) do
-    Map.get(state.modules, get_module_name(name, state))
+  defp do_get_module(name) do
+    Agent.get(__MODULE__, fn(state) ->
+      Map.get(state.modules, do_get_module_name(name, state))
+    end)
   end
 
   def add_module_reference(module_name, module_ref) do
-    module = get_module(module_name)
-
-    if module do
-      module = %{ module | module_refs: Enum.uniq(module.module_refs ++ [module_ref]) }
-      add_module(module)
-    end
+    Agent.update(__MODULE__, fn(state) ->
+      case Map.get(state.modules, do_get_module_name(module_name, state)) do
+        nil ->
+          state
+        module ->
+          module = %{ module | module_refs: Enum.uniq(module.module_refs ++ [module_ref]) }
+          %{ state | modules: Map.put(state.modules, module.name, module) }
+      end
+    end)
   end
 
   def get_module_references(module_name) do
