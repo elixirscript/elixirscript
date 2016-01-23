@@ -97,7 +97,7 @@ The intent of this guide is to get you started with ElixirScript. It will give y
     The first step is getting the dependency. In your mix.exs file for your elixir project, add elixir_script to your deps.
 
     ```elixir
-    {:elixir_script, "~> 0.13"}
+    {:elixir_script, "~> 0.14"}
     ```
 
 * Step 2: Now download the dep
@@ -121,7 +121,7 @@ The intent of this guide is to get you started with ElixirScript. It will give y
     The first step is getting the dependency. In your mix.exs file for your elixir project, add elixir_script to your deps.
 
     ```elixir
-    {:elixir_script, "~> 0.12"}
+    {:elixir_script, "~> 0.14"}
     ```
 
 * Step 2: Now download the dep
@@ -187,27 +187,33 @@ JS.import A, "a" #translates to "import {default as A} from 'a'"
 JS.import [A, B, C], "a" #translates to "import {A, B, C} from 'a'"
 ```
 
+
+#### ElixirScript-Brunch
+
+There is an Brunch plugin, [ElixirScript-Brunch](https://www.npmjs.com/package/elixirscript-brunch).
+There are instructions there on how to use it with Phoenix.
+
 #### Gulp
 
-I am a gulp user and I use elixirscript with gulp. Here is a snippet of how I my gulpfile looks
+There is no gulp plugin just yet, but below is an example of how to make a gulp
+task that will work with it.
 
         ```javascript
         var gulp = require('gulp');
         var exec = require('child_process').exec;
         var babel = require('gulp-babel');
 
-        //Calls out to the escript and places the output in src/js
+        //Calls out to the elixirscript compiler and places the output in src/js
         gulp.task('build-exjs', function(cb) {
-          exec('/usr/local/elixirscript/bin/elixirscript "' + exjsSrc + '" -o ' + "src/js", function (err, stdout, stderr) {
+          exec('elixirscript "' + exjsSrc + '" -o ' + "src/js", function (err, stdout, stderr) {
             cb(err);
           });
         });
 
+        // A task to turn the es6 output from build-exjs to es5
         gulp.task('build-js', ['build-exjs'], function() {
           return gulp.src(jsSrc)
-              .pipe(babel({modules: 'system'}))
+              .pipe(babel())
               .pipe(gulp.dest(jsDest));
         });
         ```
-
-This is also the setup I use when using ElixirScript with Phoenix. If you are a brunch user, there is n [ElixirScript brunch plugin](https://www.npmjs.com/package/elixirscript-brunch)
