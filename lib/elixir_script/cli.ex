@@ -3,11 +3,11 @@ defmodule ElixirScript.CLI do
 
   @switches [
     output: :binary, elixir: :boolean, root: :binary,
-    help: :boolean, stdlib: :boolean, stdlib_path: :binary
+    help: :boolean, core: :boolean, core_path: :binary
   ]
 
   @aliases [
-    o: :output, ex: :elixir, h: :help, r: :root, st: :stdlib, stp: :stdlib_path
+    o: :output, ex: :elixir, h: :help, r: :root
   ]
 
   def main(argv) do
@@ -21,7 +21,7 @@ defmodule ElixirScript.CLI do
 
     case parse do
       { [help: true] , _ , _ } -> :help
-      { [stdlib: true] , _ , _ } -> :stdlib
+      { [core: true] , _ , _ } -> :core
       { options , [input], _ } -> { input, options }
       _ -> :help
     end
@@ -37,15 +37,15 @@ defmodule ElixirScript.CLI do
       -o  --output [path]   places output at the given path
       -ex --elixir          read input as elixir code string
       -r  --root [path]     root import path for all exported modules
-      -st  --stdlib         outputs the elixirscript core JavaScript file
-      -stp --stdlib_path    es6 import path to the elixirscript standard lib
+      --core        outputs the elixirscript core JavaScript file
+      --core_path    es6 import path to the elixirscript standard lib
       only used with the [output] option. When used, Elixir.js is not exported
       -h  --help            this message
     """
   end
 
-  def process(:stdlib) do
-    IO.write(ElixirScript.standard_libs)
+  def process(:core) do
+    IO.write(ElixirScript.elixirscript_core)
   end
 
   def process({ input, options }) do
@@ -60,7 +60,7 @@ defmodule ElixirScript.CLI do
     compile_opts = %{
       root: options[:root],
       include_path: true,
-      stdlib_path: Keyword.get(options, :stdlib_path, "Elixir")
+      core_path: Keyword.get(options, :core_path, "Elixir")
     }
 
     compile_output = case options[:elixir] do
@@ -84,8 +84,8 @@ defmodule ElixirScript.CLI do
           write_to_file(x, output_path)
         end)
 
-        if options[:stdlib_path] == nil do
-          ElixirScript.copy_standard_libs_to_destination(output_path)
+        if options[:core_path] == nil do
+          ElixirScript.copy_core_to_destination(output_path)
         end
     end
   end

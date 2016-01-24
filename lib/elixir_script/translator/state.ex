@@ -112,7 +112,7 @@ defmodule ElixirScript.Translator.State do
   end
 
   def get_module({:__aliases__, _, _} = name) do
-    do_get_module(name)
+    do_get_module(Utils.quoted_to_name(name))
   end
 
   def get_module(module_name_list) when is_list(module_name_list) do

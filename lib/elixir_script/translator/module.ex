@@ -175,7 +175,7 @@ defmodule ElixirScript.Translator.Module do
     compiler_opts = ElixirScript.Translator.State.get().compiler_opts
     case compiler_opts.import_standard_libs do
       true ->
-        [ElixirScript.Translator.Import.create_standard_lib_imports(compiler_opts.stdlib_path)]
+        [ElixirScript.Translator.Import.create_standard_lib_imports(compiler_opts.core_path)]
       false ->
         []
     end

@@ -19,7 +19,7 @@ defmodule ElixirScript do
   or a tuple of the file name and the JavaScript code
   * `:root` - a binary path prepended to the path of the standard lib imports if needed
   * `:env` - a Macro.env struct to use. This is most useful when using macros. Make sure that the
-  * `:stdlib_path` - The es6 import path used to import the elixirscript standard lib.
+  * `:core_path` - The es6 import path used to import the elixirscript core.
   When using this option, the Elixir.js file is not exported
   """
 
@@ -103,7 +103,7 @@ defmodule ElixirScript do
     |> Map.put(:root, nil)
     |> Map.put(:env, custom_env)
     |> Map.put(:import_standard_libs, true)
-    |> Map.put(:stdlib_path, "Elixir")
+    |> Map.put(:core_path, "Elixir")
 
     Map.merge(default_options, opts)
   end
@@ -179,17 +179,17 @@ defmodule ElixirScript do
   end
 
   @doc """
-  Copies the javascript that makes up the ElixirScript standard libs
+  Copies the javascript that makes up the ElixirScript core
   to the specified location
   """
-  def copy_standard_libs_to_destination(destination) do
+  def copy_core_to_destination(destination) do
     File.cp!(operating_path <> @js_core_path, destination <> @js_core_path)
   end
 
   @doc """
-  Returns the standard lib js code
+  Returns the elixirscript core js code
   """
-  def standard_libs() do
+  def elixirscript_core() do
     File.read!(operating_path <> @js_core_path)
   end
 

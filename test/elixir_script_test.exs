@@ -165,7 +165,7 @@ defmodule ElixirScript.Test do
         end
 
       end
-    """, %{ env: make_custom_env, stdlib_path: "elixirscript"} )
+    """, %{ env: make_custom_env, core_path: "elixirscript"} )
 
     assert_js_matches """
          import Elixir from './elixirscript';

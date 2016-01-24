@@ -2,7 +2,6 @@ defmodule ElixirScript.Translator.Bitstring do
   @moduledoc false
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
-  alias ElixirScript.Translator.Primitive
 
 
   def make_bitstring(elements, env) do

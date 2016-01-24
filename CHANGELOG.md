@@ -14,6 +14,8 @@
 
 * Breaking
   * `compile`, `compile_path`, and `compile_quoted` opts parameter now expects a map
+  * The `stdlib` compiler option is now `core`. The `stdlib_path` compiler options is now
+  `core_path`
 
 # v0.14.1
 * Enhancements
