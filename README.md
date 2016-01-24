@@ -48,11 +48,10 @@ Please check the [CONTRIBUTING.md](CONTRIBUTING.md)
 
 
 ### Example projects
-* [phoenix_chat_example](https://github.com/bryanjos/phoenix_chat_example) The Pheonix Chat App using ElixirScript.
+* [phoenix_chat_example](https://github.com/bryanjos/phoenix_chat_example) The Phoenix Chat App using ElixirScript.
 * [MobileElixir](https://github.com/bryanjos/MobileElixir) Using ElixirScript with React Native
 * [color_bar_spike](https://github.com/bryanjos/color_bar_spike) A canvas drawing example using ElixirScript, React and a Redux-like design
 
 #### Using with Brunch
 There is a plugin for using ElixirScript in your Brunch project
 [here](https://www.npmjs.com/package/elixirscript-brunch)
-
