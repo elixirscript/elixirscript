@@ -3,8 +3,8 @@
   * `alias`, `require`, and `import` now work inside lexical scopes
   * `__ENV__` and `__CALLER__` are now supported
   * Some of the standard library originally written in JavaScript has been rewritten
-    in Elixir
-  * Added `JS.import/1`, `JS.typeof/1`,`JS.instanceof/1`, and JS.global/1
+    in Elixir.
+  * Added `JS.import/1`, `JS.typeof/1`,`JS.instanceof/1`, and `JS.global/1`
   * Added support for multi alias/require/imports statements
   * Generated JavaScript export statements are now default exports
   * When output is sent to standard out, there are now markers to specify where
