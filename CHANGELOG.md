@@ -1,4 +1,4 @@
-# v0.15.0-dev
+# v0.15.0
 * Enhancements
   * `alias`, `require`, and `import` now work inside lexical scopes
   * `__ENV__` and `__CALLER__` are now supported
