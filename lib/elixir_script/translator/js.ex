@@ -26,6 +26,11 @@ defmodule ElixirScript.Translator.JS do
     )
   end
 
+  defp do_translate({:throw, _, [term]}, env) do
+    Builder.throw_statement(
+      Translator.translate!(term, env)
+    )
+  end
 
   defp do_translate({:new, _, [module_name, params]}, env) when not is_list(params) do
     Builder.new_expression(

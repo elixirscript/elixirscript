@@ -7,7 +7,7 @@ function call_property(item, property){
   let prop = null;
 
   if(property in item){
-    prop = property
+      prop = property;
   }else if(Symbol.for(property) in item){
     prop = Symbol.for(property);
   }else{
@@ -62,7 +62,7 @@ function defstruct(defaults){
       let x = new this(updates);
       return Object.freeze(x);
     }
-  }
+  };
 }
 
 
@@ -85,7 +85,7 @@ function defexception(defaults){
       let x = new this(updates);
       return Object.freeze(x);
     }
-  }
+  };
 }
 
 function defprotocol(spec){
@@ -97,7 +97,7 @@ function defimpl(protocol, type, impl){
 }
 
 function get_object_keys(obj){
-  return Object.keys(obj).concat(Object.getOwnPropertySymbols(obj))
+    return Object.keys(obj).concat(Object.getOwnPropertySymbols(obj));
 }
 
 function is_valid_character(codepoint){
@@ -116,14 +116,14 @@ function b64EncodeUnicode(str) {
 }
 
 function delete_property_from_map(map, property){
-  let new_map = Object.assign(Object.create(map.constructor.prototype), map)
-  delete new_map[property]
+    let new_map = Object.assign(Object.create(map.constructor.prototype), map);
+    delete new_map[property];
 
   return Object.freeze(new_map);
 }
 
 function class_to_obj(map){
-  let new_map = Object.assign({}, map)
+    let new_map = Object.assign({}, map);
   return Object.freeze(new_map);
 }
 
@@ -131,6 +131,15 @@ function add_property_to_map(map, property, value){
   let new_map = Object.assign({}, map);
   new_map[property] = value;
   return Object.freeze(new_map);
+}
+
+
+function update_map(map, property, value){
+    if(property in get_object_keys(map)){
+        return add_property_to_map(map, property, value);
+    }
+
+    throw "map does not have key";
 }
 
 function bnot(expr){
@@ -192,6 +201,65 @@ function can_decode64(data) {
   }
 }
 
+function remove_from_list(list, element){
+    let found = false;
+
+    return list.filter((elem) => {
+        if(!found && elem === element){
+            found = true;
+            return false;
+        }
+
+        return true;
+    });
+}
+
+function foldl(fun, acc, list){
+    let acc1 = acc;
+
+    for(const el of list){
+        acc1 = fun(el, acc1);
+    }
+
+    return acc1;
+}
+
+
+function foldr(fun, acc, list){
+    let acc1 = acc;
+
+    for(let i = list.length - 1; i >= 0; i--){
+        acc1 = fun(list[i], acc1);
+    }
+
+    return acc1;
+}
+
+function keydelete(key, n, tuplelist){
+
+    for(let i = tuplelist.length - 1; i >= 0; i--){
+        if(tuplelist[i].get(n) === key){
+            return tuplelist.concat([]).splice(i, 1);
+        }
+    }
+
+    return tuplelist;
+}
+
+function keystore(key, n, list, newtuple){
+    for(let i = list.length - 1; i >= 0; i--){
+        if(list[i].get(n) === key){
+            return list.concat([]).splice(i, 1, newtuple);
+        }
+    }
+
+    return list;
+}
+
+function reverse(list){
+    return list.concat([]).reverse();
+}
+
 export default {
   call_property,
   apply,
@@ -214,5 +282,12 @@ export default {
   bsl,
   bsr,
   bxor,
-  zip
+  zip,
+  foldl,
+  foldr,
+  remove_from_list,
+  keydelete,
+  keystore,
+    reverse,
+    update_map
 };

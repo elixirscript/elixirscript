@@ -29,6 +29,12 @@ class Tuple {
     return "{" + s + "}";
   }
 
+  put_elem(index, elem){
+      let new_values = this.values.concat([]);
+      new_values.splice(index, 0, elem);
+      return new Tuple(...new_values);
+  }
+
 }
 
 
