@@ -97,7 +97,7 @@ The intent of this guide is to get you started with ElixirScript. It will give y
     The first step is getting the dependency. In your mix.exs file for your elixir project, add elixir_script to your deps.
 
     ```elixir
-    {:elixir_script, "~> 0.14"}
+    {:elixir_script, "~> 0.15"}
     ```
 
 * Step 2: Now download the dep
@@ -121,7 +121,7 @@ The intent of this guide is to get you started with ElixirScript. It will give y
     The first step is getting the dependency. In your mix.exs file for your elixir project, add elixir_script to your deps.
 
     ```elixir
-    {:elixir_script, "~> 0.14"}
+    {:elixir_script, "~> 0.15"}
     ```
 
 * Step 2: Now download the dep
