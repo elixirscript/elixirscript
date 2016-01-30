@@ -198,22 +198,22 @@ There are instructions there on how to use it with Phoenix.
 There is no gulp plugin just yet, but below is an example of how to make a gulp
 task that will work with it.
 
-        ```javascript
-        var gulp = require('gulp');
-        var exec = require('child_process').exec;
-        var babel = require('gulp-babel');
+    ```javascript
+    var gulp = require('gulp');
+    var exec = require('child_process').exec;
+    var babel = require('gulp-babel');
 
-        //Calls out to the elixirscript compiler and places the output in src/js
-        gulp.task('build-exjs', function(cb) {
-          exec('elixirscript "' + exjsSrc + '" -o ' + "src/js", function (err, stdout, stderr) {
-            cb(err);
-          });
-        });
+    //Calls out to the elixirscript compiler and places the output in src/js
+    gulp.task('build-exjs', function(cb) {
+      exec('elixirscript "' + exjsSrc + '" -o ' + "src/js", function (err, stdout, stderr) {
+        cb(err);
+      });
+    });
 
-        // A task to turn the es6 output from build-exjs to es5
-        gulp.task('build-js', ['build-exjs'], function() {
-          return gulp.src(jsSrc)
-              .pipe(babel())
-              .pipe(gulp.dest(jsDest));
-        });
-        ```
+    // A task to turn the es6 output from build-exjs to es5
+    gulp.task('build-js', ['build-exjs'], function() {
+      return gulp.src(jsSrc)
+          .pipe(babel())
+          .pipe(gulp.dest(jsDest));
+    });
+    ```
