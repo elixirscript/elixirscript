@@ -6,4 +6,4 @@ export default {
   Core,
   Enum,
   VirtualDOM
-}
+};

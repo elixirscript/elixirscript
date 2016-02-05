@@ -21,6 +21,7 @@ defmodule ElixirScript.Translator do
   alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.JS, as: JSLib
   alias ESTree.Tools.Builder, as: JS
+  alias ElixirScript.Translator.Rewriter
 
 
 
@@ -183,6 +184,11 @@ defmodule ElixirScript.Translator do
       _ ->
         Bitstring.make_bitstring(elements, env)
     end
+  end
+
+  defp do_translate({{:., _, [erlang_module, _]}, _, _} = erlang_function_call, env) when erlang_module in [:erlang, :maps, :lists] do
+    Rewriter.rewrite(erlang_function_call)
+    |> translate(env)
   end
 
   defp do_translate({{:., _, [Access, :get]}, _, [target, property]}, env) do

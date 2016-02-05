@@ -260,6 +260,14 @@ function reverse(list){
     return list.concat([]).reverse();
 }
 
+function maps_find(key, map){
+    if(key in get_object_keys(map)){
+        return new Tuple(Symbol.for("ok"), map[key]);
+    }else{
+        return Symbol.for("error");
+    }
+}
+
 export default {
   call_property,
   apply,
@@ -289,5 +297,6 @@ export default {
   keydelete,
   keystore,
     reverse,
-    update_map
+    update_map,
+    maps_find
 };

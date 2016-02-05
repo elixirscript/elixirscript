@@ -91,6 +91,10 @@ defmodule ElixirScript.Translator.State do
     Agent.get(__MODULE__, &(&1))
   end
 
+  def get_module_name({:__aliases__, _, _} = name) do
+    get_module_name(Utils.quoted_to_name(name))
+  end
+
   def get_module_name(module_name) do
     Agent.get(__MODULE__, fn(state) ->
       do_get_module_name(module_name, state)

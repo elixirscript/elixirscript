@@ -1,5 +1,13 @@
 defmodule ElixirScript.Translator.Rewriter do
 
+  # :erlang, :lists, :maps, :beam_lib, :binary, :calendar, :digraph,
+  # :epp, :erl_lint, :erl_internal, :erl_expand_records, :erl_eval,
+  # :ets, :filename, :gen_event, :gen_server, :io, :io_lib, :math,
+  # :ordsets, :proc_lib, :rand, :re, :sets, :supervisor,:sys, :timer,
+  # :unicode, :os, :application, :code, :gen_tcp, :error_logger, :gen,
+  # :file
+  # http://erlang.org/doc/applications.html
+
 
   def rewrite({{:., _, [:erlang, :abs]}, _, [number]}) do
     quote do: Math.abs(unquote(number))
@@ -55,7 +63,7 @@ defmodule ElixirScript.Translator.Rewriter do
   end
 
   def rewrite({{:., _, [:erlang, :is_float]}, _, [term]}) do
-    quote do: (JS.typeof(unquote(term)) === "number" || JS.instanceof(unquote(term, Number))) && !Number.isInteger(unquote(term))
+    quote do: (JS.typeof(unquote(term)) === "number" || JS.instanceof(unquote(term), Number)) && !Number.isInteger(unquote(term))
   end
 
   def rewrite({{:., _, [:erlang, :is_function]}, _, [term]}) do
@@ -177,11 +185,6 @@ defmodule ElixirScript.Translator.Rewriter do
     quote do: nil
   end
 
-  def rewrite({{:., _, [:erlang, :spawn_monitor]}, _, [_module, _fun, _args]}) do
-    #TODO: implement spawn_monitor
-    quote do: nil
-  end
-
   def rewrite({{:., _, [:erlang, :throw]}, _, [term]}) do
     quote do: JS.throw(unquote(term))
   end
@@ -258,6 +261,43 @@ defmodule ElixirScript.Translator.Rewriter do
     quote do: JS.throw(unquote(reason))
   end
 
+  def rewrite({{:., _, [:erlang, :atom_to_binary]}, _, [atom, _]}) do
+    quote do: Symbol.keyFor(unquote(atom))
+  end
+
+  def rewrite({{:., _, [:erlang, :atom_to_list]}, _, [atom]}) do
+    quote do: to_string(unquote(atom)).split("")
+  end
+
+  def rewrite({{:., _, [:erlang, :bnot]}, _, [expr]}) do
+    {:"~", [], [expr]}
+  end
+
+  def rewrite({{:., _, [:erlang, :band]}, _, [left, right]}) do
+    {:&, [], [left, right]}
+  end
+
+  def rewrite({{:., _, [:erlang, :bor]}, _, [left, right]}) do
+    {:|, [], [left, right]}
+  end
+
+  def rewrite({{:., _, [:erlang, :bxor]}, _, [left, right]}) do
+    {:^, [], [left, right]}
+  end
+
+  def rewrite({{:., _, [:erlang, :bsl]}, _, [left, right]}) do
+    {:"<<", [], [left, right]}
+  end
+
+  def rewrite({{:., _, [:erlang, :bsr]}, _, [left, right]}) do
+    {:">>", [], [left, right]}
+  end
+
+  def rewrite({{:., _, [:erlang, :function_exported]}, _, [_, _, _]}) do
+    quote do: true
+  end
+
+
   def rewrite({{:., _, [:lists, :map]}, _, [fun, list]}) do
     quote do: unquote(list).map(unquote(fun))
   end
@@ -296,6 +336,10 @@ defmodule ElixirScript.Translator.Rewriter do
 
   def rewrite({{:., _, [:maps, :update]}, _, [key, value, map]}) do
     quote do: Elixir.Core.Functions.update_map(unquote(map), unquote(key), unquote(value))
+  end
+
+  def rewrite({{:., _, [:maps, :find]}, _, [key, map]}) do
+    quote do: Elixir.Core.Functions.maps_find(unquote(key), unquote(map))
   end
 
 

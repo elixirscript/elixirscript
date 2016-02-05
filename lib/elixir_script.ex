@@ -42,7 +42,7 @@ defmodule ElixirScript do
 
   @external_resource libs_path = Path.join([__DIR__, "elixir_script", "prelude", "**", "*.ex"])
   @libs Enum.filter(Path.wildcard(libs_path), fn(path) ->
-    !String.contains?(path, @modules_to_not_read)
+   !String.contains?(path, @modules_to_not_read)
   end)
   |> Enum.map(fn(path) ->
       path
@@ -147,7 +147,7 @@ defmodule ElixirScript do
         compiler_opts.import_standard_libs == false && ast.name in standard_lib_modules
       end)
       |> Enum.map(fn ast ->
-        spawn_link fn ->
+      spawn_link fn ->
           env = ElixirScript.Translator.Env.module_env(ast.name,  Utils.name_to_js_file_name(ast.name) <> ".js")
 
           module = case ast.type do
