@@ -103,7 +103,6 @@ defmodule ElixirScript.Translator.ModuleCollector do
               inner_module_body = make_inner_module_aliases( name ++ inner_module_name, inner_module_body)
               inner_alias = add_module_to_state(name, inner_module_name, inner_module_body)
 
-
               [ inner_alias ]
             _ ->
               x
@@ -126,7 +125,7 @@ defmodule ElixirScript.Translator.ModuleCollector do
     %{def: functions, defp: private_functions, defmacro: macros, defmacrop: private_macros } = get_functions_from_module(inner_module_body)
     js_imports = get_js_imports_from_module(inner_module_body)
 
-    inner_alias = {:alias, [], [{:__aliases__, [alias: false], name ++ inner_module_name}]}
+    inner_alias = { :alias, [], [{:__aliases__, [alias: false], name ++ inner_module_name}] }
 
     module_name = Utils.quoted_to_name({:__aliases__, [], tl(name) ++ inner_module_name})
     State.delete_module_by_name(module_name)

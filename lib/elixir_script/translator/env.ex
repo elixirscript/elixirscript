@@ -87,6 +87,17 @@ defmodule ElixirScript.Translator.Env do
       ElixirScript.Translator.State.get_module
 
     unless module do
+      module_name = case module_name do
+        {:__aliases__, _, _} ->
+                        ElixirScript.Translator.Utils.quoted_to_name(module_name)
+                        |> Atom.to_string
+                        |> String.split(".")
+                        |> tl
+                        |> Enum.join(".")
+        _ ->
+                        module_name
+      end
+
       raise "Module #{module_name} not found"
     end
 
@@ -97,7 +108,6 @@ defmodule ElixirScript.Translator.Env do
   def add_import(env, module_name) do
     module = get_module(env, module_name)
 
-
     %{ env | requires: Enum.uniq(env.requires ++ [module.name]),
     functions: env.functions ++ [{ module.name, module.functions }],
     macros: env.macros ++ [{ module.name, module.macros }] }
@@ -107,7 +117,7 @@ defmodule ElixirScript.Translator.Env do
     module = get_module(env, module_name)
 
     %{ env | functions: List.keydelete(env.functions, module_name, 0) ++ [{ module.name, module.functions }],
-    macros: List.keydelete(env.macros, module_name, 0),
+    macros: List.keydelete(env.macros, module.name, 0),
     requires: Enum.uniq(env.requires ++ [module.name]) }
   end
 
@@ -115,7 +125,7 @@ defmodule ElixirScript.Translator.Env do
     module = get_module(env, module_name)
 
     %{ env | macros: List.keydelete(env.macros, module_name, 0) ++ [{ module.name, module.macros }],
-    functions: List.keydelete(env.functions, module_name, 0),
+    functions: List.keydelete(env.functions, module.name, 0),
     requires: Enum.uniq(env.requires ++ [module.name]) }
   end
 
@@ -130,22 +140,22 @@ defmodule ElixirScript.Translator.Env do
     end)
 
     %{ env | requires: Enum.uniq(env.requires ++ [module.name]),
-    functions: List.keydelete(env.functions, module_name, 0) ++ [{ module.name, functions }],
-    macros: List.keydelete(env.macros, module_name, 0) ++ [{ module.name, macros }] }
+    functions: List.keydelete(env.functions, module.name, 0) ++ [{ module.name, functions }],
+    macros: List.keydelete(env.macros, module.name, 0) ++ [{ module.name, macros }] }
   end
 
   def add_import(env, module_name, [except: except]) do
     module = get_module(env, module_name)
 
-    {_, current_functions } = List.keyfind(env.functions, module_name, 0, { module_name, module.functions })
-    {_, current_macros } = List.keyfind(env.macros, module_name, 0, { module_name, module.macros })
+    {_, current_functions } = List.keyfind(env.functions, module.name, 0, { module.name, module.functions })
+    {_, current_macros } = List.keyfind(env.macros, module.name, 0, { module.name, module.macros })
 
     macros = Enum.filter(current_macros, fn(mac) -> not(mac in except) end)
     functions = Enum.filter(current_functions, fn(func) -> not(func in except) end)
 
     %{ env | requires: env.requires ++ [module.name],
-    functions: List.keydelete(env.functions, module_name, 0) ++ [{ module.name, functions }],
-    macros: List.keydelete(env.macros, module_name, 0) ++ [{ module.name, macros }] }
+    functions: List.keydelete(env.functions, module.name, 0) ++ [{ module.name, functions }],
+    macros: List.keydelete(env.macros, module.name, 0) ++ [{ module.name, macros }] }
   end
 
   def add_alias(env, module_name, alias_name) do

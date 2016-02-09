@@ -75,9 +75,8 @@ defmodule ElixirScript do
   """
   @spec compile_path(binary, Map.t) :: [binary | {binary, binary}]
   def compile_path(path, opts \\ %{}) do
-    code = path
-    |> Path.wildcard
-    |> Enum.map(&file_to_quoted/1)
+    path = Path.wildcard(path)
+    code = Enum.map(path, &file_to_quoted/1)
 
     do_compile(opts, code)
   end
