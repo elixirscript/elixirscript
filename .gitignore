@@ -17,3 +17,4 @@ fprof.trace
 index.js
 /doc
 /bench/snapshots
+.tern-port

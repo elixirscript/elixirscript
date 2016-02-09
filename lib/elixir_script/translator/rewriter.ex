@@ -297,6 +297,25 @@ defmodule ElixirScript.Translator.Rewriter do
     quote do: true
   end
 
+  def rewrite({{:., _, [:erlang, :make_tuple]}, _, [size, data]}) do
+    quote do: JS.new(Elixir.Core.Tuple, List.duplicate(unquote(size), unquote(data)))
+  end
+
+  def rewrite({{:., _, [:erlang, :insert_element]}, _, [index, tuple, term]}) do
+    quote do: unquote(tuple).put_elem(unquote(index) - 1, unquote(term))
+  end
+
+  def rewrite({{:., _, [:erlang, :tuple_to_list]}, _, [tuple]}) do
+    quote do: unquote(tuple).values
+  end
+
+  def rewrite({{:., _, [:erlang, :append_element]}, _, [tuple, value]}) do
+    quote do: unquote(tuple).put_elem(unquote(tuple).length, unquote(value))
+  end
+
+  def rewrite({{:., _, [:erlang, :delete_element]}, _, [index, tuple]}) do
+    quote do: unquote(tuple).remove_elem(unquote(index))
+  end
 
   def rewrite({{:., _, [:lists, :map]}, _, [fun, list]}) do
     quote do: unquote(list).map(unquote(fun))
