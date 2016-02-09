@@ -36,11 +36,17 @@ defmodule ElixirScript.Translator.Struct do
   def make_defstruct(attributes, env) when length(attributes) == 1 do
     attributes = Enum.flat_map(attributes, fn(x) -> x end)
 
-    defaults = Enum.map(attributes, fn({x, y}) ->
-      Map.make_property(
-        Translator.translate!(x, env),
-        Translator.translate!(y, env)
-      )
+    defaults = Enum.map(attributes, fn
+      ({x, y}) ->
+        Map.make_property(
+          Translator.translate!(x, env),
+          Translator.translate!(y, env)
+        )
+      (attribute) ->
+        Map.make_property(
+          Translator.translate!(attribute, env),
+          Translator.translate!(nil, env)
+        )
     end)
     |> JS.object_expression
 

@@ -29,7 +29,7 @@ defmodule ElixirScript.Translator.Struct.Test do
 
     ex_ast = quote do
       defmodule User do
-        defstruct :name, :age
+        defstruct [:name, :age]
       end
     end
 
