@@ -83,7 +83,8 @@ defmodule ElixirScript.Translator.Env do
   end
 
   defp get_module(env, module_name) do
-    module = ElixirScript.Translator.State.get_module(module_name)
+    module = get_module_name(env, module_name) |>
+      ElixirScript.Translator.State.get_module
 
     unless module do
       raise "Module #{module_name} not found"

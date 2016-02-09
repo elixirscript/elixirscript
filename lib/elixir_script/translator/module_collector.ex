@@ -61,17 +61,46 @@ defmodule ElixirScript.Translator.ModuleCollector do
     ast
   end
 
-  def do_process_modules({:defmodule, _, [{:__aliases__, _, name}, [do: body]]} = ast) do
-    body = make_inner_module_aliases(name, body)
-
-    make_module(body, name)
-    |> State.add_module
-
+  def do_process_modules({:defmodule, _, [{:__aliases__, _, _}, [do: _]]} = ast) do
+    do_module_processing(ast)
     ast
   end
 
   def do_process_modules(ast) do
     ast
+  end
+
+  defp do_module_processing({:defmodule, _, [{:__aliases__, _, name}, [do: body]]}) do
+    { body, inner_modules } = make_inner_module_aliases(name, body)
+
+    aliases = Enum.map(inner_modules, fn
+      ({:defmodule, _, [{:__aliases__, _, inner_module_name}, [do: inner_module_body]]}) ->
+        { :alias, [], [{:__aliases__, [alias: false], name ++ inner_module_name}, [as: {:__aliases__, [alias: false], inner_module_name }] ] }
+    end)
+
+    Enum.each(inner_modules, fn
+      ({:defmodule, context1, [{:__aliases__, context2, inner_module_name}, [do: inner_module_body]]}) ->
+
+        module_name = Utils.quoted_to_name({:__aliases__, [], tl(name) ++ inner_module_name})
+        State.delete_module_by_name(module_name)
+
+        this_module_aliases = aliases -- [{ :alias, [], [{:__aliases__, [alias: false], name ++ inner_module_name}, [as: {:__aliases__, [alias: false], inner_module_name }] ] }]
+
+        {:defmodule, context1, [{:__aliases__, context2, name ++ inner_module_name}, [do: add_aliases_to_body(inner_module_body, this_module_aliases)]]}
+        |> do_module_processing
+    end)
+
+    module = make_module(add_aliases_to_body(body, aliases), name)
+    State.add_module(module)
+  end
+
+  defp add_aliases_to_body(body, aliases) do
+    case body do
+      { :__block__, context, body } ->
+        { :__block__, context, aliases ++ List.wrap(body) }
+      _ ->
+        { :__block__, [], aliases ++ List.wrap(body) }
+    end
   end
 
   defp make_module(body, name) do
@@ -94,31 +123,23 @@ defmodule ElixirScript.Translator.ModuleCollector do
   defp make_inner_module_aliases(name, body) do
     case body do
       nil ->
-        { :__block__, [], [] }
+        { { :__block__, [], [] }, [] }
 
       {:__block__, context, list2 } ->
-        list2 = Enum.map(list2, fn(x) ->
+        { list2, inner_modules } = Enum.partition(list2, fn(x) ->
           case x do
             {:defmodule, _, [{:__aliases__, _, inner_module_name}, [do: inner_module_body]]} ->
-              inner_module_body = make_inner_module_aliases( name ++ inner_module_name, inner_module_body)
-              inner_alias = add_module_to_state(name, inner_module_name, inner_module_body)
-
-
-              [ inner_alias ]
+              false
             _ ->
-              x
+              true
           end
         end)
-        |> List.flatten
 
-        {:__block__, context, list2}
-      {:defmodule, _, [{:__aliases__, context, inner_module_name}, [do: inner_module_body]]} ->
-        inner_module_body = make_inner_module_aliases(name ++ inner_module_name, inner_module_body)
-        inner_alias = add_module_to_state(name, inner_module_name, inner_module_body)
-
-        {:__block__, context, [ inner_alias ] }
+        { {:__block__, context, list2}, inner_modules }
+      {:defmodule, _, [{:__aliases__, context, inner_module_name}, [do: inner_module_body]]} = mod ->
+        { {:__block__, context, [] }, [mod] }
       _ ->
-        body
+        { body, [] }
     end
   end
 
