@@ -296,4 +296,37 @@ defmodule ElixirScript.Translator.Defmodule.Test do
 
     assert_translation(ex_ast, js_code)
   end
+
+
+  test "translate inner module has another inner module alias" do
+    ex_ast = quote do
+      defmodule Version do
+        defmodule Parser do
+          import Parser.DSL
+        end
+
+        defmodule Parser.DSL do
+          
+        end
+      end
+    end
+
+    js_code = """
+    import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+    import Elixir$Version$Parser from './Elixir.Version.Parser';
+    import Elixir$Version$Parser$DSL from './Elixir.Version.Parser.DSL';
+    export default {};
+
+    import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+    import Elixir$Version$Parser$DSL from './Elixir.Version.Parser.DSL';
+    export default {};
+
+    import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+    import Elixir$Version$Parser from './Elixir.Version.Parser';
+    export default {};
+    """
+
+    assert_translation(ex_ast, js_code)
+  end
+
 end
