@@ -123,7 +123,7 @@ describe('defmatch', () => {
 
     let fn = Patterns.defmatch(
       Patterns.make_case(
-        [Patterns.headTail()],
+        [Patterns.headTail($, $)],
         (head, tail) => tail
       )
     );

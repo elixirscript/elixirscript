@@ -57,8 +57,6 @@ defmodule ElixirScript.Translator.Module do
         body: imports ++ structs ++ private_functions ++ exported_functions ++ body ++ [default]
     }
 
-    IO.inspect(result.body)
-
     result
   end
 

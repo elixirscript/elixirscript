@@ -6,7 +6,7 @@ class BitString {
 
     this.value = Object.freeze(this.process(args));
     this.length = this.value.length;
-    this.bit_size = this.raw_value.reduce((prev, current) => prev + current.size);
+    this.bit_size = this.raw_value().reduce((prev, current) => prev + current.size);
     this.byte_size = (this.bit_size / 8) + (this.bit_size % 8 > 0 ? 1 : 0);
   }
 

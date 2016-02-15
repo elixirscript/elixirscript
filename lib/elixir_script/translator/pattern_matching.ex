@@ -65,10 +65,10 @@ defmodule ElixirScript.Translator.PatternMatching do
     )
   end
 
-  def head_tail() do
+  def head_tail(headParameter, tailParameter) do
     JS.call_expression(
       @head_tail,
-      []
+      [headParameter, tailParameter]
     )
   end
 
@@ -138,7 +138,11 @@ defmodule ElixirScript.Translator.PatternMatching do
   end
 
   defp do_build_match([{:|, _, [head, tail]}], env) do
-    { [head_tail()], [Translator.translate!(head, env), Translator.translate!(tail, env)] }
+    { head_patterns, head_params } = do_build_match(head, env)
+    { tail_patterns, tail_params } = do_build_match(tail, env)
+    params = head_params ++ tail_params
+
+    { [head_tail(hd(head_patterns), hd(tail_patterns))], params }
   end
 
   defp do_build_match({:<>, _, [prefix, value]}, env) do
