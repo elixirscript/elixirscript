@@ -2,6 +2,20 @@ defmodule ElixirScript.Translator.Kernel.Test do
   use ExUnit.Case
   import ElixirScript.TestHelper
 
+  test "raise" do
+    ex_ast = quote do
+      raise ArgumentError, "cannot convert list to string. The list must contain only integers, strings or nested such lists; got: #{inspect list}"
+    end
+
+    js_code = """
+    throw ArgumentError.create(Object.freeze({
+    [Symbol.for('message')]: 'cannot convert list to string. The list must contain only integers, strings or nested such lists; got: ' + Elixir$ElixirScript$String$Chars.to_string(inspect(list))
+    }));
+    """
+
+    assert_translation(ex_ast, js_code)
+  end
+
   test "max" do
     ex_ast = quote do
       max(1, 2)

@@ -469,6 +469,14 @@ defmodule ElixirScript.Translator do
     translate(quoted, env)
   end
 
+  defp do_translate({:raise, _, [alias_info, {:<<>>, _, _} = message]}, env) do
+    js_ast = JS.throw_statement(
+      Struct.new_struct(alias_info, {:%{}, [], [message: message] }, env)
+    )
+
+    { js_ast, env }
+  end
+
   defp do_translate({:raise, _, [alias_info, attributes]}, env) do
     js_ast = JS.throw_statement(
       Struct.new_struct(alias_info, {:%{}, [], attributes }, env)

@@ -18,3 +18,4 @@ index.js
 /doc
 /bench/snapshots
 .tern-port
+test/std_lib_compile_test.exs

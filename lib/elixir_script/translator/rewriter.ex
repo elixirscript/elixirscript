@@ -333,16 +333,102 @@ defmodule ElixirScript.Translator.Rewriter do
     quote do: Elixir.Core.Functions.foldr(unquote(fun), unquote(acc), unquote(list))
   end
 
+  def rewrite({{:., _, [:lists, :keymember]}, _, [key, n, list]}) do
+    quote do: Elixir.Core.Functions.keymember(unquote(key), unquote(n), unquote(list))
+  end
+
   def rewrite({{:., _, [:lists, :keydelete]}, _, [key, n, list]}) do
     quote do: Elixir.Core.Functions.keydelete(unquote(key), unquote(n), unquote(list))
   end
 
   def rewrite({{:., _, [:lists, :keystore]}, _, [key, n, list, newtuple]}) do
-    quote do: Elixir.Core.Functions.keymember(unquote(key), unquote(n), unquote(list),  unquote(newtuple))
+    quote do: Elixir.Core.Functions.keystore(unquote(key), unquote(n), unquote(list),  unquote(newtuple))
+  end
+
+  def rewrite({{:., _, [:lists, :keytake]}, _, [key, n, list]}) do
+    quote do: Elixir.Core.Functions.keystore(unquote(key), unquote(n), unquote(list))
+  end
+
+  def rewrite({{:., _, [:lists, :keyfind]}, _, [key, n, list]}) do
+    quote do: Elixir.Core.Functions.keyfind(unquote(key), unquote(n), unquote(list))
+  end
+
+  def rewrite({{:., _, [:lists, :keyreplace]}, _, [key, n, list, newtuple]}) do
+    quote do: Elixir.Core.Functions.keyreplace(unquote(key), unquote(n), unquote(list), unquote(newtuple))
+  end
+
+  def rewrite({{:., _, [:lists, :keysort]}, _, [n, tuplelist]}) do
+    #TODO: implement keysort
+    quote do: unquote(tuplelist)
   end
 
   def rewrite({{:., _, [:lists, :reverse]}, _, [list]}) do
     quote do: Elixir.Core.Functions.reverse(unquote(list))
+  end
+
+  def rewrite({{:., _, [:lists, :reverse]}, _, [list, tail]}) do
+    quote do: Elixir.Core.Functions.reverse(unquote(list)) ++ unquote(tail)
+  end
+
+  def rewrite({{:., _, [:lists, :flatten]}, _, [list]}) do
+    quote do: Elixir.Core.Functions.flatten(unquote(list))
+  end
+
+  def rewrite({{:., _, [:lists, :flatten]}, _, [list, tail]}) do
+    quote do: Elixir.Core.Functions.flatten(unquote(list), unquote(tail))
+  end
+
+  def rewrite({{:., _, [:lists, :delete]}, _, [elem, list]}) do
+    quote do: Elixir.Core.Functions.remove_from_list(unquote(list), unquote(elem))
+  end
+
+  def rewrite({{:., _, [:lists, :duplicate]}, _, [n, elem]}) do
+    quote do: Elixir.Core.Functions.duplicate(unquote(n), unquote(elem))
+  end
+
+  def rewrite({{:., _, [:lists, :mapfoldl]}, _, [fun, acc, list]}) do
+    quote do: Elixir.Core.Functions.mapfoldl(unquote(fun), unquote(acc), unquote(list))
+  end
+
+  def rewrite({{:., _, [:lists, :sort]}, _, [list]}) do
+    quote do: unquote(list).sort()
+  end
+
+  #TODO: Implement sort
+  def rewrite({{:., _, [:lists, :sort]}, _, [_fun, list]}) do
+    quote do: unquote(list)
+  end
+
+  def rewrite({{:., _, [:lists, :filter]}, _, [pred, list]}) do
+    quote do: unquote(list).filter(unquote(pred))
+  end
+
+  def rewrite({{:., _, [:lists, :filtermap]}, _, [fun, list]}) do
+    quote do: Elixir.Core.Functions.filtermap(unquote(fun), unquote(list))
+  end
+
+  def rewrite({{:., _, [:erlang, :list_to_atom]}, _, [char_list]}) do
+    quote do: Symbol.for(unquote(char_list))
+  end
+
+  def rewrite({{:., _, [:erlang, :list_to_existing_atom]}, _, [char_list]}) do
+    quote do: Symbol.for(unquote(char_list))
+  end
+
+  def rewrite({{:., _, [:erlang, :list_to_tuple]}, _, [list]}) do
+    quote do: JS.new(Elixir.Core.Tuple, unquote(list))
+  end
+
+  def rewrite({{:., _, [:erlang, :list_to_float]}, _, [list]}) do
+    quote do: parseFloat(unquote(list))
+  end
+
+  def rewrite({{:., _, [:erlang, :list_to_integer]}, _, [list]}) do
+    quote do: parseInt(unquote(list))
+  end
+
+  def rewrite({{:., _, [:erlang, :list_to_integer]}, _, [list, base]}) do
+    quote do: parseInt(unquote(list), unquote(base))
   end
 
   def rewrite({{:., _, [:maps, :is_key]}, _, [key, map]}) do

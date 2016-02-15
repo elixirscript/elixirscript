@@ -235,6 +235,17 @@ function foldr(fun, acc, list){
     return acc1;
 }
 
+function keyfind(key, n, tuplelist){
+
+  for(let i = tuplelist.length - 1; i >= 0; i--){
+    if(tuplelist[i].get(n) === key){
+      return tuplelist[i];
+    }
+  }
+
+  return false;
+}
+
 function keydelete(key, n, tuplelist){
 
     for(let i = tuplelist.length - 1; i >= 0; i--){
@@ -253,8 +264,40 @@ function keystore(key, n, list, newtuple){
         }
     }
 
-    return list;
+  return list.concat([]).push(newtuple);
 }
+
+function keymember(key, n, list){
+  for(let i = list.length - 1; i >= 0; i--){
+    if(list[i].get(n) === key){
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function keytake(key, n, list){
+  if(!keymember(key, n, list)){
+    return false;
+  }
+
+  let tuple = keyfind(key, n, list);
+
+  return new Tuple(tuple.get(n), tuple, keydelete(key, n, list));
+}
+
+function keyreplace(key, n, list, newtuple){
+  
+  for(let i = tuplelist.length - 1; i >= 0; i--){
+    if(tuplelist[i].get(n) === key){
+      return tuplelist.concat([]).splice(i, 1, newtuple);
+    }
+  }
+
+  return tuplelist;
+}
+
 
 function reverse(list){
     return list.concat([]).reverse();
@@ -266,6 +309,59 @@ function maps_find(key, map){
     }else{
         return Symbol.for("error");
     }
+}
+
+function flatten(list, tail = []) {
+  let new_list = [];
+
+  for(let e of list){
+    if(isArray(e)){
+      new_list = new_list.concat(flatten(e));
+    }else{
+      new_list.push(e);
+    }
+  }
+
+  return Object.freeze(new_list.concat(tail));
+}
+
+function duplicate(n, elem){
+  let list = [];
+
+  for(let i = 0; i < n; i++){
+    list.push(elem);
+  }
+
+  return Object.freeze(list);
+}
+
+function mapfoldl(fun, acc, list){
+  let newlist = [];
+
+  for(let x of list){
+    let tup = fun(x, acc);
+    newlist.push(tup.get(0));
+    acc = tup.get(1);
+  }
+
+
+  return new Tuple(Object.freeze(newlist), acc);
+}
+
+function filtermap(fun, list){
+  let newlist = [];
+
+  for(x of list){
+    let result = fun(x);
+
+    if(result === true){
+      newlist.push(x);
+    }else if(result instanceof Tuple){
+      newlist.push(result.get(1));
+    }
+  }
+
+  return Object.freeze(newlist);
 }
 
 export default {
@@ -296,7 +392,14 @@ export default {
   remove_from_list,
   keydelete,
   keystore,
-    reverse,
-    update_map,
-    maps_find
+  keyfind,
+  keytake,
+  keyreplace,
+  reverse,
+  update_map,
+  maps_find,
+  flatten,
+  duplicate,
+  mapfoldl,
+  filtermap
 };
