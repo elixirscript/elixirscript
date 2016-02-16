@@ -407,6 +407,18 @@ defmodule ElixirScript.Translator.Rewriter do
     quote do: Elixir.Core.Functions.filtermap(unquote(fun), unquote(list))
   end
 
+  def rewrite({{:., _, [:lists, :concat]}, _, [things]}) do
+    quote do: unquote(things).join("")
+  end
+
+  def rewrite({{:., _, [:erlang, :binary_to_atom]}, _, [binary, _]}) do
+    quote do: Symbol.for(unquote(binary))
+  end
+
+  def rewrite({{:., _, [:erlang, :binary_to_existing_atom]}, _, [binary, _]}) do
+    quote do: Symbol.for(unquote(binary))
+  end
+
   def rewrite({{:., _, [:erlang, :list_to_atom]}, _, [char_list]}) do
     quote do: Symbol.for(unquote(char_list))
   end
@@ -431,6 +443,50 @@ defmodule ElixirScript.Translator.Rewriter do
     quote do: parseInt(unquote(list), unquote(base))
   end
 
+  def rewrite({{:., _, [:erlang, :integer_to_binary]}, _, [integer]}) do
+    quote do: unquote(integer).toString()
+  end
+
+  def rewrite({{:., _, [:erlang, :integer_to_binary]}, _, [integer, base]}) do
+    quote do: unquote(integer).toString(unquote(base))
+  end
+
+  def rewrite({{:., _, [:erlang, :integer_to_list]}, _, [integer]}) do
+    quote do: unquote(integer).toString()
+  end
+
+  def rewrite({{:., _, [:erlang, :integer_to_list]}, _, [integer, base]}) do
+    quote do: unquote(integer).toString(unquote(base))
+  end
+
+  def rewrite({{:., _, [:erlang, :float_to_binary]}, _, [float]}) do
+    quote do: unquote(float).toString()
+  end
+
+  def rewrite({{:., _, [:erlang, :float_to_binary]}, _, [float, base]}) do
+    quote do: unquote(float).toString(unquote(base))
+  end
+
+  def rewrite({{:., _, [:erlang, :float_to_list]}, _, [float]}) do
+    quote do: unquote(float).toString()
+  end
+
+  def rewrite({{:., _, [:erlang, :float_to_list]}, _, [float, base]}) do
+    quote do: unquote(float).toString(unquote(base))
+  end
+
+  def rewrite({{:., _, [:erlang, :binary_to_float]}, _, [binary]}) do
+    quote do: parseFloat(unquote(binary))
+  end
+
+  def rewrite({{:., _, [:erlang, :binary_to_integer]}, _, [binary]}) do
+    quote do: parseInt(unquote(binary))
+  end
+
+  def rewrite({{:., _, [:erlang, :binary_to_integer]}, _, [binary, base]}) do
+    quote do: parseInt(unquote(binary), unquote(base))
+  end
+
   def rewrite({{:., _, [:maps, :is_key]}, _, [key, map]}) do
     quote do: unquote(key) in Elixir.Core.Functions.get_object_keys(unquote(map))
   end
@@ -447,5 +503,16 @@ defmodule ElixirScript.Translator.Rewriter do
     quote do: Elixir.Core.Functions.maps_find(unquote(key), unquote(map))
   end
 
+  def rewrite({{:., _, [:maps, :remove]}, _, [key, map]}) do
+    quote do: Elixir.Core.Functions.delete_property_from_map(unquote(map), unquote(key))
+  end
+
+  def rewrite({{:., _, [:maps, :fold]}, _, [fun, init, map]}) do
+    quote do: Elixir.Core.Functions.maps_fold(unquote(fun), unquote(init), unquote(map))
+  end
+
+  def rewrite({{:., _, [:maps, :from_list]}, _, [list]}) do
+    quote do: Elixir.Core.Functions.maps_fold(unquote(list))
+  end
 
 end

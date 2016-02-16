@@ -193,6 +193,10 @@ defmodule ElixirScript.Translator.ModuleCollector do
 
       add_function_to_map(state, type, name, arity)
 
+    ({type, _, [{name, _, nil}, [do: _body]]}, state)  when type in [:defmacro, :defmacrop]  ->
+      add_function_to_map(state, type, name, 0)
+
+
     ({type, _, [{name, _, params}, [do: _body]]}, state)  when type in [:defmacro, :defmacrop]  ->
       arity = length(params)
 

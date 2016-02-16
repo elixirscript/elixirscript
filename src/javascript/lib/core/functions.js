@@ -364,6 +364,26 @@ function filtermap(fun, list){
   return Object.freeze(newlist);
 }
 
+function maps_fold(fun, acc, map){
+  let acc1 = acc;
+
+  for(let k of get_object_keys(map)){
+    acc1 = fun(k, map[k], acc1);
+  }
+
+  return acc1;
+}
+
+function maps_from_list(list){
+  let m = {};
+
+  for(x of list){
+    m[x.get(0)] = x.get(1);
+  }
+
+  return Object.freeze(m);
+}
+
 export default {
   call_property,
   apply,
@@ -401,5 +421,6 @@ export default {
   flatten,
   duplicate,
   mapfoldl,
-  filtermap
+  filtermap,
+  maps_fold
 };

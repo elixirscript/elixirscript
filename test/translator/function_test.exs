@@ -463,9 +463,9 @@ defmodule ElixirScript.Translator.Function.Test do
 
 
     js_code = """
-     const something = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.headTail()],function(apple,fruits)    {
-             return     null;
-           }));
+    const something = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.headTail(Elixir.Core.Patterns.variable(),Elixir.Core.Patterns.variable())],function(apple,fruits)    {
+    return     null;
+    }));
     """
 
     assert_translation(ex_ast, js_code)
