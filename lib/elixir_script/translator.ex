@@ -21,8 +21,20 @@ defmodule ElixirScript.Translator do
   alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.JS, as: JSLib
   alias ESTree.Tools.Builder, as: JS
+  alias ElixirScript.Translator.Rewriter
 
-
+  @erlang_modules [
+    :erlang,
+    :maps,
+    :lists,
+    :gen,
+    :elixir_errors,
+    :supervisor,
+    :application,
+    :code,
+    :elixir_utils,
+    :file
+  ]
 
   @doc """
   Translates the given Elixir AST to JavaScript AST. The given `env` is a `ElixirScript.Macro.Env`
@@ -183,6 +195,11 @@ defmodule ElixirScript.Translator do
       _ ->
         Bitstring.make_bitstring(elements, env)
     end
+  end
+
+  defp do_translate({{:., _, [erlang_module, _]}, _, _} = erlang_function_call, env) when erlang_module in @erlang_modules do
+    Rewriter.rewrite(erlang_function_call)
+    |> translate(env)
   end
 
   defp do_translate({{:., _, [Access, :get]}, _, [target, property]}, env) do
@@ -463,9 +480,17 @@ defmodule ElixirScript.Translator do
     translate(quoted, env)
   end
 
-  defp do_translate({:raise, _, [alias_info, attributes]}, env) do
+  defp do_translate({:raise, _, [alias_info, attributes]}, env) when is_list(attributes) do
     js_ast = JS.throw_statement(
       Struct.new_struct(alias_info, {:%{}, [], attributes }, env)
+    )
+
+    { js_ast, env }
+  end
+
+  defp do_translate({:raise, _, [alias_info, message]}, env) do
+    js_ast = JS.throw_statement(
+      Struct.new_struct(alias_info, {:%{}, [], [message: message] }, env)
     )
 
     { js_ast, env }

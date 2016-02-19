@@ -5,6 +5,9 @@ class BitString {
     };
 
     this.value = Object.freeze(this.process(args));
+    this.length = this.value.length;
+    this.bit_size = this.raw_value().reduce((prev, current) => prev + current.size);
+    this.byte_size = (this.bit_size / 8) + (this.bit_size % 8 > 0 ? 1 : 0);
   }
 
   get(index){
@@ -119,7 +122,7 @@ class BitString {
   }
 
   static bitstring(value){
-    return BitString.wrap(value, { 'type': 'bitstring', 'unit': 1, 'size': value.length });
+    return BitString.wrap(value, { 'type': 'bitstring', 'unit': 1, 'size': value.bit_size });
   }
 
   static bits(value){
@@ -127,7 +130,7 @@ class BitString {
   }
 
   static binary(value){
-    return BitString.wrap(value, { 'type': 'binary', 'unit': 8, 'size': value.length});
+    return BitString.wrap(value, { 'type': 'binary', 'unit': 8, 'size': value.length });
   }
 
   static bytes(value){

@@ -29,7 +29,12 @@ export class Capture {
 }
 
 export class HeadTail {
-  constructor() {
+  head: any;
+  tail: any;
+
+  constructor(head: any = null, tail: any = null) {
+    this.head = head;
+    this.tail = tail;
   }
 }
 
@@ -67,8 +72,8 @@ export function capture(value: any): Capture {
   return new Capture(value);
 }
 
-export function headTail(): HeadTail {
-  return new HeadTail();
+export function headTail(head: any = null, tail: any = null): HeadTail {
+  return new HeadTail(head, tail);
 }
 
 export function type(type: any, objPattern: Object = {}): Type {

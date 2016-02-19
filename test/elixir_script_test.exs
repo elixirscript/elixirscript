@@ -181,5 +181,4 @@ defmodule ElixirScript.Test do
        };
      """, hd(js_code)
   end
-
 end

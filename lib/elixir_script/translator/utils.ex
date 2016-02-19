@@ -7,7 +7,6 @@ defmodule ElixirScript.Translator.Utils do
     :break,
     :case,
     :class,
-    :catch,
     :const,
     :continue,
     :debugger,

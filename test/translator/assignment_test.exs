@@ -71,8 +71,8 @@ defmodule ElixirScript.Translator.Assignment.Test do
   test "translate head/tail assignment" do
     ex_ast = quote do: [a | b] = [1, 2, 3, 4]
     js_code = """
-         let [a,b] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.headTail(),Object.freeze([1, 2, 3, 4]));
-         let _ref = Object.freeze([a, b]);
+    let [a,b] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.headTail(Elixir.Core.Patterns.variable(),Elixir.Core.Patterns.variable()),Object.freeze([1, 2, 3, 4]));
+    let _ref = Object.freeze([a, b]);
     """
 
     assert_translation(ex_ast, js_code)

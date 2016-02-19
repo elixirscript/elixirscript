@@ -55,7 +55,7 @@ defmodule ElixirScript.Translator.Module do
     result = %{
         name: Utils.quoted_to_name({:__aliases__, [], module }),
         body: imports ++ structs ++ private_functions ++ exported_functions ++ body ++ [default]
-      }
+    }
 
     result
   end

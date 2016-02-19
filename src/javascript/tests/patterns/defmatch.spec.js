@@ -123,7 +123,7 @@ describe('defmatch', () => {
 
     let fn = Patterns.defmatch(
       Patterns.make_case(
-        [Patterns.headTail()],
+        [Patterns.headTail($, $)],
         (head, tail) => tail
       )
     );
@@ -143,7 +143,4 @@ describe('defmatch', () => {
     expect(fn(new Tuple(1, 2, 3))).to.equal(3);
     expect(fn.bind(fn, new Tuple(1, 2, 4))).to.throw("No match for: {1, 2, 4}");
   });
-
-
-
 });

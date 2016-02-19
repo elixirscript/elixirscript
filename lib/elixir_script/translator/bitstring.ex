@@ -53,6 +53,11 @@ defmodule ElixirScript.Translator.Bitstring do
     do_make_bitstring_element({:size, Translator.translate!(element, env), [Translator.translate!(size, env)]})
   end
 
+  defp make_bitstring_element(element, env) do
+    do_make_bitstring_element({:binary, Translator.translate!(element, env)})
+  end
+
+
   defp handle_type_adjectives({:-, _, types}, ast, env) do
     Enum.reduce(types, ast, fn(type, current_ast) ->
       case type do

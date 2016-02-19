@@ -69,6 +69,12 @@ defmodule ElixirScript.JS do
   defmacro instanceof(value, type) do
   end
 
+  @doc """
+  Throws the term given
+  """
+  defmacro throw(term) do
+  end
+
 
   @doc """
   Returns a reference to the global JavaScript object.

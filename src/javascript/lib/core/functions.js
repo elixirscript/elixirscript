@@ -7,7 +7,7 @@ function call_property(item, property){
   let prop = null;
 
   if(property in item){
-    prop = property
+      prop = property;
   }else if(Symbol.for(property) in item){
     prop = Symbol.for(property);
   }else{
@@ -62,7 +62,7 @@ function defstruct(defaults){
       let x = new this(updates);
       return Object.freeze(x);
     }
-  }
+  };
 }
 
 
@@ -85,7 +85,7 @@ function defexception(defaults){
       let x = new this(updates);
       return Object.freeze(x);
     }
-  }
+  };
 }
 
 function defprotocol(spec){
@@ -97,7 +97,7 @@ function defimpl(protocol, type, impl){
 }
 
 function get_object_keys(obj){
-  return Object.keys(obj).concat(Object.getOwnPropertySymbols(obj))
+    return Object.keys(obj).concat(Object.getOwnPropertySymbols(obj));
 }
 
 function is_valid_character(codepoint){
@@ -116,14 +116,14 @@ function b64EncodeUnicode(str) {
 }
 
 function delete_property_from_map(map, property){
-  let new_map = Object.assign(Object.create(map.constructor.prototype), map)
-  delete new_map[property]
+    let new_map = Object.assign(Object.create(map.constructor.prototype), map);
+    delete new_map[property];
 
   return Object.freeze(new_map);
 }
 
 function class_to_obj(map){
-  let new_map = Object.assign({}, map)
+    let new_map = Object.assign({}, map);
   return Object.freeze(new_map);
 }
 
@@ -131,6 +131,15 @@ function add_property_to_map(map, property, value){
   let new_map = Object.assign({}, map);
   new_map[property] = value;
   return Object.freeze(new_map);
+}
+
+
+function update_map(map, property, value){
+    if(property in get_object_keys(map)){
+        return add_property_to_map(map, property, value);
+    }
+
+    throw "map does not have key";
 }
 
 function bnot(expr){
@@ -192,6 +201,189 @@ function can_decode64(data) {
   }
 }
 
+function remove_from_list(list, element){
+    let found = false;
+
+    return list.filter((elem) => {
+        if(!found && elem === element){
+            found = true;
+            return false;
+        }
+
+        return true;
+    });
+}
+
+function foldl(fun, acc, list){
+    let acc1 = acc;
+
+    for(const el of list){
+        acc1 = fun(el, acc1);
+    }
+
+    return acc1;
+}
+
+
+function foldr(fun, acc, list){
+    let acc1 = acc;
+
+    for(let i = list.length - 1; i >= 0; i--){
+        acc1 = fun(list[i], acc1);
+    }
+
+    return acc1;
+}
+
+function keyfind(key, n, tuplelist){
+
+  for(let i = tuplelist.length - 1; i >= 0; i--){
+    if(tuplelist[i].get(n) === key){
+      return tuplelist[i];
+    }
+  }
+
+  return false;
+}
+
+function keydelete(key, n, tuplelist){
+
+    for(let i = tuplelist.length - 1; i >= 0; i--){
+        if(tuplelist[i].get(n) === key){
+            return tuplelist.concat([]).splice(i, 1);
+        }
+    }
+
+    return tuplelist;
+}
+
+function keystore(key, n, list, newtuple){
+    for(let i = list.length - 1; i >= 0; i--){
+        if(list[i].get(n) === key){
+            return list.concat([]).splice(i, 1, newtuple);
+        }
+    }
+
+  return list.concat([]).push(newtuple);
+}
+
+function keymember(key, n, list){
+  for(let i = list.length - 1; i >= 0; i--){
+    if(list[i].get(n) === key){
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function keytake(key, n, list){
+  if(!keymember(key, n, list)){
+    return false;
+  }
+
+  let tuple = keyfind(key, n, list);
+
+  return new Tuple(tuple.get(n), tuple, keydelete(key, n, list));
+}
+
+function keyreplace(key, n, list, newtuple){
+  
+  for(let i = tuplelist.length - 1; i >= 0; i--){
+    if(tuplelist[i].get(n) === key){
+      return tuplelist.concat([]).splice(i, 1, newtuple);
+    }
+  }
+
+  return tuplelist;
+}
+
+
+function reverse(list){
+    return list.concat([]).reverse();
+}
+
+function maps_find(key, map){
+    if(key in get_object_keys(map)){
+        return new Tuple(Symbol.for("ok"), map[key]);
+    }else{
+        return Symbol.for("error");
+    }
+}
+
+function flatten(list, tail = []) {
+  let new_list = [];
+
+  for(let e of list){
+    if(isArray(e)){
+      new_list = new_list.concat(flatten(e));
+    }else{
+      new_list.push(e);
+    }
+  }
+
+  return Object.freeze(new_list.concat(tail));
+}
+
+function duplicate(n, elem){
+  let list = [];
+
+  for(let i = 0; i < n; i++){
+    list.push(elem);
+  }
+
+  return Object.freeze(list);
+}
+
+function mapfoldl(fun, acc, list){
+  let newlist = [];
+
+  for(let x of list){
+    let tup = fun(x, acc);
+    newlist.push(tup.get(0));
+    acc = tup.get(1);
+  }
+
+
+  return new Tuple(Object.freeze(newlist), acc);
+}
+
+function filtermap(fun, list){
+  let newlist = [];
+
+  for(x of list){
+    let result = fun(x);
+
+    if(result === true){
+      newlist.push(x);
+    }else if(result instanceof Tuple){
+      newlist.push(result.get(1));
+    }
+  }
+
+  return Object.freeze(newlist);
+}
+
+function maps_fold(fun, acc, map){
+  let acc1 = acc;
+
+  for(let k of get_object_keys(map)){
+    acc1 = fun(k, map[k], acc1);
+  }
+
+  return acc1;
+}
+
+function maps_from_list(list){
+  let m = {};
+
+  for(x of list){
+    m[x.get(0)] = x.get(1);
+  }
+
+  return Object.freeze(m);
+}
+
 export default {
   call_property,
   apply,
@@ -214,5 +406,21 @@ export default {
   bsl,
   bsr,
   bxor,
-  zip
+  zip,
+  foldl,
+  foldr,
+  remove_from_list,
+  keydelete,
+  keystore,
+  keyfind,
+  keytake,
+  keyreplace,
+  reverse,
+  update_map,
+  maps_find,
+  flatten,
+  duplicate,
+  mapfoldl,
+  filtermap,
+  maps_fold
 };

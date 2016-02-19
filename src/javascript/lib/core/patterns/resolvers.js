@@ -64,7 +64,10 @@ function resolveVariable(): Function {
   };
 }
 
-function resolveHeadTail(): Function {
+function resolveHeadTail(pattern: Types.HeadTail): Function {
+  const headMatches = buildMatch(pattern.head);
+  const tailMatches = buildMatch(pattern.tail);
+
   return function(value: any, args: Array<any>): boolean {
     if(!Checks.is_array(value) || value.length < 2){
       return false;
@@ -73,10 +76,9 @@ function resolveHeadTail(): Function {
     const head = value[0];
     const tail = value.slice(1);
 
-    args.push(head);
-    args.push(tail);
-
-    return true;
+    if(headMatches(head, args) && tailMatches(tail, args)){
+      return true;
+    }
   };
 }
 

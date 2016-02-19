@@ -38,7 +38,7 @@ defmodule ElixirScript.Html do
       { inner, attributes } = do_tag(inner, attrs)
 
       quote do
-         Elixir.VirtualDOM.h(unquote(tag), unquote(attributes), unquote_splicing(inner))
+         Elixir.VirtualDOM.h(unquote(tag), unquote(attributes), unquote(inner))
       end
     end
 
@@ -49,7 +49,7 @@ defmodule ElixirScript.Html do
       { inner, attributes } = do_tag(inner, attributes)
 
       quote do
-         Elixir.VirtualDOM.h(unquote(tag), unquote(attributes), unquote_splicing(inner))
+         Elixir.VirtualDOM.h(unquote(tag), unquote(attributes), unquote(inner))
       end
     end
   end
