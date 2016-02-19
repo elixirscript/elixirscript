@@ -17,9 +17,9 @@ class Protocol{
         let fun = null;
 
         if(Number.isInteger(thing) && this.hasImplementation(Integer)){
-          fun = this.registry.get(Core.Integer)[funName];
+          fun = this.registry.get(Integer)[funName];
         }else if(typeof thing === "number" && !Number.isInteger(thing) && this.hasImplementation(Float)){
-          fun = this.registry.get(Core.Float)[funName];
+          fun = this.registry.get(Float)[funName];
         }else if(this.hasImplementation(thing)){
           fun = this.registry.get(thing.constructor)[funName];
         }else if(this.fallback){

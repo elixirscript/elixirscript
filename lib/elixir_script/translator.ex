@@ -23,7 +23,18 @@ defmodule ElixirScript.Translator do
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator.Rewriter
 
-
+  @erlang_modules [
+    :erlang,
+    :maps,
+    :lists,
+    :gen,
+    :elixir_errors,
+    :supervisor,
+    :application,
+    :code,
+    :elixir_utils,
+    :file
+  ]
 
   @doc """
   Translates the given Elixir AST to JavaScript AST. The given `env` is a `ElixirScript.Macro.Env`
@@ -186,7 +197,7 @@ defmodule ElixirScript.Translator do
     end
   end
 
-  defp do_translate({{:., _, [erlang_module, _]}, _, _} = erlang_function_call, env) when erlang_module in [:erlang, :maps, :lists] do
+  defp do_translate({{:., _, [erlang_module, _]}, _, _} = erlang_function_call, env) when erlang_module in @erlang_modules do
     Rewriter.rewrite(erlang_function_call)
     |> translate(env)
   end
