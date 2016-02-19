@@ -1,4 +1,11 @@
-# v0.16.0-dev
+# v0.15.1
+* Bug fixes
+  * Fixed View module so that an element can have multiple elements within
+  * Removed `catch` as a javascript keyword to filter
+  * Fixed struct implementation so that lists of atoms for fields are compiled correctly
+  * Fixed head-tail pattern match to allow for more complicated scenarios
+  * Fixed ModuleCollector to properly alias inner modules
+  * Fixed raise translation to properly translate when string messages are given
 
 # v0.15.0
 * Enhancements
