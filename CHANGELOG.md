@@ -1,4 +1,4 @@
-# v0.15.2-dev
+# v0.15.2
 * Enhancements
   * Support for variables as map keys
   
