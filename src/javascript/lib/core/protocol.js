@@ -45,6 +45,10 @@ class Protocol{
   }
 
   hasImplementation(thing) {
+    if (thing === Integer || thing === Float){
+      return this.registry.has(thing);
+    }
+
     return this.registry.has(thing.constructor);
   }
 }

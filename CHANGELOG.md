@@ -1,3 +1,8 @@
+# v0.15.2-dev
+* Bug fixes
+  * Fixed protocol implementations for Integer and Float which where not recognized
+  * Fixed calling properties on non-objects
+
 # v0.15.1
 * Bug fixes
   * Fixed View module so that an element can have multiple elements within

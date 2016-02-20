@@ -6,12 +6,22 @@ import Protocol from './protocol';
 function call_property(item, property){
   let prop = null;
 
-  if(property in item){
+  if(typeof item === "number" || typeof item === "symbol" || typeof item === "boolean" || typeof item === "string"){
+    if(item[property] !== undefined){
       prop = property;
-  }else if(Symbol.for(property) in item){
-    prop = Symbol.for(property);
-  }else{
-    throw new Error(`Property ${property} not found in ${item}`);
+    }else if(item[Symbol.for(property)] !== undefined){
+      prop = Symbol.for(property);
+    }
+  } else {
+    if(property in item){
+      prop = property;
+    }else if(Symbol.for(property) in item){
+      prop = Symbol.for(property);
+    }
+  }
+
+  if(prop === null){
+    throw new Error(`Property ${ property } not found in ${ item }`); 
   }
 
   if(item[prop] instanceof Function){
