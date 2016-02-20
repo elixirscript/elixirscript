@@ -38,7 +38,7 @@ Compile
 Test
 
     mix test
-    gulp test
+    npm test
 
 
 Contributing

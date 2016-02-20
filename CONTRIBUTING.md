@@ -79,7 +79,7 @@ Please look at [this issue](https://github.com/bryanjos/elixirscript/issues/143)
 
 The ElixirScript tests can be run using `mix test`
 
-The JavaScript tests can be run using `gulp test`
+The JavaScript tests can be run using `npm test`
 
 Please make sure all tests pass after making changes. Also make sure to include tests for
 the changes you made.
