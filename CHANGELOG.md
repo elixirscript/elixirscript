@@ -1,7 +1,10 @@
 # v0.15.2-dev
+* Enhancements
+  * Support for variables as map keys
+  
 * Bug fixes
   * Fixed protocol implementations for Integer and Float which where not recognized
-  * Fixed calling properties on non-objects
+  * Fixed calling properties on non-objects 
 
 # v0.15.1
 * Bug fixes

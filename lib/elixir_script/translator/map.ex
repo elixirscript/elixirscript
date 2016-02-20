@@ -26,7 +26,13 @@ defmodule ElixirScript.Translator.Map do
     properties
     |> Enum.map(fn
       ({x, {:__aliases__, _, [value]}}) -> make_property(Translator.translate!(x, env), JS.identifier(value))
-      ({x, y}) -> make_property(Translator.translate!(x, env), Translator.translate!(y, env))
+      ({x, y}) ->
+        case x do
+          {_, _, atom } when is_atom(atom) ->
+            JS.property(Translator.translate!(x, env),  Translator.translate!(y, env), :init, false, false, true)
+          _ ->
+            make_property(Translator.translate!(x, env), Translator.translate!(y, env))
+        end
     end)
     |> JS.object_expression
     |> make_map

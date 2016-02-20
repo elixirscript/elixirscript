@@ -52,4 +52,11 @@ defmodule ElixirScript.Translator.Map.Test do
 
     assert_translation(ex_ast, js_code)
   end
+
+  test "translate variable key" do
+    ex_ast = quote do: %{key => value}
+    js_code = "Object.freeze({ [key]: value })"
+    assert_translation(ex_ast, js_code)
+  end
+
 end
