@@ -1,6 +1,11 @@
-var BitString = require('../lib/core').BitString;
-var Patterns = require('../lib/core').Patterns;
-var expect = require('chai').expect;
+import Core from "../lib/core";
+const Patterns = Core.Patterns;
+const BitString = Core.BitString;
+
+import Enum from "../lib/enum";
+
+import chai from 'chai';
+var expect = chai.expect;
 
 function is_match(pattern, expr, guard = () => true){
   return Patterns.match_no_throw(pattern, expr, guard) != null;

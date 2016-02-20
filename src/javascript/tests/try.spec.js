@@ -1,7 +1,11 @@
-var Patterns = require("../lib/core/patterns");
-var Enum = require('../lib/enum');
-var SpecialForms = require('../lib/core').SpecialForms;
-var expect = require('chai').expect;
+import Core from "../lib/core";
+const Patterns = Core.Patterns;
+const SpecialForms = Core.SpecialForms;
+
+import Enum from "../lib/enum";
+
+import chai from 'chai';
+var expect = chai.expect;
 
 
 describe('try', () => {
@@ -29,7 +33,7 @@ describe('try', () => {
         return (y < 1) && (y > -1);
     }), Patterns.make_case([Patterns.wildcard()], function() {
         return Symbol.for('large');
-    })), null)
+    })), null);
 
     expect(value).to.equal(Symbol.for('large'));
   });

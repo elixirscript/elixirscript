@@ -41,7 +41,7 @@ function _for(collections, fun, filter = () => true, into = [], previousValues =
 
     return into;
   }else{
-    let _into = []
+    let _into = [];
 
     for(let elem of collection){
       let r = Patterns.match_no_throw(pattern, elem);

@@ -1,8 +1,12 @@
-var Patterns = require("../lib/core/patterns");
-var Enum = require('../lib/enum');
-var Tuple = require('../lib/core').Tuple;
-var SpecialForms = require('../lib/core').SpecialForms;
-var expect = require('chai').expect;
+import Core from "../lib/core";
+const Patterns = Core.Patterns;
+const SpecialForms = Core.SpecialForms;
+const Tuple = Core.Tuple;
+
+import Enum from "../lib/enum";
+
+import chai from 'chai';
+var expect = chai.expect;
 
 
 describe('case', () => {

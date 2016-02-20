@@ -8,4 +8,4 @@ before_script:
   - npm install
 script:
   - mix test
-  - gulp test
+  - npm test

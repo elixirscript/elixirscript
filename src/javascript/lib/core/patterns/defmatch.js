@@ -64,7 +64,7 @@ export function match_no_throw(pattern: any, expr: any, guard: Function = () => 
   try{
     return match(pattern, expr, guard);
   }catch(e){
-    if(e instanceof MatchError){
+    if(e instanceof MatchError || e.message.startsWith('No match for:')){
       return null;
     }
 

@@ -1,5 +1,8 @@
-var SpecialForms = require('../lib/core').SpecialForms;
-var expect = require('chai').expect;
+import Core from "../lib/core";
+const SpecialForms = Core.SpecialForms;
+
+import chai from 'chai';
+var expect = chai.expect;
 
 describe('SpecialForms', function(){
 
@@ -20,7 +23,7 @@ describe('SpecialForms', function(){
       }
 
       const foo = new MyClass("bar");
-      const bar = SpecialForms.map_update(foo, {baz: "bar", fizz: "fizzbuzz"})
+      const bar = SpecialForms.map_update(foo, {baz: "bar", fizz: "fizzbuzz"});
 
       expect(foo instanceof MyClass).to.equal(bar instanceof MyClass);
       expect(foo.foo).to.equal(bar.foo);

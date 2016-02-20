@@ -76,10 +76,7 @@ defmodule ElixirScript.Mixfile do
       File.rm_rf(dist_folder)
     end
 
-    { _ , _ } = System.cmd("node", ["node_modules/gulp/bin/gulp.js", "dist_build"])
-    { elixir_js, _ } = System.cmd("node", ["node_modules/rollup/bin/rollup", "./src/javascript/dist_build/Elixir.js"])
-    File.write!("priv/Elixir.js", elixir_js)
-    { _ , _ } = System.cmd("node", ["node_modules/gulp/bin/gulp.js", "dist_add_source_map"])
+    { _ , _ } = System.cmd("npm", ["run", "build"])
 
     File.mkdir_p(folder_name <> "/bin")
     File.cp!("elixirscript", "#{folder_name}/bin/elixirscript")

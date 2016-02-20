@@ -1,5 +1,8 @@
-var Functions = require('../../lib/core').Functions;
-var expect = require('chai').expect;
+import Core from "../../lib/core";
+const Functions = Core.Functions;
+
+import chai from 'chai';
+var expect = chai.expect;
 
 describe('Functions', function(){
 

@@ -5,10 +5,6 @@ erl_crash.dump
 ex2js
 elixirscript
 node_modules
-src/javascript/build
-src/javascript/test_build
-src/javascript/dist
-src/javascript/dist_build
 /dist
 deploy.sh
 .DS_Store
@@ -19,3 +15,4 @@ index.js
 /bench/snapshots
 .tern-port
 test/std_lib_compile_test.exs
+src/elixirscript
