@@ -6,7 +6,7 @@ class BitString {
 
     this.value = Object.freeze(this.process(args));
     this.length = this.value.length;
-    this.bit_size = this.raw_value().reduce((prev, current) => prev + current.size);
+    this.bit_size = this.raw_value().reduce((prev, current) => prev + (current.unit * current.size), 0);
     this.byte_size = (this.bit_size / 8) + (this.bit_size % 8 > 0 ? 1 : 0);
   }
 
@@ -28,7 +28,7 @@ class BitString {
       if (s !== "") {
         s += ", ";
       }
-      s += this[i].toString();
+      s += this.get(i).toString();
     }
 
     return "<<" + s + ">>";
@@ -138,15 +138,15 @@ class BitString {
   }
 
   static utf8(value){
-    return BitString.wrap(value, { 'type': 'utf8' });
+    return BitString.wrap(value, { 'type': 'utf8', 'unit': 1, 'size': value.length  });
   }
 
   static utf16(value){
-    return BitString.wrap(value, { 'type': 'utf16' });
+    return BitString.wrap(value, { 'type': 'utf16', 'unit': 1, 'size': value.length * 2 });
   }
 
   static utf32(value){
-    return BitString.wrap(value, { 'type': 'utf32' });
+    return BitString.wrap(value, { 'type': 'utf32', 'unit': 1, 'size': value.length * 4 });
   }
 
   static signed(value){

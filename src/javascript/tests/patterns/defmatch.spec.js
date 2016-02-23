@@ -1,6 +1,7 @@
 import Core from "../../lib/core";
 const Patterns = Core.Patterns;
 const Tuple = Core.Tuple;
+const BitString = Core.BitString;
 
 import chai from 'chai';
 var expect = chai.expect;
@@ -145,5 +146,93 @@ describe('defmatch', () => {
 
     expect(fn(new Tuple(1, 2, 3))).to.equal(3);
     expect(fn.bind(fn, new Tuple(1, 2, 4))).to.throw("No match for: {1, 2, 4}");
+  });
+
+  describe('BitString', () => {
+    it('must match on a string', () => {
+
+      let fn = Patterns.defmatch(
+        Patterns.make_case(
+          [Patterns.bitStringMatch(BitString.integer(102), BitString.integer(111), BitString.integer(111))],
+          () => 3
+        )
+      );
+
+      expect(fn("foo")).to.equal(3);
+      expect(fn.bind(fn, "bar")).to.throw("No match for: bar");
+    });
+
+    it('must match on a bitstring', () => {
+
+      let fn = Patterns.defmatch(
+        Patterns.make_case(
+          [Patterns.bitStringMatch(BitString.integer(102), BitString.integer(111), BitString.integer(111))],
+          () => 3
+        )
+      );
+
+      expect(fn(new BitString(BitString.integer(102), BitString.integer(111), BitString.integer(111)))).to.equal(3);
+    });
+
+    it('must allow for variables', () => {
+
+      let fn = Patterns.defmatch(
+        Patterns.make_case(
+          [Patterns.bitStringMatch(BitString.integer({value: $}), BitString.integer(111), BitString.integer(111))],
+          (pattern) => pattern
+        )
+      );
+
+      expect(fn(new BitString(BitString.integer(102), BitString.integer(111), BitString.integer(111)))).to.equal(102);
+    });
+
+    it('must match on variable and convert to type', () => {
+
+      let fn = Patterns.defmatch(
+        Patterns.make_case(
+          [Patterns.bitStringMatch(BitString.integer(102), BitString.binary({value: $}))],
+          (b) => b
+        )
+      );
+
+      expect(fn(new BitString(BitString.integer(102), BitString.integer(111), BitString.integer(111)))).to.equal("oo");
+    });
+
+    it('throw error when binary is used without size', () => {
+
+      let fn = Patterns.defmatch(
+        Patterns.make_case(
+          [Patterns.bitStringMatch(BitString.binary({value: $}), BitString.binary(" the "), BitString.binary({value: $}))],
+          (name, species) => name
+        )
+      );
+
+      expect(fn.bind(fn, "Frank the Walrus")).to.throw("a binary field without size is only allowed at the end of a binary pattern");
+    });
+
+    it('allow binary pattern with size', () => {
+
+      let fn = Patterns.defmatch(
+        Patterns.make_case(
+          [Patterns.bitStringMatch(BitString.size(BitString.binary({value: $}), 5), BitString.binary(" the "), BitString.binary({value: $}))],
+          (name, species) => name
+        )
+      );
+
+      expect(fn("Frank the Walrus")).to.equal("Frank");
+    });
+
+
+    it('allow unsigned integer', () => {
+
+      let fn = Patterns.defmatch(
+        Patterns.make_case(
+          [Patterns.bitStringMatch(BitString.integer({value: $}))],
+          (int) => int
+        )
+      );
+
+      expect(fn(new BitString(BitString.integer(-100)))).to.equal(156);
+    });
   });
 });

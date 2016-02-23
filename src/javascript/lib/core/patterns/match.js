@@ -60,6 +60,10 @@ export function buildMatch(pattern: any): Function {
     return Resolvers.resolveNull(pattern);
   }
 
+  if(Checks.is_bitstring(pattern)){
+    return Resolvers.resolveBitString(pattern);
+  }
+
   if(Checks.is_object(pattern)){
     return Resolvers.resolveObject(pattern);
   }
