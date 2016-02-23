@@ -19,41 +19,41 @@ defmodule ElixirScript.Translator.Bitstring do
     { js_ast, env }
   end
 
-  defp make_bitstring_element(element, env) when is_number(element) do
+  def make_bitstring_element(element, env) when is_number(element) do
     do_make_bitstring_element({:integer, Translator.translate!(element, env)})
   end
 
-  defp make_bitstring_element(element, env) when is_binary(element) do
+  def make_bitstring_element(element, env) when is_binary(element) do
     do_make_bitstring_element({:binary, Translator.translate!(element, env)})
   end
 
-  defp make_bitstring_element({:<<>>, [], elements}, env) do
+  def make_bitstring_element({:<<>>, [], elements}, env) do
     {ast, _} = make_bitstring(elements, env)
     ast
   end
 
-  defp make_bitstring_element({:::, _, [element, {type, _, _}]}, env) when type in [:integer, :float, :bitstring, :bits, :binary, :bytes, :utf8, :utf16, :utf32] do
+  def make_bitstring_element({:::, _, [element, {type, _, _}]}, env) when type in [:integer, :float, :bitstring, :bits, :binary, :bytes, :utf8, :utf16, :utf32] do
     do_make_bitstring_element({type, Translator.translate!(element, env)})
   end
 
-  defp make_bitstring_element({:::, _, [element, {type, _, params}]}, env) when type in [:size, :unit] do
+  def make_bitstring_element({:::, _, [element, {type, _, params}]}, env) when type in [:size, :unit] do
     do_make_bitstring_element({type, Translator.translate!(element, env), Enum.map(params, &Translator.translate!(&1, env))})
   end
 
-  defp make_bitstring_element({:::, _, [element, {:*, _, [size, unit]}]}, env) do
+  def make_bitstring_element({:::, _, [element, {:*, _, [size, unit]}]}, env) do
     size_ast = do_make_bitstring_element({:size, Translator.translate!(element, env), [Translator.translate!(size, env)]})
     do_make_bitstring_element({:unit, size_ast, [Translator.translate!(unit, env)]})
   end
 
-  defp make_bitstring_element({:::, _, [element, {:-, _, types}]}, env) do
+  def make_bitstring_element({:::, _, [element, {:-, _, types}]}, env) do
     handle_type_adjectives({:-, [], types}, Translator.translate!(element, env), env)
   end
 
-  defp make_bitstring_element({:::, _, [element, size]}, env) do
+  def make_bitstring_element({:::, _, [element, size]}, env) do
     do_make_bitstring_element({:size, Translator.translate!(element, env), [Translator.translate!(size, env)]})
   end
 
-  defp make_bitstring_element(element, env) do
+  def make_bitstring_element(element, env) do
     do_make_bitstring_element({:binary, Translator.translate!(element, env)})
   end
 

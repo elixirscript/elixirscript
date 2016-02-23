@@ -7,6 +7,7 @@ defmodule ElixirScript.Translator.PatternMatching do
   alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.Map
   alias ElixirScript.Translator.Struct
+  alias ElixirScript.Translator.Bitstring
 
   @patterns JS.member_expression(
     JS.member_expression(
@@ -49,6 +50,11 @@ defmodule ElixirScript.Translator.PatternMatching do
   @_type JS.member_expression(
     @patterns,
     JS.identifier(:type)
+  )
+
+  @bitstring_match JS.member_expression(
+    @patterns,
+    JS.identifier(:bitStringMatch)
   )
 
   def wildcard() do
@@ -100,6 +106,14 @@ defmodule ElixirScript.Translator.PatternMatching do
     )
   end
 
+  def bitstring_match(values) do
+    JS.call_expression(
+      @bitstring_match,
+      values
+    )
+  end
+
+
   def process_match(params, env) do
     build_match(params, env)
     |> update_env(env)
@@ -135,6 +149,26 @@ defmodule ElixirScript.Translator.PatternMatching do
 
   defp do_build_match({:_, _, _}, _) do
     { [wildcard()], [JS.identifier(:undefined)] }
+  end
+
+  defp do_build_match({:<<>>, _, elements}, env) do
+    params = Enum.reduce(elements, [], fn
+      ({:::, _, [{ variable, [], params }, _]}, state) when is_atom(params) ->
+        state ++ [JS.identifier(variable)]
+      _, state ->
+        state
+    end)
+
+    var = {{:., [], [{:__aliases__, [], [Elixir, :Core, :Patterns]}, :variable]}, [], []}
+
+    elements = Enum.map(elements, fn
+      ({:::, context, [{ variable, [], params }, options]}) when is_atom(params) ->
+        Bitstring.make_bitstring_element({:::, context, [{:%{}, [], [{"value", var}]}, options]}, env)
+      x ->
+        Bitstring.make_bitstring_element(x, env)
+    end)
+
+    { [bitstring_match(elements)], params }
   end
 
   defp do_build_match([{:|, _, [head, tail]}], env) do
