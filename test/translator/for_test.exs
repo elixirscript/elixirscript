@@ -24,11 +24,14 @@ defmodule ElixirScript.Translator.For.Test do
     end
 
     js_code = """
-         Elixir.Core.SpecialForms._for(Object.freeze([Object.freeze([Elixir.Core.Patterns.variable(), Object.freeze([1, 2, 3, 4])])]),function(n)    {
+         Elixir.Core.SpecialForms._for(
+           Object.freeze([Object.freeze([Elixir.Core.Patterns.variable(), Object.freeze([1, 2, 3, 4])])]),
+           function(n)    {
              return     n * 2;
            },function()    {
              return     true;
-           },Object.freeze([]))
+           },
+           Object.freeze([]))
     """
 
     assert_translation(ex_ast, js_code)
@@ -115,6 +118,33 @@ defmodule ElixirScript.Translator.For.Test do
            },function()    {
              return     true;
            },Object.freeze([]))
+    """
+
+    assert_translation(ex_ast, js_code)
+  end
+
+  test "translate for with bitstring" do
+    ex_ast = quote do
+      for <<r::8, g::8, b::8 <- pixels >> do
+        {r, g, b}
+      end
+    end
+
+    js_code = """
+    Elixir.Core.SpecialForms._for(Object.freeze([Object.freeze([Elixir.Core.Patterns.bitStringMatch(Elixir.Core.BitString.size(Object.freeze({
+    value: Elixir.Core.Functions.call_property(Elixir.Core.Patterns,'variable')
+    }),8),Elixir.Core.BitString.size(Object.freeze({
+    value: Elixir.Core.Functions.call_property(Elixir.Core.Patterns,'variable')
+    }),8),Elixir.Core.BitString.size(Object.freeze({
+    value: Elixir.Core.Functions.call_property(Elixir.Core.Patterns,'variable')
+    }),8)), pixels])]),
+    function(r,g,b)    {
+      return     new Elixir.Core.Tuple(r,g,b);
+    },
+    function()    {
+      return     true;
+    },
+    Object.freeze([]))
     """
 
     assert_translation(ex_ast, js_code)
