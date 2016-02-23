@@ -1,6 +1,7 @@
 # v0.16.0-dev
 * Enhancements
   * Support for bitstring pattern matching
+  * Support for bitstrings in for comprehensions
 
 # v0.15.2
 * Enhancements
