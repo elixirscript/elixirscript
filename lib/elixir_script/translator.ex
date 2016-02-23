@@ -432,15 +432,15 @@ defmodule ElixirScript.Translator do
     Assignment.make_assignment(left, right, env)
   end
 
-  defp do_translate({function, _, [{:when, _, [{name, _, _params} | _guards] }, [do: _body]] } = ast, env) when function in [:def, :defp] do
+  defp do_translate({function, _, [{:when, _, [{name, _, _params} | _guards] }, _] } = ast, env) when function in [:def, :defp] do
     Function.process_function(Utils.filter_name(name), [ast], env)
   end
 
-  defp do_translate({function, _, [{name, _, params}, [do: _body]]} = ast, env) when function in [:def, :defp] and is_atom(params) do
+  defp do_translate({function, _, [{name, _, params}, _]} = ast, env) when function in [:def, :defp] and is_atom(params) do
     Function.process_function(Utils.filter_name(name), [ast], env)
   end
 
-  defp do_translate({function, _, [{name, _, _params}, [do: _body]]} = ast, env) when function in [:def, :defp] do
+  defp do_translate({function, _, [{name, _, _params}, _]} = ast, env) when function in [:def, :defp] do
     Function.process_function(Utils.filter_name(name), [ast], env)
   end
 

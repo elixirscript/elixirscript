@@ -777,4 +777,44 @@ defmodule ElixirScript.Translator.Function.Test do
 
     assert_translation(ex_ast, js_code)
   end
+
+  test "def with catch" do
+    ex_ast = quote do
+      defp func(param) do
+        if true do
+          nil
+        else
+          :error
+        end
+      catch
+        :invalid -> :error
+      end
+    end
+
+    js_code = """
+    const func = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],
+    function(param) {
+      return Elixir.Core.SpecialForms._try(function() {
+        return Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()], function(x) {
+          return Symbol.for('error');
+        },
+        function(x) {
+          return Elixir.Enum.member__qmark__(Object.freeze([false, null]), x);
+        }),
+        Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.wildcard()], function() {
+            return null;
+        })).call(this, true);
+      },
+      null,
+      Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Symbol.for('invalid')], function() {
+        return Symbol.for('error');
+      })),
+      null,
+      null
+     );
+    }));
+    """
+
+    assert_translation(ex_ast, js_code)
+  end
 end

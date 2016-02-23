@@ -167,26 +167,25 @@ defmodule ElixirScript.Translator.ModuleCollector do
 
   defp get_functions_from_module({:__block__, _, list}) do
     Enum.reduce(list, %{ def: Keyword.new, defp: Keyword.new, defmacro: Keyword.new, defmacrop: Keyword.new }, fn
-    ({type, _, [{:when, _, [{name, _, params} | _guards] }, [do: _body]] }, state) when type in [:def, :defp] and is_atom(params) ->
+    ({type, _, [{:when, _, [{name, _, params} | _guards] }, _] }, state) when type in [:def, :defp] and is_atom(params) ->
       arity = 0
 
       add_function_to_map(state, type, name, arity)
 
-    ({type, _, [{:when, _, [{name, _, params} | _guards] }, [do: _body]] }, state) when type in [:def, :defp] ->
+    ({type, _, [{:when, _, [{name, _, params} | _guards] }, _] }, state) when type in [:def, :defp] ->
       arity = if is_nil(params), do: 0, else: length(params)
 
       add_function_to_map(state, type, name, arity)
 
-    ({type, _, [{name, _, params}, [do: _body]]}, state) when type in [:def, :defp] and is_atom(params) ->
+    ({type, _, [{name, _, params}, _]}, state) when type in [:def, :defp] and is_atom(params) ->
       arity = 0
 
       add_function_to_map(state, type, name, arity)
 
 
-    ({type, _, [{name, _, params}, [do: _body]]}, state) when type in [:def, :defp] ->
+    ({type, _, [{name, _, params}, _]}, state) when type in [:def, :defp] ->
       arity = if is_nil(params), do: 0, else: length(params)
-
-      add_function_to_map(state, type, name, arity)
+        add_function_to_map(state, type, name, arity)
 
     ({type, _, [{:when, _, [{name, _, params} | _guards] }, [do: _body]] }, state) when type in [:defmacro, :defmacrop] ->
       arity = length(params)

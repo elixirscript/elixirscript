@@ -2,6 +2,7 @@
 * Enhancements
   * Support for bitstring pattern matching
   * Support for bitstrings in for comprehensions
+  * Support for functions with catch, after, else clauses
 
 # v0.15.2
 * Enhancements

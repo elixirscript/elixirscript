@@ -29,13 +29,16 @@ defmodule ElixirScript.Translator.Function do
     |> Enum.map(fn
       {:->, _, [ [{:when, _, [params | guards]}], body ]} ->
         process_function_body(params, body, env, name, guards)
+
       ({:->, _, [params, body]}) ->
         process_function_body(params, body, env, name)
 
-      ({_, _, [{:when, _, [{_, _, params} | guards] }, [do: body]]}) ->
+      ({_, _, [{:when, _, [{_, _, params} | guards] }, body]}) ->
+        body = convert_to_try(body)
         process_function_body(params, body, env, name, guards)
 
-      ({_, _, [{_, _, params}, [do: body]]}) ->
+      ({_, _, [{_, _, params}, body]}) ->
+        body = convert_to_try(body)
         process_function_body(params, body, env, name)
 
       ({_, _, [{_, _, params}]}) ->
@@ -43,6 +46,14 @@ defmodule ElixirScript.Translator.Function do
     end)
 
     { make_defmatch(clauses), env }
+  end
+
+  def convert_to_try([do: body]) do
+    body
+  end
+
+  def convert_to_try(function_kw_list) do
+    { :__block__, [], [{ :try, [], [function_kw_list] }] }
   end
 
   def make_defmatch(clauses) do
