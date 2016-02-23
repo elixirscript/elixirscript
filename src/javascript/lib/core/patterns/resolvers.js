@@ -161,7 +161,7 @@ function resolveBitString(pattern: Types.BitStringMatch): Function {
 
   for(let bitstringMatchPart of pattern.values){
     if(Checks.is_variable(bitstringMatchPart.value)){
-      let size = getLength(bitstringMatchPart.type, bitstringMatchPart.unit, bitstringMatchPart.size);
+      let size = getSize(bitstringMatchPart.unit, bitstringMatchPart.size);
       fillArray(patternBitString, size);
     }else{
       patternBitString = patternBitString.concat(new BitString(bitstringMatchPart).value);
@@ -198,7 +198,7 @@ function resolveBitString(pattern: Types.BitStringMatch): Function {
       let size = 0;
       let bsValueArrayPart = [];
       let patternBitStringArrayPart = [];
-      size = getLength(bitstringMatchPart.type, bitstringMatchPart.unit, bitstringMatchPart.size);
+      size = getSize(bitstringMatchPart.unit, bitstringMatchPart.size);
 
       if(i === patternValues.length - 1){
         bsValueArrayPart = bsValue.value.slice(beginningIndex);
@@ -263,18 +263,8 @@ function resolveBitString(pattern: Types.BitStringMatch): Function {
 
 }
 
-function getLength(type, unit, size){
-  if(type === 'integer' && size === 8){
-    return 1;
-  }else if(type === 'float' && size === 32){
-    return 4;
-  } else if(type === 'float' && size === 64){
-    return 8;
-  } else if(type === 'binary'){
-    return size;
-  }else{
-    return unit * size;
-  }
+function getSize(unit, size){
+  return (unit * size) / 8;
 }
 
 function arraysEqual(a, b) {
