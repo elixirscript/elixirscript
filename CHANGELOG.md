@@ -1,3 +1,7 @@
+# v0.16.0-dev
+* Enhancements
+  * Support for bitstring pattern matching
+
 # v0.15.2
 * Enhancements
   * Support for variables as map keys

@@ -41,7 +41,6 @@ The compiler to this point has been focused on translating Kernel.SpecialForms a
     * `with`
 
 * Caveats
-    * `<<args>>` - not supported in pattern matching yet
     * `quote` - ignores `location` and `context` options
     * `left = right` does not support full unification yet.
         ```elixir

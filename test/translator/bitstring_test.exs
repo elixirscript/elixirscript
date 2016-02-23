@@ -51,6 +51,26 @@ defmodule ElixirScript.Translator.Bitstring.Test do
     """
 
     assert_translation(ex_ast, js_code)
+
+
+    ex_ast = quote do: <<int::integer>> = <<-100>>
+    js_code = """
+    let [int] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.bitStringMatch(Elixir.Core.BitString.integer(Object.freeze({
+    value: Elixir.Core.Functions.call_property(Elixir.Core.Patterns,'variable')
+    }))),new Elixir.Core.BitString(Elixir.Core.BitString.binary(-100)));
+    """
+
+    assert_translation(ex_ast, js_code)
+
+
+    ex_ast = quote do: <<-100::signed, _rest::binary>> = <<-100, "foo">>
+    js_code = """
+    let [_rest] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.bitStringMatch(Elixir.Core.BitString.size(-100, signed),Elixir.Core.BitString.binary(Object.freeze({
+    value: Elixir.Core.Functions.call_property(Elixir.Core.Patterns,'variable')
+    }))),new Elixir.Core.BitString(Elixir.Core.BitString.binary(-100),Elixir.Core.BitString.binary('foo')));
+    """
+
+    assert_translation(ex_ast, js_code)
   end
 
 end
