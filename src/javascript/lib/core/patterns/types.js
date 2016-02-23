@@ -59,15 +59,6 @@ export class Bound {
 export class BitStringMatch {
   values: Array<Object>
 
-    //{'value': value, 'attributes': [type, unit, size]};
-
-    //length = unit * size
-
-    //use that info to map value to subset of bitstring
-    //use type to turn subset of bitstring into desired type
-    //if value is a variable, add variable to args list
-    //if value is just a value, match up substring with generated bitstring from value
-
   constructor(...values: Array<Object>){
     this.values = values;
   }
@@ -76,11 +67,15 @@ export class BitStringMatch {
     return values.length;
   }
 
-  size(){
+  bit_size() {
+    return this.byte_size() * 8;
+  }
+
+  byte_size(){
     let s = 0;
 
     for(let val of this.values){
-      s = s + val.unit * val.size;
+      s = s + ((val.unit * val.size)/8);
     }
 
     return s;

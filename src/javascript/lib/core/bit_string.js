@@ -1,13 +1,9 @@
 class BitString {
   constructor(...args){
-    this.raw_value = function(){
-      return Object.freeze(args);
-    };
-
     this.value = Object.freeze(this.process(args));
     this.length = this.value.length;
-    this.bit_size = this.raw_value().reduce((prev, current) => prev + (current.unit * current.size), 0);
-    this.byte_size = (this.bit_size / 8) + (this.bit_size % 8 > 0 ? 1 : 0);
+    this.bit_size = this.length * 8;
+    this.byte_size = this.length;
   }
 
   get(index){
@@ -16,6 +12,12 @@ class BitString {
 
   count(){
     return this.value.length;
+  }
+
+  slice(start, end = null){
+    let s = this.value.slice(start, end);
+    let ms = s.map((elem) => BitString.integer(elem));
+    return new BitString(...ms);
   }
 
   [Symbol.iterator]() {
@@ -34,14 +36,14 @@ class BitString {
     return "<<" + s + ">>";
   }
 
-  process(){
+  process(bitStringParts){
     let processed_values = [];
 
     var i;
-    for (i = 0; i < this.raw_value().length; i++) {
-      let processed_value = this['process_' + this.raw_value()[i].type](this.raw_value()[i]);
+    for (i = 0; i < bitStringParts.length; i++) {
+      let processed_value = this['process_' + bitStringParts[i].type](bitStringParts[i]);
 
-      for(let attr of this.raw_value()[i].attributes){
+      for(let attr of bitStringParts[i].attributes){
         processed_value = this['process_' + attr](processed_value);
       }
 

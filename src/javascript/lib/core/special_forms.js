@@ -29,25 +29,58 @@ function _for(collections, fun, filter = () => true, into = [], previousValues =
   let collection = collections[0][1];
 
   if(collections.length === 1){
+    if(collection instanceof BitString){
+      let bsSlice = collection.slice(0, pattern.byte_size());
+      let i = 1;
 
-    for(let elem of collection){
-      let r = Patterns.match_no_throw(pattern, elem);
-      let args = previousValues.concat(r);
+      while(bsSlice.byte_size == pattern.byte_size()){
+        let r = Patterns.match_no_throw(pattern, bsSlice);
+        let args = previousValues.concat(r);
 
-      if(r && filter.apply(this, args)){
-        into = into.concat([fun.apply(this, args)]);
+        if(r && filter.apply(this, args)){
+          into = into.concat([fun.apply(this, args)]);
+        }
+
+        bsSlice = collection.slice(pattern.byte_size() * i, pattern.byte_size() * (i + 1));
+        i++;
       }
-    }
 
-    return into;
+      return into;
+    }else{
+      for(let elem of collection){
+        let r = Patterns.match_no_throw(pattern, elem);
+        let args = previousValues.concat(r);
+
+        if(r && filter.apply(this, args)){
+          into = into.concat([fun.apply(this, args)]);
+        }
+      }
+
+      return into;
+    }
   }else{
     let _into = [];
 
-    for(let elem of collection){
-      let r = Patterns.match_no_throw(pattern, elem);
-      if(r){
-        _into = into.concat(this._for(collections.slice(1), fun, filter, _into, previousValues.concat(r)));
+    if(collection instanceof BitString){
+      let bsSlice = collection.slice(0, pattern.byte_size());
+      let i = 1;
+
+      while(bsSlice.byte_size == pattern.byte_size()){
+        let r = Patterns.match_no_throw(pattern, bsSlice);
+        if(r){
+          _into = into.concat(this._for(collections.slice(1), fun, filter, _into, previousValues.concat(r)));
+        }
+
+        bsSlice = collection.slice(pattern.byte_size() * i, pattern.byte_size() * (i + 1));
+        i++;
       }
+    }else{
+      for(let elem of collection){
+        let r = Patterns.match_no_throw(pattern, elem);
+        if(r){
+          _into = into.concat(this._for(collections.slice(1), fun, filter, _into, previousValues.concat(r)));
+        }
+      } 
     }
 
     return _into;

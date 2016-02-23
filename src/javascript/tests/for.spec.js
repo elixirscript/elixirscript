@@ -1,6 +1,8 @@
 import Core from "../lib/core";
 const Patterns = Core.Patterns;
 const SpecialForms = Core.SpecialForms;
+const Tuple = Core.Tuple;
+const BitString = Core.BitString;
 
 import Enum from "../lib/enum";
 
@@ -56,4 +58,34 @@ describe('for', () => {
 
     expect(result).to.eql(["JOHN", "MEG"]);
   });
+
+
+  it('for with bitstring', () => {
+    //for <<r::8, g::8, b::8 <- <<213, 45, 132, 64, 76, 32, 76, 0, 0, 234, 32, 15>> >>, do: {r, g, b}
+    
+    let collections = [
+      [
+        Patterns.bitStringMatch(BitString.integer({value: $}), BitString.integer({value: $}), BitString.integer({value: $})),
+        new BitString(
+          BitString.integer(213),
+          BitString.integer(45),
+          BitString.integer(132),
+          BitString.integer(64),
+          BitString.integer(76),
+          BitString.integer(32),
+          BitString.integer(76),
+          BitString.integer(0),
+          BitString.integer(0),
+          BitString.integer(234),
+          BitString.integer(32),
+          BitString.integer(15)
+        )
+      ]
+    ];
+
+    let result = SpecialForms._for(collections, (r, g, b) => new Tuple(r, g, b));
+
+    expect(result).to.eql([new Tuple(213, 45, 132), new Tuple(64, 76, 32), new Tuple(76, 0, 0), new Tuple(234, 32, 15)]);
+  });
+
 });
