@@ -38,7 +38,6 @@ The compiler to this point has been focused on translating Kernel.SpecialForms a
 * Missing
     * `super(args)`
     * `receive`
-    * `with`
 
 * Caveats
     * `quote` - ignores `location` and `context` options
