@@ -140,10 +140,35 @@ function _try(do_fun, rescue_function, catch_fun, else_function, after_function)
   }
 }
 
+function _with(...args){
+  let argsToPass = [];
+
+  for(let i = 0; i < args.length; i++){
+    if(i === args.length - 1){
+      return args[i].apply(null, argsToPass);
+    }else{
+      let [pattern, func] = args[i];
+
+      let result = func.apply(null, argsToPass);
+
+      let patternResult = Patterns.match_no_throw(pattern, result);
+
+      if(patternResult == null){
+        return result;
+      }else{
+        argsToPass = argsToPass.concat(patternResult);
+      }
+    }
+  }
+
+  return null;
+}
+
 export default {
   _case,
   cond,
   map_update,
   _for,
-  _try
+  _try,
+  _with
 };
