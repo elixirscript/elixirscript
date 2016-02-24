@@ -48,6 +48,7 @@ Please check the [CONTRIBUTING.md](CONTRIBUTING.md)
 
 
 ### Example projects
+* [todo-elixirscript](https://github.com/bryanjos/todo-elixirscript) A Todo App built with Elixirscript and Phoenix
 * [phoenix_chat_example](https://github.com/bryanjos/phoenix_chat_example) The Phoenix Chat App using ElixirScript.
 * [MobileElixir](https://github.com/bryanjos/MobileElixir) Using ElixirScript with React Native
 * [color_bar_spike](https://github.com/bryanjos/color_bar_spike) A canvas drawing example using ElixirScript, React and a Redux-like design
