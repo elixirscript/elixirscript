@@ -12,6 +12,7 @@ defmodule ElixirScript.Translator do
   alias ElixirScript.Translator.Case
   alias ElixirScript.Translator.For
   alias ElixirScript.Translator.Try
+  alias ElixirScript.Translator.With
   alias ElixirScript.Translator.Block
   alias ElixirScript.Translator.Struct
   alias ElixirScript.Translator.Module
@@ -289,6 +290,10 @@ defmodule ElixirScript.Translator do
 
   defp do_translate({:try, _, [ blocks ]}, env) do
     Try.make_try(blocks, env)
+  end
+
+  defp do_translate({:with, _, args }, env ) do
+    With.make_with(args, env)
   end
 
   defp do_translate({:receive, _, _ }, _ ) do
