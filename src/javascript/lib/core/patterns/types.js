@@ -1,9 +1,9 @@
 /* @flow */
 export class Variable {
-  name: ?string;
+  default_value: ?any;
 
-  constructor(name: ?string = null) {
-    this.name = name;
+  constructor(default_value: ?any = Symbol.for("elixirscript.no_value")) {
+    this.default_value = default_value;
   }
 }
 
@@ -95,8 +95,8 @@ export class BitStringMatch {
   }
 }
 
-export function variable(name: ?string = null): Variable {
-  return new Variable(name);
+export function variable(default_value: ?any = Symbol.for("elixirscript.no_value")): Variable {
+  return new Variable(default_value);
 }
 
 export function wildcard(): Wildcard {

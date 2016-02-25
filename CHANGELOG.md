@@ -5,6 +5,9 @@
   * Functions with catch, after, else clauses
   * `with` special form
   * Pin operator in map keys and function clauses
+  
+* Bugfixes
+  * Fixed optional parameter implementation
 
 # v0.15.2
 * Enhancements

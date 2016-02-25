@@ -235,4 +235,65 @@ describe('defmatch', () => {
       expect(fn(new BitString(BitString.integer(-100)))).to.equal(156);
     });
   });
+
+
+  describe('Optional Arguments', () => {
+    it('single optional argument', () => {
+
+      let fn = Patterns.defmatch(
+        Patterns.make_case(
+          [Patterns.variable(2)],
+          (arg) => arg
+        )
+      );
+
+      expect(fn()).to.equal(2);
+      expect(fn(3)).to.equal(3);
+    });
+
+
+    it('single optional argument and one required argument', () => {
+
+      let fn = Patterns.defmatch(
+        Patterns.make_case(
+          [Patterns.variable(), Patterns.variable(2)],
+          (arg1, arg2) => arg1 + arg2
+        )
+      );
+
+      expect(fn.bind(fn)).to.throw("No match for:");
+      expect(fn(1)).to.equal(3);
+      expect(fn(3, 4)).to.equal(7);
+    });
+
+    it('two optional arguments and one required argument', () => {
+
+      let fn = Patterns.defmatch(
+        Patterns.make_case(
+          [Patterns.variable(3), Patterns.variable(), Patterns.variable(2)],
+          (arg1, arg2, arg3) => arg1 + arg2 + arg3
+        )
+      );
+
+      expect(fn(1)).to.equal(6);
+      expect(fn(3, 4)).to.equal(9);
+    });
+
+
+    it('two optional arguments in between 2 required', () => {
+
+      let fn = Patterns.defmatch(
+        Patterns.make_case(
+          [Patterns.variable(), Patterns.variable(2), Patterns.variable(3), Patterns.variable()],
+          (arg1, arg2, arg3, arg4) => arg1 + arg2 + arg3 + arg4
+        )
+      );
+
+      expect(fn(1, 4)).to.equal(10);
+      expect(fn(1, 5, 4)).to.equal(13);
+      expect(fn(1, 5, 7, 4)).to.equal(17);
+    });
+  });
+
+
 });

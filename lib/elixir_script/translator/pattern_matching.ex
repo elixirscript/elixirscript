@@ -71,6 +71,13 @@ defmodule ElixirScript.Translator.PatternMatching do
     )
   end
 
+  def parameter(default_value) do
+    JS.call_expression(
+      @parameter,
+      [default_value]
+    )
+  end
+
   def head_tail(headParameter, tailParameter) do
     JS.call_expression(
       @head_tail,
@@ -251,7 +258,7 @@ defmodule ElixirScript.Translator.PatternMatching do
 
   defp do_build_match({:\\, _, [{name, _, _}, default]}, env) do
     name = Utils.filter_name(name)
-    { [parameter()], [ JS.assignment_expression(:=, JS.identifier(name), Translator.translate!(default, env))] }
+    { [parameter(Translator.translate!(default, env))], [JS.identifier(name)] }
   end
 
 

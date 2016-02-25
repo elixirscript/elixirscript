@@ -755,9 +755,9 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-      const test1 = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable()],function(alpha,beta = 0)    {
-             return     null;
-           }));
+    const test1 = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable(0)],function(alpha,beta)    {
+      return     null;
+    }));
     """
 
     assert_translation(ex_ast, js_code)
@@ -768,11 +768,12 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-     const test1 = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(alpha = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(x)    {
-         return     x;
-       })))    {
-         return     null;
-       }));
+    const test1 = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable(Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(x)    {
+      return     x;
+    })))],
+    function(alpha)    {
+      return     null;
+    }));
     """
 
     assert_translation(ex_ast, js_code)
