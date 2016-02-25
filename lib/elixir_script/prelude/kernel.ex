@@ -192,4 +192,15 @@ defmodule ElixirScript.Kernel do
       %ElixirScript.Range{ first: unquote(first), last: unquote(last) }
     end
   end
+
+  defmacro object(args) do
+    args = Enum.map(args, fn
+      { k, v } when Kernel.is_atom(k) ->
+        { Atom.to_string(k), v }
+      pair ->
+        pair
+    end)
+
+    { :%{}, [], args }
+  end
 end

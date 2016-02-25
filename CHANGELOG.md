@@ -5,6 +5,12 @@
   * Functions with catch, after, else clauses
   * `with` special form
   * Pin operator in map keys and function clauses
+  * Added `Kernel.object/1` function to make it more natural to create a JavaScript object with string keys
+    Elixirscript, by default turns the following, `%{a: "b"}` into `{[Symbol.for("a")]: "b"}` in JavaScript. In order to get string keys,
+    one would have to do `%{"a" => "b"}` which turns into `{a: "b"}` in JavaScript. With `Kernel.object`, you can create string keyed maps
+    conveniently, `object(a: "b")` which turns into `{a: "b"}`.
+
+    **NOTE**: when updating the created by, you still have to use the string form `%{ my_map | "a" => "c" }`
   
 * Bugfixes
   * Fixed optional parameter implementation
