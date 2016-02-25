@@ -186,7 +186,14 @@ defmodule ElixirScript.Translator.PatternMatching do
   defp do_build_match({:%{}, _, props}, env) do
     properties = Enum.map(props, fn({key, value}) ->
       {pattern, params} = do_build_match(value, env)
-      { Map.make_property(Translator.translate!(key, env), hd(List.wrap(pattern))), params }
+      property = case key do
+                   {:^, _, [the_key]} ->
+                     JS.property(Translator.translate!(the_key, env), hd(List.wrap(pattern)), :init, false, false, true)
+                   _ ->
+                     Map.make_property(Translator.translate!(key, env), hd(List.wrap(pattern)))
+                 end
+
+      { property, params }
     end)
 
     {props, params} = Enum.reduce(properties, {[], []}, fn({prop, param}, {props, params}) ->

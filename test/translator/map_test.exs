@@ -59,4 +59,14 @@ defmodule ElixirScript.Translator.Map.Test do
     assert_translation(ex_ast, js_code)
   end
 
+  test "translate bound map key" do
+    ex_ast = quote do: %{^key => value} = %{key => value}
+    js_code = """
+    let [value] = Elixir.Core.Patterns.match(
+      { [key]: Elixir.Core.Patterns.variable() },
+      Object.freeze({ [key]: value })
+      );
+    """
+    assert_translation(ex_ast, js_code)
+  end
 end

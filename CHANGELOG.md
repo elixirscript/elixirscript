@@ -1,9 +1,10 @@
 # v0.16.0-dev
 * Enhancements
-  * Support for bitstring pattern matching
-  * Support for bitstrings in for comprehensions
-  * Support for functions with catch, after, else clauses
-  * Support for `with` special form 
+  * Bitstring pattern matching
+  * Bitstrings in for comprehensions
+  * Functions with catch, after, else clauses
+  * `with` special form
+  * Pin operator in map keys and function clauses
 
 # v0.15.2
 * Enhancements

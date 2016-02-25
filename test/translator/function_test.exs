@@ -817,4 +817,27 @@ defmodule ElixirScript.Translator.Function.Test do
 
     assert_translation(ex_ast, js_code)
   end
+
+
+  test "translate anonymous function with variable bound" do
+    ex_ast = quote do
+      key = "test"
+      fn ^key -> :ok end
+    end
+
+    js_code = """
+    let [key] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),'test');
+    
+    Elixir.Core.Patterns.defmatch(
+      Elixir.Core.Patterns.make_case(
+        [Elixir.Core.Patterns.bound(key)],
+        function() {
+          return Symbol.for('ok');
+        }
+      )
+    )
+    """
+
+    assert_translation(ex_ast, js_code)
+  end
 end
