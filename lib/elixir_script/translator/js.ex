@@ -46,16 +46,12 @@ defmodule ElixirScript.Translator.JS do
     )
   end
 
-  defp do_translate({:update, _, [object, property, value]}, env) do
-    Builder.assignment_expression(
-      :=,
-      Builder.member_expression(
-        Translator.translate!(object, env),
-        Translator.translate!(property, env),
-        true
-      ),
-      Translator.translate!(value, env)
-    )
+  defp do_translate({:update, _, [object, map]}, env) do
+    quoted = quote do
+      Object.assign(unquote(object), unquote(map))
+    end
+
+    Translator.translate!(quoted, env)
   end
 
   defp do_translate({:import, _, [module_names, from]}, env) when is_list(module_names) do

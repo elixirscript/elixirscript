@@ -26,11 +26,13 @@ defmodule ElixirScript.Lib.JS.Test do
 
   test "translate update" do
     ex_ast = quote do
-      JS.update A, "b", [1, 2, 3]
+      JS.update A, %{"b" => [1, 2, 3]}
     end
 
     js_code = """
-      A['b'] = Object.freeze([1, 2, 3])
+    Object.assign(A, Object.freeze({
+      b: Object.freeze([1, 2, 3])
+    }))
     """
 
     assert_translation(ex_ast, js_code)

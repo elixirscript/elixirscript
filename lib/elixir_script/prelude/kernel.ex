@@ -193,6 +193,13 @@ defmodule ElixirScript.Kernel do
     end
   end
 
+  @doc """
+  Provides a convenient way to create a string-based map.
+
+  Elixirscript, by default turns the following, `%{a: "b"}` into `{[Symbol.for("a")]: "b"}` in JavaScript. In order to get string keys,
+  one would have to do `%{"a" => "b"}` which turns into `{a: "b"}` in JavaScript. With `Kernel.object`, you can create string keyed maps
+  conveniently, `object(a: "b")` which turns into `{a: "b"}`
+  """
   defmacro object(args) do
     args = Enum.map(args, fn
       { k, v } when Kernel.is_atom(k) ->

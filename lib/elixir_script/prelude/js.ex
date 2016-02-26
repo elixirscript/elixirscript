@@ -20,9 +20,9 @@ defmodule ElixirScript.JS do
   Updates an existing JavaScript object.
 
   ex:
-    JS.update elem, "width", 100
+    JS.update elem, %{"width" => 100}
   """
-  defmacro update(object, property, value) do
+  defmacro update(object, map) do
   end
 
 

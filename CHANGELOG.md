@@ -14,6 +14,10 @@
   
 * Bugfixes
   * Fixed optional parameter implementation
+  
+* Breaking
+  * `JS.update(object, property, value)` has been removed and replaced with `JS.update(object, map)`
+    This allows you to update multiple values on a javascript object at once.
 
 # v0.15.2
 * Enhancements
