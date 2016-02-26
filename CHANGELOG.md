@@ -13,7 +13,7 @@
     **NOTE**: when updating the created by, you still have to use the string form `%{ my_map | "a" => "c" }`
   
 * Bugfixes
-  * Fixed optional parameter implementation
+  * Optional parameters should now work as expected
 
 # v0.15.2
 * Enhancements
