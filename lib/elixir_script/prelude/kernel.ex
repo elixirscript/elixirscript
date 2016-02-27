@@ -1,6 +1,6 @@
 defmodule ElixirScript.Kernel do
   import Kernel, only: [defmodule: 2, def: 1, def: 2, defp: 2,
-  defmacro: 1, defmacro: 2, defmacrop: 2, ||: 2, !: 1, ++: 2, in: 2, &&: 2, ===: 2]
+  defmacro: 1, defmacro: 2, defmacrop: 2, ||: 2, !: 1, ++: 2, in: 2, &&: 2, ===: 2, @: 1]
 
   defmacro if(condition, clauses) do
     build_if(condition, clauses)
