@@ -1,4 +1,4 @@
-# v0.16.0-dev
+# v0.16.0
 * Enhancements
   * Bitstring pattern matching
   * Bitstrings in for comprehensions
