@@ -131,13 +131,15 @@ defmodule ElixirScript.Translator.For.Test do
     end
 
     js_code = """
-    Elixir.Core.SpecialForms._for(Object.freeze([Object.freeze([Elixir.Core.Patterns.bitStringMatch(Elixir.Core.BitString.size(Object.freeze({
-    value: Elixir.Core.Functions.call_property(Elixir.Core.Patterns,'variable')
-    }),8),Elixir.Core.BitString.size(Object.freeze({
-    value: Elixir.Core.Functions.call_property(Elixir.Core.Patterns,'variable')
-    }),8),Elixir.Core.BitString.size(Object.freeze({
-    value: Elixir.Core.Functions.call_property(Elixir.Core.Patterns,'variable')
-    }),8)), pixels])]),
+    Elixir.Core.SpecialForms._for(Object.freeze([Object.freeze([Elixir.Core.Patterns.bitStringMatch(Elixir.Core.BitString.size({
+      'value': Elixir.Core.Patterns.variable()
+    },8),
+    Elixir.Core.BitString.size({
+      'value': Elixir.Core.Patterns.variable()
+    },8),
+    Elixir.Core.BitString.size({
+      'value': Elixir.Core.Patterns.variable()
+    },8)), pixels])]),
     function(r,g,b)    {
       return     new Elixir.Core.Tuple(r,g,b);
     },

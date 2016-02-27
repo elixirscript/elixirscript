@@ -43,11 +43,11 @@ defmodule ElixirScript.Translator.Bitstring.Test do
   test "translate pattern matching bitstring" do
     ex_ast = quote do: <<name::binary-size(5), " the ", species::binary>> = <<"Frank the Walrus">>
     js_code = """
-    let [name,species] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.bitStringMatch(Elixir.Core.BitString.size(Elixir.Core.BitString.binary(Object.freeze({
-    value: Elixir.Core.Functions.call_property(Elixir.Core.Patterns,'variable')
-    })),5),Elixir.Core.BitString.binary(' the '),Elixir.Core.BitString.binary(Object.freeze({
-    value: Elixir.Core.Functions.call_property(Elixir.Core.Patterns,'variable')
-    }))),'Frank the Walrus');
+    let [name,species] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.bitStringMatch(Elixir.Core.BitString.size(Elixir.Core.BitString.binary({
+    'value': Elixir.Core.Patterns.variable()
+    }),5),Elixir.Core.BitString.binary(' the '),Elixir.Core.BitString.binary({
+    'value': Elixir.Core.Patterns.variable()
+    })),'Frank the Walrus');
     """
 
     assert_translation(ex_ast, js_code)
@@ -55,9 +55,9 @@ defmodule ElixirScript.Translator.Bitstring.Test do
 
     ex_ast = quote do: <<int::integer>> = <<-100>>
     js_code = """
-    let [int] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.bitStringMatch(Elixir.Core.BitString.integer(Object.freeze({
-    value: Elixir.Core.Functions.call_property(Elixir.Core.Patterns,'variable')
-    }))),new Elixir.Core.BitString(Elixir.Core.BitString.binary(-100)));
+    let [int] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.bitStringMatch(Elixir.Core.BitString.integer({
+    'value': Elixir.Core.Patterns.variable()
+    })),new Elixir.Core.BitString(Elixir.Core.BitString.binary(-100)));
     """
 
     assert_translation(ex_ast, js_code)
@@ -65,9 +65,9 @@ defmodule ElixirScript.Translator.Bitstring.Test do
 
     ex_ast = quote do: <<-100::signed, _rest::binary>> = <<-100, "foo">>
     js_code = """
-    let [_rest] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.bitStringMatch(Elixir.Core.BitString.size(-100, signed),Elixir.Core.BitString.binary(Object.freeze({
-    value: Elixir.Core.Functions.call_property(Elixir.Core.Patterns,'variable')
-    }))),new Elixir.Core.BitString(Elixir.Core.BitString.binary(-100),Elixir.Core.BitString.binary('foo')));
+    let [_rest] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.bitStringMatch(Elixir.Core.BitString.signed(-100),Elixir.Core.BitString.binary({
+    'value': Elixir.Core.Patterns.variable()
+    })),new Elixir.Core.BitString(Elixir.Core.BitString.binary(-100),Elixir.Core.BitString.binary('foo')));
     """
 
     assert_translation(ex_ast, js_code)

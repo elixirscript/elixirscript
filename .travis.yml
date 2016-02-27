@@ -1,11 +1,11 @@
 sudo: false
 language: elixir
 elixir:
-  - 1.2.0
+  - 1.2.3
 otp_release:
   - 18.0
-before_script:
-  - npm install
+#before_script:
+#  - npm install
 script:
   - mix test
-  - npm test
+#  - npm test

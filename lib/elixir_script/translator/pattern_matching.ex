@@ -160,17 +160,15 @@ defmodule ElixirScript.Translator.PatternMatching do
 
   defp do_build_match({:<<>>, _, elements}, env) do
     params = Enum.reduce(elements, [], fn
-      ({:::, _, [{ variable, [], params }, _]}, state) when is_atom(params) ->
+      ({:::, _, [{ variable, _, params }, _]}, state) when is_atom(params) ->
         state ++ [JS.identifier(variable)]
       _, state ->
         state
     end)
 
-    var = {{:., [], [{:__aliases__, [], [Elixir, :Core, :Patterns]}, :variable]}, [], []}
-
     elements = Enum.map(elements, fn
-      ({:::, context, [{ variable, [], params }, options]}) when is_atom(params) ->
-        Bitstring.make_bitstring_element({:::, context, [{:%{}, [], [{"value", var}]}, options]}, env)
+      ({:::, context, [{ variable, _, params }, options]}) when is_atom(params) ->
+        Bitstring.make_bitstring_element({:::, context, [ElixirScript.Translator.PatternMatching, options]}, env)
       x ->
         Bitstring.make_bitstring_element(x, env)
     end)
