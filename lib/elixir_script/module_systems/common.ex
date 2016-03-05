@@ -3,51 +3,39 @@ defmodule ElixirScript.ModuleSystems.Common do
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Utils
 
-  def import_module(module_name, from, env) do
-    ref_declarator = JS.variable_declarator(
-      Translator.translate!(module_name, env),
-      JS.call_expression(
-        JS.identifier("require"),
-        [JS.literal(from)]
-      )
-    )
+  def import_module(module_names, from, env) when is_list(module_names) do
+    assignment_properties = Enum.map(module_names, fn(x) ->
+      JS.assignment_property(Translator.translate!(x, env))
+    end)
 
-    JS.variable_declaration([ref_declarator], :const)
+    do_import_module(JS.object_pattern(assignment_properties), from)
+  end
+
+  def import_module(module_name, from, env) do
+    do_import_module(Translator.translate!(module_name, env), from)
   end
 
   def import_module(module_name, %ElixirScript.Macro.Env{} = env) do
     {from, _ } = Code.eval_quoted(module_name)
-
-    ref_declarator = JS.variable_declarator(
-      Translator.translate!(module_name, env),
-      JS.call_expression(
-        JS.identifier("require"),
-        [JS.literal(Macro.underscore(from))]
-      )
-    )
-
-    JS.variable_declaration([ref_declarator], :const)
-
+    do_import_module(Translator.translate!(module_name, env), Macro.underscore(from))
   end
 
   def import_module(import_name, from) do
+    do_import_module(JS.identifier(import_name), from)
+  end
+
+  defp do_import_module(ref, file_path) do
 
     ref_declarator = JS.variable_declarator(
-      JS.identifier(import_name),
+      ref,
       JS.call_expression(
         JS.identifier("require"),
-        [JS.literal(from)]
+        [JS.literal(file_path)]
       )
     )
 
     JS.variable_declaration([ref_declarator], :const)
-  end
 
-  defp do_import_module(import_specifiers, file_path) do
-    JS.import_declaration(
-      import_specifiers,
-      JS.literal(file_path)
-    )
   end
 
   def export_module(exported_object) do

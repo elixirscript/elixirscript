@@ -4,7 +4,7 @@ defmodule ElixirScript.Translator.Module do
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.Function
-  alias ElixirScript.ModuleSystems.{ES6,Common}
+  alias ElixirScript.ModuleSystems
 
   def make_module(ElixirScript.Temp, body, env) do
     { body, _ } = translate_body(body, env)
@@ -51,7 +51,7 @@ defmodule ElixirScript.Translator.Module do
     exported_functions = Enum.map(exported_functions, fn({_key, value}) -> value end)
     private_functions = Enum.map(private_functions, fn({_key, value}) -> value end)
 
-    default = Common.export_module(exported_object)
+    default = ModuleSystems.export_module(exported_object)
 
     result = %{
         name: Utils.quoted_to_name({:__aliases__, [], module }),
@@ -176,7 +176,7 @@ defmodule ElixirScript.Translator.Module do
     compiler_opts = ElixirScript.Translator.State.get().compiler_opts
     case compiler_opts.import_standard_libs do
       true ->
-        [Common.import_module(:Elixir, Utils.make_local_file_path(compiler_opts.core_path))]
+        [ModuleSystems.import_module(:Elixir, Utils.make_local_file_path(compiler_opts.core_path))]
       false ->
         []
     end
@@ -209,7 +209,7 @@ defmodule ElixirScript.Translator.Module do
   end
 
   def make_imports(enum) do
-    Enum.map(enum, fn(x) -> Common.import_module(Utils.name_to_js_name(x), Utils.make_local_file_path(Utils.name_to_js_file_name(x))) end)
+    Enum.map(enum, fn(x) -> ModuleSystems.import_module(Utils.name_to_js_name(x), Utils.make_local_file_path(Utils.name_to_js_file_name(x))) end)
   end
 
 end

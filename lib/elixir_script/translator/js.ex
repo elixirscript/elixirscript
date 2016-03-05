@@ -3,7 +3,7 @@ defmodule ElixirScript.Translator.JS do
 
   alias ESTree.Tools.Builder
   alias ElixirScript.Translator
-  alias ElixirScript.ModuleSystems.ES6
+  alias ElixirScript.ModuleSystems
 
   @doc false
   def translate_js_function(name, params, env) do
@@ -56,15 +56,15 @@ defmodule ElixirScript.Translator.JS do
   end
 
   defp do_translate({:import, _, [module_names, from]}, env) when is_list(module_names) do
-    ES6.import_module(module_names, from, env)
+    ModuleSystems.import_module(module_names, from, env)
   end
 
   defp do_translate({:import, _, [module_name, from]}, env) do
-    ES6.import_module(module_name, from, env)
+    ModuleSystems.import_module(module_name, from, env)
   end
 
   defp do_translate({:import, _, [module_name]}, env) do
-    ES6.import_module(module_name, env)
+    ModuleSystems.import_module(module_name, env)
   end
 
 end
