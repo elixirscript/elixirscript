@@ -3,6 +3,7 @@ defmodule ElixirScript.Translator.JS do
 
   alias ESTree.Tools.Builder
   alias ElixirScript.Translator
+  alias ElixirScript.ModuleSystems.ES6
 
   @doc false
   def translate_js_function(name, params, env) do
@@ -55,47 +56,15 @@ defmodule ElixirScript.Translator.JS do
   end
 
   defp do_translate({:import, _, [module_names, from]}, env) when is_list(module_names) do
-    import_specifiers = Enum.map(module_names, fn(x) ->
-        Builder.import_specifier(
-          Translator.translate!(x, env),
-          Translator.translate!(x, env)
-        )
-    end)
-
-    build_import_declaration(import_specifiers, from)
+    ES6.import_module(module_names, from, env)
   end
 
   defp do_translate({:import, _, [module_name, from]}, env) do
-
-    translated = Translator.translate!(module_name, env)
-
-    import_specifier = Builder.import_default_specifier(
-      translated,
-      translated
-    )
-
-    build_import_declaration([import_specifier], from)
+    ES6.import_module(module_name, from, env)
   end
 
   defp do_translate({:import, _, [module_name]}, env) do
-
-    translated = Translator.translate!(module_name, env)
-
-    import_specifier = Builder.import_default_specifier(
-      translated,
-      translated
-    )
-
-    {from, _ } = Code.eval_quoted(module_name)
-
-    build_import_declaration([import_specifier], Macro.underscore(from))
-  end
-
-  defp build_import_declaration(import_specifiers, from) do
-    Builder.import_declaration(
-      import_specifiers,
-      Builder.identifier("'#{from}'")
-    )
+    ES6.import_module(module_name, env)
   end
 
 end

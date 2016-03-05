@@ -175,4 +175,15 @@ defmodule ElixirScript.Translator.Utils do
     Enum.join([:Elixir] ++ name, ".")
   end
 
+  def make_local_file_path(file_name) do
+    root = ElixirScript.Translator.State.get().compiler_opts.root
+
+    case root do
+      nil ->
+        "./" <> file_name
+      root ->
+        root <> "/" <> file_name
+    end
+  end
+
 end
