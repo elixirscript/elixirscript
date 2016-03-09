@@ -32,7 +32,7 @@ class Protocol{
         }
 
         throw new Error("No implementation found for " + thing);
-      }
+      };
     }
   }
 
