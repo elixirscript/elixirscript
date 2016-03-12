@@ -151,9 +151,11 @@ defmodule ElixirScript do
 
           module = case ast.type do
             :module ->
-              ElixirScript.Translator.Module.make_module(ast.name, ast.body, env)
+                       ElixirScript.Translator.Module.make_module(ast.name, ast.body, env)
             :protocol ->
-              ElixirScript.Translator.Protocol.consolidate(ast, env)
+                       ElixirScript.Translator.Protocol.make(ast.name, ast.functions, env)
+            :protocol_implementation ->
+                       ElixirScript.Translator.Protocol.Implementation.make(ast.name, ast.impl_type, ast.body, env)
           end
 
           { path, code } = convert_to_code(module)

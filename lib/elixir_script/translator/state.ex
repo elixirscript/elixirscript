@@ -58,9 +58,9 @@ defmodule ElixirScript.Translator.State do
       proto = Map.get(state.modules, do_get_module_name(name, state))
 
       if proto == nil do
-        proto = %ElixirScript.Module{ name: name, functions: functions, impls: HashDict.new, type: :protocol }
+        proto = %ElixirScript.Module{ name: name, functions: functions, type: :protocol }
       else
-        proto = %{proto | functions: functions, type: :protocol }
+        proto = %ElixirScript.Module{proto | functions: functions, type: :protocol }
       end
 
       %{ state | modules: Map.put(state.modules, name, proto) }
@@ -75,15 +75,13 @@ defmodule ElixirScript.Translator.State do
 
   def add_protocol_impl(protocol, type, impl) do
     Agent.update(__MODULE__, fn state ->
-      proto = Map.get(state.modules, do_get_module_name(protocol, state))
+      "Elixir." <> protocol_name = Atom.to_string(protocol)
+      "Elixir." <> type_name = Atom.to_string(Utils.quoted_to_name(type))
+      module_name = String.to_atom(protocol_name <> "." <> type_name)
 
-      if proto == nil do
-        proto = %ElixirScript.Module{ name: protocol, impls: HashDict.new, type: :protocol }
-      end
+      proto_impl = %ElixirScript.Module{ name: module_name, body: impl, impl_type: type, type: :protocol_implementation }
 
-      proto = %{ proto | impls: Dict.put(proto.impls, type, impl), type: :protocol }
-
-      %{ state | modules: Map.put(state.modules, protocol, proto) }
+      %{ state | modules: Map.put(state.modules, module_name, proto_impl) }
     end)
   end
 
