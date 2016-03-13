@@ -195,8 +195,6 @@ defmodule ElixirScript do
 
     result = result ++ defimpls
 
-    IO.inspect(result)
-
       result = Enum.map(result, fn
         { path, code } ->
           case compiler_opts.include_path do

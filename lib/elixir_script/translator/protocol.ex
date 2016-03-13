@@ -9,7 +9,7 @@ defmodule ElixirScript.Translator.Protocol do
   alias ElixirScript.ModuleSystems
 
   @doc """
-  Takes a protocol and turns them into modules
+  Takes a protocol and turns it into a module
   """
   def make(name, functions, env) do
     { body, _ } = Module.translate_body( {:__block__, [], [] }, env)
@@ -48,10 +48,13 @@ defmodule ElixirScript.Translator.Protocol do
     declaration = JS.variable_declaration([declarator], :const)
 
     implementations = JS.for_of_statement(
-      JS.object_pattern([
-          JS.assignment_property(JS.identifier("Type")),
-          JS.assignment_property(JS.identifier("Implementation"))
-      ]),
+      JS.variable_declaration([JS.variable_declarator(
+                                  JS.object_pattern([
+                                    JS.assignment_property(JS.identifier("Type")),
+                                    JS.assignment_property(JS.identifier("Implementation"))
+                                  ]),
+                                  nil
+      )], :let),
       JS.identifier("Implementations"),
       JS.call_expression(
         JS.member_expression(
@@ -86,6 +89,10 @@ defmodule ElixirScript.Translator.Protocol do
     end)
   end
 
+  @doc """
+  Makes the protocol implementation module for the given implementation name.
+  This is used to consolidate all of the protocol implementations.
+  """
   def make_defimpl(name, implementations \\ []) do
     imports = Module.make_std_lib_import()
 

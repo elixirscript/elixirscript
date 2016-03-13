@@ -75,7 +75,7 @@ defmodule ElixirScript.Translator.State do
 
   def add_protocol_impl(protocol, type, impl) do
     Agent.update(__MODULE__, fn state ->
-      protocol_name = Atom.to_string(protocol)
+      protocol_name = Atom.to_string(do_get_module_name(protocol, state))
       type_name = Atom.to_string(Utils.quoted_to_name(type))
       module_name = String.to_atom(protocol_name <> ".DefImpl." <> type_name)
 
