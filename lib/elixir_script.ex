@@ -138,12 +138,20 @@ defmodule ElixirScript do
 
     state = ElixirScript.Translator.State.get
 
-    standard_lib_modules = Map.values(state.std_lib_map)
+    standard_lib_modules = Map.values(state.std_lib_map) |> Enum.map(&to_string(&1)) |> Enum.map(&String.replace(&1, "Elixir.", ""))
 
     result =
       Map.values(state.modules)
-      |> Enum.reject(fn(ast) ->
-        compiler_opts.import_standard_libs == false && ast.name in standard_lib_modules
+    |> Enum.reject(fn(ast) ->
+      name = Atom.to_string(ast.name) |> String.replace("Elixir.", "")
+        cond do
+          compiler_opts.import_standard_libs == false and name in standard_lib_modules ->
+            true
+          compiler_opts.import_standard_libs == false and ast.type == :protocol_implementation and String.starts_with?(name, standard_lib_modules) ->
+            true
+          true ->
+            false
+        end
       end)
       |> Enum.map(fn ast ->
       spawn_link fn ->
@@ -153,24 +161,38 @@ defmodule ElixirScript do
             :module ->
                        ElixirScript.Translator.Module.make_module(ast.name, ast.body, env)
             :protocol ->
-                       ElixirScript.Translator.Protocol.make(ast.name, ast.functions, env)
+                       protocol = ElixirScript.Translator.Protocol.make(ast.name, ast.functions, env)
+                       protocol_defimpl = ElixirScript.Translator.Protocol.make_defimpl(ast.name)
+                       [protocol, protocol_defimpl]
             :protocol_implementation ->
                        ElixirScript.Translator.Protocol.Implementation.make(ast.name, ast.impl_type, ast.body, env)
-          end
+                   end
 
-          { path, code } = convert_to_code(module)
 
-          result = case compiler_opts.include_path do
-            true ->
-              { path, code }
-            false ->
-              code
-          end
+          result = case module do
+                     [protocol, protocol_defimpl] ->
+                       protocol_result = convert_to_code(protocol)
+                       protocol_defimpl_result = convert_to_code(protocol_defimpl)
+                       [protocol_result, protocol_defimpl_result]
+                     _  ->
+                       result = convert_to_code(module)
+                       [result]
+                   end
+
+          result = Enum.map(result, fn
+            { path, code } ->
+              case compiler_opts.include_path do
+                true ->
+                  { path, code }
+                false ->
+                  code
+              end
+          end)
 
           send parent, { self, result }
         end
       end)
-      |> Enum.map(fn pid ->
+      |> Enum.flat_map(fn pid ->
         receive do
           {^pid, result} -> result
         end

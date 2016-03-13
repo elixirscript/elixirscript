@@ -6,6 +6,7 @@ defmodule ElixirScript.Translator.Protocol do
   alias ElixirScript.Translator.Map
   alias ElixirScript.Translator.Function
   alias ElixirScript.Translator.Utils
+  alias ElixirScript.ModuleSystems
 
   @doc """
   Takes a protocol and turns them into modules
@@ -17,7 +18,9 @@ defmodule ElixirScript.Translator.Protocol do
 
     {imports, body} = Module.extract_imports_from_body(body)
 
-    imports = imports ++ Module.make_std_lib_import() ++ Module.make_imports(module_refs) ++ [ElixirScript.ModuleSystems.import_module("Implementation", Utils.make_local_file_path(Utils.name_to_js_file_name(name) <> ".defimpl"))]
+    imports = imports ++ Module.make_std_lib_import() ++
+      Module.make_imports(module_refs) ++
+      [ElixirScript.ModuleSystems.import_module("Implementations", Utils.make_local_file_path(Utils.name_to_js_file_name(name) <> ".Defimpl"))]
 
     object = process_spec_functions(functions)
     |> Enum.map(fn({key, value}) ->
@@ -71,8 +74,6 @@ defmodule ElixirScript.Translator.Protocol do
 
     default = JS.export_default_declaration(JS.identifier(Utils.name_to_js_name(name)))
 
-    IO.inspect(imports)
-
     %{
       name: name,
       body: imports ++ body ++ [declaration] ++ [implementations] ++ [default]
@@ -85,7 +86,7 @@ defmodule ElixirScript.Translator.Protocol do
     end)
   end
 
-  def make_defimpl(name) do
+  def make_defimpl(name, implementations \\ []) do
     imports = Module.make_std_lib_import()
 
     declarator = JS.variable_declarator(
@@ -97,11 +98,25 @@ defmodule ElixirScript.Translator.Protocol do
 
     default = JS.export_default_declaration(JS.identifier("impls"))
 
+    body = Enum.flat_map(implementations, fn(x) ->
+      name = Utils.name_to_js_name(x)
+      imports = ModuleSystems.import_module(name, Utils.make_local_file_path(Utils.name_to_js_file_name(x)))
+      call = JS.call_expression(
+        JS.member_expression(
+          JS.identifier("impls"),
+          JS.identifier("push")
+        ),
+        [JS.identifier(name)]
+      )
+
+      [imports, call]
+    end)
+
     "Elixir." <> protocol_name = Atom.to_string(name)
 
     %{
-      name: String.to_atom(protocol_name <> ".defimpl"),
-      body: imports ++ declaration ++ [default]
+      name: String.to_atom(protocol_name <> ".Defimpl"),
+      body: imports ++ [declaration] ++ body ++ [default]
     }
   end
 end
