@@ -112,10 +112,10 @@ defmodule ElixirScript.Translator.Protocol do
       [imports, call]
     end)
 
-    "Elixir." <> protocol_name = Atom.to_string(name)
+    protocol_name = Atom.to_string(name)
 
     %{
-      name: String.to_atom(protocol_name <> ".Defimpl"),
+      name: String.to_atom(protocol_name <> ".DefImpl"),
       body: imports ++ [declaration] ++ body ++ [default]
     }
   end

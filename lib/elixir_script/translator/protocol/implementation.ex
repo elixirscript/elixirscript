@@ -7,6 +7,8 @@ defmodule ElixirScript.Translator.Protocol.Implementation do
     type = map_to_js(type, env)
     module = Module.make_module(name, body, env)
 
+    protocol_name = Atom.to_string(name) |> String.split(".DefImpl.") |> hd |> String.to_atom
+
     %ESTree.ExportDefaultDeclaration{ declaration: export } = List.last(module.body)
     export = JS.object_expression([
       JS.property(
@@ -24,6 +26,7 @@ defmodule ElixirScript.Translator.Protocol.Implementation do
     |> Enum.reverse
 
     %{ module | body: body ++ [JS.export_default_declaration(export)] }
+    |> Map.put(:protocol, protocol_name)
   end
 
   defp map_to_js({:__aliases__, _, [:Integer]}, _) do
