@@ -6,30 +6,21 @@ defmodule ElixirScript.Translator.Protocol do
   alias ElixirScript.Translator.Map
   alias ElixirScript.Translator.Function
   alias ElixirScript.Translator.Utils
+  alias ElixirScript.ModuleSystems
 
   @doc """
-  Takes a protocol and turns them into modules
+  Takes a protocol and turns it into a module
   """
-  def consolidate(protocol, env) do
-    name = protocol.name
-    functions = protocol.functions
-    impls = protocol.impls |> Dict.to_list
-
-    {spec_imports, spec_body, spec} = define_spec(name, functions, env)
-    {impl_imports, impl_body, impls} = define_impls(name, impls, env)
-
-    body = spec_body ++ impl_body
-    imports = Enum.uniq(spec_imports ++ impl_imports)
-
-    create_module(name, spec, impls, imports, body, env)
-  end
-
-  defp define_spec(name, functions, env) do
+  def make(name, functions, env) do
     { body, _ } = Module.translate_body( {:__block__, [], [] }, env)
-    module_refs = ElixirScript.Translator.State.get_module_references(name)
-    {imports, body} = Module.extract_imports_from_body(body)
-    imports = imports ++ Module.make_std_lib_import() ++ Module.make_imports(module_refs)
 
+    module_refs = ElixirScript.Translator.State.get_module_references(name)
+
+    {imports, body} = Module.extract_imports_from_body(body)
+
+    imports = imports ++ Module.make_std_lib_import() ++
+      Module.make_imports(module_refs) ++
+      [ElixirScript.ModuleSystems.import_module("Implementations", Utils.make_local_file_path(Utils.name_to_js_file_name(name) <> ".Defimpl"))]
 
     object = process_spec_functions(functions)
     |> Enum.map(fn({key, value}) ->
@@ -54,33 +45,18 @@ defmodule ElixirScript.Translator.Protocol do
       )
     )
 
-    {imports, body, [JS.variable_declaration([declarator], :const)]}
-  end
+    declaration = JS.variable_declaration([declarator], :const)
 
-  defp define_impls(_, [], _) do
-    { [], [], [] }
-  end
-
-  defp define_impls(name, impls, env) do
-    Enum.map(impls, fn({type, impl}) ->
-      type = map_to_js(type, env)
-      { body, functions } = Module.extract_functions_from_module(impl)
-      { body, env } = Module.translate_body(body, env)
-
-      { exported_functions, _ } = process_functions(functions, env)
-
-      module_refs = ElixirScript.Translator.State.get_module_references(name)
-
-      {imports, body} = Module.extract_imports_from_body(body)
-
-      imports = imports ++ Module.make_std_lib_import() ++ Module.make_imports(module_refs)
-
-      object = Enum.map(exported_functions, fn({key, value}) ->
-        Map.make_property(JS.identifier(Utils.filter_name(key)), value)
-      end)
-      |> JS.object_expression
-
-      impl = JS.call_expression(
+    implementations = JS.for_of_statement(
+      JS.variable_declaration([JS.variable_declarator(
+                                  JS.object_pattern([
+                                    JS.assignment_property(JS.identifier("Type")),
+                                    JS.assignment_property(JS.identifier("Implementation"))
+                                  ]),
+                                  nil
+      )], :let),
+      JS.identifier("Implementations"),
+      JS.call_expression(
         JS.member_expression(
           JS.identifier(:Elixir),
           JS.member_expression(
@@ -91,27 +67,19 @@ defmodule ElixirScript.Translator.Protocol do
             )
           )
         ),
-        [JS.identifier(Utils.name_to_js_name(name)), type, object]
+        [
+          JS.identifier(Utils.name_to_js_name(name)),
+          JS.identifier("Type"),
+          JS.identifier("Implementation")
+        ]
       )
+    )
 
-      {imports, body, [impl]}
-
-    end)
-    |> Enum.reduce({[], [], []}, fn({impl_imports, impl_body, impl}, acc) ->
-      {
-        elem(acc, 0) ++ impl_imports,
-        elem(acc, 1) ++ impl_body,
-        elem(acc, 2) ++ impl
-      }
-    end)
-  end
-
-  defp create_module(name, spec, impls, imports, body, _) do
     default = JS.export_default_declaration(JS.identifier(Utils.name_to_js_name(name)))
 
     %{
       name: name,
-      body: imports ++ body ++ spec ++ impls ++ [default]
+      body: imports ++ body ++ [declaration] ++ [implementations] ++ [default]
     }
   end
 
@@ -121,115 +89,41 @@ defmodule ElixirScript.Translator.Protocol do
     end)
   end
 
-  defp process_functions(%{ exported: exported, private: private }, env) do
-    exported_functions = Enum.map(Dict.keys(exported), fn(key) ->
-      functions = Dict.get(exported, key)
+  @doc """
+  Makes the protocol implementation module for the given implementation name.
+  This is used to consolidate all of the protocol implementations.
+  """
+  def make_defimpl(name, implementations \\ []) do
+    imports = Module.make_std_lib_import()
 
-      { functions, _ } = Function.make_anonymous_function(functions, env)
+    declarator = JS.variable_declarator(
+      JS.identifier("impls"),
+      JS.array_expression([])
+    )
 
-      { key, functions }
+    declaration = JS.variable_declaration([declarator], :let)
+
+    default = JS.export_default_declaration(JS.identifier("impls"))
+
+    body = Enum.flat_map(implementations, fn(x) ->
+      name = Utils.name_to_js_name(x)
+      imports = ModuleSystems.import_module(name, Utils.make_local_file_path(Utils.name_to_js_file_name(x)))
+      call = JS.call_expression(
+        JS.member_expression(
+          JS.identifier("impls"),
+          JS.identifier("push")
+        ),
+        [JS.identifier(name)]
+      )
+
+      [imports, call]
     end)
 
-    private_functions = Enum.map(Dict.keys(private), fn(key) ->
-      functions = Dict.get(private, key)
-      { functions, _ } = Function.make_anonymous_function(functions, env)
+    protocol_name = Atom.to_string(name)
 
-      { key, functions }
-    end)
-
-    { exported_functions, private_functions }
+    %{
+      name: String.to_atom(protocol_name <> ".DefImpl"),
+      body: imports ++ [declaration] ++ body ++ [default]
+    }
   end
-
-  defp map_to_js({:__aliases__, _, [:Integer]}, _) do
-    JS.member_expression(
-      JS.member_expression(
-        JS.identifier(:Elixir),
-        JS.identifier(:Core)
-      ),
-      JS.identifier(:Integer)
-    )
-  end
-
-  defp map_to_js({:__aliases__, _, [:Tuple]}, _) do
-    JS.member_expression(
-      JS.member_expression(
-        JS.identifier(:Elixir),
-        JS.identifier(:Core)
-      ),
-      JS.identifier(:Tuple)
-    )
-  end
-
-  defp map_to_js({:__aliases__, _, [:Atom]}, _) do
-    JS.identifier(:Symbol)
-  end
-
-  defp map_to_js({:__aliases__, _, [:List]}, _) do
-    JS.identifier(:Array)
-  end
-
-  defp map_to_js({:__aliases__, _, [:BitString]}, _) do
-    JS.member_expression(
-      JS.member_expression(
-        JS.identifier(:Elixir),
-        JS.identifier(:Core)
-      ),
-      JS.identifier(:BitString)
-    )
-  end
-
-  defp map_to_js({:__aliases__, _, [:Float]}, _) do
-    JS.member_expression(
-      JS.member_expression(
-        JS.identifier(:Elixir),
-        JS.identifier(:Core)
-      ),
-      JS.identifier(:Float)
-    )
-  end
-
-  defp map_to_js({:__aliases__, _, [:Function]}, _) do
-    JS.identifier(:Function)
-  end
-
-  defp map_to_js({:__aliases__, _, [:PID]}, _) do
-    JS.member_expression(
-      JS.member_expression(
-        JS.identifier(:Elixir),
-        JS.identifier(:Core)
-      ),
-      JS.identifier(:PID)
-    )
-  end
-
-  defp map_to_js({:__aliases__, _, [:Port]}, _) do
-    JS.member_expression(
-      JS.identifier(:Elixir),
-      JS.identifier(:Port)
-    )
-  end
-
-  defp map_to_js({:__aliases__, _, [:Reference]}, _) do
-    JS.member_expression(
-      JS.identifier(:Elixir),
-      JS.identifier(:Reference)
-    )
-  end
-
-  defp map_to_js({:__aliases__, _, [:Map]}, _) do
-    JS.identifier(:Object)
-  end
-
-  defp map_to_js({:__aliases__, _, [:Any]}, _) do
-    JS.identifier(:null)
-  end
-
-
-  defp map_to_js({:__aliases__, _, _} = module, env) do
-    ElixirScript.Translator.Struct.get_struct_class(
-      module,
-      env
-    )
-  end
-
 end

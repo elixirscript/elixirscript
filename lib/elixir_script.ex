@@ -138,12 +138,20 @@ defmodule ElixirScript do
 
     state = ElixirScript.Translator.State.get
 
-    standard_lib_modules = Map.values(state.std_lib_map)
+    standard_lib_modules = Map.values(state.std_lib_map) |> Enum.map(&to_string(&1)) |> Enum.map(&String.replace(&1, "Elixir.", ""))
 
     result =
       Map.values(state.modules)
-      |> Enum.reject(fn(ast) ->
-        compiler_opts.import_standard_libs == false && ast.name in standard_lib_modules
+    |> Enum.reject(fn(ast) ->
+      name = Atom.to_string(ast.name) |> String.replace("Elixir.", "")
+        cond do
+          compiler_opts.import_standard_libs == false and name in standard_lib_modules ->
+            true
+          compiler_opts.import_standard_libs == false and ast.type == :protocol_implementation and String.starts_with?(name, standard_lib_modules) ->
+            true
+          true ->
+            false
+        end
       end)
       |> Enum.map(fn ast ->
       spawn_link fn ->
@@ -151,19 +159,15 @@ defmodule ElixirScript do
 
           module = case ast.type do
             :module ->
-              ElixirScript.Translator.Module.make_module(ast.name, ast.body, env)
+                       ElixirScript.Translator.Module.make_module(ast.name, ast.body, env)
             :protocol ->
-              ElixirScript.Translator.Protocol.consolidate(ast, env)
-          end
+                       ElixirScript.Translator.Protocol.make(ast.name, ast.functions, env)
+            :protocol_implementation ->
+                       ElixirScript.Translator.Protocol.Implementation.make(ast.name, ast.impl_type, ast.body, env)
+                   end
 
-          { path, code } = convert_to_code(module)
 
-          result = case compiler_opts.include_path do
-            true ->
-              { path, code }
-            false ->
-              code
-          end
+          result = convert_to_code(module)
 
           send parent, { self, result }
         end
@@ -172,6 +176,33 @@ defmodule ElixirScript do
         receive do
           {^pid, result} -> result
         end
+    end)
+
+      { result, protocols } = Enum.map_reduce(result, %{}, fn
+        { path, code, nil, _ }, protocols ->
+          {{ path, code}, protocols }
+        { path, code, protocol, name }, protocols ->
+          {{ path, code}, Map.put(protocols, protocol, Map.get(protocols, protocol, []) ++ [name]) }
+      end)
+
+    defimpls = Enum.map(protocols, fn({protocol, implementations}) ->
+      ElixirScript.Translator.Protocol.make_defimpl(protocol, implementations)
+    end)
+    |> Enum.map(fn(module) ->
+      { path, code, _, _ } = convert_to_code(module)
+      {path, code}
+    end)
+
+    result = result ++ defimpls
+
+      result = Enum.map(result, fn
+        { path, code } ->
+          case compiler_opts.include_path do
+            true ->
+              { path, code }
+            false ->
+              code
+          end
       end)
 
     result
@@ -200,15 +231,15 @@ defmodule ElixirScript do
   defp process_module(module) do
     file_path = Utils.name_to_js_file_name(module.name) <> ".js"
 
-    { file_path, Builder.program(module.body) }
+    { file_path, Builder.program(module.body), Map.get(module, :protocol), Map.get(module, :name) }
   end
 
-  defp javascript_ast_to_code({path, js_ast}) do
+  defp javascript_ast_to_code({path, js_ast, protocol, name}) do
     js_code = js_ast
     |> prepare_js_ast
     |> Generator.generate
 
-    {path, js_code}
+    {path, js_code, protocol, name}
   end
 
   defp prepare_js_ast(js_ast) do
