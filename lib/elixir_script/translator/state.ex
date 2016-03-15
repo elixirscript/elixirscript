@@ -11,12 +11,13 @@ defmodule ElixirScript.Translator.State do
 
   def start_link(compiler_opts \\ []) do
     Agent.start_link(fn ->
-      %{ compiler_opts: compiler_opts, modules: Map.new, std_lib_map: build_standard_lib_map() }
+      %{ compiler_opts: compiler_opts, modules: Map.new, std_lib_map: build_standard_lib_map(), added_modules: MapSet.new }
     end, name: __MODULE__)
   end
 
   def serialize() do
     Agent.get(__MODULE__, fn(state) ->
+      state = Map.delete(state, :added_modules)
       :erlang.term_to_binary(state)
     end)
   end
@@ -25,7 +26,7 @@ defmodule ElixirScript.Translator.State do
     Agent.update(__MODULE__, fn state ->
       frozen_state = :erlang.binary_to_term(frozen_state)
       modules = Map.delete(frozen_state.modules, ElixirScript.Temp)
-      %{ state | modules: modules, std_lib_map: frozen_state.std_lib_map }
+      %{ state | modules: modules, std_lib_map: frozen_state.std_lib_map, added_modules: MapSet.new }
     end)
   end
 
@@ -57,13 +58,13 @@ defmodule ElixirScript.Translator.State do
 
   def add_module(module) do
     Agent.update(__MODULE__, fn state ->
-      %{ state | modules: Map.put(state.modules, module.name, module) }
+      %{ state | modules: Map.put(state.modules, module.name, module), added_modules: Set.put(state.added_modules, module.name)  }
     end)
   end
 
   def delete_module_by_name(module_name) do
     Agent.update(__MODULE__, fn state ->
-      %{ state | modules: Map.delete(state.modules, module_name ) }
+      %{ state | modules: Map.delete(state.modules, module_name ), added_modules: Set.delete(state.added_modules, module_name) }
     end)
   end
 
@@ -77,7 +78,7 @@ defmodule ElixirScript.Translator.State do
         proto = %ElixirScript.Module{proto | functions: functions, type: :protocol }
       end
 
-      %{ state | modules: Map.put(state.modules, name, proto) }
+      %{ state | modules: Map.put(state.modules, name, proto), added_modules: Set.put(state.added_modules, name) }
     end)
   end
 
@@ -95,7 +96,7 @@ defmodule ElixirScript.Translator.State do
 
       proto_impl = %ElixirScript.Module{ name: module_name, body: impl, impl_type: type, type: :protocol_implementation }
 
-      %{ state | modules: Map.put(state.modules, module_name, proto_impl) }
+      %{ state | modules: Map.put(state.modules, module_name, proto_impl), added_modules: Set.put(state.added_modules, module_name) }
     end)
   end
 

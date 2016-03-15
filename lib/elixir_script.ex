@@ -3,6 +3,8 @@ defmodule ElixirScript do
   alias ESTree.Tools.Generator
   alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.ModuleCollector
+  alias ElixirScript.CompilerStats
+  require Logger
 
   @moduledoc """
   Translates Elixir into JavaScript.
@@ -53,7 +55,8 @@ defmodule ElixirScript do
   """
   @spec compile_quoted(Macro.t, Map.t) :: [binary | {binary, binary}]
   def compile_quoted(quoted, opts \\ %{}) do
-    do_compile(opts, [quoted])
+    { code, _ } = do_compile(opts, [quoted])
+    code
   end
 
   @doc """
@@ -61,10 +64,33 @@ defmodule ElixirScript do
   """
   @spec compile_path(binary, Map.t) :: [binary | {binary, binary}]
   def compile_path(path, opts \\ %{}) do
-    path = Path.wildcard(path)
-    code = Enum.map(path, &file_to_quoted/1)
+    expanded_path = Path.wildcard(path)
 
-    do_compile(opts, code)
+    compiler_stats = if Map.get(opts, :rebuild, false) do
+        CompilerStats.delete_compiler_stats(path)
+        CompilerStats.new_compile_stats(@stdlib_state)
+      else
+        case CompilerStats.get_compiler_stats(path) do
+          nil ->
+            CompilerStats.new_compile_stats(@stdlib_state)
+          x ->
+            x
+        end
+      end
+
+    new_file_stats = CompilerStats.build_file_stats(expanded_path)
+
+    changed_files = CompilerStats.get_changed_files(compiler_stats.files, new_file_stats)
+    |> Enum.map(fn {file, state} -> file end)
+
+    code = Enum.map(changed_files, &file_to_quoted/1)
+
+    { code, new_state } = do_compile(opts, code, compiler_stats.state)
+    compiler_stats = %{compiler_stats | files: new_file_stats, state: new_state }
+
+    CompilerStats.save_compiler_stats(path, compiler_stats)
+
+    code
   end
 
   def compile_std_lib() do
@@ -92,16 +118,17 @@ defmodule ElixirScript do
     end)
   end
 
-  defp do_compile(opts, quoted_code_list) do
+  defp do_compile(opts, quoted_code_list, state \\ @stdlib_state) do
     compiler_opts = build_compiler_options(opts)
     ElixirScript.Translator.State.start_link(compiler_opts)
-    ElixirScript.Translator.State.deserialize(@stdlib_state)
+    ElixirScript.Translator.State.deserialize(state)
 
     ModuleCollector.process_modules(Enum.map(quoted_code_list, &update_quoted(&1)))
     code = create_code(compiler_opts)
+    new_state = ElixirScript.Translator.State.serialize()
     ElixirScript.Translator.State.stop
 
-    code
+    { code, new_state }
   end
 
   defp build_compiler_options(opts) do
@@ -146,21 +173,11 @@ defmodule ElixirScript do
 
     state = ElixirScript.Translator.State.get
 
-    standard_lib_modules = Map.values(state.std_lib_map) |> Enum.map(&to_string(&1)) |> Enum.map(&String.replace(&1, "Elixir.", ""))
+    standard_lib_modules = Map.values(state.std_lib_map) |> Enum.map(&to_string(&1))
 
     result =
       Map.values(state.modules)
-    |> Enum.reject(fn(ast) ->
-      name = Atom.to_string(ast.name) |> String.replace("Elixir.", "")
-        cond do
-          Map.get(compiler_opts, :std_lib, false) == false and name in standard_lib_modules ->
-            true
-          Map.get(compiler_opts, :std_lib, false) == false and ast.type == :protocol_implementation and String.starts_with?(name, standard_lib_modules) ->
-            true
-          true ->
-            false
-        end
-      end)
+      |> Enum.reject(fn(ast) -> not ast.name in state.added_modules end)
       |> Enum.map(fn ast ->
       spawn_link fn ->
           env = ElixirScript.Translator.Env.module_env(ast.name,  Utils.name_to_js_file_name(ast.name) <> ".js")
