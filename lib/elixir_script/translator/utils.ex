@@ -186,4 +186,13 @@ defmodule ElixirScript.Translator.Utils do
     end
   end
 
+  def make_local_file_path(file_name, root) do
+    case root do
+      nil ->
+        "./" <> file_name
+      root ->
+        root <> "/" <> file_name
+    end
+  end
+
 end

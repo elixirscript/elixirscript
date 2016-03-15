@@ -93,8 +93,8 @@ defmodule ElixirScript.Translator.Protocol do
   Makes the protocol implementation module for the given implementation name.
   This is used to consolidate all of the protocol implementations.
   """
-  def make_defimpl(name, implementations \\ []) do
-    imports = Module.make_std_lib_import()
+  def make_defimpl(name, implementations \\ [], compiler_opts) do
+    imports = [ModuleSystems.import_module(:Elixir, Utils.make_local_file_path(compiler_opts.core_path, compiler_opts.root))]
 
     declarator = JS.variable_declarator(
       JS.identifier("impls"),
@@ -107,7 +107,7 @@ defmodule ElixirScript.Translator.Protocol do
 
     body = Enum.flat_map(implementations, fn(x) ->
       name = Utils.name_to_js_name(x)
-      imports = ModuleSystems.import_module(name, Utils.make_local_file_path(Utils.name_to_js_file_name(x)))
+      imports = ModuleSystems.import_module(name, Utils.make_local_file_path(Utils.name_to_js_file_name(x), compiler_opts.root))
       call = JS.call_expression(
         JS.member_expression(
           JS.identifier("impls"),

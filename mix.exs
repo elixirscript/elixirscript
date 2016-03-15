@@ -60,7 +60,14 @@ defmodule ElixirScript.Mixfile do
 
   defp aliases do
     [dist: &dist/1,
-     install: &install/1]
+     install: &install/1,
+     std_lib: &std_lib/1]
+  end
+
+  def std_lib(_) do
+    Mix.Task.run "app.start"
+    { _ , _ } = System.cmd("npm", ["run", "build"])
+    ElixirScript.compile_std_lib()
   end
 
   def dist(_) do
@@ -76,11 +83,12 @@ defmodule ElixirScript.Mixfile do
       File.rm_rf(dist_folder)
     end
 
-    { _ , _ } = System.cmd("npm", ["run", "build"])
-
     File.mkdir_p(folder_name <> "/bin")
     File.cp!("elixirscript", "#{folder_name}/bin/elixirscript")
-    File.cp!("priv/Elixir.js", "#{folder_name}/Elixir.js")
+    if File.exists?("priv/.DS_Store") do
+      File.rm!("priv/.DS_Store")
+    end
+    File.cp_r!("priv/", "#{folder_name}")
     File.cp!("LICENSE", "#{folder_name}/LICENSE")
 
     System.cmd("tar", ["czf", archive_file_name, folder_name])

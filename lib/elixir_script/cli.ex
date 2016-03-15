@@ -3,7 +3,7 @@ defmodule ElixirScript.CLI do
 
   @switches [
     output: :binary, elixir: :boolean, root: :binary,
-    help: :boolean, core: :boolean, core_path: :binary
+    help: :boolean, core_path: :binary, std_lib: :binary
   ]
 
   @aliases [
@@ -37,15 +37,15 @@ defmodule ElixirScript.CLI do
       -o  --output [path]   places output at the given path
       -ex --elixir          read input as elixir code string
       -r  --root [path]     root import path for all exported modules
-      --core        outputs the elixirscript core JavaScript file
+      --std_lib [path]      outputs the elixirscript standard library JavaScript files to the specified path
       --core_path    es6 import path to the elixirscript standard lib
       only used with the [output] option. When used, Elixir.js is not exported
       -h  --help            this message
     """
   end
 
-  def process(:core) do
-    IO.write(ElixirScript.elixirscript_core)
+  def process([std_lib: path]) do
+    ElixirScript.copy_core_to_destination(path)
   end
 
   def process({ input, options }) do
@@ -72,16 +72,21 @@ defmodule ElixirScript.CLI do
 
     case options[:output] do
       nil ->
-        Enum.map(compile_output,
-          fn
-          ({path, code})-> "//#{path}:ENDFILENAME\n" <> code
-        end)
-        |> Enum.join("//:ENDFILE\n")
-        |> IO.write
+        Enum.each(compile_output,
+                  fn
+                    {_, code} ->
+                      IO.write(code)
+                  end)
 
       output_path ->
         Enum.each(compile_output, fn(x) ->
           write_to_file(x, output_path)
+        end)
+
+        ElixirScript.update_protocols(Path.join(output_path, "*.js"), compile_opts)
+        |> Enum.each(fn
+          x ->
+            write_to_file(x, output_path)
         end)
 
         if options[:core_path] == nil do

@@ -15,6 +15,20 @@ defmodule ElixirScript.Translator.State do
     end, name: __MODULE__)
   end
 
+  def serialize() do
+    Agent.get(__MODULE__, fn(state) ->
+      :erlang.term_to_binary(state)
+    end)
+  end
+
+  def deserialize(frozen_state) do
+    Agent.update(__MODULE__, fn state ->
+      frozen_state = :erlang.binary_to_term(frozen_state)
+      modules = Map.delete(frozen_state.modules, ElixirScript.Temp)
+      %{ state | modules: modules, std_lib_map: frozen_state.std_lib_map }
+    end)
+  end
+
   defp build_standard_lib_map() do
     Map.new
     |> Map.put(Kernel, ElixirScript.Kernel)

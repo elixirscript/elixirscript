@@ -33,24 +33,10 @@ defmodule ElixirScript do
     end
   end
 
+  @external_resource stdlib_state_path = Path.join([__DIR__, "elixir_script", "translator", "stdlib_state.exs"])
+  @stdlib_state File.read!(stdlib_state_path)
 
-  # At compile time, gathers the files containing the standard lib modules,
-  # converts them to their quoted forms and keeps them in @libs for use when compiling.
-
-  # These are full of macros and would not transpile to anything significant
-  @modules_to_not_read ["v_dom.ex", "html.ex"]
-
-  @external_resource libs_path = Path.join([__DIR__, "elixir_script", "prelude", "**", "*.ex"])
-  @libs Enum.filter(Path.wildcard(libs_path), fn(path) ->
-   !String.contains?(path, @modules_to_not_read)
-  end)
-  |> Enum.map(fn(path) ->
-      path
-      |> File.read!
-      |> Code.string_to_quoted!
-    end)
-
-  @js_core_path "/Elixir.js"
+  @js_core_path "/*.js"
 
   @doc """
   Compiles the given Elixir code string
@@ -81,16 +67,38 @@ defmodule ElixirScript do
     do_compile(opts, code)
   end
 
-  defp do_compile(opts, quoted_code_list) do
-    compiler_opts = build_compiler_options(opts)
-    libs = update_quoted(@libs)
+  def compile_std_lib() do
+    compiler_opts = build_compiler_options(%{std_lib: true, include_path: true})
+    libs_path = Path.join([__DIR__, "elixir_script", "prelude", "**", "*.ex"])
+    code = Path.wildcard(libs_path)
+    |> Enum.filter(fn(path) ->
+      !String.contains?(path, ["v_dom.ex", "html.ex"])
+    end)
+    |> Enum.map(&file_to_quoted/1)
 
     ElixirScript.Translator.State.start_link(compiler_opts)
-
-    ModuleCollector.process_modules(libs ++ Enum.map(quoted_code_list, &update_quoted(&1)))
-
+    ModuleCollector.process_modules(Enum.map(code, &update_quoted(&1)))
     code = create_code(compiler_opts)
+    new_std_state = ElixirScript.Translator.State.serialize()
+    ElixirScript.Translator.State.stop
 
+    File.write!(File.cwd!() <> "/lib/elixir_script/translator/stdlib_state.exs", new_std_state)
+
+    output_path = File.cwd!() <> "/priv"
+
+    Enum.filter(code, fn({path, _}) -> !String.contains?(path, "ElixirScript.Temp.js") end)
+    |> Enum.each(fn(x) ->
+      ElixirScript.CLI.write_to_file(x, output_path)
+    end)
+  end
+
+  defp do_compile(opts, quoted_code_list) do
+    compiler_opts = build_compiler_options(opts)
+    ElixirScript.Translator.State.start_link(compiler_opts)
+    ElixirScript.Translator.State.deserialize(@stdlib_state)
+
+    ModuleCollector.process_modules(Enum.map(quoted_code_list, &update_quoted(&1)))
+    code = create_code(compiler_opts)
     ElixirScript.Translator.State.stop
 
     code
@@ -145,9 +153,9 @@ defmodule ElixirScript do
     |> Enum.reject(fn(ast) ->
       name = Atom.to_string(ast.name) |> String.replace("Elixir.", "")
         cond do
-          compiler_opts.import_standard_libs == false and name in standard_lib_modules ->
+          Map.get(compiler_opts, :std_lib, false) == false and name in standard_lib_modules ->
             true
-          compiler_opts.import_standard_libs == false and ast.type == :protocol_implementation and String.starts_with?(name, standard_lib_modules) ->
+          Map.get(compiler_opts, :std_lib, false) == false and ast.type == :protocol_implementation and String.starts_with?(name, standard_lib_modules) ->
             true
           true ->
             false
@@ -186,7 +194,7 @@ defmodule ElixirScript do
       end)
 
     defimpls = Enum.map(protocols, fn({protocol, implementations}) ->
-      ElixirScript.Translator.Protocol.make_defimpl(protocol, implementations)
+      ElixirScript.Translator.Protocol.make_defimpl(protocol, implementations, state.compiler_opts)
     end)
     |> Enum.map(fn(module) ->
       { path, code, _, _ } = convert_to_code(module)
@@ -203,9 +211,34 @@ defmodule ElixirScript do
             false ->
               code
           end
-      end)
+    end)
 
     result
+  end
+
+  def update_protocols(path, compiler_opts) do
+    result = Enum.filter(Path.wildcard(path), fn(js_file_path) ->
+      String.contains?(js_file_path, ".DefImpl")
+    end)
+    |> Enum.reduce(%{}, fn(js_file_path, state) ->
+      case String.split(js_file_path, ".DefImpl.") do
+        [protocol, "js"] ->
+          protocol = String.split(protocol, "/") |> List.last |> String.to_atom
+          Map.put(state, protocol, Map.get(state, protocol, []))
+        [protocol, impl] ->
+          protocol = String.split(protocol, "/") |> List.last |> String.to_atom
+          impl = String.replace(impl, ".js", "") |> String.to_atom
+          Map.put(state, protocol, Map.get(state, protocol, []) ++ [impl])
+      end
+    end)
+    |> Enum.map(fn {protocol, implementations} ->
+      ElixirScript.Translator.Protocol.make_defimpl(protocol, implementations, compiler_opts)
+    end)
+    |> Enum.map(fn(module) ->
+      { path, code, _, _ } = convert_to_code(module)
+      {path, code}
+    end)
+
   end
 
   @doc """
@@ -213,14 +246,19 @@ defmodule ElixirScript do
   to the specified location
   """
   def copy_core_to_destination(destination) do
-    File.cp!(operating_path <> @js_core_path, destination <> @js_core_path)
+    Enum.each(Path.wildcard(operating_path <> @js_core_path), fn(path) ->
+      base = Path.basename(path)
+      File.cp!(path, Path.join([destination, base]))
+    end)
   end
 
   @doc """
   Returns the elixirscript core js code
   """
   def elixirscript_core() do
-    File.read!(operating_path <> @js_core_path)
+    Enum.each(Path.wildcard(operating_path <> @js_core_path), fn(path) ->
+      File.read!(path)
+    end)
   end
 
   defp convert_to_code(js_ast) do
