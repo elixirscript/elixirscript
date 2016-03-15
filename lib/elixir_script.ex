@@ -22,6 +22,7 @@ defmodule ElixirScript do
   * `:root` - a binary path prepended to the path of the standard lib imports if needed
   * `:env` - a Macro.env struct to use. This is most useful when using macros. Make sure that the
   * `:core_path` - The es6 import path used to import the elixirscript core.
+  * `:full_build` - For compile_path, tells the compiler to perform a full build instead of incremental one
   When using this option, the Elixir.js file is not exported
   """
 
@@ -66,7 +67,7 @@ defmodule ElixirScript do
   def compile_path(path, opts \\ %{}) do
     expanded_path = Path.wildcard(path)
 
-    compiler_stats = if Map.get(opts, :rebuild, false) do
+    compiler_stats = if Map.get(opts, :full_build, false) do
         CompilerStats.delete_compiler_stats(path)
         CompilerStats.new_compile_stats(@stdlib_state)
       else
@@ -138,6 +139,7 @@ defmodule ElixirScript do
     |> Map.put(:env, custom_env)
     |> Map.put(:import_standard_libs, true)
     |> Map.put(:core_path, "Elixir")
+    |> Map.put(:full_build, false)
 
     Map.merge(default_options, opts)
   end
