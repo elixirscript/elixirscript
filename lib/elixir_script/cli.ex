@@ -63,7 +63,8 @@ defmodule ElixirScript.CLI do
     compile_opts = %{
       root: options[:root],
       include_path: true,
-      core_path: Keyword.get(options, :core_path, "Elixir")
+      core_path: Keyword.get(options, :core_path, "Elixir"),
+      full_build: Keyword.get(options, :full_build, false)
     }
 
     compile_output = case options[:elixir] do
@@ -93,7 +94,14 @@ defmodule ElixirScript.CLI do
         end)
 
         if options[:core_path] == nil do
-          ElixirScript.copy_core_to_destination(output_path)
+          case ElixirScript.CompilerCache.get(input) do
+            nil ->
+              ElixirScript.copy_core_to_destination(output_path)
+            %{ full_build?: true } ->
+              ElixirScript.copy_core_to_destination(output_path)
+            _ ->
+              nil
+          end
         end
     end
   end

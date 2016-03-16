@@ -3,7 +3,7 @@ defmodule ElixirScript do
   alias ESTree.Tools.Generator
   alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.ModuleCollector
-  alias ElixirScript.CompilerStats
+  alias ElixirScript.CompilerCache
   require Logger
 
   @moduledoc """
@@ -68,20 +68,20 @@ defmodule ElixirScript do
     expanded_path = Path.wildcard(path)
 
     compiler_stats = if Map.get(opts, :full_build, false) do
-        CompilerStats.delete_compiler_stats(path)
-        CompilerStats.new_compile_stats(@stdlib_state)
+      CompilerCache.delete(path)
+      CompilerCache.new(@stdlib_state)
       else
-        case CompilerStats.get_compiler_stats(path) do
+        case CompilerCache.get(path) do
           nil ->
-            CompilerStats.new_compile_stats(@stdlib_state)
+            CompilerCache.new(@stdlib_state)
           x ->
-            x
+            %{ x | full_build?: false }
         end
       end
 
-    new_file_stats = CompilerStats.build_file_stats(expanded_path)
+    new_file_stats = CompilerCache.build_file_stats(expanded_path)
 
-    changed_files = CompilerStats.get_changed_files(compiler_stats.files, new_file_stats)
+    changed_files = CompilerCache.get_changed_files(compiler_stats.files, new_file_stats)
     |> Enum.map(fn {file, state} -> file end)
 
     code = Enum.map(changed_files, &file_to_quoted/1)
@@ -89,7 +89,7 @@ defmodule ElixirScript do
     { code, new_state } = do_compile(opts, code, compiler_stats.state)
     compiler_stats = %{compiler_stats | files: new_file_stats, state: new_state }
 
-    CompilerStats.save_compiler_stats(path, compiler_stats)
+    CompilerCache.write(path, compiler_stats)
 
     code
   end
@@ -179,7 +179,9 @@ defmodule ElixirScript do
 
     result =
       Map.values(state.modules)
-      |> Enum.reject(fn(ast) -> not ast.name in state.added_modules end)
+    |> Enum.reject(fn(ast) ->
+        not ast.name in state.added_modules
+      end)
       |> Enum.map(fn ast ->
       spawn_link fn ->
           env = ElixirScript.Translator.Env.module_env(ast.name,  Utils.name_to_js_file_name(ast.name) <> ".js")
