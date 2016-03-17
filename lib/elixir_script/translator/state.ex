@@ -58,7 +58,7 @@ defmodule ElixirScript.Translator.State do
 
   def add_module(module) do
     Agent.update(__MODULE__, fn state ->
-      %{ state | modules: Map.put(state.modules, module.name, module), added_modules: Set.put(state.added_modules, module.name)  }
+      do_add_module_to_state(state, module)
     end)
   end
 
@@ -78,7 +78,7 @@ defmodule ElixirScript.Translator.State do
         proto = %ElixirScript.Module{proto | functions: functions, type: :protocol }
       end
 
-      %{ state | modules: Map.put(state.modules, name, proto), added_modules: Set.put(state.added_modules, name) }
+      do_add_module_to_state(state, proto)
     end)
   end
 
@@ -96,8 +96,25 @@ defmodule ElixirScript.Translator.State do
 
       proto_impl = %ElixirScript.Module{ name: module_name, body: impl, impl_type: type, type: :protocol_implementation }
 
-      %{ state | modules: Map.put(state.modules, module_name, proto_impl), added_modules: Set.put(state.added_modules, module_name) }
+      do_add_module_to_state(state, proto_impl)
     end)
+  end
+
+  defp do_add_module_to_state(state, module) do
+    update_added = case state.modules[module.name] do
+                     %ElixirScript.Module{ type: :protocol } = old_module ->
+                       old_module.functions !== module.functions
+                     %ElixirScript.Module{} = old_module ->
+                       old_module.body !== module.body
+                     nil ->
+                       true
+                   end
+
+    if update_added do
+      %{ state | modules: Map.put(state.modules, module.name, module), added_modules: Set.put(state.added_modules, module.name) }
+    else
+      %{ state | modules: Map.put(state.modules, module.name, module) }
+    end
   end
 
   def get do
