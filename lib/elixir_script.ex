@@ -100,7 +100,12 @@ defmodule ElixirScript do
 
   @doc false
   def compile_std_lib() do
-    compiler_opts = build_compiler_options(%{std_lib: true, include_path: true, output: File.cwd!() <> "/priv"})
+    compile_std_lib(Path.join([File.cwd!, "priv"]))
+  end
+
+  @doc false
+  def compile_std_lib(output_path) do
+    compiler_opts = build_compiler_options(%{std_lib: true, include_path: true, output: output_path})
     libs_path = Path.join([__DIR__, "elixir_script", "prelude", "**", "*.ex"])
 
     code = Path.wildcard(libs_path)

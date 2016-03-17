@@ -1,4 +1,15 @@
 # v0.17.0-dev
+* Enhancements
+  * Incremental Compilation:
+    Now ElixirScript will only build files and modules that have changed since the last build
+  * Added `output` as an option for compiler functions. This controls whether output is returned as a list of tuples, send to stdout, or saved to a file path
+  * Added `:full_build` as an option for compiler functions and `--full-build` option to CLI. These tell the compiler to perform a full build
+  * Added `--version` option to CLI. Outputs current version of elixirscript
+  * Added `--std-lib` option to CLI. Takes a path and adds the stdlib to that path
+
+* Breaking
+  * Removed `--core` option from CLI and `:core` compiler option.
+  * Renamed `copy_core_to_destination` to `copy_stdlib_to_destination`
 
 # v0.16.0
 * Enhancements
@@ -13,10 +24,10 @@
     conveniently, `object(a: "b")` which turns into `{a: "b"}`.
 
     **NOTE**: when updating the created by, you still have to use the string form `%{ my_map | "a" => "c" }`
-  
+
 * Bugfixes
   * Optional parameters should now work as expected
-  
+
 * Breaking
   * `JS.update(object, property, value)` has been removed and replaced with `JS.update(object, map)`
     This allows you to update multiple values on a javascript object at once.
@@ -24,10 +35,10 @@
 # v0.15.2
 * Enhancements
   * Support for variables as map keys
-  
+
 * Bug fixes
   * Fixed protocol implementations for Integer and Float which where not recognized
-  * Fixed calling properties on non-objects 
+  * Fixed calling properties on non-objects
 
 # v0.15.1
 * Bug fixes
