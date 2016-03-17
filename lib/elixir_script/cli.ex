@@ -1,14 +1,16 @@
 defmodule ElixirScript.CLI do
   @moduledoc false
 
+  @app_version Mix.Project.config()[:version]
+
   @switches [
     output: :binary, elixir: :boolean, root: :binary,
     help: :boolean, core_path: :binary, std_lib: :binary,
-    full_build: :boolean
+    full_build: :boolean, version: :boolean
   ]
 
   @aliases [
-    o: :output, ex: :elixir, h: :help, r: :root
+    o: :output, ex: :elixir, h: :help, r: :root, v: :version
   ]
 
   def main(argv) do
@@ -22,29 +24,38 @@ defmodule ElixirScript.CLI do
 
     case parse do
       { [help: true] , _ , _ } -> :help
-      { [core: true] , _ , _ } -> :core
+      { [version: true] , _ , _ } -> :version
       { options , [input], _ } -> { input, options }
       _ -> :help
     end
 
   end
 
+  def help_message() do
+  """
+  usage: elixirscript <input> [options]
+  <input> path to elixir files or
+  the elixir code string if the -ex flag is used
+  options:
+  -o  --output [path]   places output at the given path
+  -ex --elixir          read input as elixir code string
+  -r  --root [path]     root import path for all exported modules
+  --std_lib [path]      outputs the elixirscript standard library JavaScript files to the specified path
+  --full_build          informs the compiler to do a full build instead of an incremental one
+  only used when output is specified
+  --core_path    es6 import path to the elixirscript standard lib
+  only used with the [output] option. When used, Elixir.js is not exported
+  -v  --version         the current version number
+  -h  --help            this message
+  """
+  end
+
   def process(:help) do
-    IO.write """
-      usage: elixirscript <input> [options]
-      <input> path to elixir files or
-              the elixir code string if the -ex flag is used
-      options:
-      -o  --output [path]   places output at the given path
-      -ex --elixir          read input as elixir code string
-      -r  --root [path]     root import path for all exported modules
-      --std_lib [path]      outputs the elixirscript standard library JavaScript files to the specified path
-      --full_build          informs the compiler to do a full build instead of an incremental one
-      only used when output is specified
-      --core_path    es6 import path to the elixirscript standard lib
-      only used with the [output] option. When used, Elixir.js is not exported
-      -h  --help            this message
-    """
+    IO.write help_message
+  end
+
+  def process(:version) do
+    IO.write @app_version
   end
 
   def process([std_lib: path]) do

@@ -98,6 +98,7 @@ defmodule ElixirScript do
     Output.out(path, code, opts)
   end
 
+  @doc false
   def compile_std_lib() do
     compiler_opts = build_compiler_options(%{std_lib: true, include_path: true, output: File.cwd!() <> "/priv"})
     libs_path = Path.join([__DIR__, "elixir_script", "prelude", "**", "*.ex"])
@@ -210,6 +211,7 @@ defmodule ElixirScript do
     end)
   end
 
+  @doc false
   def update_protocols(compiler_output, compiler_opts) do
     Enum.reduce(compiler_output, %{}, fn
       {file, code}, state ->
@@ -227,6 +229,7 @@ defmodule ElixirScript do
     |> do_make_defimpl(compiler_opts)
   end
 
+  @doc false
   def update_protocols_in_path(compiler_output, compiler_opts, output_path) do
     Enum.reduce(compiler_output, %{}, fn {file, code}, state ->
       case String.split(file, ".DefImpl.") do
@@ -251,7 +254,7 @@ defmodule ElixirScript do
     end)
   end
 
-  def find_protocols_implementations_in_path(path, protocol_prefix) do
+  defp find_protocols_implementations_in_path(path, protocol_prefix) do
     Path.join([path, protocol_prefix <> ".DefImpl*.js"])
     |> Path.wildcard
     |> Enum.filter(fn path -> !String.ends_with?(path, "DefImpl.js") end)
