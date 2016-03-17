@@ -27,13 +27,9 @@ defmodule ElixirScript.Compiler.Output do
     end)
 
     if core_path == "Elixir" and Map.get(compiler_opts, :std_lib, false) == false do
-      case Cache.get(compiler_input) do
-        nil ->
-          ElixirScript.copy_core_to_destination(output_path)
-        %{ full_build?: true } ->
-          ElixirScript.copy_core_to_destination(output_path)
-        _ ->
-          nil
+      cache = Cache.get(compiler_input)
+      if cache == nil or Map.get(cache, :full_build?) == true do
+        ElixirScript.copy_stdlib_to_destination(output_path)
       end
     end
   end

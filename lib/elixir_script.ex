@@ -267,22 +267,13 @@ defmodule ElixirScript do
   end
 
   @doc """
-  Copies the javascript that makes up the ElixirScript core
+  Copies the javascript that makes up the ElixirScript stdlib
   to the specified location
   """
-  def copy_core_to_destination(destination) do
+  def copy_stdlib_to_destination(destination) do
     Enum.each(Path.wildcard(operating_path <> @js_core_path), fn(path) ->
       base = Path.basename(path)
       File.cp!(path, Path.join([destination, base]))
-    end)
-  end
-
-  @doc """
-  Returns the elixirscript core js code
-  """
-  def elixirscript_core() do
-    Enum.each(Path.wildcard(operating_path <> @js_core_path), fn(path) ->
-      File.read!(path)
     end)
   end
 

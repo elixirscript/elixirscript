@@ -59,7 +59,7 @@ defmodule ElixirScript.CLI do
   end
 
   def process([std_lib: path]) do
-    ElixirScript.copy_core_to_destination(path)
+    ElixirScript.copy_stdlib_to_destination(path)
   end
 
   def process({ input, options }) do
