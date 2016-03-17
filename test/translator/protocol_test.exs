@@ -73,6 +73,7 @@ defmodule ElixirScript.Translator.Protocol.Test do
 
 
 
+         import Elixir from './Elixir';
          let impls = [];
          import Elixir$Blank$DefImpl$Elixir$Atom from './Elixir.Blank.DefImpl.Elixir.Atom';
          impls.push(Elixir$Blank$DefImpl$Elixir$Atom)

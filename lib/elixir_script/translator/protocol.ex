@@ -7,6 +7,7 @@ defmodule ElixirScript.Translator.Protocol do
   alias ElixirScript.Translator.Function
   alias ElixirScript.Translator.Utils
   alias ElixirScript.ModuleSystems
+  require Logger
 
   @doc """
   Takes a protocol and turns it into a module
@@ -105,7 +106,11 @@ defmodule ElixirScript.Translator.Protocol do
 
     default = JS.export_default_declaration(JS.identifier("impls"))
 
+    protocol_name = Atom.to_string(name)
+
     body = Enum.flat_map(implementations, fn(x) ->
+      x = if is_atom(x), do: Atom.to_string(x), else: x
+      x = String.to_atom(protocol_name <> ".DefImpl." <> x)
       name = Utils.name_to_js_name(x)
       imports = ModuleSystems.import_module(name, Utils.make_local_file_path(Utils.name_to_js_file_name(x), compiler_opts.root))
       call = JS.call_expression(
@@ -118,8 +123,6 @@ defmodule ElixirScript.Translator.Protocol do
 
       [imports, call]
     end)
-
-    protocol_name = Atom.to_string(name)
 
     %{
       name: String.to_atom(protocol_name <> ".DefImpl"),

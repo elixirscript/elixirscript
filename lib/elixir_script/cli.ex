@@ -3,7 +3,8 @@ defmodule ElixirScript.CLI do
 
   @switches [
     output: :binary, elixir: :boolean, root: :binary,
-    help: :boolean, core_path: :binary, std_lib: :binary
+    help: :boolean, core_path: :binary, std_lib: :binary,
+    full_build: :boolean
   ]
 
   @aliases [
@@ -38,6 +39,8 @@ defmodule ElixirScript.CLI do
       -ex --elixir          read input as elixir code string
       -r  --root [path]     root import path for all exported modules
       --std_lib [path]      outputs the elixirscript standard library JavaScript files to the specified path
+      --full_build          informs the compiler to do a full build instead of an incremental one
+      only used when output is specified
       --core_path    es6 import path to the elixirscript standard lib
       only used with the [output] option. When used, Elixir.js is not exported
       -h  --help            this message
@@ -60,38 +63,16 @@ defmodule ElixirScript.CLI do
     compile_opts = %{
       root: options[:root],
       include_path: true,
-      core_path: Keyword.get(options, :core_path, "Elixir")
+      core_path: Keyword.get(options, :core_path, "Elixir"),
+      full_build: Keyword.get(options, :full_build, false),
+      output: Keyword.get(options, :output, :stdout)
     }
 
-    compile_output = case options[:elixir] do
+    case options[:elixir] do
       true ->
         ElixirScript.compile(input, compile_opts)
       _ ->
         ElixirScript.compile_path(input, compile_opts)
-    end
-
-    case options[:output] do
-      nil ->
-        Enum.each(compile_output,
-                  fn
-                    {_, code} ->
-                      IO.write(code)
-                  end)
-
-      output_path ->
-        Enum.each(compile_output, fn(x) ->
-          write_to_file(x, output_path)
-        end)
-
-        ElixirScript.update_protocols(Path.join(output_path, "*.js"), compile_opts)
-        |> Enum.each(fn
-          x ->
-            write_to_file(x, output_path)
-        end)
-
-        if options[:core_path] == nil do
-          ElixirScript.copy_core_to_destination(output_path)
-        end
     end
   end
 
@@ -103,15 +84,5 @@ defmodule ElixirScript.CLI do
         true
       end
     end)
-  end
-
-  def write_to_file({ file_path, js_code }, destination) do
-    file_name = Path.join([destination, file_path])
-
-    if !File.exists?(Path.dirname(file_name)) do
-      File.mkdir_p!(Path.dirname(file_name))
-    end
-
-    File.write!(file_name, js_code)
   end
 end
