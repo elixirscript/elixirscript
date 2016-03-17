@@ -1,4 +1,4 @@
-defmodule ElixirScript.CompilerCache do
+defmodule ElixirScript.Compiler.Cache do
   @moduledoc false
   require Logger
 
@@ -80,7 +80,7 @@ defmodule ElixirScript.CompilerCache do
 
   def new(state) do
     %{
-      files: [],
+      input_files: [],
       state: state,
       full_build?: true
     }
