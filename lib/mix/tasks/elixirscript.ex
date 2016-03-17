@@ -1,6 +1,4 @@
 defmodule Mix.Tasks.Elixirscript do
-  @moduledoc ElixirScript.CLI.help_message
-
   use Mix.Task
 
    @shortdoc "Translate Elixir to JavaScript"

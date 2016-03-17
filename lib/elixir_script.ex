@@ -23,12 +23,12 @@ defmodule ElixirScript do
   * `:root` - a binary path prepended to the path of the standard lib imports if needed
   * `:env` - a Macro.env struct to use. This is most useful when using macros. Make sure that the
   * `:core_path` - The es6 import path used to import the elixirscript core.
+  When using this option, the Elixir.js file is not exported
   * `:full_build` - For compile_path, tells the compiler to perform a full build instead of incremental one
   * `:output` - option to tell compiler how to output data
-  `nil`: Return as list
-  `:stdout`: Write to standard out
-  `path (string)`: Write to specified path
-  When using this option, the Elixir.js file is not exported
+      * `nil`: Return as list
+      * `:stdout`: Write to standard out
+      * `path (string)`: Write to specified path
   """
 
   defmacro __using__(_) do
@@ -49,7 +49,7 @@ defmodule ElixirScript do
   @doc """
   Compiles the given Elixir code string
   """
-  @spec compile(binary, Map.t) :: [binary | {binary, binary}]
+  @spec compile(binary, Map.t) :: [binary | {binary, binary} | :ok]
   def compile(elixir_code, opts \\ %{}) do
     elixir_code
     |> Code.string_to_quoted!
@@ -59,7 +59,7 @@ defmodule ElixirScript do
   @doc """
   Compiles the given Elixir code in quoted form
   """
-  @spec compile_quoted(Macro.t, Map.t) :: [binary | {binary, binary}]
+  @spec compile_quoted(Macro.t, Map.t) :: [binary | {binary, binary} | :ok]
   def compile_quoted(quoted, opts \\ %{}) do
     { code, _ } = do_compile(opts, [quoted])
     Output.out(quoted, code, build_compiler_options(opts))
@@ -68,7 +68,7 @@ defmodule ElixirScript do
   @doc """
   Compiles the elixir files found at the given path
   """
-  @spec compile_path(binary, Map.t) :: [binary | {binary, binary}]
+  @spec compile_path(binary, Map.t) :: [binary | {binary, binary} | :ok]
   def compile_path(path, opts \\ %{}) do
     expanded_path = Path.wildcard(path)
 
