@@ -22,6 +22,7 @@ defmodule ElixirScript do
   or a tuple of the file name and the JavaScript code
   * `:root` - a binary path prepended to the path of the standard lib imports if needed
   * `:env` - a Macro.env struct to use. This is most useful when using macros. Make sure that the
+  env has the macros imported or required.
   * `:core_path` - The es6 import path used to import the elixirscript core.
   When using this option, the Elixir.js file is not exported
   * `:full_build` - For compile_path, tells the compiler to perform a full build instead of incremental one
@@ -41,10 +42,9 @@ defmodule ElixirScript do
     end
   end
 
+  # This is the serialized state of the ElixirScript.State module containing references to the standard library
   @external_resource stdlib_state_path = Path.join([__DIR__, "elixir_script", "translator", "stdlib_state.exs"])
   @stdlib_state File.read!(stdlib_state_path)
-
-  @js_core_path "/*.js"
 
   @doc """
   Compiles the given Elixir code string
@@ -181,10 +181,7 @@ defmodule ElixirScript do
   defp create_code(compiler_opts) do
 
     parent = self
-
     state = ElixirScript.Translator.State.get
-
-    standard_lib_modules = Map.values(state.std_lib_map) |> Enum.map(&to_string(&1))
 
     Map.values(state.modules)
     |> Enum.reject(fn(ast) ->
@@ -204,7 +201,7 @@ defmodule ElixirScript do
                    end
 
 
-          result = convert_to_code(module)
+          result = javascript_ast_to_code(module)
 
           send parent, { self, result }
         end
@@ -255,7 +252,7 @@ defmodule ElixirScript do
       ElixirScript.Translator.Protocol.make_defimpl(protocol, Enum.uniq(implementations), compiler_opts)
     end)
     |> Enum.map(fn(module) ->
-      convert_to_code(module)
+      javascript_ast_to_code(module)
     end)
   end
 
@@ -276,24 +273,16 @@ defmodule ElixirScript do
   to the specified location
   """
   def copy_stdlib_to_destination(destination) do
-    Enum.each(Path.wildcard(operating_path <> @js_core_path), fn(path) ->
+    Enum.each(Path.wildcard(Path.join([operating_path, "*.js"])), fn(path) ->
       base = Path.basename(path)
       File.cp!(path, Path.join([destination, base]))
     end)
   end
 
-  defp convert_to_code(js_ast) do
-    process_module(js_ast)
-    |> javascript_ast_to_code
-  end
+  defp javascript_ast_to_code(module) do
+    path = Utils.name_to_js_file_name(module.name) <> ".js"
+    js_ast = Builder.program(module.body)
 
-  defp process_module(module) do
-    file_path = Utils.name_to_js_file_name(module.name) <> ".js"
-
-    { file_path, Builder.program(module.body) }
-  end
-
-  defp javascript_ast_to_code({path, js_ast}) do
     js_code = js_ast
     |> prepare_js_ast
     |> Generator.generate
@@ -316,6 +305,8 @@ defmodule ElixirScript do
     js_ast
   end
 
+  #Gets path to js files whether the mix project is available
+  #or when used as an escript
   defp operating_path do
     try do
       Mix.Project.build_path <> "/lib/elixir_script/priv"
