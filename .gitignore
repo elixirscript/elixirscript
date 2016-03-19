@@ -16,3 +16,4 @@ index.js
 .tern-port
 test/std_lib_compile_test.exs
 src/elixirscript
+priv/*.js
