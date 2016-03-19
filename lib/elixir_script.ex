@@ -43,7 +43,7 @@ defmodule ElixirScript do
   end
 
   # This is the serialized state of the ElixirScript.State module containing references to the standard library
-  @external_resource stdlib_state_path = Path.join([__DIR__, "elixir_script", "translator", "stdlib_state.exs"])
+  @external_resource stdlib_state_path = Path.join([__DIR__, "elixir_script", "translator", "stdlib_state.bin"])
   @stdlib_state File.read!(stdlib_state_path)
 
   @doc """
@@ -123,7 +123,7 @@ defmodule ElixirScript do
     new_std_state = ElixirScript.Translator.State.serialize()
     ElixirScript.Translator.State.stop
 
-    File.write!(File.cwd!() <> "/lib/elixir_script/translator/stdlib_state.exs", new_std_state)
+    File.write!(File.cwd!() <> "/lib/elixir_script/translator/stdlib_state.bin", new_std_state)
     Output.out(libs_path, code, compiler_opts)
   end
 

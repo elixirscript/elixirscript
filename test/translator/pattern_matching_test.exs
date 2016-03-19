@@ -6,7 +6,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
   alias ElixirScript.Translator.Map
   alias ESTree.Tools.Builder, as: JS
 
-  @std_lib_state File.read!(File.cwd!() <> "/lib/elixir_script/translator/stdlib_state.exs")
+  @std_lib_state File.read!(File.cwd!() <> "/lib/elixir_script/translator/stdlib_state.bin")
 
   setup do
     ElixirScript.Translator.State.start_link(%{env: ElixirScript.custom_env})

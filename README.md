@@ -34,6 +34,7 @@ Get dependencies
 Compile
 
     mix compile
+    mix std_lib
 
 Test
 
