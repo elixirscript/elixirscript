@@ -42,6 +42,10 @@ Test
     npm test
 
 
+Build
+=============
+    MIX_ENV=prod mix do clean, compile, std_lib, dist
+
 Contributing
 ========
 
