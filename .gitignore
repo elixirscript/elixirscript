@@ -17,4 +17,3 @@ index.js
 test/std_lib_compile_test.exs
 src/elixirscript
 priv/*.js
-lib/elixir_script/translator/stdlib_state.bin

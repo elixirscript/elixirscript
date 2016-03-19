@@ -7,5 +7,4 @@ otp_release:
 before_script:
   - npm install
 script:
-  - mix std_lib
   - mix test
