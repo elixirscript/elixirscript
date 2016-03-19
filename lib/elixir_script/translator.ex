@@ -1,6 +1,7 @@
 defmodule ElixirScript.Translator do
   @moduledoc """
-  Translates Elixir AST into JavaScript AST
+  Translates the given Elixir AST into
+  JavaScript AST.
   """
   alias ElixirScript.Translator.Primitive
   alias ElixirScript.Translator.Expression
@@ -24,6 +25,8 @@ defmodule ElixirScript.Translator do
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator.Rewriter
 
+  # A list of erlang modules. These are rewritten into equivalent
+  # JavaScript functions using ElixirScript.Translator.Rewriter
   @erlang_modules [
     :erlang,
     :maps,
@@ -35,6 +38,13 @@ defmodule ElixirScript.Translator do
     :code,
     :elixir_utils,
     :file
+  ]
+
+  @module_attributes_to_ignore [
+    :doc, :moduledoc, :type, :typep, :spec,
+    :opaque, :callback, :macrocallback, :after_compile,
+    :before_compile, :behaviour, :compile, :file,
+    :on_definition, :on_load, :dialyzer, :vsn, :external_resource
   ]
 
   @doc """
@@ -152,7 +162,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:@, _, [{name, _, _}]}, env)
-  when name in [:doc, :moduledoc, :type, :typep, :spec, :opaque, :callback, :macrocallback, :after_compile, :before_compile, :behaviour, :compile, :file, :on_definition, :on_load, :dialyzer, :vsn, :external_resource] do
+  when name in @module_attributes_to_ignore do
     { %ElixirScript.Translator.Group{}, env }
   end
 

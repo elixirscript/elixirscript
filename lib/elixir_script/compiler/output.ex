@@ -1,4 +1,5 @@
 defmodule ElixirScript.Compiler.Output do
+  @moduledoc false
   alias ElixirScript.Compiler.Cache
 
   def out(_, compiler_output, %{output: nil} = compiler_opts) do
