@@ -72,17 +72,7 @@ defmodule ElixirScript do
   def compile_path(path, opts \\ %{}) do
     expanded_path = Path.wildcard(path)
 
-    compiler_cache = if Map.get(opts, :full_build, false) do
-      Cache.delete(path)
-      Cache.new(@stdlib_state)
-      else
-        case Cache.get(path) do
-          nil ->
-            Cache.new(@stdlib_state)
-          x ->
-            %{ x | full_build?: false }
-        end
-      end
+    compiler_cache = get_compiler_cache(path, opts)
 
     new_file_stats = Cache.build_file_stats(expanded_path)
 
@@ -96,6 +86,35 @@ defmodule ElixirScript do
 
     Cache.write(path, compiler_cache)
     Output.out(path, code, opts)
+end
+
+  defp get_compiler_cache(path, opts) do
+    if Map.get(opts, :full_build) or empty?(opts.output) do
+      Cache.delete(path)
+      Cache.new(@stdlib_state)
+    else
+      case Cache.get(path) do
+        nil ->
+          Cache.new(@stdlib_state)
+        x ->
+          %{ x | full_build?: false }
+      end
+    end
+  end
+
+  defp empty?(path) when is_binary(path) do
+    case File.ls(path) do
+      {:ok, []} ->
+        true
+      {:error, _} ->
+        true
+      _ ->
+        false
+    end
+  end
+
+  defp empty?(_) do
+    true
   end
 
   @doc false
@@ -115,9 +134,12 @@ defmodule ElixirScript do
     |> Enum.map(&file_to_quoted/1)
 
     ElixirScript.Translator.State.start_link(compiler_opts)
-    ModuleCollector.process_modules(Enum.map(code, &update_quoted(&1)))
 
-    code = create_code(compiler_opts)
+    code
+    |> Enum.map(&update_quoted(&1))
+    |> ModuleCollector.process_modules
+
+    code = create_code(compiler_opts, ElixirScript.Translator.State.get)
     |> Enum.filter(fn({path, _}) -> !String.contains?(path, "ElixirScript.Temp.js") end)
 
     new_std_state = ElixirScript.Translator.State.serialize()
@@ -129,11 +151,15 @@ defmodule ElixirScript do
 
   defp do_compile(opts, quoted_code_list, state \\ @stdlib_state) do
     compiler_opts = build_compiler_options(opts)
+
     ElixirScript.Translator.State.start_link(compiler_opts)
     ElixirScript.Translator.State.deserialize(state)
 
-    ModuleCollector.process_modules(Enum.map(quoted_code_list, &update_quoted(&1)))
-    code = create_code(compiler_opts)
+    quoted_code_list
+    |> Enum.map(&update_quoted(&1))
+    |> ModuleCollector.process_modules
+
+    code = create_code(compiler_opts, ElixirScript.Translator.State.get)
     new_state = ElixirScript.Translator.State.serialize()
     ElixirScript.Translator.State.stop
 
@@ -178,10 +204,9 @@ defmodule ElixirScript do
     __ENV__
   end
 
-  defp create_code(compiler_opts) do
+  defp create_code(compiler_opts, state) do
 
     parent = self
-    state = ElixirScript.Translator.State.get
 
     Map.values(state.modules)
     |> Enum.reject(fn(ast) ->

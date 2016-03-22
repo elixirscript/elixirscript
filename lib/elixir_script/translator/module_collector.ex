@@ -1,30 +1,34 @@
 defmodule ElixirScript.Translator.ModuleCollector do
   @moduledoc false
 
+  # This module is responsible for
+  # taking the compiler input and parsing out any modules found
+  # These modules are then added to ElixirScript.Translator.State
+
   alias ElixirScript.Translator.State
   alias ElixirScript.Translator.Utils
 
   def process_modules(modules) do
     Enum.map(modules, fn
       { :__block__, _, list } ->
-        {modules, not_modules} = Enum.partition(list, fn
-          ({:defprotocol, _, _ }) ->
-            true
-          ({:defimpl, _, _ }) ->
-            true
-          ({:defmodule, _, _}) ->
-            true
-          _ ->
-            false
-        end)
+        {modules, not_modules} = Enum.partition(list,
+                                                fn
+                                                  {type, _, _ } when type in [:defprotocol, :defimpl, :defmodule] ->
+                                                    true
+                                                  _ ->
+                                                    false
+                                                end)
 
-        temp_module = [{:defmodule, [], [{:__aliases__, [], [:ElixirScript, :Temp]}, [do: { :__block__, [], not_modules }]]}]
-        modules ++ temp_module
-      ({:defprotocol, _, _ }) = x ->
-        x
-      ({:defimpl, _, _}) = x ->
-        x
-      ({:defmodule, _, _}) = x ->
+      temp_module = case not_modules do
+                      [] ->
+                        []
+                      _ ->
+                        [{:defmodule, [], [{:__aliases__, [], [:ElixirScript, :Temp]}, [do: { :__block__, [], not_modules }]]}]
+                    end
+
+      modules ++ temp_module
+
+      {type, _, _ } = x when type in [:defprotocol, :defimpl, :defmodule] ->
         x
       x ->
         {:defmodule, [], [{:__aliases__, [], [:ElixirScript, :Temp]}, [do: { :__block__, [], [x] }]]}
