@@ -1,9 +1,9 @@
 # v0.17.0-dev
 * Enhancements
   * Incremental Compilation:
-    Now ElixirScript will only build files and modules that have changed since the last build
+    ElixirScript will now only build files and modules that have changed since the last build
   * Added `output` as an option for compiler functions. This controls whether output is returned as a list of tuples, send to stdout, or saved to a file path
-  * Added `:full_build` as an option for compiler functions and `--full-build` option to CLI. These tell the compiler to perform a full build
+  * Added `:full_build` as an option for compiler functions and `--full-build` option to CLI. These force the compiler to perform a full build
   * Added `--version` option to CLI. Outputs current version of elixirscript
   * Added `--std-lib` option to CLI. Takes a path and adds the stdlib to that path
 
