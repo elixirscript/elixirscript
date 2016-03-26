@@ -4,7 +4,6 @@ defmodule ElixirScript.Translator.Protocol do
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator.Module
   alias ElixirScript.Translator.Map
-  alias ElixirScript.Translator.Function
   alias ElixirScript.Translator.Utils
   alias ElixirScript.ModuleSystems
   require Logger

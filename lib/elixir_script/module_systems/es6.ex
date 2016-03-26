@@ -1,7 +1,6 @@
 defmodule ElixirScript.ModuleSystems.ES6 do
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
-  alias ElixirScript.Translator.Utils
 
   def import_module(module_names, from, env) when is_list(module_names) do
     import_specifiers = Enum.map(module_names, fn(x) ->
