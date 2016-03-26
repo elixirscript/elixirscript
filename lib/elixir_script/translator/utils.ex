@@ -39,6 +39,8 @@ defmodule ElixirScript.Translator.Utils do
   def inflate_groups(body) do
     Enum.map(body, fn(x) ->
       case x do
+        %ElixirScript.Translator.Empty{} ->
+          []
         %ElixirScript.Translator.Group{body: group_body} ->
           group_body
         %ESTree.BlockStatement{} ->

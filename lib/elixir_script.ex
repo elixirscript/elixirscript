@@ -317,15 +317,17 @@ end
 
   defp prepare_js_ast(js_ast) do
     js_ast = case js_ast do
-      modules when is_list(modules) ->
-        modules
-        |> Enum.reduce([], &(&2 ++ &1.body))
-        |> Builder.program
-      %ElixirScript.Translator.Group{ body: body } ->
-        Builder.program(body)
-      _ ->
-        js_ast
-    end
+               modules when is_list(modules) ->
+                 modules
+                 |> Enum.reduce([], &(&2 ++ &1.body))
+                 |> Builder.program
+               %ElixirScript.Translator.Group{ body: body } ->
+                 Builder.program(body)
+               %ElixirScript.Translator.Empty{ } ->
+                 Builder.program([])
+               _ ->
+                 js_ast
+             end
 
     js_ast
   end

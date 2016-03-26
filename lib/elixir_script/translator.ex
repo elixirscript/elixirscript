@@ -163,7 +163,7 @@ defmodule ElixirScript.Translator do
 
   defp do_translate({:@, _, [{name, _, _}]}, env)
   when name in @module_attributes_to_ignore do
-    { %ElixirScript.Translator.Group{}, env }
+    { %ElixirScript.Translator.Empty{}, env }
   end
 
   defp do_translate({:@, _, [{name, _, [value]}]}, env) do
@@ -344,13 +344,13 @@ defmodule ElixirScript.Translator do
       ElixirScript.Translator.Env.add_import(acc, module_name)
     end)
 
-    { %ElixirScript.Translator.Group{}, env }
+    { %ElixirScript.Translator.Empty{}, env }
   end
 
 
   defp do_translate({:import, _, [{:__aliases__, _, _} = module_name]}, env) do
     env = ElixirScript.Translator.Env.add_import(env, module_name)
-    { %ElixirScript.Translator.Group{}, env }
+    { %ElixirScript.Translator.Empty{}, env }
   end
 
   defp do_translate({:import, _, [{:__aliases__, _, _} = module_name, options]}, env) do
@@ -358,7 +358,7 @@ defmodule ElixirScript.Translator do
 
     env = ElixirScript.Translator.Env.add_import(env, module_name, options)
 
-    { %ElixirScript.Translator.Group{}, env }
+    { %ElixirScript.Translator.Empty{}, env }
   end
 
   defp do_translate({:alias, _, [{{:., _, [{:__aliases__, _, head_alias_name}, :{}]}, _, tail_aliases }]}, env) do
@@ -371,7 +371,7 @@ defmodule ElixirScript.Translator do
       ElixirScript.Translator.Env.add_alias(acc, module_name, alias_name)
     end)
 
-    { %ElixirScript.Translator.Group{}, env }
+    { %ElixirScript.Translator.Empty{}, env }
   end
 
   defp do_translate({:alias, _, [{:__aliases__, _, _} = module_name] }, env) do
@@ -382,7 +382,7 @@ defmodule ElixirScript.Translator do
     alias_name = Utils.quoted_to_name({:__aliases__, [], name })
 
     env = ElixirScript.Translator.Env.add_alias(env, module_name, alias_name)
-    { %ElixirScript.Translator.Group{}, env }
+    { %ElixirScript.Translator.Empty{}, env }
   end
 
   defp do_translate({:alias, _, [{:__aliases__, _, _} = module_name, [as: {:__aliases__, _, _} = alias_name]]}, env) do
@@ -390,7 +390,7 @@ defmodule ElixirScript.Translator do
     alias_name = Utils.quoted_to_name(alias_name)
 
     env = ElixirScript.Translator.Env.add_alias(env, module_name, alias_name)
-    { %ElixirScript.Translator.Group{}, env }
+    { %ElixirScript.Translator.Empty{}, env }
   end
 
   defp do_translate({:require, _, [{{:., _, [{:__aliases__, _, head_require_name}, :{}]}, _, tail_requires }]}, env) do
@@ -401,13 +401,13 @@ defmodule ElixirScript.Translator do
       ElixirScript.Translator.Env.add_require(acc, module_name)
     end)
 
-    { %ElixirScript.Translator.Group{}, env }
+    { %ElixirScript.Translator.Empty{}, env }
   end
 
   defp do_translate({:require, _, [{:__aliases__, _, _} = module_name] }, env) do
     module_name = Utils.quoted_to_name(module_name)
     env = ElixirScript.Translator.Env.add_require(env, module_name)
-    { %ElixirScript.Translator.Group{}, env }
+    { %ElixirScript.Translator.Empty{}, env }
   end
 
   defp do_translate({:require, _, [{:__aliases__, _, _} = module_name, [as: {:__aliases__, _, _} = alias_name]]}, env) do
@@ -415,7 +415,7 @@ defmodule ElixirScript.Translator do
     alias_name = Utils.quoted_to_name(alias_name)
 
     env = ElixirScript.Translator.Env.add_require(env, module_name, alias_name)
-    { %ElixirScript.Translator.Group{}, env }
+    { %ElixirScript.Translator.Empty{}, env }
   end
 
   defp do_translate({:case, _, [condition, [do: clauses]]}, env) do
@@ -472,19 +472,19 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:defprotocol, _, _}, env) do
-    { %ElixirScript.Translator.Group{}, env }
+    { %ElixirScript.Translator.Empty{}, env }
   end
 
   defp do_translate({:defmacro, _, _}, env) do
-    { %ElixirScript.Translator.Group{}, env }
+    { %ElixirScript.Translator.Empty{}, env }
   end
 
   defp do_translate({:defmacrop, _, _}, env) do
-    { %ElixirScript.Translator.Group{}, env }
+    { %ElixirScript.Translator.Empty{}, env }
   end
 
   defp do_translate({:defimpl, _, _}, env) do
-    { %ElixirScript.Translator.Group{}, env }
+    { %ElixirScript.Translator.Empty{}, env }
   end
 
   defp do_translate({:|, _, [item, list]}, env) do
