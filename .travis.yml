@@ -12,5 +12,6 @@ install:
 script:
   - mix local.hex --force
   - mix deps.get
+  - mix do std_lib, clean, compile
   - mix test
   - npm test
