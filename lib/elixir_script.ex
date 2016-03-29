@@ -45,6 +45,7 @@ defmodule ElixirScript do
   # This is the serialized state of the ElixirScript.State module containing references to the standard library
   @external_resource stdlib_state_path = Path.join([__DIR__, "elixir_script", "translator", "stdlib_state.bin"])
   @stdlib_state File.read!(stdlib_state_path)
+  @lib_path Application.get_env(:elixir_script, :lib_path)
 
   @doc """
   Compiles the given Elixir code string
@@ -71,6 +72,7 @@ defmodule ElixirScript do
   @spec compile_path(binary, Map.t) :: [binary | {binary, binary} | :ok]
   def compile_path(path, opts \\ %{}) do
     expanded_path = Path.wildcard(path)
+    opts = build_compiler_options(opts)
 
     compiler_cache = get_compiler_cache(path, opts)
 
@@ -335,14 +337,20 @@ end
   #Gets path to js files whether the mix project is available
   #or when used as an escript
   defp operating_path do
-    try do
-      Mix.Project.build_path <> "/lib/elixir_script/priv"
-    rescue
-      UndefinedFunctionError ->
-        split_path = Path.split(Application.app_dir(:elixirscript))
-        replaced_path = List.delete_at(split_path, length(split_path) - 1)
-        replaced_path = List.delete_at(replaced_path, length(replaced_path) - 1)
-        Path.join(replaced_path)
+    case @lib_path do
+      nil ->
+        try do
+          Mix.Project.build_path <> "/lib/elixir_script/priv"
+        rescue
+          UndefinedFunctionError ->
+            split_path = Path.split(Application.app_dir(:elixirscript))
+          replaced_path = List.delete_at(split_path, length(split_path) - 1)
+          replaced_path = List.delete_at(replaced_path, length(replaced_path) - 1)
+          Path.join(replaced_path)
+        end
+      lib_path ->
+        lib_path
     end
   end
+
 end
