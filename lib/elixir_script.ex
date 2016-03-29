@@ -44,7 +44,7 @@ defmodule ElixirScript do
 
   # This is the serialized state of the ElixirScript.State module containing references to the standard library
   @external_resource stdlib_state_path = Path.join([__DIR__, "elixir_script", "translator", "stdlib_state.bin"])
-  @stdlib_state File.read!(stdlib_state_path)
+  @stdlib_state File.read(stdlib_state_path)
   @lib_path Application.get_env(:elixir_script, :lib_path)
 
   @doc """
@@ -62,7 +62,7 @@ defmodule ElixirScript do
   """
   @spec compile_quoted(Macro.t, Map.t) :: [binary | {binary, binary} | :ok]
   def compile_quoted(quoted, opts \\ %{}) do
-    { code, _ } = do_compile(opts, [quoted])
+    { code, _ } = do_compile(opts, [quoted], get_stdlib_state)
     Output.out(quoted, code, build_compiler_options(opts))
   end
 
@@ -88,16 +88,25 @@ defmodule ElixirScript do
 
     Cache.write(path, compiler_cache)
     Output.out(path, code, opts)
-end
+  end
+
+  defp get_stdlib_state() do
+    case @stdlib_state do
+      {:ok, data} ->
+        data
+      {:error, _} ->
+        raise RuntimeError, message: "Standard Library state not found. Please run `mix std_lib`"
+    end
+  end
 
   defp get_compiler_cache(path, opts) do
     if Map.get(opts, :full_build) or empty?(opts.output) do
       Cache.delete(path)
-      Cache.new(@stdlib_state)
+      Cache.new(get_stdlib_state)
     else
       case Cache.get(path) do
         nil ->
-          Cache.new(@stdlib_state)
+          Cache.new(get_stdlib_state)
         x ->
           %{ x | full_build?: false }
       end
@@ -151,7 +160,7 @@ end
     Output.out(libs_path, code, compiler_opts)
   end
 
-  defp do_compile(opts, quoted_code_list, state \\ @stdlib_state) do
+  defp do_compile(opts, quoted_code_list, state) do
     compiler_opts = build_compiler_options(opts)
 
     ElixirScript.Translator.State.start_link(compiler_opts)
