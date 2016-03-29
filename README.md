@@ -33,8 +33,8 @@ Get dependencies
 
 Compile
 
-    mix compile
     mix std_lib
+    mix compile
 
 Test
 
