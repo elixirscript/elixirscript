@@ -33,8 +33,7 @@ Get dependencies
 
 Compile
 
-    mix std_lib
-    mix compile
+    mix do std_lib, clean, compile
 
 Test
 
@@ -45,6 +44,12 @@ Test
 Build
 =============
     MIX_ENV=prod mix do clean, compile, std_lib, dist
+
+    This will build a tarball in the dist folder.
+    By default the escript built will look into the folder above it for the
+    core JavaScript files needed for ElixirScript. To change the location,
+    update the `lib_path` config variable in the `:elixir_script` config block
+    to the path to look in and then do a clean build.
 
 Contributing
 ========
