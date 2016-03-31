@@ -28,16 +28,20 @@ The intent of this guide is to get you started with ElixirScript. It will give y
     This is the help output of elixirscript
 
     ```bash
-      usage: elixirscript <input> [options]
+    usage: elixirscript <input> [options]
+    <input> path to elixir files or the elixir code string if the -ex flag is used
 
-      <input> path to elixir files or
-              the elixir code string if the -ex flag is used
-
-      options:
-      -o  --output [path]   places output at the given path
-      -ex --elixir          read input as elixir code string
-      -r  --root [path]     root path for standard libs
-      -h  --help            this message
+    options:
+    -o  --output [path]   places output at the given path
+    -ex --elixir          read input as elixir code string
+    -r  --root [path]     root import path for all exported modules
+    --std-lib [path]      outputs the elixirscript standard library JavaScript files to the specified path
+    --full-build          informs the compiler to do a full build instead of an incremental one
+    only used when output is specified
+    --core-path    es6 import path to the elixirscript standard lib
+    only used with the [output] option. When used, Elixir.js is not exported
+    -v  --version         the current version number
+    -h  --help            this message
     ```
 
     the `<input>` is the elixir code string or file path you want to convert from elixir to javascript. Below is an example of using a code string and turning it into JavaScript
@@ -97,7 +101,7 @@ The intent of this guide is to get you started with ElixirScript. It will give y
     The first step is getting the dependency. In your mix.exs file for your elixir project, add elixir_script to your deps.
 
     ```elixir
-    {:elixir_script, "~> 0.16"}
+    {:elixir_script, "~> 0.17"}
     ```
 
 * Step 2: Now download the dep
@@ -121,7 +125,7 @@ The intent of this guide is to get you started with ElixirScript. It will give y
     The first step is getting the dependency. In your mix.exs file for your elixir project, add elixir_script to your deps.
 
     ```elixir
-    {:elixir_script, "~> 0.15"}
+    {:elixir_script, "~> 0.17"}
     ```
 
 * Step 2: Now download the dep
