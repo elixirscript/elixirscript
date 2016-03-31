@@ -1,4 +1,4 @@
-# v0.17.0-dev
+# v0.17.0
 * Enhancements
   * Incremental Compilation:
     ElixirScript will now only build files and modules that have changed since the last build
