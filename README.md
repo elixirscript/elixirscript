@@ -66,3 +66,6 @@ Please check the [CONTRIBUTING.md](CONTRIBUTING.md)
 #### Using with Brunch
 There is a plugin for using ElixirScript in your Brunch project
 [here](https://www.npmjs.com/package/elixirscript-brunch)
+
+#### 1.0 Roadmap
+There is a [1.0.0 Milestone](https://github.com/bryanjos/elixirscript/milestones/1.0.0) defined which includes issues that are needed to be cleared before 1.0 can be reached.
