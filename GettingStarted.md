@@ -60,6 +60,8 @@ The intent of this guide is to get you started with ElixirScript. It will give y
     Symbol.for('atom')
     ```
 
+    **NOTE**: ElixirScript files must have the extension, `.exjs`
+
     What you will have noticed by now is that it has output everything we've done so far to the terminal. What about if we want to place the output to a path? The next example takes a file as input and outputs the result in another directory.
 
     ```bash
@@ -71,7 +73,7 @@ The intent of this guide is to get you started with ElixirScript. It will give y
     wildcards are also accepted:
 
     ```bash
-    $ elixirscript "src/**/*.exjs" -o "dist"
+    $ elixirscript "src" -o "dist"
     ```
 
     The last option we will show is the root option. This option is for defining a root path for the import statements. By default your import statement will not have anything prepended to it. For example, the elixir import will look like this:
@@ -83,7 +85,7 @@ The intent of this guide is to get you started with ElixirScript. It will give y
     If we wanted to prepend "js" to the root, we can like this:
 
     ```
-    $ elixirscript "example.ex" -o "dist" -r "js"
+    $ elixirscript "example.exjs" -o "dist" -r "js"
     ```
 
     Now the import will look like this:
@@ -114,7 +116,7 @@ The intent of this guide is to get you started with ElixirScript. It will give y
 
 * Step 3: Use
     ```bash
-    $ mix elixirscript "example.ex" -o "dist" -r "js"
+    $ mix elixirscript "example.exjs" -o "dist" -r "js"
     ```
 
     What you will notice is that the parameters are exactly the same as the escript.
@@ -143,38 +145,10 @@ The intent of this guide is to get you started with ElixirScript. It will give y
 
     The is also compile_path/2 and compile_quoted/2. Each of the functions take an options keyword list.
 
-     * `:root` - a binary path prepended to the path of the standard lib imports if needed
-    * `:env` - a Macro.env struct to use. This is most useful when using macros. Make sure that the  given env has the macros required. Defaults to `__ENV__`.
 
-    You may notice the mention of macros. Using the module in your code allows you to use macros. As long as you pass in an environment with the macros loaded. By default, it uses the current environment.
-
-    For example, if I have a module with a macro in it
-
-    ```elixir
-    defmodule ElixirScript.Math do
-      defmacro squared(x) do
-        quote do
-          unquote(x) * unquote(x)
-        end
-      end
-    end
-    ```
-
-    If I create a custom env I can pass it to the compile functions:
-
-    ```elixir
-      def make_custom_env do
-        require Logger
-        require ElixirScript.Math
-
-        __ENV__
-      end
-
-    ElixirScript.compile("ElixirScript.Math.squared(2)", [env: make_custom_env])
-
-    #Should return ["2 * 2"]
-    ```
-
+### Macros
+Macros must be defined in either a `.ex` or `.exs` file. These will be loaded at compile time and
+whenever an import or require expression is found, if the module specified is loaded, it will use it to expand macros within the lexical scope
 
 
 ### Appendix

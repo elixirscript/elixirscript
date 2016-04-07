@@ -1,3 +1,10 @@
+# v0.18.0-dev
+* Enhancements
+  * Better support for macros. Macros should be defined in .ex or .exs files. ElixirScript code should be in .exjs files
+
+* Breaking
+  * The above functionality will cause either compiler errors or no output. Please change extensions of ElixirScript code to .exjs
+
 # v0.17.0
 * Enhancements
   * Incremental Compilation:

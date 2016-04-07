@@ -72,7 +72,12 @@ defmodule ElixirScript do
   @spec compile_path(binary, Map.t) :: [binary | {binary, binary} | :ok]
   def compile_path(path, opts \\ %{}) do
 
-    {expanded_path, loaded_modules} = process_path(path)
+    {expanded_path, loaded_modules} = case File.dir?(path) do
+                                        true ->
+                                          process_path(path)
+                                        false ->
+                                          {[path], []}
+                                      end
 
     opts = build_compiler_options(opts)
 
