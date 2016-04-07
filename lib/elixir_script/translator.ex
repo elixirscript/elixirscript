@@ -222,7 +222,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:., _, [module_name, function_name]} = ast, env) do
-    expanded_ast = Macro.expand(ast, ElixirScript.Translator.State.get().compiler_opts.env)
+    expanded_ast = Macro.expand(ast, env.env)
 
     if expanded_ast == ast do
       module_name = create_module_name(module_name, env)
@@ -233,7 +233,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({{:., _, [module_name, function_name]}, _, [] } = ast, env) do
-    expanded_ast = Macro.expand(ast, ElixirScript.Translator.State.get().compiler_opts.env)
+    expanded_ast = Macro.expand(ast, env.env)
 
     if expanded_ast == ast do
       module_name = create_module_name(module_name, env)
@@ -244,7 +244,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({{:., _, [{:__aliases__, _, _} = module_name]}, _, params} = ast, env) do
-    expanded_ast = Macro.expand(ast, ElixirScript.Translator.State.get().compiler_opts.env)
+    expanded_ast = Macro.expand(ast, env.env)
 
     if expanded_ast == ast do
       module_name = create_module_name(module_name, env)
@@ -263,7 +263,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({{:., _, [module_name, function_name]}, _, params } = ast, env) do
-    expanded_ast = Macro.expand(ast, ElixirScript.Translator.State.get().compiler_opts.env)
+    expanded_ast = Macro.expand(ast, env.env)
 
     if expanded_ast == ast do
       module_name = create_module_name(module_name, env)
@@ -349,6 +349,8 @@ defmodule ElixirScript.Translator do
 
 
   defp do_translate({:import, _, [{:__aliases__, _, _} = module_name]}, env) do
+    module_name = Utils.quoted_to_name(module_name)
+
     env = ElixirScript.Translator.Env.add_import(env, module_name)
     { %ElixirScript.Translator.Empty{}, env }
   end
@@ -528,7 +530,7 @@ defmodule ElixirScript.Translator do
   defp do_translate({name, _, params} = ast, env) when is_list(params) do
 
 
-      expanded_ast = Macro.expand(ast, ElixirScript.Translator.State.get().compiler_opts.env)
+      expanded_ast = Macro.expand(ast, env.env)
 
       if expanded_ast == ast do
         name_arity = {name, length(params)}

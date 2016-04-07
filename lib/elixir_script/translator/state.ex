@@ -22,11 +22,11 @@ defmodule ElixirScript.Translator.State do
     end)
   end
 
-  def deserialize(frozen_state) do
+  def deserialize(frozen_state, loaded_modules \\ []) do
     Agent.update(__MODULE__, fn state ->
       frozen_state = :erlang.binary_to_term(frozen_state)
       modules = Map.delete(frozen_state.modules, ElixirScript.Temp)
-      %{ state | modules: modules, std_lib_map: frozen_state.std_lib_map, added_modules: MapSet.new, loaded_modules: [] }
+      %{ state | modules: modules, std_lib_map: frozen_state.std_lib_map, added_modules: MapSet.new, loaded_modules: loaded_modules }
     end)
   end
 
