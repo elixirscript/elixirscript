@@ -144,7 +144,7 @@ defmodule ElixirScript do
     end)
     |> Enum.map(&file_to_quoted/1)
 
-    ElixirScript.Translator.State.start_link(compiler_opts)
+    ElixirScript.Translator.State.start_link(compiler_opts, [])
 
     code
     |> Enum.map(&update_quoted(&1))
@@ -163,7 +163,7 @@ defmodule ElixirScript do
   defp do_compile(opts, quoted_code_list, state) do
     compiler_opts = build_compiler_options(opts)
 
-    ElixirScript.Translator.State.start_link(compiler_opts)
+    ElixirScript.Translator.State.start_link(compiler_opts, [])
     ElixirScript.Translator.State.deserialize(state)
 
     quoted_code_list
@@ -225,7 +225,7 @@ defmodule ElixirScript do
       end)
       |> Enum.map(fn ast ->
       spawn_link fn ->
-          env = ElixirScript.Translator.Env.module_env(ast.name,  Utils.name_to_js_file_name(ast.name) <> ".js")
+          env = ElixirScript.Translator.Env.module_env(ast.name,  Utils.name_to_js_file_name(ast.name) <> ".js", state.compiler_opts.env)
 
           module = case ast.type do
             :module ->

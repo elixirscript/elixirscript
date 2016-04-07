@@ -1,24 +1,26 @@
 defmodule ElixirScript.Translator.Env do
   @moduledoc false
 
-  def module_env(ElixirScript.Temp, filename) do
+  def module_env(ElixirScript.Temp, filename, env) do
 
     env = %ElixirScript.Macro.Env {
       module: ElixirScript.Temp, file: filename, requires: [],
       functions: [],
-      macros: []
+      macros: [],
+      env: env
     }
 
     add_import(env, ElixirScript.Kernel)
   end
 
-  def module_env(module_name, filename) do
+  def module_env(module_name, filename, env) do
     module = ElixirScript.Translator.State.get_module(module_name)
 
     env = %ElixirScript.Macro.Env {
       module: module_name, file: filename, requires: [],
       functions: [{ module.name, module.functions}],
-      macros: [{ module.name, module.macros}]
+      macros: [{ module.name, module.macros}],
+      env: env
     }
 
     add_import(env, ElixirScript.Kernel)
@@ -105,76 +107,110 @@ defmodule ElixirScript.Translator.Env do
     module
   end
 
-  def add_import(env, module_name) do
-    module = get_module(env, module_name)
-
-    %{ env | requires: Enum.uniq(env.requires ++ [module.name]),
-    functions: env.functions ++ [{ module.name, module.functions }],
-    macros: env.macros ++ [{ module.name, module.macros }] }
-  end
-
-  def add_import(env, module_name, [only: :functions]) do
-    module = get_module(env, module_name)
-
-    %{ env | functions: List.keydelete(env.functions, module_name, 0) ++ [{ module.name, module.functions }],
-    macros: List.keydelete(env.macros, module.name, 0),
-    requires: Enum.uniq(env.requires ++ [module.name]) }
-  end
-
-  def add_import(env, module_name, [only: :macros]) do
-    module = get_module(env, module_name)
-
-    %{ env | macros: List.keydelete(env.macros, module_name, 0) ++ [{ module.name, module.macros }],
-    functions: List.keydelete(env.functions, module.name, 0),
-    requires: Enum.uniq(env.requires ++ [module.name]) }
-  end
-
-  def add_import(env, module_name, [only: only]) do
-    module = get_module(env, module_name)
-
-    macros = Enum.filter(module.macros, fn(mac) ->
-      mac in only
-    end)
-    functions = Enum.filter(module.functions, fn(func) ->
-      func in only
-    end)
-
-    %{ env | requires: Enum.uniq(env.requires ++ [module.name]),
-    functions: List.keydelete(env.functions, module.name, 0) ++ [{ module.name, functions }],
-    macros: List.keydelete(env.macros, module.name, 0) ++ [{ module.name, macros }] }
-  end
-
-  def add_import(env, module_name, [except: except]) do
-    module = get_module(env, module_name)
-
-    {_, current_functions } = List.keyfind(env.functions, module.name, 0, { module.name, module.functions })
-    {_, current_macros } = List.keyfind(env.macros, module.name, 0, { module.name, module.macros })
-
-    macros = Enum.filter(current_macros, fn(mac) -> not(mac in except) end)
-    functions = Enum.filter(current_functions, fn(func) -> not(func in except) end)
-
-    %{ env | requires: env.requires ++ [module.name],
-    functions: List.keydelete(env.functions, module.name, 0) ++ [{ module.name, functions }],
-    macros: List.keydelete(env.macros, module.name, 0) ++ [{ module.name, macros }] }
-  end
-
   def add_alias(env, module_name, alias_name) do
     module = get_module(env, module_name)
-
     %{ env | aliases: Enum.uniq(env.aliases ++ [{alias_name, module.name}]) }
   end
 
-  def add_require(env, module_name) do
-    module = get_module(env, module_name)
+  def add_import(env, module_name) do
+    case ElixirScript.Translator.State.is_module_loaded?(module_name) do
+      true ->
+        add_import_macro(env, module_name, [])
+      false ->
+        module = get_module(env, module_name)
 
-    %{ env | requires: Enum.uniq(env.requires ++ [module.name]) }
+        %{ env | requires: Enum.uniq(env.requires ++ [module.name]),
+           functions: env.functions ++ [{ module.name, module.functions }],
+           macros: env.macros ++ [{ module.name, module.macros }] }
+    end
+  end
+
+  def add_import(env, module_name, [only: :functions]) do
+    case ElixirScript.Translator.State.is_module_loaded?(module_name) do
+      true ->
+        add_import_macro(env, module_name, [only: :functions])
+      false ->
+        module = get_module(env, module_name)
+
+        %{ env | functions: List.keydelete(env.functions, module_name, 0) ++ [{ module.name, module.functions }],
+           macros: List.keydelete(env.macros, module.name, 0),
+           requires: Enum.uniq(env.requires ++ [module.name]) }
+    end
+  end
+
+  def add_import(env, module_name, [only: :macros]) do
+    case ElixirScript.Translator.State.is_module_loaded?(module_name) do
+      true ->
+        add_import_macro(env, module_name, [only: :macros])
+      false ->
+        module = get_module(env, module_name)
+
+        %{ env | macros: List.keydelete(env.macros, module_name, 0) ++ [{ module.name, module.macros }],
+           functions: List.keydelete(env.functions, module.name, 0),
+           requires: Enum.uniq(env.requires ++ [module.name]) }
+    end
+  end
+
+  def add_import(env, module_name, [only: only]) do
+    case ElixirScript.Translator.State.is_module_loaded?(module_name) do
+      true ->
+        add_import_macro(env, module_name, [only: only])
+      false ->
+        module = get_module(env, module_name)
+
+      macros = Enum.filter(module.macros, fn(mac) ->
+        mac in only
+      end)
+      functions = Enum.filter(module.functions, fn(func) ->
+        func in only
+      end)
+
+      %{ env | requires: Enum.uniq(env.requires ++ [module.name]),
+         functions: List.keydelete(env.functions, module.name, 0) ++ [{ module.name, functions }],
+         macros: List.keydelete(env.macros, module.name, 0) ++ [{ module.name, macros }] }
+    end
+  end
+
+  def add_import(env, module_name, [except: except]) do
+    case ElixirScript.Translator.State.is_module_loaded?(module_name) do
+      true ->
+        add_import_macro(env, module_name, [except: except])
+      false ->
+        module = get_module(env, module_name)
+
+        {_, current_functions } = List.keyfind(env.functions, module.name, 0, { module.name, module.functions })
+        {_, current_macros } = List.keyfind(env.macros, module.name, 0, { module.name, module.macros })
+
+        macros = Enum.filter(current_macros, fn(mac) -> not(mac in except) end)
+        functions = Enum.filter(current_functions, fn(func) -> not(func in except) end)
+
+        %{ env | requires: env.requires ++ [module.name],
+          functions: List.keydelete(env.functions, module.name, 0) ++ [{ module.name, functions }],
+          macros: List.keydelete(env.macros, module.name, 0) ++ [{ module.name, macros }] }
+    end
+  end
+
+  def add_require(env, module_name) do
+    case ElixirScript.Translator.State.is_module_loaded?(module_name) do
+      true ->
+        add_require_macro(env, module_name, [])
+      false ->
+        module = get_module(env, module_name)
+        %{ env | requires: Enum.uniq(env.requires ++ [module.name]) }
+    end
   end
 
   def add_require(env, module_name, alias_name) do
-    module = get_module(env, module_name)
+    case ElixirScript.Translator.State.is_module_loaded?(module_name) do
+      true ->
+        add_require_macro(env, module_name, [as: alias_name])
+      false ->
+        module = get_module(env, module_name)
 
-    %{ env | aliases: Enum.uniq(env.aliases ++ [{alias_name, module.name}]),
-    requires: Enum.uniq(env.requires ++ [module.name]) }
+        %{ env | aliases: Enum.uniq(env.aliases ++ [{alias_name, module.name}]),
+           requires: Enum.uniq(env.requires ++ [module.name]) }
+    end
+
   end
 
   def get_module_name(env, module_name) do
@@ -188,4 +224,26 @@ defmodule ElixirScript.Translator.Env do
 
   end
 
+  def add_import_macro(elixirscript_env, module, opts) do
+    eval = """
+    import #{inspect module}, #{inspect opts}
+    __ENV__
+    """
+
+    do_macro(eval, elixirscript_env)
+  end
+
+  def add_require_macro(elixirscript_env, module, opts) do
+    eval = """
+    require #{inspect module}, #{inspect opts}
+    __ENV__
+    """
+
+    do_macro(eval, elixirscript_env)
+  end
+
+  def do_macro(eval, elixirscript_env) do
+    {env, _} = Code.eval_string(eval, [], elixirscript_env.env)
+    %{ elixirscript_env | env: env }
+  end
 end

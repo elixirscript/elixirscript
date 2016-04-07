@@ -9,9 +9,9 @@ defmodule ElixirScript.Translator.State do
   @moduledoc false
   alias ElixirScript.Translator.Utils
 
-  def start_link(compiler_opts \\ []) do
+  def start_link(compiler_opts, loaded_modules) do
     Agent.start_link(fn ->
-      %{ compiler_opts: compiler_opts, modules: Map.new, std_lib_map: build_standard_lib_map(), added_modules: MapSet.new }
+      %{ compiler_opts: compiler_opts, modules: Map.new, std_lib_map: build_standard_lib_map(), added_modules: MapSet.new, loaded_modules: loaded_modules }
     end, name: __MODULE__)
   end
 
@@ -26,7 +26,7 @@ defmodule ElixirScript.Translator.State do
     Agent.update(__MODULE__, fn state ->
       frozen_state = :erlang.binary_to_term(frozen_state)
       modules = Map.delete(frozen_state.modules, ElixirScript.Temp)
-      %{ state | modules: modules, std_lib_map: frozen_state.std_lib_map, added_modules: MapSet.new }
+      %{ state | modules: modules, std_lib_map: frozen_state.std_lib_map, added_modules: MapSet.new, loaded_modules: [] }
     end)
   end
 
@@ -139,6 +139,17 @@ defmodule ElixirScript.Translator.State do
       actual_module_name ->
         actual_module_name
     end
+  end
+
+  def is_module_loaded?(module) when is_atom(module) do
+    Agent.get(__MODULE__, fn(state) ->
+      module in state.loaded_modules
+    end)
+  end
+
+  def is_module_loaded?({:__aliases__, _, _} = module) do
+    Utils.quoted_to_name(module)
+    |> is_module_loaded?
   end
 
   def get_module(module) when is_atom(module) do

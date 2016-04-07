@@ -1,5 +1,5 @@
 defmodule ElixirScript.Macro.Env do
-  @type t :: %ElixirScript.Macro.Env{ 
+  @type t :: %ElixirScript.Macro.Env{
     module: atom,
     file: binary,
     line: non_neg_integer,
@@ -14,7 +14,8 @@ defmodule ElixirScript.Macro.Env do
     vars: [{atom, atom | non_neg_integer}],
     export_vars: [{atom, atom | non_neg_integer}] | nil,
     lexical_tracker: nil,
-    caller: t | nil
+    caller: t | nil,
+    env: nil
   }
 
   defstruct [
@@ -32,6 +33,7 @@ defmodule ElixirScript.Macro.Env do
     vars: [],
     export_vars: nil,
     lexical_tracker: nil,
-    caller: nil
+    caller: nil,
+    env: nil
   ]
 end
