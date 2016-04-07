@@ -3,7 +3,6 @@ defmodule ElixirScript.Module do
 
   defstruct name: nil,
   functions: Keyword.new, private_functions: Keyword.new,
-  macros: Keyword.new, private_macros: Keyword.new,
   body: nil, js_imports: [], module_refs: [], type: :module,
   impls: HashDict.new, impl_type: nil
 
