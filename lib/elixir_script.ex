@@ -108,9 +108,7 @@ defmodule ElixirScript do
       end
     end)
 
-    ex = Enum.flat_map(ex, fn(x) -> Code.load_file(x) end)
-    |> Enum.map(fn({module, _}) -> module end)
-
+    ex = Kernel.ParallelRequire.files(ex)
     {exjs, ex}
   end
 
