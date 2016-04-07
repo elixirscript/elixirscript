@@ -5,6 +5,9 @@
 * Breaking
   * The above functionality will cause either compiler errors or no output. Please change extensions of ElixirScript code to .exjs
 
+* Deprecations
+  * `Html`, `View`, and `VDom` modules will be removed in the next version as they can now be replicated using macros
+
 # v0.17.0
 * Enhancements
   * Incremental Compilation:
