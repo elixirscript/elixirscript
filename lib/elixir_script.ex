@@ -62,7 +62,7 @@ defmodule ElixirScript do
   """
   @spec compile_quoted(Macro.t, Map.t) :: [binary | {binary, binary} | :ok]
   def compile_quoted(quoted, opts \\ %{}) do
-    { code, _ } = do_compile(opts, [quoted], get_stdlib_state)
+    { code, _ } = do_compile(opts, [quoted], get_stdlib_state, [])
     Output.out(quoted, code, build_compiler_options(opts))
   end
 
@@ -71,7 +71,14 @@ defmodule ElixirScript do
   """
   @spec compile_path(binary, Map.t) :: [binary | {binary, binary} | :ok]
   def compile_path(path, opts \\ %{}) do
-    expanded_path = Path.wildcard(path)
+
+    {expanded_path, loaded_modules} = case File.dir?(path) do
+                                        true ->
+                                          process_path(path)
+                                        false ->
+                                          {[path], []}
+                                      end
+
     opts = build_compiler_options(opts)
 
     compiler_cache = get_compiler_cache(path, opts)
@@ -83,11 +90,26 @@ defmodule ElixirScript do
 
     code = Enum.map(changed_files, &file_to_quoted/1)
 
-    { code, new_state } = do_compile(opts, code, compiler_cache.state)
+    { code, new_state } = do_compile(opts, code, compiler_cache.state, loaded_modules)
     compiler_cache = %{compiler_cache | input_files: new_file_stats, state: new_state }
 
     Cache.write(path, compiler_cache)
     Output.out(path, code, opts)
+  end
+
+  defp process_path(path) do
+    path = Path.join(path, "**/*.{ex,exs,exjs}") |> Path.wildcard
+    {exjs, ex} = Enum.partition(path, fn(x) ->
+      case Path.extname(x) do
+        ext when ext in [".ex", ".exs"] ->
+          false
+        _ ->
+          true
+      end
+    end)
+
+    ex = Kernel.ParallelRequire.files(ex)
+    {exjs, ex}
   end
 
   defp get_stdlib_state() do
@@ -144,7 +166,7 @@ defmodule ElixirScript do
     end)
     |> Enum.map(&file_to_quoted/1)
 
-    ElixirScript.Translator.State.start_link(compiler_opts)
+    ElixirScript.Translator.State.start_link(compiler_opts, [])
 
     code
     |> Enum.map(&update_quoted(&1))
@@ -160,11 +182,11 @@ defmodule ElixirScript do
     Output.out(libs_path, code, compiler_opts)
   end
 
-  defp do_compile(opts, quoted_code_list, state) do
+  defp do_compile(opts, quoted_code_list, state, loaded_modules) do
     compiler_opts = build_compiler_options(opts)
 
-    ElixirScript.Translator.State.start_link(compiler_opts)
-    ElixirScript.Translator.State.deserialize(state)
+    ElixirScript.Translator.State.start_link(compiler_opts, loaded_modules)
+    ElixirScript.Translator.State.deserialize(state, loaded_modules)
 
     quoted_code_list
     |> Enum.map(&update_quoted(&1))
@@ -225,7 +247,7 @@ defmodule ElixirScript do
       end)
       |> Enum.map(fn ast ->
       spawn_link fn ->
-          env = ElixirScript.Translator.Env.module_env(ast.name,  Utils.name_to_js_file_name(ast.name) <> ".js")
+          env = ElixirScript.Translator.Env.module_env(ast.name,  Utils.name_to_js_file_name(ast.name) <> ".js", state.compiler_opts.env)
 
           module = case ast.type do
             :module ->

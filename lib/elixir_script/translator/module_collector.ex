@@ -40,12 +40,12 @@ defmodule ElixirScript.Translator.ModuleCollector do
   end
 
   def do_process_modules({:defprotocol, _, [{:__aliases__, _, _} = the_alias, [do: {:__block__, _, _} = block]]}) do
-    %{def: functions, defp: _, defmacro: _, defmacrop: _ } = get_functions_from_module(block)
+    %{def: functions, defp: _ } = get_functions_from_module(block)
     ElixirScript.Translator.State.add_protocol(Utils.quoted_to_name(the_alias), functions)
   end
 
   def do_process_modules({:defprotocol, _, [{:__aliases__, _, _} = the_alias, [do: spec]]}) do
-    %{def: functions, defp: _, defmacro: _, defmacrop: _ } = get_functions_from_module({:__block__, [], [spec]})
+    %{def: functions, defp: _ } = get_functions_from_module({:__block__, [], [spec]})
     ElixirScript.Translator.State.add_protocol(Utils.quoted_to_name(the_alias), functions)
   end
 
@@ -108,20 +108,60 @@ defmodule ElixirScript.Translator.ModuleCollector do
   end
 
   defp make_module(body, name) do
+    # Finds use expressions and expands them
     body = case body do
-      {:__block__, _, _ } ->
-        Macro.expand(body, State.get().compiler_opts.env)
+      {:__block__, context, list } ->
+               list = Enum.map(list, fn
+                 {:use, _, [module, _] } = using ->
+                   {:use, handle_use_expression(using, module) }
+                 {:use, _, [module] } = using ->
+                   {:use, handle_use_expression(using, module) }
+                 ast ->
+                   {:expanded, ast}
+               end)
+               |> Enum.reduce([], fn
+                 {:use, ast}, state ->
+                                    case ast do
+                                      {:__block__, _, list} ->
+                                        state ++ list
+                                      _ ->
+                                        state ++ [ast]
+                                    end
+
+                 {:expanded, ast}, state ->
+                   state ++ [ast]
+               end)
+
+               {:__block__, context, list}
+
       _ ->
         body
-    end
+           end
 
-    %{def: functions, defp: private_functions, defmacro: macros, defmacrop: private_macros } = get_functions_from_module(body)
+    %{def: functions, defp: private_functions } = get_functions_from_module(body)
     js_imports = get_js_imports_from_module(body)
 
     %ElixirScript.Module{ name: Utils.quoted_to_name({:__aliases__, [], name}) , body: body,
-    functions: functions, private_functions: private_functions,
-    macros: macros, private_macros: private_macros,
-    js_imports: js_imports }
+    functions: functions, private_functions: private_functions, js_imports: js_imports }
+  end
+
+  def handle_use_expression(using_ast, module) do
+    module = Utils.quoted_to_name(module)
+
+    eval = """
+    require #{inspect module}
+    __ENV__
+    """
+    {env, _} = Code.eval_string(eval, [], State.get().compiler_opts.env)
+
+
+    case Macro.expand(using_ast, env) do
+                 {:__block__, _,
+                  [{:__block__, _,
+                    [{:require, _, _},
+                      {{:., _, [_, :__using__]}, _, _} = ast]}]} ->
+                   Macro.expand_once(ast, env)
+        end
   end
 
   defp make_inner_module_aliases(name, body) do
@@ -148,7 +188,7 @@ defmodule ElixirScript.Translator.ModuleCollector do
   end
 
   defp add_module_to_state(name, inner_module_name, inner_module_body) do
-    %{def: functions, defp: private_functions, defmacro: macros, defmacrop: private_macros } = get_functions_from_module(inner_module_body)
+    %{ def: functions, defp: private_functions } = get_functions_from_module(inner_module_body)
     js_imports = get_js_imports_from_module(inner_module_body)
 
     inner_alias = { :alias, [], [{:__aliases__, [alias: false], name ++ inner_module_name}] }
@@ -160,7 +200,6 @@ defmodule ElixirScript.Translator.ModuleCollector do
 
     mod = %ElixirScript.Module{ name: module_name, body: inner_module_body,
     functions: functions, private_functions: private_functions,
-    macros: macros, private_macros: private_macros,
     js_imports: js_imports  }
 
     State.add_module(mod)
@@ -170,7 +209,7 @@ defmodule ElixirScript.Translator.ModuleCollector do
 
 
   defp get_functions_from_module({:__block__, _, list}) do
-    Enum.reduce(list, %{ def: Keyword.new, defp: Keyword.new, defmacro: Keyword.new, defmacrop: Keyword.new }, fn
+    Enum.reduce(list, %{ def: Keyword.new, defp: Keyword.new }, fn
     ({type, _, [{:when, _, [{name, _, params} | _guards] }, _] }, state) when type in [:def, :defp] and is_atom(params) ->
       arity = 0
 
@@ -186,24 +225,9 @@ defmodule ElixirScript.Translator.ModuleCollector do
 
       add_function_to_map(state, type, name, arity)
 
-
     ({type, _, [{name, _, params}, _]}, state) when type in [:def, :defp] ->
       arity = if is_nil(params), do: 0, else: length(params)
         add_function_to_map(state, type, name, arity)
-
-    ({type, _, [{:when, _, [{name, _, params} | _guards] }, [do: _body]] }, state) when type in [:defmacro, :defmacrop] ->
-      arity = length(params)
-
-      add_function_to_map(state, type, name, arity)
-
-    ({type, _, [{name, _, nil}, [do: _body]]}, state)  when type in [:defmacro, :defmacrop]  ->
-      add_function_to_map(state, type, name, 0)
-
-
-    ({type, _, [{name, _, params}, [do: _body]]}, state)  when type in [:defmacro, :defmacrop]  ->
-      arity = length(params)
-
-      add_function_to_map(state, type, name, arity)
 
     ({type, _, [{name, _, params}]}, state) when is_atom(params) and type in [:def, :defp] ->
       arity = 0
@@ -220,7 +244,7 @@ defmodule ElixirScript.Translator.ModuleCollector do
   end
 
   defp get_functions_from_module(_) do
-    %{ def: Keyword.new, defp: Keyword.new, defmacro: Keyword.new, defmacrop: Keyword.new }
+    %{ def: Keyword.new, defp: Keyword.new }
   end
 
   defp add_function_to_map(map, type, name, arity) do

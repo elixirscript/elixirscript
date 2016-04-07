@@ -1,3 +1,13 @@
+# v0.18.0-dev
+* Enhancements
+  * Better support for macros. Macros should be defined in .ex or .exs files. ElixirScript code should be in .exjs files
+
+* Breaking
+  * The above functionality will cause either compiler errors or no output. Please change extensions of ElixirScript code to .exjs
+
+* Deprecations
+  * `Html`, `View`, and `VDom` modules will be removed in the next version as they can now be replicated using macros
+
 # v0.17.0
 * Enhancements
   * Incremental Compilation:
