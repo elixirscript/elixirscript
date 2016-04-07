@@ -108,18 +108,60 @@ defmodule ElixirScript.Translator.ModuleCollector do
   end
 
   defp make_module(body, name) do
+    # Finds use expressions and expands them
     body = case body do
-      {:__block__, _, _ } ->
-        Macro.expand(body, State.get().compiler_opts.env)
+      {:__block__, context, list } ->
+               list = Enum.map(list, fn
+                 {:use, _, [module, _] } = using ->
+                   {:use, handle_use_expression(using, module) }
+                 {:use, _, [module] } = using ->
+                   {:use, handle_use_expression(using, module) }
+                 ast ->
+                   {:expanded, ast}
+               end)
+               |> Enum.reduce([], fn
+                 {:use, ast}, state ->
+                                    case ast do
+                                      {:__block__, _, list} ->
+                                        state ++ list
+                                      _ ->
+                                        state ++ [ast]
+                                    end
+
+                 {:expanded, ast}, state ->
+                   state ++ [ast]
+               end)
+
+               {:__block__, context, list}
+
       _ ->
         body
-    end
+           end
 
     %{def: functions, defp: private_functions } = get_functions_from_module(body)
     js_imports = get_js_imports_from_module(body)
 
     %ElixirScript.Module{ name: Utils.quoted_to_name({:__aliases__, [], name}) , body: body,
     functions: functions, private_functions: private_functions, js_imports: js_imports }
+  end
+
+  def handle_use_expression(using_ast, module) do
+    module = Utils.quoted_to_name(module)
+
+    eval = """
+    require #{inspect module}
+    __ENV__
+    """
+    {env, _} = Code.eval_string(eval, [], State.get().compiler_opts.env)
+
+
+    case Macro.expand(using_ast, env) do
+                 {:__block__, _,
+                  [{:__block__, _,
+                    [{:require, _, _},
+                      {{:., _, [_, :__using__]}, _, _} = ast]}]} ->
+                   Macro.expand_once(ast, env)
+        end
   end
 
   defp make_inner_module_aliases(name, body) do

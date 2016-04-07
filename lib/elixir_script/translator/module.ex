@@ -16,7 +16,6 @@ defmodule ElixirScript.Translator.Module do
   end
 
   def make_module(module, body, env) do
-    body = process_use(body)
     { body, functions } = extract_functions_from_module(body)
     { body, env } = translate_body(body, env)
 
@@ -59,28 +58,6 @@ defmodule ElixirScript.Translator.Module do
     }
 
     result
-  end
-
-  defp process_use(ast) do
-    Macro.prewalk(ast, &do_process_use(&1))
-  end
-
-  defp do_process_use({:use, _, _} = ast) do
-    ast
-    |> Macro.expand(ElixirScript.Translator.State.get().compiler_opts.env)
-    |> expand__using__
-  end
-
-  defp do_process_use(ast) do
-    ast
-  end
-
-  defp expand__using__({:__block__, _, [{:require, _, _}, {{:., _, [_, :__using__]}, _, _} = using_ast]}) do
-    Macro.expand_once(using_ast, ElixirScript.Translator.State.get().compiler_opts.env)
-  end
-
-  defp expand__using__({:__block__, _, [{:__block__, _, [{:require, _, _}, {{:., _, [_, :__using__]}, _, _} = using_ast]}]}) do
-    Macro.expand_once(using_ast, ElixirScript.Translator.State.get().compiler_opts.env)
   end
 
   def translate_body(body, env) do
