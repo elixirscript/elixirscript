@@ -83,7 +83,7 @@ You **can** use ElixirScript on your front ends and have it work and interoperat
 
 ## Q. Can I use pattern matching?
 
-### A. Yes, but not for bitstrings (yet)
+### A. Yes
 
 ## Q. Can I use processes?
 
@@ -94,7 +94,7 @@ You **can** use ElixirScript on your front ends and have it work and interoperat
 
 ### A. Maybe, but in an idiomatic fashion.
 
-One of my demos is an example of using a design similar to redux to accomplish the things that redux does only using the Elixir standard library. Redux is influenced by Elm. The goal is to eventually allow for designs that can be Elm influenced if that is the desire. Similar to the same way the José saya to bring the spirit of projects from other languages to Elixir and not always just a straight port. If processes are added, I believe it will be easier to do those things in an idiomatic Elixir way.
+One of my demos is an example of using a design similar to redux to accomplish the things that redux does only using the Elixir standard library. Redux is influenced by Elm. The goal is to eventually allow for designs that can be Elm influenced if that is the desire. Similar to the same way the José says to bring the spirit of projects from other languages to Elixir and not always just a straight port. If processes are added, I believe it will be easier to do those things in an idiomatic Elixir way.
 
 ## Q. What about OTP?
 

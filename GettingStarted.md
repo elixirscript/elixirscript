@@ -148,7 +148,7 @@ The intent of this guide is to get you started with ElixirScript. It will give y
 
 ### Macros
 Macros must be defined in either a `.ex` or `.exs` file. These will be loaded at compile time and
-whenever an import or require expression is found, if the module specified is loaded, it will use it to expand macros within the lexical scope
+whenever an import or require expression is found, if the module specified is loaded, it will use it to expand macros within the lexical scope.
 
 
 ### Appendix
