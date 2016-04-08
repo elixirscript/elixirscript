@@ -155,9 +155,9 @@ whenever an import or require expression is found, if the module specified is lo
 
 #### Using JavaScript Modules
 
-You can use `alias`, `import`, and `require` as you would in Elixir (sans macros).
+You can use `alias`, `import`, and `require` as you would in Elixir.
 
-For JavaScript modules, use `JS.import`
+For JavaScript modules, you use must `JS.import`
 
 ```elixir
 JS.import A, "a" #translates to "import {default as A} from 'a'"
