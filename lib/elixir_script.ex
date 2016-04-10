@@ -37,8 +37,6 @@ defmodule ElixirScript do
       import Kernel, only: [&&: 2, use: 2, use: 1]
       import ElixirScript.Kernel
       require ElixirScript.JS, as: JS
-      require ElixirScript.Html, as: Html
-      require ElixirScript.VDom, as: VDom
     end
   end
 
@@ -161,9 +159,6 @@ defmodule ElixirScript do
     libs_path = Path.join([__DIR__, "elixir_script", "prelude", "**", "*.ex"])
 
     code = Path.wildcard(libs_path)
-    |> Enum.filter(fn(path) ->
-      !String.contains?(path, ["v_dom.ex", "html.ex"])
-    end)
     |> Enum.map(&file_to_quoted/1)
 
     ElixirScript.Translator.State.start_link(compiler_opts, [])

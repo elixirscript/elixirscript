@@ -130,30 +130,6 @@ defmodule ElixirScript.Test do
   end
 
 
-  test "expand Html macros" do
-      js_code = ElixirScript.compile("""
-      tree = Html.div [id: "myDiv"] do
-        Html.span do
-          "Hello"
-        end
-
-        Html.span do
-          "World"
-        end
-      end
-
-      rootNode = VDom.create(tree)
-      :document.getElementById("main").appendChild(rootNode)
-      """)
-
-      js_code = Enum.join(js_code, "\n")
-
-      assert js_code =~ "Elixir.VirtualDOM.h('div'"
-      assert js_code =~ "Elixir.VirtualDOM.h('span'"
-      assert js_code =~ "Elixir.VirtualDOM.create"
-  end
-
-
   test "set standard lib path" do
 
     js_code = ElixirScript.compile("""
