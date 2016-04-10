@@ -9,6 +9,8 @@ The intent of this guide is to get you started with ElixirScript. It will give y
 
 ### Escript
 
+**OSX**: Elixirscript can be installed via homebrew `brew install elixirscript`. For everyone else, plase read below
+
 * Step 1: Get escript
 
     You can download the elixirscript escript from the [releases page on github](https://github.com/bryanjos/elixirscript/releases). It is a tar file named elixirscript.tar.gz.
@@ -165,33 +167,12 @@ JS.import A, "a" #translates to "import {default as A} from 'a'"
 JS.import [A, B, C], "a" #translates to "import {A, B, C} from 'a'"
 ```
 
+#### Frontend Project Boilerplate
+
+There is an [elixirscript frontend boilerplate project](https://github.com/bryanjos/elixirscript-project-boilerplate). This setup uses gulp and brunch to build and bundle assets.
+
 
 #### ElixirScript-Brunch
 
 There is an Brunch plugin, [ElixirScript-Brunch](https://www.npmjs.com/package/elixirscript-brunch).
 There are instructions there on how to use it with Phoenix.
-
-#### Gulp
-
-There is no gulp plugin just yet, but below is an example of how to make a gulp
-task that will work with it.
-
-```javascript
-var gulp = require('gulp');
-var exec = require('child_process').exec;
-var babel = require('gulp-babel');
-
-//Calls out to the elixirscript compiler and places the output in src/js
-gulp.task('build-exjs', function(cb) {
-  exec('elixirscript "' + exjsSrc + '" -o ' + "src/js", function (err, stdout, stderr) {
-    cb(err);
-  });
-});
-
-// A task to turn the es6 output from build-exjs to es5
-gulp.task('build-js', ['build-exjs'], function() {
-  return gulp.src(jsSrc)
-      .pipe(babel())
-      .pipe(gulp.dest(jsDest));
-});
-```
