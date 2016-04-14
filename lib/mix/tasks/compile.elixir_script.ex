@@ -12,7 +12,7 @@ defmodule Mix.Tasks.Compile.ElixirScript do
         version: "0.1.0",
         elixir: "~> 1.0",
         deps: deps,
-        elixirscript: [ input: "src/exjs", output: "src/js"],
+        elixir_script: [ input: "src/exjs", output: "src/js"],
         compilers: [:elixir_script] ++ Mix.compilers
       ]
       end
@@ -45,7 +45,7 @@ defmodule Mix.Tasks.Compile.ElixirScript do
 
   def get_elixirscript_config() do
     config  = Mix.Project.config
-    Keyword.fetch!(config, :elixirscript)
+    Keyword.fetch!(config, :elixir_script)
   end
 
 end
