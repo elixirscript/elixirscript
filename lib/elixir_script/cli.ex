@@ -6,7 +6,7 @@ defmodule ElixirScript.CLI do
   @switches [
     output: :binary, elixir: :boolean, root: :binary,
     help: :boolean, core_path: :binary, std_lib: :binary,
-    full_build: :boolean, version: :boolean
+    full_build: :boolean, version: :boolean, watch: :boolean
   ]
 
   @aliases [
@@ -63,6 +63,7 @@ defmodule ElixirScript.CLI do
   end
 
   def process({ input, options }) do
+    IO.inspect(options)
     if options_contains_unknown_values(options) do
         process(:help)
     else
@@ -71,6 +72,8 @@ defmodule ElixirScript.CLI do
   end
 
   def do_process(input, options) do
+    {watch, options} = Keyword.pop(options, :watch, false)
+
     compile_opts = %{
       root: options[:root],
       include_path: true,
@@ -84,6 +87,11 @@ defmodule ElixirScript.CLI do
         ElixirScript.compile(input, compile_opts)
       _ ->
         ElixirScript.compile_path(input, compile_opts)
+
+        if watch do
+          ElixirScript.Watcher.start_link(input, compile_opts)
+          :timer.sleep :infinity
+        end
     end
   end
 

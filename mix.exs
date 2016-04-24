@@ -22,13 +22,14 @@ defmodule ElixirScript.Mixfile do
 
   def application do
     [
-      applications: [:logger, :estree]
+      applications: [:logger, :estree, :fs]
     ]
   end
 
   defp deps do
     [
       {:estree, "~> 2.3" },
+      {:fs, "~> 0.9.1"},
       {:earmark, "~> 0.2", only: :dev },
       {:ex_doc, "~> 0.11", only: :dev },
       {:excoveralls, "~> 0.4", only: :test},
