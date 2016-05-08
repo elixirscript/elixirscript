@@ -53,6 +53,7 @@ export function defmatch(...cases: Array<Case>): Function {
       }
     }
 
+    console.error('No match for:', args);
     throw new MatchError(args);
   };
 }
@@ -99,35 +100,17 @@ export function match(pattern: any, expr: any, guard: Function = () => true): Ar
   if (processedPattern(expr, result) && guard.apply(this, result)){
     return result;
   }else{
+    console.error('No match for:', args);
     throw new MatchError(expr);
   }
 }
 
 export function match_no_throw(pattern: any, expr: any, guard: Function = () => true): ?Array<any> {
-  try{
-    return match(pattern, expr, guard);
-  }catch(e){
-    if(e instanceof MatchError || e.message.startsWith('No match for:')){
-      return null;
-    }
-
-    throw e;
+  let result = [];
+  let processedPattern = buildMatch(pattern);
+  if (processedPattern(expr, result) && guard.apply(this, result)){
+    return result;
+  }else{
+    return null;
   }
-}
-
-export function patternMap(collection: Array<any>, pattern: any, fun: Function, guard: Function = () => true): Array<any> {
-  let ret = [];
-
-  for(let elem of collection){
-    try{
-      let result = fun.apply(this, match(pattern, elem, guard));
-      ret = ret.concat(result);
-    }catch(e){
-    if(!(e instanceof MatchError)){
-        throw e;
-      }
-    }
-  }
-
-  return ret;
 }
