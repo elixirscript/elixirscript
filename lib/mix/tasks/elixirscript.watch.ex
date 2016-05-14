@@ -3,6 +3,25 @@ defmodule Mix.Tasks.Elixirscript.Watch do
 
   @shortdoc "Watches ElixirScript files for changes"
 
+  @moduledoc """
+  Watches ElixirScript files for changes
+
+  Looks for the `elixir_script` key in your mix project config
+
+  def project do
+  [
+  app: :my_app,
+  version: "0.1.0",
+  elixir: "~> 1.0",
+  deps: deps,
+  elixir_script: [ input: "src/exjs", output: "dest/js"],
+  compilers: [:elixir_script] ++ Mix.compilers
+  ]
+  end
+  """
+
+
+
   def run(_) do
     Mix.Task.run "app.start"
 

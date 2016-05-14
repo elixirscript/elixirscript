@@ -2,6 +2,11 @@ defmodule ElixirScript.Watcher do
   use GenServer
   require Logger
 
+  @moduledoc """
+  Watches the input folder for changes and calls the ElixirScript compiler
+  """
+
+
   def start_link(input, options) do
     GenServer.start_link(__MODULE__, [input: input, options: options])
   end

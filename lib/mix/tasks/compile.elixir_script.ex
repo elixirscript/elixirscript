@@ -4,7 +4,7 @@ defmodule Mix.Tasks.Compile.ElixirScript do
   @moduledoc """
   Mix compiler to allow mix to compile Elixirscript source files into JavaScript
 
-  Looks for an `elixirscript` key in your mix project config
+  Looks for an `elixir_script` key in your mix project config
 
       def project do
       [
