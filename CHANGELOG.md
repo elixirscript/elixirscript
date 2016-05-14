@@ -1,3 +1,12 @@
+# v0.20.0-dev
+
+# v0.19.0
+* Enhancements
+  * Added elixir_script mix compiler
+
+* Breaking
+  * `Html`, `View`, and `VDom` modules have been removed
+
 # v0.18.0
 * Enhancements
   * Better support for macros. Macros should be defined in .ex or .exs files. ElixirScript code should be in .exjs files
