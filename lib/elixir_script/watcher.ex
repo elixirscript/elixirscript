@@ -13,8 +13,28 @@ defmodule ElixirScript.Watcher do
   end
 
   def handle_info({_pid, {:fs, :file_event}, {path, event}}, state) do
-    Logger.debug "File changed: #{path}"
-    ElixirScript.compile_path(state[:input], state[:options])
+
+    try do
+      if input_changed?(to_string(path), state) do
+        Logger.debug "Event: #{inspect event} Path: #{path}"
+        ElixirScript.compile_path(state[:input], state[:options])
+      end
+    rescue
+      x ->
+        Logger.error(x.message)
+    end
+
     {:noreply, state}
+  end
+
+  defp input_changed?(path, state) do
+    file = Path.basename(path)
+
+    case file do
+      "." <> _ ->
+        false
+      _ ->
+       path == Path.absname(Path.join([state[:input], file]))
+    end
   end
 end
