@@ -1,4 +1,7 @@
-# v0.20.0-dev
+# v0.20.0
+* Enhancements
+  * Add `ElixirScript.Watcher` module and `elixirscript.watch` mix task
+  * Add logging MatchError exceptions to better show terms that don't match
 
 # v0.19.0
 * Enhancements
