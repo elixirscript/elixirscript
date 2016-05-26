@@ -67,7 +67,7 @@ defmodule ElixirScript.Translator.Function do
   end
 
   defp process_function_body(params, body, env, name, guards \\ nil) do
-    env = ElixirScript.Translator.Env.function_env(env, {name, get_arity(params)})
+    env = ElixirScript.Translator.LexicalScope.function_scope(env, {name, get_arity(params)})
 
     { patterns, params, env } = process_params(params, env)
     { body, _ } = make_function_body(body, env)

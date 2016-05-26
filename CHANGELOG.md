@@ -1,3 +1,7 @@
+# v0.21.0-dev
+* Fixed
+  * Scoping on `fn` and `def`
+
 # v0.20.0
 * Enhancements
   * Add `ElixirScript.Watcher` module and `elixirscript.watch` mix task

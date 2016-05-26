@@ -12,7 +12,7 @@ defmodule ElixirScript.ModuleSystems do
     module_system.import_module(module_name, from, env)
   end
 
-  def import_module(module_name, %ElixirScript.Macro.Env{} = env) do
+  def import_module(module_name, %ElixirScript.Translator.LexicalScope{} = env) do
     module_system.import_module(module_name, env)
   end
 

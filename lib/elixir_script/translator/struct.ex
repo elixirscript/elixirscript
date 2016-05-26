@@ -9,8 +9,8 @@ defmodule ElixirScript.Translator.Struct do
     candiate_module_name = Utils.quoted_to_name(module_name)
     |> ElixirScript.Translator.State.get_module_name
 
-    if ElixirScript.Translator.Env.get_module_name(env, candiate_module_name) in ElixirScript.Translator.State.list_module_names() do
-      name = ElixirScript.Translator.Env.get_module_name(env, candiate_module_name)
+    if ElixirScript.Translator.LexicalScope.get_module_name(env, candiate_module_name) in ElixirScript.Translator.State.list_module_names() do
+      name = ElixirScript.Translator.LexicalScope.get_module_name(env, candiate_module_name)
 
       JS.member_expression(
         JS.identifier(Utils.name_to_js_name(name)),

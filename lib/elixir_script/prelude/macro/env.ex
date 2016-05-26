@@ -13,9 +13,7 @@ defmodule ElixirScript.Macro.Env do
     context_modules: [atom],
     vars: [{atom, atom | non_neg_integer}],
     export_vars: [{atom, atom | non_neg_integer}] | nil,
-    lexical_tracker: nil,
-    caller: t | nil,
-    env: nil
+    lexical_tracker: nil
   }
 
   defstruct [
@@ -32,8 +30,6 @@ defmodule ElixirScript.Macro.Env do
     context_modules: [],
     vars: [],
     export_vars: nil,
-    lexical_tracker: nil,
-    caller: nil,
-    env: nil
+    lexical_tracker: nil
   ]
 end

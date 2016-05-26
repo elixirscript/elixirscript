@@ -1,7 +1,6 @@
 defmodule ElixirScript.ModuleSystems.Common do
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
-  alias ElixirScript.Translator.Utils
 
   def import_module(module_names, from, env) when is_list(module_names) do
     assignment_properties = Enum.map(module_names, fn(x) ->
@@ -15,7 +14,7 @@ defmodule ElixirScript.ModuleSystems.Common do
     do_import_module(Translator.translate!(module_name, env), from)
   end
 
-  def import_module(module_name, %ElixirScript.Macro.Env{} = env) do
+  def import_module(module_name, %ElixirScript.Translator.LexicalScope{} = env) do
     {from, _ } = Code.eval_quoted(module_name)
     do_import_module(Translator.translate!(module_name, env), Macro.underscore(from))
   end

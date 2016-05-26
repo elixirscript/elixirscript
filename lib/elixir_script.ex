@@ -242,7 +242,7 @@ defmodule ElixirScript do
       end)
       |> Enum.map(fn ast ->
       spawn_link fn ->
-          env = ElixirScript.Translator.Env.module_env(ast.name,  Utils.name_to_js_file_name(ast.name) <> ".js", state.compiler_opts.env)
+          env = ElixirScript.Translator.LexicalScope.module_scope(ast.name,  Utils.name_to_js_file_name(ast.name) <> ".js", state.compiler_opts.env)
 
           module = case ast.type do
             :module ->

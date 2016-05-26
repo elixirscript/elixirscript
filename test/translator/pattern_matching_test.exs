@@ -18,7 +18,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
 
   test "match wildcard" do
     params = [{:_, [], Test}]
-    result = PatternMatching.build_match(params, ElixirScript.Translator.Env.module_env(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) )
+    result = PatternMatching.build_match(params, ElixirScript.Translator.LexicalScope.module_scope(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) )
     expected_result = { [PatternMatching.wildcard],  [JS.identifier(:undefined)] }
 
     assert result == expected_result
@@ -26,7 +26,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
 
   test "match one identifier param" do
     params = [{:a, [], Test}]
-    result = PatternMatching.build_match(params, ElixirScript.Translator.Env.module_env(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) )
+    result = PatternMatching.build_match(params, ElixirScript.Translator.LexicalScope.module_scope(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) )
     expected_result = {[PatternMatching.parameter],  [JS.identifier("a")]}
 
     assert result == expected_result
@@ -34,7 +34,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
 
   test "match multiple identifier params" do
     params = [{:a, [], Test}, {:b, [], Test}, {:c, [], Test}]
-    result = PatternMatching.build_match(params, ElixirScript.Translator.Env.module_env(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) )
+    result = PatternMatching.build_match(params, ElixirScript.Translator.LexicalScope.module_scope(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) )
     expected_result = {
       List.duplicate(PatternMatching.parameter, 3),
       [JS.identifier("a"), JS.identifier("b"), JS.identifier("c")]
@@ -45,7 +45,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
 
   test "match head and tail param" do
     params = [[{:|, [], [{:head, [], Elixir}, {:tail, [], Elixir}]}]]
-    result = PatternMatching.build_match(params, ElixirScript.Translator.Env.module_env(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) )
+    result = PatternMatching.build_match(params, ElixirScript.Translator.LexicalScope.module_scope(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) )
     expected_result = {
       [PatternMatching.head_tail(PatternMatching.parameter, PatternMatching.parameter)],
       [JS.identifier("head"), JS.identifier("tail")]
@@ -56,7 +56,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
 
   test "match prefix param" do
     params = [{:<>, [context: Elixir, import: Elixir.Kernel], ["Bearer ", {:token, [], Elixir}]}]
-    result = PatternMatching.build_match(params, ElixirScript.Translator.Env.module_env(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) )
+    result = PatternMatching.build_match(params, ElixirScript.Translator.LexicalScope.module_scope(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) )
     expected_result = {
       [PatternMatching.starts_with("Bearer ")],
       [JS.identifier("token")]
@@ -67,7 +67,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
 
   test "match list" do
     params = [[{:a, [], Elixir}, {:b, [], Elixir}, {:c, [], Elixir}]]
-    result = PatternMatching.build_match(params, ElixirScript.Translator.Env.module_env(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) )
+    result = PatternMatching.build_match(params, ElixirScript.Translator.LexicalScope.module_scope(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) )
     expected_result = {
       [Primitive.make_list_no_translate(List.duplicate(PatternMatching.parameter, 3))],
       [JS.identifier("a"), JS.identifier("b"), JS.identifier("c")]
@@ -78,7 +78,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
 
   test "match list with a literal" do
     params = [[1, {:b, [], Elixir}, {:c, [], Elixir}]]
-    result = PatternMatching.build_match(params, ElixirScript.Translator.Env.module_env(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) )
+    result = PatternMatching.build_match(params, ElixirScript.Translator.LexicalScope.module_scope(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) )
     expected_result = {
       [Primitive.make_list_no_translate([JS.literal(1), PatternMatching.parameter, PatternMatching.parameter])],
       [JS.identifier("b"), JS.identifier("c")]
@@ -89,7 +89,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
 
   test "match number" do
     params = [1]
-    result = PatternMatching.build_match(params, ElixirScript.Translator.Env.module_env(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) )
+    result = PatternMatching.build_match(params, ElixirScript.Translator.LexicalScope.module_scope(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) )
     expected_result = {
       [JS.literal(1)],
       []
@@ -100,7 +100,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
 
   test "match struct pattern" do
     params = [{:%, [], [{:__aliases__, [alias: false], [:Hello]}, {:%{}, [], []}]}]
-    result = PatternMatching.build_match(params, ElixirScript.Translator.Env.module_env(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) )
+    result = PatternMatching.build_match(params, ElixirScript.Translator.LexicalScope.module_scope(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) )
     expected_result = {
       [PatternMatching.type(JS.identifier(:Hello), JS.object_expression([]))],
       []
@@ -111,10 +111,10 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
 
   test "match struct pattern with property" do
     params = [{:%, [], [{:__aliases__, [alias: false], [:Hello]}, {:%{}, [], [key: 1]}]}]
-    result = PatternMatching.build_match(params, ElixirScript.Translator.Env.module_env(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) )
+    result = PatternMatching.build_match(params, ElixirScript.Translator.LexicalScope.module_scope(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) )
     expected_result = {
       [PatternMatching.type(JS.identifier(:Hello), JS.object_expression([
-              Map.make_property(Translator.translate!(:key, ElixirScript.Translator.Env.module_env(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) ), Translator.translate!(1, ElixirScript.Translator.Env.module_env(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) ))
+              Map.make_property(Translator.translate!(:key, ElixirScript.Translator.LexicalScope.module_scope(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) ), Translator.translate!(1, ElixirScript.Translator.LexicalScope.module_scope(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) ))
         ]))
       ],
       []
@@ -125,10 +125,10 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
 
   test "match struct pattern with property param" do
     params = [{:%, [], [{:__aliases__, [alias: false], [:Hello]}, {:%{}, [], [key: {:key, [], Elixir }]}]}]
-    result = PatternMatching.build_match(params, ElixirScript.Translator.Env.module_env(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) )
+    result = PatternMatching.build_match(params, ElixirScript.Translator.LexicalScope.module_scope(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) )
     expected_result = {
       [PatternMatching.type(JS.identifier(:Hello), JS.object_expression([
-              Map.make_property(Translator.translate!(:key, ElixirScript.Translator.Env.module_env(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) ), PatternMatching.parameter)
+              Map.make_property(Translator.translate!(:key, ElixirScript.Translator.LexicalScope.module_scope(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) ), PatternMatching.parameter)
         ]))
       ],
       [JS.identifier("key")]
@@ -139,7 +139,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
 
   test "capture parameter when assigning it" do
     params = [{:=, [], [1, {:a, [], Elixir}]}]
-    result = PatternMatching.build_match(params, ElixirScript.Translator.Env.module_env(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) )
+    result = PatternMatching.build_match(params, ElixirScript.Translator.LexicalScope.module_scope(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) )
     expected_result = {
       [PatternMatching.capture(JS.literal(1))],
       [JS.identifier("a")]
@@ -149,7 +149,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
 
 
     params = [{:=, [], [{:a, [], Elixir}, 1]}]
-    result = PatternMatching.build_match(params, ElixirScript.Translator.Env.module_env(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) )
+    result = PatternMatching.build_match(params, ElixirScript.Translator.LexicalScope.module_scope(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) )
     expected_result = {
       [PatternMatching.capture(JS.literal(1))],
       [JS.identifier("a")]
@@ -159,7 +159,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
 
 
     params = [{:=, [], [{:%, [], [{:__aliases__, [alias: false], [:AStruct]}, {:%{}, [], []}]}, {:a, [], ElixirScript.Translator.Function.Test}]}]
-    result = PatternMatching.build_match(params, ElixirScript.Translator.Env.module_env(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) )
+    result = PatternMatching.build_match(params, ElixirScript.Translator.LexicalScope.module_scope(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) )
     expected_result = {
       [PatternMatching.capture(PatternMatching.type(JS.identifier(:AStruct), JS.object_expression([])))],
       [JS.identifier("a")]
@@ -170,7 +170,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
 
   test "match and assign list" do
     params = [{:=, [], [[{:a, [], Elixir}, {:b, [], Elixir}, {:c, [], Elixir}], {:d, [], Elixir}]}]
-    result = PatternMatching.build_match(params, ElixirScript.Translator.Env.module_env(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) )
+    result = PatternMatching.build_match(params, ElixirScript.Translator.LexicalScope.module_scope(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) )
     expected_result = {
       [PatternMatching.capture(Primitive.make_list_no_translate([PatternMatching.parameter, PatternMatching.parameter, PatternMatching.parameter]))],
       [JS.identifier("a"), JS.identifier("b"), JS.identifier("c"), JS.identifier("d")]
@@ -181,7 +181,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
 
   test "match on tuple" do
     params = [{:{}, [], [1, {:b, [], Elixir}, 3]}]
-    result = PatternMatching.build_match(params, ElixirScript.Translator.Env.module_env(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) )
+    result = PatternMatching.build_match(params, ElixirScript.Translator.LexicalScope.module_scope(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) )
     expected_result = {
       [PatternMatching.type(Primitive.tuple_class, JS.object_expression([JS.property(
         JS.identifier("values"),
@@ -193,7 +193,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
     assert result == expected_result
 
     params = [{1, {:b, [], Elixir}}]
-    result = PatternMatching.build_match(params, ElixirScript.Translator.Env.module_env(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) )
+    result = PatternMatching.build_match(params, ElixirScript.Translator.LexicalScope.module_scope(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) )
     expected_result = {
       [PatternMatching.type(Primitive.tuple_class, JS.object_expression([JS.property(
         JS.identifier("values"),
@@ -207,11 +207,11 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
 
   test "match on map" do
     params = [{:%{}, [], [which: 13]}]
-    result = PatternMatching.build_match(params, ElixirScript.Translator.Env.module_env(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) )
+    result = PatternMatching.build_match(params, ElixirScript.Translator.LexicalScope.module_scope(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) )
 
     expected_result = {
       [JS.object_expression([
-          Map.make_property(Translator.translate!(:which, ElixirScript.Translator.Env.module_env(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) ), JS.literal(13))
+          Map.make_property(Translator.translate!(:which, ElixirScript.Translator.LexicalScope.module_scope(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) ), JS.literal(13))
             ])],
       []
     }
@@ -222,7 +222,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
 
   test "match on bound value" do
     params = [{:^, [], [{:a, [], Elixir}]}]
-    result = PatternMatching.build_match(params, ElixirScript.Translator.Env.module_env(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) )
+    result = PatternMatching.build_match(params, ElixirScript.Translator.LexicalScope.module_scope(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) )
 
     expected_result = {
       [PatternMatching.bound(JS.identifier("a"))],

@@ -63,7 +63,6 @@ defmodule ElixirScript.CLI do
   end
 
   def process({ input, options }) do
-    IO.inspect(options)
     if options_contains_unknown_values(options) do
         process(:help)
     else

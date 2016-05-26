@@ -22,7 +22,7 @@ defmodule ElixirScript.ModuleSystems.ES6 do
     do_import_module([import_specifier], from)
   end
 
-  def import_module(module_name, %ElixirScript.Macro.Env{} = env) do
+  def import_module(module_name, %ElixirScript.Translator.LexicalScope{} = env) do
     import_specifier = JS.import_default_specifier(
       Translator.translate!(module_name, env),
       Translator.translate!(module_name, env)

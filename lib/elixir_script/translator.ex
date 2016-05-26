@@ -315,14 +315,14 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:__CALLER__, _, _expressions }, env) do
-    env_to_translate = %{ env.caller | vars: Enum.map(env.caller.vars, fn({key, _}) -> {key, nil} end), caller: nil }
+    env_to_translate = ElixirScript.Translator.LexicalScope.caller(env)
 
     quoted = Macro.escape(env_to_translate)
     translate(quoted, env)
   end
 
   defp do_translate({:__ENV__, _, _expressions }, env) do
-    env_to_translate = %{ env | vars: Enum.map(env.vars, fn({key, _}) -> {key, nil} end), caller: nil }
+    env_to_translate = ElixirScript.Translator.LexicalScope.env(env)
 
     quoted = Macro.escape(env_to_translate)
     translate(quoted, env)
@@ -341,7 +341,7 @@ defmodule ElixirScript.Translator do
       full_module_name = { :__aliases__, context, head_import_name ++ name }
 
       module_name = Utils.quoted_to_name(full_module_name)
-      ElixirScript.Translator.Env.add_import(acc, module_name)
+      ElixirScript.Translator.LexicalScope.add_import(acc, module_name)
     end)
 
     { %ElixirScript.Translator.Empty{}, env }
@@ -351,14 +351,14 @@ defmodule ElixirScript.Translator do
   defp do_translate({:import, _, [{:__aliases__, _, _} = module_name]}, env) do
     module_name = Utils.quoted_to_name(module_name)
 
-    env = ElixirScript.Translator.Env.add_import(env, module_name)
+    env = ElixirScript.Translator.LexicalScope.add_import(env, module_name)
     { %ElixirScript.Translator.Empty{}, env }
   end
 
   defp do_translate({:import, _, [{:__aliases__, _, _} = module_name, options]}, env) do
     module_name = Utils.quoted_to_name(module_name)
 
-    env = ElixirScript.Translator.Env.add_import(env, module_name, options)
+    env = ElixirScript.Translator.LexicalScope.add_import(env, module_name, options)
 
     { %ElixirScript.Translator.Empty{}, env }
   end
@@ -370,7 +370,7 @@ defmodule ElixirScript.Translator do
       module_name = Utils.quoted_to_name(full_module_name)
       alias_name = Utils.quoted_to_name({:__aliases__, [], [List.last(name)] })
 
-      ElixirScript.Translator.Env.add_alias(acc, module_name, alias_name)
+      ElixirScript.Translator.LexicalScope.add_alias(acc, module_name, alias_name)
     end)
 
     { %ElixirScript.Translator.Empty{}, env }
@@ -383,7 +383,7 @@ defmodule ElixirScript.Translator do
     module_name = Utils.quoted_to_name(module_name)
     alias_name = Utils.quoted_to_name({:__aliases__, [], name })
 
-    env = ElixirScript.Translator.Env.add_alias(env, module_name, alias_name)
+    env = ElixirScript.Translator.LexicalScope.add_alias(env, module_name, alias_name)
     { %ElixirScript.Translator.Empty{}, env }
   end
 
@@ -391,7 +391,7 @@ defmodule ElixirScript.Translator do
     module_name = Utils.quoted_to_name(module_name)
     alias_name = Utils.quoted_to_name(alias_name)
 
-    env = ElixirScript.Translator.Env.add_alias(env, module_name, alias_name)
+    env = ElixirScript.Translator.LexicalScope.add_alias(env, module_name, alias_name)
     { %ElixirScript.Translator.Empty{}, env }
   end
 
@@ -400,7 +400,7 @@ defmodule ElixirScript.Translator do
       full_module_name = { :__aliases__, context, head_require_name ++ name }
 
       module_name = Utils.quoted_to_name(full_module_name)
-      ElixirScript.Translator.Env.add_require(acc, module_name)
+      ElixirScript.Translator.LexicalScope.add_require(acc, module_name)
     end)
 
     { %ElixirScript.Translator.Empty{}, env }
@@ -408,7 +408,7 @@ defmodule ElixirScript.Translator do
 
   defp do_translate({:require, _, [{:__aliases__, _, _} = module_name] }, env) do
     module_name = Utils.quoted_to_name(module_name)
-    env = ElixirScript.Translator.Env.add_require(env, module_name)
+    env = ElixirScript.Translator.LexicalScope.add_require(env, module_name)
     { %ElixirScript.Translator.Empty{}, env }
   end
 
@@ -416,7 +416,7 @@ defmodule ElixirScript.Translator do
     module_name = Utils.quoted_to_name(module_name)
     alias_name = Utils.quoted_to_name(alias_name)
 
-    env = ElixirScript.Translator.Env.add_require(env, module_name, alias_name)
+    env = ElixirScript.Translator.LexicalScope.add_require(env, module_name, alias_name)
     { %ElixirScript.Translator.Empty{}, env }
   end
 
@@ -433,7 +433,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:fn, _, clauses}, env) do
-    env = ElixirScript.Translator.Env.function_env(env, nil)
+    env = ElixirScript.Translator.LexicalScope.function_scope(env, nil)
     Function.make_anonymous_function(clauses, env)
   end
 
@@ -539,8 +539,8 @@ defmodule ElixirScript.Translator do
         cond do
           name_arity in module.functions or name_arity in module.private_functions ->
             Function.make_function_call(name, params, env)
-          ElixirScript.Translator.Env.find_module(env, name_arity) ->
-             imported_module_name = ElixirScript.Translator.Env.find_module(env, name_arity)
+          ElixirScript.Translator.LexicalScope.find_module(env, name_arity) ->
+             imported_module_name = ElixirScript.Translator.LexicalScope.find_module(env, name_arity)
              Function.make_function_call(imported_module_name, name, params, env)
           true ->
             Function.make_function_call(name, params, env)
@@ -553,13 +553,13 @@ defmodule ElixirScript.Translator do
 
   defp do_translate({ name, _, params }, env) when is_atom(params) do
     cond do
-      ElixirScript.Translator.Env.has_var?(env, name) ->
+      ElixirScript.Translator.LexicalScope.has_var?(env, name) ->
         name = Utils.filter_name(name)
         { Primitive.make_identifier(name), env }
       has_function?(env.module, {name, 0}) ->
         Function.make_function_call(name, [], env)
-      ElixirScript.Translator.Env.find_module(env, {name, 0}) ->
-         imported_module_name = ElixirScript.Translator.Env.find_module(env, {name, 0})
+      ElixirScript.Translator.LexicalScope.find_module(env, {name, 0}) ->
+         imported_module_name = ElixirScript.Translator.LexicalScope.find_module(env, {name, 0})
          Function.make_function_call(imported_module_name, name, params, env)
       true ->
         name = Utils.filter_name(name)
@@ -574,8 +574,8 @@ defmodule ElixirScript.Translator do
         candiate_module_name = Utils.quoted_to_name(module_name)
         |> ElixirScript.Translator.State.get_module_name
 
-        if ElixirScript.Translator.Env.get_module_name(env, candiate_module_name) in ElixirScript.Translator.State.list_module_names() do
-          ElixirScript.Translator.Env.get_module_name(env, candiate_module_name)
+        if ElixirScript.Translator.LexicalScope.get_module_name(env, candiate_module_name) in ElixirScript.Translator.State.list_module_names() do
+          ElixirScript.Translator.LexicalScope.get_module_name(env, candiate_module_name)
         else
           module_name
         end

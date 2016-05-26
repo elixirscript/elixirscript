@@ -1,9 +1,85 @@
-defmodule ElixirScript.Translator.Env do
+defmodule ElixirScript.Translator.LexicalScope do
   @moduledoc false
 
-  def module_env(ElixirScript.Temp, filename, env) do
+  @type t :: %ElixirScript.Translator.LexicalScope{
+    module: atom,
+    file: binary,
+    line: non_neg_integer,
+    function: { atom, non_neg_integer } | nil,
+    context: :match | :guard | nil,
+    aliases: [{atom, atom}],
+    requires: [atom],
+    functions: [{atom, [{ atom, non_neg_integer }]}],
+    macros: [{atom, [{ atom, non_neg_integer }]}],
+    macro_aliases: [{atom, {integer, atom}}],
+    context_modules: [atom],
+    vars: [{atom, atom | non_neg_integer}],
+    export_vars: [{atom, atom | non_neg_integer}] | nil,
+    lexical_tracker: nil,
+    caller: t | nil,
+    env: nil
+  }
 
-    env = %ElixirScript.Macro.Env {
+  defstruct [
+    module: nil,
+    file: nil,
+    line: 0,
+    function: nil,
+    context: nil,
+    aliases: [],
+    requires: [],
+    functions: [],
+    macros: [],
+    macro_aliases: [],
+    context_modules: [],
+    vars: [],
+    export_vars: nil,
+    lexical_tracker: nil,
+    caller: nil,
+    env: nil
+  ]
+
+  def env(scope) do
+    %Macro.Env{
+      module: scope.module,
+      file: scope.file,
+      line: scope.line,
+      function: scope.function,
+      context: scope.context,
+      aliases: scope.aliases,
+      requires: scope.requires,
+      functions: scope.functions,
+      macros: scope.macros,
+      macro_aliases: scope.macro_aliases,
+      context_modules: scope.context_modules,
+      vars: Enum.map(scope.vars, fn({key, _}) -> {key, nil} end),
+      export_vars: scope.export_vars,
+      lexical_tracker: scope.lexical_tracker
+    }
+  end
+
+  def caller(scope) do
+    %Macro.Env{
+      module: scope.caller.module,
+      file: scope.caller.file,
+      line: scope.caller.line,
+      function: scope.caller.function,
+      context: scope.caller.context,
+      aliases: scope.caller.aliases,
+      requires: scope.caller.requires,
+      functions: scope.caller.functions,
+      macros: scope.caller.macros,
+      macro_aliases: scope.caller.macro_aliases,
+      context_modules: scope.caller.context_modules,
+      vars: Enum.map(scope.vars, fn({key, _}) -> {key, nil} end),
+      export_vars: scope.caller.export_vars,
+      lexical_tracker: scope.caller.lexical_tracker
+    }
+  end
+
+  def module_scope(ElixirScript.Temp, filename, env) do
+
+    env = %ElixirScript.Translator.LexicalScope {
       module: ElixirScript.Temp, file: filename, requires: [],
       functions: [],
       env: env
@@ -12,10 +88,10 @@ defmodule ElixirScript.Translator.Env do
     add_import(env, ElixirScript.Kernel)
   end
 
-  def module_env(module_name, filename, env) do
+  def module_scope(module_name, filename, env) do
     module = ElixirScript.Translator.State.get_module(module_name)
 
-    env = %ElixirScript.Macro.Env {
+    env = %ElixirScript.Translator.LexicalScope {
       module: module_name, file: filename, requires: [],
       functions: [{ module.name, module.functions}],
       env: env
@@ -24,12 +100,12 @@ defmodule ElixirScript.Translator.Env do
     add_import(env, ElixirScript.Kernel)
   end
 
-  def function_env(env, { _, _ } = func) do
-    %{ env |  function: func, caller: env }
+  def function_scope(env, { _, _ } = func) do
+    %{ env |  function: func, caller: env, vars: [] }
   end
 
-  def function_env(env, nil) do
-    %{ env |  function: nil, caller: env, vars: [] }
+  def function_scope(env, nil) do
+    %{ env |  function: nil, caller: env }
   end
 
   def find_module(env, name_arity) do
