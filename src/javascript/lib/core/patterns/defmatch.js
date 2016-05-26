@@ -100,7 +100,7 @@ export function match(pattern: any, expr: any, guard: Function = () => true): Ar
   if (processedPattern(expr, result) && guard.apply(this, result)){
     return result;
   }else{
-    console.error('No match for:', args);
+    console.error('No match for:', expr);
     throw new MatchError(expr);
   }
 }
