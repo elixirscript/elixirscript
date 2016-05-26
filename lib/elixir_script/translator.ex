@@ -5,9 +5,10 @@ defmodule ElixirScript.Translator do
   """
   alias ElixirScript.Translator.Primitive
   alias ElixirScript.Translator.Expression
-  alias ElixirScript.Translator.Assignment
+  alias ElixirScript.Translator.Match
   alias ElixirScript.Translator.Map
   alias ElixirScript.Translator.Function
+  alias ElixirScript.Translator.Def
   alias ElixirScript.Translator.Capture
   alias ElixirScript.Translator.Cond
   alias ElixirScript.Translator.Case
@@ -16,7 +17,7 @@ defmodule ElixirScript.Translator do
   alias ElixirScript.Translator.With
   alias ElixirScript.Translator.Block
   alias ElixirScript.Translator.Struct
-  alias ElixirScript.Translator.Module
+  alias ElixirScript.Translator.Defmodule
   alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.Bitstring
   alias ElixirScript.Translator.Quote
@@ -168,7 +169,7 @@ defmodule ElixirScript.Translator do
 
   defp do_translate({:@, _, [{name, _, [value]}]}, env) do
     name = Utils.filter_name(name)
-    { Module.make_attribute(name, value, env), env }
+    { Defmodule.make_attribute(name, value, env), env }
   end
 
   defp do_translate({:@, _, [{name, _, _}]}, env) do
@@ -446,19 +447,19 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:=, _, [left, right]}, env) do
-    Assignment.make_assignment(left, right, env)
+    Match.make_match(left, right, env)
   end
 
   defp do_translate({function, _, [{:when, _, [{name, _, _params} | _guards] }, _] } = ast, env) when function in [:def, :defp] do
-    Function.process_function(Utils.filter_name(name), [ast], env)
+    Def.process_function(Utils.filter_name(name), [ast], env)
   end
 
   defp do_translate({function, _, [{name, _, params}, _]} = ast, env) when function in [:def, :defp] and is_atom(params) do
-    Function.process_function(Utils.filter_name(name), [ast], env)
+    Def.process_function(Utils.filter_name(name), [ast], env)
   end
 
   defp do_translate({function, _, [{name, _, _params}, _]} = ast, env) when function in [:def, :defp] do
-    Function.process_function(Utils.filter_name(name), [ast], env)
+    Def.process_function(Utils.filter_name(name), [ast], env)
   end
 
   defp do_translate({:defstruct, _, attributes}, env) do
@@ -470,7 +471,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:defmodule, _, [{:__aliases__, _, module_name_list}, [do: body]]}, env) do
-    { Module.make_module(module_name_list, body, env), env }
+    { Defmodule.make_module(module_name_list, body, env), env }
   end
 
   defp do_translate({:defprotocol, _, _}, env) do

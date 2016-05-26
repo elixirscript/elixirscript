@@ -1,4 +1,4 @@
-defmodule ElixirScript.Translator.Assignment.Test do
+defmodule ElixirScript.Translator.Match.Test do
   use ExUnit.Case
   import ElixirScript.TestHelper
 

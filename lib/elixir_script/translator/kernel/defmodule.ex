@@ -1,9 +1,10 @@
-defmodule ElixirScript.Translator.Module do
+defmodule ElixirScript.Translator.Defmodule do
   @moduledoc false
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.Function
+  alias ElixirScript.Translator.Def
   alias ElixirScript.ModuleSystems
 
   def make_module(ElixirScript.Temp, body, env) do
@@ -163,13 +164,13 @@ defmodule ElixirScript.Translator.Module do
     exported_functions = Enum.map(Dict.keys(exported), fn(key) ->
       functions = Dict.get(exported, key)
 
-      { functions, _ } = Function.process_function(key, functions, env)
+      { functions, _ } = Def.process_function(key, functions, env)
       { key, functions }
     end)
 
     private_functions = Enum.map(Dict.keys(private), fn(key) ->
       functions = Dict.get(private, key)
-      { functions, _ } = Function.process_function(key, functions, env)
+      { functions, _ } = Def.process_function(key, functions, env)
       { key, functions }
     end)
 

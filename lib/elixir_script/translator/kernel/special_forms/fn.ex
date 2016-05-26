@@ -13,17 +13,6 @@ defmodule ElixirScript.Translator.Function do
     JS.identifier("Patterns")
   )
 
-  def process_function(name, functions, env) do
-    { result, _ } = make_anonymous_function(functions, env, name)
-
-    declarator = JS.variable_declarator(
-      JS.identifier(Utils.filter_name(name)),
-      result
-    )
-
-    { JS.variable_declaration([declarator], :const), env }
-  end
-
   def make_anonymous_function(functions, env, name \\ nil) do
     clauses = functions
     |> Enum.map(fn

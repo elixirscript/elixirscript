@@ -1,11 +1,11 @@
-defmodule ElixirScript.Translator.Protocol.Implementation do
+defmodule ElixirScript.Translator.Defimpl do
   alias ESTree.Tools.Builder, as: JS
-  alias ElixirScript.Translator.Module
+  alias ElixirScript.Translator.Defmodule
 
   def make(name, type, body, env) do
 
     type = map_to_js(type, env)
-    module = Module.make_module(name, body, env)
+    module = Defmodule.make_module(name, body, env)
 
     protocol_name = Atom.to_string(name) |> String.split(".DefImpl.") |> hd |> String.to_atom
 
