@@ -58,6 +58,7 @@ Please check the [CONTRIBUTING.md](CONTRIBUTING.md)
 
 
 ### Example projects
+* [hello](https://github.com/bryanjos/hello) Shows using Phoenix + Elixirscript with file watching
 * [elixirscript frontend boilerplate](https://github.com/bryanjos/elixirscript-project-boilerplate) A boilerplate project for elixirscript frontends
 * [todo-elixirscript](https://github.com/bryanjos/todo-elixirscript) A Todo App built with Elixirscript and Phoenix
 * [phoenix_chat_example](https://github.com/bryanjos/phoenix_chat_example) The Phoenix Chat App using ElixirScript.
