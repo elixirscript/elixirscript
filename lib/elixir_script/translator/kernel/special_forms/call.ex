@@ -3,7 +3,6 @@ defmodule ElixirScript.Translator.Call do
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Utils
-  alias ElixirScript.Translator.PatternMatching
   alias ElixirScript.Translator.Primitive
 
 

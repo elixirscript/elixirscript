@@ -2,9 +2,8 @@ defmodule ElixirScript.Translator.Function do
   @moduledoc false
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
-  alias ElixirScript.Translator.Utils
+  alias ElixirScript.Translator.Group
   alias ElixirScript.Translator.PatternMatching
-  alias ElixirScript.Translator.Primitive
 
   @patterns JS.member_expression(
     JS.member_expression(
@@ -138,7 +137,7 @@ defmodule ElixirScript.Translator.Function do
         end)
     end
 
-    list = Utils.inflate_groups(list)
+    list = Group.inflate_groups(list)
     |> return_last_expression
 
     { list, env }

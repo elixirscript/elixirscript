@@ -187,27 +187,6 @@ defmodule ElixirScript.Translator.ModuleCollector do
     end
   end
 
-  defp add_module_to_state(name, inner_module_name, inner_module_body) do
-    %{ def: functions, defp: private_functions } = get_functions_from_module(inner_module_body)
-    js_imports = get_js_imports_from_module(inner_module_body)
-
-    inner_alias = { :alias, [], [{:__aliases__, [alias: false], name ++ inner_module_name}] }
-
-    module_name = Utils.quoted_to_name({:__aliases__, [], tl(name) ++ inner_module_name})
-    State.delete_module_by_name(module_name)
-
-    module_name = Utils.quoted_to_name({:__aliases__, [], name ++ inner_module_name})
-
-    mod = %ElixirScript.Module{ name: module_name, body: inner_module_body,
-    functions: functions, private_functions: private_functions,
-    js_imports: js_imports  }
-
-    State.add_module(mod)
-
-    inner_alias
-  end
-
-
   defp get_functions_from_module({:__block__, _, list}) do
     Enum.reduce(list, %{ def: Keyword.new, defp: Keyword.new }, fn
     ({type, _, [{:when, _, [{name, _, params} | _guards] }, _] }, state) when type in [:def, :defp] and is_atom(params) ->

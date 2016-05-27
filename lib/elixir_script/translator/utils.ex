@@ -37,24 +37,6 @@ defmodule ElixirScript.Translator.Utils do
     :yield
   ]
 
-  def inflate_groups(body) do
-    Enum.map(body, fn(x) ->
-      case x do
-        %ElixirScript.Translator.Empty{} ->
-          []
-        %ElixirScript.Translator.Group{body: group_body} ->
-          group_body
-        %ESTree.BlockStatement{} ->
-          %ESTree.BlockStatement{ body: inflate_groups(x.body) }
-        %ESTree.IfStatement{} ->
-          %{x | consequent: inflate_groups(x.consequent), alternate: inflate_groups(x.alternate) }
-        _ ->
-          x
-      end
-    end)
-    |> List.flatten
-  end
-
   def make_module_expression_tree([module], computed, env) do
     make_module_expression_tree(module, computed, env)
   end

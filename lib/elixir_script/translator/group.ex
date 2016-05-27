@@ -9,4 +9,22 @@ defmodule ElixirScript.Translator.Group do
     body: [ESTree.Statement.t]
   }
   defstruct type: "Group", body: []
+
+  def inflate_groups(body) do
+    Enum.map(body, fn(x) ->
+      case x do
+        %ElixirScript.Translator.Empty{} ->
+          []
+        %ElixirScript.Translator.Group{body: group_body} ->
+          group_body
+        %ESTree.BlockStatement{} ->
+          %ESTree.BlockStatement{ body: inflate_groups(x.body) }
+        %ESTree.IfStatement{} ->
+          %{x | consequent: inflate_groups(x.consequent), alternate: inflate_groups(x.alternate) }
+        _ ->
+          x
+      end
+    end)
+    |> List.flatten
+  end
 end

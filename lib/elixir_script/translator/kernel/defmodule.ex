@@ -3,13 +3,14 @@ defmodule ElixirScript.Translator.Defmodule do
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Utils
+  alias ElixirScript.Translator.Group
   alias ElixirScript.Translator.Def
   alias ElixirScript.ModuleSystems
   alias ElixirScript.Translator.Primitive
 
   def make_module(ElixirScript.Temp, body, env) do
     { body, _ } = translate_body(body, env)
-    %{ name: ElixirScript.Temp, body: body |> Utils.inflate_groups }
+    %{ name: ElixirScript.Temp, body: body |> Group.inflate_groups }
   end
 
   def make_module(module, nil, _) do
@@ -39,7 +40,7 @@ defmodule ElixirScript.Translator.Defmodule do
       end
     end)
 
-    body = Utils.inflate_groups(body)
+    body = Group.inflate_groups(body)
 
     exported_object = JS.object_expression(
       make_defstruct_property(module, structs) ++
