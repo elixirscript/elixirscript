@@ -6,6 +6,7 @@ defmodule ElixirScript.Translator.Defprotocol do
   alias ElixirScript.Translator.Map
   alias ElixirScript.Translator.Utils
   alias ElixirScript.ModuleSystems
+  alias ElixirScript.Translator.Primitive
   require Logger
 
   @doc """
@@ -24,7 +25,7 @@ defmodule ElixirScript.Translator.Defprotocol do
 
     object = process_spec_functions(functions)
     |> Enum.map(fn({key, value}) ->
-      Map.make_property(JS.identifier(Utils.filter_name(key)), value)
+      Map.make_property(Primitive.make_identifier(key), value)
     end)
     |> JS.object_expression
 

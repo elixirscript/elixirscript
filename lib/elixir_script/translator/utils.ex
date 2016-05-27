@@ -2,6 +2,7 @@ defmodule ElixirScript.Translator.Utils do
   @moduledoc false
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
+  alias ElixirScript.Translator.Primitive
 
   @js_reserved_words [
     :break,
@@ -62,17 +63,17 @@ defmodule ElixirScript.Translator.Utils do
     Enum.reduce(modules, nil, fn(x, ast) ->
       case ast do
         nil ->
-          JS.member_expression(JS.identifier(x), nil, computed)
+          JS.member_expression(Primitive.make_identifier(x), nil, computed)
         %ESTree.MemberExpression{ property: nil } ->
-          %{ ast | property: JS.identifier(x) }
+          %{ ast | property: Primitive.make_identifier(x) }
         _ ->
-          JS.member_expression(ast, JS.identifier(x), computed)
+          JS.member_expression(ast, Primitive.make_identifier(x), computed)
       end
     end)
   end
 
   def make_module_expression_tree(module, _computed, _) when is_binary(module) or is_atom(module) do
-    JS.identifier(module)
+    Primitive.make_identifier(module)
   end
 
   def make_module_expression_tree(module, _computed, env) do
@@ -95,7 +96,7 @@ defmodule ElixirScript.Translator.Utils do
 
   def make_call_expression(function_name, params, env) do
     JS.call_expression(
-      JS.identifier(function_name),
+      Primitive.make_identifier(function_name),
       Enum.map(params, &Translator.translate!(&1, env))
     )
   end
@@ -106,37 +107,37 @@ defmodule ElixirScript.Translator.Utils do
         ast = make_module_expression_tree(modules, computed, env)
         JS.member_expression(
           ast,
-          JS.identifier(function_name),
+          Primitive.make_identifier(function_name),
           computed
         )
       modules when is_list(modules) and length(modules) == 1 ->
         JS.member_expression(
-          JS.identifier(hd(modules)),
-          JS.identifier(function_name),
+          Primitive.make_identifier(hd(modules)),
+          Primitive.make_identifier(function_name),
           computed
         )
       {{:., _, [_module_name, _function_name]}, _, _params } = ast ->
         JS.member_expression(
           Translator.translate!(ast, env),
-          JS.identifier(function_name),
+          Primitive.make_identifier(function_name),
           computed
         )
       {{:., _, [{:__aliases__, _, _}]}, _, _} = ast ->
         JS.member_expression(
           Translator.translate!(ast, env),
-          JS.identifier(function_name),
+          Primitive.make_identifier(function_name),
           computed
         )
       {:., _, _} = ast ->
         JS.member_expression(
           Translator.translate!(ast, env),
-          JS.identifier(function_name),
+          Primitive.make_identifier(function_name),
           computed
         )
       _ ->
         JS.member_expression(
-          JS.identifier(module_name),
-          JS.identifier(function_name),
+          Primitive.make_identifier(module_name),
+          Primitive.make_identifier(function_name),
           computed
         )
     end

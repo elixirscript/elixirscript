@@ -4,6 +4,7 @@ defmodule ElixirScript.Translator.Function do
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.PatternMatching
+  alias ElixirScript.Translator.Primitive
 
   @patterns JS.member_expression(
     JS.member_expression(
@@ -165,14 +166,14 @@ defmodule ElixirScript.Translator.Function do
   end
 
   def make_function_call(function_name, params, env) do
-    { Utils.make_call_expression(Utils.filter_name(function_name), params, env), env }
+    { Utils.make_call_expression(function_name, params, env), env }
   end
 
   def make_function_call(module_name, function_name, params, env) when is_list(module_name) do
     call = JS.call_expression(
       JS.member_expression(
         Translator.translate!(module_name, env),
-        JS.identifier(Utils.filter_name(function_name))
+        Primitive.make_identifier(function_name)
       ),
       Enum.map(params, &Translator.translate!(&1, env))
     )
@@ -182,7 +183,7 @@ defmodule ElixirScript.Translator.Function do
 
   def make_function_call(module_name, function_name, params, env) do
     the_name = get_module_name_for_function(module_name, env)
-    { Utils.make_call_expression(the_name, Utils.filter_name(function_name), params, env), env }
+    { Utils.make_call_expression(the_name, function_name, params, env), env }
   end
 
   def prepare_function_body(body, env) do

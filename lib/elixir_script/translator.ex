@@ -148,12 +148,10 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:&, _, [{:/, _, [{{:., _, [module_name, function_name]}, _, []}, arity]}]}, env) do
-    function_name = Utils.filter_name(function_name)
     { Capture.make_capture(module_name, function_name, arity, env), env }
   end
 
   defp do_translate({:&, _, [{:/, _, [{function_name, _, _}, arity]}]}, env) do
-    function_name = Utils.filter_name(function_name)
     { Capture.make_capture(function_name, arity, env), env }
   end
 
@@ -168,12 +166,10 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:@, _, [{name, _, [value]}]}, env) do
-    name = Utils.filter_name(name)
     { Defmodule.make_attribute(name, value, env), env }
   end
 
   defp do_translate({:@, _, [{name, _, _}]}, env) do
-    name = Utils.filter_name(name)
     { Primitive.make_identifier(name), env }
   end
 
@@ -451,15 +447,15 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({function, _, [{:when, _, [{name, _, _params} | _guards] }, _] } = ast, env) when function in [:def, :defp] do
-    Def.process_function(Utils.filter_name(name), [ast], env)
+    Def.process_function(name, [ast], env)
   end
 
   defp do_translate({function, _, [{name, _, params}, _]} = ast, env) when function in [:def, :defp] and is_atom(params) do
-    Def.process_function(Utils.filter_name(name), [ast], env)
+    Def.process_function(name, [ast], env)
   end
 
   defp do_translate({function, _, [{name, _, _params}, _]} = ast, env) when function in [:def, :defp] do
-    Def.process_function(Utils.filter_name(name), [ast], env)
+    Def.process_function(name, [ast], env)
   end
 
   defp do_translate({:defstruct, _, attributes}, env) do
@@ -555,7 +551,6 @@ defmodule ElixirScript.Translator do
   defp do_translate({ name, _, params }, env) when is_atom(params) do
     cond do
       ElixirScript.Translator.LexicalScope.has_var?(env, name) ->
-        name = Utils.filter_name(name)
         { Primitive.make_identifier(name), env }
       has_function?(env.module, {name, 0}) ->
         Function.make_function_call(name, [], env)
@@ -563,7 +558,6 @@ defmodule ElixirScript.Translator do
          imported_module_name = ElixirScript.Translator.LexicalScope.find_module(env, {name, 0})
          Function.make_function_call(imported_module_name, name, params, env)
       true ->
-        name = Utils.filter_name(name)
         { Primitive.make_identifier(name), env }
     end
   end

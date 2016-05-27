@@ -44,11 +44,13 @@ defmodule ElixirScript.Translator.Primitive do
   end
 
   def make_identifier([ast]) do
-    JS.identifier(ast)
+    make_identifier(ast)
   end
 
   def make_identifier(ast) do
-    JS.identifier(ast)
+    ast
+    |> Utils.filter_name
+    |> JS.identifier
   end
 
   def make_literal(ast) when is_number(ast) or is_binary(ast) or is_boolean(ast) or is_nil(ast) do

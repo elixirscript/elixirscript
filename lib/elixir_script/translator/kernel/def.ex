@@ -4,12 +4,13 @@ defmodule  ElixirScript.Translator.Def do
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Function
   alias ElixirScript.Translator.Utils
+  alias ElixirScript.Translator.Primitive
 
   def process_function(name, functions, env) do
     { result, _ } = Function.make_anonymous_function(functions, env, name)
 
     declarator = JS.variable_declarator(
-      JS.identifier(Utils.filter_name(name)),
+      Primitive.make_identifier(name),
       result
     )
 
