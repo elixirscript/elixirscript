@@ -1,0 +1,73 @@
+defmodule ElixirScript.Translator.Identifier do
+  @moduledoc false
+  alias ESTree.Tools.Builder, as: JS
+
+  @js_reserved_words [
+    :break,
+    :case,
+    :class,
+    :const,
+    :continue,
+    :debugger,
+    :default,
+    :delete,
+    :do,
+    :else,
+    :export,
+    :extends,
+    :finally,
+    :function,
+    :if,
+    :import,
+    :in,
+    :instanceof,
+    :new,
+    :return,
+    :super,
+    :switch,
+    :throw,
+    :try,
+    :typeof,
+    :var,
+    :void,
+    :while,
+    :with,
+    :yield
+  ]
+
+
+  def make_identifier({:__aliases__, _, aliases}) do
+    aliases
+    |> Enum.reverse
+    |> make_alias
+  end
+
+  def make_identifier([ast]) do
+    make_identifier(ast)
+  end
+
+  def make_identifier(ast) do
+    ast
+    |> filter_name
+    |> JS.identifier
+  end
+
+  defp filter_name(reserved_word) when reserved_word in @js_reserved_words do
+    "__#{Atom.to_string(reserved_word)}__"
+  end
+
+  defp filter_name(name) do
+    to_string(name)
+    |> String.replace("?", "__qmark__")
+    |> String.replace("!", "__emark__")
+  end
+
+  defp make_alias([x]) do
+    make_identifier(x)
+  end
+
+  defp make_alias([h|t]) do
+    JS.member_expression(make_alias(t), make_identifier(h))
+  end
+
+end

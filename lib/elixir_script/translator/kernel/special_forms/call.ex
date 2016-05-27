@@ -3,7 +3,7 @@ defmodule ElixirScript.Translator.Call do
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Utils
-  alias ElixirScript.Translator.Primitive
+  alias ElixirScript.Translator.Identifier
 
 
   def make_function_or_property_call(module_name, function_name, env) do
@@ -61,7 +61,7 @@ defmodule ElixirScript.Translator.Call do
     call = JS.call_expression(
       JS.member_expression(
         Translator.translate!(module_name, env),
-        Primitive.make_identifier(function_name)
+        Identifier.make_identifier(function_name)
       ),
       Enum.map(params, &Translator.translate!(&1, env))
     )

@@ -5,7 +5,7 @@ defmodule ElixirScript.Translator.Capture do
   alias ElixirScript.Translator.PatternMatching
   alias ElixirScript.Translator.Function
   alias ElixirScript.Translator.Call
-  alias ElixirScript.Translator.Primitive
+  alias ElixirScript.Translator.Identifier
 
   def make_capture(function_name, arity, env) do
     { patterns, params, _ } = process_params(arity, env)
@@ -13,7 +13,7 @@ defmodule ElixirScript.Translator.Capture do
     body = JS.block_statement([
       JS.return_statement(
         JS.call_expression(
-          Primitive.make_identifier(function_name),
+          Identifier.make_identifier(function_name),
           params
         )
       )

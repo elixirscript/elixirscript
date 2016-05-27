@@ -4,6 +4,7 @@ defmodule ElixirScript.Translator do
   JavaScript AST.
   """
   alias ElixirScript.Translator.Primitive
+  alias ElixirScript.Translator.Identifier
   alias ElixirScript.Translator.Expression
   alias ElixirScript.Translator.Match
   alias ElixirScript.Translator.Map
@@ -145,7 +146,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:&, _, [number]}, env) when is_number(number) do
-    { Primitive.make_identifier(String.to_atom("__#{number}")), env }
+    { Identifier.make_identifier(String.to_atom("__#{number}")), env }
   end
 
   defp do_translate({:&, _, [{:/, _, [{{:., _, [module_name, function_name]}, _, []}, arity]}]}, env) do
@@ -171,7 +172,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:@, _, [{name, _, _}]}, env) do
-    { Primitive.make_identifier(name), env }
+    { Identifier.make_identifier(name), env }
   end
 
   defp do_translate({:%, _, [alias_info, data]}, env) do
@@ -272,11 +273,11 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:_, _, _}, env) do
-    { Primitive.make_identifier(:undefined), env }
+    { Identifier.make_identifier(:undefined), env }
   end
 
   defp do_translate({:__aliases__, _, aliases}, env) do
-    { Primitive.make_identifier({:__aliases__, [], aliases}), env }
+    { Identifier.make_identifier({:__aliases__, [], aliases}), env }
   end
 
   defp do_translate({:__MODULE__, _, _ }, env) do
@@ -552,14 +553,14 @@ defmodule ElixirScript.Translator do
   defp do_translate({ name, _, params }, env) when is_atom(params) do
     cond do
       ElixirScript.Translator.LexicalScope.has_var?(env, name) ->
-        { Primitive.make_identifier(name), env }
+        { Identifier.make_identifier(name), env }
       has_function?(env.module, {name, 0}) ->
         Call.make_function_call(name, [], env)
       ElixirScript.Translator.LexicalScope.find_module(env, {name, 0}) ->
          imported_module_name = ElixirScript.Translator.LexicalScope.find_module(env, {name, 0})
          Call.make_function_call(imported_module_name, name, params, env)
       true ->
-        { Primitive.make_identifier(name), env }
+        { Identifier.make_identifier(name), env }
     end
   end
 

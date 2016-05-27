@@ -3,7 +3,6 @@ defmodule ElixirScript.Translator.Primitive do
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Quote
-  alias ElixirScript.Translator.Utils
 
   def special_forms() do
     JS.member_expression(
@@ -36,21 +35,6 @@ defmodule ElixirScript.Translator.Primitive do
       ),
       JS.identifier("list")
     )
-  end
-
-
-  def make_identifier({:__aliases__, _, aliases}) do
-    Utils.make_module_expression_tree(aliases, false, __ENV__)
-  end
-
-  def make_identifier([ast]) do
-    make_identifier(ast)
-  end
-
-  def make_identifier(ast) do
-    ast
-    |> Utils.filter_name
-    |> JS.identifier
   end
 
   def make_literal(ast) when is_number(ast) or is_binary(ast) or is_boolean(ast) or is_nil(ast) do

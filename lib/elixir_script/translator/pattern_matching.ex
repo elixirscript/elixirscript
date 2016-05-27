@@ -4,6 +4,7 @@ defmodule ElixirScript.Translator.PatternMatching do
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Primitive
+  alias ElixirScript.Translator.Identifier
   alias ElixirScript.Translator.Map
   alias ElixirScript.Translator.Struct
   alias ElixirScript.Translator.Bitstring
@@ -254,12 +255,12 @@ defmodule ElixirScript.Translator.PatternMatching do
   end
 
   defp do_build_match({:\\, _, [{name, _, _}, default]}, env) do
-    { [parameter(Translator.translate!(default, env))], [Primitive.make_identifier(name)] }
+    { [parameter(Translator.translate!(default, env))], [Identifier.make_identifier(name)] }
   end
 
 
   defp do_build_match({name, _, _}, _) do
-    { [parameter()], [Primitive.make_identifier(name)] }
+    { [parameter()], [Identifier.make_identifier(name)] }
   end
 
   defp reduce_patterns(patterns) do
@@ -271,7 +272,7 @@ defmodule ElixirScript.Translator.PatternMatching do
 
   defp unify(target, source, env) do
     { patterns, params } = build_match([source], env)
-    { [capture(hd(patterns))], params ++ [Primitive.make_identifier(target)] }
+    { [capture(hd(patterns))], params ++ [Identifier.make_identifier(target)] }
   end
 
 end

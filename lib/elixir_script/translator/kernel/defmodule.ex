@@ -6,7 +6,7 @@ defmodule ElixirScript.Translator.Defmodule do
   alias ElixirScript.Translator.Group
   alias ElixirScript.Translator.Def
   alias ElixirScript.ModuleSystems
-  alias ElixirScript.Translator.Primitive
+  alias ElixirScript.Translator.Identifier
 
   def make_module(ElixirScript.Temp, body, env) do
     { body, _ } = translate_body(body, env)
@@ -45,7 +45,7 @@ defmodule ElixirScript.Translator.Defmodule do
     exported_object = JS.object_expression(
       make_defstruct_property(module, structs) ++
       Enum.map(exported_functions, fn({key, _value}) ->
-        JS.property(Primitive.make_identifier(key), Primitive.make_identifier(key), :init, true)
+        JS.property(Identifier.make_identifier(key), Identifier.make_identifier(key), :init, true)
       end)
     )
 
@@ -180,7 +180,7 @@ defmodule ElixirScript.Translator.Defmodule do
 
   def make_attribute(name, value, env) do
     declarator = JS.variable_declarator(
-      Primitive.make_identifier(name),
+      Identifier.make_identifier(name),
       ElixirScript.Translator.translate!(value, env)
     )
 
