@@ -4,6 +4,7 @@ defmodule ElixirScript.Translator.Struct do
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.Map
+  alias ElixirScript.Translator.Identifier
 
   def get_struct_class(module_name, env) do
     candiate_module_name = Utils.quoted_to_name(module_name)
@@ -11,14 +12,11 @@ defmodule ElixirScript.Translator.Struct do
 
     if ElixirScript.Translator.LexicalScope.get_module_name(env, candiate_module_name) in ElixirScript.Translator.State.list_module_names() do
       name = ElixirScript.Translator.LexicalScope.get_module_name(env, candiate_module_name)
-
-      JS.member_expression(
-        JS.identifier(Utils.name_to_js_name(name)),
-        JS.identifier(Utils.name_to_js_name(name))
-      )
+      ident = JS.identifier(Utils.name_to_js_name(name))
+      JS.member_expression(ident, ident)
 
     else
-      Utils.make_module_expression_tree(module_name, false, env)
+      Identifier.make_identifier(module_name)
     end
 
   end
