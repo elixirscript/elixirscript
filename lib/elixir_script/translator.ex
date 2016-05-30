@@ -4,10 +4,13 @@ defmodule ElixirScript.Translator do
   JavaScript AST.
   """
   alias ElixirScript.Translator.Primitive
+  alias ElixirScript.Translator.Identifier
   alias ElixirScript.Translator.Expression
-  alias ElixirScript.Translator.Assignment
+  alias ElixirScript.Translator.Match
   alias ElixirScript.Translator.Map
   alias ElixirScript.Translator.Function
+  alias ElixirScript.Translator.Call
+  alias ElixirScript.Translator.Def
   alias ElixirScript.Translator.Capture
   alias ElixirScript.Translator.Cond
   alias ElixirScript.Translator.Case
@@ -16,7 +19,7 @@ defmodule ElixirScript.Translator do
   alias ElixirScript.Translator.With
   alias ElixirScript.Translator.Block
   alias ElixirScript.Translator.Struct
-  alias ElixirScript.Translator.Module
+  alias ElixirScript.Translator.Defmodule
   alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.Bitstring
   alias ElixirScript.Translator.Quote
@@ -143,16 +146,14 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:&, _, [number]}, env) when is_number(number) do
-    { Primitive.make_identifier(String.to_atom("__#{number}")), env }
+    { Identifier.make_identifier(String.to_atom("__#{number}")), env }
   end
 
   defp do_translate({:&, _, [{:/, _, [{{:., _, [module_name, function_name]}, _, []}, arity]}]}, env) do
-    function_name = Utils.filter_name(function_name)
     { Capture.make_capture(module_name, function_name, arity, env), env }
   end
 
   defp do_translate({:&, _, [{:/, _, [{function_name, _, _}, arity]}]}, env) do
-    function_name = Utils.filter_name(function_name)
     { Capture.make_capture(function_name, arity, env), env }
   end
 
@@ -167,13 +168,11 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:@, _, [{name, _, [value]}]}, env) do
-    name = Utils.filter_name(name)
-    { Module.make_attribute(name, value, env), env }
+    { Defmodule.make_attribute(name, value, env), env }
   end
 
   defp do_translate({:@, _, [{name, _, _}]}, env) do
-    name = Utils.filter_name(name)
-    { Primitive.make_identifier(name), env }
+    { Identifier.make_identifier(name), env }
   end
 
   defp do_translate({:%, _, [alias_info, data]}, env) do
@@ -218,7 +217,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({{:., _, [function_name]}, _, params}, env) do
-    Function.make_function_call(function_name, params, env)
+    Call.make_function_call(function_name, params, env)
   end
 
   defp do_translate({:., _, [module_name, function_name]} = ast, env) do
@@ -226,7 +225,7 @@ defmodule ElixirScript.Translator do
 
     if expanded_ast == ast do
       module_name = create_module_name(module_name, env)
-      Function.make_function_or_property_call(module_name, function_name, env)
+      Call.make_function_or_property_call(module_name, function_name, env)
     else
       translate(expanded_ast, env)
     end
@@ -237,7 +236,7 @@ defmodule ElixirScript.Translator do
 
     if expanded_ast == ast do
       module_name = create_module_name(module_name, env)
-      Function.make_function_or_property_call(module_name, function_name, env)
+      Call.make_function_or_property_call(module_name, function_name, env)
     else
       translate(expanded_ast, env)
     end
@@ -248,7 +247,7 @@ defmodule ElixirScript.Translator do
 
     if expanded_ast == ast do
       module_name = create_module_name(module_name, env)
-      Function.make_function_call(module_name, params, env)
+      Call.make_function_call(module_name, params, env)
     else
       translate(expanded_ast, env)
     end
@@ -267,18 +266,18 @@ defmodule ElixirScript.Translator do
 
     if expanded_ast == ast do
       module_name = create_module_name(module_name, env)
-      Function.make_function_call(module_name, function_name, params, env)
+      Call.make_function_call(module_name, function_name, params, env)
     else
       translate(expanded_ast, env)
     end
   end
 
   defp do_translate({:_, _, _}, env) do
-    { Primitive.make_identifier(:undefined), env }
+    { Identifier.make_identifier(:undefined), env }
   end
 
   defp do_translate({:__aliases__, _, aliases}, env) do
-    { Primitive.make_identifier({:__aliases__, [], aliases}), env }
+    { Identifier.make_identifier({:__aliases__, [], aliases}), env }
   end
 
   defp do_translate({:__MODULE__, _, _ }, env) do
@@ -446,19 +445,19 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:=, _, [left, right]}, env) do
-    Assignment.make_assignment(left, right, env)
+    Match.make_match(left, right, env)
   end
 
   defp do_translate({function, _, [{:when, _, [{name, _, _params} | _guards] }, _] } = ast, env) when function in [:def, :defp] do
-    Function.process_function(Utils.filter_name(name), [ast], env)
+    Def.process_function(name, [ast], env)
   end
 
   defp do_translate({function, _, [{name, _, params}, _]} = ast, env) when function in [:def, :defp] and is_atom(params) do
-    Function.process_function(Utils.filter_name(name), [ast], env)
+    Def.process_function(name, [ast], env)
   end
 
   defp do_translate({function, _, [{name, _, _params}, _]} = ast, env) when function in [:def, :defp] do
-    Function.process_function(Utils.filter_name(name), [ast], env)
+    Def.process_function(name, [ast], env)
   end
 
   defp do_translate({:defstruct, _, attributes}, env) do
@@ -470,7 +469,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:defmodule, _, [{:__aliases__, _, module_name_list}, [do: body]]}, env) do
-    { Module.make_module(module_name_list, body, env), env }
+    { Defmodule.make_module(module_name_list, body, env), env }
   end
 
   defp do_translate({:defprotocol, _, _}, env) do
@@ -538,12 +537,12 @@ defmodule ElixirScript.Translator do
 
         cond do
           name_arity in module.functions or name_arity in module.private_functions ->
-            Function.make_function_call(name, params, env)
+            Call.make_function_call(name, params, env)
           ElixirScript.Translator.LexicalScope.find_module(env, name_arity) ->
              imported_module_name = ElixirScript.Translator.LexicalScope.find_module(env, name_arity)
-             Function.make_function_call(imported_module_name, name, params, env)
+             Call.make_function_call(imported_module_name, name, params, env)
           true ->
-            Function.make_function_call(name, params, env)
+            Call.make_function_call(name, params, env)
         end
 
       else
@@ -554,16 +553,14 @@ defmodule ElixirScript.Translator do
   defp do_translate({ name, _, params }, env) when is_atom(params) do
     cond do
       ElixirScript.Translator.LexicalScope.has_var?(env, name) ->
-        name = Utils.filter_name(name)
-        { Primitive.make_identifier(name), env }
+        { Identifier.make_identifier(name), env }
       has_function?(env.module, {name, 0}) ->
-        Function.make_function_call(name, [], env)
+        Call.make_function_call(name, [], env)
       ElixirScript.Translator.LexicalScope.find_module(env, {name, 0}) ->
          imported_module_name = ElixirScript.Translator.LexicalScope.find_module(env, {name, 0})
-         Function.make_function_call(imported_module_name, name, params, env)
+         Call.make_function_call(imported_module_name, name, params, env)
       true ->
-        name = Utils.filter_name(name)
-        { Primitive.make_identifier(name), env }
+        { Identifier.make_identifier(name), env }
     end
   end
 

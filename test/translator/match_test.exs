@@ -1,8 +1,8 @@
-defmodule ElixirScript.Translator.Assignment.Test do
+defmodule ElixirScript.Translator.Match.Test do
   use ExUnit.Case
   import ElixirScript.TestHelper
 
-  test "translate simple assignment" do
+  test "translate simple match" do
     ex_ast = quote do: a = 1
     js_code = "let [a] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(), 1);"
 
@@ -14,7 +14,7 @@ defmodule ElixirScript.Translator.Assignment.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  test "translate tuple assignment" do
+  test "translate tuple match" do
     ex_ast = quote do
       {a, b} = {1, 2}
     end
@@ -49,7 +49,7 @@ defmodule ElixirScript.Translator.Assignment.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  test "translate bound assignment" do
+  test "translate bound match" do
     ex_ast = quote do: ^a = 1
     js_code = """
      let [] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.bound(a),1);
@@ -58,7 +58,7 @@ defmodule ElixirScript.Translator.Assignment.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  test "translate list assignment" do
+  test "translate list match" do
     ex_ast = quote do: [a, b] = [1, 2]
     js_code = """
          let [a,b] = Elixir.Core.Patterns.match(Object.freeze([Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable()]),Object.freeze([1, 2]));
@@ -68,7 +68,7 @@ defmodule ElixirScript.Translator.Assignment.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  test "translate head/tail assignment" do
+  test "translate head/tail match" do
     ex_ast = quote do: [a | b] = [1, 2, 3, 4]
     js_code = """
     let [a,b] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.headTail(Elixir.Core.Patterns.variable(),Elixir.Core.Patterns.variable()),Object.freeze([1, 2, 3, 4]));

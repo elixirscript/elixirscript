@@ -1,4 +1,4 @@
-defmodule ElixirScript.Translator.Protocol.Test do
+defmodule ElixirScript.Translator.Defprotocol.Test do
   use ExUnit.Case
   import ElixirScript.TestHelper
 

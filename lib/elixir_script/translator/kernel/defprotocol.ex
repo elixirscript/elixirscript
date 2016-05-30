@@ -1,30 +1,31 @@
-defmodule ElixirScript.Translator.Protocol do
+defmodule ElixirScript.Translator.Defprotocol do
   @moduledoc false
 
   alias ESTree.Tools.Builder, as: JS
-  alias ElixirScript.Translator.Module
+  alias ElixirScript.Translator.Defmodule
   alias ElixirScript.Translator.Map
   alias ElixirScript.Translator.Utils
   alias ElixirScript.ModuleSystems
+  alias ElixirScript.Translator.Identifier
   require Logger
 
   @doc """
   Takes a protocol and turns it into a module
   """
   def make(name, functions, env) do
-    { body, _ } = Module.translate_body( {:__block__, [], [] }, env)
+    { body, _ } = Defmodule.translate_body( {:__block__, [], [] }, env)
 
     module_refs = ElixirScript.Translator.State.get_module_references(name)
 
-    {imports, body} = Module.extract_imports_from_body(body)
+    {imports, body} = Defmodule.extract_imports_from_body(body)
 
-    imports = imports ++ Module.make_std_lib_import() ++
-      Module.make_imports(module_refs) ++
+    imports = imports ++ Defmodule.make_std_lib_import() ++
+      Defmodule.make_imports(module_refs) ++
       [ElixirScript.ModuleSystems.import_module("Implementations", Utils.make_local_file_path(Utils.name_to_js_file_name(name) <> ".Defimpl"))]
 
     object = process_spec_functions(functions)
     |> Enum.map(fn({key, value}) ->
-      Map.make_property(JS.identifier(Utils.filter_name(key)), value)
+      Map.make_property(Identifier.make_identifier(key), value)
     end)
     |> JS.object_expression
 

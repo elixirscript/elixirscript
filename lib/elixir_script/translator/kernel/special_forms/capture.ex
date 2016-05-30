@@ -4,6 +4,8 @@ defmodule ElixirScript.Translator.Capture do
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator.PatternMatching
   alias ElixirScript.Translator.Function
+  alias ElixirScript.Translator.Call
+  alias ElixirScript.Translator.Identifier
 
   def make_capture(function_name, arity, env) do
     { patterns, params, _ } = process_params(arity, env)
@@ -11,7 +13,7 @@ defmodule ElixirScript.Translator.Capture do
     body = JS.block_statement([
       JS.return_statement(
         JS.call_expression(
-          JS.identifier(function_name),
+          Identifier.make_identifier(function_name),
           params
         )
       )
@@ -31,7 +33,7 @@ defmodule ElixirScript.Translator.Capture do
       name = [:ElixirScript, :Kernel]
     end
 
-    { func, _ } = Function.make_function_call({:__aliases__, [], name }, function_name, arity_params, env)
+    { func, _ } = Call.make_function_call({:__aliases__, [], name }, function_name, arity_params, env)
 
     body = JS.block_statement([
       JS.return_statement(

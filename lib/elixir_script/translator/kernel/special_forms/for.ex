@@ -33,7 +33,7 @@ defmodule ElixirScript.Translator.For do
       { bs_parts, collection } = Enum.map_reduce(body, nil, fn
         {:::, _, _} = ast, state ->
           {ast, state}
-        {:<-, [], [var, collection]}, state ->
+        {:<-, [], [var, collection]}, _ ->
           { var, collection }
       end)
 

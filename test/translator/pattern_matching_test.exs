@@ -102,7 +102,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
     params = [{:%, [], [{:__aliases__, [alias: false], [:Hello]}, {:%{}, [], []}]}]
     result = PatternMatching.build_match(params, ElixirScript.Translator.LexicalScope.module_scope(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) )
     expected_result = {
-      [PatternMatching.type(JS.identifier(:Hello), JS.object_expression([]))],
+      [PatternMatching.type(JS.identifier("Hello"), JS.object_expression([]))],
       []
     }
 
@@ -113,7 +113,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
     params = [{:%, [], [{:__aliases__, [alias: false], [:Hello]}, {:%{}, [], [key: 1]}]}]
     result = PatternMatching.build_match(params, ElixirScript.Translator.LexicalScope.module_scope(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) )
     expected_result = {
-      [PatternMatching.type(JS.identifier(:Hello), JS.object_expression([
+      [PatternMatching.type(JS.identifier("Hello"), JS.object_expression([
               Map.make_property(Translator.translate!(:key, ElixirScript.Translator.LexicalScope.module_scope(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) ), Translator.translate!(1, ElixirScript.Translator.LexicalScope.module_scope(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) ))
         ]))
       ],
@@ -127,7 +127,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
     params = [{:%, [], [{:__aliases__, [alias: false], [:Hello]}, {:%{}, [], [key: {:key, [], Elixir }]}]}]
     result = PatternMatching.build_match(params, ElixirScript.Translator.LexicalScope.module_scope(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) )
     expected_result = {
-      [PatternMatching.type(JS.identifier(:Hello), JS.object_expression([
+      [PatternMatching.type(JS.identifier("Hello"), JS.object_expression([
               Map.make_property(Translator.translate!(:key, ElixirScript.Translator.LexicalScope.module_scope(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) ), PatternMatching.parameter)
         ]))
       ],
@@ -161,7 +161,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
     params = [{:=, [], [{:%, [], [{:__aliases__, [alias: false], [:AStruct]}, {:%{}, [], []}]}, {:a, [], ElixirScript.Translator.Function.Test}]}]
     result = PatternMatching.build_match(params, ElixirScript.Translator.LexicalScope.module_scope(ElixirScript.Temp, "temp.ex", ElixirScript.custom_env) )
     expected_result = {
-      [PatternMatching.capture(PatternMatching.type(JS.identifier(:AStruct), JS.object_expression([])))],
+      [PatternMatching.capture(PatternMatching.type(JS.identifier("AStruct"), JS.object_expression([])))],
       [JS.identifier("a")]
     }
 

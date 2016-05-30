@@ -1,14 +1,16 @@
-defmodule ElixirScript.Translator.Module do
+defmodule ElixirScript.Translator.Defmodule do
   @moduledoc false
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Utils
-  alias ElixirScript.Translator.Function
+  alias ElixirScript.Translator.Group
+  alias ElixirScript.Translator.Def
   alias ElixirScript.ModuleSystems
+  alias ElixirScript.Translator.Identifier
 
   def make_module(ElixirScript.Temp, body, env) do
     { body, _ } = translate_body(body, env)
-    %{ name: ElixirScript.Temp, body: body |> Utils.inflate_groups }
+    %{ name: ElixirScript.Temp, body: body |> Group.inflate_groups }
   end
 
   def make_module(module, nil, _) do
@@ -38,12 +40,12 @@ defmodule ElixirScript.Translator.Module do
       end
     end)
 
-    body = Utils.inflate_groups(body)
+    body = Group.inflate_groups(body)
 
     exported_object = JS.object_expression(
       make_defstruct_property(module, structs) ++
       Enum.map(exported_functions, fn({key, _value}) ->
-        JS.property(JS.identifier(Utils.filter_name(key)), JS.identifier(Utils.filter_name(key)), :init, true)
+        JS.property(Identifier.make_identifier(key), Identifier.make_identifier(key), :init, true)
       end)
     )
 
@@ -163,13 +165,13 @@ defmodule ElixirScript.Translator.Module do
     exported_functions = Enum.map(Dict.keys(exported), fn(key) ->
       functions = Dict.get(exported, key)
 
-      { functions, _ } = Function.process_function(key, functions, env)
+      { functions, _ } = Def.process_function(key, functions, env)
       { key, functions }
     end)
 
     private_functions = Enum.map(Dict.keys(private), fn(key) ->
       functions = Dict.get(private, key)
-      { functions, _ } = Function.process_function(key, functions, env)
+      { functions, _ } = Def.process_function(key, functions, env)
       { key, functions }
     end)
 
@@ -178,7 +180,7 @@ defmodule ElixirScript.Translator.Module do
 
   def make_attribute(name, value, env) do
     declarator = JS.variable_declarator(
-      JS.identifier(name),
+      Identifier.make_identifier(name),
       ElixirScript.Translator.translate!(value, env)
     )
 

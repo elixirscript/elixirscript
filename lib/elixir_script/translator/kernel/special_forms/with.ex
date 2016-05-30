@@ -13,7 +13,7 @@ defmodule ElixirScript.Translator.With do
         translated_body = JS.block_statement(body)
         expr_function = JS.function_expression(state.arguments, [], translated_body)
 
-        { patterns, params, env } = PatternMatching.process_match([pattern], env)
+        { patterns, params, _ } = PatternMatching.process_match([pattern], env)
 
         %{state | arguments: state.arguments ++ params,
           expressions: state.expressions ++ [ JS.array_expression([hd(patterns), expr_function]) ] }

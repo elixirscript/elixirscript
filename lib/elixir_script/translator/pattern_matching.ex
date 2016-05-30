@@ -4,7 +4,7 @@ defmodule ElixirScript.Translator.PatternMatching do
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Primitive
-  alias ElixirScript.Translator.Utils
+  alias ElixirScript.Translator.Identifier
   alias ElixirScript.Translator.Map
   alias ElixirScript.Translator.Struct
   alias ElixirScript.Translator.Bitstring
@@ -167,7 +167,7 @@ defmodule ElixirScript.Translator.PatternMatching do
     end)
 
     elements = Enum.map(elements, fn
-      ({:::, context, [{ variable, _, params }, options]}) when is_atom(params) ->
+      ({:::, context, [{ _, _, params }, options]}) when is_atom(params) ->
         Bitstring.make_bitstring_element({:::, context, [ElixirScript.Translator.PatternMatching, options]}, env)
       x ->
         Bitstring.make_bitstring_element(x, env)
@@ -255,14 +255,12 @@ defmodule ElixirScript.Translator.PatternMatching do
   end
 
   defp do_build_match({:\\, _, [{name, _, _}, default]}, env) do
-    name = Utils.filter_name(name)
-    { [parameter(Translator.translate!(default, env))], [JS.identifier(name)] }
+    { [parameter(Translator.translate!(default, env))], [Identifier.make_identifier(name)] }
   end
 
 
   defp do_build_match({name, _, _}, _) do
-    name = Utils.filter_name(name)
-    { [parameter()], [JS.identifier(name)] }
+    { [parameter()], [Identifier.make_identifier(name)] }
   end
 
   defp reduce_patterns(patterns) do
@@ -274,7 +272,7 @@ defmodule ElixirScript.Translator.PatternMatching do
 
   defp unify(target, source, env) do
     { patterns, params } = build_match([source], env)
-    { [capture(hd(patterns))], params ++ [JS.identifier(Utils.filter_name(target))] }
+    { [capture(hd(patterns))], params ++ [Identifier.make_identifier(target)] }
   end
 
 end

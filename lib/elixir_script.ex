@@ -246,11 +246,11 @@ defmodule ElixirScript do
 
           module = case ast.type do
             :module ->
-                       ElixirScript.Translator.Module.make_module(ast.name, ast.body, env)
+                       ElixirScript.Translator.Defmodule.make_module(ast.name, ast.body, env)
             :protocol ->
-                       ElixirScript.Translator.Protocol.make(ast.name, ast.functions, env)
+                       ElixirScript.Translator.Defprotocol.make(ast.name, ast.functions, env)
             :protocol_implementation ->
-                       ElixirScript.Translator.Protocol.Implementation.make(ast.name, ast.impl_type, ast.body, env)
+                       ElixirScript.Translator.Defimpl.make(ast.name, ast.impl_type, ast.body, env)
                    end
 
 
@@ -302,7 +302,7 @@ defmodule ElixirScript do
 
   defp do_make_defimpl(protocols, compiler_opts) do
     Enum.map(protocols, fn {protocol, implementations} ->
-      ElixirScript.Translator.Protocol.make_defimpl(protocol, Enum.uniq(implementations), compiler_opts)
+      ElixirScript.Translator.Defprotocol.make_defimpl(protocol, Enum.uniq(implementations), compiler_opts)
     end)
     |> Enum.map(fn(module) ->
       javascript_ast_to_code(module)
