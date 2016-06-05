@@ -51,6 +51,11 @@ core JavaScript files needed for ElixirScript. To change the location,
 update the `lib_path` config variable in the `:elixir_script` config block
 to the path to look in and then do a clean build.
 
+Communication
+========
+
+[#elixirscript](https://elixir-lang.slack.com/messages/elixirscript/) on the elixir-lang Slack
+
 Contributing
 ========
 
