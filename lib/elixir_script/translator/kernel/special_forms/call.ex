@@ -58,7 +58,7 @@ defmodule ElixirScript.Translator.Call do
   end
 
   def make_function_call(module_name, function_name, params, env) when is_list(module_name) do
-    call = JS.call_expression(
+    call = make_gen_call(
       JS.member_expression(
         Translator.translate!(module_name, env),
         Identifier.make_identifier(function_name)
@@ -72,6 +72,43 @@ defmodule ElixirScript.Translator.Call do
   def make_function_call(module_name, function_name, params, env) do
     the_name = get_module_name_for_function(module_name, env)
     { make_call_expression(the_name, function_name, params, env), env }
+  end
+
+  defp make_call_expression(module_name, function_name, params, env) do
+    make_gen_call(
+      make_member_expression(module_name, function_name, env),
+      Enum.map(params, &Translator.translate!(&1, env))
+    )
+  end
+
+  defp make_call_expression(function_name, params, env) when is_tuple(function_name) do
+    make_gen_call(
+      Translator.translate!(function_name, env),
+      Enum.map(params, &Translator.translate!(&1, env))
+    )
+  end
+
+  defp make_call_expression(function_name, params, env) do
+    make_gen_call(
+      Identifier.make_identifier(function_name),
+      Enum.map(params, &Translator.translate!(&1, env))
+    )
+  end
+
+  defp make_gen_call(func, params) do
+      JS.call_expression(
+        JS.member_expression(
+          JS.member_expression(
+            JS.identifier("Elixir"),
+            JS.member_expression(
+              JS.identifier("Core"),
+              JS.identifier("Functions")
+            )
+          ),
+          JS.identifier("run")
+        ),
+        [func, JS.array_expression(params)]
+      )
   end
 
 
@@ -103,28 +140,6 @@ defmodule ElixirScript.Translator.Call do
             module_name
         end
     end
-  end
-
-
-  defp make_call_expression(module_name, function_name, params, env) do
-    JS.call_expression(
-      make_member_expression(module_name, function_name, env),
-      Enum.map(params, &Translator.translate!(&1, env))
-    )
-  end
-
-  defp make_call_expression(function_name, params, env) when is_tuple(function_name) do
-    JS.call_expression(
-      Translator.translate!(function_name, env),
-      Enum.map(params, &Translator.translate!(&1, env))
-    )
-  end
-
-  defp make_call_expression(function_name, params, env) do
-    JS.call_expression(
-      Identifier.make_identifier(function_name),
-      Enum.map(params, &Translator.translate!(&1, env))
-    )
   end
 
 

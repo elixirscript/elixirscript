@@ -103,11 +103,11 @@ defmodule ElixirScript.Translator.Function do
   def make_function_clause(patterns, params, body, guard_body) do
     arguments = [
             JS.array_expression(patterns),
-            JS.function_expression(params, [], body),
+            JS.function_expression(params, [], body, true),
           ]
 
     if guard_body do
-      arguments = arguments ++ [JS.function_expression(params, [], guard_body)]
+      arguments = arguments ++ [JS.function_expression(params, [], guard_body, true)]
     end
 
     JS.call_expression(
@@ -159,6 +159,8 @@ defmodule ElixirScript.Translator.Function do
     last_item = List.last(list)
 
     last_item = case last_item do
+      %ESTree.YieldExpression{} ->
+                    JS.return_statement(last_item)
       %ESTree.Literal{} ->
         JS.return_statement(last_item)
       %ESTree.Identifier{} ->
@@ -181,11 +183,11 @@ defmodule ElixirScript.Translator.Function do
       %ESTree.BlockStatement{} ->
         last_item = %ESTree.BlockStatement{ last_item | body: return_last_expression(last_item.body) }
       _ ->
-        if String.contains?(last_item.type, "Expression") do
-          JS.return_statement(last_item)
-        else
-          [last_item, JS.return_statement(JS.literal(nil))]
-        end
+                    if String.contains?(last_item.type, "Expression") do
+                        JS.return_statement(last_item)
+                    else
+                      [last_item, JS.return_statement(JS.literal(nil))]
+                    end
     end
 
 

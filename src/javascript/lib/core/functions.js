@@ -3,7 +3,7 @@ import BitString from './bit_string';
 import Patterns from './patterns';
 import Protocol from './protocol';
 
-function call_property(item, property){
+function* call_property(item, property){
   let prop = null;
 
   if(typeof item === "number" || typeof item === "symbol" || typeof item === "boolean" || typeof item === "string"){
@@ -21,14 +21,22 @@ function call_property(item, property){
   }
 
   if(prop === null){
-    throw new Error(`Property ${ property } not found in ${ item }`); 
+    throw new Error(`Property ${ property } not found in ${ item }`);
   }
 
   if(item[prop] instanceof Function){
-    return item[prop]();
+    return yield* item[prop]();
   }else{
-    return item[prop];
+    return yield item[prop];
   }
+}
+
+function* run(fun, args, context = null){
+  if(fun.constructor.name === "GeneratorFunction"){
+    return yield* fun.apply(context, args);
+  }
+
+  return yield fun.apply(context, args);
 }
 
 function apply(...args){
@@ -298,7 +306,7 @@ function keytake(key, n, list){
 }
 
 function keyreplace(key, n, list, newtuple){
-  
+
   for(let i = tuplelist.length - 1; i >= 0; i--){
     if(tuplelist[i].get(n) === key){
       return tuplelist.concat([]).splice(i, 1, newtuple);
@@ -396,6 +404,7 @@ function maps_from_list(list){
 
 export default {
   call_property,
+  run,
   apply,
   contains,
   get_global,

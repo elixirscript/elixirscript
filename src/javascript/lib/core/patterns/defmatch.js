@@ -43,13 +43,13 @@ export function make_case(pattern: Array<any>, fn: Function, guard: Function = (
 }
 
 export function defmatch(...cases: Array<Case>): Function {
-  return function(...args: Array<any>): any {
+  return function* (...args: Array<any>): any {
     for (let processedCase of cases) {
       let result = [];
       args = fillInOptionalValues(args, processedCase.arity, processedCase.optionals);
 
       if (processedCase.pattern(args, result) && processedCase.guard.apply(this, result)) {
-        return processedCase.fn.apply(this, result);
+        return yield* processedCase.fn.apply(this, result);
       }
     }
 

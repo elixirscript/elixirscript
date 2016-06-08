@@ -75,13 +75,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate(ast, env) when is_atom(ast) do
-    str = Atom.to_string(ast)
-
-    quoted = quote do
-      Symbol.for(unquote(str))
-    end
-
-    translate(quoted, env)
+    { Primitive.make_atom(ast), env }
   end
 
   defp do_translate([ {:|, _, [left, right] } ], env) do
