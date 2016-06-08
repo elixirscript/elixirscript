@@ -70,8 +70,8 @@ defmodule ElixirScript.Translator.Primitive do
   def do_make_list(ast) do
     JS.call_expression(
       JS.member_expression(
-        JS.identifier(:Object),
-        JS.identifier(:freeze)
+        JS.identifier("Object"),
+        JS.identifier("freeze")
       ),
       [JS.array_expression(ast)]
     )

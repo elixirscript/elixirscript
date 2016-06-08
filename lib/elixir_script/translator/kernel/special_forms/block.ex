@@ -14,19 +14,35 @@ defmodule ElixirScript.Translator.Block do
 
   defp process_call(item) do
    case item do
-     %ESTree.CallExpression{ callee: %ESTree.MemberExpression{ object: %ESTree.Identifier{ name: :Object }, property: %ESTree.Identifier{ name: :freeze }} } ->
+     %ESTree.CallExpression{ callee: %ESTree.MemberExpression{ object: %ESTree.Identifier{ name: "Object" }, property: %ESTree.Identifier{ name: "freeze" }} } ->
        item
      %ESTree.CallExpression{ callee: %ESTree.MemberExpression{ object: %ESTree.Identifier{ name: "Symbol" }, property: %ESTree.Identifier{ name: "for" }} } ->
        item
      %ESTree.CallExpression{}->
-       JS.yield_expression(item, true)
+       item
      %ESTree.BinaryExpression{ left: %ESTree.CallExpression{} }->
-       JS.yield_expression(item, true)
+       item
      %ESTree.BinaryExpression{ right: %ESTree.CallExpression{} }->
-       JS.yield_expression(item, true)
+       item
      _ ->
        item
    end
+  end
+
+  defp make_gen_call(func, params) do
+    JS.call_expression(
+      JS.member_expression(
+        JS.member_expression(
+          JS.identifier("Elixir"),
+          JS.member_expression(
+            JS.identifier("Core"),
+            JS.identifier("Functions")
+          )
+        ),
+        JS.identifier("run")
+      ),
+      [func, JS.array_expression(params)]
+    )
   end
 
 end
