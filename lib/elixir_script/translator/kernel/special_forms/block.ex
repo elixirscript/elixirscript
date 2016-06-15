@@ -32,6 +32,14 @@ defmodule ElixirScript.Translator.Block do
   end
 
   defp make_gen_call(callee, func, params) do
+    context = case callee do
+                %ESTree.Identifier{ name: "console" } ->
+                  JS.identifier("console")
+                _ ->
+                  JS.identifier("null")
+              end
+
+
     JS.yield_expression(
       JS.call_expression(
         JS.member_expression(
@@ -50,7 +58,8 @@ defmodule ElixirScript.Translator.Block do
             JS.literal(func),
             true
           ),
-          JS.array_expression(params)
+          JS.array_expression(params),
+          context
         ]
       ),
       true

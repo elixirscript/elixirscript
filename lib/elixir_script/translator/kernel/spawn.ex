@@ -68,16 +68,12 @@ defmodule ElixirScript.Translator.Spawn do
         JS.identifier("get_global")
       ), [])
 
-
-    run_func = JS.member_expression(
+    functions_module = JS.member_expression(
+      JS.identifier("Elixir"),
       JS.member_expression(
-        JS.identifier("Elixir"),
-        JS.member_expression(
-          JS.identifier("Core"),
-          JS.identifier("Functions")
-        )
-      ),
-      JS.identifier("run")
+        JS.identifier("Core"),
+        JS.identifier("Functions")
+      )
     )
 
     {js, _} = Call.make_function_call(Translator.create_module_name(module, env), fun, args, env)
@@ -89,6 +85,13 @@ defmodule ElixirScript.Translator.Spawn do
       true
     )
 
+    context = case module do
+                %ESTree.Identifier{ name: "console" } ->
+                  JS.identifier("console")
+                _ ->
+                  JS.identifier("null")
+              end
+
     js_ast = JS.call_expression(
       JS.member_expression(
         JS.member_expression(
@@ -98,8 +101,9 @@ defmodule ElixirScript.Translator.Spawn do
         JS.identifier(spawn_func_name)
       ),
       [
-        run_func,
-        JS.array_expression([func_to_run, JS.array_expression(args)])
+        functions_module,
+        JS.literal("run"),
+        JS.array_expression([func_to_run, JS.array_expression(args), context])
       ]
     )
 
