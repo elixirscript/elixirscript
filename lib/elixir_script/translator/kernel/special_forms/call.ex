@@ -30,7 +30,7 @@ defmodule ElixirScript.Translator.Call do
   end
 
 
-  defp get_module_name_for_function(module_name, env) do
+  def get_module_name_for_function(module_name, env) do
     case module_name do
       {:__aliases__, _, name} ->
         module_name = Utils.quoted_to_name(name)

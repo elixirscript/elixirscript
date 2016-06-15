@@ -27,6 +27,7 @@ defmodule ElixirScript.Translator do
   alias ElixirScript.Translator.JS, as: JSLib
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator.Rewriter
+  alias ElixirScript.Translator.Spawn
 
   # A list of erlang modules. These are rewritten into equivalent
   # JavaScript functions using ElixirScript.Translator.Rewriter
@@ -430,19 +431,19 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:spawn, _, [{:fn, _, _} = func]}, env) do
-    #TODO: set in_process and set to original value before passing on
+    Spawn.make_spawn(func, env)
   end
 
   defp do_translate({:spawn, _, [module, function, params]}, env) do
-    #TODO: set in_process and set to original value before passing on
+    Spawn.make_spawn(module, function, params, env)
   end
 
   defp do_translate({:spawn_link, _, [{:fn, _, _} = func]}, env) do
-    #TODO: set in_process and set to original value before passing on
+    Spawn.make_spawn_link(func, env)
   end
 
   defp do_translate({:spawn_link, _, [module, function, params]}, env) do
-    #TODO: set in_process and set to original value before passing on
+    Spawn.make_spawn_link(module, function, params, env)
   end
 
   defp do_translate({:{}, _, elements}, env) do
