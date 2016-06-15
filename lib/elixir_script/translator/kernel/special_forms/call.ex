@@ -96,16 +96,21 @@ defmodule ElixirScript.Translator.Call do
   end
 
 
-  defp get_js_name([Elixir | _] = list, _) do
+  def get_js_name([Elixir | _] = list, _) do
     list
   end
 
-  defp get_js_name(module_name, env) when is_list(module_name) do
+  def get_js_name({:__aliases__, _, _} = name, env) do
+    Utils.quoted_to_name(name)
+    |> get_js_name(env)
+  end
+
+  def get_js_name(module_name, env) when is_list(module_name) do
     Utils.quoted_to_name({:__aliases__, [], module_name})
     |> get_js_name(env)
   end
 
-  defp get_js_name(module_name, env) do
+  def get_js_name(module_name, env) do
 
     cond do
       module_name in env.requires ->

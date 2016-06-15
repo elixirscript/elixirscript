@@ -18,12 +18,10 @@ defmodule ElixirScript.Translator.Block do
        item
      %ESTree.CallExpression{ callee: %ESTree.MemberExpression{ object: %ESTree.Identifier{ name: "Symbol" }, property: %ESTree.Identifier{ name: "for" }} } ->
        item
-     %ESTree.CallExpression{}->
-       JS.yield_expression(item, true)
-     %ESTree.BinaryExpression{ left: %ESTree.CallExpression{} }->
-       JS.yield_expression(item, true)
-     %ESTree.BinaryExpression{ right: %ESTree.CallExpression{} }->
-       JS.yield_expression(item, true)
+     %ESTree.CallExpression{ callee: %ESTree.MemberExpression{ object: object, property: %ESTree.Identifier{ name: name } }, arguments: arguments } ->
+       make_gen_call(object, name, arguments)
+     %ESTree.CallExpression{ callee: %ESTree.Identifier{ name: name }, arguments: arguments } ->
+       make_gen_call(name, arguments)
      _ ->
        item
    end
@@ -33,19 +31,52 @@ defmodule ElixirScript.Translator.Block do
     item
   end
 
-  defp make_gen_call(func, params) do
-    JS.call_expression(
-      JS.member_expression(
+  defp make_gen_call(callee, func, params) do
+    JS.yield_expression(
+      JS.call_expression(
         JS.member_expression(
-          JS.identifier("Elixir"),
           JS.member_expression(
-            JS.identifier("Core"),
-            JS.identifier("Functions")
-          )
+            JS.identifier("Elixir"),
+            JS.member_expression(
+              JS.identifier("Core"),
+              JS.identifier("Functions")
+            )
+          ),
+          JS.identifier("run")
         ),
-        JS.identifier("run")
+        [
+          JS.member_expression(
+            callee,
+            JS.literal(func),
+            true
+          ),
+          JS.array_expression(params)
+        ]
       ),
-      [func, JS.array_expression(params)]
+      true
+    )
+  end
+
+
+  defp make_gen_call(func, params) do
+    JS.yield_expression(
+      JS.call_expression(
+        JS.member_expression(
+          JS.member_expression(
+            JS.identifier("Elixir"),
+            JS.member_expression(
+              JS.identifier("Core"),
+              JS.identifier("Functions")
+            )
+          ),
+          JS.identifier("run")
+        ),
+        [
+          JS.identifier(func),
+          JS.array_expression(params)
+        ]
+      ),
+      true
     )
   end
 

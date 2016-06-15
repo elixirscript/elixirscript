@@ -575,7 +575,7 @@ defmodule ElixirScript.Translator do
   end
 
 
-  defp create_module_name(module_name, env) do
+  def create_module_name(module_name, env) do
     case module_name do
       {:__aliases__, _, _} ->
         candiate_module_name = Utils.quoted_to_name(module_name)
