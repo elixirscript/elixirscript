@@ -17,6 +17,7 @@ defmodule ElixirScript.Translator.LexicalScope do
     export_vars: [{atom, atom | non_neg_integer}] | nil,
     lexical_tracker: nil,
     caller: t | nil,
+    in_process: boolean,
     env: nil
   }
 
@@ -36,6 +37,7 @@ defmodule ElixirScript.Translator.LexicalScope do
     export_vars: nil,
     lexical_tracker: nil,
     caller: nil,
+    in_process: false,
     env: nil
   ]
 

@@ -3,7 +3,7 @@ import BitString from './bit_string';
 import Patterns from './patterns';
 import Protocol from './protocol';
 
-function* call_property(item, property){
+function call_property(item, property){
   let prop = null;
 
   if(typeof item === "number" || typeof item === "symbol" || typeof item === "boolean" || typeof item === "string"){
@@ -25,9 +25,9 @@ function* call_property(item, property){
   }
 
   if(item[prop] instanceof Function){
-    return yield* item[prop]();
+    return item[prop]();
   }else{
-    return yield item[prop];
+    return item[prop];
   }
 }
 
