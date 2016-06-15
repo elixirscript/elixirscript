@@ -49,7 +49,7 @@ export function defmatch(...cases: Array<Case>): Function {
       args = fillInOptionalValues(args, processedCase.arity, processedCase.optionals);
 
       if (processedCase.pattern(args, result) && processedCase.guard.apply(this, result)) {
-        return yield* processedCase.fn.apply(this, result);
+        return processedCase.fn.apply(this, result);
       }
     }
 
