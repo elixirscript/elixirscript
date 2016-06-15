@@ -426,8 +426,23 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:fn, _, clauses}, env) do
-    env = ElixirScript.Translator.LexicalScope.function_scope(env, nil)
     Function.make_anonymous_function(clauses, env)
+  end
+
+  defp do_translate({:spawn, _, [{:fn, _, _} = func]}, env) do
+    #TODO: set in_process and set to original value before passing on
+  end
+
+  defp do_translate({:spawn, _, [module, function, params]}, env) do
+    #TODO: set in_process and set to original value before passing on
+  end
+
+  defp do_translate({:spawn_link, _, [{:fn, _, _} = func]}, env) do
+    #TODO: set in_process and set to original value before passing on
+  end
+
+  defp do_translate({:spawn_link, _, [module, function, params]}, env) do
+    #TODO: set in_process and set to original value before passing on
   end
 
   defp do_translate({:{}, _, elements}, env) do
