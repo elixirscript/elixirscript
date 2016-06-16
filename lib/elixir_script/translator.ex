@@ -446,6 +446,16 @@ defmodule ElixirScript.Translator do
     Spawn.make_spawn_link(module, function, params, env)
   end
 
+  defp do_translate({:send, _, [id, msg]}, env) do
+    js = Spawn.call_processes_func("send", [translate!(id, env), translate!(msg, env)])
+    {js, env}
+  end
+
+  defp do_translate({:self, _, []}, env) do
+    js = Spawn.call_processes_func("pid", [])
+    {js, env}
+  end
+
   defp do_translate({:{}, _, elements}, env) do
     quoted = quote do
       JS.new(Elixir.Core.Tuple, unquote(elements))

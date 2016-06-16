@@ -14,36 +14,8 @@ defmodule ElixirScript.Translator.Spawn do
 
   defp do_spawn_with_fn({:fn, _, [{:->, _, [[], body]}]}, env, spawn_func_name) do
     { body, env } = Function.prepare_function_body(body, %{ env | in_process: true })
-
-    js_ast = JS.call_expression(
-      JS.member_expression(
-        JS.member_expression(
-          JS.identifier("Elixir"),
-          JS.member_expression(
-            JS.identifier("Core"),
-            JS.identifier("Functions")
-          )
-        ),
-        JS.identifier("get_global")
-      ),
-      []
-    )
-
-
-    js_ast = JS.call_expression(
-      JS.member_expression(
-        JS.member_expression(
-          js_ast,
-          JS.identifier("processes")
-        ),
-        JS.identifier(spawn_func_name)
-      ),
-      [
-        JS.function_expression([], [], JS.block_statement(body), true)
-      ]
-    )
-
-    { js_ast, env }
+    js = call_processes_func(spawn_func_name, [JS.function_expression([], [], JS.block_statement(body), true)])
+    { js, env }
   end
 
   def make_spawn(module, fun, args, env) do
@@ -55,19 +27,6 @@ defmodule ElixirScript.Translator.Spawn do
   end
 
   defp do_spawn_with_mod(module, fun, args, env, spawn_func_name) do
-
-    js_ast = JS.call_expression(
-      JS.member_expression(
-        JS.member_expression(
-          JS.identifier("Elixir"),
-          JS.member_expression(
-            JS.identifier("Core"),
-            JS.identifier("Functions")
-          )
-        ),
-        JS.identifier("get_global")
-      ), [])
-
     functions_module = JS.member_expression(
       JS.identifier("Elixir"),
       JS.member_expression(
@@ -92,24 +51,47 @@ defmodule ElixirScript.Translator.Spawn do
                   JS.identifier("null")
               end
 
+
+    js = call_processes_func(spawn_func_name, [
+          functions_module,
+          JS.literal("run"),
+          JS.array_expression([func_to_run, JS.array_expression(args), context])
+        ])
+
+    { js, env }
+  end
+
+
+
+  def call_processes_func(func_name, params) do
+    js_ast = JS.call_expression(
+      JS.member_expression(
+        JS.member_expression(
+          JS.identifier("Elixir"),
+          JS.member_expression(
+            JS.identifier("Core"),
+            JS.identifier("Functions")
+          )
+        ),
+        JS.identifier("get_global")
+      ),
+      []
+    )
+
+
     js_ast = JS.call_expression(
       JS.member_expression(
         JS.member_expression(
           js_ast,
           JS.identifier("processes")
         ),
-        JS.identifier(spawn_func_name)
+        JS.identifier(func_name)
       ),
-      [
-        functions_module,
-        JS.literal("run"),
-        JS.array_expression([func_to_run, JS.array_expression(args), context])
-      ]
+      params
     )
 
-    { js_ast, env }
-  end
 
+  end
 
 
 end
