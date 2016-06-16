@@ -28,6 +28,7 @@ defmodule ElixirScript.Translator do
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator.Rewriter
   alias ElixirScript.Translator.Spawn
+  alias ElixirScript.Translator.Receive
 
   # A list of erlang modules. These are rewritten into equivalent
   # JavaScript functions using ElixirScript.Translator.Rewriter
@@ -300,10 +301,6 @@ defmodule ElixirScript.Translator do
     With.make_with(args, env)
   end
 
-  defp do_translate({:receive, _, _ }, _ ) do
-    raise ElixirScript.Translator.UnsupportedError, "receive"
-  end
-
   defp do_translate({:super, _, _expressions }, _ ) do
     raise ElixirScript.Translator.UnsupportedError, "super"
   end
@@ -454,6 +451,14 @@ defmodule ElixirScript.Translator do
   defp do_translate({:self, _, []}, env) do
     js = Spawn.call_processes_func("pid", [])
     {js, env}
+  end
+
+  defp do_translate({:receive, _, _ }, %LexicalScope{ in_process: false}) do
+    raise ElixirScript.Translator.UnsupportedError, "receive outside of a process"
+  end
+
+  defp do_translate({:receive, _, [expressions] }, env) do
+    Receive.make_receive(expressions, env)
   end
 
   defp do_translate({:{}, _, elements}, env) do
