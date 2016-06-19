@@ -19,7 +19,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "erlang-processes": "^1.0.2"
+    "erlang-processes": "bryanjos/processes"
   },
   "devDependencies": {
     "babel": "^6.5.2",

@@ -12,6 +12,10 @@ defmodule ElixirScript.Translator.Spawn do
     do_spawn_with_fn(func, env, "spawn_link")
   end
 
+  def make_spawn_monitor(func, env) do
+    do_spawn_with_fn(func, env, "spawn_monitor")
+  end
+
   defp do_spawn_with_fn({:fn, _, [{:->, _, [[], body]}]}, env, spawn_func_name) do
     { body, env } = Function.prepare_function_body(body, %{ env | in_process: true })
     js = call_processes_func(spawn_func_name, [JS.function_expression([], [], JS.block_statement(body), true)])
@@ -24,6 +28,10 @@ defmodule ElixirScript.Translator.Spawn do
 
   def make_spawn_link(module, fun, args, env) do
     do_spawn_with_mod(module, fun, args, env, "spawn_link")
+  end
+
+  def make_spawn_monitor(module, fun, args, env) do
+    do_spawn_with_mod(module, fun, args, env, "spawn_monitor")
   end
 
   defp do_spawn_with_mod(module, fun, args, env, spawn_func_name) do
@@ -64,33 +72,19 @@ defmodule ElixirScript.Translator.Spawn do
 
 
   def call_processes_func(func_name, params) do
-    js_ast = JS.call_expression(
+    JS.call_expression(
       JS.member_expression(
         JS.member_expression(
           JS.identifier("Elixir"),
           JS.member_expression(
             JS.identifier("Core"),
-            JS.identifier("Functions")
+            JS.identifier("processes")
           )
-        ),
-        JS.identifier("get_global")
-      ),
-      []
-    )
-
-
-    js_ast = JS.call_expression(
-      JS.member_expression(
-        JS.member_expression(
-          js_ast,
-          JS.identifier("processes")
         ),
         JS.identifier(func_name)
       ),
       params
     )
-
-
   end
 
 

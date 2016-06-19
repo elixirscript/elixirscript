@@ -29,6 +29,7 @@ defmodule ElixirScript.Translator do
   alias ElixirScript.Translator.Rewriter
   alias ElixirScript.Translator.Spawn
   alias ElixirScript.Translator.Receive
+  alias ElixirScript.Translator.LexicalScope
 
   # A list of erlang modules. These are rewritten into equivalent
   # JavaScript functions using ElixirScript.Translator.Rewriter
@@ -441,6 +442,14 @@ defmodule ElixirScript.Translator do
 
   defp do_translate({:spawn_link, _, [module, function, params]}, env) do
     Spawn.make_spawn_link(module, function, params, env)
+  end
+
+  defp do_translate({:spawn_monitor, _, [{:fn, _, _} = func]}, env) do
+    Spawn.make_spawn_monitor(func, env)
+  end
+
+  defp do_translate({:spawn_monitor, _, [module, function, params]}, env) do
+    Spawn.make_spawn_monitor(module, function, params, env)
   end
 
   defp do_translate({:send, _, [id, msg]}, env) do
