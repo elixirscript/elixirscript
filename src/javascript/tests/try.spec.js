@@ -27,11 +27,11 @@ describe('try', () => {
 
     let value = SpecialForms._try(function() {
         return 1 / x;
-    }, null, null, Patterns.defmatch(Patterns.make_case([Patterns.variable()], function(y) {
+    }, null, null, Patterns.defmatch(Patterns.clause([Patterns.variable()], function(y) {
         return Symbol.for('small');
     }, function(y) {
         return (y < 1) && (y > -1);
-    }), Patterns.make_case([Patterns.wildcard()], function() {
+    }), Patterns.clause([Patterns.wildcard()], function() {
         return Symbol.for('large');
     })), null);
 

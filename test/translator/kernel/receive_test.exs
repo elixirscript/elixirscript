@@ -19,13 +19,13 @@ defmodule ElixirScript.Translator.Receive.Test do
     end
 
     js_code = """
-    Elixir.Core.Functions.get_global().processes.spawn(function*()    {
-    return     yield Elixir.Core.Functions.get_global().processes.receive(function(message)    {
-    return     Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Symbol.for('ok')],function()    {
+    Elixir.Core.processes.spawn(function*()    {
+    return     yield Elixir.Core.processes.receive(function(message)    {
+    return     Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Symbol.for('ok')],function()    {
     return     value;
-    }),Elixir.Core.Patterns.make_case([Symbol.for('error')],function()    {
+    }),Elixir.Core.Patterns.clause([Symbol.for('error')],function()    {
     return     value;
-    }),Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.wildcard()],function()    {
+    }),Elixir.Core.Patterns.clause([Elixir.Core.Patterns.wildcard()],function()    {
     return     yield* Elixir.Core.Functions.run(IO['puts'],['Unexpected message received'],null);
     })).call(this,message);
     });
@@ -54,16 +54,16 @@ defmodule ElixirScript.Translator.Receive.Test do
     end
 
     js_code = """
-    Elixir.Core.Functions.get_global().processes.spawn(function*()    {
-    return     yield Elixir.Core.Functions.get_global().processes.receive(function(message)    {
-    return     Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Symbol.for('ok')],function()    {
+    Elixir.Core.processes.spawn(function*()    {
+    return     yield Elixir.Core.processes.receive(function(message)    {
+    return     Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Symbol.for('ok')],function()    {
     return     value;
-    }),Elixir.Core.Patterns.make_case([Symbol.for('error')],function()    {
+    }),Elixir.Core.Patterns.clause([Symbol.for('error')],function()    {
     return     value;
-    }),Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.wildcard()],function()    {
+    }),Elixir.Core.Patterns.clause([Elixir.Core.Patterns.wildcard()],function()    {
     return     yield* Elixir.Core.Functions.run(IO['puts'],['Unexpected message received'],null);
     })).call(this,message);
-    },5000,Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([5000],function()    {
+    },5000,Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([5000],function()    {
     return     yield* Elixir.Core.Functions.run(IO['puts'],['No message in 5 seconds'],null);
     })));
     })

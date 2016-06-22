@@ -8,7 +8,7 @@ defmodule ElixirScript.Translator.Spawn.Test do
     end
 
     js_code = """
-    Elixir.Core.Functions.get_global().processes.spawn(function*() { return 1; })
+    Elixir.Core.processes.spawn(function*() { return 1; })
     """
 
     assert_translation(ex_ast, js_code)
@@ -23,7 +23,7 @@ defmodule ElixirScript.Translator.Spawn.Test do
     end
 
     js_code = """
-    Elixir.Core.Functions.get_global().processes.spawn(function*()    {
+    Elixir.Core.processes.spawn(function*()    {
     yield* Elixir.Core.Functions.run(Window['call'],[1],null)
     return     yield* Elixir.Core.Functions.run(Elixir$ElixirScript$Tuple['to_list'],[new Elixir.Core.Tuple(1,2,3)],null);
     })
@@ -39,7 +39,7 @@ defmodule ElixirScript.Translator.Spawn.Test do
     end
 
     js_code = """
-    Elixir.Core.Functions.get_global().processes.spawn(Elixir.Core.Functions,'run',[Elixir$ElixirScript$Tuple['to_list'], [new Elixir.Core.Tuple(1,2,3)], null])
+    Elixir.Core.processes.spawn(Elixir.Core.Functions,'run',[Elixir$ElixirScript$Tuple['to_list'], [new Elixir.Core.Tuple(1,2,3)], null])
     """
 
     assert_translation(ex_ast, js_code)
@@ -52,7 +52,7 @@ defmodule ElixirScript.Translator.Spawn.Test do
     end
 
     js_code = """
-    Elixir.Core.Functions.get_global().processes.spawn(Elixir.Core.Functions,'run',[Window['call'], [new Elixir.Core.Tuple(1,2,3)], null])
+    Elixir.Core.processes.spawn(Elixir.Core.Functions,'run',[Window['call'], [new Elixir.Core.Tuple(1,2,3)], null])
     """
 
     assert_translation(ex_ast, js_code)

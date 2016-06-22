@@ -1,4 +1,4 @@
-import { Integer, Float } from './primitives';
+import Core from '../core';
 
 //https://github.com/airportyh/protomorphism
 class Protocol{
@@ -16,10 +16,10 @@ class Protocol{
         let thing = args[0];
         let fun = null;
 
-        if(Number.isInteger(thing) && this.hasImplementation(Integer)){
-          fun = this.registry.get(Integer)[funName];
-        }else if(typeof thing === "number" && !Number.isInteger(thing) && this.hasImplementation(Float)){
-          fun = this.registry.get(Float)[funName];
+        if(Number.isInteger(thing) && this.hasImplementation(Core.Integer)){
+          fun = this.registry.get(Core.Integer)[funName];
+        }else if(typeof thing === "number" && !Number.isInteger(thing) && this.hasImplementation(Core.Float)){
+          fun = this.registry.get(Core.Float)[funName];
         }else if(this.hasImplementation(thing)){
           fun = this.registry.get(thing.constructor)[funName];
         }else if(this.fallback){
@@ -45,7 +45,7 @@ class Protocol{
   }
 
   hasImplementation(thing) {
-    if (thing === Integer || thing === Float){
+    if (thing === Core.Integer || thing === Core.Float){
       return this.registry.has(thing);
     }
 

@@ -1,7 +1,5 @@
-import { Tuple } from './primitives';
-import BitString from './bit_string';
-import Patterns from './patterns';
 import Protocol from './protocol';
+import Core from '../core';
 
 function call_property(item, property){
   let prop = null;
@@ -49,7 +47,7 @@ function apply(...args){
 
 function contains(left, right){
   for(let x of right){
-    if(Patterns.match_no_throw(left, x) != null){
+    if(Core.Patterns.match_or_default(left, x) != null){
       return true;
     }
   }
@@ -95,7 +93,7 @@ function defexception(defaults){
 
       this.name = this.constructor.name;
       this.message = message;
-      this[SpecialForms.atom("__exception__")] = true;
+      this[Symbol.for("__exception__")] = true;
       Error.captureStackTrace(this, this.constructor.name);
     }
 
@@ -204,7 +202,7 @@ function zip(list_of_lists){
       current_value.push(list_of_lists[j][i]);
     }
 
-    new_value.push(new Tuple(...current_value));
+    new_value.push(new Core.Tuple(...current_value));
   }
 
   return Object.freeze(new_value);
@@ -323,7 +321,7 @@ function reverse(list){
 
 function maps_find(key, map){
     if(key in get_object_keys(map)){
-        return new Tuple(Symbol.for("ok"), map[key]);
+        return new Core.Tuple(Symbol.for("ok"), map[key]);
     }else{
         return Symbol.for("error");
     }
@@ -333,7 +331,7 @@ function flatten(list, tail = []) {
   let new_list = [];
 
   for(let e of list){
-    if(isArray(e)){
+    if(Array.isArray(e)){
       new_list = new_list.concat(flatten(e));
     }else{
       new_list.push(e);
@@ -363,7 +361,7 @@ function mapfoldl(fun, acc, list){
   }
 
 
-  return new Tuple(Object.freeze(newlist), acc);
+  return new Core.Tuple(Object.freeze(newlist), acc);
 }
 
 function filtermap(fun, list){
@@ -374,7 +372,7 @@ function filtermap(fun, list){
 
     if(result === true){
       newlist.push(x);
-    }else if(result instanceof Tuple){
+    }else if(result instanceof Core.Tuple){
       newlist.push(result.get(1));
     }
   }

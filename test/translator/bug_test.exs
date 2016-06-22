@@ -10,7 +10,7 @@ defmodule ElixirScript.Translator.Bug.Test do
     end
 
     js_code = """
-      const test = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function(){
+      const test = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function(){
         return Symbol.for('atom');
       }));
     """
@@ -117,15 +117,15 @@ defmodule ElixirScript.Translator.Bug.Test do
 
 
     js_code = """
-     const getDispatcher = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
+     const getDispatcher = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function()    {
              return     DeLorean.Flux.createDispatcher(Object.freeze({
-             [Symbol.for('startPainting')]: Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
+             [Symbol.for('startPainting')]: Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function()    {
              return     this.dispatch('startPainting');
-           })),     [Symbol.for('stopPainting')]: Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
+           })),     [Symbol.for('stopPainting')]: Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function()    {
              return     this.dispatch('stopPainting');
-           })),     [Symbol.for('addPoint')]: Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(data)    {
+           })),     [Symbol.for('addPoint')]: Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Elixir.Core.Patterns.variable()],function(data)    {
              return     this.dispatch('addPoint',data);
-           })),     [Symbol.for('getStores')]: Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
+           })),     [Symbol.for('getStores')]: Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function()    {
              return     Object.freeze({
              [Symbol.for('graphic')]: GraphicStore
        });

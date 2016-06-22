@@ -50,7 +50,7 @@ defmodule ElixirScript.Translator.List.Test do
     end
 
     js_code = """
-    Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.wildcard()],function(){
+    Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Elixir.Core.Patterns.wildcard()],function(){
       return Object.freeze([x]).concat(list);
     }))
     """

@@ -249,6 +249,10 @@ defmodule ElixirScript.Translator.Rewriter do
     {:||, [], [left, right]}
   end
 
+  def rewrite({{:., _, [:erlang, :or]}, _, [left, right]}) do
+    {:||, [], [left, right]}
+  end
+
   def rewrite({{:., _, [:erlang, :andalso]}, _, [left, right]}) do
     {:&&, [], [left, right]}
   end

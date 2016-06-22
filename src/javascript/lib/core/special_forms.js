@@ -1,9 +1,7 @@
-import BitString from './bit_string';
-import Patterns from './patterns';
-import { Tuple } from './primitives';
+import Core from '../core';
 
 function _case(condition, clauses){
-  return Patterns.defmatch(...clauses)(condition);
+  return Core.Patterns.defmatch(...clauses)(condition);
 }
 
 function cond(clauses){
@@ -29,12 +27,12 @@ function _for(collections, fun, filter = () => true, into = [], previousValues =
   let collection = collections[0][1];
 
   if(collections.length === 1){
-    if(collection instanceof BitString){
+    if(collection instanceof Core.BitString){
       let bsSlice = collection.slice(0, pattern.byte_size());
       let i = 1;
 
       while(bsSlice.byte_size == pattern.byte_size()){
-        let r = Patterns.match_no_throw(pattern, bsSlice);
+        let r = Core.Patterns.match_or_default(pattern, bsSlice);
         let args = previousValues.concat(r);
 
         if(r && filter.apply(this, args)){
@@ -48,7 +46,7 @@ function _for(collections, fun, filter = () => true, into = [], previousValues =
       return into;
     }else{
       for(let elem of collection){
-        let r = Patterns.match_no_throw(pattern, elem);
+        let r = Core.Patterns.match_or_default(pattern, elem);
         let args = previousValues.concat(r);
 
         if(r && filter.apply(this, args)){
@@ -61,12 +59,12 @@ function _for(collections, fun, filter = () => true, into = [], previousValues =
   }else{
     let _into = [];
 
-    if(collection instanceof BitString){
+    if(collection instanceof Core.BitString){
       let bsSlice = collection.slice(0, pattern.byte_size());
       let i = 1;
 
       while(bsSlice.byte_size == pattern.byte_size()){
-        let r = Patterns.match_no_throw(pattern, bsSlice);
+        let r = Core.Patterns.match_or_default(pattern, bsSlice);
         if(r){
           _into = into.concat(this._for(collections.slice(1), fun, filter, _into, previousValues.concat(r)));
         }
@@ -76,11 +74,11 @@ function _for(collections, fun, filter = () => true, into = [], previousValues =
       }
     }else{
       for(let elem of collection){
-        let r = Patterns.match_no_throw(pattern, elem);
+        let r = Core.Patterns.match_or_default(pattern, elem);
         if(r){
           _into = into.concat(this._for(collections.slice(1), fun, filter, _into, previousValues.concat(r)));
         }
-      } 
+      }
     }
 
     return _into;
@@ -100,7 +98,7 @@ function _try(do_fun, rescue_function, catch_fun, else_function, after_function)
         ex_result = rescue_function(e);
         return ex_result;
       }catch(ex){
-        if(ex instanceof Patterns.MatchError){
+        if(ex instanceof Core.Patterns.MatchError){
           throw ex;
         }
       }
@@ -111,7 +109,7 @@ function _try(do_fun, rescue_function, catch_fun, else_function, after_function)
         ex_result = catch_fun(e);
         return ex_result;
       }catch(ex){
-        if(ex instanceof Patterns.MatchError){
+        if(ex instanceof Core.Patterns.MatchError){
           throw ex;
         }
       }
@@ -129,7 +127,7 @@ function _try(do_fun, rescue_function, catch_fun, else_function, after_function)
     try{
       return else_function(result);
     }catch(ex){
-        if(ex instanceof Patterns.MatchError){
+        if(ex instanceof Core.Patterns.MatchError){
           throw new Error("No Match Found in Else");
         }
 
@@ -151,7 +149,7 @@ function _with(...args){
 
       let result = func.apply(null, argsToPass);
 
-      let patternResult = Patterns.match_no_throw(pattern, result);
+      let patternResult = Core.Patterns.match_or_default(pattern, result);
 
       if(patternResult == null){
         return result;

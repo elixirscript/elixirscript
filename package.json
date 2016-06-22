@@ -1,6 +1,6 @@
 {
   "name": "elixirscript",
-  "version": "0.14.1",
+  "version": "0.21.0",
   "description": "Convert Elixir to JavaScript",
   "main": "elixir.js",
   "bin": {
@@ -19,7 +19,9 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "erlang-processes": "bryanjos/processes"
+    "erlang-types": "^1.0.0",
+    "erlang-processes": "bryanjos/processes",
+    "tailored": "bryanjos/tailored"
   },
   "devDependencies": {
     "babel": "^6.5.2",

@@ -8,7 +8,7 @@ defmodule ElixirScript.Translator.Send.Test do
     end
 
     js_code = """
-    Elixir.Core.Functions.get_global().processes.send(pid, 'hello')
+    Elixir.Core.processes.send(pid, 'hello')
     """
 
     assert_translation(ex_ast, js_code)
@@ -25,9 +25,9 @@ defmodule ElixirScript.Translator.Send.Test do
     end
 
     js_code = """
-    Elixir.Core.Functions.get_global().processes.spawn(function*()    {
-    let [inside] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),Elixir.Core.Functions.get_global().processes.pid());
-    return yield* Elixir.Core.Functions.run(Elixir.Core.Functions.get_global().processes['send'],[pid, 'hello'], null);
+    Elixir.Core.processes.spawn(function*()    {
+    let [inside] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),Elixir.Core.processes.pid());
+    return yield* Elixir.Core.Functions.run(Elixir.Core.processes['send'],[pid, 'hello'], null);
     })
     """
 

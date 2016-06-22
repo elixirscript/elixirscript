@@ -10,8 +10,6 @@ export default {
   plugins: [
     nodeResolve({ jsnext: true }),
     babel({
-      presets: ["react"],
-      plugins: ["transform-class-properties"],
       babelrc: false
     })
   ]

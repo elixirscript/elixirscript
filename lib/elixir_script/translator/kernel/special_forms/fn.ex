@@ -114,7 +114,7 @@ defmodule ElixirScript.Translator.Function do
     JS.call_expression(
       JS.member_expression(
         @patterns,
-        JS.identifier("make_case")
+        JS.identifier("clause")
       ),
       arguments
     )
