@@ -89,7 +89,7 @@ defmodule ElixirScript.Translator.Function.Test do
              return     Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Elixir.Core.Patterns.variable()],function(x)    {
              return     2;
            },function(x)    {
-             return     Elixir.Enum.member__qmark__(Object.freeze([false, null]),x);
+           return     (x === null) || (x === false);
            }),Elixir.Core.Patterns.clause([Elixir.Core.Patterns.wildcard()],function()    {
              return     1;
            })).call(this,1 == 1);
@@ -117,13 +117,13 @@ defmodule ElixirScript.Translator.Function.Test do
        return     Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Elixir.Core.Patterns.variable()],function(x)    {
        return     2;
      },function(x)    {
-       return     Elixir.Enum.member__qmark__(Object.freeze([false, null]),x);
+     return     (x === null) || (x === false);
      }),Elixir.Core.Patterns.clause([Elixir.Core.Patterns.wildcard()],function()    {
        return     Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Elixir.Core.Patterns.variable()],function(x)    {
        let [a] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),1);
        return     a;
      },function(x)    {
-       return     Elixir.Enum.member__qmark__(Object.freeze([false, null]),x);
+     return     (x === null) || (x === false);
      }),Elixir.Core.Patterns.clause([Elixir.Core.Patterns.wildcard()],function()    {
        return     4;
      })).call(this,2 == 2);
@@ -800,7 +800,7 @@ defmodule ElixirScript.Translator.Function.Test do
           return Symbol.for('error');
         },
         function(x) {
-          return Elixir.Enum.member__qmark__(Object.freeze([false, null]), x);
+        return (x === null) || (x === false);
         }),
         Elixir.Core.Patterns.clause([Elixir.Core.Patterns.wildcard()], function() {
             return null;
@@ -828,7 +828,7 @@ defmodule ElixirScript.Translator.Function.Test do
 
     js_code = """
     let [key] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),'test');
-    
+
     Elixir.Core.Patterns.defmatch(
       Elixir.Core.Patterns.clause(
         [Elixir.Core.Patterns.bound(key)],

@@ -22,7 +22,7 @@ defmodule ElixirScript.Translator.String.Test do
 
   test "translate string interpolation" do
     ex_ast = quote do: "Hello #{"world"}"
-    assert_translation(ex_ast, "'Hello ' + 'world'")
+    assert_translation(ex_ast, "'Hello ' + Elixir$ElixirScript$String$Chars.to_string('world')")
 
     ex_ast = quote do: "Hello #{length([])}"
     assert_translation(ex_ast, "'Hello ' + Elixir$ElixirScript$String$Chars.to_string(Elixir$ElixirScript$Kernel.length(Object.freeze([])))")

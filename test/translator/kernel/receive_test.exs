@@ -26,7 +26,7 @@ defmodule ElixirScript.Translator.Receive.Test do
     }),Elixir.Core.Patterns.clause([Symbol.for('error')],function()    {
     return     value;
     }),Elixir.Core.Patterns.clause([Elixir.Core.Patterns.wildcard()],function()    {
-    return     yield* Elixir.Core.Functions.run(IO['puts'],['Unexpected message received'],null);
+    return     IO.puts('Unexpected message received');
     })).call(this,message);
     });
     })
@@ -61,10 +61,10 @@ defmodule ElixirScript.Translator.Receive.Test do
     }),Elixir.Core.Patterns.clause([Symbol.for('error')],function()    {
     return     value;
     }),Elixir.Core.Patterns.clause([Elixir.Core.Patterns.wildcard()],function()    {
-    return     yield* Elixir.Core.Functions.run(IO['puts'],['Unexpected message received'],null);
+    return     IO.puts('Unexpected message received');
     })).call(this,message);
     },5000,Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([5000],function()    {
-    return     yield* Elixir.Core.Functions.run(IO['puts'],['No message in 5 seconds'],null);
+    return     IO.puts('No message in 5 seconds');
     })));
     })
     """

@@ -27,7 +27,7 @@ defmodule ElixirScript.Translator.Send.Test do
     js_code = """
     Elixir.Core.processes.spawn(function*()    {
     let [inside] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),Elixir.Core.processes.pid());
-    return yield* Elixir.Core.Functions.run(Elixir.Core.processes['send'],[pid, 'hello'], null);
+    return     yield* Elixir.Core.Functions.run(Elixir.Core.processes['send'],[pid, 'hello'],Elixir.Core.processes);
     })
     """
 

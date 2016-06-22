@@ -24,8 +24,8 @@ defmodule ElixirScript.Translator.Spawn.Test do
 
     js_code = """
     Elixir.Core.processes.spawn(function*()    {
-    yield* Elixir.Core.Functions.run(Window['call'],[1],null)
-    return     yield* Elixir.Core.Functions.run(Elixir$ElixirScript$Tuple['to_list'],[new Elixir.Core.Tuple(1,2,3)],null);
+    yield* Elixir.Core.Functions.run(Window['call'],[1],Window)
+    return     yield* Elixir.Core.Functions.run(Elixir$ElixirScript$Tuple['to_list'],[new Elixir.Core.Tuple(1,2,3)],Elixir$ElixirScript$Tuple);
     })
     """
 
