@@ -1,13 +1,14 @@
 defmodule ElixirScript.Agent do
 
   def start(fun) do
-    pid = JS.global().processes.spawn()
+    pid = Elixir.Core.processes.spawn(fn() -> end)
     Elixir.Core.processes.put(pid, "state", fun.());
     { :ok, pid }
   end
 
   def start(fun, options) do
-    pid = Elixir.Core.processes.spawn()
+    pid = Elixir.Core.processes.spawn(fn() ->
+    end)
 
     pid = if Elixir.Keyword.has_key?(options, :name) do
       Elixir.Core.processes.register(Elixir.Keyword.get(options, :name), pid)
