@@ -71,10 +71,10 @@ defmodule ElixirScript.Translator.State do
     Agent.update(__MODULE__, fn state ->
       proto = Map.get(state.modules, do_get_module_name(name, state))
 
-      if proto == nil do
-        proto = %ElixirScript.Module{ name: name, functions: functions, type: :protocol }
+      proto = if proto == nil do
+        %ElixirScript.Module{ name: name, functions: functions, type: :protocol }
       else
-        proto = %ElixirScript.Module{proto | functions: functions, type: :protocol }
+        %ElixirScript.Module{proto | functions: functions, type: :protocol }
       end
 
       do_add_module_to_state(state, proto)

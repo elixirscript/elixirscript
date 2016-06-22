@@ -28,7 +28,7 @@ defmodule Mix.Tasks.Elixirscript.Watch do
     elixirscript_config = get_elixirscript_config()
     input_path = Keyword.fetch!(elixirscript_config, :input)
     output_path = Keyword.fetch!(elixirscript_config, :output)
-    {:ok, pid} = ElixirScript.Watcher.start_link(input_path, %{ output: output_path })
+    {:ok, _} = ElixirScript.Watcher.start_link(input_path, %{ output: output_path })
 
     :timer.sleep :infinity
   end

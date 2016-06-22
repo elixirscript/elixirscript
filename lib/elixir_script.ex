@@ -216,9 +216,11 @@ defmodule ElixirScript do
   defp update_quoted(quoted) do
     Macro.prewalk(quoted, fn
     ({name, context, parms}) ->
-      if context[:import] == Kernel do
-        context = Keyword.update!(context, :import, fn(_) -> ElixirScript.Kernel end)
-      end
+      context = if context[:import] == Kernel do
+          context = Keyword.update!(context, :import, fn(_) -> ElixirScript.Kernel end)
+        else
+          context
+        end
 
       {name, context, parms}
     (x) ->

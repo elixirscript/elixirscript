@@ -16,28 +16,29 @@ defmodule ElixirScript.Translator.Try do
     translated_body = JS.block_statement(translated_body)
     try_block = JS.function_expression([], [], translated_body)
 
-    if rescue_block do
-      rescue_block = process_rescue_block(rescue_block, env)
+    rescue_block = if rescue_block do
+      process_rescue_block(rescue_block, env)
     else
-      rescue_block = JS.identifier(:null)
+      JS.identifier(:null)
     end
 
-    if catch_block do
-      catch_block = process_catch_block(catch_block, env)
+    catch_block = if catch_block do
+      process_catch_block(catch_block, env)
     else
-      catch_block = JS.identifier(:null)
+      JS.identifier(:null)
     end
 
-    if after_block do
-      after_block = process_after_block(after_block, env)
+    after_block = if after_block do
+      process_after_block(after_block, env)
     else
-      after_block = JS.identifier(:null)
+      JS.identifier(:null)
     end
 
-    if else_block do
-      { else_block, _ } = Function.make_anonymous_function(else_block, env)
+    else_block = if else_block do
+      Function.make_anonymous_function(else_block, env)
+      |> elem(0)
     else
-      else_block = JS.identifier(:null)
+      JS.identifier(:null)
     end
 
     js_ast = JS.call_expression(

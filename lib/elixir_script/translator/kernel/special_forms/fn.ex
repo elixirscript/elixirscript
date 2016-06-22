@@ -107,8 +107,10 @@ defmodule ElixirScript.Translator.Function do
             JS.function_expression(params, [], body),
           ]
 
-    if guard_body do
-      arguments = arguments ++ [JS.function_expression(params, [], guard_body)]
+    argument = if guard_body do
+      arguments ++ [JS.function_expression(params, [], guard_body)]
+    else
+      arguments
     end
 
     JS.call_expression(
