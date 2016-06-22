@@ -102,16 +102,20 @@ defmodule ElixirScript.Translator.Function do
   end
 
   def make_function_clause(patterns, params, body, guard_body) do
-    arguments = [
-            JS.array_expression(patterns),
-            JS.function_expression(params, [], body),
-          ]
+    arguments = case guard_body do
+                  nil ->
+                    [
+                      JS.array_expression(patterns),
+                      JS.function_expression(params, [], body)
+                    ]
+                  _ ->
+                    [
+                      JS.array_expression(patterns),
+                      JS.function_expression(params, [], body),
+                      JS.function_expression(params, [], guard_body)
+                    ]
+                end
 
-    argument = if guard_body do
-      arguments ++ [JS.function_expression(params, [], guard_body)]
-    else
-      arguments
-    end
 
     JS.call_expression(
       JS.member_expression(
