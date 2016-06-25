@@ -400,6 +400,10 @@ function maps_from_list(list){
   return Object.freeze(m);
 }
 
+function new_pid(){
+  return new Core.PID();
+}
+
 export default {
   call_property,
   run,

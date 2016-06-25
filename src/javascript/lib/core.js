@@ -3,6 +3,7 @@ import Patterns from 'tailored';
 import ErlangTypes from 'erlang-types';
 import Functions from './core/functions';
 import SpecialForms from './core/special_forms';
+import Store from './core/store';
 
 let processes = new Processes.ProcessSystem();
 
@@ -19,5 +20,6 @@ export default {
   Integer,
   Float,
   Functions,
-  SpecialForms
+  SpecialForms,
+  Store
 };
