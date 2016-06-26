@@ -44,6 +44,7 @@ defmodule ElixirScript do
   @external_resource stdlib_state_path = Path.join([__DIR__, "elixir_script", "translator", "stdlib_state.bin"])
   @stdlib_state File.read(stdlib_state_path)
   @lib_path Application.get_env(:elixir_script, :lib_path)
+  @version Mix.Project.config[:version]
 
   @doc """
   Compiles the given Elixir code string
@@ -120,7 +121,7 @@ defmodule ElixirScript do
   end
 
   defp get_compiler_cache(path, opts) do
-    if Map.get(opts, :full_build) or empty?(opts.output) do
+    if Map.get(opts, :full_build) or empty?(opts.output) or old_version?(opts) do
       Cache.delete(path)
       Cache.new(get_stdlib_state)
     else
@@ -147,6 +148,14 @@ defmodule ElixirScript do
   defp empty?(_) do
     true
   end
+
+  defp old_version?(opts) do
+    cache_version = Map.get(opts, :version, nil)
+    cache_version == version()
+  end
+
+  @doc false
+  def version(), do: @version
 
   @doc false
   def compile_std_lib() do

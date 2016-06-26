@@ -82,7 +82,8 @@ defmodule ElixirScript.Compiler.Cache do
     %{
       input_files: [],
       state: state,
-      full_build?: true
+      full_build?: true,
+      version: ElixirScript.version()
     }
   end
 
