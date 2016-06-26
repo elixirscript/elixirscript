@@ -17,7 +17,7 @@ defmodule ElixirScript.Translator.Spawn do
   end
 
   defp do_spawn_with_fn({:fn, _, [{:->, _, [[], body]}]}, env, spawn_func_name) do
-    { body, env } = Function.prepare_function_body(body, %{ env | in_process: true })
+    { body, _ } = Function.prepare_function_body(body, %{ env | in_process: true })
     js = call_processes_func(spawn_func_name, [JS.function_expression([], [], JS.block_statement(body), true)])
     { js, env }
   end
