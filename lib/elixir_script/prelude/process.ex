@@ -72,8 +72,12 @@ defmodule ElixirScript.Process do
     Elixir.Core.processes.list()
   end
 
-  def sleep(duration) do
+  def sleep(duration) when is_integer(duration) do
     Elixir.Core.processes.sleep(duration)
+  end
+
+  def sleep(:infinity) do
+    Elixir.Core.processes.sleep(:infinity)
   end
 
 end
