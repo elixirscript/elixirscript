@@ -48,6 +48,14 @@ defmodule ElixirScript.Process do
     Elixir.Core.processes.unlink(pid)
   end
 
+  def monitor(item) do
+    Elixir.Core.processes.monitor(item)
+  end
+
+  def demonitor(monitor_ref) do
+    Elixir.Core.processes.demonitor(monitor_ref)
+  end
+
   def register(pid, name) when is_atom(name) do
     Elixir.Core.processes.register(pid, name)
   end
