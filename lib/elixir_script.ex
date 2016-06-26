@@ -121,16 +121,24 @@ defmodule ElixirScript do
   end
 
   defp get_compiler_cache(path, opts) do
-    if Map.get(opts, :full_build) or empty?(opts.output) or old_version?(opts) do
+    refresh_cache = cond do
+      Map.get(opts, :full_build) ->
+        true
+      empty?(opts.output) ->
+        true
+      old_version?(opts) ->
+        true
+      Cache.get(path) == nil ->
+        true
+      true ->
+        false
+    end
+
+    if refresh_cache do
       Cache.delete(path)
       Cache.new(get_stdlib_state)
     else
-      case Cache.get(path) do
-        nil ->
-          Cache.new(get_stdlib_state)
-        x ->
-          %{ x | full_build?: false }
-      end
+      %{ Cache.get(path) | full_build?: false }
     end
   end
 
