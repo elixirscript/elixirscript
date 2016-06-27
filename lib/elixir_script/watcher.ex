@@ -13,6 +13,8 @@ defmodule ElixirScript.Watcher do
 
   def init(args) do
     {:ok, _} = Application.ensure_all_started(:elixir_script)
+    {:ok, _} = Application.ensure_all_started(:fs)
+
     :fs.subscribe()
     {:ok, args}
   end

@@ -29,8 +29,10 @@ defmodule ElixirScript.Translator.Capture do
 
     { _, _, name } = module_name
 
-    if name == [:Kernel] or name == [Elixir, :Kernel] do
-      name = [:ElixirScript, :Kernel]
+    name = if name == [:Kernel] or name == [Elixir, :Kernel] do
+      [:ElixirScript, :Kernel]
+    else
+      name
     end
 
     { func, _ } = Call.make_function_call({:__aliases__, [], name }, function_name, arity_params, env)

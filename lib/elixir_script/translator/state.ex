@@ -52,8 +52,7 @@ defmodule ElixirScript.Translator.State do
     |> Map.put(MapSet, ElixirScript.MapSet)
     |> Map.put(List, ElixirScript.List)
     |> Map.put(JS, ElixirScript.JS)
-    |> Map.put(VDom, ElixirScript.VDom)
-    |> Map.put(Html, ElixirScript.Html)
+    |> Map.put(Process, ElixirScript.Process)
   end
 
   def add_module(module) do
@@ -72,10 +71,10 @@ defmodule ElixirScript.Translator.State do
     Agent.update(__MODULE__, fn state ->
       proto = Map.get(state.modules, do_get_module_name(name, state))
 
-      if proto == nil do
-        proto = %ElixirScript.Module{ name: name, functions: functions, type: :protocol }
+      proto = if proto == nil do
+        %ElixirScript.Module{ name: name, functions: functions, type: :protocol }
       else
-        proto = %ElixirScript.Module{proto | functions: functions, type: :protocol }
+        %ElixirScript.Module{proto | functions: functions, type: :protocol }
       end
 
       do_add_module_to_state(state, proto)

@@ -33,10 +33,10 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     js_code = """
 
         import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
-         const something_else = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
+         const something_else = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function()    {
              return     null;
            }));
-         const something = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
+         const something = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function()    {
              return     ul;
            }));
          const ul = JQuery('#todo-list');
@@ -69,11 +69,11 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     js_code = """
     import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
     import Elixir$Animals$Elephant from './Elixir.Animals.Elephant';
-    const something_else = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
+    const something_else = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function()    {
       return     null;
     }));
 
-    const something = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
+    const something = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function()    {
       return     Elixir$Animals$Elephant.Elixir$Animals$Elephant.create(Object.freeze({}));
     }));
 
@@ -121,10 +121,10 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     js_code = """
     import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
     import Elixir$Animals$Elephant from './Elixir.Animals.Elephant';
-    const something_else = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
+    const something_else = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function()    {
         return     null;
       }));
-    const something = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
+    const something = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function()    {
         return     Elixir$Animals$Elephant.Elixir$Animals$Elephant.create(Object.freeze({}));
       }));
 
@@ -204,7 +204,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     export default {};
 
     import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
-    const oh_my = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
+    const oh_my = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function()    {
         return     null;
       }));
     Elixir.Core.Functions.call_property(Lions.Tigers.Bears,'oh_my');
@@ -240,11 +240,11 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     export default {};
 
     import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
-    const oh_my2 = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
+    const oh_my2 = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function()    {
       return     null;
     }));
 
-    const oh_my = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
+    const oh_my = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function()    {
       return     null;
     }));
 
@@ -280,11 +280,11 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     export default {};
 
     import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
-    const oh_my2 = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
+    const oh_my2 = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function()    {
       return     null;
     }));
 
-    const oh_my = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([],function()    {
+    const oh_my = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function()    {
       return     null;
     }));
 

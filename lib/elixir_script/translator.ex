@@ -27,6 +27,9 @@ defmodule ElixirScript.Translator do
   alias ElixirScript.Translator.JS, as: JSLib
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator.Rewriter
+  alias ElixirScript.Translator.Spawn
+  alias ElixirScript.Translator.Receive
+  alias ElixirScript.Translator.LexicalScope
 
   # A list of erlang modules. These are rewritten into equivalent
   # JavaScript functions using ElixirScript.Translator.Rewriter
@@ -75,13 +78,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate(ast, env) when is_atom(ast) do
-    str = Atom.to_string(ast)
-
-    quoted = quote do
-      Symbol.for(unquote(str))
-    end
-
-    translate(quoted, env)
+    { Primitive.make_atom(ast), env }
   end
 
   defp do_translate([ {:|, _, [left, right] } ], env) do
@@ -305,10 +302,6 @@ defmodule ElixirScript.Translator do
     With.make_with(args, env)
   end
 
-  defp do_translate({:receive, _, _ }, _ ) do
-    raise ElixirScript.Translator.UnsupportedError, "receive"
-  end
-
   defp do_translate({:super, _, _expressions }, _ ) do
     raise ElixirScript.Translator.UnsupportedError, "super"
   end
@@ -432,8 +425,49 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:fn, _, clauses}, env) do
-    env = ElixirScript.Translator.LexicalScope.function_scope(env, nil)
     Function.make_anonymous_function(clauses, env)
+  end
+
+  defp do_translate({:spawn, _, [{:fn, _, _} = func]}, env) do
+    Spawn.make_spawn(func, env)
+  end
+
+  defp do_translate({:spawn, _, [module, function, params]}, env) do
+    Spawn.make_spawn(module, function, params, env)
+  end
+
+  defp do_translate({:spawn_link, _, [{:fn, _, _} = func]}, env) do
+    Spawn.make_spawn_link(func, env)
+  end
+
+  defp do_translate({:spawn_link, _, [module, function, params]}, env) do
+    Spawn.make_spawn_link(module, function, params, env)
+  end
+
+  defp do_translate({:spawn_monitor, _, [{:fn, _, _} = func]}, env) do
+    Spawn.make_spawn_monitor(func, env)
+  end
+
+  defp do_translate({:spawn_monitor, _, [module, function, params]}, env) do
+    Spawn.make_spawn_monitor(module, function, params, env)
+  end
+
+  defp do_translate({:send, _, [id, msg]}, env) do
+    js = Spawn.call_processes_func("send", [translate!(id, env), translate!(msg, env)])
+    {js, env}
+  end
+
+  defp do_translate({:self, _, []}, env) do
+    js = Spawn.call_processes_func("pid", [])
+    {js, env}
+  end
+
+  defp do_translate({:receive, _, _ }, %LexicalScope{ in_process: false}) do
+    raise ElixirScript.Translator.UnsupportedError, "receive outside of a process"
+  end
+
+  defp do_translate({:receive, _, [expressions] }, env) do
+    Receive.make_receive(expressions, env)
   end
 
   defp do_translate({:{}, _, elements}, env) do
@@ -565,7 +599,7 @@ defmodule ElixirScript.Translator do
   end
 
 
-  defp create_module_name(module_name, env) do
+  def create_module_name(module_name, env) do
     case module_name do
       {:__aliases__, _, _} ->
         candiate_module_name = Utils.quoted_to_name(module_name)

@@ -44,6 +44,7 @@ defmodule ElixirScript do
   @external_resource stdlib_state_path = Path.join([__DIR__, "elixir_script", "translator", "stdlib_state.bin"])
   @stdlib_state File.read(stdlib_state_path)
   @lib_path Application.get_env(:elixir_script, :lib_path)
+  @version Mix.Project.config[:version]
 
   @doc """
   Compiles the given Elixir code string
@@ -120,16 +121,24 @@ defmodule ElixirScript do
   end
 
   defp get_compiler_cache(path, opts) do
-    if Map.get(opts, :full_build) or empty?(opts.output) do
+    refresh_cache = cond do
+      Map.get(opts, :full_build) ->
+        true
+      empty?(opts.output) ->
+        true
+      old_version?(opts) ->
+        true
+      Cache.get(path) == nil ->
+        true
+      true ->
+        false
+    end
+
+    if refresh_cache do
       Cache.delete(path)
       Cache.new(get_stdlib_state)
     else
-      case Cache.get(path) do
-        nil ->
-          Cache.new(get_stdlib_state)
-        x ->
-          %{ x | full_build?: false }
-      end
+      %{ Cache.get(path) | full_build?: false }
     end
   end
 
@@ -147,6 +156,14 @@ defmodule ElixirScript do
   defp empty?(_) do
     true
   end
+
+  defp old_version?(opts) do
+    cache_version = Map.get(opts, :version, nil)
+    cache_version == version()
+  end
+
+  @doc false
+  def version(), do: @version
 
   @doc false
   def compile_std_lib() do
@@ -216,9 +233,11 @@ defmodule ElixirScript do
   defp update_quoted(quoted) do
     Macro.prewalk(quoted, fn
     ({name, context, parms}) ->
-      if context[:import] == Kernel do
-        context = Keyword.update!(context, :import, fn(_) -> ElixirScript.Kernel end)
-      end
+      context = if context[:import] == Kernel do
+          context = Keyword.update!(context, :import, fn(_) -> ElixirScript.Kernel end)
+        else
+          context
+        end
 
       {name, context, parms}
     (x) ->

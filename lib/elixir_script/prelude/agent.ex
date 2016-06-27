@@ -1,42 +1,50 @@
 defmodule ElixirScript.Agent do
 
-  def start(fun) do
-    pid = JS.global().processes.spawn()
-    JS.global().processes.put(pid, "state", fun.());
-    { :ok, pid }
-  end
-
-  def start(fun, options) do
-    pid = JS.global().processes.spawn()
+  def start(fun, options \\ []) do
+    pid = spawn(fn() -> Process.sleep(:infinity) end)
 
     if Elixir.Keyword.has_key?(options, :name) do
-      pid = JS.global().processes.register(Elixir.Keyword.get(options, :name), pid)
+      Process.register(pid, Elixir.Keyword.get(options, :name))
     end
 
-    JS.global().processes.put(pid, "state", fun.())
+    Elixir.Core.Store.create(pid, fun.())
     { :ok, pid }
   end
 
-  def stop(view) do
-    JS.global().processes.exit(view)
+  def start_link(fun, options \\ []) do
+    pid = spawn_link(fn() -> Process.sleep(:infinity) end)
+
+    if Elixir.Keyword.has_key?(options, :name) do
+      Process.register(pid, Elixir.Keyword.get(options, :name))
+    end
+
+    Elixir.Core.Store.create(pid, fun.())
+    { :ok, pid }
+  end
+
+  def stop(agent) do
+    Process.exit(agent)
     :ok
   end
 
   def update(agent, fun) do
-    current_state = JS.global().processes.get(agent, "state")
-    JS.global().processes.put(agent, "state", fun.(current_state));
+    pid = Elixir.Core.processes.pidof(agent)
+    current_state = Elixir.Core.Store.read(pid)
+    Elixir.Core.Store.update(pid, fun.(current_state))
     :ok
   end
 
   def get(agent, fun) do
-    current_state = JS.global().processes.get(agent, "state")
+    pid = Elixir.Core.processes.pidof(agent)
+    current_state = Elixir.Core.Store.read(pid)
     fun.(current_state)
   end
 
   def get_and_update(agent, fun) do
-    current_state = JS.global().processes.get(agent, "state")
+    pid = Elixir.Core.processes.pidof(agent)
+    current_state = Elixir.Core.Store.read(pid)
     {val, new_state} = fun.(current_state)
-    JS.global().processes.put(agent, "state", new_state);
+    Elixir.Core.Store.update(pid, new_state)
     val
   end
 

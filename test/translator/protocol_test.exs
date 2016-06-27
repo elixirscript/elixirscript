@@ -36,11 +36,11 @@ defmodule ElixirScript.Translator.Defprotocol.Test do
          export default Elixir$Blank;
 
          import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
-         const blank__qmark__ = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([false],function()    {
+         const blank__qmark__ = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([false],function()    {
              return     true;
-           }),Elixir.Core.Patterns.make_case([null],function()    {
+           }),Elixir.Core.Patterns.clause([null],function()    {
              return     true;
-           }),Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.wildcard()],function()    {
+           }),Elixir.Core.Patterns.clause([Elixir.Core.Patterns.wildcard()],function()    {
              return     false;
            }));
          export default {
@@ -50,7 +50,7 @@ defmodule ElixirScript.Translator.Defprotocol.Test do
        };
 
          import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
-         const blank__qmark__ = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.variable()],function(number)    {
+         const blank__qmark__ = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Elixir.Core.Patterns.variable()],function(number)    {
              return     false;
            }));
          export default {
@@ -60,9 +60,9 @@ defmodule ElixirScript.Translator.Defprotocol.Test do
        };
 
          import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
-         const blank__qmark__ = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.make_case([Object.freeze([])],function()    {
+         const blank__qmark__ = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Object.freeze([])],function()    {
              return     true;
-           }),Elixir.Core.Patterns.make_case([Elixir.Core.Patterns.wildcard()],function()    {
+           }),Elixir.Core.Patterns.clause([Elixir.Core.Patterns.wildcard()],function()    {
              return     false;
            }));
          export default {

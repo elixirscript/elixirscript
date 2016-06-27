@@ -13,12 +13,12 @@ describe('case', () => {
 
   it('case', () => {
     let clauses = [
-      Patterns.make_case(
+      Patterns.clause(
         [new Tuple(Symbol.for("selector"), Patterns.variable(), Patterns.variable())],
         function(i, value){ return value; },
         function(i){ return Kernel.is_integer(i); }
       ),
-      Patterns.make_case(
+      Patterns.clause(
         [Patterns.variable()],
         function(value){ return value; }
       )

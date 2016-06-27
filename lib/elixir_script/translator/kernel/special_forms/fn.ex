@@ -4,6 +4,7 @@ defmodule ElixirScript.Translator.Function do
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Group
   alias ElixirScript.Translator.PatternMatching
+  alias ElixirScript.Translator.Block
 
   @patterns JS.member_expression(
     JS.member_expression(
@@ -63,7 +64,7 @@ defmodule ElixirScript.Translator.Function do
 
     if guards do
       { guard_body, _ } = hd(List.wrap(guards))
-      |> prepare_function_body(env)
+      |> prepare_function_body(%{ env | context: :guard})
 
       guard_body = JS.block_statement(guard_body)
       make_function_clause(patterns, params, body, guard_body)
@@ -101,19 +102,25 @@ defmodule ElixirScript.Translator.Function do
   end
 
   def make_function_clause(patterns, params, body, guard_body) do
-    arguments = [
-            JS.array_expression(patterns),
-            JS.function_expression(params, [], body),
-          ]
+    arguments = case guard_body do
+                  nil ->
+                    [
+                      JS.array_expression(patterns),
+                      JS.function_expression(params, [], body)
+                    ]
+                  _ ->
+                    [
+                      JS.array_expression(patterns),
+                      JS.function_expression(params, [], body),
+                      JS.function_expression(params, [], guard_body)
+                    ]
+                end
 
-    if guard_body do
-      arguments = arguments ++ [JS.function_expression(params, [], guard_body)]
-    end
 
     JS.call_expression(
       JS.member_expression(
         @patterns,
-        JS.identifier("make_case")
+        JS.identifier("clause")
       ),
       arguments
     )
@@ -138,6 +145,7 @@ defmodule ElixirScript.Translator.Function do
     end
 
     list = Group.inflate_groups(list)
+    |> Enum.map(fn(x) -> Block.process_call(x, env) end)
     |> return_last_expression
 
     { list, env }
@@ -159,6 +167,8 @@ defmodule ElixirScript.Translator.Function do
     last_item = List.last(list)
 
     last_item = case last_item do
+      %ESTree.YieldExpression{} ->
+        JS.return_statement(last_item)
       %ESTree.Literal{} ->
         JS.return_statement(last_item)
       %ESTree.Identifier{} ->
@@ -181,11 +191,11 @@ defmodule ElixirScript.Translator.Function do
       %ESTree.BlockStatement{} ->
         last_item = %ESTree.BlockStatement{ last_item | body: return_last_expression(last_item.body) }
       _ ->
-        if String.contains?(last_item.type, "Expression") do
-          JS.return_statement(last_item)
-        else
-          [last_item, JS.return_statement(JS.literal(nil))]
-        end
+                    if String.contains?(last_item.type, "Expression") do
+                        JS.return_statement(last_item)
+                    else
+                      [last_item, JS.return_statement(JS.literal(nil))]
+                    end
     end
 
 

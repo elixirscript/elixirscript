@@ -37,6 +37,16 @@ defmodule ElixirScript.Translator.Primitive do
     )
   end
 
+  def make_atom(ast) when is_atom(ast) do
+    JS.call_expression(
+      JS.member_expression(
+        JS.identifier("Symbol"),
+        JS.identifier("for")
+      ),
+      [JS.literal(ast)]
+    )
+  end
+
   def make_literal(ast) when is_number(ast) or is_binary(ast) or is_boolean(ast) or is_nil(ast) do
     JS.literal(ast)
   end
@@ -60,8 +70,8 @@ defmodule ElixirScript.Translator.Primitive do
   def do_make_list(ast) do
     JS.call_expression(
       JS.member_expression(
-        JS.identifier(:Object),
-        JS.identifier(:freeze)
+        JS.identifier("Object"),
+        JS.identifier("freeze")
       ),
       [JS.array_expression(ast)]
     )

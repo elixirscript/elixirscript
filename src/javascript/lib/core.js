@@ -1,20 +1,25 @@
-import ProcessSystem from './core/processes/process_system';
-import { Tuple, PID, Integer, Float } from './core/primitives';
-import BitString from './core/bit_string';
-import Patterns from './core/patterns';
+import Processes from 'erlang-processes';
+import Patterns from 'tailored';
+import ErlangTypes from 'erlang-types';
 import Functions from './core/functions';
 import SpecialForms from './core/special_forms';
+import Store from './core/store';
 
-Functions.get_global().processes = Functions.get_global().processes || new ProcessSystem();
+let processes = new Processes.ProcessSystem();
+
+class Integer {}
+class Float {}
 
 export default {
-  ProcessSystem,
-  Tuple,
-  PID,
-  BitString,
+  ProcessSystem: Processes.ProcessSystem,
+  processes: processes,
+  Tuple: ErlangTypes.Tuple,
+  PID: ErlangTypes.PID,
+  BitString: ErlangTypes.BitString,
   Patterns,
   Integer,
   Float,
   Functions,
-  SpecialForms
-}
+  SpecialForms,
+  Store
+};
