@@ -156,6 +156,10 @@ defmodule ElixirScript.Kernel do
     term === nil
   end
 
+  def make_ref() do
+    Elixir.Core.processes.make_ref()
+  end
+
   defmacro match?(left, right) do
     quote do
       case unquote(right) do

@@ -68,6 +68,10 @@ defmodule ElixirScript.Process do
     Elixir.Core.processes.whereis(name)
   end
 
+  def unregister(name) do
+    Elixir.Core.processes.unregister(name)
+  end
+
   def list() do
     Elixir.Core.processes.list()
   end
@@ -80,4 +84,7 @@ defmodule ElixirScript.Process do
     Elixir.Core.processes.sleep(:infinity)
   end
 
+  def send(dest, msg, _) do
+    Elixir.Core.processes.send(dest, msg)
+  end
 end

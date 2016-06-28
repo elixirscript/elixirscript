@@ -457,6 +457,11 @@ defmodule ElixirScript.Translator do
     {js, env}
   end
 
+  defp do_translate({:send, _, [id, msg, _]}, env) do
+    js = Spawn.call_processes_func("send", [translate!(id, env), translate!(msg, env)])
+    {js, env}
+  end
+
   defp do_translate({:self, _, []}, env) do
     js = Spawn.call_processes_func("pid", [])
     {js, env}

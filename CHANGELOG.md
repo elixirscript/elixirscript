@@ -1,4 +1,37 @@
 # v0.21.0-dev
+* Enhancements
+  * This is the first release with early support for processes in elixirscript. Creating a process only works currently using `spawn/1`, `spawn_link/1`, and `spawn_monitor/1`. Inside of a process, you can use functions such as `send` and `receive`, along with some defined in the `Process` module. From outside of a process, you can send messages to a process, but you cannot receive a message from a process. Eventually all code will run inside processes and this restriction will naturally lift.
+  * The `Process` module has been implemented with the following functions:
+    * `alive?/1`
+    * `delete/1`
+    * `demonitor/1`
+    * `exit/2`
+    * `flag/2`
+    * `flag/3`
+    * `get/0`
+    * `get_keys/0`
+    * `get_keys/1`
+    * `link/1`
+    * `list/0`
+    * `monitor/1`
+    * `put/2`
+    * `register/2`
+    * `registered/0`
+    * `send/3`
+    * `sleep/1`
+    * `unlink/1`
+    * `unregister/1`
+    * `whereis/1`
+  * The `receive` special form has been implemented with the above caveat
+  * The following have been implemented on `Kernel`:
+    * `spawn/1`
+    * `spawn_link/1`
+    * `spawn_monitor/1`
+    * `send/2`
+    * `make_ref/0`
+
+
+
 * Fixed
   * Scoping on `fn` and `def`
 
