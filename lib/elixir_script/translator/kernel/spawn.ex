@@ -1,4 +1,6 @@
 defmodule ElixirScript.Translator.Spawn do
+  @moduledoc false
+
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Function
