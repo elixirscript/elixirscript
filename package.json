@@ -20,8 +20,8 @@
   "license": "MIT",
   "dependencies": {
     "erlang-types": "^1.0.0",
-    "erlang-processes": "bryanjos/processes",
-    "tailored": "bryanjos/tailored"
+    "erlang-processes": "^2.0.0",
+    "tailored": "^2.0.0"
   },
   "devDependencies": {
     "babel": "^6.5.2",
