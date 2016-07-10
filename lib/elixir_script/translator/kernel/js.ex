@@ -3,6 +3,7 @@ defmodule ElixirScript.Translator.JS do
 
   alias ESTree.Tools.Builder
   alias ElixirScript.Translator
+  alias ElixirScript.Translator.Identifier
   alias ElixirScript.ModuleSystems
 
   @doc false
@@ -10,20 +11,105 @@ defmodule ElixirScript.Translator.JS do
     { do_translate({name, [], params}, env), env }
   end
 
-  defp do_translate({:typeof, _, [param]}, env) do
+  defp do_translate({op, _, [param]}, env) when op in [:typeof, :delete, :void, :-, :+, :!, :"~"] do
     Builder.unary_expression(
-      :typeof,
+      op,
       true,
       Translator.translate!(param, env)
     )
   end
 
-
-  defp do_translate({:instanceof, _, [value, type]}, env) do
+  defp do_translate({op, _, [value, type]}, env) when op in [:"**", :==, :!=, :===, :!==, :<, :<=, :>, :>=, :"<<", :">>", :<<<, :+, :-, :*, :/, :%, :|, :^, :&, :in, :instanceof] do
     Builder.binary_expression(
-      :instanceof,
+      op,
       Translator.translate!(value, env),
       Translator.translate!(type, env)
+    )
+  end
+
+  defp do_translate({op, _, [value, type]}, env) when op in [:||, :&&] do
+    Builder.logical_expression(
+      op,
+      Translator.translate!(value, env),
+      Translator.translate!(type, env)
+    )
+  end
+
+  defp do_translate({:function, _, [{name, _, params}, [do: body]]}, env) when is_list(params) do
+    make_function(name, params, body, env, [])
+  end
+
+  defp do_translate({:function, _, params}, env) do
+    [do: body] = List.last(params)
+    params = Enum.reverse(params) |> tl |> Enum.reverse
+
+    make_function(nil, params, body, env, [])
+  end
+
+  defp do_translate({:generator, _, [{name, _, params}, [do: body]]}, env) when is_list(params) do
+    make_function(name, params, body, env, generator: true)
+  end
+
+  defp do_translate({:generator, _, params}, env) do
+    [do: body] = List.last(params)
+    params = Enum.reverse(params) |> tl |> Enum.reverse
+
+    make_function(nil, params, body, env, generator: true)
+  end
+
+  defp do_translate({:async, _, [{name, _, params}, [do: body]]}, env) when is_list(params) do
+    make_function(name, params, body, env, async: true)
+  end
+
+  defp do_translate({:async, _, params}, env) do
+    [do: body] = List.last(params)
+    params = Enum.reverse(params) |> tl |> Enum.reverse
+
+    make_function(nil, params, body, env, async: true)
+  end
+
+  defp make_function(nil, params, body, env, opts) do
+    env = ElixirScript.Translator.LexicalScope.function_scope(env, {nil, length(params)})
+    {block, env} = ElixirScript.Translator.Function.prepare_function_body(body, env)
+
+    Builder.function_expression(
+      Enum.map(params, &Translator.translate!(&1, env)),
+      [],
+      Builder.block_statement(block),
+      opts[:generator] || false,
+      false,
+      opts[:async] || false
+    )
+  end
+
+  defp make_function(name, params, body, env, opts) do
+    env = ElixirScript.Translator.LexicalScope.function_scope(env, {name, length(params)})
+    {block, env} = ElixirScript.Translator.Function.prepare_function_body(body, env)
+
+    Builder.function_declaration(
+      Identifier.make_identifier(name),
+      Enum.map(params, &Translator.translate!(&1, env)),
+      [],
+      Builder.block_statement(block),
+      opts[:generator] || false,
+      false,
+      opts[:async] || false
+    )
+  end
+
+  defp do_translate({:yield, _, []}, env) do
+    Builder.yield_expression()
+  end
+
+  defp do_translate({:yield, _, [term]}, env) do
+    Builder.yield_expression(
+      Translator.translate!(term, env)
+    )
+  end
+
+  defp do_translate({:await, _, [term]}, env) do
+    Builder.await_expression(
+      Translator.translate!(term, env)
     )
   end
 
