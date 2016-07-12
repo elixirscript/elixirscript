@@ -53,6 +53,8 @@ defmodule ElixirScript.Translator do
     :on_definition, :on_load, :dialyzer, :vsn, :external_resource
   ]
 
+  @function_types [:def, :defp]
+
   @doc """
   Translates the given Elixir AST to JavaScript AST. The given `env` is a `ElixirScript.Macro.Env`
   used to track the variables, imports, aliases, and scopes like `Macro.Env`. The JavaScript AST and
@@ -487,15 +489,15 @@ defmodule ElixirScript.Translator do
     Match.make_match(left, right, env)
   end
 
-  defp do_translate({function, _, [{:when, _, [{name, _, _params} | _guards] }, _] } = ast, env) when function in [:def, :defp] do
+  defp do_translate({function, _, [{:when, _, [{name, _, _params} | _guards] }, _] } = ast, env) when function in @function_types do
     Def.process_function(name, [ast], env)
   end
 
-  defp do_translate({function, _, [{name, _, params}, _]} = ast, env) when function in [:def, :defp] and is_atom(params) do
+  defp do_translate({function, _, [{name, _, params}, _]} = ast, env) when function in @function_types and is_atom(params) do
     Def.process_function(name, [ast], env)
   end
 
-  defp do_translate({function, _, [{name, _, _params}, _]} = ast, env) when function in [:def, :defp] do
+  defp do_translate({function, _, [{name, _, _params}, _]} = ast, env) when function in @function_types do
     Def.process_function(name, [ast], env)
   end
 

@@ -8,6 +8,9 @@ defmodule ElixirScript.Translator.ModuleCollector do
   alias ElixirScript.Translator.State
   alias ElixirScript.Translator.Utils
 
+  @function_types [:def, :defp]
+
+
   def process_modules(modules) do
     Enum.map(modules, fn
       { :__block__, _, list } ->
@@ -189,30 +192,30 @@ defmodule ElixirScript.Translator.ModuleCollector do
 
   defp get_functions_from_module({:__block__, _, list}) do
     Enum.reduce(list, %{ def: Keyword.new, defp: Keyword.new }, fn
-    ({type, _, [{:when, _, [{name, _, params} | _guards] }, _] }, state) when type in [:def, :defp] and is_atom(params) ->
+      ({type, _, [{:when, _, [{name, _, params} | _guards] }, _] }, state) when type in @function_types and is_atom(params) ->
       arity = 0
 
       add_function_to_map(state, type, name, arity)
 
-    ({type, _, [{:when, _, [{name, _, params} | _guards] }, _] }, state) when type in [:def, :defp] ->
+      ({type, _, [{:when, _, [{name, _, params} | _guards] }, _] }, state) when type in @function_types ->
       arity = if is_nil(params), do: 0, else: length(params)
 
       add_function_to_map(state, type, name, arity)
 
-    ({type, _, [{name, _, params}, _]}, state) when type in [:def, :defp] and is_atom(params) ->
+      ({type, _, [{name, _, params}, _]}, state) when type in @function_types and is_atom(params) ->
       arity = 0
 
       add_function_to_map(state, type, name, arity)
 
-    ({type, _, [{name, _, params}, _]}, state) when type in [:def, :defp] ->
+      ({type, _, [{name, _, params}, _]}, state) when type in @function_types ->
       arity = if is_nil(params), do: 0, else: length(params)
         add_function_to_map(state, type, name, arity)
 
-    ({type, _, [{name, _, params}]}, state) when is_atom(params) and type in [:def, :defp] ->
+      ({type, _, [{name, _, params}]}, state) when is_atom(params) and type in @function_types ->
       arity = 0
       add_function_to_map(state, type, name, arity)
 
-    ({type, _, [{name, _, params}]}, state) when type in [:def, :defp] ->
+      ({type, _, [{name, _, params}]}, state) when type in @function_types ->
       arity = length(params)
       add_function_to_map(state, type, name, arity)
 

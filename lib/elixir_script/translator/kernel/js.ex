@@ -35,37 +35,17 @@ defmodule ElixirScript.Translator.JS do
     )
   end
 
-  defp do_translate({:function, _, [{name, _, params}, [do: body]]}, env) when is_list(params) do
-    make_function(name, params, body, env, [])
+  defp do_translate({type, _, [{name, _, params}, [do: body]]}, env) when is_list(params) and type in [:generator, :function, :async]  do
+    make_function(name, params, body, env, Keyword.new([{type, true}]))
   end
 
-  defp do_translate({:function, _, params}, env) do
-    [do: body] = List.last(params)
-    params = Enum.reverse(params) |> tl |> Enum.reverse
-
-    make_function(nil, params, body, env, [])
+  defp do_translate({type, _, [[do: body]]}, env) when type in [:generator, :function, :async] do
+    make_function(nil, [], body, env, Keyword.new([{type, true}]))
   end
 
-  defp do_translate({:generator, _, [{name, _, params}, [do: body]]}, env) when is_list(params) do
-    make_function(name, params, body, env, generator: true)
-  end
-
-  defp do_translate({:generator, _, params}, env) do
-    [do: body] = List.last(params)
-    params = Enum.reverse(params) |> tl |> Enum.reverse
-
-    make_function(nil, params, body, env, generator: true)
-  end
-
-  defp do_translate({:async, _, [{name, _, params}, [do: body]]}, env) when is_list(params) do
-    make_function(name, params, body, env, async: true)
-  end
-
-  defp do_translate({:async, _, params}, env) do
-    [do: body] = List.last(params)
-    params = Enum.reverse(params) |> tl |> Enum.reverse
-
-    make_function(nil, params, body, env, async: true)
+  defp do_translate({type, _, params}, env) when type in [:generator, :function, :async] do
+     [[do: body] | params] = Enum.reverse(params)
+     make_function(nil, Enum.reverse(params), body, env, Keyword.new([{type, true}]))
   end
 
   defp make_function(nil, params, body, env, opts) do
