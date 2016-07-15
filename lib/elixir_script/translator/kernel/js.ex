@@ -6,8 +6,6 @@ defmodule ElixirScript.Translator.JS do
   alias ElixirScript.Translator.Identifier
   alias ElixirScript.ModuleSystems
 
-  @js_function_types [:generator, :function, :async]
-
   @doc false
   def translate_js_function(name, params, env) do
     { do_translate({name, [], params}, env), env }
@@ -37,62 +35,20 @@ defmodule ElixirScript.Translator.JS do
     )
   end
 
-  defp do_translate({type, _, [{name, _, params}, [do: body]]}, env) when is_list(params) and type in @js_function_types do
-    make_function(name, params, body, env, Keyword.new([{type, true}]))
-  end
-
-  defp do_translate({type, _, [[do: body]]}, env) when type in @js_function_types do
-    make_function(nil, [], body, env, Keyword.new([{type, true}]))
-  end
-
-  defp do_translate({type, _, params}, env) when type in @js_function_types do
-     [[do: body] | params] = Enum.reverse(params)
-     make_function(nil, Enum.reverse(params), body, env, Keyword.new([{type, true}]))
-  end
-
-  defp make_function(nil, params, body, env, opts) do
-    env = ElixirScript.Translator.LexicalScope.function_scope(env, {nil, length(params)})
-    {block, env} = ElixirScript.Translator.Function.prepare_function_body(body, env)
-
-    Builder.function_expression(
-      Enum.map(params, &Translator.translate!(&1, env)),
-      [],
-      Builder.block_statement(block),
-      opts[:generator] || false,
-      false,
-      opts[:async] || false
-    )
-  end
-
-  defp make_function(name, params, body, env, opts) do
-    env = ElixirScript.Translator.LexicalScope.function_scope(env, {name, length(params)})
-    {block, env} = ElixirScript.Translator.Function.prepare_function_body(body, env)
-
-    Builder.function_declaration(
-      Identifier.make_identifier(name),
-      Enum.map(params, &Translator.translate!(&1, env)),
-      [],
-      Builder.block_statement(block),
-      opts[:generator] || false,
-      false,
-      opts[:async] || false
-    )
-  end
-
   defp do_translate({:yield, _, []}, env) do
     Builder.yield_expression()
   end
 
   defp do_translate({:yield, _, [term]}, env) do
     Builder.yield_expression(
-      Translator.translate!(term, env),
-      true
+      Translator.translate!(term, env)
     )
   end
 
-  defp do_translate({:await, _, [term]}, env) do
-    Builder.await_expression(
-      Translator.translate!(term, env)
+  defp do_translate({:yield_all, _, [term]}, env) do
+    Builder.yield_expression(
+      Translator.translate!(term, env),
+      true
     )
   end
 
