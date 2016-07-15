@@ -6,6 +6,8 @@ defmodule ElixirScript.Translator.JS do
   alias ElixirScript.Translator.Identifier
   alias ElixirScript.ModuleSystems
 
+  @js_function_types [:generator, :function, :async]
+
   @doc false
   def translate_js_function(name, params, env) do
     { do_translate({name, [], params}, env), env }
@@ -35,15 +37,15 @@ defmodule ElixirScript.Translator.JS do
     )
   end
 
-  defp do_translate({type, _, [{name, _, params}, [do: body]]}, env) when is_list(params) and type in [:generator, :function, :async]  do
+  defp do_translate({type, _, [{name, _, params}, [do: body]]}, env) when is_list(params) and type in @js_function_types do
     make_function(name, params, body, env, Keyword.new([{type, true}]))
   end
 
-  defp do_translate({type, _, [[do: body]]}, env) when type in [:generator, :function, :async] do
+  defp do_translate({type, _, [[do: body]]}, env) when type in @js_function_types do
     make_function(nil, [], body, env, Keyword.new([{type, true}]))
   end
 
-  defp do_translate({type, _, params}, env) when type in [:generator, :function, :async] do
+  defp do_translate({type, _, params}, env) when type in @js_function_types do
      [[do: body] | params] = Enum.reverse(params)
      make_function(nil, Enum.reverse(params), body, env, Keyword.new([{type, true}]))
   end
@@ -83,7 +85,8 @@ defmodule ElixirScript.Translator.JS do
 
   defp do_translate({:yield, _, [term]}, env) do
     Builder.yield_expression(
-      Translator.translate!(term, env)
+      Translator.translate!(term, env),
+      true
     )
   end
 
