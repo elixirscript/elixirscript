@@ -35,7 +35,7 @@ defmodule ElixirScript.Translator.Function do
         process_function_body(params, [], env, name)
     end)
 
-    { make_defmatch(clauses), env }
+    { make_defmatch(clauses, env.context == :generator), env }
   end
 
   def convert_to_try([do: body]) do
@@ -46,7 +46,17 @@ defmodule ElixirScript.Translator.Function do
     { :__block__, [], [{ :try, [], [function_kw_list] }] }
   end
 
-  def make_defmatch(clauses) do
+  def make_defmatch(clauses, true) do
+    JS.call_expression(
+      JS.member_expression(
+        @patterns,
+        JS.identifier("defmatchgen")
+      ),
+      clauses
+    )
+  end
+
+  def make_defmatch(clauses, _) do
     JS.call_expression(
       JS.member_expression(
         @patterns,
@@ -67,9 +77,9 @@ defmodule ElixirScript.Translator.Function do
       |> prepare_function_body(%{ env | context: :guard})
 
       guard_body = JS.block_statement(guard_body)
-      make_function_clause(patterns, params, body, guard_body)
+      make_function_clause(patterns, params, body, guard_body, env.context == :generator)
     else
-      make_function_clause(patterns, params, body, nil)
+      make_function_clause(patterns, params, body, nil, env.context == :generator)
     end
   end
 
@@ -101,17 +111,17 @@ defmodule ElixirScript.Translator.Function do
     { patterns, make_params(params), env }
   end
 
-  def make_function_clause(patterns, params, body, guard_body) do
+  def make_function_clause(patterns, params, body, guard_body, is_generator?) do
     arguments = case guard_body do
                   nil ->
                     [
                       JS.array_expression(patterns),
-                      JS.function_expression(params, [], body)
+                      JS.function_expression(params, [], body, is_generator?)
                     ]
                   _ ->
                     [
                       JS.array_expression(patterns),
-                      JS.function_expression(params, [], body),
+                      JS.function_expression(params, [], body, is_generator?),
                       JS.function_expression(params, [], guard_body)
                     ]
                 end

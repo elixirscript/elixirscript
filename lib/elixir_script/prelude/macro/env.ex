@@ -4,7 +4,7 @@ defmodule ElixirScript.Macro.Env do
     file: binary,
     line: non_neg_integer,
     function: { atom, non_neg_integer } | nil,
-    context: :match | :guard | nil,
+    context: :match | :guard | :generator | nil,
     aliases: [{atom, atom}],
     requires: [atom],
     functions: [{atom, [{ atom, non_neg_integer }]}],

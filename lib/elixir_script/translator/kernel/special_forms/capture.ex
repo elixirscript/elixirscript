@@ -19,7 +19,7 @@ defmodule ElixirScript.Translator.Capture do
       )
     ])
 
-    make_capture_function(patterns, params, body)
+    make_capture_function(patterns, params, body, env)
   end
 
   def make_capture(module_name, function_name, arity, env) do
@@ -43,7 +43,7 @@ defmodule ElixirScript.Translator.Capture do
       )
     ])
 
-    make_capture_function(patterns, params, body)
+    make_capture_function(patterns, params, body, env)
   end
 
   defp process_params(arity, env) do
@@ -51,10 +51,12 @@ defmodule ElixirScript.Translator.Capture do
     PatternMatching.process_match(params, env)
   end
 
-  defp make_capture_function(patterns, params, body) do
+  defp make_capture_function(patterns, params, body, env) do
+    is_generator? = env.context == :generator
     Function.make_defmatch([
-      Function.make_function_clause(patterns, params, body, nil)
-    ])
+      Function.make_function_clause(patterns, params, body, nil, is_generator?)
+    ],
+      is_generator?)
   end
 
   def find_value_placeholders(ast) do
