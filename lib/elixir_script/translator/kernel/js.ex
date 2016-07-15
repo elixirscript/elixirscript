@@ -3,6 +3,7 @@ defmodule ElixirScript.Translator.JS do
 
   alias ESTree.Tools.Builder
   alias ElixirScript.Translator
+  alias ElixirScript.Translator.Identifier
   alias ElixirScript.ModuleSystems
 
   @doc false
@@ -10,20 +11,44 @@ defmodule ElixirScript.Translator.JS do
     { do_translate({name, [], params}, env), env }
   end
 
-  defp do_translate({:typeof, _, [param]}, env) do
+  defp do_translate({op, _, [param]}, env) when op in [:typeof, :delete, :void, :-, :+, :!, :"~"] do
     Builder.unary_expression(
-      :typeof,
+      op,
       true,
       Translator.translate!(param, env)
     )
   end
 
-
-  defp do_translate({:instanceof, _, [value, type]}, env) do
+  defp do_translate({op, _, [value, type]}, env) when op in [:"**", :==, :!=, :===, :!==, :<, :<=, :>, :>=, :"<<", :">>", :<<<, :+, :-, :*, :/, :%, :|, :^, :&, :in, :instanceof] do
     Builder.binary_expression(
-      :instanceof,
+      op,
       Translator.translate!(value, env),
       Translator.translate!(type, env)
+    )
+  end
+
+  defp do_translate({op, _, [value, type]}, env) when op in [:||, :&&] do
+    Builder.logical_expression(
+      op,
+      Translator.translate!(value, env),
+      Translator.translate!(type, env)
+    )
+  end
+
+  defp do_translate({:yield, _, []}, env) do
+    Builder.yield_expression()
+  end
+
+  defp do_translate({:yield, _, [term]}, env) do
+    Builder.yield_expression(
+      Translator.translate!(term, env)
+    )
+  end
+
+  defp do_translate({:yield_all, _, [term]}, env) do
+    Builder.yield_expression(
+      Translator.translate!(term, env),
+      true
     )
   end
 
