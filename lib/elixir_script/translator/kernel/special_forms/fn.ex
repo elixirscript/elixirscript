@@ -155,7 +155,6 @@ defmodule ElixirScript.Translator.Function do
     end
 
     list = Group.inflate_groups(list)
-    |> Enum.map(fn(x) -> Block.process_call(x, env) end)
     |> return_last_expression
 
     { list, env }

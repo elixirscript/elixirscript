@@ -79,7 +79,7 @@ defmodule ElixirScript.Translator.Defmodule do
 
   def extract_functions_from_module({:__block__, meta, body_list}) do
     { body_list, functions } = Enum.map_reduce(body_list,
-      %{exported: HashDict.new(), private: HashDict.new()}, fn
+      %{exported: HashDict.new(), private: HashDict.new(), exported_generators: HashDict.new(), private_generators: HashDict.new()}, fn
         ({:def, _, [{:when, _, [{name, _, _} | _guards] }, _] } = function, state) ->
           {
             nil,
@@ -99,6 +99,26 @@ defmodule ElixirScript.Translator.Defmodule do
           {
             nil,
             %{ state | private: HashDict.put(state.private, name, HashDict.get(state.private, name, []) ++ [function]) }
+          }
+        ({:defgen, _, [{:when, _, [{name, _, _} | _guards] }, _] } = function, state) ->
+          {
+            nil,
+            %{ state | exported_generators: HashDict.put(state.exported_generators, name, HashDict.get(state.exported_generators, name, []) ++ [function]) }
+          }
+        ({:defgen, _, [{name, _, _}, _]} = function, state) ->
+          {
+            nil,
+            %{ state | exported_generators: HashDict.put(state.exported_generators, name, HashDict.get(state.exported_generators, name, []) ++ [function]) }
+          }
+        ({:defgenp, _, [{:when, _, [{name, _, _} | _guards] }, _] } = function, state) ->
+          {
+            nil,
+            %{ state | private_generators: HashDict.put(state.private_generators, name, HashDict.get(state.private_generators, name, []) ++ [function]) }
+          }
+        ({:defgenp, _, [{name, _, _}, _]} = function, state) ->
+          {
+            nil,
+            %{ state | private_generators: HashDict.put(state.private_generators, name, HashDict.get(state.private_generators, name, []) ++ [function]) }
           }
         (x, state) ->
           { x, state }
@@ -161,11 +181,18 @@ defmodule ElixirScript.Translator.Defmodule do
     end
   end
 
-  def process_functions(%{ exported: exported, private: private }, env) do
+  def process_functions(%{ exported: exported, private: private, exported_generators: exported_generators, private_generators: private_generators }, env) do
     exported_functions = Enum.map(Dict.keys(exported), fn(key) ->
       functions = Dict.get(exported, key)
 
       { functions, _ } = Def.process_function(key, functions, env)
+      { key, functions }
+    end)
+
+    exported_generators = Enum.map(Dict.keys(exported_generators), fn(key) ->
+      functions = Dict.get(exported_generators, key)
+
+      { functions, _ } = Def.process_function(key, functions, %{ env | context: :generator})
       { key, functions }
     end)
 
@@ -175,7 +202,13 @@ defmodule ElixirScript.Translator.Defmodule do
       { key, functions }
     end)
 
-    { exported_functions, private_functions }
+    private_generators = Enum.map(Dict.keys(private_generators), fn(key) ->
+      functions = Dict.get(private_generators, key)
+      { functions, _ } = Def.process_function(key, functions, %{ env | context: :generator})
+      { key, functions }
+    end)
+
+    { exported_functions ++ exported_generators, private_functions ++ private_generators }
   end
 
   def make_attribute(name, value, env) do

@@ -7,19 +7,19 @@ defmodule ElixirScript.Translator.Spawn do
   alias ElixirScript.Translator.Call
 
   def make_spawn(func, env) do
-    do_spawn_with_fn(func, env, "spawn")
+    do_spawn_with_gn(func, env, "spawn")
   end
 
   def make_spawn_link(func, env) do
-    do_spawn_with_fn(func, env, "spawn_link")
+    do_spawn_with_gn(func, env, "spawn_link")
   end
 
   def make_spawn_monitor(func, env) do
-    do_spawn_with_fn(func, env, "spawn_monitor")
+    do_spawn_with_gn(func, env, "spawn_monitor")
   end
 
-  defp do_spawn_with_fn({:fn, _, [{:->, _, [[], body]}]}, env, spawn_func_name) do
-    { body, _ } = Function.prepare_function_body(body, %{ env | in_process: true })
+  defp do_spawn_with_gn({:fn, _, [{:->, _, [[], body]}]}, env, spawn_func_name) do
+    { body, _ } = Function.prepare_function_body(body, env)
     js = call_processes_func(spawn_func_name, [JS.function_expression([], [], JS.block_statement(body), true)])
     { js, env }
   end

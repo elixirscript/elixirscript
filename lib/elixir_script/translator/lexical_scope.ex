@@ -6,7 +6,7 @@ defmodule ElixirScript.Translator.LexicalScope do
     file: binary,
     line: non_neg_integer,
     function: { atom, non_neg_integer } | nil,
-    context: :match | :guard | nil,
+    context: :match | :guard | :generator | nil,
     aliases: [{atom, atom}],
     requires: [atom],
     functions: [{atom, [{ atom, non_neg_integer }]}],
@@ -17,7 +17,6 @@ defmodule ElixirScript.Translator.LexicalScope do
     export_vars: [{atom, atom | non_neg_integer}] | nil,
     lexical_tracker: nil,
     caller: t | nil,
-    in_process: boolean,
     env: nil
   }
 
@@ -37,7 +36,6 @@ defmodule ElixirScript.Translator.LexicalScope do
     export_vars: nil,
     lexical_tracker: nil,
     caller: nil,
-    in_process: false,
     env: nil
   ]
 

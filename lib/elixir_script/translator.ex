@@ -53,7 +53,9 @@ defmodule ElixirScript.Translator do
     :on_definition, :on_load, :dialyzer, :vsn, :external_resource
   ]
 
-  @function_types [:def, :defp]
+  @function_types [:def, :defp, :defgen, :defgenp]
+  @generator_types [:defgen, :defgenp]
+
 
   @doc """
   Translates the given Elixir AST to JavaScript AST. The given `env` is a `ElixirScript.Macro.Env`
@@ -105,6 +107,30 @@ defmodule ElixirScript.Translator do
 
   defp do_translate({operator, _, [value]}, env) when operator in [:-, :!, :+] do
     Expression.make_unary_expression(operator, value, env)
+  end
+
+  defp do_translate({:yield, _, []}, env) do
+    quoted = quote do
+      JS.yield
+    end
+
+    translate(quoted, env)
+  end
+
+  defp do_translate({:yield, _, [term]}, env) do
+    quoted = quote do
+      JS.yield unquote(term)
+    end
+
+    translate(quoted, env)
+  end
+
+  defp do_translate({:yield_all, _, [term]}, env) do
+    quoted = quote do
+      JS.yield_all unquote(term)
+    end
+
+    translate(quoted, env)
   end
 
   defp do_translate({:not, _, [value]}, env) do
@@ -430,8 +456,12 @@ defmodule ElixirScript.Translator do
     Function.make_anonymous_function(clauses, env)
   end
 
+  defp do_translate({:gn, _, clauses}, env) do
+    Function.make_anonymous_function(clauses, %{ env | context: :generator})
+  end
+
   defp do_translate({:spawn, _, [{:fn, _, _} = func]}, env) do
-    Spawn.make_spawn(func, env)
+    Spawn.make_spawn(func, %{ env | context: :generator})
   end
 
   defp do_translate({:spawn, _, [module, function, params]}, env) do
@@ -439,7 +469,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:spawn_link, _, [{:fn, _, _} = func]}, env) do
-    Spawn.make_spawn_link(func, env)
+    Spawn.make_spawn_link(func, %{ env | context: :generator})
   end
 
   defp do_translate({:spawn_link, _, [module, function, params]}, env) do
@@ -447,7 +477,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:spawn_monitor, _, [{:fn, _, _} = func]}, env) do
-    Spawn.make_spawn_monitor(func, env)
+    Spawn.make_spawn_monitor(func, %{ env | context: :generator})
   end
 
   defp do_translate({:spawn_monitor, _, [module, function, params]}, env) do
@@ -469,10 +499,6 @@ defmodule ElixirScript.Translator do
     {js, env}
   end
 
-  defp do_translate({:receive, _, _ }, %LexicalScope{ in_process: false}) do
-    raise ElixirScript.Translator.UnsupportedError, "receive outside of a process"
-  end
-
   defp do_translate({:receive, _, [expressions] }, env) do
     Receive.make_receive(expressions, env)
   end
@@ -487,6 +513,18 @@ defmodule ElixirScript.Translator do
 
   defp do_translate({:=, _, [left, right]}, env) do
     Match.make_match(left, right, env)
+  end
+
+  defp do_translate({function, _, [{:when, _, [{name, _, _params} | _guards] }, _] } = ast, env) when function in @generator_types do
+    Def.process_function(name, [ast], %{ env | context: :generator})
+  end
+
+  defp do_translate({function, _, [{name, _, params}, _]} = ast, env) when function in @generator_types and is_atom(params) do
+    Def.process_function(name, [ast], %{ env | context: :generator})
+  end
+
+  defp do_translate({function, _, [{name, _, _params}, _]} = ast, env) when function in @generator_types do
+    Def.process_function(name, [ast], %{ env | context: :generator})
   end
 
   defp do_translate({function, _, [{:when, _, [{name, _, _params} | _guards] }, _] } = ast, env) when function in @function_types do

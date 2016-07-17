@@ -8,7 +8,7 @@ defmodule ElixirScript.Translator.ModuleCollector do
   alias ElixirScript.Translator.State
   alias ElixirScript.Translator.Utils
 
-  @function_types [:def, :defp]
+  @function_types [:def, :defp, :defgen, :defgenp]
 
 
   def process_modules(modules) do
@@ -141,11 +141,11 @@ defmodule ElixirScript.Translator.ModuleCollector do
         body
            end
 
-    %{def: functions, defp: private_functions } = get_functions_from_module(body)
+    %{def: functions, defp: private_functions, defgen: generators, defgenp: private_generators } = get_functions_from_module(body)
     js_imports = get_js_imports_from_module(body)
 
     %ElixirScript.Module{ name: Utils.quoted_to_name({:__aliases__, [], name}) , body: body,
-    functions: functions, private_functions: private_functions, js_imports: js_imports }
+    functions: functions ++ generators, private_functions: private_functions ++ private_generators, js_imports: js_imports }
   end
 
   def handle_use_expression(using_ast, module) do
@@ -191,7 +191,7 @@ defmodule ElixirScript.Translator.ModuleCollector do
   end
 
   defp get_functions_from_module({:__block__, _, list}) do
-    Enum.reduce(list, %{ def: Keyword.new, defp: Keyword.new }, fn
+    Enum.reduce(list, %{ def: Keyword.new, defp: Keyword.new, defgen: Keyword.new, defgenp: Keyword.new }, fn
       ({type, _, [{:when, _, [{name, _, params} | _guards] }, _] }, state) when type in @function_types and is_atom(params) ->
       arity = 0
 
