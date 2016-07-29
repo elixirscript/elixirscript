@@ -108,30 +108,6 @@ defmodule ElixirScript.Translator do
     Expression.make_unary_expression(operator, value, env)
   end
 
-  defp do_translate({:yield, _, []}, env) do
-    quoted = quote do
-      JS.yield
-    end
-
-    translate(quoted, env)
-  end
-
-  defp do_translate({:yield, _, [term]}, env) do
-    quoted = quote do
-      JS.yield unquote(term)
-    end
-
-    translate(quoted, env)
-  end
-
-  defp do_translate({:yield_all, _, [term]}, env) do
-    quoted = quote do
-      JS.yield_all unquote(term)
-    end
-
-    translate(quoted, env)
-  end
-
   defp do_translate({:not, _, [value]}, env) do
     Expression.make_unary_expression(:!, value, env)
   end
