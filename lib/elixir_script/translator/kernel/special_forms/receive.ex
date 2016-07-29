@@ -3,14 +3,13 @@ defmodule ElixirScript.Translator.Receive do
 
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
-  alias ElixirScript.Translator.Spawn
   alias ElixirScript.Translator.Primitive
   alias ElixirScript.Translator.LexicalScope
 
   def make_receive([do: clauses], env) do
     {made_case, _} = ElixirScript.Translator.Case.make_case({:__aliases__, [], [:message]}, clauses, env)
 
-      js = Spawn.call_processes_func("receive", [
+      js = call_processes_func("receive", [
             JS.function_expression(
               [JS.identifier(:message)],
               [],
@@ -30,7 +29,7 @@ defmodule ElixirScript.Translator.Receive do
     {anon_func, _} = ElixirScript.Translator.Function.make_anonymous_function(after_clause, env)
 
 
-      js = Spawn.call_processes_func("receive", [
+      js = call_processes_func("receive", [
             JS.function_expression(
               [JS.identifier(:message)],
               [],
@@ -45,6 +44,22 @@ defmodule ElixirScript.Translator.Receive do
       ])
 
       {js, env}
+  end
+
+  def call_processes_func(func_name, params) do
+    JS.call_expression(
+      JS.member_expression(
+        JS.member_expression(
+          JS.identifier("Elixir"),
+          JS.member_expression(
+            JS.identifier("Core"),
+            JS.identifier("processes")
+          )
+        ),
+        JS.identifier(func_name)
+      ),
+      params
+    )
   end
 
 end

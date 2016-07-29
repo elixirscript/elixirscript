@@ -45,7 +45,7 @@ defmodule ElixirScript.Translator.JS do
     )
   end
 
-  defp do_translate({:yield_all, _, [term]}, env) do
+  defp do_translate({:yield_to, _, [term]}, env) do
     Builder.yield_expression(
       Translator.translate!(term, env),
       true

@@ -5,7 +5,6 @@ defmodule ElixirScript.Translator.Receive.Test do
 
   test "translate receive without after in process" do
     ex_ast = quote do
-      spawn(fn() ->
         receive do
           :ok ->
             value
@@ -14,13 +13,11 @@ defmodule ElixirScript.Translator.Receive.Test do
           _ ->
             IO.puts "Unexpected message received"
         end
-      end)
 
     end
 
     js_code = """
-    Elixir.Core.processes.spawn(function*()    {
-    return     yield Elixir.Core.processes.receive(function(message)    {
+    Elixir.Core.processes.receive(function(message)    {
     return     Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Symbol.for('ok')],function()    {
     return     value;
     }),Elixir.Core.Patterns.clause([Symbol.for('error')],function()    {
@@ -28,7 +25,6 @@ defmodule ElixirScript.Translator.Receive.Test do
     }),Elixir.Core.Patterns.clause([Elixir.Core.Patterns.wildcard()],function()    {
     return     IO.puts('Unexpected message received');
     })).call(this,message);
-    });
     })
     """
 
@@ -37,8 +33,6 @@ defmodule ElixirScript.Translator.Receive.Test do
 
   test "translate receive with after in process" do
     ex_ast = quote do
-
-      spawn(fn() ->
         receive do
           :ok ->
             value
@@ -50,12 +44,10 @@ defmodule ElixirScript.Translator.Receive.Test do
           5000 ->
             IO.puts "No message in 5 seconds"
         end
-      end)
     end
 
     js_code = """
-    Elixir.Core.processes.spawn(function*()    {
-    return     yield Elixir.Core.processes.receive(function(message)    {
+    Elixir.Core.processes.receive(function(message)    {
     return     Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Symbol.for('ok')],function()    {
     return     value;
     }),Elixir.Core.Patterns.clause([Symbol.for('error')],function()    {
@@ -65,8 +57,7 @@ defmodule ElixirScript.Translator.Receive.Test do
     })).call(this,message);
     },5000,Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([5000],function()    {
     return     IO.puts('No message in 5 seconds');
-    })));
-    })
+    })))
     """
 
     assert_translation(ex_ast, js_code)

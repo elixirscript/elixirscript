@@ -27,7 +27,6 @@ defmodule ElixirScript.Translator do
   alias ElixirScript.Translator.JS, as: JSLib
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator.Rewriter
-  alias ElixirScript.Translator.Spawn
   alias ElixirScript.Translator.Receive
   alias ElixirScript.Translator.LexicalScope
 
@@ -137,7 +136,7 @@ defmodule ElixirScript.Translator do
     Expression.make_unary_expression(:!, value, env)
   end
 
-  defp do_translate({operator, _, [left, right]}, env) when operator in [:+, :-, :/, :*, :==, :!=, :&&, :||, :>, :<, :>=, :<=, :===, :!==] do
+  defp do_translate({operator, _, [left, right]}, env) when operator in [:+, :-, :/, :*, :==, :!=, :&&, :||, :>, :<, :>=, :<=, :===, :!==, :"**"] do
     Expression.make_binary_expression(operator, left, right, env)
   end
 
@@ -301,8 +300,9 @@ defmodule ElixirScript.Translator do
     { Identifier.make_identifier(:undefined), env }
   end
 
-  defp do_translate({:__aliases__, _, aliases}, env) do
-    { Identifier.make_identifier({:__aliases__, [], aliases}), env }
+  defp do_translate({:__aliases__, _, aliases} = ast, env) do
+    module_name = create_module_name(ast, env)
+    Call.make_module_name(module_name, env)
   end
 
   defp do_translate({:__MODULE__, _, _ }, env) do
@@ -454,49 +454,6 @@ defmodule ElixirScript.Translator do
 
   defp do_translate({:fn, _, clauses}, env) do
     Function.make_anonymous_function(clauses, env)
-  end
-
-  defp do_translate({:gn, _, clauses}, env) do
-    Function.make_anonymous_function(clauses, %{ env | context: :generator})
-  end
-
-  defp do_translate({:spawn, _, [{:fn, _, _} = func]}, env) do
-    Spawn.make_spawn(func, %{ env | context: :generator})
-  end
-
-  defp do_translate({:spawn, _, [module, function, params]}, env) do
-    Spawn.make_spawn(module, function, params, env)
-  end
-
-  defp do_translate({:spawn_link, _, [{:fn, _, _} = func]}, env) do
-    Spawn.make_spawn_link(func, %{ env | context: :generator})
-  end
-
-  defp do_translate({:spawn_link, _, [module, function, params]}, env) do
-    Spawn.make_spawn_link(module, function, params, env)
-  end
-
-  defp do_translate({:spawn_monitor, _, [{:fn, _, _} = func]}, env) do
-    Spawn.make_spawn_monitor(func, %{ env | context: :generator})
-  end
-
-  defp do_translate({:spawn_monitor, _, [module, function, params]}, env) do
-    Spawn.make_spawn_monitor(module, function, params, env)
-  end
-
-  defp do_translate({:send, _, [id, msg]}, env) do
-    js = Spawn.call_processes_func("send", [translate!(id, env), translate!(msg, env)])
-    {js, env}
-  end
-
-  defp do_translate({:send, _, [id, msg, _]}, env) do
-    js = Spawn.call_processes_func("send", [translate!(id, env), translate!(msg, env)])
-    {js, env}
-  end
-
-  defp do_translate({:self, _, []}, env) do
-    js = Spawn.call_processes_func("pid", [])
-    {js, env}
   end
 
   defp do_translate({:receive, _, [expressions] }, env) do

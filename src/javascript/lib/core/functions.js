@@ -29,6 +29,10 @@ function call_property(item, property){
   }
 }
 
+function is_generator(fun){
+  return fun.constructor.name === "GeneratorFunction";
+}
+
 function* run(fun, args, context = null){
   if(fun.constructor.name === "GeneratorFunction"){
     return yield* fun.apply(context, args);
@@ -439,5 +443,6 @@ export default {
   duplicate,
   mapfoldl,
   filtermap,
-  maps_fold
+  maps_fold,
+  is_generator
 };
