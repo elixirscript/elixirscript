@@ -56,8 +56,7 @@ defmodule ElixirScript.Kernel do
   end
 
   def apply(module, fun, args) do
-    fun = if Elixir.Core.is_atom(fun), do: Atom.to_string(fun), else: fun
-    Elixir.Core.Functions.apply(module, fun, args)
+    Elixir.Core.Functions.apply(module, Atom.to_string(fun), args)
   end
 
   def binary_part(binary, start, len) do
@@ -176,19 +175,28 @@ defmodule ElixirScript.Kernel do
     Elixir.Core.processes.make_ref()
   end
 
+  def spawn(gen) do
+    Elixir.Core.processes.spawn(gen)
+  end
+
   def spawn(module, fun, args) do
-    fun = if Elixir.Core.is_atom(fun), do: Atom.to_string(fun), else: fun
-    Elixir.Core.processes.spawn(module, fun, args)
+    Elixir.Core.processes.spawn(module, Atom.to_string(fun), args)
+  end
+
+  def spawn_link(gen) do
+    Elixir.Core.processes.spawn_link(gen)
   end
 
   def spawn_link(module, fun, args) do
-    fun = if Elixir.Core.is_atom(fun), do: Atom.to_string(fun), else: fun
-    Elixir.Core.processes.spawn_link(module, fun, args)
+    Elixir.Core.processes.spawn_link(module, Atom.to_string(fun), args)
+  end
+
+  def spawn_monitor(gen) do
+    Elixir.Core.processes.spawn_monitor(gen)
   end
 
   def spawn_monitor(module, fun, args) do
-    fun = if Elixir.Core.is_atom(fun), do: Atom.to_string(fun), else: fun
-    Elixir.Core.processes.spawn_monitor(module, fun, args)
+    Elixir.Core.processes.spawn_monitor(module, Atom.to_string(fun), args)
   end
 
   def send(pid, message) do
