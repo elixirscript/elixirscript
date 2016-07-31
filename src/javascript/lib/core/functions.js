@@ -29,18 +29,6 @@ function call_property(item, property){
   }
 }
 
-function is_generator(fun){
-  return fun.constructor.name === "GeneratorFunction";
-}
-
-function* run(fun, args, context = null){
-  if(fun.constructor.name === "GeneratorFunction"){
-    return yield* fun.apply(context, args);
-  }
-
-  return yield fun.apply(context, args);
-}
-
 function apply(...args){
   if(args.length === 2){
     args[0].apply(null, args.slice(1));
@@ -406,7 +394,6 @@ function maps_from_list(list){
 
 export default {
   call_property,
-  run,
   apply,
   contains,
   get_global,
@@ -443,6 +430,5 @@ export default {
   duplicate,
   mapfoldl,
   filtermap,
-  maps_fold,
-  is_generator
+  maps_fold
 };
