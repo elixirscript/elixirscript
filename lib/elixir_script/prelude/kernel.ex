@@ -35,6 +35,18 @@ defmodule ElixirScript.Kernel do
     end
   end
 
+  defmacro typeof(term) do
+    quote do
+      JS.typeof(unquote(term))
+    end
+  end
+
+  defmacro instanceof(term, type) do
+    quote do
+      JS.instanceof(unquote(term), unquote(type))
+    end
+  end
+
   def abs(number) do
     Math.abs(number)
   end
@@ -44,8 +56,7 @@ defmodule ElixirScript.Kernel do
   end
 
   def apply(module, fun, args) do
-    fun = if Elixir.Core.is_atom(fun), do: Atom.to_string(fun), else: fun
-    Elixir.Core.Functions.apply(module, fun, args)
+    Elixir.Core.Functions.apply(module, Atom.to_string(fun), args)
   end
 
   def binary_part(binary, start, len) do
@@ -61,19 +72,19 @@ defmodule ElixirScript.Kernel do
   end
 
   def is_atom(term) do
-    JS.typeof(term) === "symbol"
+    typeof(term) === "symbol"
   end
 
   def is_binary(term) do
-    JS.typeof(term) === "string"
+    typeof(term) === "string"
   end
 
   def is_bitstring(term) do
-    is_binary(term) || JS.instanceof(term, Elixir.Core.BitString)
+    is_binary(term) || instanceof(term, Elixir.Core.BitString)
   end
 
   def is_boolean(term) do
-    JS.typeof(term) === "boolean" || JS.instanceof(term, Boolean)
+    JS.typeof(term) === "boolean" || instanceof(term, Boolean)
   end
 
   def is_float(term) do
@@ -85,7 +96,7 @@ defmodule ElixirScript.Kernel do
   end
 
   def is_function(term, _) do
-    JS.typeof(term) === "function" || JS.instanceof(term, Function)
+    typeof(term) === "function" || instanceof(term, Function)
   end
 
   def is_integer(term) do
@@ -97,7 +108,7 @@ defmodule ElixirScript.Kernel do
   end
 
   def is_number(term) do
-    JS.typeof(term) === "number" || JS.instanceof(term, Number)
+    typeof(term) === "number" || instanceof(term, Number)
   end
 
   def is_pid(term) do
@@ -109,7 +120,11 @@ defmodule ElixirScript.Kernel do
   end
 
   def is_map(term) do
-    JS.typeof(term) === "object" || JS.instanceof(term, Object)
+    typeof(term) === "object" || instanceof(term, Object)
+  end
+
+  def is_generator(term) do
+    term.constructor.name === "GeneratorFunction"
   end
 
   def is_port(_) do
@@ -160,6 +175,38 @@ defmodule ElixirScript.Kernel do
     Elixir.Core.processes.make_ref()
   end
 
+  def spawn(gen) do
+    Elixir.Core.processes.spawn(gen)
+  end
+
+  def spawn(module, fun, args) do
+    Elixir.Core.processes.spawn(module, Atom.to_string(fun), args)
+  end
+
+  def spawn_link(gen) do
+    Elixir.Core.processes.spawn_link(gen)
+  end
+
+  def spawn_link(module, fun, args) do
+    Elixir.Core.processes.spawn_link(module, Atom.to_string(fun), args)
+  end
+
+  def spawn_monitor(gen) do
+    Elixir.Core.processes.spawn_monitor(gen)
+  end
+
+  def spawn_monitor(module, fun, args) do
+    Elixir.Core.processes.spawn_monitor(module, Atom.to_string(fun), args)
+  end
+
+  def send(pid, message) do
+    Elixir.Core.processes.send(pid, message)
+  end
+
+  def self() do
+    Elixir.Core.processes.pid()
+  end
+
   defmacro match?(left, right) do
     quote do
       case unquote(right) do
@@ -194,6 +241,24 @@ defmodule ElixirScript.Kernel do
   defmacro first .. last do
     quote do
       %ElixirScript.Range{ first: unquote(first), last: unquote(last) }
+    end
+  end
+
+  defmacro yield() do
+    quote do
+      JS.yield()
+    end
+  end
+
+  defmacro yield(term) do
+    quote do
+      JS.yield(unquote(term))
+    end
+  end
+
+  defmacro yield_to(term) do
+    quote do
+      JS.yield_to(unquote(term))
     end
   end
 

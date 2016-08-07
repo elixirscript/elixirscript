@@ -5,6 +5,11 @@ defmodule ElixirScript.Translator.Call do
   alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.Identifier
 
+  def make_module_name(module_name, env) do
+    the_name = get_module_name_for_function(module_name, env)
+    { make_module_expression_tree(the_name, false, env), env }
+  end
+
 
   def make_function_or_property_call(module_name, function_name, env) do
     the_name = get_module_name_for_function(module_name, env)

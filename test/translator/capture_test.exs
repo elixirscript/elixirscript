@@ -8,9 +8,7 @@ defmodule ElixirScript.Translator.Capture.Test do
     end
 
     js_code = """
-     let [fun] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Elixir.Core.Patterns.variable()],function(__1)    {
-             return     Elixir$ElixirScript$Kernel.is_atom(__1);
-           })));
+    let [fun] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),Elixir$ElixirScript$Kernel.is_atom);
     """
 
     assert_translation(ex_ast, js_code)
@@ -41,9 +39,7 @@ defmodule ElixirScript.Translator.Capture.Test do
     end
 
     js_code = """
-     let [fun] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Elixir.Core.Patterns.variable()],function(__1)    {
-             return     local_function(__1);
-           })));
+    let [fun] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),local_function);
     """
 
     assert_translation(ex_ast, js_code)

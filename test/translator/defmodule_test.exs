@@ -25,7 +25,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
           @ul
         end
 
-        defp something_else() do
+        defgenp something_else() do
         end
       end
     end
@@ -33,7 +33,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     js_code = """
 
         import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
-         const something_else = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function()    {
+         const something_else = Elixir.Core.Patterns.defmatchgen(Elixir.Core.Patterns.clause([],function*()    {
              return     null;
            }));
          const something = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function()    {
@@ -306,7 +306,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
         end
 
         defmodule Parser.DSL do
-          
+
         end
       end
     end
