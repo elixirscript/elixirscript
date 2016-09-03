@@ -1,3 +1,7 @@
+# v0.22.0-dev
+* Bug fixes
+  * Correctly returning list if list is only item in body
+
 # v0.21.0
 * Enhancements
   * This is the first release with early support for processes in elixirscript. Creating a process only works currently using `spawn/1`, `spawn_link/1`, and `spawn_monitor/1`. Inside of a process, you can use functions such as `send` and `receive`, along with some defined in the `Process` module. From outside of a process, you can send messages to a process, but you cannot receive a message from a process. Eventually all code will run inside processes and this restriction will naturally lift.
