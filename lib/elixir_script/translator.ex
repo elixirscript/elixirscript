@@ -157,7 +157,7 @@ defmodule ElixirScript.Translator do
     { Capture.make_capture(function_name, arity, env), env }
   end
 
-  defp do_translate({:&, _, body}, env) do
+  defp do_translate({:&, _, [body]}, env) do
     params = Capture.find_value_placeholders(body) |> List.flatten
     Function.make_anonymous_function([{:->, [], [params, body]}], env)
   end

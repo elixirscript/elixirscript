@@ -138,4 +138,20 @@ defmodule ElixirScript.Translator.Bug.Test do
   end
 
 
+  test "test array returns correctly" do
+    ex_ast = quote do
+      def my_func(x) do
+        [x.a, x.b]
+      end
+    end
+
+    js_code = """
+    const my_func = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Elixir.Core.Patterns.variable()],function(x){
+    return Object.freeze([Elixir.Core.Functions.call_property(x,'a'), Elixir.Core.Functions.call_property(x,'b')]);
+    }));
+    """
+
+    assert_translation(ex_ast, js_code)
+  end
+
 end

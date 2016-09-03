@@ -141,9 +141,8 @@ defmodule ElixirScript.Translator.Function do
       nil ->
         { [], env }
       list when is_list(list) ->
-        Enum.map_reduce(list, env, fn(x, env) ->
-          Translator.translate(x, env)
-        end)
+        t = Translator.translate!(list, env)
+        {[t], env}
       {:__block__, _, list} ->
         Enum.map_reduce(list, env, fn(x, env) ->
           Translator.translate(x, env)
