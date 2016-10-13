@@ -182,7 +182,7 @@ defmodule ElixirScript do
 
     code
     |> Enum.map(&update_quoted(&1))
-    |> ModuleCollector.process_modules
+    |> ModuleCollector.process_modules(:elixir)
 
     code = create_code(compiler_opts, ElixirScript.Translator.State.get)
     |> Enum.filter(fn({path, _}) -> !String.contains?(path, "ElixirScript.Temp.js") end)
@@ -202,7 +202,7 @@ defmodule ElixirScript do
 
     quoted_code_list
     |> Enum.map(&update_quoted(&1))
-    |> ModuleCollector.process_modules
+    |> ModuleCollector.process_modules(:app)
 
     code = create_code(compiler_opts, ElixirScript.Translator.State.get)
     new_state = ElixirScript.Translator.State.serialize()

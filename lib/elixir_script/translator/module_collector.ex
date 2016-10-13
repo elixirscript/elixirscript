@@ -11,7 +11,7 @@ defmodule ElixirScript.Translator.ModuleCollector do
   @function_types [:def, :defp, :defgen, :defgenp]
 
 
-  def process_modules(modules) do
+  def process_modules(modules, app_name) do
     Enum.map(modules, fn
       { :__block__, _, list } ->
         {modules, not_modules} = Enum.partition(list,
@@ -38,46 +38,46 @@ defmodule ElixirScript.Translator.ModuleCollector do
     end)
     |> List.flatten
     |> Enum.each(fn(m) ->
-      Macro.postwalk(m, &do_process_modules(&1))
+      Macro.postwalk(m, &do_process_modules(&1, app_name))
     end)
   end
 
-  def do_process_modules({:defprotocol, _, [{:__aliases__, _, _} = the_alias, [do: {:__block__, _, _} = block]]}) do
+  def do_process_modules({:defprotocol, _, [{:__aliases__, _, _} = the_alias, [do: {:__block__, _, _} = block]]}, app_name) do
     %{def: functions, defp: _ } = get_functions_from_module(block)
-    ElixirScript.Translator.State.add_protocol(Utils.quoted_to_name(the_alias), functions)
+    ElixirScript.Translator.State.add_protocol(Utils.quoted_to_name(the_alias), functions, app_name)
   end
 
-  def do_process_modules({:defprotocol, _, [{:__aliases__, _, _} = the_alias, [do: spec]]}) do
+  def do_process_modules({:defprotocol, _, [{:__aliases__, _, _} = the_alias, [do: spec]]}, app_name) do
     %{def: functions, defp: _ } = get_functions_from_module({:__block__, [], [spec]})
-    ElixirScript.Translator.State.add_protocol(Utils.quoted_to_name(the_alias), functions)
+    ElixirScript.Translator.State.add_protocol(Utils.quoted_to_name(the_alias), functions, app_name)
   end
 
-  def do_process_modules({:defimpl, _, [ {:__aliases__, _, _} = the_alias, [for: type],  [do: {:__block__, context, spec}] ]}) do
-    ElixirScript.Translator.State.add_protocol_impl(Utils.quoted_to_name(the_alias), type, {:__block__, context, spec})
+  def do_process_modules({:defimpl, _, [ {:__aliases__, _, _} = the_alias, [for: type],  [do: {:__block__, context, spec}] ]}, app_name) do
+    ElixirScript.Translator.State.add_protocol_impl(Utils.quoted_to_name(the_alias), type, {:__block__, context, spec}, app_name)
   end
 
-  def do_process_modules({:defimpl, _, [ {:__aliases__, _, _} = the_alias, [for: type],  [do: spec] ]}) do
-    ElixirScript.Translator.State.add_protocol_impl(Utils.quoted_to_name(the_alias), type, {:__block__, [], [spec]})
+  def do_process_modules({:defimpl, _, [ {:__aliases__, _, _} = the_alias, [for: type],  [do: spec] ]}, app_name) do
+    ElixirScript.Translator.State.add_protocol_impl(Utils.quoted_to_name(the_alias), type, {:__block__, [], [spec]}, app_name)
   end
 
-  def do_process_modules({:defmodule, _, [{:__aliases__, _, [:ElixirScript, :Temp]}, [do: body]]} = ast) do
+  def do_process_modules({:defmodule, _, [{:__aliases__, _, [:ElixirScript, :Temp]}, [do: body]]} = ast, app_name) do
     body
-    |> make_module([:ElixirScript, :Temp])
+    |> make_module([:ElixirScript, :Temp], app_name)
     |> State.add_module
 
     ast
   end
 
-  def do_process_modules({:defmodule, _, [{:__aliases__, _, _}, [do: _]]} = ast) do
-    do_module_processing(ast)
+  def do_process_modules({:defmodule, _, [{:__aliases__, _, _}, [do: _]]} = ast, app_name) do
+    do_module_processing(ast, app_name)
     ast
   end
 
-  def do_process_modules(ast) do
+  def do_process_modules(ast, _) do
     ast
   end
 
-  defp do_module_processing({:defmodule, _, [{:__aliases__, _, name}, [do: body]]}) do
+  defp do_module_processing({:defmodule, _, [{:__aliases__, _, name}, [do: body]]}, app_name) do
     { body, inner_modules } = make_inner_module_aliases(name, body)
 
     aliases = Enum.map(inner_modules, fn
@@ -94,10 +94,10 @@ defmodule ElixirScript.Translator.ModuleCollector do
         this_module_aliases = aliases -- [{ :alias, [], [{:__aliases__, [alias: false], name ++ inner_module_name}, [as: {:__aliases__, [alias: false], inner_module_name }] ] }]
 
         {:defmodule, context1, [{:__aliases__, context2, name ++ inner_module_name}, [do: add_aliases_to_body(inner_module_body, this_module_aliases)]]}
-        |> do_module_processing
+        |> do_module_processing(app_name)
     end)
 
-    module = make_module(add_aliases_to_body(body, aliases), name)
+    module = make_module(add_aliases_to_body(body, aliases), name, app_name)
     State.add_module(module)
   end
 
@@ -110,7 +110,7 @@ defmodule ElixirScript.Translator.ModuleCollector do
     end
   end
 
-  defp make_module(body, name) do
+  defp make_module(body, name, app_name) do
     # Finds use expressions and expands them
     body = case body do
       {:__block__, context, list } ->
@@ -144,7 +144,7 @@ defmodule ElixirScript.Translator.ModuleCollector do
     %{def: functions, defp: private_functions, defgen: generators, defgenp: private_generators } = get_functions_from_module(body)
     js_imports = get_js_imports_from_module(body)
 
-    %ElixirScript.Module{ name: Utils.quoted_to_name({:__aliases__, [], name}) , body: body,
+    %ElixirScript.Module{app_name: app_name, name: Utils.quoted_to_name({:__aliases__, [], name}) , body: body,
     functions: functions ++ generators, private_functions: private_functions ++ private_generators, js_imports: js_imports }
   end
 
