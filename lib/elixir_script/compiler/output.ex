@@ -11,7 +11,7 @@ defmodule ElixirScript.Compiler.Output do
     compiler_output ++ ElixirScript.update_protocols(compiler_output, compiler_opts)
     |>  process_include_path(compiler_opts)
     |> Enum.each(fn
-      {_, code} -> IO.write(code)
+      {_, code, _} -> IO.write(code)
       code -> IO.write(code)
     end)
   end
@@ -35,8 +35,8 @@ defmodule ElixirScript.Compiler.Output do
     end
   end
 
-  def write_to_file({ file_path, js_code }, destination) do
-    file_name = Path.join([destination, file_path])
+  def write_to_file({ file_path, js_code, app }, destination) do
+    file_name = Path.join([destination, to_string(app), file_path])
 
     if !File.exists?(Path.dirname(file_name)) do
       File.mkdir_p!(Path.dirname(file_name))
@@ -47,10 +47,10 @@ defmodule ElixirScript.Compiler.Output do
 
   defp process_include_path(compiler_output, compiler_opts) do
     Enum.map(compiler_output, fn
-      { path, code } ->
+      { path, code, app_name } ->
         case compiler_opts.include_path do
           true ->
-            { path, code }
+            { path, code, app_name }
           false ->
             code
         end

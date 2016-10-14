@@ -10,7 +10,7 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-      import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+    import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
         const Elixir$User = Elixir.Core.Functions.defstruct({
           [Symbol.for('__struct__')]: Symbol.for('Elixir.User'),
           [Symbol.for('name')]: 'john',
@@ -34,7 +34,7 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-    import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+    import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
     const Elixir$User = Elixir.Core.Functions.defstruct({
       [Symbol.for('__struct__')]: Symbol.for('Elixir.User'),
       [Symbol.for('name')]: null,
@@ -61,7 +61,7 @@ defmodule ElixirScript.Translator.Struct.Test do
     js_code = """
     let [user] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(), Elixir$User.Elixir$User.create(Object.freeze({})));
 
-    import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+    import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
     const Elixir$User = Elixir.Core.Functions.defstruct({
         [Symbol.for('__struct__')]: Symbol.for('Elixir.User'),
         [Symbol.for('name')]: null,
@@ -88,7 +88,7 @@ defmodule ElixirScript.Translator.Struct.Test do
         [Symbol.for('name')]: 'John'
   })));
 
-    import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+    import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
     const Elixir$User = Elixir.Core.Functions.defstruct({
       [Symbol.for('__struct__')]: Symbol.for('Elixir.User'),
       [Symbol.for('name')]: null,
@@ -137,7 +137,7 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-    import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+    import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
      const Elixir$MyAppError = Elixir.Core.Functions.defexception({
           [Symbol.for('__struct__')]: Symbol.for('Elixir.MyAppError'),
           [Symbol.for('__exception__')]: true,
@@ -157,7 +157,7 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-    import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+    import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
       const Elixir$MyAppError = Elixir.Core.Functions.defexception({
              [Symbol.for('__struct__')]: Symbol.for('Elixir.MyAppError'),
              [Symbol.for('__exception__')]: true,
@@ -187,7 +187,7 @@ defmodule ElixirScript.Translator.Struct.Test do
         [Symbol.for('message')]: 'did not get what was expected'
     }));
 
-import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+    import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
     const Elixir$MyAppError = Elixir.Core.Functions.defexception({
         [Symbol.for('__struct__')]: Symbol.for('Elixir.MyAppError'),
         [Symbol.for('__exception__')]: true,
