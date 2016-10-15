@@ -80,6 +80,12 @@ defmodule ElixirScript do
                                           {[path], []}
                                       end
 
+    #deps = if Code.ensure_loaded?(Mix) do
+    #  ElixirScript.Compiler.Deps.get_deps_paths
+    #else
+    #  []
+    #end
+
     opts = build_compiler_options(opts)
 
     compiler_cache = get_compiler_cache(path, opts)

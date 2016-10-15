@@ -2,14 +2,20 @@ defmodule ElixirScript.Compiler.Deps do
   alias ElixirScript.Translator.Utils
 
   def get_deps_paths(env \\ Mix.env) do
-    deps = Mix.Dep.loaded([env: "env"])
+    Mix.Dep.loaded([env: env])
+    |> do_get_deps_paths
+  end
 
-    Enum.reduce(deps, Map.new, fn(dep, map) ->
+  defp do_get_deps_paths(deps) do
+    Enum.reduce(deps, [], fn(dep, list) ->
       paths = Mix.Project.in_project dep.app, dep.opts[:dest], fn mixfile -> Mix.Project.config()[:elixirc_paths] end
       paths = Enum.map(paths, fn path -> Path.join([dep.opts[:dest], path]) end)
 
-      Map.put(map, dep.app, paths)
+      deps = do_get_deps_paths(dep.deps)
+
+      deps ++ [{dep.app, paths}] ++ list
     end)
+    |> Enum.uniq
   end
 
   def get_module_filepath_map(env \\ Mix.env) do
