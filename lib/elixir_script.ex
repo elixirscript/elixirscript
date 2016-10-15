@@ -75,6 +75,17 @@ defmodule ElixirScript do
 
     opts = build_compiler_options(opts)
 
+    paths = if Code.ensure_loaded?(Mix) do
+      deps = ElixirScript.Compiler.Deps.get_deps_paths(Mix.env)
+      deps ++ [{opts[:app], [path]}]
+    else
+      [{opts[:app], [path]}]
+    end
+
+    paths = ElixirScript.Compiler.Deps.get_module_filepath_map(paths)
+
+
+
     {expanded_path, loaded_modules} = case File.dir?(path) do
                                         true ->
                                           process_path(path)
