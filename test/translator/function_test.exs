@@ -239,7 +239,7 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-          import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+          import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
          const example = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function()    {
              return     null;
            }),Elixir.Core.Patterns.clause([Elixir.Core.Patterns.variable()],function(oneArg)    {
@@ -276,7 +276,7 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-          import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+    import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
          const example = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function()    {
              return     null;
            }),Elixir.Core.Patterns.clause([Elixir.Core.Patterns.variable()],function(oneArg)    {
@@ -303,7 +303,7 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-          import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+    import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
          const example = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Elixir.Core.Patterns.variable()],function(oneArg)    {
              return     null;
            }));
@@ -421,7 +421,7 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-         import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+    import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
          const something = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Elixir.Core.Patterns.variable()],function(one)    {
              return     null;
            },function(one)    {
@@ -652,7 +652,7 @@ defmodule ElixirScript.Translator.Function.Test do
 
 
     js_code = """
-         import Elixir$ElixirScript$Kernel from './Elixir.ElixirScript.Kernel';
+    import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
          const something = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([1],function()    {
              return     null;
            }),Elixir.Core.Patterns.clause([2],function()    {

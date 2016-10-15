@@ -4,7 +4,7 @@ import babel from 'rollup-plugin-babel';
 
 export default {
   entry: 'src/javascript/elixir.js',
-  dest: 'priv/Elixir.js',
+  dest: 'priv/elixir/Elixir.js',
   sourceMap: 'inline',
   format: 'es6',
   plugins: [

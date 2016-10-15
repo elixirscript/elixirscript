@@ -62,7 +62,9 @@ defmodule ElixirScript do
   @spec compile_quoted(Macro.t, Map.t) :: [binary | {binary, binary} | :ok]
   def compile_quoted(quoted, opts \\ %{}) do
     { code, _ } = do_compile(opts, [quoted], get_stdlib_state, [])
-    Output.out(quoted, code, build_compiler_options(opts))
+    result = Output.out(quoted, code, build_compiler_options(opts))
+    ElixirScript.Translator.State.stop
+    result
   end
 
   @doc """
@@ -71,6 +73,8 @@ defmodule ElixirScript do
   @spec compile_path(binary, Map.t) :: [binary | {binary, binary} | :ok]
   def compile_path(path, opts \\ %{}) do
 
+    opts = build_compiler_options(opts)
+
     {expanded_path, loaded_modules} = case File.dir?(path) do
                                         true ->
                                           process_path(path)
@@ -78,10 +82,7 @@ defmodule ElixirScript do
                                           {[path], []}
                                       end
 
-    opts = build_compiler_options(opts)
-
     compiler_cache = get_compiler_cache(path, opts)
-
     new_file_stats = Cache.build_file_stats(expanded_path)
 
     changed_files = Cache.get_changed_files(compiler_cache.input_files, new_file_stats)
@@ -93,7 +94,9 @@ defmodule ElixirScript do
     compiler_cache = %{compiler_cache | input_files: new_file_stats, state: new_state }
 
     Cache.write(path, compiler_cache)
-    Output.out(path, code, opts)
+    result = Output.out(path, code, opts)
+    ElixirScript.Translator.State.stop
+    result
   end
 
   defp process_path(path) do
@@ -172,7 +175,7 @@ defmodule ElixirScript do
 
   @doc false
   def compile_std_lib(output_path) do
-    compiler_opts = build_compiler_options(%{std_lib: true, include_path: true, output: output_path})
+    compiler_opts = build_compiler_options(%{std_lib: true, include_path: true, output: output_path, app: :elixir})
     libs_path = Path.join([__DIR__, "elixir_script", "prelude", "**", "*.ex"])
 
     code = Path.wildcard(libs_path)
@@ -182,16 +185,21 @@ defmodule ElixirScript do
 
     code
     |> Enum.map(&update_quoted(&1))
-    |> ModuleCollector.process_modules
+    |> ModuleCollector.process_modules(compiler_opts[:app])
 
     code = create_code(compiler_opts, ElixirScript.Translator.State.get)
-    |> Enum.filter(fn({path, _}) -> !String.contains?(path, "ElixirScript.Temp.js") end)
+    |> Enum.filter(fn({path, _, _}) -> !String.contains?(path, "ElixirScript.Temp.js") end)
 
     new_std_state = ElixirScript.Translator.State.serialize()
+
+    stdlib_state_path = Path.join([File.cwd!(), "lib", "elixir_script", "translator", "stdlib_state.bin"])
+
+    File.write!(stdlib_state_path, new_std_state)
+    result = Output.out(libs_path, code, compiler_opts)
+
     ElixirScript.Translator.State.stop
 
-    File.write!(File.cwd!() <> "/lib/elixir_script/translator/stdlib_state.bin", new_std_state)
-    Output.out(libs_path, code, compiler_opts)
+    result
   end
 
   defp do_compile(opts, quoted_code_list, state, loaded_modules) do
@@ -202,11 +210,10 @@ defmodule ElixirScript do
 
     quoted_code_list
     |> Enum.map(&update_quoted(&1))
-    |> ModuleCollector.process_modules
+    |> ModuleCollector.process_modules(compiler_opts[:app])
 
     code = create_code(compiler_opts, ElixirScript.Translator.State.get)
     new_state = ElixirScript.Translator.State.serialize()
-    ElixirScript.Translator.State.stop
 
     { code, new_state }
   end
@@ -220,6 +227,7 @@ defmodule ElixirScript do
     |> Map.put(:core_path, "Elixir")
     |> Map.put(:full_build, false)
     |> Map.put(:output, nil)
+    |> Map.put(:app, :app)
 
     Map.merge(default_options, opts)
   end
@@ -288,12 +296,17 @@ defmodule ElixirScript do
   @doc false
   def update_protocols(compiler_output, compiler_opts) do
     Enum.reduce(compiler_output, %{}, fn
-      {file, code}, state ->
+      {file, code, app_name}, state ->
         case String.split(file, ".DefImpl.") do
           [protocol, impl] ->
             protocol = String.split(protocol, "/") |> List.last |> String.to_atom
             impl = String.replace(impl, ".js", "") |> String.to_atom
-            Map.put(state, protocol, Map.get(state, protocol, []) ++ [impl])
+
+            entry = Map.get(state, protocol, [])
+            entry = entry ++ [{app_name, impl}]
+
+
+            Map.put(state, protocol, entry)
           [_] ->
             state
         end
@@ -305,13 +318,17 @@ defmodule ElixirScript do
 
   @doc false
   def update_protocols_in_path(compiler_output, compiler_opts, output_path) do
-    Enum.reduce(compiler_output, %{}, fn {file, code}, state ->
+    Enum.reduce(compiler_output, %{}, fn { file, code, app_name }, state ->
       case String.split(file, ".DefImpl.") do
         [protocol, _] ->
           protocol = String.split(protocol, "/") |> List.last
           protocol_impls = find_protocols_implementations_in_path(output_path, protocol)
           protocol = String.to_atom(protocol)
-          Map.put(state, protocol, Map.get(state, protocol, []) ++ protocol_impls)
+
+          entry = Map.get(state, protocol, [])
+          entry = entry ++ protocol_impls
+
+          Map.put(state, protocol, entry)
         [_] ->
           state
       end
@@ -320,8 +337,8 @@ defmodule ElixirScript do
   end
 
   defp do_make_defimpl(protocols, compiler_opts) do
-    Enum.map(protocols, fn {protocol, implementations} ->
-      ElixirScript.Translator.Defprotocol.make_defimpl(protocol, Enum.uniq(implementations), compiler_opts)
+    Enum.map(protocols, fn {protocol, impls} ->
+      ElixirScript.Translator.Defprotocol.make_defimpl(protocol, Enum.uniq(impls), compiler_opts)
     end)
     |> Enum.map(fn(module) ->
       javascript_ast_to_code(module)
@@ -329,15 +346,24 @@ defmodule ElixirScript do
   end
 
   defp find_protocols_implementations_in_path(path, protocol_prefix) do
-    Path.join([path, protocol_prefix <> ".DefImpl*.js"])
+    Path.join([path, "**", protocol_prefix <> ".DefImpl*.js"])
     |> Path.wildcard
     |> Enum.filter(fn path -> !String.ends_with?(path, "DefImpl.js") end)
     |> Enum.map(fn impl ->
-      Path.basename(impl)
+
+      path_split = Path.split(impl)
+
+      implementation = path_split
+      |> List.last
       |> String.split(".DefImpl.")
       |> List.last
       |> String.replace(".js", "")
-      |> String.to_atom end)
+      |> String.to_atom
+
+      app_name = Enum.at(path_split, length(path_split) - 2)
+
+      {app_name, implementation}
+    end)
   end
 
   @doc """
@@ -345,9 +371,10 @@ defmodule ElixirScript do
   to the specified location
   """
   def copy_stdlib_to_destination(destination) do
-    Enum.each(Path.wildcard(Path.join([operating_path, "*.js"])), fn(path) ->
+    Enum.each(Path.wildcard(Path.join([operating_path, "elixir", "*.js"])), fn(path) ->
       base = Path.basename(path)
-      File.cp!(path, Path.join([destination, base]))
+      File.mkdir_p!(Path.join([destination, "elixir"]))
+      File.cp!(path, Path.join([destination, "elixir", base]))
     end)
   end
 
@@ -359,7 +386,7 @@ defmodule ElixirScript do
     |> prepare_js_ast
     |> Generator.generate
 
-    { path, js_code }
+    { path, js_code, module.app_name }
   end
 
   defp prepare_js_ast(js_ast) do

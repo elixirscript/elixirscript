@@ -67,12 +67,12 @@ defmodule ElixirScript.Translator.State do
     end)
   end
 
-  def add_protocol(name, functions) do
+  def add_protocol(name, functions, app_name) do
     Agent.update(__MODULE__, fn state ->
       proto = Map.get(state.modules, do_get_module_name(name, state))
 
       proto = if proto == nil do
-        %ElixirScript.Module{ name: name, functions: functions, type: :protocol }
+        %ElixirScript.Module{ app_name: app_name, name: name, functions: functions, type: :protocol }
       else
         %ElixirScript.Module{proto | functions: functions, type: :protocol }
       end
@@ -81,19 +81,19 @@ defmodule ElixirScript.Translator.State do
     end)
   end
 
-  def add_protocol_impl(protocol, type, impl) when is_list(type) do
+  def add_protocol_impl(protocol, type, impl, app_name) when is_list(type) do
     Enum.each(type, fn x ->
-      add_protocol_impl(protocol, x, impl)
+      add_protocol_impl(protocol, x, impl, app_name)
     end)
   end
 
-  def add_protocol_impl(protocol, type, impl) do
+  def add_protocol_impl(protocol, type, impl, app_name) do
     Agent.update(__MODULE__, fn state ->
       protocol_name = Atom.to_string(do_get_module_name(protocol, state))
       type_name = Atom.to_string(Utils.quoted_to_name(type))
       module_name = String.to_atom(protocol_name <> ".DefImpl." <> type_name)
 
-      proto_impl = %ElixirScript.Module{ name: module_name, body: impl, impl_type: type, type: :protocol_implementation }
+      proto_impl = %ElixirScript.Module{ app_name: app_name, name: module_name, body: impl, impl_type: type, type: :protocol_implementation }
 
       do_add_module_to_state(state, proto_impl)
     end)
