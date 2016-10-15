@@ -11,11 +11,11 @@ defmodule ElixirScript.Translator.Defmodule do
 
   def make_module(ElixirScript.Temp, body, env) do
     { body, _ } = translate_body(body, env)
-    %{ name: ElixirScript.Temp, body: body |> Group.inflate_groups, app_name: :app }
+    %{ name: ElixirScript.Temp, body: body |> Group.inflate_groups, app_name: ElixirScript.Translator.State.get().compiler_opts.app }
   end
 
   def make_module(module, nil, _) do
-    %{ name: module, body: [], app_name: :app }
+    %{ name: module, body: [], app_name: ElixirScript.Translator.State.get().compiler_opts.app }
   end
 
   def make_module(module, body, env) do
