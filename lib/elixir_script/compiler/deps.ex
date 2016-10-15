@@ -21,54 +21,54 @@ defmodule ElixirScript.Compiler.Deps do
   def get_module_filepath_map(env \\ Mix.env) do
     deps_paths = get_deps_paths(env)
 
-    Enum.reduce(deps_paths, Map.new, fn({dep, paths}, map) ->
+    Enum.reduce(deps_paths, [], fn({dep, paths}, list) ->
 
       file_paths = Enum.flat_map(paths, fn(path) ->
         path = Path.join(path, "**/*.{ex,exs,exjs}")
         |> Path.wildcard
       end)
 
-      file_paths = Enum.reduce(file_paths, Map.new, fn(path, map) ->
+      file_paths = Enum.reduce(file_paths, [], fn(path, list) ->
         quoted = path
         |> File.read!
         |> Code.string_to_quoted!
 
-        { _, modules } = Macro.postwalk(quoted, %{protocols: [], modules: [], impls: []}, &get_defmodules(&1, &2))
+        { _, modules } = Macro.postwalk(quoted, [], &get_defmodules(&1, &2))
 
-        { path, modules }
-        Map.put(map, path, modules)
+        modules = Enum.map(modules, fn(x) -> { x.module,  Map.put(x, :path, path) |> Map.put(:app, dep) } end)
+        list ++ modules
       end)
 
-      {dep, file_paths}
-      Map.put(map, dep, file_paths)
+
+      list ++ file_paths
     end)
 
   end
 
 
   defp get_defmodules({:defprotocol, _, [{:__aliases__, _, _} = the_alias, _]} = ast, state) do
-    state = Map.update!(state, :protocols, fn(l) -> [ Utils.quoted_to_name(the_alias) | l ] end)
-    { ast, state }
+    s = %{ module:  Utils.quoted_to_name(the_alias),  type: :protocol }
+    { ast, state ++ [s] }
   end
 
   defp get_defmodules({:defprotocol, _, [{:__aliases__, _, _} = the_alias, _]} = ast, state) do
-    state = Map.update!(state, :protocols, fn(l) -> [ Utils.quoted_to_name(the_alias) | l ] end)
-    { ast, state }
+    s =  %{module:  Utils.quoted_to_name(the_alias), type: :protocol }
+    { ast, state ++ [s] }
   end
 
   defp get_defmodules({:defimpl, _, [ {:__aliases__, _, _} = the_alias, [for: type],  _ ]} = ast, state) do
-    state = Map.update!(state, :impls, fn(l) -> [  { Utils.quoted_to_name(the_alias), Utils.quoted_to_name(type) } | l ] end)
-    { ast, state }
+    s =  %{module:  Utils.quoted_to_name(the_alias), type: :impl, for: Utils.quoted_to_name(type) }
+    { ast, state ++ [s] }
   end
 
   defp get_defmodules({:defimpl, _, [ {:__aliases__, _, _} = the_alias, [for: type],  _ ]} = ast, state) do
-    state = Map.update!(state, :impls, fn(l) -> [  { Utils.quoted_to_name(the_alias), Utils.quoted_to_name(type) } | l ] end)
-    { ast, state }
+    s = %{module:  Utils.quoted_to_name(the_alias), type: :impl, for: Utils.quoted_to_name(type) }
+    { ast, state ++ [s] }
   end
 
   defp get_defmodules({:defmodule, _, [{:__aliases__, _, _} = the_alias, [do: _]]} = ast, state) do
-    state = Map.update!(state, :modules, fn(l) -> [ Utils.quoted_to_name(the_alias) | l ] end)
-    { ast, state }
+    s = %{module:  Utils.quoted_to_name(the_alias), type: :module }
+    { ast, state ++ [s] }
   end
 
   defp get_defmodules(ast, state) do
