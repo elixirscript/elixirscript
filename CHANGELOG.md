@@ -1,4 +1,13 @@
-# v0.22.0-dev
+# v0.22.0
+
+* Enhancements
+  * Add `defgen` and `defgenp` for defining public and private generators
+  * Add `yield/0`, `yield/1`, and `yield_to\1` to `Kernel`
+  * Updated output folder structure. stdlib code will now go in an `elxiir` folder under the output paths while generated app code will go into an `app` folder under the output path
+
+* Breaking
+  * All process macros and functions now expect to receive and/or work using generators as entry points. Using functions defined with `def` or `defp` will not work correctly with them
+
 * Bug fixes
   * Correctly returning list if list is only item in body
 
