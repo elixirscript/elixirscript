@@ -2,6 +2,7 @@ import Core from "../lib/core";
 const Patterns = Core.Patterns;
 const SpecialForms = Core.SpecialForms;
 const Tuple = Core.Tuple;
+const MatchError = Core.Patterns.MatchError;
 
 import Enum from "../lib/enum";
 
@@ -90,5 +91,61 @@ describe('with', () => {
     expect(value).to.eql(new Tuple(Symbol.for('ok'), 300));
   });
 
-});
 
+  it('with else', () => {
+    /*
+      opts = %{width: 10}
+
+      with {:ok, width} <- Map.fetch(opts, :width),
+           {:ok, height} <- Map.fetch(opts, :height) do
+        {:ok, width * height}
+      else
+        :error -> {:error, :wrong_data}
+      end
+
+      {:error, :wrong_data}
+    */
+
+    let opts = { width: 10 };
+
+    let value = SpecialForms._with(
+      [new Tuple(Symbol.for('ok'), $), () => map_fetch(opts, "width")],
+      [new Tuple(Symbol.for('ok'), $), (width) => map_fetch(opts, "height")],
+      (width, height) => new Tuple(Symbol.for('ok'), width * height),
+      Patterns.defmatch(
+        Patterns.clause([Symbol.for('error')], () => new Tuple(Symbol.for('error'), Symbol.for('wrong_data')))
+      )
+    );
+
+    expect(value).to.eql(new Tuple(Symbol.for('error'), Symbol.for('wrong_data')));
+  });
+
+  it('with else that don`t match', () => {
+    /*
+      opts = %{width: 10}
+
+      with {:ok, width} <- Map.fetch(opts, :width),
+           {:ok, height} <- Map.fetch(opts, :height) do
+        {:ok, width * height}
+      else
+        :fail -> {:error, :wrong_data}
+      end
+
+      {:error, :wrong_data}
+    */
+
+    let opts = { width: 10 };
+
+    let withFunction = SpecialForms._with.bind(
+      null,
+      [new Tuple(Symbol.for('ok'), $), () => map_fetch(opts, "width")],
+      [new Tuple(Symbol.for('ok'), $), (width) => map_fetch(opts, "height")],
+      (width, height) => new Tuple(Symbol.for('ok'), width * height),
+      Patterns.defmatch(
+        Patterns.clause([Symbol.for('fail')], () => new Tuple(Symbol.for('error'), Symbol.for('wrong_data')))
+      )
+    );
+
+    expect(withFunction).to.throw(MatchError, 'No match for: Symbol(error)');
+  });
+});
