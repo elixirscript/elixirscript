@@ -30,10 +30,10 @@ defmodule ElixirScript.Mixfile do
     [
       {:estree, "~> 2.4" },
       {:fs, "~> 0.9.1"},
-      {:earmark, "~> 0.2", only: :dev },
-      {:ex_doc, "~> 0.11", only: :dev },
-      {:excoveralls, "~> 0.4", only: :test},
-      {:credo, "~> 0.2.0", only: [:dev, :test]}
+      {:earmark, "~> 1.0", only: :dev },
+      {:ex_doc, "~> 0.14", only: :dev },
+      {:excoveralls, "~> 0.5", only: :test},
+      {:credo, "~> 0.4", only: [:dev, :test]}
     ]
   end
 
