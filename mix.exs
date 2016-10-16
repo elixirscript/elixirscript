@@ -4,7 +4,7 @@ defmodule ElixirScript.Mixfile do
   def project do
     [
       app: :elixir_script,
-      version: "0.22.0-dev",
+      version: "0.22.0",
       elixir: "~> 1.0",
       escript: escript_config,
       deps: deps,
@@ -28,7 +28,7 @@ defmodule ElixirScript.Mixfile do
 
   defp deps do
     [
-      {:estree, "~> 2.3" },
+      {:estree, "~> 2.4" },
       {:fs, "~> 0.9.1"},
       {:earmark, "~> 0.2", only: :dev },
       {:ex_doc, "~> 0.11", only: :dev },

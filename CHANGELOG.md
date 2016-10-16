@@ -1,4 +1,9 @@
-# v0.22.0-dev
+# v0.22.0
+
+* Enhancements
+  * Add `defgen` and `defgenp` for defining public and private generators
+  * Updated output folder structure
+
 * Bug fixes
   * Correctly returning list if list is only item in body
 
