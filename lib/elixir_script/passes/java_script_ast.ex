@@ -13,7 +13,7 @@ defmodule ElixirScript.Passes.JavaScriptAST do
 
 
   defp compile(module_data, opts) do
-    env = ElixirScript.Translator.LexicalScope.module_scope(module_data.module,  Utils.name_to_js_file_name(module_data.module) <> ".js", opts.env)
+    env = ElixirScript.Translator.LexicalScope.module_scope(module_data.module,  Utils.name_to_js_file_name(module_data.module) <> ".js", opts.env, module_data)
 
     module = case module_data.type do
                :module ->

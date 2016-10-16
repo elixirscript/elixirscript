@@ -8,8 +8,11 @@ defmodule ElixirScript.Passes.RemoveUnused do
   end
 
   defp module_found_in_deps(module_name, module_filepath_map, apps_not_to_touch) do
-    Enum.any?(module_filepath_map, fn({_, %{deps: deps, app: app}}) ->
-      Enum.member?(apps_not_to_touch, app) or Enum.member?(deps, module_name)
+    Enum.any?(module_filepath_map, fn
+      ({_, %{deps: deps, app: app, type: :module}}) ->
+        Enum.member?(apps_not_to_touch, app) or Enum.member?(deps, module_name)
+      _ ->
+        true
     end)
   end
 end

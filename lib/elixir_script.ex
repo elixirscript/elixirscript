@@ -83,7 +83,10 @@ defmodule ElixirScript do
     |> ElixirScript.Passes.LoadModules.execute(opts)
     |> ElixirScript.Passes.FindFunctions.execute(opts)
     |> ElixirScript.Passes.JavaScriptAST.execute(opts)
+    |> ElixirScript.Passes.ConsolidateProtocols.execute(opts)
     |> ElixirScript.Passes.JavaScriptCode.execute(opts)
+    |> ElixirScript.Passes.JavaScriptName.execute(opts)
+    |> ElixirScript.Passes.HandleOutput.execute(opts)
 
     {expanded_path, loaded_modules} = case File.dir?(path) do
                                         true ->

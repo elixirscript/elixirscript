@@ -3,11 +3,11 @@ defmodule ElixirScript.Passes.ModuleFilepaths do
 
   alias ElixirScript.Translator.Utils
 
-  def execute(deps_paths, _) do
+  def execute(deps_paths, opts) do
     Enum.reduce(deps_paths, [], fn({dep, paths}, list) ->
 
       file_paths = Enum.flat_map(paths, fn(path) ->
-        path = Path.join(path, "**/*.{ex,exs,exjs}")
+        Path.join(path, "**/*.{ex,exs,exjs}")
         |> Path.wildcard
       end)
 
@@ -16,9 +16,11 @@ defmodule ElixirScript.Passes.ModuleFilepaths do
         |> File.read!
         |> Code.string_to_quoted!
 
-        { _, modules } = Macro.postwalk(quoted, [], &get_defmodules(&1, &2))
+        { _, modules } = Macro.postwalk(quoted, [], &get_defmodules(&1, &2, opts))
 
-        modules = Enum.map(modules, fn(x) -> { x.module,  Map.put(x, :path, path) |> Map.put(:app, dep) } end)
+        stat = File.stat!(path)
+
+        modules = Enum.map(modules, fn(x) -> { x.module, Map.merge(x, %{ path: path, app: dep, stat: stat }) } end)
         list ++ modules
       end)
 
@@ -27,35 +29,26 @@ defmodule ElixirScript.Passes.ModuleFilepaths do
     end)
   end
 
-  defp get_defmodules({:defprotocol, _, [{:__aliases__, _, _} = the_alias, _]} = ast, state) do
+  defp get_defmodules({:defprotocol, _, [{:__aliases__, _, _} = the_alias, _]} = ast, state, _) do
     s = %{ module:  Utils.quoted_to_name(the_alias),  type: :protocol, ast: ast }
     { ast, state ++ [s] }
   end
 
-  defp get_defmodules({:defprotocol, _, [{:__aliases__, _, _} = the_alias, _]} = ast, state) do
-    s =  %{module:  Utils.quoted_to_name(the_alias), type: :protocol, ast: ast }
+  defp get_defmodules({:defimpl, _, [ {:__aliases__, _, name} = the_alias, [for: {:__aliases__, _, type_name} = type],  _ ]} = ast, state, _) do
+    name = name ++ [DefImpl] ++ type_name
+    s =  %{module:  Utils.quoted_to_name({:__aliases__, [], name}), type: :impl, for: Utils.quoted_to_name(type), ast: ast, implements: Utils.quoted_to_name(the_alias) }
     { ast, state ++ [s] }
   end
 
-  defp get_defmodules({:defimpl, _, [ {:__aliases__, _, _} = the_alias, [for: type],  _ ]} = ast, state) do
-    s =  %{module:  Utils.quoted_to_name(the_alias), type: :impl, for: Utils.quoted_to_name(type), ast: ast }
-    { ast, state ++ [s] }
+  defp get_defmodules({:defmodule, _, [{:__aliases__, _, _}, [do: _]]} = ast, state, opts) do
+    { ast, do_module_processing(ast, state, opts) }
   end
 
-  defp get_defmodules({:defimpl, _, [ {:__aliases__, _, _} = the_alias, [for: type],  _ ]} = ast, state) do
-    s = %{module:  Utils.quoted_to_name(the_alias), type: :impl, for: Utils.quoted_to_name(type), ast: ast }
-    { ast, state ++ [s] }
-  end
-
-  defp get_defmodules({:defmodule, _, [{:__aliases__, _, _} = the_alias, [do: _]]} = ast, state) do
-    { ast, do_module_processing(ast, state) }
-  end
-
-  defp get_defmodules(ast, state) do
+  defp get_defmodules(ast, state, _) do
     { ast, state }
   end
 
-  defp do_module_processing({:defmodule, context1, [{:__aliases__, _, name} = the_alias, [do: body]]}, state) do
+  defp do_module_processing({:defmodule, context1, [{:__aliases__, _, name} = the_alias, [do: body]]}, state, opts) do
     { body, inner_modules } = make_inner_module_aliases(name, body)
 
     aliases = Enum.map(inner_modules, fn
@@ -73,8 +66,37 @@ defmodule ElixirScript.Passes.ModuleFilepaths do
 
         do_module_processing(
           {:defmodule, context1, [{:__aliases__, context2, name ++ inner_module_name}, [do: add_aliases_to_body(inner_module_body, this_module_aliases)]]},
-          state)
+          state, opts)
     end)
+
+    body = case body do
+             {:__block__, context, list } ->
+               list = Enum.map(list, fn
+               {:use, _, [module, _] } = using ->
+                 {:use, handle_use_expression(using, module, opts) }
+               {:use, _, [module] } = using ->
+                 {:use, handle_use_expression(using, module, opts) }
+               ast ->
+                 {:expanded, ast}
+             end)
+             |> Enum.reduce([], fn
+                 {:use, ast}, state ->
+                   case ast do
+                     {:__block__, _, list} ->
+                       state ++ list
+                     _ ->
+                       state ++ [ast]
+                   end
+
+                 {:expanded, ast}, state ->
+                   state ++ [ast]
+               end)
+
+               {:__block__, context, list}
+
+             _ ->
+               body
+           end
 
 
     [%{module: Utils.quoted_to_name(the_alias), type: :module, ast: {:defmodule, context1, [the_alias, [do: body]]} }] ++ state
@@ -109,6 +131,25 @@ defmodule ElixirScript.Passes.ModuleFilepaths do
         { {:__block__, context, [] }, [mod] }
       _ ->
         { body, [] }
+    end
+  end
+
+  defp handle_use_expression(using_ast, module, opts) do
+    module = Utils.quoted_to_name(module)
+
+    eval = """
+    require #{inspect module}
+    __ENV__
+    """
+    {env, _} = Code.eval_string(eval, [], opts.env)
+
+
+    case Macro.expand(using_ast, env) do
+      {:__block__, _,
+       [{:__block__, _,
+         [{:require, _, _},
+           {{:., _, [_, :__using__]}, _, _} = ast]}]} ->
+        Macro.expand_once(ast, env)
     end
   end
 end
