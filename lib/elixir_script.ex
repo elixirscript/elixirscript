@@ -60,6 +60,23 @@ defmodule ElixirScript do
   """
   @spec compile_quoted(Macro.t, Map.t) :: [binary | {binary, binary} | :ok]
   def compile_quoted(quoted, opts \\ %{}) do
+
+    opts = build_compiler_options(opts)
+
+    result = %{ data: [%{ast: quoted}] }
+    |> ElixirScript.Passes.FindModules.execute(opts)
+    |> ElixirScript.Passes.FindDeps.execute(opts)
+    |> ElixirScript.Passes.RemoveUnused.execute(opts)
+    |> ElixirScript.Passes.LoadModules.execute(opts)
+    |> ElixirScript.Passes.FindChangedFiles.execute(opts)
+    |> ElixirScript.Passes.FindFunctions.execute(opts)
+    |> ElixirScript.Passes.JavaScriptAST.execute(opts)
+    |> ElixirScript.Passes.ConsolidateProtocols.execute(opts)
+    |> ElixirScript.Passes.JavaScriptCode.execute(opts)
+    |> ElixirScript.Passes.JavaScriptName.execute(opts)
+    |> ElixirScript.Passes.HandleOutput.execute(opts)
+
+
     { code, _ } = do_compile(opts, [quoted], get_stdlib_state, [])
     result = Output.out(quoted, code, build_compiler_options(opts))
     ElixirScript.Translator.State.stop
@@ -76,7 +93,8 @@ defmodule ElixirScript do
 
     result = %{ path: path }
     |> ElixirScript.Passes.DepsPaths.execute(opts)
-    |> ElixirScript.Passes.ModuleFilepaths.execute(opts)
+    |> ElixirScript.Passes.ASTFromFile.execute(opts)
+    |> ElixirScript.Passes.FindModules.execute(opts)
     |> ElixirScript.Passes.FindDeps.execute(opts)
     |> ElixirScript.Passes.RemoveUnused.execute(opts)
     |> ElixirScript.Passes.LoadModules.execute(opts)
@@ -172,7 +190,8 @@ defmodule ElixirScript do
 
     result = %{ path: libs_path }
     |> ElixirScript.Passes.DepsPaths.execute(opts)
-    |> ElixirScript.Passes.ModuleFilepaths.execute(opts)
+    |> ElixirScript.Passes.ASTFromFile.execute(opts)
+    |> ElixirScript.Passes.FindModules.execute(opts)
     #|> ElixirScript.Passes.FindDeps.execute(opts)
     #|> ElixirScript.Passes.RemoveUnused.execute(opts)
     #|> ElixirScript.Passes.LoadModules.execute(opts)

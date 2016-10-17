@@ -1,35 +1,15 @@
-defmodule ElixirScript.Passes.ModuleFilepaths do
+defmodule ElixirScript.Passes.FindModules do
   @pass 2
 
   alias ElixirScript.Translator.Utils
 
-
-  #TODO: Split into smaller passes?
-
   def execute(compiler_data, opts) do
-    data = Enum.reduce(compiler_data.data, [], fn({dep, paths}, list) ->
+    data = Enum.reduce(compiler_data.data, [], fn(data, list) ->
+      quoted = update_quoted(data.ast)
+      { _, modules } = Macro.postwalk(quoted, [], &get_defmodules(&1, &2, opts))
 
-      file_paths = Enum.flat_map(paths, fn(path) ->
-        Path.join(path, "**/*.{ex,exs,exjs}")
-        |> Path.wildcard
-      end)
-
-      file_paths = Enum.reduce(file_paths, [], fn(path, list) ->
-        quoted = path
-        |> File.read!
-        |> Code.string_to_quoted!
-        |> update_quoted
-
-        { _, modules } = Macro.postwalk(quoted, [], &get_defmodules(&1, &2, opts))
-
-        stat = File.stat!(path)
-
-        modules = Enum.map(modules, fn(x) -> { x.module, Map.merge(x, %{ path: path, app: dep, stat: stat }) } end)
-        list ++ modules
-      end)
-
-
-      list ++ file_paths
+      modules = Enum.map(modules, fn(x) -> { x.module, Map.merge(data, x) } end)
+      list ++ modules
     end)
 
     Map.put(compiler_data, :data, data)
