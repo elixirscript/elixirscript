@@ -1,20 +1,29 @@
-# v0.22.0
+# Change Log
+All notable changes to this project will be documented in this file.
 
-* Enhancements
-  * Add `defgen` and `defgenp` for defining public and private generators
-  * Add `yield/0`, `yield/1`, and `yield_to\1` to `Kernel`
-  * Updated output folder structure. stdlib code will now go in an `elxiir` folder under the output paths while generated app code will go into an `app` folder under the output path
+The format is based on [Keep a Changelog](http://keepachangelog.com/)
+and this project adheres to [Semantic Versioning](http://semver.org/).
 
-* Breaking
-  * All process macros and functions now expect to receive and/or work using generators as entry points. Using functions defined with `def` or `defp` will not work correctly with them
+## [Unreleased]
+### Changed
+- Changed CHANGELOG.md to adhere the format from Keep a Changelog
 
-* Bug fixes
-  * Correctly returning list if list is only item in body
+## [0.22.0] - 2016-10-16
+### Added
+- `defgen` and `defgenp` for defining public and private generators
+- `yield/0`, `yield/1`, and `yield_to\1` to `Kernel`
 
-# v0.21.0
-* Enhancements
-  * This is the first release with early support for processes in elixirscript. Creating a process only works currently using `spawn/1`, `spawn_link/1`, and `spawn_monitor/1`. Inside of a process, you can use functions such as `send` and `receive`, along with some defined in the `Process` module. From outside of a process, you can send messages to a process, but you cannot receive a message from a process. Eventually all code will run inside processes and this restriction will naturally lift.
-  * The `Process` module has been implemented with the following functions:
+### Changed
+- Updated output folder structure. stdlib code will now go in an `elxiir` folder under the output paths while generated app code will go into an `app` folder under the output path
+- All process macros and functions now expect to receive and/or work using generators as entry points. Using functions defined with `def` or `defp` will not work correctly with them
+
+### Fixed
+- Correctly returning list if list is only item in body
+
+## [0.21.0] - 2016-06-28
+### Added
+- This is the first release with early support for processes in elixirscript. Creating a process only works currently using `spawn/1`, `spawn_link/1`, and `spawn_monitor/1`. Inside of a process, you can use functions such as `send` and `receive`, along with some defined in the `Process` module. From outside of a process, you can send messages to a process, but you cannot receive a message from a process. Eventually all code will run inside processes and this restriction will naturally lift.
+- The `Process` module has been implemented with the following functions:
     * `alive?/1`
     * `delete/1`
     * `demonitor/1`
@@ -35,293 +44,290 @@
     * `unlink/1`
     * `unregister/1`
     * `whereis/1`
-  * The `receive` special form has been implemented with the above caveat
-  * The following have been implemented on `Kernel`:
+- The `receive` special form has been implemented with the above caveat
+- The following have been implemented on `Kernel`:
     * `spawn/1`
     * `spawn_link/1`
     * `spawn_monitor/1`
     * `send/2`
     * `make_ref/0`
 
+## Fixed
+- Scoping on `fn` and `def`
 
+## [0.20.0] - 2016-05-14
+### Added
+- `ElixirScript.Watcher` module and `elixirscript.watch` mix task
+- logging MatchError exceptions to better show terms that don't match
 
-* Fixed
-  * Scoping on `fn` and `def`
+## [0.19.0] - 2016-04-30
+### Added
+- elixir_script mix compiler
 
-# v0.20.0
-* Enhancements
-  * Add `ElixirScript.Watcher` module and `elixirscript.watch` mix task
-  * Add logging MatchError exceptions to better show terms that don't match
+### Removed
+- `Html`, `View`, and `VDom` modules have been removed
 
-# v0.19.0
-* Enhancements
-  * Added elixir_script mix compiler
+## [0.18.0] - 2016-04-08
+### Changed
+- Better support for macros. Macros should be defined in .ex or .exs files. ElixirScript code should be in .exjs files
 
-* Breaking
-  * `Html`, `View`, and `VDom` modules have been removed
+**NOTE**: The above functionality will cause either compiler errors or no output. Please change extensions of ElixirScript code to .exjs
 
-# v0.18.0
-* Enhancements
-  * Better support for macros. Macros should be defined in .ex or .exs files. ElixirScript code should be in .exjs files
+### Deprecated
+- `Html`, `View`, and `VDom` modules will be removed in the next version as they can now be replicated using macros
 
-* Breaking
-  * The above functionality will cause either compiler errors or no output. Please change extensions of ElixirScript code to .exjs
+## [0.17.0] - 2016-03-31
+### Added
+- `output` as an option for compiler functions. This controls whether output is returned as a list of tuples, send to stdout, or saved to a file path
+- `:full_build` as an option for compiler functions and `--full-build` option to CLI. These force the compiler to perform a full build
+- `--version` option to CLI. Outputs current version of elixirscript
+- `--std-lib` option to CLI. Takes a path and adds the stdlib to that path
 
-* Deprecations
-  * `Html`, `View`, and `VDom` modules will be removed in the next version as they can now be replicated using macros
+### Changed
+- Renamed `copy_core_to_destination` to `copy_stdlib_to_destination`
+- Incremental Compilation: ElixirScript will now only build files and modules that have changed since the last build
 
-# v0.17.0
-* Enhancements
-  * Incremental Compilation:
-    ElixirScript will now only build files and modules that have changed since the last build
-  * Added `output` as an option for compiler functions. This controls whether output is returned as a list of tuples, send to stdout, or saved to a file path
-  * Added `:full_build` as an option for compiler functions and `--full-build` option to CLI. These force the compiler to perform a full build
-  * Added `--version` option to CLI. Outputs current version of elixirscript
-  * Added `--std-lib` option to CLI. Takes a path and adds the stdlib to that path
+### Removed
+- `--core` option from CLI and `:core` compiler option.
 
-* Breaking
-  * Removed `--core` option from CLI and `:core` compiler option.
-  * Renamed `copy_core_to_destination` to `copy_stdlib_to_destination`
+## [0.16.0] 2016-02-27
+### Added
+- Bitstring pattern matching
+- Bitstrings in for comprehensions
+- Functions with catch, after, else clauses
+- `with` special form
+- Pin operator in map keys and function clauses
+- Added `Kernel.object/1` function to make it more natural to create a JavaScript object with string keys. Elixirscript, by default turns the following, `%{a:"b"}` into `{[Symbol.for("a")]: "b"}` in JavaScript. In order to get string keys, one would have to do `%{"a" => "b"}` which turns into `{a: "b"}` in JavaScript. With `Kernel.object`, you can create string keyed maps conveniently, `object(a: "b")` which turns into `{a: "b"}`.
 
-# v0.16.0
-* Enhancements
-  * Bitstring pattern matching
-  * Bitstrings in for comprehensions
-  * Functions with catch, after, else clauses
-  * `with` special form
-  * Pin operator in map keys and function clauses
-  * Added `Kernel.object/1` function to make it more natural to create a JavaScript object with string keys
-    Elixirscript, by default turns the following, `%{a: "b"}` into `{[Symbol.for("a")]: "b"}` in JavaScript. In order to get string keys,
-    one would have to do `%{"a" => "b"}` which turns into `{a: "b"}` in JavaScript. With `Kernel.object`, you can create string keyed maps
-    conveniently, `object(a: "b")` which turns into `{a: "b"}`.
+ **NOTE**: when updating the created by, you still have to use the string form `%{ my_map | "a" => "c" }`
 
-    **NOTE**: when updating the created by, you still have to use the string form `%{ my_map | "a" => "c" }`
+### Removed
+- `JS.update(object, property, value)` has been removed and replaced with `JS.update(object, map)`. This allows you to update multiple values on a javascript object at once.
 
-* Bugfixes
-  * Optional parameters should now work as expected
+### Fixed
+- Optional parameters should now work as expected
 
-* Breaking
-  * `JS.update(object, property, value)` has been removed and replaced with `JS.update(object, map)`
-    This allows you to update multiple values on a javascript object at once.
+## [0.15.2] - 2016-02-21
+### Addded
+- Support for variables as map keys
 
-# v0.15.2
-* Enhancements
-  * Support for variables as map keys
+### Fixed
+- Protocol implementations for Integer and Float which where not recognized
+- Calling properties on non-objects
 
-* Bug fixes
-  * Fixed protocol implementations for Integer and Float which where not recognized
-  * Fixed calling properties on non-objects
+## [0.15.1] - 2016-02-19
+### Removed
+- Removed `catch` as a javascript keyword to filter
 
-# v0.15.1
-* Bug fixes
-  * Fixed View module so that an element can have multiple elements within
-  * Removed `catch` as a javascript keyword to filter
-  * Fixed struct implementation so that lists of atoms for fields are compiled correctly
-  * Fixed head-tail pattern match to allow for more complicated scenarios
-  * Fixed ModuleCollector to properly alias inner modules
-  * Fixed raise translation to properly translate when string messages are given
+### Fixed
+- Fixed View module so that an element can have multiple elements within
+- struct implementation so that lists of atoms for fields are compiled correctly
+- head-tail pattern match to allow for more complicated scenarios
+- ModuleCollector to properly alias inner modules
+- Raise translation to properly translate when string messages are given
 
-# v0.15.0
-* Enhancements
-  * `alias`, `require`, and `import` now work inside lexical scopes
-  * `__ENV__` and `__CALLER__` are now supported
-  * Some of the standard library originally written in JavaScript has been rewritten
-    in Elixir.
-  * Added `JS.import/1`, `JS.typeof/1`,`JS.instanceof/1`, and `JS.global/1`
-  * Added support for multi alias/require/imports statements
-  * Generated JavaScript export statements are now default exports
-  * When output is sent to standard out, there are now markers to specify where
-    each module begins as well as what the file name would be.
-    For the end of a file, `//:ENDFILE` is used. For the file name, `//<file>:ENDFILENAME`
-    is used where `<file>` is the name of the file
+## [0.15.0] - 2016-01-26
+### Added
+- `__ENV__` and `__CALLER__` are now supported
+- `JS.import/1`, `JS.typeof/1`,`JS.instanceof/1`, and `JS.global/1`
+- Support for multi alias/require/imports statements
 
-* Breaking
-  * `compile`, `compile_path`, and `compile_quoted` opts parameter now expects a map
-  * The `stdlib` compiler option is now `core`. The `stdlib_path` compiler options is now
-  `core_path`
+### Changed
+- `alias`, `require`, and `import` now work inside lexical scopes
+- Some of the standard library originally written in JavaScript has been rewritten in Elixir.
+- Generated JavaScript export statements are now default exports
+- When output is sent to standard out, there are now markers to specify where each module begins as well as what the file name would be. For the end of a file, `//:ENDFILE` is used. For the file name, `//<file>:ENDFILENAME` is used where `<file>` is the name of the file
+- `compile`, `compile_path`, and `compile_quoted` opts parameter now expects a map
+- The `stdlib` compiler option is now `core`. The `stdlib_path` compiler options is now `core_path`
 
-# v0.14.1
-* Enhancements
-  * Removed .DS_Store and LICENSE from output
+## [0.14.1] - 2015-12-07
+### Removed
+- .DS_Store and LICENSE from output
 
-# v0.14.0
-* Breaking
-  * Renamed `ex2js` to `elixirscript`. This effects the escript as well as the
-  mix task
-* Enhancements
-  * Structs are now translated into classes
-  * Structs and Tuples now match on their types
-  * Can now match on JavaScript classes. Works just like matching on structs:
-  ```elixir
-    def my_func(%HTMLElement{id: "myId"})
-  ```
-  * Can now implement protocols using JavaScript types
+## [0.14.0] - 2015-12-06
+### Added
+- Can now implement protocols using JavaScript types
   ```elixir
     defimpl MyProtocol, for: HTMLElement
   ```
-  * Added virtual-dom JavaScript library
-  * Added ElixirScript.Html module for defining a virtual-dom tree
-  * Added ElixirScript.VDom module for manipulating the virtual-dom tree created
-  using the ElixirScript.Html module
-  * Added ElixirScript.View module for handling view state and rendering virtual-dom
-  * Added `stdlib_path` compiler option to specify the es6 path to the standard library.
-  If used, elixir.js will not be exported with the compiled modules
-  * Moved non-elixir JavaScript code into `core` es6 module. This will hopefully
+- virtual-dom JavaScript library
+- ElixirScript.Html module for defining a virtual-dom tree
+- ElixirScript.VDom module for manipulating the virtual-dom tree created using the ElixirScript.Html module
+- Added ElixirScript.View module for handling view state and rendering virtual-dom
+- Added `stdlib_path` compiler option to specify the es6 path to the standard library. If used, elixir.js will not be exported with the compiled modules
+
+### Changed
+- Renamed `ex2js` to `elixirscript`. This effects the escript as well as the
+  mix task
+- Structs are now translated into classes
+- Structs and Tuples now match on their types
+- Can now match on JavaScript classes. Works just like matching on structs:
+  ```elixir
+    def my_func(%HTMLElement{id: "myId"})
+  ```
+- Moved non-elixir JavaScript code into `core` es6 module. This will hopefully
   make it so ElixirScript Standard Library modules can be defined in Elixir soon.
 
+## [0.13.0] - 2015-10-26
+### Added
+- `Base` module with function: encode64, decode64, and decode64!
+- `String` module
+- `Bitwise` module
+- `Map` module
+- `MapSet` module
+- `Set` module
+- Protocol support
+- Added `Collectable`, `Enumerable`, `Inspect`, `List.Chars`, and `String.Chars` protocols. The only one currently being used in the Standard Library, however, is String.Chars
 
-# v0.13.0
-* Enhancements
-  * Added `Base` module with function: encode64, decode64, and decode64!
-  * Added `String` module
-  * Added `Bitwise` module
-  * Added `Map` module
-  * Added `MapSet` module
-  * Added `Set` module
-  * Protocol support
-  * Added `Collectable`, `Enumerable`, `Inspect`, `List.Chars`, and `String.Chars` protocols.
-    The only one currently being used in the Standard Library, however, is String.Chars
+## [0.12.0] - 2015-09-23
+### Added
+- Added PostOffice. Only thing that current uses it is Agent
 
-# v0.12.0
-* Enhancements
-  * Updated tuple implementation. It's now a class.
-  * Replaced pattern matching library with custom one
-  * Added PostOffice. Only thing that current uses it is Agent
-  * Removed erlang.js. Moved data types to Kernel.SpecialForms
-  * `else` now works for try expressions
-  * for now works with `into` for lists
+### Changed
+- Updated tuple implementation. It's now a class.
+- Replaced pattern matching library with custom one
+- Moved data types to Kernel.SpecialForms
+- `else` now works for try expressions
+- for now works with `into` for lists
 
-# v0.11.0
-* Enhancements
-  * `import` works with all options
-  * Added `JS` module with `new`, `mutate`, `import` macros
-  * All Standard libraries are rolled up into one elixir.js file and imported from that
-  * Added `Keyword` module with functions, `has_key?` and `get`
-  * Added `Agent` module with functions, `start`, `get`, `update`, and `get_and_update`
-  * Map keys are now correctly turned into their atom counterparts if atom keys are used
-  * Modules no longer export a default object
-  * `alias` now translates to a namespace import unless `default` option is given
+### Removed
+- Removed erlang.js.
 
-* Breaking
-  * `Mutable.update` has been replaced by `JS.update`
-  * `transpile`, `transpile_quoted`, and `transpile_path` are now `compile`, `compile_quoted`, and `compile_path`
+## [0.11.0] - 2015-09-17
+### Added
+- Added `JS` module with `new`, `mutate`, `import` macros
+- Added `Keyword` module with functions, `has_key?` and `get`
+- Added `Agent` module with functions, `start`, `get`, `update`, and `get_and_update`
 
-# v0.10.0
-* Enhancements
-  * Added `env` option for `ElixirScript.transpile` adding macros for compilation
-  * Fixed `case` implementation to add `this` to call
-  * Updated `Kernel` module to translate some functions to it's JavaScript equivalent
-  * Added `Logger` that translates Logger functions to console
+### Changed
+- Map keys are now correctly turned into their atom counterparts if atom keys are used
+- `import` works with all options
+- `Mutable.update` has been replaced by `JS.update`
+- `transpile`, `transpile_quoted`, and `transpile_path` are now `compile`, `compile_quoted`, and `compile_path`
+- All Standard libraries are rolled up into one elixir.js file and imported from that
+- Modules no longer export a default object
+- `alias` now translates to a namespace import unless `default` option is given
 
-# v0.9.0
-* Enhancements
-  * an implementation for quote. Currently ignores `:location` and `:context` options
-  * an implementation for unquote and unquote_splicing
+## [0.10.0] - 2015-09-02
+### Added
+- Added `env` option for `ElixirScript.transpile` adding macros for compilation
+- Added `Logger` that translates Logger functions to console
 
-# v0.8.0
-* Enhancements
-  * Can now support catch blocks in try expressions
-  * Wrapped try's in function closure to make sure they return a value;
-  * Added receive
-  * Updated pattern matching implementation
+### Changed
+- Updated `Kernel` module to translate some functions to it's JavaScript equivalent
 
-# v0.7.0
-* Enhancements
-  * Can now support rescue and after blocks in try expressions
+### Fixed
+- Fixed `case` implementation to add `this` to call
 
-# v0.6.5
-* Enhancements
-  * Now using the JS code generator from elixir-estree for code generation, improving speed of transpilation
-  * the parse functions in the ElixirScript module have been renamed to transpile
+## [0.9.0] - 2015-08-30
+### Added
+- an implementation for quote. Currently ignores `:location` and `:context` options
+- an implementation for unquote and unquote_splicing
 
-# v0.6.0
-  * Enhancements
-    * Made the Tuple, Range and BitString data structures more immutable
-    * Now replacing characters that can't be used in variable and function names in JavaScript with
-      something that it (i.e. `match?` -> `match__qmark__`)
-    * Implemented Integer module
-    * Atom now translates to an ES6 Symbol
-    * List now translates to a frozen JS Array
-    * Added iterators for Range and BitString
-    * Updated the pattern match binding to use ES6 destructuring for lists and tuples
-    * Inner modules are now split out into their own files
+## [0.8.0] - 2015-08-15
+### Added
+- Can now support catch blocks in try expressions
+- Added receive
+
+### Changed
+- Updated pattern matching implementation
+- Wrapped try's in function closure to make sure they return a value;
+
+## [0.7.0] - 2015-08-01
+### Added
+- Can now support rescue and after blocks in try expressions
+
+## [0.6.5] - 2015-07-13
+### Changed
+- Now using the JS code generator from elixir-estree for code generation, improving speed of transpilation
+- the parse functions in the ElixirScript module have been renamed to transpile
+
+## [0.6.0] - 2015-07-02
+### Added
+- Added iterators for Range and BitString
+- Now replacing characters that can't be used in variable and function names in JavaScript with something that it (i.e. `match?` -> `match__qmark__`)
+- Implemented Integer module
+
+### Changed
+- Made the Tuple, Range and BitString data structures more immutable
+- Atom now translates to an ES6 Symbol
+- List now translates to a frozen JS Array
+- Updated the pattern match binding to use ES6 destructuring for lists and tuples
+- Inner modules are now split out into their own files
     * Standard lib is now exported with file output from cli
     * Standard lib modules are now automatically imported
     * No longer have to define modules via aliases ahead of time. They will be automatically be resolved
       and made into JavaScript import statements
 
-# v0.5.0
-  * Enhancements
-    * For statements now work with pattern matching tuples
-    * Improved function chaining
-    * added `from` clause to `import`, `alias`, and `require` so that the import path can be overridden
-    * `alias` now acts like `require` in that it is translated into an import default statement
-    * modules now export a default object with def functions added as properties on it.
-    * for function closures, now calling by using `.call(this)` so that `this` is available inside of it
+## [0.5.0] - 2015-05-31
+### Added
+- added `from` clause to `import`, `alias`, and `require` so that the import path can be overridden
 
-# v0.4.0
-  * Enhancements
-    * bitstrings
-    * Better Pattern Matching (Does not support bitstrings yet)
-    * Capture Operator
-    * Fixed multi arity implementation
-    * Updated variable implementation to match Elixir's (i.e. Reusing the same variable name creates a new one in the background)
-    * Throwing ParseError for SpecialForms currently not supported
-    * Added more functions from the list standard library
+### Changed
+- For statements now work with pattern matching tuples
+- Improved function chaining
+- `alias` now acts like `require` in that it is translated into an import default statement
+- modules now export a default object with def functions added as properties on it.
+- for function closures, now calling by using `.call(this)` so that `this` is available inside of it
 
-# v0.3.0
-  * Enhancements
-    * function and case guards
-    * function and case pattern matching
-    * Can now use ^ on a variable during assignment
+## [0.4.0] - 2015-05-05
+### Added
+- bitstrings
+- Better Pattern Matching (Does not support bitstrings yet)
+- Capture Operator
+- Added more functions from the list standard library
 
-# v0.2.1
-  * Enhancements
-    * Renamed project to ElixirScript
-    * Reduced escript file size
+### Changed
+- Updated variable implementation to match Elixir's (i.e. Reusing the same variable name creates a new one in the background)
 
-# v0.2.0
-  * Enhancements
-    * Pipe operator
-    * String interpolation
-    * Adding more functions to the Kernel module
-    * Now checking to see if a function is a Kernel function and prepending Kernel to it
-    * Now turning Atoms into an Atom javascript object instead of a Symbol
-    * Now turning tuples into a Tuple javascript object
-    * Fully implemented Tuple module
-    * Fully implemented Atom module
-    * Fully implemented Range module
-    * Can now call properties and zero parameter functions correctly
-    * case, cond, and if are now turned into if statements wrapped in function closures
-    * Anonymous functions are now turned into anonymous functions in javascript insteed of arrow functions
+### Fixed
+- Fixed multi arity implementation
 
-# v0.1.0
+## [0.3.0] - 2015-04-23
+### Added
+- function and case guards
+- function and case pattern matching
 
-* Enhancements
-  * From standard library implemented:
-      * Enum.map
-      * Kernel.tl
-      * Kernel.hd
-      * Logger
+### Changed
+- Can now use ^ on a variable during assignment
 
-  * Implemented language features:
-      * All primitives except bitstrings
-      * defmodule
-      * import, alias, and require
-      * case, cond, if
-      * def, defp
-      * defstruct, defexception
-      * raise
-      * multiple arity functions
-      * basic binary operations
-      * for without into
+## [0.2.1] - 2015-04-14
+### Changed
+- Renamed project to ElixirScript
+- Reduced escript file size
 
-  * Missing features:
-      * bitstrings
-      * pattern matching
-      * macros
-      * actors
-      * try
-      * regular expressions
-      * string interpolation
-      * Most of standard library
+## [0.2.0] - 2015-04-12
+### Added
+- Pipe operator
+- String interpolation
+- Adding more functions to the Kernel module
+- Fully implemented Tuple module
+- Fully implemented Atom module
+- Fully implemented Range module
+
+### Changed
+- Now checking to see if a function is a Kernel function and prepending Kernel to it
+- Now turning Atoms into an Atom javascript object instead of a Symbol
+- Now turning tuples into a Tuple javascript object
+- Can now call properties and zero parameter functions correctly
+- case, cond, and if are now turned into if statements wrapped in function closures
+- Anonymous functions are now turned into anonymous functions in javascript insteed of arrow functions
+
+## [0.1.0] - 2015-04-04
+### Added
+- From standard library implemented:
+ * Enum.map
+ * Kernel.tl
+ * Kernel.hd
+ * Logger
+- Implemented language features:
+ * All primitives except bitstrings
+ * defmodule
+ * import, alias, and require
+ * case, cond, if
+ * def, defp
+ * defstruct, defexception
+ * raise
+ * multiple arity functions
+ * basic binary operations
+ * for without into
