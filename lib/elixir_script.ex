@@ -415,11 +415,10 @@ defmodule ElixirScript do
   defp operating_path do
     case @lib_path do
       nil ->
-        try do
+        if Code.ensure_loaded?(Mix.Project) do
           Mix.Project.build_path <> "/lib/elixir_script/priv"
-        rescue
-          UndefinedFunctionError ->
-            split_path = Path.split(Application.app_dir(:elixirscript))
+        else
+          split_path = Path.split(Application.app_dir(:elixirscript))
           replaced_path = List.delete_at(split_path, length(split_path) - 1)
           replaced_path = List.delete_at(replaced_path, length(replaced_path) - 1)
           Path.join(replaced_path)
