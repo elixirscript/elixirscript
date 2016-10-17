@@ -11,13 +11,12 @@ defmodule ElixirScript.Translator.State do
 
   def start_link(compiler_opts, loaded_modules) do
     Agent.start_link(fn ->
-      %{ compiler_opts: compiler_opts, modules: Map.new, std_lib_map: build_standard_lib_map(), added_modules: MapSet.new, loaded_modules: loaded_modules }
+      %{ compiler_opts: compiler_opts, modules: Keyword.new, std_lib_map: build_standard_lib_map(), loaded_modules: loaded_modules }
     end, name: __MODULE__)
   end
 
   def serialize() do
     Agent.get(__MODULE__, fn(state) ->
-      state = Map.delete(state, :added_modules)
       :erlang.term_to_binary(state)
     end)
   end
@@ -26,7 +25,7 @@ defmodule ElixirScript.Translator.State do
     Agent.update(__MODULE__, fn state ->
       frozen_state = :erlang.binary_to_term(frozen_state)
       modules = Map.delete(frozen_state.modules, ElixirScript.Temp)
-      %{ state | modules: modules, std_lib_map: frozen_state.std_lib_map, added_modules: MapSet.new, loaded_modules: loaded_modules }
+      %{ state | modules: modules, std_lib_map: frozen_state.std_lib_map, loaded_modules: loaded_modules }
     end)
   end
 
@@ -55,65 +54,12 @@ defmodule ElixirScript.Translator.State do
     |> Map.put(Process, ElixirScript.Process)
   end
 
-  def add_module(module) do
+  def set_module_data(module_data) do
     Agent.update(__MODULE__, fn state ->
-      do_add_module_to_state(state, module)
+      keys = Map.values(state.std_lib_map)
+      data = Keyword.take(state.modules, keys)
+      %{ state | modules: Keyword.merge(data, module_data) }
     end)
-  end
-
-  def delete_module_by_name(module_name) do
-    Agent.update(__MODULE__, fn state ->
-      %{ state | modules: Map.delete(state.modules, module_name ), added_modules: Set.delete(state.added_modules, module_name) }
-    end)
-  end
-
-  def add_protocol(name, functions, app_name) do
-    Agent.update(__MODULE__, fn state ->
-      proto = Map.get(state.modules, do_get_module_name(name, state))
-
-      proto = if proto == nil do
-        %ElixirScript.Module{ app_name: app_name, name: name, functions: functions, type: :protocol }
-      else
-        %ElixirScript.Module{proto | functions: functions, type: :protocol }
-      end
-
-      do_add_module_to_state(state, proto)
-    end)
-  end
-
-  def add_protocol_impl(protocol, type, impl, app_name) when is_list(type) do
-    Enum.each(type, fn x ->
-      add_protocol_impl(protocol, x, impl, app_name)
-    end)
-  end
-
-  def add_protocol_impl(protocol, type, impl, app_name) do
-    Agent.update(__MODULE__, fn state ->
-      protocol_name = Atom.to_string(do_get_module_name(protocol, state))
-      type_name = Atom.to_string(Utils.quoted_to_name(type))
-      module_name = String.to_atom(protocol_name <> ".DefImpl." <> type_name)
-
-      proto_impl = %ElixirScript.Module{ app_name: app_name, name: module_name, body: impl, impl_type: type, type: :protocol_implementation }
-
-      do_add_module_to_state(state, proto_impl)
-    end)
-  end
-
-  defp do_add_module_to_state(state, module) do
-    update_added = case state.modules[module.name] do
-                     %ElixirScript.Module{ type: :protocol } = old_module ->
-                       old_module.functions !== module.functions
-                     %ElixirScript.Module{} = old_module ->
-                       old_module.body !== module.body
-                     nil ->
-                       true
-                   end
-
-    if update_added do
-      %{ state | modules: Map.put(state.modules, module.name, module), added_modules: Set.put(state.added_modules, module.name) }
-    else
-      %{ state | modules: Map.put(state.modules, module.name, module) }
-    end
   end
 
   def get do
@@ -165,19 +111,7 @@ defmodule ElixirScript.Translator.State do
 
   defp do_get_module(name) do
     Agent.get(__MODULE__, fn(state) ->
-      Map.get(state.modules, do_get_module_name(name, state))
-    end)
-  end
-
-  def add_module_reference(module_name, module_ref) do
-    Agent.update(__MODULE__, fn(state) ->
-      case Map.get(state.modules, do_get_module_name(module_name, state)) do
-        nil ->
-          state
-        module ->
-          module = %{ module | module_refs: Enum.uniq(module.module_refs ++ [module_ref]) }
-          %{ state | modules: Map.put(state.modules, module.name, module) }
-      end
+      Keyword.get(state.modules, do_get_module_name(name, state))
     end)
   end
 
@@ -186,20 +120,19 @@ defmodule ElixirScript.Translator.State do
       nil ->
         []
       module ->
-        module.module_refs
+        module.deps
     end
   end
 
   def list_modules() do
-    Agent.get(__MODULE__, fn(x) ->
-      Map.values(x.modules)
+    Agent.get(__MODULE__, fn(state) ->
+      Keyword.values(state.modules)
     end)
   end
 
   def list_module_names() do
-    Agent.get(__MODULE__, fn(x) ->
-      Map.values(x.modules)
-      |> Enum.map(fn(x) -> x.name end)
+    Agent.get(__MODULE__, fn(state) ->
+      Keyword.keys(state.modules)
     end)
   end
 

@@ -1,9 +1,17 @@
 defmodule ElixirScript.Passes.HandleOutput do
   @pass 11
+  alias ElixirScript.Translator.State
 
   def execute(compiler_data, opts) do
+    if opts.std_lib do
+      State.set_module_data(compiler_data.data)
+      new_std_state = State.serialize()
+      stdlib_state_path = Path.join([File.cwd!(), "lib", "elixir_script", "translator", "stdlib_state.bin"])
+      File.write!(stdlib_state_path, new_std_state)
+    end
+
+    State.stop()
     out(compiler_data, opts)
-    compiler_data
   end
 
   defp out(compiler_output, %{output: nil} = compiler_opts) do

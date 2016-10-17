@@ -3,8 +3,9 @@ defmodule ElixirScript.Passes.FindDeps do
 
   alias ElixirScript.Translator.Utils
 
-  def execute(module_filepath_map, _) do
-    Enum.map(module_filepath_map, &do_find_dependencies(&1))
+  def execute(compiler_data, _) do
+    data = Enum.map(compiler_data.data, &do_find_dependencies(&1))
+    Map.put(compiler_data, :data, data)
   end
 
   defp do_find_dependencies({ module, module_data }) do

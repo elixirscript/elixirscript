@@ -3,8 +3,11 @@ defmodule ElixirScript.Passes.ModuleFilepaths do
 
   alias ElixirScript.Translator.Utils
 
-  def execute(deps_paths, opts) do
-    Enum.reduce(deps_paths, [], fn({dep, paths}, list) ->
+
+  #TODO: Split into smaller passes?
+
+  def execute(compiler_data, opts) do
+    data = Enum.reduce(compiler_data.data, [], fn({dep, paths}, list) ->
 
       file_paths = Enum.flat_map(paths, fn(path) ->
         Path.join(path, "**/*.{ex,exs,exjs}")
@@ -15,6 +18,7 @@ defmodule ElixirScript.Passes.ModuleFilepaths do
         quoted = path
         |> File.read!
         |> Code.string_to_quoted!
+        |> update_quoted
 
         { _, modules } = Macro.postwalk(quoted, [], &get_defmodules(&1, &2, opts))
 
@@ -27,6 +31,8 @@ defmodule ElixirScript.Passes.ModuleFilepaths do
 
       list ++ file_paths
     end)
+
+    Map.put(compiler_data, :data, data)
   end
 
   defp get_defmodules({:defprotocol, _, [{:__aliases__, _, _} = the_alias, _]} = ast, state, _) do
@@ -152,4 +158,20 @@ defmodule ElixirScript.Passes.ModuleFilepaths do
         Macro.expand_once(ast, env)
     end
   end
+
+  defp update_quoted(quoted) do
+    Macro.prewalk(quoted, fn
+      ({name, context, parms}) ->
+        context = if context[:import] == Kernel do
+          context = Keyword.update!(context, :import, fn(_) -> ElixirScript.Kernel end)
+        else
+          context
+        end
+
+      {name, context, parms}
+      (x) ->
+        x
+    end)
+  end
+
 end

@@ -2,7 +2,6 @@ defmodule ElixirScript do
   alias ESTree.Tools.Builder
   alias ESTree.Tools.Generator
   alias ElixirScript.Translator.Utils
-  alias ElixirScript.Translator.ModuleCollector
   alias ElixirScript.Compiler.Cache
   alias ElixirScript.Compiler.Output
   require Logger
@@ -75,41 +74,20 @@ defmodule ElixirScript do
 
     opts = build_compiler_options(opts)
 
-    paths = path
+    result = %{ path: path }
     |> ElixirScript.Passes.DepsPaths.execute(opts)
     |> ElixirScript.Passes.ModuleFilepaths.execute(opts)
     |> ElixirScript.Passes.FindDeps.execute(opts)
     |> ElixirScript.Passes.RemoveUnused.execute(opts)
     |> ElixirScript.Passes.LoadModules.execute(opts)
+    |> ElixirScript.Passes.FindChangedFiles.execute(opts)
     |> ElixirScript.Passes.FindFunctions.execute(opts)
     |> ElixirScript.Passes.JavaScriptAST.execute(opts)
     |> ElixirScript.Passes.ConsolidateProtocols.execute(opts)
     |> ElixirScript.Passes.JavaScriptCode.execute(opts)
     |> ElixirScript.Passes.JavaScriptName.execute(opts)
+    |> ElixirScript.Passes.WriteCache.execute(opts)
     |> ElixirScript.Passes.HandleOutput.execute(opts)
-
-    {expanded_path, loaded_modules} = case File.dir?(path) do
-                                        true ->
-                                          process_path(path)
-                                        false ->
-                                          {[path], []}
-                                      end
-
-    compiler_cache = get_compiler_cache(path, opts)
-    new_file_stats = Cache.build_file_stats(expanded_path)
-
-    changed_files = Cache.get_changed_files(compiler_cache.input_files, new_file_stats)
-    |> Enum.map(fn {file, state} -> file end)
-
-    code = Enum.map(changed_files, &file_to_quoted/1)
-
-    { code, new_state } = do_compile(opts, code, compiler_cache.state, loaded_modules)
-    compiler_cache = %{compiler_cache | input_files: new_file_stats, state: new_state }
-
-    Cache.write(path, compiler_cache)
-    result = Output.out(path, code, opts)
-    ElixirScript.Translator.State.stop
-    result
   end
 
   defp process_path(path) do
@@ -127,7 +105,8 @@ defmodule ElixirScript do
     {exjs, ex}
   end
 
-  defp get_stdlib_state() do
+  @doc false
+  def get_stdlib_state() do
     case @stdlib_state do
       {:ok, data} ->
         data
@@ -188,29 +167,22 @@ defmodule ElixirScript do
 
   @doc false
   def compile_std_lib(output_path) do
-    compiler_opts = build_compiler_options(%{std_lib: true, include_path: true, output: output_path, app: :elixir})
-    libs_path = Path.join([__DIR__, "elixir_script", "prelude", "**", "*.ex"])
+    opts = build_compiler_options(%{std_lib: true, include_path: true, output: output_path, app: :elixir})
+    libs_path = Path.join([__DIR__, "elixir_script", "prelude"])
 
-    code = Path.wildcard(libs_path)
-    |> Enum.map(&file_to_quoted/1)
-
-    ElixirScript.Translator.State.start_link(compiler_opts, [])
-
-    code
-    |> Enum.map(&update_quoted(&1))
-    |> ModuleCollector.process_modules(compiler_opts[:app])
-
-    code = create_code(compiler_opts, ElixirScript.Translator.State.get)
-    |> Enum.filter(fn({path, _, _}) -> !String.contains?(path, "ElixirScript.Temp.js") end)
-
-    new_std_state = ElixirScript.Translator.State.serialize()
-
-    stdlib_state_path = Path.join([File.cwd!(), "lib", "elixir_script", "translator", "stdlib_state.bin"])
-
-    File.write!(stdlib_state_path, new_std_state)
-    result = Output.out(libs_path, code, compiler_opts)
-
-    ElixirScript.Translator.State.stop
+    result = %{ path: libs_path }
+    |> ElixirScript.Passes.DepsPaths.execute(opts)
+    |> ElixirScript.Passes.ModuleFilepaths.execute(opts)
+    #|> ElixirScript.Passes.FindDeps.execute(opts)
+    #|> ElixirScript.Passes.RemoveUnused.execute(opts)
+    #|> ElixirScript.Passes.LoadModules.execute(opts)
+    #|> ElixirScript.Passes.FindChangedFiles.execute(opts)
+    |> ElixirScript.Passes.FindFunctions.execute(opts)
+    |> ElixirScript.Passes.JavaScriptAST.execute(opts)
+    |> ElixirScript.Passes.ConsolidateProtocols.execute(opts)
+    |> ElixirScript.Passes.JavaScriptCode.execute(opts)
+    |> ElixirScript.Passes.JavaScriptName.execute(opts)
+    |> ElixirScript.Passes.HandleOutput.execute(opts)
 
     result
   end
@@ -223,7 +195,7 @@ defmodule ElixirScript do
 
     quoted_code_list
     |> Enum.map(&update_quoted(&1))
-    |> ModuleCollector.process_modules(compiler_opts[:app])
+    #|> ModuleCollector.process_modules(compiler_opts[:app])
 
     code = create_code(compiler_opts, ElixirScript.Translator.State.get)
     new_state = ElixirScript.Translator.State.serialize()

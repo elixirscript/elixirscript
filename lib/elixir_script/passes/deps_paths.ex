@@ -1,13 +1,21 @@
 defmodule ElixirScript.Passes.DepsPaths do
   @pass 1
+  alias ElixirScript.Translator.State
 
-  def execute(path, opts) do
-    if Code.ensure_loaded?(Mix) do
-      deps = get_deps_paths(Mix.env)
-      deps ++ [{opts[:app], [path]}]
-    else
-      [{opts[:app], [path]}]
+  def execute(compiler_data, opts) do
+    State.start_link(opts, [])
+
+    data = cond do
+      opts.std_lib ->
+        [{opts[:app], [compiler_data.path]}]
+      Code.ensure_loaded?(Mix) ->
+        deps = get_deps_paths(Mix.env)
+        deps ++ [{opts[:app], [compiler_data.path]}]
+      true ->
+        [{opts[:app], [compiler_data.path]}]
     end
+
+    Map.put(compiler_data, :data, data)
   end
 
   defp get_deps_paths(env) do

@@ -17,8 +17,7 @@ defmodule ElixirScript.Translator.LexicalScope do
     export_vars: [{atom, atom | non_neg_integer}] | nil,
     lexical_tracker: nil,
     caller: t | nil,
-    env: nil,
-    module_data: [{atom, %{}}]
+    env: nil
   }
 
   defstruct [
@@ -37,8 +36,7 @@ defmodule ElixirScript.Translator.LexicalScope do
     export_vars: nil,
     lexical_tracker: nil,
     caller: nil,
-    env: nil,
-    module_data: []
+    env: nil
   ]
 
   def env(scope) do
@@ -79,26 +77,24 @@ defmodule ElixirScript.Translator.LexicalScope do
     }
   end
 
-  def module_scope(ElixirScript.Temp, filename, env, module_data) do
+  def module_scope(ElixirScript.Temp, filename, env) do
 
     env = %ElixirScript.Translator.LexicalScope {
       module: ElixirScript.Temp, file: filename, requires: [],
       functions: [],
-      env: env,
-      module_data: module_data
+      env: env
     }
 
     add_import(env, ElixirScript.Kernel)
   end
 
-  def module_scope(module_name, filename, env, module_data) do
+  def module_scope(module_name, filename, env) do
     module = ElixirScript.Translator.State.get_module(module_name)
 
     env = %ElixirScript.Translator.LexicalScope {
       module: module_name, file: filename, requires: [],
       functions: [{ module.name, module.functions}],
-      env: env,
-      module_data: module_data
+      env: env
     }
 
     add_import(env, ElixirScript.Kernel)
