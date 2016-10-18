@@ -5,7 +5,7 @@ defmodule ElixirScript.Passes.DepsPaths do
   def execute(compiler_data, opts) do
 
     data = cond do
-      opts.std_lib ->
+      Map.get(opts, :std_lib, false) ->
         [{opts[:app], [compiler_data.path]}]
       Code.ensure_loaded?(Mix) ->
         deps = get_deps_paths(Mix.env)
