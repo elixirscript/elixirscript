@@ -126,6 +126,7 @@ defmodule ElixirScript do
     |> ElixirScript.Passes.RemoveUnused.execute(opts)
     |> ElixirScript.Passes.LoadModules.execute(opts)
     |> ElixirScript.Passes.FindChangedFiles.execute(opts)
+    |> ElixirScript.Passes.FilterExjs.execute(opts)
     |> ElixirScript.Passes.FindFunctions.execute(opts)
     |> ElixirScript.Passes.JavaScriptAST.execute(opts)
     |> ElixirScript.Passes.ConsolidateProtocols.execute(opts)

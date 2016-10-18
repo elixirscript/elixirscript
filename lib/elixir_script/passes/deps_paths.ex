@@ -8,7 +8,7 @@ defmodule ElixirScript.Passes.DepsPaths do
       Map.get(opts, :std_lib, false) ->
         [{opts[:app], [compiler_data.path]}]
       Code.ensure_loaded?(Mix) ->
-        deps = get_deps_paths(Mix.env)
+        deps = get_deps_paths(:elixirscript)
         deps ++ [{opts[:app], [compiler_data.path]}]
       true ->
         [{opts[:app], [compiler_data.path]}]
