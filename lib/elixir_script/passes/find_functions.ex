@@ -5,17 +5,7 @@ defmodule ElixirScript.Passes.FindFunctions do
   def execute(data, opts) do
     new_data = Enum.map(data.data, fn { module_name, module_data } ->
 
-      %{def: functions, defp: private_functions, defgen: generators, defgenp: private_generators } = case module_data.ast do
-        {:defmodule, _, [_, [do: body]]} ->
-          get_functions_from_module(body)
-        {:defprotocol, _, [_, [do: {:__block__, _, _} = block]]} ->
-          get_functions_from_module(block)
-        {:defprotocol, _, [{:__aliases__, _, _} = the_alias, [do: spec]]} ->
-          get_functions_from_module({:__block__, [], [spec]})
-        _ ->
-          %{ def: Keyword.new, defp: Keyword.new, defgen: Keyword.new, defgenp: Keyword.new }
-      end
-
+      %{def: functions, defp: private_functions, defgen: generators, defgenp: private_generators } = get_functions_from_module(module_data.ast)
 
       module_data = Map.put(module_data, :functions, functions ++ generators)
       |> Map.put(:private_functions, private_functions ++ private_generators)
@@ -62,7 +52,7 @@ defmodule ElixirScript.Passes.FindFunctions do
   end
 
   defp get_functions_from_module(_) do
-    %{ def: Keyword.new, defp: Keyword.new }
+    %{ def: Keyword.new, defp: Keyword.new, defgen: Keyword.new, defgenp: Keyword.new }
   end
 
   defp add_function_to_map(map, type, name, arity) do

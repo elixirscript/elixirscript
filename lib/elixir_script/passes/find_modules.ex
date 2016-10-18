@@ -15,14 +15,25 @@ defmodule ElixirScript.Passes.FindModules do
     Map.put(compiler_data, :data, data)
   end
 
-  defp get_defmodules({:defprotocol, _, [{:__aliases__, _, _} = the_alias, _]} = ast, state, _) do
-    s = %{ name:  Utils.quoted_to_name(the_alias),  type: :protocol, ast: ast }
+  defp get_defmodules({:defprotocol, _, [{:__aliases__, _, _} = the_alias, [do: {:__block__, _, _} = block]]} = ast, state, _) do
+    s = %{ name:  Utils.quoted_to_name(the_alias),  type: :protocol, ast: block }
     { ast, state ++ [s] }
   end
 
-  defp get_defmodules({:defimpl, _, [ {:__aliases__, _, name} = the_alias, [for: {:__aliases__, _, type_name} = type],  _ ]} = ast, state, _) do
+  defp get_defmodules({:defprotocol, _, [{:__aliases__, _, _} = the_alias, [do: spec]]} = ast, state, _) do
+    s = %{ name:  Utils.quoted_to_name(the_alias),  type: :protocol, ast: {:__block__, [], [spec]} }
+    { ast, state ++ [s] }
+  end
+
+  defp get_defmodules({:defimpl, _, [ {:__aliases__, _, name} = the_alias, [for: {:__aliases__, _, type_name} = type],  [do: {:__block__, context, spec}] ]} = ast, state, _) do
     name = name ++ [DefImpl] ++ type_name
-    s =  %{name:  Utils.quoted_to_name({:__aliases__, [], name}), type: :impl, for: type, ast: ast, implements: Utils.quoted_to_name(the_alias) }
+    s =  %{name:  Utils.quoted_to_name({:__aliases__, [], name}), type: :impl, for: type, ast: {:__block__, context, spec}, implements: Utils.quoted_to_name(the_alias) }
+    { ast, state ++ [s] }
+  end
+
+  defp get_defmodules({:defimpl, _, [ {:__aliases__, _, name} = the_alias, [for: {:__aliases__, _, type_name} = type],  [do: spec] ]} = ast, state, _) do
+    name = name ++ [DefImpl] ++ type_name
+    s =  %{name:  Utils.quoted_to_name({:__aliases__, [], name}), type: :impl, for: type, ast: {:__block__, [], [spec]}, implements: Utils.quoted_to_name(the_alias) }
     { ast, state ++ [s] }
   end
 
@@ -90,6 +101,7 @@ defmodule ElixirScript.Passes.FindModules do
                body
            end
 
+    body = add_aliases_to_body(body, aliases)
 
     [%{name: Utils.quoted_to_name(the_alias), type: :module, ast: body }] ++ state
   end

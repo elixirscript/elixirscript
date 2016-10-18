@@ -539,10 +539,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({name, _, params} = ast, env) when is_list(params) do
-
-
       expanded_ast = Macro.expand(ast, env.env)
-
       if expanded_ast == ast do
         name_arity = {name, length(params)}
         module = ElixirScript.Translator.State.get_module(env.module)

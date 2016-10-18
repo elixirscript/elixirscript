@@ -10,7 +10,7 @@ defmodule ElixirScript.Passes.FindDeps do
 
   defp do_find_dependencies({ module, module_data }) do
     {_, deps} = Macro.prewalk(module_data.ast, [], &collect_references(&1, &2))
-    { module, Map.put(module_data, :deps, deps) }
+    { module, Map.put(module_data, :deps, [ElixirScript.Kernel] ++ deps) }
   end
 
   defp collect_references({:import, _, [{{:., _, [{:__aliases__, _, head_import_name}, :{}]}, _, tail_imports }]}, state) do

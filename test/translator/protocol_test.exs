@@ -36,20 +36,6 @@ defmodule ElixirScript.Translator.Defprotocol.Test do
          export default Elixir$Blank;
 
     import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
-         const blank__qmark__ = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([false],function()    {
-             return     true;
-           }),Elixir.Core.Patterns.clause([null],function()    {
-             return     true;
-           }),Elixir.Core.Patterns.clause([Elixir.Core.Patterns.wildcard()],function()    {
-             return     false;
-           }));
-         export default {
-             'Type': Symbol,     'Implementation': {
-             blank__qmark__
-       }
-       };
-
-    import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
          const blank__qmark__ = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Elixir.Core.Patterns.variable()],function(number)    {
              return     false;
            }));
@@ -71,16 +57,28 @@ defmodule ElixirScript.Translator.Defprotocol.Test do
        }
        };
 
-
+    import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
+    const blank__qmark__ = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([false],function()    {
+    return     true;
+    }),Elixir.Core.Patterns.clause([null],function()    {
+    return     true;
+    }),Elixir.Core.Patterns.clause([Elixir.Core.Patterns.wildcard()],function()    {
+    return     false;
+    }));
+    export default {
+    'Type': Symbol,     'Implementation': {
+    blank__qmark__
+    }
+    };
 
     import Elixir from '../elixir/Elixir';
          let impls = [];
-         import Elixir$Blank$DefImpl$Elixir$Atom from '../app/Elixir.Blank.DefImpl.Elixir.Atom';
-         impls.push(Elixir$Blank$DefImpl$Elixir$Atom)
          import Elixir$Blank$DefImpl$Elixir$Integer from '../app/Elixir.Blank.DefImpl.Elixir.Integer';
          impls.push(Elixir$Blank$DefImpl$Elixir$Integer)
          import Elixir$Blank$DefImpl$Elixir$List from '../app/Elixir.Blank.DefImpl.Elixir.List';
          impls.push(Elixir$Blank$DefImpl$Elixir$List)
+         import Elixir$Blank$DefImpl$Elixir$Atom from '../app/Elixir.Blank.DefImpl.Elixir.Atom';
+         impls.push(Elixir$Blank$DefImpl$Elixir$Atom)
          export default impls;
     """
 

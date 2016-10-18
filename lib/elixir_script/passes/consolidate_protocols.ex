@@ -64,10 +64,10 @@ defmodule ElixirScript.Passes.ConsolidateProtocols do
     app_name = protocol.app
 
     body = Enum.flat_map(implementations, fn({impl_app_name, impl_data}) ->
-      x = Atom.to_string(impl_data.type)
+      x = Atom.to_string(Utils.quoted_to_name(impl_data.for))
       x = String.to_atom(protocol_name <> ".DefImpl." <> x)
       name = Utils.name_to_js_name(x)
-      imports = ModuleSystems.import_module(name, Utils.make_local_file_path(impl_app_name, Utils.name_to_js_file_name(x), compiler_opts.root))
+      imports = ModuleSystems.import_module(name, Utils.make_local_file_path(impl_data.app, Utils.name_to_js_file_name(x), compiler_opts.root))
       call = JS.call_expression(
         JS.member_expression(
           JS.identifier("impls"),

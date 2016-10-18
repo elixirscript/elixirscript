@@ -115,6 +115,19 @@ defmodule ElixirScript.Translator.State do
     end)
   end
 
+  def add_module_reference(module_name, module_ref) do
+    Agent.update(__MODULE__, fn(state) ->
+      case Keyword.get(state.modules, do_get_module_name(module_name, state)) do
+        nil ->
+          state
+        module ->
+          module = Map.update(module, :deps, [module_ref], fn(x) -> Enum.uniq(x ++ [module_ref]) end)
+          modules = Keyword.put(state.modules, module.name, module)
+          %{ state | modules: modules }
+      end
+    end)
+  end
+
   def get_module_references(module_name) do
     case get_module(module_name) do
       nil ->

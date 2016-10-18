@@ -70,7 +70,6 @@ defmodule ElixirScript do
     result = %{ data: data }
     |> ElixirScript.Passes.Init.execute(opts)
     |> ElixirScript.Passes.FindModules.execute(opts)
-    |> ElixirScript.Passes.FindDeps.execute(opts)
     |> ElixirScript.Passes.FindFunctions.execute(opts)
     |> ElixirScript.Passes.AddStdLib.execute(opts)
     |> ElixirScript.Passes.JavaScriptAST.execute(opts)
@@ -124,7 +123,6 @@ defmodule ElixirScript do
     |> ElixirScript.Passes.DepsPaths.execute(opts)
     |> ElixirScript.Passes.ASTFromFile.execute(opts)
     |> ElixirScript.Passes.FindModules.execute(opts)
-    |> ElixirScript.Passes.FindDeps.execute(opts)
     |> ElixirScript.Passes.RemoveUnused.execute(opts)
     |> ElixirScript.Passes.LoadModules.execute(opts)
     |> ElixirScript.Passes.FindChangedFiles.execute(opts)
@@ -139,21 +137,6 @@ defmodule ElixirScript do
     result
   end
 
-  defp process_path(path) do
-    path = Path.join(path, "**/*.{ex,exs,exjs}") |> Path.wildcard
-    {exjs, ex} = Enum.partition(path, fn(x) ->
-      case Path.extname(x) do
-        ext when ext in [".ex", ".exs"] ->
-          false
-        _ ->
-          true
-      end
-    end)
-
-    ex = Kernel.ParallelRequire.files(ex)
-    {exjs, ex}
-  end
-
   @doc false
   def get_stdlib_state() do
     case @stdlib_state do
@@ -162,48 +145,6 @@ defmodule ElixirScript do
       {:error, _} ->
         raise RuntimeError, message: "Standard Library state not found. Please run `mix std_lib`"
     end
-  end
-
-  defp get_compiler_cache(path, opts) do
-    refresh_cache = cond do
-      Map.get(opts, :full_build) ->
-        true
-      empty?(opts.output) ->
-        true
-      old_version?(opts) ->
-        true
-      Cache.get(path) == nil ->
-        true
-      true ->
-        false
-    end
-
-    if refresh_cache do
-      Cache.delete(path)
-      Cache.new(get_stdlib_state)
-    else
-      %{ Cache.get(path) | full_build?: false }
-    end
-  end
-
-  defp empty?(path) when is_binary(path) do
-    case File.ls(path) do
-      {:ok, []} ->
-        true
-      {:error, _} ->
-        true
-      _ ->
-        false
-    end
-  end
-
-  defp empty?(_) do
-    true
-  end
-
-  defp old_version?(opts) do
-    cache_version = Map.get(opts, :version, nil)
-    cache_version == version()
   end
 
   @doc false
@@ -234,22 +175,6 @@ defmodule ElixirScript do
     result
   end
 
-  defp do_compile(opts, quoted_code_list, state, loaded_modules) do
-    compiler_opts = build_compiler_options(opts)
-
-    ElixirScript.Translator.State.start_link(compiler_opts, loaded_modules)
-    ElixirScript.Translator.State.deserialize(state, loaded_modules)
-
-    quoted_code_list
-    |> Enum.map(&update_quoted(&1))
-    #|> ModuleCollector.process_modules(compiler_opts[:app])
-
-    code = create_code(compiler_opts, ElixirScript.Translator.State.get)
-    new_state = ElixirScript.Translator.State.serialize()
-
-    { code, new_state }
-  end
-
   defp build_compiler_options(opts) do
     default_options = Map.new
     |> Map.put(:include_path, false)
@@ -264,138 +189,10 @@ defmodule ElixirScript do
     Map.merge(default_options, opts)
   end
 
-  defp file_to_quoted(file) do
-    file
-    |> File.read!
-    |> Code.string_to_quoted!
-  end
-
-  defp update_quoted(quoted) do
-    Macro.prewalk(quoted, fn
-    ({name, context, parms}) ->
-      context = if context[:import] == Kernel do
-          context = Keyword.update!(context, :import, fn(_) -> ElixirScript.Kernel end)
-        else
-          context
-        end
-
-      {name, context, parms}
-    (x) ->
-      x
-    end)
-  end
-
   @doc false
   def custom_env() do
     __using__([])
     __ENV__
-  end
-
-  defp create_code(compiler_opts, state) do
-
-    parent = self
-
-    Map.values(state.modules)
-    |> Enum.reject(fn(ast) ->
-        not ast.name in state.added_modules
-      end)
-      |> Enum.map(fn ast ->
-      spawn_link fn ->
-          env = ElixirScript.Translator.LexicalScope.module_scope(ast.name,  Utils.name_to_js_file_name(ast.name) <> ".js", state.compiler_opts.env)
-
-          module = case ast.type do
-            :module ->
-                       ElixirScript.Translator.Defmodule.make_module(ast.name, ast.body, env)
-            :protocol ->
-                       ElixirScript.Translator.Defprotocol.make(ast.name, ast.functions, env)
-            :protocol_implementation ->
-                       ElixirScript.Translator.Defimpl.make(ast.name, ast.impl_type, ast.body, env)
-                   end
-
-
-          result = javascript_ast_to_code(module)
-
-          send parent, { self, result }
-        end
-      end)
-      |> Enum.map(fn pid ->
-        receive do
-          {^pid, result} -> result
-        end
-    end)
-  end
-
-  @doc false
-  def update_protocols(compiler_output, compiler_opts) do
-    Enum.reduce(compiler_output, %{}, fn
-      {file, code, app_name}, state ->
-        case String.split(file, ".DefImpl.") do
-          [protocol, impl] ->
-            protocol = String.split(protocol, "/") |> List.last |> String.to_atom
-            impl = String.replace(impl, ".js", "") |> String.to_atom
-
-            entry = Map.get(state, protocol, [])
-            entry = entry ++ [{app_name, impl}]
-
-
-            Map.put(state, protocol, entry)
-          [_] ->
-            state
-        end
-      _, state ->
-        state
-    end)
-    |> do_make_defimpl(compiler_opts)
-  end
-
-  @doc false
-  def update_protocols_in_path(compiler_output, compiler_opts, output_path) do
-    Enum.reduce(compiler_output, %{}, fn { file, code, app_name }, state ->
-      case String.split(file, ".DefImpl.") do
-        [protocol, _] ->
-          protocol = String.split(protocol, "/") |> List.last
-          protocol_impls = find_protocols_implementations_in_path(output_path, protocol)
-          protocol = String.to_atom(protocol)
-
-          entry = Map.get(state, protocol, [])
-          entry = entry ++ protocol_impls
-
-          Map.put(state, protocol, entry)
-        [_] ->
-          state
-      end
-    end)
-    |> do_make_defimpl(compiler_opts)
-  end
-
-  defp do_make_defimpl(protocols, compiler_opts) do
-    Enum.map(protocols, fn {protocol, impls} ->
-      ElixirScript.Translator.Defprotocol.make_defimpl(protocol, Enum.uniq(impls), compiler_opts)
-    end)
-    |> Enum.map(fn(module) ->
-      javascript_ast_to_code(module)
-    end)
-  end
-
-  defp find_protocols_implementations_in_path(path, protocol_prefix) do
-    Path.join([path, "**", protocol_prefix <> ".DefImpl*.js"])
-    |> Path.wildcard
-    |> Enum.filter(fn path -> !String.ends_with?(path, "DefImpl.js") end)
-    |> Enum.map(fn impl ->
-
-      path_split = Path.split(impl)
-
-      implementation = path_split
-      |> List.last
-      |> String.split(".DefImpl.")
-      |> List.last
-      |> String.replace(".js", "")
-      |> String.to_atom
-
-      app_name = Enum.at(path_split, length(path_split) - 2)
-
-      {app_name, implementation}
-    end)
   end
 
   @doc """
@@ -408,34 +205,6 @@ defmodule ElixirScript do
       File.mkdir_p!(Path.join([destination, "elixir"]))
       File.cp!(path, Path.join([destination, "elixir", base]))
     end)
-  end
-
-  defp javascript_ast_to_code(module) do
-    path = Utils.name_to_js_file_name(module.name) <> ".js"
-    js_ast = Builder.program(module.body)
-
-    js_code = js_ast
-    |> prepare_js_ast
-    |> Generator.generate
-
-    { path, js_code, module.app_name }
-  end
-
-  defp prepare_js_ast(js_ast) do
-    js_ast = case js_ast do
-               modules when is_list(modules) ->
-                 modules
-                 |> Enum.reduce([], &(&2 ++ &1.body))
-                 |> Builder.program
-               %ElixirScript.Translator.Group{ body: body } ->
-                 Builder.program(body)
-               %ElixirScript.Translator.Empty{ } ->
-                 Builder.program([])
-               _ ->
-                 js_ast
-             end
-
-    js_ast
   end
 
   #Gets path to js files whether the mix project is available

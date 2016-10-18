@@ -122,6 +122,7 @@ defmodule ElixirScript.Translator.Call do
         Utils.name_to_js_name(module_name)
 
       module_name in ElixirScript.Translator.State.list_module_names ->
+        ElixirScript.Translator.State.add_module_reference(env.module, module_name)
         Utils.name_to_js_name(module_name)
 
       true ->

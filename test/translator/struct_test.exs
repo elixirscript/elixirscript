@@ -59,7 +59,6 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-    let [user] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(), Elixir$User.Elixir$User.create(Object.freeze({})));
 
     import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
     const Elixir$User = Elixir.Core.Functions.defstruct({
@@ -71,6 +70,8 @@ defmodule ElixirScript.Translator.Struct.Test do
     export default {
         Elixir$User
     };
+
+    let [user] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(), Elixir$User.Elixir$User.create(Object.freeze({})));
     """
 
     assert_translation(ex_ast, js_code)
@@ -84,10 +85,6 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-    let [user] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),Elixir$User.Elixir$User.create(Object.freeze({
-        [Symbol.for('name')]: 'John'
-  })));
-
     import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
     const Elixir$User = Elixir.Core.Functions.defstruct({
       [Symbol.for('__struct__')]: Symbol.for('Elixir.User'),
@@ -97,6 +94,10 @@ defmodule ElixirScript.Translator.Struct.Test do
     export default {
         Elixir$User
   };
+
+    let [user] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),Elixir$User.Elixir$User.create(Object.freeze({
+    [Symbol.for('name')]: 'John'
+    })));
     """
 
     assert_translation(ex_ast, js_code)
@@ -183,10 +184,6 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-    throw Elixir$MyAppError.Elixir$MyAppError.create(Object.freeze({
-        [Symbol.for('message')]: 'did not get what was expected'
-    }));
-
     import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
     const Elixir$MyAppError = Elixir.Core.Functions.defexception({
         [Symbol.for('__struct__')]: Symbol.for('Elixir.MyAppError'),
@@ -197,6 +194,10 @@ defmodule ElixirScript.Translator.Struct.Test do
     export default {
       Elixir$MyAppError
     };
+
+    throw Elixir$MyAppError.Elixir$MyAppError.create(Object.freeze({
+    [Symbol.for('message')]: 'did not get what was expected'
+    }));
     """
 
     assert_translation(ex_ast, js_code)
