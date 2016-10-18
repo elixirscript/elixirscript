@@ -6,6 +6,10 @@ defmodule ElixirScript.Translator.Utils do
     name
   end
 
+  def name_to_quoted(name) when is_list(name) do
+    { :__aliases__, [], name }
+  end
+
   def name_to_quoted(name) do
     name = name
     |> Atom.to_string

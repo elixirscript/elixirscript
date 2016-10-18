@@ -20,7 +20,7 @@ defmodule ElixirScript.Translator.Defprotocol do
 
     {imports, body} = Defmodule.extract_imports_from_body(body)
 
-    app_name = State.get_module(name).app_name
+    app_name = State.get_module(name).app
 
     imports = imports ++ Defmodule.make_std_lib_import() ++
       Defmodule.make_imports(app_name, module_refs) ++
@@ -112,7 +112,7 @@ defmodule ElixirScript.Translator.Defprotocol do
 
     protocol_name = Atom.to_string(name)
 
-    app_name = State.get_module(name).app_name
+    app_name = State.get_module(name).app
 
     body = Enum.flat_map(implementations, fn({impl_app_name, x}) ->
       x = if is_atom(x), do: Atom.to_string(x), else: x

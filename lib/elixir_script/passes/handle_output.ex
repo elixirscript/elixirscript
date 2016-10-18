@@ -3,7 +3,7 @@ defmodule ElixirScript.Passes.HandleOutput do
   alias ElixirScript.Translator.State
 
   def execute(compiler_data, opts) do
-    if opts.std_lib do
+    if Map.get(opts, :std_lib, false) do
       State.set_module_data(compiler_data.data)
       new_std_state = State.serialize()
       stdlib_state_path = Path.join([File.cwd!(), "lib", "elixir_script", "translator", "stdlib_state.bin"])
@@ -29,14 +29,16 @@ defmodule ElixirScript.Passes.HandleOutput do
   end
 
   defp out(compiler_output, %{output: output_path, core_path: core_path} = compiler_opts) do
-    Enum.each(compiler_output, fn(x) ->
+    Enum.each(compiler_output.data, fn({_, x}) ->
       write_to_file(x, output_path)
     end)
 
-    ElixirScript.copy_stdlib_to_destination(output_path)
+    if Map.get(compiler_opts, :std_lib, false) == false do
+      ElixirScript.copy_stdlib_to_destination(output_path)
+    end
   end
 
-  defp write_to_file({_, module_data}, destination) do
+  defp write_to_file(module_data, destination) do
     file_name = Path.join([destination, to_string(module_data.app), module_data.javascript_name])
 
     if !File.exists?(Path.dirname(file_name)) do
@@ -47,7 +49,7 @@ defmodule ElixirScript.Passes.HandleOutput do
   end
 
   defp process_include_path(compiler_output, compiler_opts) do
-    Enum.map(compiler_output, fn
+    Enum.map(compiler_output.data, fn
       {module_name, module_data} ->
         case compiler_opts.include_path do
           true ->

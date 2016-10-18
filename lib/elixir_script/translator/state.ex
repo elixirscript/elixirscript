@@ -24,7 +24,7 @@ defmodule ElixirScript.Translator.State do
   def deserialize(frozen_state, loaded_modules \\ []) do
     Agent.update(__MODULE__, fn state ->
       frozen_state = :erlang.binary_to_term(frozen_state)
-      modules = Map.delete(frozen_state.modules, ElixirScript.Temp)
+      modules = Keyword.delete(frozen_state.modules, ElixirScript.Temp)
       %{ state | modules: modules, std_lib_map: frozen_state.std_lib_map, loaded_modules: loaded_modules }
     end)
   end
@@ -120,7 +120,7 @@ defmodule ElixirScript.Translator.State do
       nil ->
         []
       module ->
-        module.deps
+        Map.get(module, :deps, [])
     end
   end
 

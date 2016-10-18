@@ -8,7 +8,7 @@ defmodule ElixirScript.Passes.FindModules do
       quoted = update_quoted(data.ast)
       { _, modules } = Macro.postwalk(quoted, [], &get_defmodules(&1, &2, opts))
 
-      modules = Enum.map(modules, fn(x) -> { x.module, Map.merge(data, x) } end)
+      modules = Enum.map(modules, fn(x) -> { x.name, Map.merge(data, x) } end)
       list ++ modules
     end)
 
@@ -16,15 +16,21 @@ defmodule ElixirScript.Passes.FindModules do
   end
 
   defp get_defmodules({:defprotocol, _, [{:__aliases__, _, _} = the_alias, _]} = ast, state, _) do
-    s = %{ module:  Utils.quoted_to_name(the_alias),  type: :protocol, ast: ast }
+    s = %{ name:  Utils.quoted_to_name(the_alias),  type: :protocol, ast: ast }
     { ast, state ++ [s] }
   end
 
   defp get_defmodules({:defimpl, _, [ {:__aliases__, _, name} = the_alias, [for: {:__aliases__, _, type_name} = type],  _ ]} = ast, state, _) do
     name = name ++ [DefImpl] ++ type_name
-    s =  %{module:  Utils.quoted_to_name({:__aliases__, [], name}), type: :impl, for: Utils.quoted_to_name(type), ast: ast, implements: Utils.quoted_to_name(the_alias) }
+    s =  %{name:  Utils.quoted_to_name({:__aliases__, [], name}), type: :impl, for: type, ast: ast, implements: Utils.quoted_to_name(the_alias) }
     { ast, state ++ [s] }
   end
+
+  defp get_defmodules({:defmodule, _, [{:__aliases__, _, [:ElixirScript, :Temp]}, [do: body]]} = ast, state, opts) do
+    s = %{name: ElixirScript.Temp, type: :module, ast: body }
+    { ast, state ++ [s] }
+  end
+
 
   defp get_defmodules({:defmodule, _, [{:__aliases__, _, _}, [do: _]]} = ast, state, opts) do
     { ast, do_module_processing(ast, state, opts) }
@@ -46,7 +52,7 @@ defmodule ElixirScript.Passes.FindModules do
       ({:defmodule, context1, [{:__aliases__, context2, inner_module_name}, [do: inner_module_body]]}, state) ->
 
         module_name = Utils.quoted_to_name({:__aliases__, [], tl(name) ++ inner_module_name})
-        state = Enum.reject(state, fn(x) -> x.module == module_name end)
+        state = Enum.reject(state, fn(x) -> x.name == module_name end)
 
         this_module_aliases = aliases -- [{ :alias, [], [{:__aliases__, [alias: false], name ++ inner_module_name}, [as: {:__aliases__, [alias: false], inner_module_name }] ] }]
 
@@ -85,7 +91,7 @@ defmodule ElixirScript.Passes.FindModules do
            end
 
 
-    [%{module: Utils.quoted_to_name(the_alias), type: :module, ast: {:defmodule, context1, [the_alias, [do: body]]} }] ++ state
+    [%{name: Utils.quoted_to_name(the_alias), type: :module, ast: body }] ++ state
   end
 
   defp add_aliases_to_body(body, aliases) do

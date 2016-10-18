@@ -25,25 +25,29 @@ defmodule ElixirScript.Passes.ConsolidateProtocols do
     Enum.reduce(data, %{}, fn({module_name, module_data} = dat, state) ->
       if module_data.type == :protocol do
         existing = Map.get(state, module_name, %{})
-        Map.put(existing, :protocol, dat)
+        existing = Map.put(existing, :protocol, dat)
         Map.put(state, module_name, existing)
       else
         existing = Map.get(state, module_data.implements, %{})
         existing_protocol_data = Map.get(existing, :impls, [])
         existing_protocol_data = existing_protocol_data ++ [dat]
-        Map.put(existing, :impls, existing_protocol_data)
-        Map.put(state, module_name.implements, existing)
+        existing = Map.put(existing, :impls, existing_protocol_data)
+        Map.put(state, module_data.implements, existing)
       end
     end)
   end
 
   defp update_protocols(grouped_protocol_data, opts) do
-    Enum.map(grouped_protocol_data, fn({ protocol_name, %{ protocol: protocol, impls: impls } }) ->
-      make_defimpl(protocol_name, protocol, Enum.uniq(impls), opts)
+    Enum.map(grouped_protocol_data, fn
+        ({ protocol_name, %{ protocol: protocol, impls: impls } }) ->
+          make_defimpl(protocol_name, protocol, Enum.uniq(impls), opts)
+
+        ({ protocol_name, %{ protocol: protocol } }) ->
+         make_defimpl(protocol_name, protocol, [], opts)
     end)
   end
 
-  defp make_defimpl(name, protocol, implementations, compiler_opts) do
+  defp make_defimpl(name, { protocol_name, protocol }, implementations, compiler_opts) do
     imports = [ModuleSystems.import_module(:Elixir, Utils.make_local_file_path(:elixir, compiler_opts.core_path, compiler_opts.root))]
 
     declarator = JS.variable_declarator(

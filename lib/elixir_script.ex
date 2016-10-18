@@ -63,24 +63,52 @@ defmodule ElixirScript do
 
     opts = build_compiler_options(opts)
 
-    result = %{ data: [%{ast: quoted}] }
+    data = quoted
+    |> get_modules_from_quoted
+    |> Enum.map(fn(x) -> %{ast: x, app: :app} end)
+
+    result = %{ data: data }
+    |> ElixirScript.Passes.Init.execute(opts)
     |> ElixirScript.Passes.FindModules.execute(opts)
     |> ElixirScript.Passes.FindDeps.execute(opts)
-    |> ElixirScript.Passes.RemoveUnused.execute(opts)
-    |> ElixirScript.Passes.LoadModules.execute(opts)
-    |> ElixirScript.Passes.FindChangedFiles.execute(opts)
     |> ElixirScript.Passes.FindFunctions.execute(opts)
+    |> ElixirScript.Passes.AddStdLib.execute(opts)
     |> ElixirScript.Passes.JavaScriptAST.execute(opts)
     |> ElixirScript.Passes.ConsolidateProtocols.execute(opts)
     |> ElixirScript.Passes.JavaScriptCode.execute(opts)
     |> ElixirScript.Passes.JavaScriptName.execute(opts)
     |> ElixirScript.Passes.HandleOutput.execute(opts)
 
-
-    { code, _ } = do_compile(opts, [quoted], get_stdlib_state, [])
-    result = Output.out(quoted, code, build_compiler_options(opts))
-    ElixirScript.Translator.State.stop
     result
+  end
+
+  defp get_modules_from_quoted(quoted) do
+    results = case quoted do
+                { :__block__, _, list } ->
+                  {modules, not_modules} = Enum.partition(list,
+                                                fn
+                                                  {type, _, _ } when type in [:defprotocol, :defimpl, :defmodule] ->
+                                                    true
+                                                  _ ->
+                                                    false
+                                                end)
+
+                  temp_module = case not_modules do
+                                  [] ->
+                                    []
+                                  _ ->
+                                    [{:defmodule, [], [{:__aliases__, [], [:ElixirScript, :Temp]}, [do: { :__block__, [], not_modules }]]}]
+                                end
+
+                  modules ++ temp_module
+
+                {type, _, _ } = x when type in [:defprotocol, :defimpl, :defmodule] ->
+                  x
+                x ->
+                  {:defmodule, [], [{:__aliases__, [], [:ElixirScript, :Temp]}, [do: { :__block__, [], [x] }]]}
+              end
+
+    List.wrap(results)
   end
 
   @doc """
@@ -92,6 +120,7 @@ defmodule ElixirScript do
     opts = build_compiler_options(opts)
 
     result = %{ path: path }
+    |> ElixirScript.Passes.Init.execute(opts)
     |> ElixirScript.Passes.DepsPaths.execute(opts)
     |> ElixirScript.Passes.ASTFromFile.execute(opts)
     |> ElixirScript.Passes.FindModules.execute(opts)
@@ -106,6 +135,8 @@ defmodule ElixirScript do
     |> ElixirScript.Passes.JavaScriptName.execute(opts)
     |> ElixirScript.Passes.WriteCache.execute(opts)
     |> ElixirScript.Passes.HandleOutput.execute(opts)
+
+    result
   end
 
   defp process_path(path) do
@@ -189,13 +220,10 @@ defmodule ElixirScript do
     libs_path = Path.join([__DIR__, "elixir_script", "prelude"])
 
     result = %{ path: libs_path }
+    |> ElixirScript.Passes.Init.execute(opts)
     |> ElixirScript.Passes.DepsPaths.execute(opts)
     |> ElixirScript.Passes.ASTFromFile.execute(opts)
     |> ElixirScript.Passes.FindModules.execute(opts)
-    #|> ElixirScript.Passes.FindDeps.execute(opts)
-    #|> ElixirScript.Passes.RemoveUnused.execute(opts)
-    #|> ElixirScript.Passes.LoadModules.execute(opts)
-    #|> ElixirScript.Passes.FindChangedFiles.execute(opts)
     |> ElixirScript.Passes.FindFunctions.execute(opts)
     |> ElixirScript.Passes.JavaScriptAST.execute(opts)
     |> ElixirScript.Passes.ConsolidateProtocols.execute(opts)

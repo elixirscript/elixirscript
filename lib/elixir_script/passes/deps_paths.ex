@@ -1,9 +1,8 @@
 defmodule ElixirScript.Passes.DepsPaths do
   @pass 1
-  alias ElixirScript.Translator.State
+
 
   def execute(compiler_data, opts) do
-    State.start_link(opts, [])
 
     data = cond do
       opts.std_lib ->

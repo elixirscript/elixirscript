@@ -176,7 +176,6 @@ defmodule ElixirScript.Translator.LexicalScope do
       raise "Module #{inspect module_name} not found"
     end
 
-    ElixirScript.Translator.State.add_module_reference(env.module, module.name)
     module
   end
 
@@ -325,7 +324,7 @@ defmodule ElixirScript.Translator.LexicalScope do
   end
 
   defp check_for_module_existence(env, module_name) do
-    if !ElixirScript.Translator.State.is_module_loaded?(module_name) and !has_module?(env, module_name) do
+    if ElixirScript.Translator.State.is_module_loaded?(module_name) == false and has_module?(env, module_name) == false do
       raise "Module #{inspect module_name} not found"
     end
   end
