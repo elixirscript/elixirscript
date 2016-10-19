@@ -8,7 +8,7 @@ defmodule ElixirScript.Passes.DepsPaths do
       Map.get(opts, :std_lib, false) ->
         [{opts[:app], [compiler_data.path]}]
       Code.ensure_loaded?(Mix) ->
-        deps = get_deps_paths(:elixirscript)
+        deps = get_deps_paths(Mix.env)
         deps ++ [{opts[:app], [compiler_data.path]}]
       true ->
         [{opts[:app], [compiler_data.path]}]
@@ -24,12 +24,18 @@ defmodule ElixirScript.Passes.DepsPaths do
 
   defp do_get_deps_paths(deps) do
     Enum.reduce(deps, [], fn(dep, list) ->
-      paths = Mix.Project.in_project dep.app, dep.opts[:dest], fn mixfile -> Mix.Project.config()[:elixirc_paths] end
-      paths = Enum.map(paths, fn path -> Path.join([dep.opts[:dest], path]) end)
+      elixirscript_config = Mix.Project.in_project dep.app, dep.opts[:dest], fn mixfile -> Mix.Project.config()[:elixirscript] end
 
-      deps = do_get_deps_paths(dep.deps)
+      paths = case elixirscript_config do
+                nil ->
+                  list
 
-      deps ++ [{dep.app, paths}] ++ list
+                config ->
+                  paths = Keyword.get(config, :input, "") |> List.wrap
+                  paths = Enum.map(paths, fn path -> Path.join([dep.opts[:dest], path]) end)
+                  deps = do_get_deps_paths(dep.deps)
+                  deps ++ [{dep.app, paths}] ++ list
+              end
     end)
     |> Enum.uniq
   end

@@ -123,7 +123,6 @@ defmodule ElixirScript do
     |> ElixirScript.Passes.DepsPaths.execute(opts)
     |> ElixirScript.Passes.ASTFromFile.execute(opts)
     |> ElixirScript.Passes.FindModules.execute(opts)
-    |> ElixirScript.Passes.RemoveUnused.execute(opts)
     |> ElixirScript.Passes.LoadModules.execute(opts)
     |> ElixirScript.Passes.FindChangedFiles.execute(opts)
     |> ElixirScript.Passes.FilterExjs.execute(opts)
