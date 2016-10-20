@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - Changed CHANGELOG.md to adhere the format from Keep a Changelog
 - New compiler pipeline
-- If in mix project, will crawls deps to find packages that have an `elixirscript` config key with the `input` key set to a path to look in
+- If in mix project, will crawls deps to find packages that have an `elixir_script` config key with the `input` key set to a path to look in
 
 ## [0.22.0] - 2016-10-16
 ### Added
