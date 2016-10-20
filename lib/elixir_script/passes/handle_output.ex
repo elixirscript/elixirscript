@@ -28,7 +28,7 @@ defmodule ElixirScript.Passes.HandleOutput do
     end)
   end
 
-  defp out(compiler_output, %{output: output_path, core_path: core_path} = compiler_opts) do
+  defp out(compiler_output, %{output: output_path, core_path: _} = compiler_opts) do
     Enum.each(compiler_output.data, fn({_, x}) ->
       write_to_file(x, output_path)
     end)
@@ -50,7 +50,7 @@ defmodule ElixirScript.Passes.HandleOutput do
 
   defp process_include_path(compiler_output, compiler_opts) do
     Enum.map(compiler_output.data, fn
-      {module_name, module_data} ->
+      {_, module_data} ->
         case compiler_opts.include_path do
           true ->
             { module_data.javascript_name, module_data.javascript_code, module_data.app }

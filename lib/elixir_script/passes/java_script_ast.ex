@@ -8,7 +8,8 @@ defmodule ElixirScript.Passes.JavaScriptAST do
 
     parent = self
 
-    data = Enum.map(compiler_data.data, fn({module_name, module_data}) ->
+    data = compiler_data.data
+    |> Enum.map(fn({module_name, module_data}) ->
 
       spawn_link fn ->
         module_data = compile(module_data, opts)

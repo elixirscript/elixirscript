@@ -2,7 +2,7 @@ defmodule ElixirScript.Passes.FindFunctions do
   @pass 6
   @function_types [:def, :defp, :defgen, :defgenp]
 
-  def execute(data, opts) do
+  def execute(data, _) do
     new_data = Enum.map(data.data, fn { module_name, module_data } ->
 
       %{def: functions, defp: private_functions, defgen: generators, defgenp: private_generators } = get_functions_from_module(module_data.ast)

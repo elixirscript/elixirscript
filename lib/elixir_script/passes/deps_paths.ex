@@ -24,18 +24,18 @@ defmodule ElixirScript.Passes.DepsPaths do
 
   defp do_get_deps_paths(deps) do
     Enum.reduce(deps, [], fn(dep, list) ->
-      elixirscript_config = Mix.Project.in_project dep.app, dep.opts[:dest], fn mixfile -> Mix.Project.config()[:elixirscript] end
+      elixirscript_config = Mix.Project.in_project dep.app, dep.opts[:dest], fn _ -> Mix.Project.config()[:elixirscript] end
 
-      paths = case elixirscript_config do
-                nil ->
-                  list
+      case elixirscript_config do
+        nil ->
+          list
 
-                config ->
-                  paths = Keyword.get(config, :input, "") |> List.wrap
-                  paths = Enum.map(paths, fn path -> Path.join([dep.opts[:dest], path]) end)
-                  deps = do_get_deps_paths(dep.deps)
-                  deps ++ [{dep.app, paths}] ++ list
-              end
+        config ->
+          paths = Keyword.get(config, :input, "") |> List.wrap
+          paths = Enum.map(paths, fn path -> Path.join([dep.opts[:dest], path]) end)
+          deps = do_get_deps_paths(dep.deps)
+          deps ++ [{dep.app, paths}] ++ list
+      end
     end)
     |> Enum.uniq
   end

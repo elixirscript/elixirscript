@@ -3,7 +3,6 @@ defmodule ElixirScript.Passes.ConsolidateProtocols do
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator.Utils
   alias ElixirScript.ModuleSystems
-  alias ElixirScript.Translator.Identifier
   require Logger
 
   def execute(compiler_data, opts) do
@@ -47,7 +46,7 @@ defmodule ElixirScript.Passes.ConsolidateProtocols do
     end)
   end
 
-  defp make_defimpl(name, { protocol_name, protocol }, implementations, compiler_opts) do
+  defp make_defimpl(name, { _, protocol }, implementations, compiler_opts) do
     imports = [ModuleSystems.import_module(:Elixir, Utils.make_local_file_path(:elixir, compiler_opts.core_path, compiler_opts.root))]
 
     declarator = JS.variable_declarator(
@@ -63,7 +62,7 @@ defmodule ElixirScript.Passes.ConsolidateProtocols do
 
     app_name = protocol.app
 
-    body = Enum.flat_map(implementations, fn({impl_app_name, impl_data}) ->
+    body = Enum.flat_map(implementations, fn({_, impl_data}) ->
       x = Atom.to_string(Utils.quoted_to_name(impl_data.for))
       x = String.to_atom(protocol_name <> ".DefImpl." <> x)
       name = Utils.name_to_js_name(x)

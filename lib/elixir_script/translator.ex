@@ -28,7 +28,6 @@ defmodule ElixirScript.Translator do
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator.Rewriter
   alias ElixirScript.Translator.Receive
-  alias ElixirScript.Translator.LexicalScope
 
   # A list of erlang modules. These are rewritten into equivalent
   # JavaScript functions using ElixirScript.Translator.Rewriter

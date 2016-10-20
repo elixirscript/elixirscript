@@ -17,6 +17,7 @@ defmodule ElixirScript.Translator.State do
 
   def serialize() do
     Agent.get(__MODULE__, fn(state) ->
+      state = Map.delete(state, :changed_modules)
       :erlang.term_to_binary(state)
     end)
   end
