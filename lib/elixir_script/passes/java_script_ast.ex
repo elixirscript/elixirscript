@@ -5,9 +5,23 @@ defmodule ElixirScript.Passes.JavaScriptAST do
 
   def execute(compiler_data, opts) do
     State.set_module_data(compiler_data.data)
+
+    parent = self
+
     data = Enum.map(compiler_data.data, fn({module_name, module_data}) ->
-      module_data = compile(module_data, opts)
-      {module_name, module_data}
+
+      spawn_link fn ->
+        module_data = compile(module_data, opts)
+        result = {module_name, module_data}
+        send parent, {self, result }
+      end
+
+    end)
+    |> Enum.map(fn pid ->
+      receive do
+        {^pid, result} ->
+          result
+      end
     end)
 
     %{ compiler_data | data: data }

@@ -3,9 +3,22 @@ defmodule ElixirScript.Passes.JavaScriptCode do
   alias ESTree.Tools.{ Builder, Generator }
 
   def execute(compiler_data, _) do
+    parent = self
+
     data = Enum.map(compiler_data.data, fn({module_name, module_data}) ->
-      module_data = compile(module_data)
-      {module_name, module_data}
+
+      spawn_link fn ->
+        module_data = compile(module_data)
+        result = {module_name, module_data}
+        send parent, {self, result }
+      end
+
+    end)
+    |> Enum.map(fn pid ->
+      receive do
+        {^pid, result} ->
+          result
+      end
     end)
 
     %{ compiler_data | data: data }
