@@ -110,4 +110,47 @@ defmodule ElixirScript.Compiler.Cache do
     end
   end
 
+  def get_compiler_cache(path, opts) do
+    refresh_cache = cond do
+      Map.get(opts, :full_build) ->
+        true
+      empty?(opts.output) ->
+        true
+      old_version?(opts) ->
+        true
+      get(path) == nil ->
+        true
+      true ->
+        false
+    end
+
+    if refresh_cache do
+      delete(path)
+      new(ElixirScript.get_stdlib_state())
+    else
+      %{ get(path) | full_build?: false }
+    end
+  end
+
+  defp empty?(path) when is_binary(path) do
+    case File.ls(path) do
+      {:ok, []} ->
+        true
+      {:error, _} ->
+        true
+      _ ->
+        false
+    end
+  end
+
+  defp empty?(_) do
+    true
+  end
+
+  defp old_version?(opts) do
+    cache_version = Map.get(opts, :version, nil)
+    cache_version == ElixirScript.version()
+  end
+
+
 end

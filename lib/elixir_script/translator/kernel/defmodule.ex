@@ -20,6 +20,7 @@ defmodule ElixirScript.Translator.Defmodule do
 
   def make_module(module, body, env) do
     { body, functions } = extract_functions_from_module(body)
+
     { body, env } = translate_body(body, env)
 
     { exported_functions, private_functions } = process_functions(functions, env)
@@ -29,7 +30,7 @@ defmodule ElixirScript.Translator.Defmodule do
     {imports, body} = extract_imports_from_body(body)
     {structs, body} = extract_structs_from_body(body, env)
 
-    app_name = State.get_module(module).app_name
+    app_name = State.get_module(module).app
 
     imports = imports ++ make_std_lib_import() ++ make_imports(app_name, module_refs)
 
@@ -227,7 +228,7 @@ defmodule ElixirScript.Translator.Defmodule do
   def make_imports(current_app_name, enum) do
     Enum.map(enum, fn(x) ->
       module_name = Utils.name_to_js_name(x)
-      app_name = State.get_module(x).app_name
+      app_name = State.get_module(x).app
       path = Utils.make_local_file_path(app_name, Utils.name_to_js_file_name(x))
       ModuleSystems.import_module(module_name, path)
     end)

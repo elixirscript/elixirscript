@@ -206,7 +206,6 @@ defmodule ElixirScript.Translator.LexicalScope do
 
     if has_module?(env, module_name) do
       module = get_module(env, module_name)
-
       %{ env | requires: Enum.uniq(env.requires ++ [module.name]),
          functions: env.functions ++ [{ module.name, module.functions }] }
     else
@@ -325,7 +324,7 @@ defmodule ElixirScript.Translator.LexicalScope do
   end
 
   defp check_for_module_existence(env, module_name) do
-    if !ElixirScript.Translator.State.is_module_loaded?(module_name) and !has_module?(env, module_name) do
+    if ElixirScript.Translator.State.is_module_loaded?(module_name) == false and has_module?(env, module_name) == false do
       raise "Module #{inspect module_name} not found"
     end
   end

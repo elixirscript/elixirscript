@@ -235,11 +235,6 @@ defmodule ElixirScript.Translator.Defmodule.Test do
 
     js_code = """
     import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
-    import Elixir$Lions$Tigers from '../app/Elixir.Lions.Tigers';
-    Elixir$Lions$Tigers.oh_my();
-    export default {};
-
-    import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
     const oh_my2 = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function()    {
       return     null;
     }));
@@ -251,6 +246,11 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     export default {
       oh_my2,     oh_my
     };
+
+    import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
+    import Elixir$Lions$Tigers from '../app/Elixir.Lions.Tigers';
+    Elixir$Lions$Tigers.oh_my();
+    export default {};
     """
 
     assert_translation(ex_ast, js_code)
@@ -275,11 +275,6 @@ defmodule ElixirScript.Translator.Defmodule.Test do
 
     js_code = """
     import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
-    import Elixir$Lions$Tigers from '../app/Elixir.Lions.Tigers';
-    Elixir$Lions$Tigers.oh_my2();
-    export default {};
-
-    import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
     const oh_my2 = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function()    {
       return     null;
     }));
@@ -292,6 +287,11 @@ defmodule ElixirScript.Translator.Defmodule.Test do
       oh_my2,
       oh_my
     };
+
+    import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
+    import Elixir$Lions$Tigers from '../app/Elixir.Lions.Tigers';
+    Elixir$Lions$Tigers.oh_my2();
+    export default {};
     """
 
     assert_translation(ex_ast, js_code)
@@ -318,11 +318,11 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     export default {};
 
     import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
-    import Elixir$Version$Parser$DSL from '../app/Elixir.Version.Parser.DSL';
+    import Elixir$Version$Parser from '../app/Elixir.Version.Parser';
     export default {};
 
     import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
-    import Elixir$Version$Parser from '../app/Elixir.Version.Parser';
+    import Elixir$Version$Parser$DSL from '../app/Elixir.Version.Parser.DSL';
     export default {};
     """
 
