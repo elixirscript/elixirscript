@@ -140,26 +140,34 @@ function _try(do_fun, rescue_function, catch_fun, else_function, after_function)
 
 function _with(...args){
   let argsToPass = [];
+  let successFunction = null;
+  let elseFunction = null;
+
+  if(typeof(args[args.length - 2]) === 'function'){
+    [successFunction, elseFunction] = args.splice(-2);
+  }else{
+    successFunction = args.pop();
+  }
 
   for(let i = 0; i < args.length; i++){
-    if(i === args.length - 1){
-      return args[i].apply(null, argsToPass);
-    }else{
-      let [pattern, func] = args[i];
+    let [pattern, func] = args[i];
 
-      let result = func.apply(null, argsToPass);
+    let result = func.apply(null, argsToPass);
 
-      let patternResult = Core.Patterns.match_or_default(pattern, result);
+    let patternResult = Core.Patterns.match_or_default(pattern, result);
 
-      if(patternResult == null){
-        return result;
+    if(patternResult == null){
+      if(elseFunction){
+        return elseFunction.call(null, result);
       }else{
-        argsToPass = argsToPass.concat(patternResult);
+        return result;
       }
+    }else{
+      argsToPass = argsToPass.concat(patternResult);
     }
   }
 
-  return null;
+  return successFunction.apply(null, argsToPass);
 }
 
 export default {
