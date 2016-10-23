@@ -18,7 +18,7 @@ defmodule ElixirScript.Passes.LoadModules do
           _ ->
             []
         end
-    end
+                     end
 
     Map.put(compiler_data, :loaded_modules, loaded_modules)
   end

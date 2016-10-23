@@ -3,15 +3,14 @@ defmodule ElixirScript.Passes.DepsPaths do
 
 
   def execute(compiler_data, opts) do
-
     data = cond do
       Map.get(opts, :std_lib, false) ->
-        [{opts[:app], [compiler_data.path]}]
+        [{opts[:app], List.wrap(compiler_data.path)}]
       Code.ensure_loaded?(Mix) ->
         deps = get_deps_paths(Mix.env)
-        deps ++ [{opts[:app], [compiler_data.path]}]
+        deps ++ [{opts[:app], List.wrap(compiler_data.path)}]
       true ->
-        [{opts[:app], [compiler_data.path]}]
+        [{opts[:app], List.wrap(compiler_data.path)}]
     end
 
     Map.put(compiler_data, :data, data)
@@ -24,8 +23,7 @@ defmodule ElixirScript.Passes.DepsPaths do
 
   defp do_get_deps_paths(deps) do
     Enum.reduce(deps, [], fn(dep, list) ->
-      elixirscript_config = Mix.Project.in_project dep.app, dep.opts[:dest], fn _ -> Mix.Project.config()[:elixirscript] end
-
+      elixirscript_config = Mix.Project.in_project dep.app, dep.opts[:dest], fn _ -> Mix.Project.config()[:elixir_script] end
       case elixirscript_config do
         nil ->
           list
