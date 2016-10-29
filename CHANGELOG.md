@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - [Changed CHANGELOG.md to adhere the format from Keep a Changelog](https://github.com/bryanjos/elixirscript/pull/205)
 - [`with` now supports `else`](https://github.com/bryanjos/elixirscript/pull/207)
+- [Implement `context` option on `quote`](https://github.com/bryanjos/elixirscript/pull/208)
 - New compiler pipeline
 - In mix projects, will now crawl deps to find packages that have an `elixir_script` config key with the `input` key set to a path to look in. Basically, if a compiler has elixirscript code in it and the above is in the mix config, then it will be used during compilation
 
