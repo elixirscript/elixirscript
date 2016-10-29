@@ -87,8 +87,11 @@ defmodule ElixirScript.Translator.State do
     end
   end
 
+  def is_module_loaded?(Kernel) do
+    false
+  end
+
   def is_module_loaded?(module) when is_atom(module) do
-    module = get_module_name(module)
     Agent.get(__MODULE__, fn(state) ->
       Code.ensure_loaded?(module) or (module in state.loaded_modules)
     end)

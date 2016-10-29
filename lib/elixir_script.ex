@@ -179,7 +179,7 @@ defmodule ElixirScript do
     default_options = Map.new
     |> Map.put(:include_path, false)
     |> Map.put(:root, nil)
-    |> Map.put(:env, custom_env)
+    |> Map.put(:env, custom_env())
     |> Map.put(:import_standard_libs, true)
     |> Map.put(:core_path, "Elixir")
     |> Map.put(:full_build, false)
