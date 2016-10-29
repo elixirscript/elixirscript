@@ -47,6 +47,11 @@ defmodule ElixirScript.Translator.Quote do
     Primitive.make_tuple_quoted(opts, [:unquote, context, params], env)
   end
 
+  def make_quote([context: {_, _, [new_context]}] = opts, {name, context, params}, env) do
+    updated_context = Keyword.put(context, :context, new_context)
+    Primitive.make_tuple_quoted(opts, [name, updated_context, params], env)
+  end
+
   def make_quote(_, {:alias!, _, [the_alias]}, _) do
     the_alias
   end

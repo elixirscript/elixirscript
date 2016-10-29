@@ -120,4 +120,21 @@ defmodule ElixirScript.Translator.Quote.Test do
 
     assert_translation(ex_ast, js_code)
   end
+
+  test "quote with context option" do
+    ex_ast = quote do
+      quote context: Elixir do
+        test(1)
+      end
+    end
+
+    js_code = """
+    new Elixir.Core.Tuple(
+    Symbol.for('test'),
+    Object.freeze([new Elixir.Core.Tuple(Symbol.for('context'),Symbol.for('Elixir')), new Elixir.Core.Tuple(Symbol.for('import'),Symbol.for('Elixir.ExUnit.Case'))]),Object.freeze([1])
+    )
+    """
+
+    assert_translation(ex_ast, js_code)
+  end
 end
