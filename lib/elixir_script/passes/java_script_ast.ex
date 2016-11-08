@@ -30,6 +30,16 @@ defmodule ElixirScript.Passes.JavaScriptAST do
 
 
   defp compile(module_data, opts) do
+    loaded_modules = case Map.get(module_data, :path) do
+                       nil ->
+                         []
+                       files ->
+                         Kernel.ParallelRequire.files(List.wrap(files))
+                     end
+
+    State.add_loaded_modules(loaded_modules)
+
+
     env = ElixirScript.Translator.LexicalScope.module_scope(module_data.name,  Utils.name_to_js_file_name(module_data.name) <> ".js", opts.env)
 
     module = case module_data.type do

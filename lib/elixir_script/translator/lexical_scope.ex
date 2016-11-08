@@ -97,7 +97,16 @@ defmodule ElixirScript.Translator.LexicalScope do
       env: env
     }
 
-    add_import(env, ElixirScript.Kernel)
+    env = add_import(env, ElixirScript.Kernel)
+
+    cond do
+      module_name == ElixirScript.JS ->
+        env
+      ElixirScript.Translator.State.is_module_loaded?(module_name) ->
+        add_import(env, module_name, [only: :macros])
+      true ->
+        env
+    end
   end
 
   def function_scope(env, { _, _ } = func) do

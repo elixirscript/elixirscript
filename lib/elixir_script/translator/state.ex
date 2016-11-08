@@ -150,6 +150,12 @@ defmodule ElixirScript.Translator.State do
     end)
   end
 
+  def add_loaded_modules(modules) do
+    Agent.update(__MODULE__, fn(state) ->
+      %{ state | loaded_modules: state.loaded_modules ++ List.wrap(modules) }
+    end)
+  end
+
   def stop do
     Agent.stop(__MODULE__)
   end
