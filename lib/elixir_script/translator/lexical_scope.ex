@@ -82,6 +82,7 @@ defmodule ElixirScript.Translator.LexicalScope do
     env = %ElixirScript.Translator.LexicalScope {
       module: ElixirScript.Temp, file: filename, requires: [],
       functions: [],
+      macros: [],
       env: env
     }
 
@@ -94,6 +95,7 @@ defmodule ElixirScript.Translator.LexicalScope do
     env = %ElixirScript.Translator.LexicalScope {
       module: module_name, file: filename, requires: [],
       functions: [{ module.name, module.functions}],
+      macros: [{module.name, module.macros}],
       env: env
     }
 
@@ -102,7 +104,7 @@ defmodule ElixirScript.Translator.LexicalScope do
     cond do
       module_name == ElixirScript.JS ->
         env
-      ElixirScript.Translator.State.is_module_loaded?(module_name) ->
+      ElixirScript.Translator.State.is_module_loaded?(module_name) and length(module.macros) > 0 ->
         add_import(env, module_name, [only: :macros])
       true ->
         env

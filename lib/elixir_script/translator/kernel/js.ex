@@ -88,8 +88,4 @@ defmodule ElixirScript.Translator.JS do
     ModuleSystems.import_module(module_name, from, env)
   end
 
-  defp do_translate({:import, _, [module_name]}, env) do
-    ModuleSystems.import_module(module_name, env)
-  end
-
 end

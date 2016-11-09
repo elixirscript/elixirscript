@@ -1,5 +1,4 @@
 defmodule ElixirScript.Passes.HandleOutput do
-  @pass 11
   alias ElixirScript.Translator.State
 
   def execute(compiler_data, opts) do
@@ -32,10 +31,6 @@ defmodule ElixirScript.Passes.HandleOutput do
     Enum.each(compiler_output.data, fn({_, x}) ->
       write_to_file(x, output_path)
     end)
-
-    if Map.get(compiler_opts, :std_lib, false) == false do
-      ElixirScript.copy_stdlib_to_destination(output_path)
-    end
   end
 
   defp write_to_file(module_data, destination) do

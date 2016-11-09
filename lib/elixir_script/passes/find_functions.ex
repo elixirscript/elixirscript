@@ -1,14 +1,15 @@
 defmodule ElixirScript.Passes.FindFunctions do
-  @pass 6
-  @function_types [:def, :defp, :defgen, :defgenp]
+  @function_types [:def, :defp, :defgen, :defgenp, :defmacro, :defmacrop]
 
   def execute(data, _) do
     new_data = Enum.map(data.data, fn { module_name, module_data } ->
 
-      %{def: functions, defp: private_functions, defgen: generators, defgenp: private_generators } = get_functions_from_module(module_data.ast)
+      %{def: functions, defp: private_functions, defgen: generators, defgenp: private_generators, defmacro: macros, defmacrop: private_macros } = get_functions_from_module(module_data.ast)
 
       module_data = Map.put(module_data, :functions, functions ++ generators)
       |> Map.put(:private_functions, private_functions ++ private_generators)
+      |> Map.put(:macros, macros)
+      |> Map.put(:private_macros, private_macros)
 
       {module_name, module_data}
     end)
@@ -17,7 +18,7 @@ defmodule ElixirScript.Passes.FindFunctions do
   end
 
   defp get_functions_from_module({:__block__, _, list}) do
-    Enum.reduce(list, %{ def: Keyword.new, defp: Keyword.new, defgen: Keyword.new, defgenp: Keyword.new }, fn
+    Enum.reduce(list, new_function_map(), fn
       ({type, _, [{:when, _, [{name, _, params} | _guards] }, _] }, state) when type in @function_types and is_atom(params) ->
       arity = 0
 
@@ -51,8 +52,12 @@ defmodule ElixirScript.Passes.FindFunctions do
     end)
   end
 
+  defp new_function_map() do
+    %{ def: Keyword.new, defp: Keyword.new, defgen: Keyword.new, defgenp: Keyword.new, defmacro: Keyword.new, defmacrop: Keyword.new }
+  end
+
   defp get_functions_from_module(_) do
-    %{ def: Keyword.new, defp: Keyword.new, defgen: Keyword.new, defgenp: Keyword.new }
+    new_function_map()
   end
 
   defp add_function_to_map(map, type, name, arity) do

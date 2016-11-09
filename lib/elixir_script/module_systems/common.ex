@@ -14,11 +14,6 @@ defmodule ElixirScript.ModuleSystems.Common do
     do_import_module(Translator.translate!(module_name, env), from)
   end
 
-  def import_module(module_name, %ElixirScript.Translator.LexicalScope{} = env) do
-    {from, _ } = Code.eval_quoted(module_name)
-    do_import_module(Translator.translate!(module_name, env), Macro.underscore(from))
-  end
-
   def import_module(import_name, from) do
     do_import_module(JS.identifier(import_name), from)
   end

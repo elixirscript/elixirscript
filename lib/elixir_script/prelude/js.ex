@@ -1,4 +1,4 @@
-defmodule ElixirScript.JS do
+defmodule JS do
   @moduledoc """
   This module defines macros and functions which implement
   JavaScript functionality that may not translate easily to
@@ -12,7 +12,7 @@ defmodule ElixirScript.JS do
   ex:
     JS.new User, ["first_name", "last_name"]
   """
-  defmacro new(module, params) do
+  def new(module, params) do
   end
 
 
@@ -22,7 +22,7 @@ defmodule ElixirScript.JS do
   ex:
     JS.update elem, %{"width" => 100}
   """
-  defmacro update(object, map) do
+  def update(object, map) do
   end
 
 
@@ -41,38 +41,25 @@ defmodule ElixirScript.JS do
 
     JS.import [A, B, C], "a" #translates to "import {A, B, C} from 'a'"
   """
-  defmacro import(module, from) do
-  end
-
-
-  @doc """
-  Imports a JavaScript module.
-
-  Works like import/2, but tries to infer the path to the module.
-  Only works for default imports. Uses `Macro.underscore` to infer path.
-
-  ex:
-    JS.import React #translates to "import React from 'react'"
-  """
-  defmacro import(module) do
+  def import(module, from) do
   end
 
   @doc """
   Returns the type of the given value
   """
-  defmacro typeof(value) do
+  def typeof(value) do
   end
 
   @doc """
   Determines if value is an instance of type.
   """
-  defmacro instanceof(value, type) do
+  def instanceof(value, type) do
   end
 
   @doc """
   Throws the term given
   """
-  defmacro throw(term) do
+  def throw(term) do
   end
 
 

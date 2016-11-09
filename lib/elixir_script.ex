@@ -35,7 +35,6 @@ defmodule ElixirScript do
     quote do
       import Kernel, only: [&&: 2, use: 2, use: 1]
       import ElixirScript.Kernel
-      require ElixirScript.JS, as: JS
     end
   end
 
@@ -127,6 +126,7 @@ defmodule ElixirScript do
     |> ElixirScript.Passes.FindModules.execute(opts)
     |> ElixirScript.Passes.FindChangedFiles.execute(opts)
     |> ElixirScript.Passes.FindFunctions.execute(opts)
+    |> ElixirScript.Passes.AddStdLib.execute(opts)
     |> ElixirScript.Passes.JavaScriptAST.execute(opts)
     |> ElixirScript.Passes.ConsolidateProtocols.execute(opts)
     |> ElixirScript.Passes.JavaScriptCode.execute(opts)

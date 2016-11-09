@@ -1,13 +1,18 @@
 defmodule ElixirScript.Passes.ConsolidateProtocols do
-  @pass 8
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator.Utils
   alias ElixirScript.ModuleSystems
+  alias ElixirScript.Translator.State
   require Logger
 
   def execute(compiler_data, opts) do
-    only_protocols_and_impls = Enum.filter(compiler_data.data, fn
+    State.set_module_data(compiler_data.data)
+    data = State.get_module_data()
+
+    only_protocols_and_impls = Enum.filter(data, fn
       ({_, %{type: :module}}) ->
+        false
+      ({_, %{type: :consolidated}}) ->
         false
       _ ->
         true
@@ -16,7 +21,9 @@ defmodule ElixirScript.Passes.ConsolidateProtocols do
     grouped = group_protocol_data(only_protocols_and_impls)
     consolidated_protocols = update_protocols(grouped, opts)
 
-    %{ compiler_data | data: compiler_data.data ++ consolidated_protocols }
+    data = Enum.reduce(consolidated_protocols, data, fn({ key, value }, d) -> Keyword.put(d, key, value) end)
+
+    %{ compiler_data | data: data }
   end
 
 
@@ -42,7 +49,7 @@ defmodule ElixirScript.Passes.ConsolidateProtocols do
           make_defimpl(protocol_name, protocol, Enum.uniq(impls), opts)
 
         ({ protocol_name, %{ protocol: protocol } }) ->
-         make_defimpl(protocol_name, protocol, [], opts)
+        make_defimpl(protocol_name, protocol, [], opts)
     end)
   end
 
