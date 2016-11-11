@@ -102,7 +102,7 @@ defmodule ElixirScript.Translator.LexicalScope do
     env = add_import(env, ElixirScript.Kernel)
 
     cond do
-      module_name == ElixirScript.JS ->
+      module_name == JS ->
         env
       ElixirScript.Translator.State.is_module_loaded?(module_name) and length(module.macros) > 0 ->
         add_import(env, module_name, [only: :macros])

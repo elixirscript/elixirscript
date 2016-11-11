@@ -2,6 +2,7 @@ defmodule ElixirScript.Kernel do
   import Kernel, only: [defmodule: 2, def: 1, def: 2, defp: 2,
   defmacro: 1, defmacro: 2, defmacrop: 2, ||: 2, !: 1, ++: 2, in: 2, &&: 2, ===: 2, @: 1]
 
+
   defmacro if(condition, clauses) do
     build_if(condition, clauses)
   end
@@ -35,18 +36,6 @@ defmodule ElixirScript.Kernel do
     end
   end
 
-  defmacro typeof(term) do
-    quote do
-      JS.typeof(unquote(term))
-    end
-  end
-
-  defmacro instanceof(term, type) do
-    quote do
-      JS.instanceof(unquote(term), unquote(type))
-    end
-  end
-
   def abs(number) do
     Math.abs(number)
   end
@@ -72,19 +61,19 @@ defmodule ElixirScript.Kernel do
   end
 
   def is_atom(term) do
-    typeof(term) === "symbol"
+    JS.typeof(term) === "symbol"
   end
 
   def is_binary(term) do
-    typeof(term) === "string"
+    JS.typeof(term) === "string"
   end
 
   def is_bitstring(term) do
-    is_binary(term) || instanceof(term, Elixir.Core.BitString)
+    is_binary(term) || JS.instanceof(term, Elixir.Core.BitString)
   end
 
   def is_boolean(term) do
-    JS.typeof(term) === "boolean" || instanceof(term, Boolean)
+    JS.typeof(term) === "boolean" || JS.instanceof(term, Boolean)
   end
 
   def is_float(term) do
@@ -96,7 +85,7 @@ defmodule ElixirScript.Kernel do
   end
 
   def is_function(term, _) do
-    typeof(term) === "function" || instanceof(term, Function)
+    JS.typeof(term) === "function" || JS.instanceof(term, Function)
   end
 
   def is_integer(term) do
@@ -108,7 +97,7 @@ defmodule ElixirScript.Kernel do
   end
 
   def is_number(term) do
-    typeof(term) === "number" || instanceof(term, Number)
+    JS.typeof(term) === "number" || JS.instanceof(term, Number)
   end
 
   def is_pid(term) do
@@ -120,11 +109,7 @@ defmodule ElixirScript.Kernel do
   end
 
   def is_map(term) do
-    typeof(term) === "object" || instanceof(term, Object)
-  end
-
-  def is_generator(term) do
-    term.constructor.name === "GeneratorFunction"
+    JS.typeof(term) === "object" || JS.instanceof(term, Object)
   end
 
   def is_port(_) do
@@ -242,41 +227,5 @@ defmodule ElixirScript.Kernel do
     quote do
       %ElixirScript.Range{ first: unquote(first), last: unquote(last) }
     end
-  end
-
-  defmacro yield() do
-    quote do
-      JS.yield()
-    end
-  end
-
-  defmacro yield(term) do
-    quote do
-      JS.yield(unquote(term))
-    end
-  end
-
-  defmacro yield_to(term) do
-    quote do
-      JS.yield_to(unquote(term))
-    end
-  end
-
-  @doc """
-  Provides a convenient way to create a string-based map.
-
-  Elixirscript, by default turns the following, `%{a: "b"}` into `{[Symbol.for("a")]: "b"}` in JavaScript. In order to get string keys,
-  one would have to do `%{"a" => "b"}` which turns into `{a: "b"}` in JavaScript. With `Kernel.object`, you can create string keyed maps
-  conveniently, `object(a: "b")` which turns into `{a: "b"}`
-  """
-  defmacro object(args) do
-    args = Enum.map(args, fn
-      { k, v } when Kernel.is_atom(k) ->
-        { Atom.to_string(k), v }
-      pair ->
-        pair
-    end)
-
-    { :%{}, [], args }
   end
 end

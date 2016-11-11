@@ -73,4 +73,40 @@ defmodule JS do
     Elixir.Core.Functions.get_global()
   end
 
+  defmacro defgen(call, expr \\ nil) do
+  end
+
+  defmacro defgenp(call, expr \\ nil) do
+  end
+
+  def is_generator(term) do
+    term.constructor.name === "GeneratorFunction"
+  end
+
+  def yield() do
+  end
+
+  def yield(term) do
+  end
+
+  def yield_to(term) do
+  end
+
+  @doc """
+  Provides a convenient way to create a string-based map.
+
+  Elixirscript, by default turns the following, `%{a: "b"}` into `{[Symbol.for("a")]: "b"}` in JavaScript. In order to get string keys,
+  one would have to do `%{"a" => "b"}` which turns into `{a: "b"}` in JavaScript. With `Kernel.object`, you can create string keyed maps
+  conveniently, `object(a: "b")` which turns into `{a: "b"}`
+  """
+  defmacro object(args) do
+    args = Enum.map(args, fn
+      { k, v } when Kernel.is_atom(k) ->
+        { Atom.to_string(k), v }
+      pair ->
+        pair
+    end)
+
+    { :%{}, [], args }
+  end
 end

@@ -33,8 +33,17 @@ defmodule ElixirScript do
 
   defmacro __using__(_) do
     quote do
-      import Kernel, only: [&&: 2, use: 2, use: 1]
+      import Kernel, except: [
+        if: 2, unless: 2, abs: 1, apply: 2, apply: 3, binary_part: 3, hd: 1,
+        tl: 1, is_atom: 1, is_binary: 1, is_bitstring: 1, is_boolean: 1, is_float: 1,
+        is_function: 1, is_function: 2, is_integer: 1, is_list: 1, is_number: 1,
+        is_pid: 1, is_tuple: 1, is_map: 1, is_port: 1, is_reference: 1, length: 1,
+        map_size: 1, max: 2, min: 2, round: 1, trunc: 1, tuple_size: 1, elem: 2, is_nil: 1,
+        make_ref: 1, spawn: 1, spawn: 3, spawn_link: 1, spawn_link: 3, spawn_monitor: 1,
+        spawn_monitor: 3, send: 2, self: 0, match?: 2, to_string: 1, "|>": 2, in: 2, "..": 2
+      ]
       import ElixirScript.Kernel
+      import JS, only: [defgen: 1, defgen: 2, is_generator: 1, yield: 0, yield: 1, yield_to: 1, object: 1]
     end
   end
 

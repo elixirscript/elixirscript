@@ -67,6 +67,12 @@ defmodule ElixirScript.Translator.State do
     end)
   end
 
+  def set_loaded_modules(modules) do
+    Agent.update(__MODULE__, fn state ->
+      %{ state | loaded_modules: modules }
+    end)
+  end
+
   def get do
     Agent.get(__MODULE__, &(&1))
   end

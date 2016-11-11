@@ -5,6 +5,7 @@ defmodule ElixirScript.Passes.JavaScriptAST do
   def execute(compiler_data, opts) do
 
     State.set_module_data(compiler_data.data)
+    State.set_loaded_modules(Map.get(compiler_data, :loaded_modules, []))
 
     parent = self
 
