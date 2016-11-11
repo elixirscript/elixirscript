@@ -29,7 +29,6 @@ defmodule ElixirScript.Passes.JavaScriptAST do
     %{ compiler_data | data: data }
   end
 
-
   defp compile(module_data, opts) do
 
     env = ElixirScript.Translator.LexicalScope.module_scope(module_data.name,  Utils.name_to_js_file_name(module_data.name) <> ".js", opts.env)

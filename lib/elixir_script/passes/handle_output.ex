@@ -10,8 +10,15 @@ defmodule ElixirScript.Passes.HandleOutput do
       File.write!(stdlib_state_path, new_std_state)
       State.stop()
     else
+      State.stop()
       out(compiler_data, opts)
     end
+  end
+
+  defp out(compiler_output, %{import_standard_libs: false} = compiler_opts) do
+    data = Enum.filter(compiler_output.data, fn({m, d}) -> d.app != :elixir end)
+
+    out(%{ compiler_output | data: data }, Map.delete(compiler_opts, :import_standard_libs))
   end
 
   defp out(compiler_output, %{output: nil} = compiler_opts) do
@@ -34,7 +41,6 @@ defmodule ElixirScript.Passes.HandleOutput do
     end
 
     compiler_output.data
-    |> Enum.reject(fn({m, d}) -> Map.get(compiler_opts, :import_standard_libs, true) == false && d.app == :elixir end)
     |> Enum.each(fn({_, x}) ->
       write_to_file(x, output_path)
     end)
@@ -52,7 +58,6 @@ defmodule ElixirScript.Passes.HandleOutput do
 
   defp process_include_path(compiler_output, compiler_opts) do
     compiler_output.data
-    |> Enum.reject(fn({m, d}) -> Map.get(compiler_opts, :import_standard_libs, true) == false && d.app == :elixir end)
     |> Enum.map(fn
       {_, module_data} ->
         case compiler_opts.include_path do

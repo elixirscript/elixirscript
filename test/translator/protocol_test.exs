@@ -25,8 +25,18 @@ defmodule ElixirScript.Translator.Defprotocol.Test do
     end
 
     js_code = """
-    import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
-    import Implementations from '../app/Elixir.Blank.Defimpl';
+         import Elixir from '../elixir/Elixir';
+         let impls = [];
+         import Elixir$Blank$DefImpl$Elixir$Integer from '../app/Elixir.Blank.DefImpl.Elixir.Integer';
+         impls.push(Elixir$Blank$DefImpl$Elixir$Integer)
+         import Elixir$Blank$DefImpl$Elixir$List from '../app/Elixir.Blank.DefImpl.Elixir.List';
+         impls.push(Elixir$Blank$DefImpl$Elixir$List)
+         import Elixir$Blank$DefImpl$Elixir$Atom from '../app/Elixir.Blank.DefImpl.Elixir.Atom';
+         impls.push(Elixir$Blank$DefImpl$Elixir$Atom)
+         export default impls;
+
+         import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
+         import Implementations from '../app/Elixir.Blank.Defimpl';
          const Elixir$Blank = Elixir.Core.Functions.defprotocol({
              blank__qmark__: function()    {
 
@@ -35,7 +45,7 @@ defmodule ElixirScript.Translator.Defprotocol.Test do
          for(let {Type,Implementation} of Implementations) Elixir.Core.Functions.defimpl(Elixir$Blank,Type,Implementation)
          export default Elixir$Blank;
 
-    import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
+         import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
          const blank__qmark__ = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Elixir.Core.Patterns.variable()],function(number)    {
              return     false;
            }));
@@ -45,7 +55,7 @@ defmodule ElixirScript.Translator.Defprotocol.Test do
        }
        };
 
-    import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
+         import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
          const blank__qmark__ = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Object.freeze([])],function()    {
              return     true;
            }),Elixir.Core.Patterns.clause([Elixir.Core.Patterns.wildcard()],function()    {
@@ -57,29 +67,19 @@ defmodule ElixirScript.Translator.Defprotocol.Test do
        }
        };
 
-    import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
-    const blank__qmark__ = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([false],function()    {
-    return     true;
-    }),Elixir.Core.Patterns.clause([null],function()    {
-    return     true;
-    }),Elixir.Core.Patterns.clause([Elixir.Core.Patterns.wildcard()],function()    {
-    return     false;
-    }));
-    export default {
-    'Type': Symbol,     'Implementation': {
-    blank__qmark__
-    }
-    };
-
-    import Elixir from '../elixir/Elixir';
-         let impls = [];
-         import Elixir$Blank$DefImpl$Elixir$Integer from '../app/Elixir.Blank.DefImpl.Elixir.Integer';
-         impls.push(Elixir$Blank$DefImpl$Elixir$Integer)
-         import Elixir$Blank$DefImpl$Elixir$List from '../app/Elixir.Blank.DefImpl.Elixir.List';
-         impls.push(Elixir$Blank$DefImpl$Elixir$List)
-         import Elixir$Blank$DefImpl$Elixir$Atom from '../app/Elixir.Blank.DefImpl.Elixir.Atom';
-         impls.push(Elixir$Blank$DefImpl$Elixir$Atom)
-         export default impls;
+         import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
+         const blank__qmark__ = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([false],function()    {
+             return     true;
+           }),Elixir.Core.Patterns.clause([null],function()    {
+             return     true;
+           }),Elixir.Core.Patterns.clause([Elixir.Core.Patterns.wildcard()],function()    {
+             return     false;
+           }));
+         export default {
+             'Type': Symbol,     'Implementation': {
+             blank__qmark__
+       }
+       };
     """
 
     assert_translation(ex_ast, js_code)

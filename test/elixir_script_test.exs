@@ -2,94 +2,9 @@ defmodule ElixirScript.Test do
   use ExUnit.Case
   import ElixirScript.TestHelper
 
-  test "chain methods" do
-    js_code = ElixirScript.compile("""
-      JQuery.("<div/>").text(html)
-    """)
-
-    assert Enum.join(js_code, "\n") =~ "JQuery('<div/>').text(html)"
-  end
-
   test "turn javascript ast into javascript code strings" do
     js_code = ElixirScript.compile(":atom")
     assert Enum.join(js_code, "\n") =~ "Symbol.for('atom')"
-  end
-
-  test "parse one module correctly" do
-    js_code = ElixirScript.compile("""
-
-      defmodule Elephant do
-        @ul JQuery.("#todo-list")
-
-        @doc "ignore"
-        def something() do
-          @ul
-        end
-
-        defp something_else() do
-          to_string(10)
-        end
-      end
-
-    """)
-
-    assert_js_matches """
-    import Elixir from '../elixir/Elixir';
-    import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
-    import Elixir$ElixirScript$String$Chars from '../elixir/Elixir.ElixirScript.String.Chars';
-         const something_else = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function()    {
-             return     Elixir$ElixirScript$String$Chars.to_string(10);
-           }));
-         const something = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function()    {
-             return     ul;
-           }));
-         const ul = JQuery('#todo-list');
-         export default {
-             something
-       };
-    """, hd(js_code)
-  end
-
-  test "parse multiple modules correctly" do
-
-    js_code = ElixirScript.compile("""
-      defmodule Animals do
-
-        defmodule Elephant do
-          defstruct trunk: true
-        end
-
-
-        def something() do
-          %Elephant{}
-        end
-
-      end
-    """, %{ env: make_custom_env })
-
-    assert_js_matches """
-    import Elixir from '../elixir/Elixir';
-    import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
-    import Elixir$Animals$Elephant from '../app/Elixir.Animals.Elephant';
-    const something = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function()    {
-        return     Elixir$Animals$Elephant.Elixir$Animals$Elephant.create(Object.freeze({}));
-      }));
-    export default {
-        something
-  };
-     """, hd(js_code)
-
-     assert_js_matches """
-     import Elixir from '../elixir/Elixir';
-     import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
-     const Elixir$Animals$Elephant = Elixir.Core.Functions.defstruct({
-         [Symbol.for('__struct__')]: Symbol.for('Elixir.Animals.Elephant'),
-         [Symbol.for('trunk')]: true
-   });
-     export default {
-         Elixir$Animals$Elephant
-   };
-       """, Enum.fetch!(js_code, 1)
   end
 
 
@@ -118,7 +33,7 @@ defmodule ElixirScript.Test do
          export default {
              sandwich
        };
-     """, hd(js_code)
+     """, List.last(js_code)
   end
 
 
@@ -147,6 +62,6 @@ defmodule ElixirScript.Test do
          export default {
              sandwich
        };
-     """, hd(js_code)
+     """, List.last(js_code)
   end
 end
