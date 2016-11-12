@@ -80,8 +80,12 @@ defmodule ElixirScript.Translator.JS do
     Translator.translate!(quoted, env)
   end
 
-  defp do_translate({:import, _, [module_names, from]}, env) when is_list(module_names) do
-    ModuleSystems.import_module(module_names, from, env)
+  defp do_translate({:import, _, [module_name, from, [default: false]]}, env) do
+    ModuleSystems.import_namespace_module(module_name, from, env)
+  end
+
+  defp do_translate({:import, _, [module_name, from, [default: true]]}, env) do
+    ModuleSystems.import_module(module_name, from, env)
   end
 
   defp do_translate({:import, _, [module_name, from]}, env) do

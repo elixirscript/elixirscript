@@ -11,6 +11,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - [Implement `context` option on `quote`](https://github.com/bryanjos/elixirscript/pull/208)
 - New compiler pipeline
 - `@on_js_load`. Expects a 0 arity function. This function will be called when the compiled module is loaded in JavaScript
+- `JS.import\3`. Just like `JS.import\2` but expects options to decide if the import should be a default one or a namespace on. Only option allowed is `default`. Set to `true` by default
+  ```elixir
+  # translates to "import A from 'a'"
+  JS.import A, "a"
+
+  #translates to "import * as A from 'a'"
+  JS.import A, "a", default: false
+  ```
+
+### Removed
+- The form of `JS.import` that accepted a list of atoms as the first arg. Used `JS.import\3` with `default: false` instead to create a namespace import
 
 ### Changed
 - [Changed CHANGELOG.md to adhere the format from Keep a Changelog](https://github.com/bryanjos/elixirscript/pull/205)

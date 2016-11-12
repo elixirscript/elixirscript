@@ -33,15 +33,15 @@ defmodule JS do
   but JavaScript modules work differently and have to be imported
   using this.
 
-  If module is not a list, then it is treated as a default import,
-  otherwise it is not.
+  If `default` is set to true then it is treated as a default import.
+  Otherwise it is treated as a namespace import.
 
   ex:
     JS.import A, "a" #translates to "import A from 'a'"
 
-    JS.import [A, B, C], "a" #translates to "import {A, B, C} from 'a'"
+    JS.import A, "a", default: false #translates to "import * as A from 'a'"
   """
-  def import(module, from) do
+  def import(module, from, opts \\ [default: true]) do
   end
 
   @doc """
