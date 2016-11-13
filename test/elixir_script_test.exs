@@ -22,7 +22,7 @@ defmodule ElixirScript.Test do
     """, %{ env: make_custom_env })
 
     assert_js_matches """
-    import Elixir from '../elixir/Elixir';
+    import Elixir from '../elixir/Elixir.Bootstrap';
     import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
          const something_else = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function()    {
              return     1 * 1;

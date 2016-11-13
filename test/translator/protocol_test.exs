@@ -25,7 +25,7 @@ defmodule ElixirScript.Translator.Defprotocol.Test do
     end
 
     js_code = """
-         import Elixir from '../elixir/Elixir';
+         import Elixir from '../elixir/Elixir.Bootstrap';
          let impls = [];
          import Elixir$Blank$DefImpl$Elixir$Integer from '../app/Elixir.Blank.DefImpl.Elixir.Integer';
          impls.push(Elixir$Blank$DefImpl$Elixir$Integer)

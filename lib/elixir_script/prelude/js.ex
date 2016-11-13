@@ -12,7 +12,7 @@ defmodule JS do
   ex:
     JS.new User, ["first_name", "last_name"]
   """
-  def new(module, params) do
+  defmacro new(module, params) do
   end
 
 
@@ -22,7 +22,7 @@ defmodule JS do
   ex:
     JS.update elem, %{"width" => 100}
   """
-  def update(object, map) do
+  defmacro update(object, map) do
   end
 
 
@@ -41,25 +41,25 @@ defmodule JS do
 
     JS.import A, "a", default: false #translates to "import * as A from 'a'"
   """
-  def import(module, from, opts \\ [default: true]) do
+  defmacro import(module, from, opts \\ [default: true]) do
   end
 
   @doc """
   Returns the type of the given value
   """
-  def typeof(value) do
+  defmacro typeof(value) do
   end
 
   @doc """
   Determines if value is an instance of type.
   """
-  def instanceof(value, type) do
+  defmacro instanceof(value, type) do
   end
 
   @doc """
   Throws the term given
   """
-  def throw(term) do
+  defmacro throw(term) do
   end
 
 
@@ -83,13 +83,13 @@ defmodule JS do
     term.constructor.name === "GeneratorFunction"
   end
 
-  def yield() do
+  defmacro yield() do
   end
 
-  def yield(term) do
+  defmacro yield(term) do
   end
 
-  def yield_to(term) do
+  defmacro yield_to(term) do
   end
 
   @doc """
@@ -100,13 +100,5 @@ defmodule JS do
   conveniently, `object(a: "b")` which turns into `{a: "b"}`
   """
   defmacro object(args) do
-    args = Enum.map(args, fn
-      { k, v } when Kernel.is_atom(k) ->
-        { Atom.to_string(k), v }
-      pair ->
-        pair
-    end)
-
-    { :%{}, [], args }
   end
 end

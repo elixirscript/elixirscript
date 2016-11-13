@@ -76,7 +76,7 @@ defmodule ElixirScript.CLI do
     compile_opts = %{
       root: options[:root],
       include_path: true,
-      core_path: Keyword.get(options, :core_path, "Elixir"),
+      core_path: Keyword.get(options, :core_path, "Elixir.Bootstrap"),
       full_build: Keyword.get(options, :full_build, false),
       output: Keyword.get(options, :output, :stdout)
     }

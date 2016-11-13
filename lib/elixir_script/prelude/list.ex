@@ -1,4 +1,5 @@
 defmodule ElixirScript.List do
+  require JS
 
   def duplicate(data, size) do
     do_duplicate(data, size, [])

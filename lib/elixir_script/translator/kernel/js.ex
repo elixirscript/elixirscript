@@ -92,4 +92,15 @@ defmodule ElixirScript.Translator.JS do
     ModuleSystems.import_module(module_name, from, env)
   end
 
+  defp do_translate({:object, _, [args]}, env) do
+    args = Enum.map(args, fn
+      { k, v } when Kernel.is_atom(k) ->
+        { Atom.to_string(k), v }
+      pair ->
+        pair
+    end)
+
+    Translator.translate!({ :%{}, [], args }, env)
+  end
+
 end

@@ -20,7 +20,6 @@ defmodule ElixirScript do
   * `:include_path` - a boolean controlling whether to return just the JavaScript code
   or a tuple of the file name and the JavaScript code
   * `:root` - a binary path prepended to the path of the standard lib imports if needed
-  * `:env` - a Macro.env struct to use. This is most useful when using macros. Make sure that the
   env has the macros imported or required.
   * `:core_path` - The es6 import path used to import the elixirscript core.
   When using this option, the Elixir.js file is not exported
@@ -43,7 +42,7 @@ defmodule ElixirScript do
         spawn_monitor: 3, send: 2, self: 0, match?: 2, to_string: 1, "|>": 2, in: 2, "..": 2
       ]
       import ElixirScript.Kernel
-      import JS, only: [defgen: 1, defgen: 2, is_generator: 1, yield: 0, yield: 1, yield_to: 1, object: 1]
+      require JS
     end
   end
 
@@ -131,7 +130,6 @@ defmodule ElixirScript do
     |> ElixirScript.Passes.DepsPaths.execute(opts)
     |> ElixirScript.Passes.ASTFromFile.execute(opts)
     |> ElixirScript.Passes.LoadModules.execute(opts)
-    |> ElixirScript.Passes.FilterExjs.execute(opts)
     |> ElixirScript.Passes.FindModules.execute(opts)
     |> ElixirScript.Passes.FindChangedFiles.execute(opts)
     |> ElixirScript.Passes.FindFunctions.execute(opts)
@@ -188,20 +186,14 @@ defmodule ElixirScript do
     default_options = Map.new
     |> Map.put(:include_path, false)
     |> Map.put(:root, nil)
-    |> Map.put(:env, custom_env())
+    |> Map.put(:env, __ENV__)
     |> Map.put(:import_standard_libs, true)
-    |> Map.put(:core_path, "Elixir")
+    |> Map.put(:core_path, "Elixir.Bootstrap")
     |> Map.put(:full_build, false)
     |> Map.put(:output, nil)
     |> Map.put(:app, :app)
 
     Map.merge(default_options, opts)
-  end
-
-  @doc false
-  def custom_env() do
-    __using__([])
-    __ENV__
   end
 
   @doc """

@@ -70,10 +70,4 @@ defmodule ElixirScript.Translator.Map.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  test "translate object macro" do
-    ex_ast = quote do: object(a: b)
-    js_code = "Object.freeze({ a: b })"
-    assert_translation(ex_ast, js_code)
-  end
-
 end

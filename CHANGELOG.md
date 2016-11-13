@@ -22,13 +22,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Removed
 - The form of `JS.import` that accepted a list of atoms as the first arg. Used `JS.import\3` with `default: false` instead to create a namespace import
+- `env` is no longer an option for `ElixirScript`'s compile functions
 
 ### Changed
 - [Changed CHANGELOG.md to adhere the format from Keep a Changelog](https://github.com/bryanjos/elixirscript/pull/205)
 - `defmacro` now supported. No longer have to separate macros from functions in separate files. `defmacrop` still unsupported
 - Elixirscript files must now be valid Elixir syntax. Syntax once supported by Elixirscript `JQuery.("#element")`, is no longer supported
 - Now compiles `exjs` and `ex` files within the path can be compiled all the same. Dependencies from hex are still unsupported so these files must not rely on any code outside of the path. What this does mean is that it is now possible to share code between Elixir and Elixirscript as long as the Elixir files functionality fall within what Elixirscript currently supports.
-- `defgen`, `defgenp`, `yield`, `yield_to`, and `object` now require a `use ElixirScript` expression before use.
+- To use anything in the `JS` module, you must `require` the `JS` module first
+- `defgen`, `defgenp`, `yield`, `yield_to`, and `object` are now in the `JS` module
 - To access functions in the global JavaScript scope, either use `JS.global\0` or use the erlang module call syntax
     ```elixir
     #calling alert

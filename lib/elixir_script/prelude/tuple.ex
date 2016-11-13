@@ -1,4 +1,5 @@
 defmodule ElixirScript.Tuple do
+  require JS
 
   def duplicate(data, size) do
     JS.new(Elixir.Core.Tuple, do_duplicate(data, size, []))
