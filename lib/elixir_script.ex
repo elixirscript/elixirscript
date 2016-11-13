@@ -1,9 +1,4 @@
 defmodule ElixirScript do
-  alias ESTree.Tools.Builder
-  alias ESTree.Tools.Generator
-  alias ElixirScript.Translator.Utils
-  alias ElixirScript.Compiler.Cache
-  alias ElixirScript.Compiler.Output
   require Logger
 
   @moduledoc """
