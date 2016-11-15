@@ -116,7 +116,7 @@ The intent of this guide is to get you started with ElixirScript. It will give y
 Macros can be used in Elixirscript just like in Elixir. The only exception is that `defmacrop` is unsupported
 
 
-#### JavaScript Interop
+### JavaScript Interop
 
 Elixirscript has a couple of ways of interacting with JavaScript.
 
