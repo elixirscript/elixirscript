@@ -2,7 +2,7 @@
 
 # Q. How do I get started?
 
-### A. Check out the [Getting Started](GettingStarted.md) Guide for more info.
+### A. Check out the [Getting Started](GettingStarted.html) Guide for more info.
 
 # Q. How much is implemented?
 
