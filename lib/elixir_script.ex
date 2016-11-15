@@ -15,7 +15,6 @@ defmodule ElixirScript do
   * `:include_path` - a boolean controlling whether to return just the JavaScript code
   or a tuple of the file name and the JavaScript code
   * `:root` - a binary path prepended to the path of the standard lib imports if needed
-  env has the macros imported or required.
   * `:core_path` - The es6 import path used to import the elixirscript core.
   When using this option, the Elixir.js file is not exported
   * `:full_build` - For compile_path, tells the compiler to perform a full build instead of incremental one
@@ -45,7 +44,7 @@ defmodule ElixirScript do
   @external_resource stdlib_state_path = Path.join([__DIR__, "elixir_script", "translator", "stdlib_state.bin"])
   @stdlib_state File.read(stdlib_state_path)
   @lib_path Application.get_env(:elixir_script, :lib_path)
-  @version Mix.Project.config[:version]
+  @version  Mix.Project.config[:version]
 
   @doc """
   Compiles the given Elixir code string

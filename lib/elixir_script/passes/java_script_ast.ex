@@ -9,7 +9,7 @@ defmodule ElixirScript.Passes.JavaScriptAST do
 
     parent = self
 
-    data = compiler_data.data
+    data = State.get_module_data()
     |> Enum.map(fn({module_name, module_data}) ->
 
       spawn_link fn ->

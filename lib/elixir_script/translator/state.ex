@@ -17,7 +17,19 @@ defmodule ElixirScript.Translator.State do
 
   def serialize() do
     Agent.get(__MODULE__, fn(state) ->
+      modules = state.modules
+      modules = Enum.map(modules, fn {m, d} -> 
+        d = Map.delete(d, :javascript_ast)
+        |> Map.delete(:javascript_code)
+        |> Map.delete(:javascript_name)
+
+        {m, d}  
+      end)
+      |> Enum.filter(fn {_, d} -> d.type != :consolidated end)
+
       state = Map.delete(state, :changed_modules)
+      |> Map.put(:modules, modules)
+
       :erlang.term_to_binary(state)
     end)
   end
