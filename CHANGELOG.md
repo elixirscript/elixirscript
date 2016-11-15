@@ -5,11 +5,46 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
-### Changed
-- [Changed CHANGELOG.md to adhere the format from Keep a Changelog](https://github.com/bryanjos/elixirscript/pull/205)
+
+### Added
 - [`with` now supports `else`](https://github.com/bryanjos/elixirscript/pull/207)
 - [Implement `context` option on `quote`](https://github.com/bryanjos/elixirscript/pull/208)
 - New compiler pipeline
+- `@on_js_load`. Expects a 0 arity function. This function will be called when the compiled module is loaded in JavaScript
+- `JS.import\3`. Just like `JS.import\2` but expects options to decide if the import should be a default one or a namespace on. Only option allowed is `default`. Set to `true` by default
+  ```elixir
+  # translates to "import A from 'a'"
+  JS.import A, "a"
+
+  #translates to "import * as A from 'a'"
+  JS.import A, "a", default: false
+  ```
+
+### Removed
+- The form of `JS.import` that accepted a list of atoms as the first arg. Used `JS.import\3` with `default: false` instead to create a namespace import
+- `env` and `root` are no longer options for `ElixirScript`'s compile functions and cli
+- Syntax once supported by Elixirscript `JQuery.("#element")`, is no longer supported
+
+### Changed
+- [Changed CHANGELOG.md to adhere the format from Keep a Changelog](https://github.com/bryanjos/elixirscript/pull/205)
+- `defmacro` now supported. No longer have to separate macros from functions in separate files. `defmacrop` still unsupported
+- To use anything in the `JS` module, you must `require` the `JS` module first
+- Elixirscript files must now contain valid Elixir syntax.
+- Now compiles `exjs` and `ex` files within the path can be compiled all the same. Dependencies from hex are still unsupported so these files must not rely on any code outside of the path. What this does mean is that it is now possible to share code between Elixir and Elixirscript as long as the Elixir files functionality fall within what Elixirscript currently supports.
+- `defgen`, `defgenp`, `yield`, `yield_to`, and `object` are now in the `JS` module
+- To access functions in the global JavaScript scope, either use `JS.global\0` or use the erlang module call syntax
+    ```elixir
+    #calling alert
+    JS.global().alert("hi")
+
+    #calling alert
+    :window.alert("hi")
+    ```
+    Calling JavaScript modules in the global scope works without using the above methods
+    ```elixir
+    #calls window.Date.now()
+    Date.now()
+    ```
 
 ## [0.22.0] - 2016-10-16
 ### Added

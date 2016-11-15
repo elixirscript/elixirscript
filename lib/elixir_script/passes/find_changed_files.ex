@@ -1,5 +1,4 @@
 defmodule ElixirScript.Passes.FindChangedFiles do
-  @pass 2
 
   alias ElixirScript.Compiler.Cache
   alias ElixirScript.Translator.State

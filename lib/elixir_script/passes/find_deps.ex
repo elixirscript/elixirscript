@@ -1,5 +1,4 @@
 defmodule ElixirScript.Passes.FindDeps do
-  @pass 3
 
   alias ElixirScript.Translator.Utils
 

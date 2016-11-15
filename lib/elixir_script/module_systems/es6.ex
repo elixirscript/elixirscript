@@ -2,15 +2,13 @@ defmodule ElixirScript.ModuleSystems.ES6 do
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
 
-  def import_module(module_names, from, env) when is_list(module_names) do
-    import_specifiers = Enum.map(module_names, fn(x) ->
-      JS.import_specifier(
-        Translator.translate!(x, env),
-        Translator.translate!(x, env)
-      )
-    end)
+  def import_namespace_module(module_name, from, env) do
+    import_specifier = JS.import_namespace_specifier(
+      Translator.translate!(module_name, env),
+      Translator.translate!(module_name, env)
+    )
 
-    do_import_module(import_specifiers, from)
+    do_import_module([import_specifier], from)
   end
 
   def import_module(module_name, from, env) do
@@ -20,17 +18,6 @@ defmodule ElixirScript.ModuleSystems.ES6 do
     )
 
     do_import_module([import_specifier], from)
-  end
-
-  def import_module(module_name, %ElixirScript.Translator.LexicalScope{} = env) do
-    import_specifier = JS.import_default_specifier(
-      Translator.translate!(module_name, env),
-      Translator.translate!(module_name, env)
-    )
-
-    {from, _ } = Code.eval_quoted(module_name)
-
-    do_import_module([import_specifier], Macro.underscore(from))
   end
 
   def import_module(import_name, from) do

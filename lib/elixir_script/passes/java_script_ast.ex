@@ -1,14 +1,15 @@
 defmodule ElixirScript.Passes.JavaScriptAST do
-  @pass 7
   alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.State
 
   def execute(compiler_data, opts) do
+
     State.set_module_data(compiler_data.data)
+    State.set_loaded_modules(Map.get(compiler_data, :loaded_modules, []))
 
     parent = self
 
-    data = compiler_data.data
+    data = State.get_module_data()
     |> Enum.map(fn({module_name, module_data}) ->
 
       spawn_link fn ->
@@ -28,8 +29,8 @@ defmodule ElixirScript.Passes.JavaScriptAST do
     %{ compiler_data | data: data }
   end
 
-
   defp compile(module_data, opts) do
+
     env = ElixirScript.Translator.LexicalScope.module_scope(module_data.name,  Utils.name_to_js_file_name(module_data.name) <> ".js", opts.env)
 
     module = case module_data.type do

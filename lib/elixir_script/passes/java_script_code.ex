@@ -1,5 +1,4 @@
 defmodule ElixirScript.Passes.JavaScriptCode do
-  @pass 9
   alias ESTree.Tools.{ Builder, Generator }
 
   def execute(compiler_data, _) do

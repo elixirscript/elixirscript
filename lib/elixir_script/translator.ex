@@ -166,6 +166,10 @@ defmodule ElixirScript.Translator do
     { %ElixirScript.Translator.Empty{}, env }
   end
 
+  defp do_translate({:@, _, [{:on_js_load, _, [value]}]}, env) do
+    Call.make_function_call(value, [], env)
+  end
+
   defp do_translate({:@, _, [{name, _, [value]}]}, env) do
     { Defmodule.make_attribute(name, value, env), env }
   end

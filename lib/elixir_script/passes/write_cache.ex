@@ -7,7 +7,9 @@ defmodule ElixirScript.Passes.WriteCache do
 
     State.set_module_data(compiler_data.data)
     new_state = State.serialize()
-    new_file_stats = Enum.map(compiler_data.data, fn({_, data}) -> { data.path, data.stat } end) |> Enum.uniq
+    new_file_stats = Enum.filter(compiler_data.data, fn({ _, data }) -> Map.has_key?(data, :path) end)
+    |> Enum.map(fn({_, data}) -> { data.path, data.stat } end)
+    |> Enum.uniq
 
     compiler_cache = %{compiler_cache | input_files: new_file_stats, state: new_state }
 

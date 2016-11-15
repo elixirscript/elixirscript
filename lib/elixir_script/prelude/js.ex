@@ -1,4 +1,4 @@
-defmodule ElixirScript.JS do
+defmodule JS do
   @moduledoc """
   This module defines macros and functions which implement
   JavaScript functionality that may not translate easily to
@@ -33,28 +33,15 @@ defmodule ElixirScript.JS do
   but JavaScript modules work differently and have to be imported
   using this.
 
-  If module is not a list, then it is treated as a default import,
-  otherwise it is not.
+  If `default` is set to true then it is treated as a default import.
+  Otherwise it is treated as a namespace import.
 
   ex:
     JS.import A, "a" #translates to "import A from 'a'"
 
-    JS.import [A, B, C], "a" #translates to "import {A, B, C} from 'a'"
+    JS.import A, "a", default: false #translates to "import * as A from 'a'"
   """
-  defmacro import(module, from) do
-  end
-
-
-  @doc """
-  Imports a JavaScript module.
-
-  Works like import/2, but tries to infer the path to the module.
-  Only works for default imports. Uses `Macro.underscore` to infer path.
-
-  ex:
-    JS.import React #translates to "import React from 'react'"
-  """
-  defmacro import(module) do
+  defmacro import(module, from, opts \\ [default: true]) do
   end
 
   @doc """
@@ -86,4 +73,32 @@ defmodule ElixirScript.JS do
     Elixir.Core.Functions.get_global()
   end
 
+  defmacro defgen(call, expr \\ nil) do
+  end
+
+  defmacro defgenp(call, expr \\ nil) do
+  end
+
+  def is_generator(term) do
+    term.constructor.name === "GeneratorFunction"
+  end
+
+  defmacro yield() do
+  end
+
+  defmacro yield(term) do
+  end
+
+  defmacro yield_to(term) do
+  end
+
+  @doc """
+  Provides a convenient way to create a string-based map.
+
+  Elixirscript, by default turns the following, `%{a: "b"}` into `{[Symbol.for("a")]: "b"}` in JavaScript. In order to get string keys,
+  one would have to do `%{"a" => "b"}` which turns into `{a: "b"}` in JavaScript. With `Kernel.object`, you can create string keyed maps
+  conveniently, `object(a: "b")` which turns into `{a: "b"}`
+  """
+  defmacro object(args) do
+  end
 end

@@ -1,5 +1,4 @@
 defmodule ElixirScript.Passes.RemoveUnused do
-  @pass 4
 
   def execute(compiler_data, opts) do
     data = Enum.filter(compiler_data.data, fn({module_name, _}) ->

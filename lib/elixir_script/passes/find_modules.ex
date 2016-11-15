@@ -1,7 +1,7 @@
 defmodule ElixirScript.Passes.FindModules do
-  @pass 2
 
   alias ElixirScript.Translator.Utils
+  alias ElixirScript.Translator.State
 
   def execute(compiler_data, opts) do
     data = Enum.reduce(compiler_data.data, [], fn(data, list) ->
@@ -25,15 +25,17 @@ defmodule ElixirScript.Passes.FindModules do
     { ast, state ++ [s] }
   end
 
-  defp get_defmodules({:defimpl, _, [ {:__aliases__, _, name} = the_alias, [for: {:__aliases__, _, type_name} = type],  [do: {:__block__, context, spec}] ]} = ast, state, _) do
-    name = name ++ [DefImpl] ++ type_name
-    s =  %{name:  Utils.quoted_to_name({:__aliases__, [], name}), type: :impl, for: type, ast: {:__block__, context, spec}, implements: Utils.quoted_to_name(the_alias) }
+  defp get_defmodules({:defimpl, _, [ the_alias, [for: {:__aliases__, _, type_name} = type],  [do: {:__block__, context, spec}] ]} = ast, state, _) do
+    {:__aliases__, _, original_name} = Utils.name_to_quoted(State.get_module_name(the_alias))
+    name = original_name ++ [DefImpl] ++ type_name
+    s =  %{name:  Utils.quoted_to_name({:__aliases__, [], name}), type: :impl, for: type, ast: {:__block__, context, spec}, implements: Utils.quoted_to_name({:__aliases__, [], original_name}) }
     { ast, state ++ [s] }
   end
 
-  defp get_defmodules({:defimpl, _, [ {:__aliases__, _, name} = the_alias, [for: {:__aliases__, _, type_name} = type],  [do: spec] ]} = ast, state, _) do
-    name = name ++ [DefImpl] ++ type_name
-    s =  %{name:  Utils.quoted_to_name({:__aliases__, [], name}), type: :impl, for: type, ast: {:__block__, [], [spec]}, implements: Utils.quoted_to_name(the_alias) }
+  defp get_defmodules({:defimpl, _, [ the_alias, [for: {:__aliases__, _, type_name} = type],  [do: spec] ]} = ast, state, _) do
+    {:__aliases__, _, original_name} = Utils.name_to_quoted(State.get_module_name(the_alias))
+    name = original_name ++ [DefImpl] ++ type_name
+    s =  %{name:  Utils.quoted_to_name({:__aliases__, [], name}), type: :impl, for: type, ast: {:__block__, [], [spec]}, implements: Utils.quoted_to_name({:__aliases__, [], original_name}) }
     { ast, state ++ [s] }
   end
 

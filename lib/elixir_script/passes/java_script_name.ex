@@ -1,5 +1,4 @@
 defmodule ElixirScript.Passes.JavaScriptName do
-  @pass 10
   alias ElixirScript.Translator.Utils
 
   def execute(compiler_data, _) do

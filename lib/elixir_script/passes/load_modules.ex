@@ -1,23 +1,17 @@
 defmodule ElixirScript.Passes.LoadModules do
-  @pass 5
 
   def execute(compiler_data, _) do
+
     ex_files = Enum.map(compiler_data.data, fn
       { _, %{path: path} } -> path
       %{path: path} -> path
     end)
-    |> Enum.filter(fn path -> Path.extname(path) == ".ex" || Path.extname(path) == ".exs" end)
 
-    loaded_modules = case ex_files do
-      [] ->
-        []
-      files ->
-        try do
-          Kernel.ParallelRequire.files(files)
-        rescue
-          _ ->
-            []
-        end
+    loaded_modules = case Enum.reverse(ex_files) do
+                       [] ->
+                         []
+                       files ->
+                         Kernel.ParallelCompiler.files(files)
                      end
 
     Map.put(compiler_data, :loaded_modules, loaded_modules)

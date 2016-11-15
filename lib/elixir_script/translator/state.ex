@@ -17,7 +17,19 @@ defmodule ElixirScript.Translator.State do
 
   def serialize() do
     Agent.get(__MODULE__, fn(state) ->
+      modules = state.modules
+      modules = Enum.map(modules, fn {m, d} -> 
+        d = Map.delete(d, :javascript_ast)
+        |> Map.delete(:javascript_code)
+        |> Map.delete(:javascript_name)
+
+        {m, d}  
+      end)
+      |> Enum.filter(fn {_, d} -> d.type != :consolidated end)
+
       state = Map.delete(state, :changed_modules)
+      |> Map.put(:modules, modules)
+
       :erlang.term_to_binary(state)
     end)
   end
@@ -51,15 +63,25 @@ defmodule ElixirScript.Translator.State do
     |> Map.put(Bitwise, ElixirScript.Bitwise)
     |> Map.put(MapSet, ElixirScript.MapSet)
     |> Map.put(List, ElixirScript.List)
-    |> Map.put(JS, ElixirScript.JS)
     |> Map.put(Process, ElixirScript.Process)
   end
 
   def set_module_data(module_data) do
     Agent.update(__MODULE__, fn state ->
-      keys = Map.values(state.std_lib_map)
-      data = Keyword.take(state.modules, keys)
+      data = Enum.filter(state.modules, fn {module_name, data} -> data.app == :elixir end)
       %{ state | modules: Keyword.merge(data, module_data) }
+    end)
+  end
+
+  def get_module_data() do
+    Agent.get(__MODULE__, fn state ->
+      state.modules
+    end)
+  end
+
+  def set_loaded_modules(modules) do
+    Agent.update(__MODULE__, fn state ->
+      %{ state | loaded_modules: modules }
     end)
   end
 
