@@ -9,7 +9,7 @@ The intent of this guide is to get you started with ElixirScript. It will give y
 
 ### Escript
 
-**OSX**: Elixirscript can be installed via homebrew `brew install elixirscript`. For everyone else, plase read below
+**macOS**: Elixirscript can be installed via homebrew `brew install elixirscript`. For everyone else, plase read below
 
 * Step 1: Get escript
 
