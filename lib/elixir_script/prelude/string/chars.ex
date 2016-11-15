@@ -1,4 +1,5 @@
 defprotocol ElixirScript.String.Chars do
+    @moduledoc false
   def to_string(item)
 end
 

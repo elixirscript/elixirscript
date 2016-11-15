@@ -1,4 +1,5 @@
 defmodule ElixirScript.Translator.Defimpl do
+  @moduledoc false  
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator.Defmodule
 

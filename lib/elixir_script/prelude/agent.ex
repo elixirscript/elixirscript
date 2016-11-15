@@ -1,4 +1,5 @@
 defmodule ElixirScript.Agent do
+    @moduledoc false
 
   def start(fun, options \\ []) do
     pid = spawn(fn() -> Process.sleep(:infinity) end)

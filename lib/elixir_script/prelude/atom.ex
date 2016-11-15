@@ -1,4 +1,5 @@
 defmodule ElixirScript.Atom do
+   @moduledoc false 
   import Kernel, except: [to_string: 1]
 
   def to_char_list(atom) do

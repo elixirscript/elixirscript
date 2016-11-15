@@ -1,5 +1,5 @@
 defmodule ElixirScript.Passes.FindDeps do
-
+  @moduledoc false  
   alias ElixirScript.Translator.Utils
 
   def execute(compiler_data, _) do

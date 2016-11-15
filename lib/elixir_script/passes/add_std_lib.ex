@@ -1,4 +1,5 @@
 defmodule ElixirScript.Passes.AddStdLib do
+    @moduledoc false  
   alias ElixirScript.Translator.State
 
   def execute(compiler_data, _) do

@@ -73,23 +73,42 @@ defmodule JS do
     Elixir.Core.Functions.get_global()
   end
 
+  @doc """
+  Defines a generator. This is compiled into a generator function in JavaScript.
+  defgen and defgenp are currently the only ways to use process in Elixirscript right now.
+  """
   defmacro defgen(call, expr \\ nil) do
   end
 
+  @doc """
+  Defines a private generator. This is compiled into a generator function in JavaScript.
+  """
   defmacro defgenp(call, expr \\ nil) do
   end
 
+  @doc """
+  Determines if term is a generator
+  """
   def is_generator(term) do
     term.constructor.name === "GeneratorFunction"
   end
 
+  @doc """
+  Yields the current generator function
+  """
   defmacro yield() do
   end
 
+  @doc """
+  Yields the current generator function with the given term
+  """
   defmacro yield(term) do
   end
 
-  defmacro yield_to(term) do
+  @doc """
+  Yields control to the given generator
+  """
+  defmacro yield_to(gen) do
   end
 
   @doc """

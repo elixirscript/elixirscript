@@ -1,5 +1,5 @@
 defmodule ElixirScript.Passes.RemoveUnused do
-
+  @moduledoc false  
   def execute(compiler_data, opts) do
     data = Enum.filter(compiler_data.data, fn({module_name, _}) ->
       module_found_in_deps(module_name, compiler_data.data, [opts[:app]]) == true

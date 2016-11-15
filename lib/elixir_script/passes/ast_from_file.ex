@@ -1,5 +1,5 @@
 defmodule ElixirScript.Passes.ASTFromFile do
-
+  @moduledoc false  
 
   def execute(compiler_data, opts) do
     data = Enum.reduce(compiler_data.data, [], fn({dep, paths}, list) ->

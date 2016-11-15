@@ -75,8 +75,6 @@ The standard library modules are in the `lib/elixir_script/prelude` folder.
 The JavaScript code is in the `src/javascript`. 
 This is where features such as pattern matching and the standard library are implemented.
 
-Please look at [this issue](https://github.com/bryanjos/elixirscript/issues/143) for information on how to add modules to the standard library.
-
 The ElixirScript tests can be run using `mix test`
 
 The JavaScript tests can be run using `npm test`
@@ -152,7 +150,7 @@ in order to craft an excellent pull request:
 
   ```sh
   mix test
-  gulp test
+  npm test
   ```
 
   This is needed to ensure your changes can

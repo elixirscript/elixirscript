@@ -36,7 +36,6 @@ The intent of this guide is to get you started with ElixirScript. It will give y
     options:
     -o  --output [path]   places output at the given path
     -ex --elixir          read input as elixir code string
-    -r  --root [path]     root import path for all exported modules
     --std-lib [path]      outputs the elixirscript standard library JavaScript files to the specified path
     --full-build          informs the compiler to do a full build instead of an incremental one
     only used when output is specified
@@ -55,48 +54,13 @@ The intent of this guide is to get you started with ElixirScript. It will give y
 
     The elixirscript escript changed the elixir code, `:atom` into the JavaScript code `Symbol.for('atom')`. The `-ex` parameter lets the script know that the input is an Elixir code string instead of a file.
 
-    What if we wanted to give it a file? You would simply do the following:
-
-    ```bash
-    $ elixirscript "example.exjs"
-    Symbol.for('atom')
-    ```
-
-    **NOTE**: ElixirScript files must have the extension, `.exjs`
-
-    What you will have noticed by now is that it has output everything we've done so far to the terminal. What about if we want to place the output to a path? The next example takes a file as input and outputs the result in another directory.
-
-    ```bash
-    $ elixirscript "example.exjs" -o "dist"
-    ```
-
-    If you look in the dist folder, you should see example.js as well as elixir.js. elixir.js is the JavaScript file that contains the Elixir Standard library. In example.js, the first line should be an import statement importing elixir.js for use.
-
-    wildcards are also accepted:
+    elixirscript also takes a path to your `.ex` and `.exjs` files as well:
 
     ```bash
     $ elixirscript "src" -o "dist"
     ```
 
-    The last option we will show is the root option. This option is for defining a root path for the import statements. By default your import statement will not have anything prepended to it. For example, the elixir import will look like this:
-
-    ```javascript
-    import * as Elixir from 'elixir';
-    ```
-
-    If we wanted to prepend "js" to the root, we can like this:
-
-    ```
-    $ elixirscript "example.exjs" -o "dist" -r "js"
-    ```
-
-    Now the import will look like this:
-
-    ```javascript
-    import * as Elixir from 'js/elixir';
-    ```
-
-    That concludes the walkthrough on options, as well as the walkthrough on using the elixirscript escript.
+    If you look in the dist folder, you should see 2 folders. One, `app`, contains your code and the other, `elixir` contains the elixirscript standard library files.
 
 ### mix elixirscript
 
@@ -105,7 +69,7 @@ The intent of this guide is to get you started with ElixirScript. It will give y
     The first step is getting the dependency. In your mix.exs file for your elixir project, add elixir_script to your deps.
 
     ```elixir
-    {:elixir_script, "~> 0.18"}
+    {:elixir_script, "~> 0.23"}
     ```
 
 * Step 2: Now download the dep
@@ -118,7 +82,7 @@ The intent of this guide is to get you started with ElixirScript. It will give y
 
 * Step 3: Use
     ```bash
-    $ mix elixirscript "example.exjs" -o "dist" -r "js"
+    $ mix elixirscript "src" -o "dist"
     ```
 
     What you will notice is that the parameters are exactly the same as the escript.
@@ -129,7 +93,7 @@ The intent of this guide is to get you started with ElixirScript. It will give y
     The first step is getting the dependency. In your mix.exs file for your elixir project, add elixir_script to your deps.
 
     ```elixir
-    {:elixir_script, "~> 0.22"}
+    {:elixir_script, "~> 0.23"}
     ```
 
 * Step 2: Now download the dep
@@ -149,27 +113,61 @@ The intent of this guide is to get you started with ElixirScript. It will give y
 
 
 ### Macros
-Macros must be defined in either a `.ex` or `.exs` file. These will be loaded at compile time and
-whenever an import or require expression is found, if the module specified is loaded, it will use it to expand macros within the lexical scope.
+Macros can be used in Elixirscript just like in Elixir. The only exception is that `defmacrop` is unsupported
 
 
-### Appendix
+#### JavaScript Interop
 
-#### Using JavaScript Modules
+Elixirscript has a couple of ways of interacting with JavaScript.
 
-You can use `alias`, `import`, and `require` as you would in Elixir.
+#### Globally scoped functions
 
-For JavaScript modules, you use must `JS.import`
+To call functions in JavaScript in the global scope, such as those defined on `window`, use the erlang module syntax
 
 ```elixir
-JS.import A, "a" #translates to "import {default as A} from 'a'"
+# Calling alert
+:window.alert("hi")
 
-JS.import [A, B, C], "a" #translates to "import {A, B, C} from 'a'"
+# console
+:console.log("hello")
+
+# document
+:document.getElementById("main")
 ```
+
+#### Globally scoped modules
+
+To call globally scoped modules defined in JavaScript, you can call them just like you would an Elixir module
+
+```elixir
+Date.now()
+```
+
+Only works if module begins with a captial letter
+
+#### Importing ES Modules
+
+To import ES modules, first you must require the `JS` module. Then import the module using `JS.import`
+
+```elixir
+defmodule MyModule do
+    require JS
+    JS.import React, "react"
+
+    def func() do
+        React.render(my_component)
+    end
+end
+
+```
+
+#### The JS module
+
+The JS module has a number of other functions and macros. For more information, check out the docs.
 
 #### Frontend Project Boilerplate
 
-There is an [elixirscript frontend boilerplate project](https://github.com/bryanjos/elixirscript-project-boilerplate). This setup uses gulp and brunch to build and bundle assets.
+There is an [elixirscript frontend boilerplate project](https://github.com/bryanjos/elixirscript-project-boilerplate). This setup uses gulp and webpack to build and bundle assets.
 
 
 #### ElixirScript-Brunch

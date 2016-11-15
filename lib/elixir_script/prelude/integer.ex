@@ -1,5 +1,5 @@
 defmodule ElixirScript.Integer do
-
+  @moduledoc false
   def is_even(number) do
     rem(number, 2) == 0
   end

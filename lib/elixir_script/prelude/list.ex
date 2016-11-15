@@ -1,4 +1,5 @@
 defmodule ElixirScript.List do
+  @moduledoc false  
   require JS
 
   def duplicate(data, size) do

@@ -1,8 +1,5 @@
 defmodule ElixirScript.Translator do
-  @moduledoc """
-  Translates the given Elixir AST into
-  JavaScript AST.
-  """
+  @moduledoc false
   alias ElixirScript.Translator.Primitive
   alias ElixirScript.Translator.Identifier
   alias ElixirScript.Translator.Expression

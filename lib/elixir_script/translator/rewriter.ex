@@ -1,4 +1,5 @@
 defmodule ElixirScript.Translator.Rewriter do
+  @moduledoc false  
 
   # :erlang, :lists, :maps, :beam_lib, :binary, :calendar, :digraph,
   # :epp, :erl_lint, :erl_internal, :erl_expand_records, :erl_eval,

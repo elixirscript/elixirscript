@@ -1,5 +1,5 @@
 defmodule ElixirScript.Passes.LoadModules do
-
+  @moduledoc false  
   def execute(compiler_data, _) do
 
     ex_files = Enum.map(compiler_data.data, fn

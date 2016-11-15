@@ -1,5 +1,5 @@
 defmodule ElixirScript.Passes.FindChangedFiles do
-
+  @moduledoc false  
   alias ElixirScript.Compiler.Cache
   alias ElixirScript.Translator.State
   @version Mix.Project.config[:version]

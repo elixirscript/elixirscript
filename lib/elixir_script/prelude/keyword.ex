@@ -1,5 +1,6 @@
 defmodule ElixirScript.Keyword do
-
+  @moduledoc false
+  
   def has_key?(kw, key) do
     do_has_key?(kw, key)
   end

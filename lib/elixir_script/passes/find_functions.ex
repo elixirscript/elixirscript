@@ -1,4 +1,5 @@
 defmodule ElixirScript.Passes.FindFunctions do
+  @moduledoc false    
   @function_types [:def, :defp, :defgen, :defgenp, :defmacro, :defmacrop]
 
   def execute(data, _) do

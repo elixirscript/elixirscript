@@ -1,4 +1,5 @@
 defmodule ElixirScript.String do
+  @moduledoc false  
   import Kernel, except: [length: 1]
 
   def to_atom(str) do

@@ -1,5 +1,5 @@
 defmodule ElixirScript.MapSet do
-
+  @moduledoc false
   defstruct set: []
 
   def new() do

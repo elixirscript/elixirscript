@@ -1,4 +1,5 @@
 defmodule ElixirScript.Tuple do
+  @moduledoc false  
   require JS
 
   def duplicate(data, size) do

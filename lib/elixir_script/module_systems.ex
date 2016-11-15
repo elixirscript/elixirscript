@@ -1,5 +1,5 @@
 defmodule ElixirScript.ModuleSystems do
-
+  @moduledoc false
   defp module_system() do
     ElixirScript.ModuleSystems.ES6
   end

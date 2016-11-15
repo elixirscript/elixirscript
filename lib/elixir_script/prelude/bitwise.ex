@@ -1,5 +1,5 @@
 defmodule ElixirScript.Bitwise do
-
+  @moduledoc false
   defmacro bnot(expr) do
     quote do
       Elixir.Core.bnot(unquote(expr))

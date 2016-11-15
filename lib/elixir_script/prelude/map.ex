@@ -1,5 +1,6 @@
 defmodule ElixirScript.Map do
-
+  @moduledoc false
+  
   def new() do
     %{}
   end

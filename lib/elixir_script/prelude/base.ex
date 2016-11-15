@@ -1,4 +1,5 @@
 defmodule ElixirScript.Base do
+  @moduledoc false  
 
   def encode64(data) do
     Elixir.Core.b64EncodeUnicode(data)

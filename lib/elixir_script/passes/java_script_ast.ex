@@ -1,4 +1,5 @@
 defmodule ElixirScript.Passes.JavaScriptAST do
+  @moduledoc false    
   alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.State
 

@@ -1,5 +1,5 @@
 defmodule ElixirScript.Process do
-
+  @moduledoc false
   def alive?(pid) do
     Elixir.Core.processes.is_alive(pid)
   end

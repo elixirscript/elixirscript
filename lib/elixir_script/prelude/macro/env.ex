@@ -1,4 +1,6 @@
 defmodule ElixirScript.Macro.Env do
+  @moduledoc false
+  
   @type t :: %ElixirScript.Macro.Env{
     module: atom,
     file: binary,

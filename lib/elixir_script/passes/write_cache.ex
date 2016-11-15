@@ -1,4 +1,5 @@
 defmodule ElixirScript.Passes.WriteCache do
+  @moduledoc false    
   alias ElixirScript.Compiler.Cache
   alias ElixirScript.Translator.State
 

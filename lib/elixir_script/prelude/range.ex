@@ -1,4 +1,5 @@
 defmodule ElixirScript.Range do
+  @moduledoc false  
   defstruct first: nil, last: nil
 
   def new(first, last) do
