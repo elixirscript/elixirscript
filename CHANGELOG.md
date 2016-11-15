@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [0.23.0] - 2016-11-15
 
 ### Added
 - [`with` now supports `else`](https://github.com/bryanjos/elixirscript/pull/207)
