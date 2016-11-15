@@ -4,13 +4,14 @@ defmodule ElixirScript.CLI do
   @app_version Mix.Project.config()[:version]
 
   @switches [
-    output: :binary, elixir: :boolean, root: :binary,
-    help: :boolean, core_path: :binary, std_lib: :binary,
-    full_build: :boolean, version: :boolean, watch: :boolean
+    output: :binary, elixir: :boolean,
+    help: :boolean, core_path: :binary,
+    full_build: :boolean, version: :boolean, 
+    watch: :boolean
   ]
 
   @aliases [
-    o: :output, ex: :elixir, h: :help, r: :root, v: :version
+    o: :output, ex: :elixir, h: :help, v: :version
   ]
 
   def main(argv) do
@@ -39,8 +40,6 @@ defmodule ElixirScript.CLI do
   options:
   -o  --output [path]   places output at the given path
   -ex --elixir          read input as elixir code string
-  -r  --root [path]     root import path for all exported modules
-  --std-lib [path]      outputs the elixirscript standard library JavaScript files to the specified path
   --full-build          informs the compiler to do a full build instead of an incremental one
   only used when output is specified
   --core-path    es6 import path to the elixirscript standard lib
@@ -58,10 +57,6 @@ defmodule ElixirScript.CLI do
     IO.write @app_version
   end
 
-  def process([std_lib: path]) do
-    ElixirScript.copy_stdlib_to_destination(path)
-  end
-
   def process({ input, options }) do
     if options_contains_unknown_values(options) do
         process(:help)
@@ -74,7 +69,6 @@ defmodule ElixirScript.CLI do
     {watch, options} = Keyword.pop(options, :watch, false)
 
     compile_opts = %{
-      root: options[:root],
       include_path: true,
       core_path: Keyword.get(options, :core_path, "Elixir.Bootstrap"),
       full_build: Keyword.get(options, :full_build, false),

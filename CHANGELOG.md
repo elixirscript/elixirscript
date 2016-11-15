@@ -22,7 +22,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Removed
 - The form of `JS.import` that accepted a list of atoms as the first arg. Used `JS.import\3` with `default: false` instead to create a namespace import
-- `env` is no longer an option for `ElixirScript`'s compile functions
+- `env` and `root` are no longer options for `ElixirScript`'s compile functions and cli
 - Syntax once supported by Elixirscript `JQuery.("#element")`, is no longer supported
 
 ### Changed

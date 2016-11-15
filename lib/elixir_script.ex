@@ -14,7 +14,6 @@ defmodule ElixirScript do
   Available options are:
   * `:include_path` - a boolean controlling whether to return just the JavaScript code
   or a tuple of the file name and the JavaScript code
-  * `:root` - a binary path prepended to the path of the standard lib imports if needed
   * `:core_path` - The es6 import path used to import the elixirscript core.
   When using this option, the Elixir.js file is not exported
   * `:full_build` - For compile_path, tells the compiler to perform a full build instead of incremental one
