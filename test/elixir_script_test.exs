@@ -4,7 +4,7 @@ defmodule ElixirScript.Test do
 
   test "turn javascript ast into javascript code strings" do
     js_code = ElixirScript.compile(":atom")
-    assert Enum.join(js_code, "\n") =~ "Symbol.for('atom')"
+    assert Enum.join(js_code, "\n") |> String.trim == "Symbol.for('atom')"
   end
 
 
@@ -22,8 +22,7 @@ defmodule ElixirScript.Test do
     """, %{ env: make_custom_env })
 
     assert_js_matches """
-    import Elixir from '../elixir/Elixir.Bootstrap';
-    import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
+         import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
          const something_else = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function()    {
              return     1 * 1;
            }));
@@ -51,7 +50,6 @@ defmodule ElixirScript.Test do
     """, %{ env: make_custom_env, core_path: "elixirscript"} )
 
     assert_js_matches """
-         import Elixir from '../elixir/elixirscript';
          import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
          const something_else = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function()    {
              return     1 * 1;

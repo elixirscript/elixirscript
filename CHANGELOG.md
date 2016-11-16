@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.23.1] - 2016-11-16
+
+### Fixed
+- Incorrectly sending standard lib when using compile or compile_path by default
+
 ## [0.23.0] - 2016-11-15
 
 ### Added

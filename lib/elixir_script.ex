@@ -61,7 +61,7 @@ defmodule ElixirScript do
   @spec compile_quoted(Macro.t, Map.t) :: [binary | {binary, binary} | :ok]
   def compile_quoted(quoted, opts \\ %{}) do
 
-    opts = build_compiler_options(opts)
+    opts = build_compiler_options(Map.merge(opts, %{import_standard_libs: false}))
 
     data = quoted
     |> get_modules_from_quoted
