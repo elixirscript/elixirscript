@@ -78,12 +78,18 @@ defmodule JS do
   defgen and defgenp are currently the only ways to use process in Elixirscript right now.
   """
   defmacro defgen(call, expr \\ nil) do
+    quote do
+      def unquote(call), unquote(expr)
+    end
   end
 
   @doc """
   Defines a private generator. This is compiled into a generator function in JavaScript.
   """
   defmacro defgenp(call, expr \\ nil) do
+    quote do
+      defp unquote(call), unquote(expr)
+    end
   end
 
   @doc """

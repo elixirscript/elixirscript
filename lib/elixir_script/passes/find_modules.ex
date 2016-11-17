@@ -1,5 +1,5 @@
 defmodule ElixirScript.Passes.FindModules do
-  @moduledoc false  
+  @moduledoc false
   alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.State
 
@@ -27,14 +27,14 @@ defmodule ElixirScript.Passes.FindModules do
 
   defp get_defmodules({:defimpl, _, [ the_alias, [for: {:__aliases__, _, type_name} = type],  [do: {:__block__, context, spec}] ]} = ast, state, _) do
     {:__aliases__, _, original_name} = Utils.name_to_quoted(State.get_module_name(the_alias))
-    name = original_name ++ [DefImpl] ++ type_name
+    name = original_name ++ [DefImpl] ++ [Elixir] ++ type_name
     s =  %{name:  Utils.quoted_to_name({:__aliases__, [], name}), type: :impl, for: type, ast: {:__block__, context, spec}, implements: Utils.quoted_to_name({:__aliases__, [], original_name}) }
     { ast, state ++ [s] }
   end
 
   defp get_defmodules({:defimpl, _, [ the_alias, [for: {:__aliases__, _, type_name} = type],  [do: spec] ]} = ast, state, _) do
     {:__aliases__, _, original_name} = Utils.name_to_quoted(State.get_module_name(the_alias))
-    name = original_name ++ [DefImpl] ++ type_name
+    name = original_name ++ [DefImpl] ++ [Elixir] ++ type_name
     s =  %{name:  Utils.quoted_to_name({:__aliases__, [], name}), type: :impl, for: type, ast: {:__block__, [], [spec]}, implements: Utils.quoted_to_name({:__aliases__, [], original_name}) }
     { ast, state ++ [s] }
   end

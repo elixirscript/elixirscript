@@ -1,5 +1,5 @@
 defmodule ElixirScript.Passes.ConsolidateProtocols do
-  @moduledoc false    
+  @moduledoc false
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator.Utils
   alias ElixirScript.ModuleSystems

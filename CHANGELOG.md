@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.23.2] - Unreleased
+
+### Fixed
+- Agent not functioning properly. Now uses internal store instead of making a process and using that to put data in store
+- Protocol incorrectly handling strings
+- `defgen` and `defgenp` functions not being recognized by Elixir compiler.
+
+
 ## [0.23.1] - 2016-11-16
 
 ### Fixed

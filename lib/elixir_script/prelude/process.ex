@@ -57,7 +57,7 @@ defmodule ElixirScript.Process do
   end
 
   def register(pid, name) when is_atom(name) do
-    Elixir.Core.processes.register(pid, name)
+    Elixir.Core.processes.register(name, pid)
   end
 
   def registered() do

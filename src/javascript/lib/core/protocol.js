@@ -20,6 +20,8 @@ class Protocol{
           fun = this.registry.get(Core.Integer)[funName];
         }else if(typeof thing === "number" && !Number.isInteger(thing) && this.hasImplementation(Core.Float)){
           fun = this.registry.get(Core.Float)[funName];
+        }else if(typeof thing === "string" && this.hasImplementation(Core.BitString)){
+          fun = this.registry.get(Core.BitString)[funName];
         }else if(this.hasImplementation(thing)){
           fun = this.registry.get(thing.constructor)[funName];
         }else if(this.fallback){
@@ -45,7 +47,7 @@ class Protocol{
   }
 
   hasImplementation(thing) {
-    if (thing === Core.Integer || thing === Core.Float){
+    if (thing === Core.Integer || thing === Core.Float || Core.BitString){
       return this.registry.has(thing);
     }
 

@@ -392,6 +392,10 @@ function maps_from_list(list){
   return Object.freeze(m);
 }
 
+function* sleep_forever(){
+  yield* Core.processes.sleep(Symbol("infinity"));
+}
+
 export default {
   call_property,
   apply,
@@ -430,5 +434,6 @@ export default {
   duplicate,
   mapfoldl,
   filtermap,
-  maps_fold
+  maps_fold,
+  sleep_forever
 };
