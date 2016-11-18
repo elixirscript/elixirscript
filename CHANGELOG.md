@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [0.23.2] - Unreleased
+## [0.23.2] - 2016-11-17
 
 ### Fixed
 - Agent not functioning properly. Now uses internal store instead of making a process and using that to put data in store
