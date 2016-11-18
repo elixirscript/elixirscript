@@ -1,5 +1,5 @@
 defmodule ElixirScript.Passes.HandleOutput do
-  @moduledoc false    
+  @moduledoc false
   alias ElixirScript.Translator.State
 
   def execute(compiler_data, opts) do
@@ -24,12 +24,14 @@ defmodule ElixirScript.Passes.HandleOutput do
 
   defp out(compiler_output, %{output: nil} = compiler_opts) do
     compiler_output
-    |>  process_include_path(compiler_opts)
+    |> remove_load_only
+    |> process_include_path(compiler_opts)
   end
 
   defp out(compiler_output, %{output: :stdout} = compiler_opts) do
     compiler_output
-    |>  process_include_path(compiler_opts)
+    |> remove_load_only
+    |> process_include_path(compiler_opts)
     |> Enum.each(fn
       {_, code, _} -> IO.write(code)
       code -> IO.write(code)
@@ -40,6 +42,8 @@ defmodule ElixirScript.Passes.HandleOutput do
     if Map.get(compiler_opts, :std_lib, false) == false do
       ElixirScript.copy_stdlib_to_destination(output_path)
     end
+
+    compiler_output = remove_load_only(compiler_output)
 
     compiler_output.data
     |> Enum.each(fn({_, x}) ->
@@ -68,5 +72,10 @@ defmodule ElixirScript.Passes.HandleOutput do
             module_data.javascript_code
         end
     end)
+  end
+
+  defp remove_load_only(compiler_output) do
+    data = Enum.filter(compiler_output.data, fn({m, d}) -> Map.get(d, :load_only, false) == false end)
+    %{ compiler_output | data: data }
   end
 end

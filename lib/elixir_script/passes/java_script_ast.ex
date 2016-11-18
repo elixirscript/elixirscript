@@ -1,5 +1,5 @@
 defmodule ElixirScript.Passes.JavaScriptAST do
-  @moduledoc false    
+  @moduledoc false
   alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.State
 
@@ -28,6 +28,10 @@ defmodule ElixirScript.Passes.JavaScriptAST do
     end)
 
     %{ compiler_data | data: data }
+  end
+
+  defp compile(%{load_only: true} = module_data, opts) do
+    module_data
   end
 
   defp compile(module_data, opts) do

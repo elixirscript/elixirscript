@@ -187,14 +187,22 @@ defmodule ElixirScript.Translator.LexicalScope do
       raise "Module #{inspect module_name} not found"
     end
 
-    ElixirScript.Translator.State.add_module_reference(env.module, module.name)
+    if Map.get(module, :load_only, false) == false do
+      ElixirScript.Translator.State.add_module_reference(env.module, module.name)
+    end
+
     module
   end
 
   defp has_module?(env, module_name) do
     try do
-      get_module(env, module_name)
-      true
+      module = get_module(env, module_name)
+      case module do
+        %{load_only: true} ->
+          false
+        _ ->
+          true
+      end
     rescue
       _ ->
         false

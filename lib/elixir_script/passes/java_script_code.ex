@@ -1,5 +1,5 @@
 defmodule ElixirScript.Passes.JavaScriptCode do
-  @moduledoc false    
+  @moduledoc false
   alias ESTree.Tools.{ Builder, Generator }
 
   def execute(compiler_data, _) do
@@ -22,6 +22,10 @@ defmodule ElixirScript.Passes.JavaScriptCode do
     end)
 
     %{ compiler_data | data: data }
+  end
+
+  defp compile(%{load_only: true} = module_data) do
+    module_data
   end
 
 

@@ -70,6 +70,7 @@ defmodule ElixirScript do
     result = %{ data: data }
     |> ElixirScript.Passes.Init.execute(opts)
     |> ElixirScript.Passes.FindModules.execute(opts)
+    |> ElixirScript.Passes.FindLoadOnly.execute(opts)
     |> ElixirScript.Passes.FindFunctions.execute(opts)
     |> ElixirScript.Passes.AddStdLib.execute(opts)
     |> ElixirScript.Passes.JavaScriptAST.execute(opts)
@@ -124,6 +125,7 @@ defmodule ElixirScript do
     |> ElixirScript.Passes.ASTFromFile.execute(opts)
     |> ElixirScript.Passes.LoadModules.execute(opts)
     |> ElixirScript.Passes.FindModules.execute(opts)
+    |> ElixirScript.Passes.FindLoadOnly.execute(opts)
     |> ElixirScript.Passes.FindChangedFiles.execute(opts)
     |> ElixirScript.Passes.FindFunctions.execute(opts)
     |> ElixirScript.Passes.AddStdLib.execute(opts)
@@ -165,6 +167,7 @@ defmodule ElixirScript do
     |> ElixirScript.Passes.DepsPaths.execute(opts)
     |> ElixirScript.Passes.ASTFromFile.execute(opts)
     |> ElixirScript.Passes.FindModules.execute(opts)
+    |> ElixirScript.Passes.FindLoadOnly.execute(opts)
     |> ElixirScript.Passes.FindFunctions.execute(opts)
     |> ElixirScript.Passes.JavaScriptAST.execute(opts)
     |> ElixirScript.Passes.ConsolidateProtocols.execute(opts)
