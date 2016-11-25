@@ -79,6 +79,9 @@ defmodule ElixirScript.CLI do
       true ->
         ElixirScript.compile(input, compile_opts)
       _ ->
+        input = input
+        |> String.split([" ", ","], trim: true)
+        
         ElixirScript.compile_path(input, compile_opts)
 
         if watch do
@@ -97,4 +100,5 @@ defmodule ElixirScript.CLI do
       end
     end)
   end
+
 end

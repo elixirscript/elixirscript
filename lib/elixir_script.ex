@@ -114,7 +114,7 @@ defmodule ElixirScript do
   @doc """
   Compiles the elixir files found at the given path
   """
-  @spec compile_path(binary, Map.t) :: [binary | {binary, binary} | :ok]
+  @spec compile_path(binary | [binary], Map.t) :: [binary | {binary, binary} | :ok]
   def compile_path(path, opts \\ %{}) do
 
     opts = build_compiler_options(opts)
