@@ -16,4 +16,16 @@ defmodule ElixirScript.Lib.Elixir.Kernel.Test do
 
     assert_translation(ex_ast, js_code)
   end
+
+  test "translate sigil_r" do
+    ex_ast = quote do
+      ~r/foo/
+    end
+
+    js_code = """
+    new RegExp('foo')
+    """
+
+    assert_translation(ex_ast, js_code)
+  end
 end

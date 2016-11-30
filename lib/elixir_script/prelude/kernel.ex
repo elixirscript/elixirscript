@@ -1,7 +1,8 @@
 defmodule ElixirScript.Kernel do
-  @moduledoc false  
+  @moduledoc false
   import Kernel, only: [defmodule: 2, def: 1, def: 2, defp: 2,
-                        defmacro: 1, defmacro: 2, defmacrop: 2, ||: 2, !: 1, ++: 2, in: 2, &&: 2, ===: 2, @: 1]
+                        defmacro: 1, defmacro: 2, defmacrop: 2, ||: 2, !: 1,
+                        ++: 2, in: 2, &&: 2, ===: 2, @: 1, sigil_r: 2]
   require JS
 
 
@@ -192,6 +193,10 @@ defmodule ElixirScript.Kernel do
 
   def self() do
     Elixir.Core.processes.pid()
+  end
+
+  def sigil_r({:<<>>, _meta, [string]}, options) do
+    JS.new(RegExp, [string, options])
   end
 
   defmacro match?(left, right) do

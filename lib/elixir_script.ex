@@ -32,7 +32,8 @@ defmodule ElixirScript do
         is_pid: 1, is_tuple: 1, is_map: 1, is_port: 1, is_reference: 1, length: 1,
         map_size: 1, max: 2, min: 2, round: 1, trunc: 1, tuple_size: 1, elem: 2, is_nil: 1,
         make_ref: 1, spawn: 1, spawn: 3, spawn_link: 1, spawn_link: 3, spawn_monitor: 1,
-        spawn_monitor: 3, send: 2, self: 0, match?: 2, to_string: 1, "|>": 2, in: 2, "..": 2
+        spawn_monitor: 3, send: 2, self: 0, match?: 2, to_string: 1, "|>": 2, in: 2, "..": 2,
+        sigil_r: 2
       ]
       import ElixirScript.Kernel
       require JS
