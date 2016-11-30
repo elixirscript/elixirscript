@@ -10,6 +10,10 @@ defmodule ElixirScript.Regex do
     end
   end
 
+  def compile!(source, options \\ "") do
+    JS.new(RegExp, [source, options])
+  end
+
   def regex?(term) do
     JS.instanceof(term, RegExp)
   end

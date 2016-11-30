@@ -195,8 +195,11 @@ defmodule ElixirScript.Kernel do
     Elixir.Core.processes.pid()
   end
 
-  def sigil_r({:<<>>, _meta, [string]}, options) do
-    JS.new(RegExp, [string, options])
+  defmacro sigil_r({:<<>>, _meta, [string]}, options) do
+    str_options = List.to_string(options)
+    quote do
+      Regex.compile!(unquote(string), unquote(str_options))
+    end
   end
 
   defmacro match?(left, right) do

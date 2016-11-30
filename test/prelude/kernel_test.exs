@@ -23,7 +23,19 @@ defmodule ElixirScript.Lib.Elixir.Kernel.Test do
     end
 
     js_code = """
-    new RegExp('foo')
+    Elixir$ElixirScript$Regex.compile__emark__('foo','')
+    """
+
+    assert_translation(ex_ast, js_code)
+  end
+
+  test "translate sigil_r with options" do
+    ex_ast = quote do
+      ~r/foo/ig
+    end
+
+    js_code = """
+    Elixir$ElixirScript$Regex.compile__emark__('foo', 'ig')
     """
 
     assert_translation(ex_ast, js_code)
