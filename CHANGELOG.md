@@ -4,10 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [0.23.4] - Unreleased
+## [0.24.0] - Unreleased
 
 ### Fixed
 - CLI now allows a comma-separated or space-separated list of paths
+- Implement `sigil_r` and `Regex` module
 
 ## [0.23.3] - 2016-11-18
 
