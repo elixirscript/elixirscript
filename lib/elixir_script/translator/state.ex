@@ -18,12 +18,12 @@ defmodule ElixirScript.Translator.State do
   def serialize() do
     Agent.get(__MODULE__, fn(state) ->
       modules = state.modules
-      modules = Enum.map(modules, fn {m, d} -> 
+      modules = Enum.map(modules, fn {m, d} ->
         d = Map.delete(d, :javascript_ast)
         |> Map.delete(:javascript_code)
         |> Map.delete(:javascript_name)
 
-        {m, d}  
+        {m, d}
       end)
       |> Enum.filter(fn {_, d} -> d.type != :consolidated end)
 
@@ -64,6 +64,7 @@ defmodule ElixirScript.Translator.State do
     |> Map.put(MapSet, ElixirScript.MapSet)
     |> Map.put(List, ElixirScript.List)
     |> Map.put(Process, ElixirScript.Process)
+    |> Map.put(Regex, ElixirScript.Regex)
   end
 
   def set_module_data(module_data) do
