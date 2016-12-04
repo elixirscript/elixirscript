@@ -64,8 +64,9 @@ Please check the [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ### Example projects
 * [hello](https://github.com/bryanjos/hello) Shows using Phoenix + Elixirscript with file watching
-* [elixirscript frontend boilerplate](https://github.com/bryanjos/elixirscript-project-boilerplate) A boilerplate project for elixirscript frontends
-* [elixirscript react example](https://github.com/bryanjos/elixirscript_react) An example of using with React
+* [Elixirscript frontend boilerplate](https://github.com/bryanjos/elixirscript-project-boilerplate) A boilerplate project for elixirscript frontends
+* [Elixirscript React example](https://github.com/bryanjos/elixirscript_react) An example of using with React
+* [Elixirscript AWS Lambda example](https://github.com/bryanjos/elixirscript_lambda)
 
 #### Using with Brunch
 There is a plugin for using ElixirScript in your Brunch project
