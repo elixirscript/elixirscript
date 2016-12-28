@@ -52,8 +52,13 @@ defmodule ElixirScript do
   @spec compile(binary, Map.t) :: [binary | {binary, binary} | :ok]
   def compile(elixir_code, opts \\ %{}) do
     elixir_code
-    |> Code.string_to_quoted!
-    |> compile_quoted(opts)
+    |> List.wrap
+    |> Enum.map(fn(x) ->
+      x
+      |> Code.string_to_quoted!
+      |> compile_quoted(opts)
+    end)
+    |> List.flatten
   end
 
   @doc """

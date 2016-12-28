@@ -41,7 +41,9 @@ defmodule ElixirScript.Watcher do
       "." <> _ ->
         false
       _ ->
-       path == Path.absname(Path.join([state[:input], file]))
+        Enum.any?(List.wrap(state[:input]), fn(x) ->
+          path == Path.absname(Path.join([x, file]))
+        end)
     end
   end
 end

@@ -13,6 +13,7 @@ defmodule ElixirScript.Translator.Struct do
     if ElixirScript.Translator.LexicalScope.get_module_name(env, candiate_module_name) in ElixirScript.Translator.State.list_module_names() do
       name = ElixirScript.Translator.LexicalScope.get_module_name(env, candiate_module_name)
       ident = JS.identifier(Utils.name_to_js_name(name))
+      ElixirScript.Translator.State.add_module_reference(env.module, name)
       JS.member_expression(ident, ident)
 
     else

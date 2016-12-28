@@ -6,9 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [0.24.0] - Unreleased
 
+### Added
+- Implement `sigil_r` and `Regex` module
+
 ### Fixed
 - CLI now allows a comma-separated or space-separated list of paths
-- Implement `sigil_r` and `Regex` module
+- Struct not properly referenced
 
 ## [0.23.3] - 2016-11-18
 

@@ -6,7 +6,7 @@ defmodule ElixirScript.CLI do
   @switches [
     output: :binary, elixir: :boolean,
     help: :boolean, core_path: :binary,
-    full_build: :boolean, version: :boolean, 
+    full_build: :boolean, version: :boolean,
     watch: :boolean
   ]
 
@@ -21,13 +21,19 @@ defmodule ElixirScript.CLI do
   end
 
   def parse_args(args) do
-    parse = OptionParser.parse(args, switches: @switches, aliases: @aliases)
+    { options, input, errors } = OptionParser.parse(args, switches: @switches, aliases: @aliases)
 
-    case parse do
-      { [help: true] , _ , _ } -> :help
-      { [version: true] , _ , _ } -> :version
-      { options , [input], _ } -> { input, options }
-      _ -> :help
+    cond do
+      length(errors) > 0 ->
+        :help
+      Keyword.get(options, :help, false) ->
+        :help
+      Keyword.get(options, :version, false) ->
+        :version
+      length(input) == 0 ->
+        :help
+      true ->
+        { input, options }
     end
 
   end
@@ -80,8 +86,9 @@ defmodule ElixirScript.CLI do
         ElixirScript.compile(input, compile_opts)
       _ ->
         input = input
-        |> String.split([" ", ","], trim: true)
-        
+        |> Enum.map(fn(x) -> String.split(x, [" ", ","], trim: true) end)
+        |> List.flatten
+
         ElixirScript.compile_path(input, compile_opts)
 
         if watch do
