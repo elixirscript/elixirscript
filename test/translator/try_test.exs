@@ -172,15 +172,15 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-     Elixir.Core.SpecialForms._try(function()    {
-             return     1 / x;
-           },null,null,Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Elixir.Core.Patterns.variable()],function(y)    {
-             return     Symbol.for('small');
-           },function(y)    {
-             return     (y < 1) && (y > -1);
-           }),Elixir.Core.Patterns.clause([Elixir.Core.Patterns.wildcard()],function()    {
-             return     Symbol.for('large');
-           })),null)
+    Elixir.Core.SpecialForms._try(function() {
+      return 1 / x;
+    }, null, null, Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Elixir.Core.Patterns.variable()], function(y) {
+      return Symbol.for('small');
+    }, function(y) {
+      return y < 1 && y > -1;
+    }), Elixir.Core.Patterns.clause([Elixir.Core.Patterns.wildcard()], function() {
+      return Symbol.for('large');
+    })), null)
     """
 
     assert_translation(ex_ast, js_code)

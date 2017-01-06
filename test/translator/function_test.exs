@@ -89,7 +89,7 @@ defmodule ElixirScript.Translator.Function.Test do
              return     Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Elixir.Core.Patterns.variable()],function(x)    {
              return     2;
            },function(x)    {
-           return     (x === null) || (x === false);
+           return x === null || x === false;
            }),Elixir.Core.Patterns.clause([Elixir.Core.Patterns.wildcard()],function()    {
              return     1;
            })).call(this,1 == 1);
@@ -113,21 +113,22 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-   const test1 = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable()],function(alpha,beta)    {
-       return     Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Elixir.Core.Patterns.variable()],function(x)    {
-       return     2;
-     },function(x)    {
-     return     (x === null) || (x === false);
-     }),Elixir.Core.Patterns.clause([Elixir.Core.Patterns.wildcard()],function()    {
-       return     Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Elixir.Core.Patterns.variable()],function(x)    {
-       let [a] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),1);
-       return     a;
-     },function(x)    {
-     return     (x === null) || (x === false);
-     }),Elixir.Core.Patterns.clause([Elixir.Core.Patterns.wildcard()],function()    {
-       return     4;
-     })).call(this,2 == 2);
-     })).call(this,1 == 1);
+     const test1 = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable()], function(alpha, beta) {
+         return Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Elixir.Core.Patterns.variable()], function(x) {
+             return 2;
+         }, function(x) {
+             return x === null || x === false;
+         }), Elixir.Core.Patterns.clause([Elixir.Core.Patterns.wildcard()], function() {
+             return Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Elixir.Core.Patterns.variable()], function(x) {
+                 let [a] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(), 1);
+
+                 return a;
+             }, function(x) {
+                 return x === null || x === false;
+             }), Elixir.Core.Patterns.clause([Elixir.Core.Patterns.wildcard()], function() {
+                 return 4;
+             })).call(this, 2 == 2);
+         })).call(this, 1 == 1);
      }));
     """
 
@@ -800,7 +801,7 @@ defmodule ElixirScript.Translator.Function.Test do
           return Symbol.for('error');
         },
         function(x) {
-        return (x === null) || (x === false);
+        return x === null || x === false;
         }),
         Elixir.Core.Patterns.clause([Elixir.Core.Patterns.wildcard()], function() {
             return null;
