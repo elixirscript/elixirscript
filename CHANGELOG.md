@@ -7,7 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.24.0] - Unreleased
 
 ### Added
-- Implement `sigil_r` and `Regex` module
+- Support for `sigil_r`
+- `Regex` module
+- Better JavaScript formatting
 
 ### Fixed
 - CLI now allows a comma-separated or space-separated list of paths
