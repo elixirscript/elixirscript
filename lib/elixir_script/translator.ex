@@ -108,8 +108,32 @@ defmodule ElixirScript.Translator do
     Expression.make_unary_expression(:!, value, env)
   end
 
+  defp do_translate({:"~~~", _, [value]}, env) do
+    Expression.make_unary_expression(:"~~~", value, env)
+  end
+
   defp do_translate({operator, _, [left, right]}, env) when operator in [:+, :-, :/, :*, :==, :!=, :&&, :||, :>, :<, :>=, :<=, :===, :!==, :"**"] do
     Expression.make_binary_expression(operator, left, right, env)
+  end
+
+  defp do_translate({:&&&, _, [left, right]}, env) do
+    Expression.make_binary_expression(:&, left, right, env)
+  end
+
+  defp do_translate({:<<<, _, [left, right]}, env) do
+    Expression.make_binary_expression(:<, left, right, env)
+  end
+
+  defp do_translate({:>>>, _, [left, right]}, env) do
+    Expression.make_binary_expression(:^, left, right, env)
+  end
+
+  defp do_translate({:^^^, _, [left, right]}, env) do
+    Expression.make_binary_expression(:^, left, right, env)
+  end
+
+  defp do_translate({:|||, _, [left, right]}, env) do
+    Expression.make_binary_expression(:|, left, right, env)
   end
 
   defp do_translate({:and, _, [left, right]}, env) do

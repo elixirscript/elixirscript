@@ -1,5 +1,5 @@
 defmodule ElixirScript.String do
-  @moduledoc false  
+  @moduledoc false
   import Kernel, except: [length: 1]
 
   def to_atom(str) do
@@ -52,6 +52,20 @@ defmodule ElixirScript.String do
 
   def split(str) do
     str.split()
+  end
+
+  def split(str, replace, options \\ []) do
+    limit = Keyword.get(options, :parts, -1)
+    trim = Keyword.get(options, :trim, false)
+    split = str.split(replace, limit)
+
+    Enum.map(split, fn(x) ->
+      if trim do
+        x.trim()
+      else
+        x
+      end
+    end)
   end
 
 

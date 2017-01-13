@@ -112,6 +112,7 @@ defmodule ElixirScript.Translator.Function do
   end
 
   def make_function_clause(patterns, params, body, guard_body, is_generator?) do
+
     arguments = case guard_body do
                   nil ->
                     [

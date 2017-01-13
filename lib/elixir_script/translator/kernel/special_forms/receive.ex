@@ -21,6 +21,7 @@ defmodule ElixirScript.Translator.Receive do
             )
         ])
 
+
       {js, env}
   end
 
@@ -47,7 +48,8 @@ defmodule ElixirScript.Translator.Receive do
   end
 
   def call_processes_func(func_name, params) do
-    JS.call_expression(
+    JS.yield_expression(
+      JS.call_expression(
       JS.member_expression(
         JS.member_expression(
           JS.identifier("Elixir"),
@@ -59,7 +61,8 @@ defmodule ElixirScript.Translator.Receive do
         JS.identifier(func_name)
       ),
       params
-    )
+      )
+     )
   end
 
 end

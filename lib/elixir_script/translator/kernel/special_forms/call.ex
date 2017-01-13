@@ -75,6 +75,15 @@ defmodule ElixirScript.Translator.Call do
   end
 
   def make_function_call(module_name, function_name, params, env) do
+    params = case params do
+               atom when is_atom(atom) ->
+                 []
+               nil ->
+                 []
+               _ ->
+                 params
+             end
+
     the_name = get_module_name_for_function(module_name, env)
     { make_call_expression(the_name, function_name, params, env), env }
   end
