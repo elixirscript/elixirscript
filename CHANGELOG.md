@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - CLI now allows a comma-separated or space-separated list of paths
 - Struct not properly referenced
+- Tail call optimization
 
 ## [0.23.3] - 2016-11-18
 
