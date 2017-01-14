@@ -21,7 +21,7 @@
   "dependencies": {
     "erlang-types": "^1.0.0",
     "erlang-processes": "^2.0.0",
-    "tailored": "^2.0.0"
+    "tailored": "^2.2.0"
   },
   "devDependencies": {
     "babel": "^6.5.2",
