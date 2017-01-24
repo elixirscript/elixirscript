@@ -563,6 +563,9 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({name, _, params} = ast, env) when is_list(params) do
+    if is_from_js_module(name, params, env) do
+      do_translate({{:., [], [{:__aliases__, [], [:JS]}, name]}, [], params }, env)
+    else
       expanded_ast = Macro.expand(ast, env.env)
       if expanded_ast == ast do
         name_arity = {name, length(params)}
@@ -572,8 +575,8 @@ defmodule ElixirScript.Translator do
           name_arity in module.functions or name_arity in module.private_functions ->
             Call.make_function_call(name, params, env)
           ElixirScript.Translator.LexicalScope.find_module(env, name_arity) ->
-             imported_module_name = ElixirScript.Translator.LexicalScope.find_module(env, name_arity)
-             Call.make_function_call(imported_module_name, name, params, env)
+            imported_module_name = ElixirScript.Translator.LexicalScope.find_module(env, name_arity)
+            Call.make_function_call(imported_module_name, name, params, env)
           true ->
             Call.make_function_call(name, params, env)
         end
@@ -581,22 +584,46 @@ defmodule ElixirScript.Translator do
       else
         translate(expanded_ast, env)
       end
-  end
-
-  defp do_translate({ name, _, params }, env) when is_atom(params) do
-    cond do
-      ElixirScript.Translator.LexicalScope.has_var?(env, name) ->
-        { Identifier.make_identifier(name), env }
-      has_function?(env.module, {name, 0}) ->
-        Call.make_function_call(name, [], env)
-      ElixirScript.Translator.LexicalScope.find_module(env, {name, 0}) ->
-         imported_module_name = ElixirScript.Translator.LexicalScope.find_module(env, {name, 0})
-         Call.make_function_call(imported_module_name, name, params, env)
-      true ->
-        { Identifier.make_identifier(name), env }
     end
   end
 
+  defp do_translate({ name, _, params }, env) when is_atom(params) do
+    if is_from_js_module(name, params, env) do
+      do_translate({{:., [], [{:__aliases__, [], [:JS]}, name]}, [], params }, env)
+    else
+
+      cond do
+        ElixirScript.Translator.LexicalScope.has_var?(env, name) ->
+          { Identifier.make_identifier(name), env }
+        has_function?(env.module, {name, 0}) ->
+          Call.make_function_call(name, [], env)
+        ElixirScript.Translator.LexicalScope.find_module(env, {name, 0}) ->
+          imported_module_name = ElixirScript.Translator.LexicalScope.find_module(env, {name, 0})
+          Call.make_function_call(imported_module_name, name, params, env)
+        true ->
+          { Identifier.make_identifier(name), env }
+      end
+    end
+  end
+
+  defp is_from_js_module(name, params, env) do
+    func = if is_list(params) do
+      {name, length(params)}
+    else
+      {name, 0}
+    end
+
+    {_, macros} = Enum.find(env.env.macros, {nil, []}, fn({k, v}) -> to_string(k) == "Elixir.JS" end)
+    {_, functions} = Enum.find(env.env.functions, {nil, []}, fn({k, v}) -> to_string(k) == "Elixir.JS" end)
+
+    js = macros ++ functions
+
+    if func in js do
+      true
+    else
+      false
+    end
+  end
 
   def create_module_name(module_name, env) do
     case module_name do

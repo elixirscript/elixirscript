@@ -11,7 +11,7 @@ defmodule ElixirScript.Translator.State do
 
   def start_link(compiler_opts, loaded_modules) do
     Agent.start_link(fn ->
-      %{ compiler_opts: compiler_opts, modules: Keyword.new, std_lib_map: build_standard_lib_map(), loaded_modules: loaded_modules }
+      %{ compiler_opts: compiler_opts, modules: Keyword.new, std_lib_map: build_standard_lib_map(), loaded_modules: [JS | loaded_modules] }
     end, name: __MODULE__)
   end
 
@@ -38,7 +38,7 @@ defmodule ElixirScript.Translator.State do
     Agent.update(__MODULE__, fn state ->
       frozen_state = :erlang.binary_to_term(frozen_state)
       modules = Keyword.delete(frozen_state.modules, ElixirScript.Temp)
-      %{ state | modules: modules, std_lib_map: frozen_state.std_lib_map, loaded_modules: loaded_modules }
+      %{ state | modules: modules, std_lib_map: frozen_state.std_lib_map, loaded_modules: [JS | loaded_modules] }
     end)
   end
 
@@ -82,7 +82,7 @@ defmodule ElixirScript.Translator.State do
 
   def set_loaded_modules(modules) do
     Agent.update(__MODULE__, fn state ->
-      %{ state | loaded_modules: modules }
+      %{ state | loaded_modules: [ JS | modules ] }
     end)
   end
 

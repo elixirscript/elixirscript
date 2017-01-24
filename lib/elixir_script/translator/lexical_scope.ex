@@ -226,7 +226,8 @@ defmodule ElixirScript.Translator.LexicalScope do
     if has_module?(env, module_name) do
       module = get_module(env, module_name)
       %{ env | requires: Enum.uniq(env.requires ++ [module.name]),
-         functions: env.functions ++ [{ module.name, module.functions }] }
+         functions: env.functions ++ [{ module.name, module.functions }]
+      }
     else
       env
     end
@@ -236,7 +237,8 @@ defmodule ElixirScript.Translator.LexicalScope do
       module = get_module(env, module_name)
 
       %{ env | functions: List.keydelete(env.functions, module_name, 0) ++ [{ module.name, module.functions }],
-                       requires: Enum.uniq(env.requires ++ [module.name]) }
+         requires: Enum.uniq(env.requires ++ [module.name])
+      }
   end
 
   def add_import(env, module_name, [only: :macros]) do
