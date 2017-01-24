@@ -592,11 +592,9 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({ name, _, params }, env) when is_atom(params) do
-    if is_from_js_module(name, params, env) do
-      do_translate({{:., [], [{:__aliases__, [], [:JS]}, name]}, [], params }, env)
-    else
-
       cond do
+        is_from_js_module(name, params, env) ->
+          do_translate({{:., [], [{:__aliases__, [], [:JS]}, name]}, [], params }, env)
         ElixirScript.Translator.LexicalScope.has_var?(env, name) ->
           { Identifier.make_identifier(name), env }
         has_function?(env.module, {name, 0}) ->
@@ -607,7 +605,6 @@ defmodule ElixirScript.Translator do
         true ->
           { Identifier.make_identifier(name), env }
       end
-    end
   end
 
   defp is_from_js_module(name, params, env) do
