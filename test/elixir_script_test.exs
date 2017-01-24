@@ -15,7 +15,6 @@ defmodule ElixirScript.Test do
         use ElixirScript.Using
 
         defp something_else() do
-          new Date, []
           ElixirScript.Math.squared(1)
         end
 
