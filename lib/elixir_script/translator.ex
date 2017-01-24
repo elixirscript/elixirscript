@@ -281,6 +281,10 @@ defmodule ElixirScript.Translator do
     translate({{:., context1, [{:__aliases__, context2, [:Elixir, :Enum]}, function_name]}, context3, params }, env)
   end
 
+  defp do_translate({{:., _, [{:__aliases__, _, [:JS]}, function_name]}, _, params }, env) when function_name in @generator_types do
+    do_translate({function_name, [], params}, env)
+  end
+
   defp do_translate({{:., _, [{:__aliases__, _, [:JS]}, function_name]}, _, params }, env) do
     JSLib.translate_js_function(function_name, params, env)
   end
