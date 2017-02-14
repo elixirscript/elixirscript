@@ -21,16 +21,33 @@ defmodule Mix.Tasks.Compile.ElixirScript do
 
   def run(_) do
     elixirscript_config = get_elixirscript_config()
-    input_path = Keyword.fetch!(elixirscript_config, :input)
-    output_path = Keyword.fetch!(elixirscript_config, :output)
 
-    ElixirScript.compile_path(input_path, %{ output: output_path })
+    elixirscript_base = Path.join([Mix.Project.build_path, "elixirscript"])
+    File.mkdir_p!(elixirscript_base)
+    elixirscript_path = Path.join([elixirscript_base, "#{Mix.Project.config[:app]}"])
+
+    input_path = Keyword.fetch!(elixirscript_config, :input)
+    |> List.wrap
+    |> Enum.map(fn(path) -> 
+      Path.absname(path)
+    end)
+    |> Enum.join("\n")
+
+    File.write!(elixirscript_path, input_path)
+
+    paths = Path.join([elixirscript_base, "*"]) 
+    |> Path.wildcard
+    |> Enum.map(fn(path) -> 
+      File.read!(path)
+    end)
+
+    output_path = Keyword.fetch!(elixirscript_config, :output)
+    ElixirScript.compile_path(paths, %{output: output_path})
     :ok
   end
 
   def clean do
     elixirscript_config = get_elixirscript_config()
-    input_path = Keyword.fetch!(elixirscript_config, :input)
     output_path = Keyword.fetch!(elixirscript_config, :output)
 
     File.ls!(output_path)
@@ -45,7 +62,7 @@ defmodule Mix.Tasks.Compile.ElixirScript do
 
   defp get_elixirscript_config() do
     config  = Mix.Project.config
-    Keyword.fetch!(config, :elixir_script)
+    Keyword.fetch!(config, :elixir_script) || Keyword.fetch!(config, :elixirscript)
   end
 
 end
