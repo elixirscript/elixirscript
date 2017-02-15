@@ -234,23 +234,28 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
-    import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
-    const oh_my2 = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function()    {
-      return     null;
-    }));
+     import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
 
-    const oh_my = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function()    {
-      return     null;
-    }));
+     const oh_my = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([], function() {
+         return null;
+     }));
 
-    export default {
-      oh_my2,     oh_my
-    };
+     const oh_my2 = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([], function() {
+         return null;
+     }));
 
-    import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
-    import Elixir$Lions$Tigers from '../app/Elixir.Lions.Tigers';
-    Elixir$Lions$Tigers.oh_my();
-    export default {};
+     export default {
+         oh_my,
+         oh_my2
+     };
+
+     import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
+
+     import Elixir$Lions$Tigers from '../app/Elixir.Lions.Tigers';
+
+     Elixir$Lions$Tigers.oh_my();
+
+     export default {};
     """
 
     assert_translation(ex_ast, js_code)
@@ -274,24 +279,28 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
-    import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
-    const oh_my2 = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function()    {
-      return     null;
-    }));
+     import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
 
-    const oh_my = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function()    {
-      return     null;
-    }));
+     const oh_my = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([], function() {
+         return null;
+     }));
 
-    export default {
-      oh_my2,
-      oh_my
-    };
+     const oh_my2 = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([], function() {
+         return null;
+     }));
 
-    import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
-    import Elixir$Lions$Tigers from '../app/Elixir.Lions.Tigers';
-    Elixir$Lions$Tigers.oh_my2();
-    export default {};
+     export default {
+         oh_my,
+         oh_my2
+     };
+
+     import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
+
+     import Elixir$Lions$Tigers from '../app/Elixir.Lions.Tigers';
+
+     Elixir$Lions$Tigers.oh_my2();
+
+     export default {};
     """
 
     assert_translation(ex_ast, js_code)

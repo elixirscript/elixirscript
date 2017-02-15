@@ -4,6 +4,6 @@ defmodule ElixirScript.Module do
   defstruct name: nil,
   functions: Keyword.new, private_functions: Keyword.new,
   body: nil, js_imports: [], module_refs: [], type: :module,
-  impls: HashDict.new, impl_type: nil, app_name: nil
+  impls: Map.new, impl_type: nil, app_name: nil
 
 end

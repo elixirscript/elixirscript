@@ -120,26 +120,48 @@ defmodule ElixirScript do
   @doc """
   Compiles the elixir files found at the given path
   """
-  @spec compile_path(binary | [binary], Map.t) :: [binary | {binary, binary} | :ok]
-  def compile_path(path, opts \\ %{}) do
+  @spec compile_path(binary | [binary] | map, Map.t) :: [binary | {binary, binary} | :ok]
+  def compile_path(path, opts \\ %{})
+
+  def compile_path(path, opts) when is_binary(path) do
+    compile_path([path], opts)
+  end
+
+  def compile_path(path, opts) when is_list(path) do
+    built_opts = build_compiler_options(opts)
+
+    app_name = cond do
+      !is_nil(built_opts[:app]) ->
+        opts[:app]
+      Code.ensure_loaded?(Mix) ->
+        Mix.Project.config()[:app]
+      true ->
+        :app
+    end
+
+    compile_path(Map.put(%{}, app_name, path), opts)
+  end
+
+  def compile_path(path, opts) do
 
     opts = build_compiler_options(opts)
 
-    result = %{ path: path }
+    deps = path
+    |> Map.to_list
+    |> Enum.map(fn {app, path} -> {app, List.wrap(path)} end)
+
+    result = %{ data: deps }
     |> ElixirScript.Passes.Init.execute(opts)
-    |> ElixirScript.Passes.DepsPaths.execute(opts)
     |> ElixirScript.Passes.ASTFromFile.execute(opts)
     |> ElixirScript.Passes.LoadModules.execute(opts)
     |> ElixirScript.Passes.FindModules.execute(opts)
     |> ElixirScript.Passes.FindLoadOnly.execute(opts)
-    |> ElixirScript.Passes.FindChangedFiles.execute(opts)
     |> ElixirScript.Passes.FindFunctions.execute(opts)
     |> ElixirScript.Passes.AddStdLib.execute(opts)
     |> ElixirScript.Passes.JavaScriptAST.execute(opts)
     |> ElixirScript.Passes.ConsolidateProtocols.execute(opts)
     |> ElixirScript.Passes.JavaScriptCode.execute(opts)
     |> ElixirScript.Passes.JavaScriptName.execute(opts)
-    |> ElixirScript.Passes.WriteCache.execute(opts)
     |> ElixirScript.Passes.HandleOutput.execute(opts)
 
     result
@@ -168,9 +190,8 @@ defmodule ElixirScript do
     opts = build_compiler_options(%{std_lib: true, include_path: true, output: output_path, app: :elixir})
     libs_path = Path.join([__DIR__, "elixir_script", "prelude"])
 
-    result = %{ path: libs_path }
+    result = %{ data: [{:elixir, List.wrap(libs_path)}] }
     |> ElixirScript.Passes.Init.execute(opts)
-    |> ElixirScript.Passes.DepsPaths.execute(opts)
     |> ElixirScript.Passes.ASTFromFile.execute(opts)
     |> ElixirScript.Passes.FindModules.execute(opts)
     |> ElixirScript.Passes.FindLoadOnly.execute(opts)

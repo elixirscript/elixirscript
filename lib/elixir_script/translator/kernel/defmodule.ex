@@ -84,46 +84,46 @@ defmodule ElixirScript.Translator.Defmodule do
 
   def extract_functions_from_module({:__block__, meta, body_list}) do
     { body_list, functions } = Enum.map_reduce(body_list,
-      %{exported: HashDict.new(), private: HashDict.new(), exported_generators: HashDict.new(), private_generators: HashDict.new()}, fn
+      %{exported: Map.new(), private: Map.new(), exported_generators: Map.new(), private_generators: Map.new()}, fn
         ({:def, _, [{:when, _, [{name, _, _} | _guards] }, _] } = function, state) ->
           {
             nil,
-            %{ state | exported: HashDict.put(state.exported, name, HashDict.get(state.exported, name, []) ++ [function]) }
+            %{ state | exported: Map.put(state.exported, name, Map.get(state.exported, name, []) ++ [function]) }
           }
         ({:def, _, [{name, _, _}, _]} = function, state) ->
           {
             nil,
-            %{ state | exported: HashDict.put(state.exported, name, HashDict.get(state.exported, name, []) ++ [function]) }
+            %{ state | exported: Map.put(state.exported, name, Map.get(state.exported, name, []) ++ [function]) }
           }
         ({:defp, _, [{:when, _, [{name, _, _} | _guards] }, _] } = function, state) ->
           {
             nil,
-            %{ state | private: HashDict.put(state.private, name, HashDict.get(state.private, name, []) ++ [function]) }
+            %{ state | private: Map.put(state.private, name, Map.get(state.private, name, []) ++ [function]) }
           }
         ({:defp, _, [{name, _, _}, _]} = function, state) ->
           {
             nil,
-            %{ state | private: HashDict.put(state.private, name, HashDict.get(state.private, name, []) ++ [function]) }
+            %{ state | private: Map.put(state.private, name, Map.get(state.private, name, []) ++ [function]) }
           }
         ({:defgen, _, [{:when, _, [{name, _, _} | _guards] }, _] } = function, state) ->
           {
             nil,
-            %{ state | exported_generators: HashDict.put(state.exported_generators, name, HashDict.get(state.exported_generators, name, []) ++ [function]) }
+            %{ state | exported_generators: Map.put(state.exported_generators, name, Map.get(state.exported_generators, name, []) ++ [function]) }
           }
         ({:defgen, _, [{name, _, _}, _]} = function, state) ->
           {
             nil,
-            %{ state | exported_generators: HashDict.put(state.exported_generators, name, HashDict.get(state.exported_generators, name, []) ++ [function]) }
+            %{ state | exported_generators: Map.put(state.exported_generators, name, Map.get(state.exported_generators, name, []) ++ [function]) }
           }
         ({:defgenp, _, [{:when, _, [{name, _, _} | _guards] }, _] } = function, state) ->
           {
             nil,
-            %{ state | private_generators: HashDict.put(state.private_generators, name, HashDict.get(state.private_generators, name, []) ++ [function]) }
+            %{ state | private_generators: Map.put(state.private_generators, name, Map.get(state.private_generators, name, []) ++ [function]) }
           }
         ({:defgenp, _, [{name, _, _}, _]} = function, state) ->
           {
             nil,
-            %{ state | private_generators: HashDict.put(state.private_generators, name, HashDict.get(state.private_generators, name, []) ++ [function]) }
+            %{ state | private_generators: Map.put(state.private_generators, name, Map.get(state.private_generators, name, []) ++ [function]) }
           }
         (x, state) ->
           { x, state }
