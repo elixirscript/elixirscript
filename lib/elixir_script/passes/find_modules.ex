@@ -6,7 +6,7 @@ defmodule ElixirScript.Passes.FindModules do
   def execute(compiler_data, opts) do
     data = Enum.reduce(compiler_data.data, [], fn(data, list) ->
       quoted = update_quoted(data.ast)
-      { _, modules } = Macro.postwalk(quoted, [], &get_defmodules(&1, &2, opts))
+      { _, modules } = Macro.postwalk(quoted, [], &get_defmodules(&1, &2, opts, compiler_data))
 
       modules = Enum.map(modules, fn(x) -> { x.name, Map.merge(data, x) } end)
       list ++ modules
@@ -15,41 +15,41 @@ defmodule ElixirScript.Passes.FindModules do
     Map.put(compiler_data, :data, data)
   end
 
-  defp get_defmodules({:defprotocol, _, [{:__aliases__, _, _} = the_alias, [do: {:__block__, _, _} = block]]} = ast, state, _) do
+  defp get_defmodules({:defprotocol, _, [{:__aliases__, _, _} = the_alias, [do: {:__block__, _, _} = block]]} = ast, state, _, _) do
     s = %{ name:  Utils.quoted_to_name(the_alias),  type: :protocol, ast: block }
     { ast, state ++ [s] }
   end
 
-  defp get_defmodules({:defprotocol, _, [{:__aliases__, _, _} = the_alias, [do: spec]]} = ast, state, _) do
+  defp get_defmodules({:defprotocol, _, [{:__aliases__, _, _} = the_alias, [do: spec]]} = ast, state, _, _) do
     s = %{ name:  Utils.quoted_to_name(the_alias),  type: :protocol, ast: {:__block__, [], [spec]} }
     { ast, state ++ [s] }
   end
 
-  defp get_defmodules({:defimpl, _, [ the_alias, [for: {:__aliases__, _, type_name} = type],  [do: {:__block__, context, spec}] ]} = ast, state, _) do
-    {:__aliases__, _, original_name} = Utils.name_to_quoted(State.get_module_name(the_alias))
+  defp get_defmodules({:defimpl, _, [ the_alias, [for: {:__aliases__, _, type_name} = type],  [do: {:__block__, context, spec}] ]} = ast, state, _, compiler_data) do
+    {:__aliases__, _, original_name} = Utils.name_to_quoted(State.get_module_name(compiler_data.state, the_alias))
     name = original_name ++ [DefImpl] ++ [Elixir] ++ type_name
     s =  %{name:  Utils.quoted_to_name({:__aliases__, [], name}), type: :impl, for: type, ast: {:__block__, context, spec}, implements: Utils.quoted_to_name({:__aliases__, [], original_name}) }
     { ast, state ++ [s] }
   end
 
-  defp get_defmodules({:defimpl, _, [ the_alias, [for: {:__aliases__, _, type_name} = type],  [do: spec] ]} = ast, state, _) do
-    {:__aliases__, _, original_name} = Utils.name_to_quoted(State.get_module_name(the_alias))
+  defp get_defmodules({:defimpl, _, [ the_alias, [for: {:__aliases__, _, type_name} = type],  [do: spec] ]} = ast, state, _, compiler_data) do
+    {:__aliases__, _, original_name} = Utils.name_to_quoted(State.get_module_name(compiler_data.state, the_alias))
     name = original_name ++ [DefImpl] ++ [Elixir] ++ type_name
     s =  %{name:  Utils.quoted_to_name({:__aliases__, [], name}), type: :impl, for: type, ast: {:__block__, [], [spec]}, implements: Utils.quoted_to_name({:__aliases__, [], original_name}) }
     { ast, state ++ [s] }
   end
 
-  defp get_defmodules({:defmodule, _, [{:__aliases__, _, [:ElixirScript, :Temp]}, [do: body]]} = ast, state, opts) do
+  defp get_defmodules({:defmodule, _, [{:__aliases__, _, [:ElixirScript, :Temp]}, [do: body]]} = ast, state, _, _) do
     s = %{name: ElixirScript.Temp, type: :module, ast: body }
     { ast, state ++ [s] }
   end
 
 
-  defp get_defmodules({:defmodule, _, [{:__aliases__, _, _}, [do: _]]} = ast, state, opts) do
+  defp get_defmodules({:defmodule, _, [{:__aliases__, _, _}, [do: _]]} = ast, state, opts, _) do
     { ast, do_module_processing(ast, state, opts) }
   end
 
-  defp get_defmodules(ast, state, _) do
+  defp get_defmodules(ast, state, _, _) do
     { ast, state }
   end
 

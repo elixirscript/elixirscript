@@ -30,9 +30,9 @@ defmodule ElixirScript.Translator.Utils do
     Enum.join([:Elixir] ++ name, ".")
   end
 
-  def make_local_file_path(module_app_name, file_name) when is_atom(module_app_name) do
-    root = ElixirScript.Translator.State.get().compiler_opts.root
-    app_name = to_string(module_app_name)
+  def make_local_file_path(module_app_name, file_name, env) do
+    root = ElixirScript.Translator.State.get(env.state).compiler_opts.root
+    app_name = if is_binary(module_app_name), do: module_app_name, else: to_string(module_app_name)
 
     case root do
       nil ->
@@ -42,8 +42,8 @@ defmodule ElixirScript.Translator.Utils do
     end
   end
 
-  def make_local_file_path(file_name) do
-    root = ElixirScript.Translator.State.get().compiler_opts.root
+  def make_local_file_path(file_name, env) do
+    root = ElixirScript.Translator.State.get(env.state).compiler_opts.root
 
     case root do
       nil ->
@@ -53,7 +53,7 @@ defmodule ElixirScript.Translator.Utils do
     end
   end
 
-  def make_local_file_path(module_app_name, file_name, root) do
+  def make_local_file_path(module_app_name, file_name, root, _) do
     app_name = to_string(module_app_name)
 
     case root do

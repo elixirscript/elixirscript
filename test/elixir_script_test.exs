@@ -19,7 +19,7 @@ defmodule ElixirScript.Test do
         end
 
       end
-    """, %{ env: make_custom_env })
+    """, %{ env: make_custom_env() })
 
     assert_js_matches """
          import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
@@ -47,7 +47,7 @@ defmodule ElixirScript.Test do
         end
 
       end
-    """, %{ env: make_custom_env, core_path: "elixirscript"} )
+    """, %{ env: make_custom_env(), core_path: "elixirscript"} )
 
     assert_js_matches """
          import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';

@@ -573,7 +573,7 @@ defmodule ElixirScript.Translator do
       expanded_ast = Macro.expand(ast, env.env)
       if expanded_ast == ast do
         name_arity = {name, length(params)}
-        module = ElixirScript.Translator.State.get_module(env.module)
+        module = ElixirScript.Translator.State.get_module(env.state, env.module)
 
         cond do
           name_arity in module.functions or name_arity in module.private_functions ->
@@ -597,7 +597,7 @@ defmodule ElixirScript.Translator do
           do_translate({{:., [], [{:__aliases__, [], [:JS]}, name]}, [], params }, env)
         ElixirScript.Translator.LexicalScope.has_var?(env, name) ->
           { Identifier.make_identifier(name), env }
-        has_function?(env.module, {name, 0}) ->
+        has_function?(env.module, {name, 0}, env) ->
           Call.make_function_call(name, [], env)
         ElixirScript.Translator.LexicalScope.find_module(env, {name, 0}) ->
           imported_module_name = ElixirScript.Translator.LexicalScope.find_module(env, {name, 0})
@@ -629,10 +629,10 @@ defmodule ElixirScript.Translator do
   def create_module_name(module_name, env) do
     case module_name do
       {:__aliases__, _, _} ->
-        candiate_module_name = Utils.quoted_to_name(module_name)
-        |> ElixirScript.Translator.State.get_module_name
+        candiate_module_name = ElixirScript.Translator.State.get_module_name(env.state, 
+        Utils.quoted_to_name(module_name))
 
-        if ElixirScript.Translator.LexicalScope.get_module_name(env, candiate_module_name) in ElixirScript.Translator.State.list_module_names() do
+        if ElixirScript.Translator.LexicalScope.get_module_name(env, candiate_module_name) in ElixirScript.Translator.State.list_module_names(env.state) do
           ElixirScript.Translator.LexicalScope.get_module_name(env, candiate_module_name)
         else
           module_name
@@ -642,8 +642,8 @@ defmodule ElixirScript.Translator do
     end
   end
 
-  def has_function?(module_name, name_arity) do
-    case ElixirScript.Translator.State.get_module(module_name) do
+  def has_function?(module_name, name_arity, env) do
+    case ElixirScript.Translator.State.get_module(env.state, module_name) do
       nil ->
         false
       module ->
