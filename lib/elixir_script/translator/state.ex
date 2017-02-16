@@ -12,11 +12,11 @@ defmodule ElixirScript.Translator.State do
   def start_link(compiler_opts, loaded_modules) do
     Agent.start_link(fn ->
       %{ compiler_opts: compiler_opts, modules: Keyword.new, std_lib_map: build_standard_lib_map(), loaded_modules: [JS | loaded_modules] }
-    end, name: __MODULE__)
+    end)
   end
 
-  def serialize() do
-    Agent.get(__MODULE__, fn(state) ->
+  def serialize(pid) do
+    Agent.get(pid, fn(state) ->
       modules = state.modules
       modules = Enum.map(modules, fn {m, d} ->
         d = Map.delete(d, :javascript_ast)
@@ -34,8 +34,8 @@ defmodule ElixirScript.Translator.State do
     end)
   end
 
-  def deserialize(frozen_state, loaded_modules \\ []) do
-    Agent.update(__MODULE__, fn state ->
+  def deserialize(pid, frozen_state, loaded_modules \\ []) do
+    Agent.update(pid, fn state ->
       frozen_state = :erlang.binary_to_term(frozen_state)
       modules = Keyword.delete(frozen_state.modules, ElixirScript.Temp)
       %{ state | modules: modules, std_lib_map: frozen_state.std_lib_map, loaded_modules: [JS | loaded_modules] }
@@ -67,35 +67,35 @@ defmodule ElixirScript.Translator.State do
     |> Map.put(Regex, ElixirScript.Regex)
   end
 
-  def set_module_data(module_data) do
-    Agent.update(__MODULE__, fn state ->
+  def set_module_data(pid, module_data) do
+    Agent.update(pid, fn state ->
       data = Enum.filter(state.modules, fn {module_name, data} -> data.app == :elixir end)
       %{ state | modules: Keyword.merge(data, module_data) }
     end)
   end
 
-  def get_module_data() do
-    Agent.get(__MODULE__, fn state ->
+  def get_module_data(pid) do
+    Agent.get(pid, fn state ->
       state.modules
     end)
   end
 
-  def set_loaded_modules(modules) do
-    Agent.update(__MODULE__, fn state ->
+  def set_loaded_modules(pid, modules) do
+    Agent.update(pid, fn state ->
       %{ state | loaded_modules: [ JS | modules ] }
     end)
   end
 
-  def get do
-    Agent.get(__MODULE__, &(&1))
+  def get(pid) do
+    Agent.get(pid, &(&1))
   end
 
-  def get_module_name({:__aliases__, _, _} = name) do
-    get_module_name(Utils.quoted_to_name(name))
+  def get_module_name(pid, {:__aliases__, _, _} = name) do
+    get_module_name(pid, Utils.quoted_to_name(name))
   end
 
-  def get_module_name(module_name) do
-    Agent.get(__MODULE__, fn(state) ->
+  def get_module_name(pid, module_name) do
+    Agent.get(pid, fn(state) ->
       do_get_module_name(module_name, state)
     end)
   end
@@ -110,37 +110,37 @@ defmodule ElixirScript.Translator.State do
     end
   end
 
-  def is_module_loaded?(module) when is_atom(module) do
-    Agent.get(__MODULE__, fn(state) ->
+  def is_module_loaded?(pid, module) when is_atom(module) do
+    Agent.get(pid, fn(state) ->
       (module in state.loaded_modules)
     end)
   end
 
-  def is_module_loaded?({:__aliases__, _, _} = module) do
-    Utils.quoted_to_name(module)
-    |> is_module_loaded?
+  def is_module_loaded?(pid, {:__aliases__, _, _} = module) do
+    
+    is_module_loaded?(pid, Utils.quoted_to_name(module))
   end
 
-  def get_module(module) when is_atom(module) do
-    do_get_module(module)
+  def get_module(pid, module) when is_atom(module) do
+    do_get_module(pid, module)
   end
 
-  def get_module({:__aliases__, _, _} = name) do
-    do_get_module(Utils.quoted_to_name(name))
+  def get_module(pid, {:__aliases__, _, _} = name) do
+    do_get_module(pid, Utils.quoted_to_name(name))
   end
 
-  def get_module(module_name_list) when is_list(module_name_list) do
-    do_get_module(Utils.quoted_to_name({:__aliases__, [], module_name_list}))
+  def get_module(pid, module_name_list) when is_list(module_name_list) do
+    do_get_module(pid, Utils.quoted_to_name({:__aliases__, [], module_name_list}))
   end
 
-  defp do_get_module(name) do
-    Agent.get(__MODULE__, fn(state) ->
+  defp do_get_module(pid, name) do
+    Agent.get(pid, fn(state) ->
       Keyword.get(state.modules, do_get_module_name(name, state))
     end)
   end
 
-  def add_module_reference(module_name, module_ref) do
-    Agent.update(__MODULE__, fn(state) ->
+  def add_module_reference(pid, module_name, module_ref) do
+    Agent.update(pid, fn(state) ->
       case Keyword.get(state.modules, do_get_module_name(module_name, state)) do
         nil ->
           state
@@ -152,8 +152,8 @@ defmodule ElixirScript.Translator.State do
     end)
   end
 
-  def get_module_references(module_name) do
-    case get_module(module_name) do
+  def get_module_references(pid, module_name) do
+    case get_module(pid, module_name) do
       nil ->
         []
       module ->
@@ -161,19 +161,19 @@ defmodule ElixirScript.Translator.State do
     end
   end
 
-  def list_modules() do
-    Agent.get(__MODULE__, fn(state) ->
+  def list_modules(pid) do
+    Agent.get(pid, fn(state) ->
       Keyword.values(state.modules)
     end)
   end
 
-  def list_module_names() do
-    Agent.get(__MODULE__, fn(state) ->
+  def list_module_names(pid) do
+    Agent.get(pid, fn(state) ->
       Keyword.keys(state.modules)
     end)
   end
 
-  def stop do
-    Agent.stop(__MODULE__)
+  def stop(pid) do
+    Agent.stop(pid)
   end
 end

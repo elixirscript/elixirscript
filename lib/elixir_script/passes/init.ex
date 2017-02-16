@@ -3,8 +3,8 @@ defmodule ElixirScript.Passes.Init do
   alias ElixirScript.Translator.State
 
   def execute(compiler_data, opts) do
-    State.start_link(opts, [])
-    compiler_data
+    {:ok, pid} = State.start_link(opts, [])
+    Map.put(compiler_data, :state, pid)
   end
 
 end

@@ -73,7 +73,7 @@ defmodule ElixirScript do
     |> get_modules_from_quoted
     |> Enum.map(fn(x) -> %{ast: x, app: :app} end)
 
-    result = %{ data: data }
+    result = %{data: data}
     |> ElixirScript.Passes.Init.execute(opts)
     |> ElixirScript.Passes.FindModules.execute(opts)
     |> ElixirScript.Passes.FindLoadOnly.execute(opts)
@@ -90,7 +90,7 @@ defmodule ElixirScript do
 
   defp get_modules_from_quoted(quoted) do
     results = case quoted do
-                { :__block__, _, list } ->
+                {:__block__, _, list} ->
                   {modules, not_modules} = Enum.partition(list,
                                                 fn
                                                   {type, _, _ } when type in [:defprotocol, :defimpl, :defmodule] ->
@@ -150,7 +150,7 @@ defmodule ElixirScript do
     |> Map.to_list
     |> Enum.map(fn {app, path} -> {app, List.wrap(path)} end)
 
-    result = %{ data: deps }
+    result = %{data: deps}
     |> ElixirScript.Passes.Init.execute(opts)
     |> ElixirScript.Passes.ASTFromFile.execute(opts)
     |> ElixirScript.Passes.LoadModules.execute(opts)

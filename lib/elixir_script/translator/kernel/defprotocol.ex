@@ -16,15 +16,15 @@ defmodule ElixirScript.Translator.Defprotocol do
   def make(name, functions, env) do
     { body, _ } = Defmodule.translate_body( {:__block__, [], [] }, env)
 
-    module_refs = ElixirScript.Translator.State.get_module_references(name)
+    module_refs = ElixirScript.Translator.State.get_module_references(env.state, name)
 
     {imports, body} = Defmodule.extract_imports_from_body(body)
 
-    app_name = State.get_module(name).app
+    app_name = State.get_module(env.state, name).app
 
-    imports = imports ++ Defmodule.make_std_lib_import() ++
-      Defmodule.make_imports(app_name, module_refs) ++
-      [ElixirScript.ModuleSystems.import_module("Implementations", Utils.make_local_file_path(app_name, Utils.name_to_js_file_name(name) <> ".Defimpl"))]
+    imports = imports ++ Defmodule.make_std_lib_import(env) ++
+      Defmodule.make_imports(app_name, module_refs, env) ++
+      [ElixirScript.ModuleSystems.import_module("Implementations", Utils.make_local_file_path(app_name, Utils.name_to_js_file_name(name) <> ".Defimpl", env)) ]
 
     object = process_spec_functions(functions)
     |> Enum.map(fn({key, value}) ->
@@ -98,8 +98,8 @@ defmodule ElixirScript.Translator.Defprotocol do
   Makes the protocol implementation module for the given implementation name.
   This is used to consolidate all of the protocol implementations.
   """
-  def make_defimpl(name, implementations \\ [], compiler_opts) do
-    imports = [ModuleSystems.import_module(:Elixir, Utils.make_local_file_path(:elixir, compiler_opts.core_path, compiler_opts.root))]
+  def make_defimpl(name, implementations \\ [], compiler_opts, env) do
+    imports = [ModuleSystems.import_module(:Elixir, Utils.make_local_file_path(:elixir, compiler_opts.core_path, compiler_opts.root, env))]
 
     declarator = JS.variable_declarator(
       JS.identifier("impls"),
@@ -112,7 +112,7 @@ defmodule ElixirScript.Translator.Defprotocol do
 
     protocol_name = Atom.to_string(name)
 
-    app_name = State.get_module(name).app
+    app_name = State.get_module(env.state, name).app
 
     body = Enum.flat_map(implementations, fn({impl_app_name, x}) ->
       x = if is_atom(x), do: Atom.to_string(x), else: x

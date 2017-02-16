@@ -7,8 +7,8 @@ defmodule ElixirScript.Passes.ConsolidateProtocols do
   require Logger
 
   def execute(compiler_data, opts) do
-    State.set_module_data(compiler_data.data)
-    data = State.get_module_data()
+    State.set_module_data(compiler_data.state, compiler_data.data)
+    data = State.get_module_data(compiler_data.state)
 
     only_protocols_and_impls = Enum.filter(data, fn
       ({_, %{type: :module}}) ->
@@ -55,7 +55,7 @@ defmodule ElixirScript.Passes.ConsolidateProtocols do
   end
 
   defp make_defimpl(name, { _, protocol }, implementations, compiler_opts) do
-    imports = [ModuleSystems.import_module(:Elixir, Utils.make_local_file_path(:elixir, compiler_opts.core_path, compiler_opts.root))]
+    imports = [ModuleSystems.import_module(:Elixir, Utils.make_local_file_path(:elixir, compiler_opts.core_path, compiler_opts.root, nil))]
 
     declarator = JS.variable_declarator(
       JS.identifier("impls"),
@@ -74,7 +74,7 @@ defmodule ElixirScript.Passes.ConsolidateProtocols do
       x = Atom.to_string(Utils.quoted_to_name(impl_data.for))
       x = String.to_atom(protocol_name <> ".DefImpl." <> x)
       name = Utils.name_to_js_name(x)
-      imports = ModuleSystems.import_module(name, Utils.make_local_file_path(impl_data.app, Utils.name_to_js_file_name(x), compiler_opts.root))
+      imports = ModuleSystems.import_module(name, Utils.make_local_file_path(impl_data.app, Utils.name_to_js_file_name(x), compiler_opts.root, nil))
       call = JS.call_expression(
         JS.member_expression(
           JS.identifier("impls"),

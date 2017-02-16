@@ -12,7 +12,7 @@ defmodule ElixirScript.Passes.FindChangedFiles do
     |> Enum.map(fn {file, _} -> file end)
 
 
-    State.deserialize(compiler_cache.state, compiler_data.loaded_modules)
+    State.deserialize(compiler_data.state, compiler_cache.state, compiler_data.loaded_modules)
 
 
     Map.put(compiler_data, :changed_files, changed_files)

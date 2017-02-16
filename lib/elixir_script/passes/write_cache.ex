@@ -6,8 +6,8 @@ defmodule ElixirScript.Passes.WriteCache do
   def execute(compiler_data, opts) do
     compiler_cache = Cache.get_compiler_cache(compiler_data.path, opts)
 
-    State.set_module_data(compiler_data.data)
-    new_state = State.serialize()
+    State.set_module_data(compiler_data.state, compiler_data.data)
+    new_state = State.serialize(compiler_data.state)
     new_file_stats = Enum.filter(compiler_data.data, fn({ _, data }) -> Map.has_key?(data, :path) end)
     |> Enum.map(fn({_, data}) -> { data.path, data.stat } end)
     |> Enum.uniq

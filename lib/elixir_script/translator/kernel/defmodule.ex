@@ -11,11 +11,11 @@ defmodule ElixirScript.Translator.Defmodule do
 
   def make_module(ElixirScript.Temp, body, env) do
     { body, _ } = translate_body(body, env)
-    %{ name: ElixirScript.Temp, body: body |> Group.inflate_groups, app_name: ElixirScript.Translator.State.get().compiler_opts.app }
+    %{ name: ElixirScript.Temp, body: body |> Group.inflate_groups, app_name: ElixirScript.Translator.State.get(env.state).compiler_opts.app }
   end
 
-  def make_module(module, nil, _) do
-    %{ name: module, body: [], app_name: ElixirScript.Translator.State.get().compiler_opts.app }
+  def make_module(module, nil, env) do
+    %{ name: module, body: [], app_name: ElixirScript.Translator.State.get(env.state).compiler_opts.app }
   end
 
   def make_module(module, body, env) do
@@ -25,14 +25,14 @@ defmodule ElixirScript.Translator.Defmodule do
 
     { exported_functions, private_functions } = process_functions(functions, env)
 
-    module_refs = ElixirScript.Translator.State.get_module_references(module) -- [env.module]
+    module_refs = ElixirScript.Translator.State.get_module_references(env.state, module) -- [env.module]
 
     {imports, body} = extract_imports_from_body(body)
     {structs, body} = extract_structs_from_body(body, env)
 
-    app_name = State.get_module(module).app
+    app_name = State.get_module(env.state, module).app
 
-    imports = imports ++ make_std_lib_import() ++ make_imports(app_name, module_refs)
+    imports = imports ++ make_std_lib_import(env) ++ make_imports(app_name, module_refs, env)
 
     #Collect all the functions so that we can process their arity
     body = Enum.map(body, fn(x) ->
@@ -176,11 +176,11 @@ defmodule ElixirScript.Translator.Defmodule do
     end
   end
 
-  def make_std_lib_import() do
-    compiler_opts = ElixirScript.Translator.State.get().compiler_opts
+  def make_std_lib_import(env) do
+    compiler_opts = ElixirScript.Translator.State.get(env.state).compiler_opts
     case compiler_opts.import_standard_libs do
       true ->
-        [ModuleSystems.import_module(:Elixir, Utils.make_local_file_path(:elixir, compiler_opts.core_path))]
+        [ModuleSystems.import_module(:Elixir, Utils.make_local_file_path(:elixir, compiler_opts.core_path, env))]
       false ->
         []
     end
@@ -225,11 +225,11 @@ defmodule ElixirScript.Translator.Defmodule do
     JS.variable_declaration([declarator], :const)
   end
 
-  def make_imports(current_app_name, enum) do
+  def make_imports(current_app_name, enum, env) do
     Enum.map(enum, fn(x) ->
       module_name = Utils.name_to_js_name(x)
-      app_name = State.get_module(x).app
-      path = Utils.make_local_file_path(app_name, Utils.name_to_js_file_name(x))
+      app_name = State.get_module(env.state, x).app
+      path = Utils.make_local_file_path(app_name, Utils.name_to_js_file_name(x), env)
       ModuleSystems.import_module(module_name, path)
     end)
   end

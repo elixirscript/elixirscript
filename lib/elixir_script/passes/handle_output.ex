@@ -5,13 +5,13 @@ defmodule ElixirScript.Passes.HandleOutput do
   def execute(compiler_data, opts) do
 
     if Map.get(opts, :std_lib, false) do
-      State.set_module_data(compiler_data.data)
-      new_std_state = State.serialize()
+      State.set_module_data(compiler_data.state, compiler_data.data)
+      new_std_state = State.serialize(compiler_data.state)
       stdlib_state_path = Path.join([File.cwd!(), "lib", "elixir_script", "translator", "stdlib_state.bin"])
       File.write!(stdlib_state_path, new_std_state)
-      State.stop()
+      State.stop(compiler_data.state)
     else
-      State.stop()
+      State.stop(compiler_data.state)
       out(compiler_data, opts)
     end
   end
