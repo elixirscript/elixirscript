@@ -5,70 +5,112 @@ defmodule ElixirScript.Translator.For do
   alias ElixirScript.Translator.PatternMatching
   alias ElixirScript.Translator.Primitive
   alias ElixirScript.Translator.Function
-
+  alias ElixirScript.Translator.Utils
 
   def make_for(generators, env) do
+    ElixirScript.Translator.State.add_module_reference(env.state, env.module, ElixirScript.Collectable)
     args = handle_args(generators, env)
 
-    collections = Primitive.make_list_no_translate(args.collections)
+    generators = JS.array_expression(args.generators)   
+
     into = args.into || Primitive.make_list_no_translate([])
     filter = args.filter || JS.function_expression([], [], JS.block_statement([JS.return_statement(JS.identifier("true"))]))
     fun = args.fun
+
+    expression = JS.call_expression(
+      JS.member_expression(
+        JS.member_expression(
+            JS.member_expression(
+              JS.identifier("Elixir"),
+              JS.identifier("Core")
+            ),
+            JS.identifier("Patterns")
+          ),
+        JS.identifier("clause")
+      ),
+      [JS.array_expression(args.patterns), fun, filter]
+    )
 
     js_ast = JS.call_expression(
       JS.member_expression(
         Primitive.special_forms(),
         JS.identifier("_for")
       ),
-      [collections, fun, filter, into]
+      [expression, generators, JS.identifier(Utils.name_to_js_name(ElixirScript.Collectable)), into]
     )
 
-    { js_ast, env }
+    {js_ast, env}
   end
 
   defp handle_args(generators, env) do
-    Enum.reduce(generators, %{collections: [], args: [], filter: nil, fun: nil, into: nil}, fn
+    Enum.reduce(generators, %{generators: [], args: [], filter: nil, fun: nil, into: nil, patterns: []}, fn
 
       ({:<<>>, [], body}, state) ->
-      { bs_parts, collection } = Enum.map_reduce(body, nil, fn
+      {bs_parts, collection} = Enum.map_reduce(body, nil, fn
         {:::, _, _} = ast, state ->
           {ast, state}
         {:<-, [], [var, collection]}, _ ->
-          { var, collection }
+          {var, collection}
       end)
 
-      { patterns, params, env } = PatternMatching.process_match([{:<<>>, [], bs_parts}], env)
-      list = Primitive.make_list_no_translate([hd(patterns), Translator.translate!(collection, env)])
-      %{state | collections: state.collections ++ [list], args: state.args ++ params }
+      {patterns, params, env} = PatternMatching.process_match([{:<<>>, [], bs_parts}], env)
+
+      gen = JS.call_expression(
+        JS.member_expression(
+          JS.member_expression(
+              JS.member_expression(
+                JS.identifier("Elixir"),
+                JS.identifier("Core")
+              ),
+              JS.identifier("Patterns")
+            ),
+          JS.identifier("bitstring_generator")
+        ),
+        [hd(patterns), Translator.translate!(collection, env)]
+      )
+
+      %{state | generators: state.generators ++ [gen], args: state.args ++ params, patterns: state.patterns ++ patterns}
 
       ({:<-, _, [identifier, enum]}, state) ->
-        { patterns, params, env } = PatternMatching.process_match([identifier], env)
+        {patterns, params, env} = PatternMatching.process_match([identifier], env)
 
-        list = Primitive.make_list_no_translate([hd(patterns), Translator.translate!(enum, env)])
+        gen = JS.call_expression(
+          JS.member_expression(
+            JS.member_expression(
+                JS.member_expression(
+                  JS.identifier("Elixir"),
+                  JS.identifier("Core")
+                ),
+                JS.identifier("Patterns")
+              ),
+            JS.identifier("list_generator")
+          ),
+          [hd(patterns), Translator.translate!(enum, env)]
+        )
 
-        %{state | collections: state.collections ++ [list], args: state.args ++ params }
+        %{state | generators: state.generators ++ [gen], args: state.args ++ params, patterns: state.patterns ++ patterns}
       ([into: expression], state) ->
-        %{ state | into: Translator.translate(expression, env) }
+        %{state | into: Translator.translate(expression, env)}
 
       ([into: expression, do: expression2], state) ->
         fun = create_function_expression(expression2, env, state)
 
-        %{ state | into: Translator.translate!(expression, env), fun: fun }
+        %{state | into: Translator.translate!(expression, env), fun: fun}
 
       ([do: expression], state) ->
         fun = create_function_expression(expression, env, state)
 
-        %{ state | fun: fun }
+        %{state | fun: fun}
       (filter, state) ->
         fun = create_function_expression(filter, env, state)
 
-        %{ state | filter: fun }
+        %{state | filter: fun}
     end)
   end
 
 
   defp create_function_expression(ast, env, state) do
-    { ast, _ } = Function.make_function_body(ast, env)
+    {ast, _} = Function.make_function_body(ast, env)
 
     JS.function_expression(
       state.args,

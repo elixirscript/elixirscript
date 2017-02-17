@@ -19,7 +19,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
   test "match wildcard", %{scope: scope} do
     params = [{:_, [], Test}]
     result = PatternMatching.build_match(params, scope)
-    expected_result = { [PatternMatching.wildcard],  [JS.identifier(:undefined)] }
+    expected_result = {[PatternMatching.wildcard],  [JS.identifier(:undefined)]}
 
     assert result == expected_result
   end
@@ -38,7 +38,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
     expected_result = {
       List.duplicate(PatternMatching.parameter, 3),
       [JS.identifier("a"), JS.identifier("b"), JS.identifier("c")]
-    }
+  }
 
     assert result == expected_result
   end
@@ -49,7 +49,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
     expected_result = {
       [PatternMatching.head_tail(PatternMatching.parameter, PatternMatching.parameter)],
       [JS.identifier("head"), JS.identifier("tail")]
-    }
+  }
 
     assert result == expected_result
   end
@@ -60,7 +60,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
     expected_result = {
       [PatternMatching.starts_with("Bearer ")],
       [JS.identifier("token")]
-    }
+  }
 
     assert result == expected_result
   end
@@ -71,7 +71,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
     expected_result = {
       [Primitive.make_list_no_translate(List.duplicate(PatternMatching.parameter, 3))],
       [JS.identifier("a"), JS.identifier("b"), JS.identifier("c")]
-    }
+  }
 
     assert result == expected_result
   end
@@ -82,7 +82,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
     expected_result = {
       [Primitive.make_list_no_translate([JS.literal(1), PatternMatching.parameter, PatternMatching.parameter])],
       [JS.identifier("b"), JS.identifier("c")]
-    }
+  }
 
     assert result == expected_result
   end
@@ -93,7 +93,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
     expected_result = {
       [JS.literal(1)],
       []
-    }
+  }
 
     assert result == expected_result
   end
@@ -104,7 +104,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
     expected_result = {
       [PatternMatching.type(JS.identifier("Hello"), JS.object_expression([]))],
       []
-    }
+  }
 
     assert result == expected_result
   end
@@ -118,13 +118,13 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
         ]))
       ],
       []
-    }
+  }
 
     assert result == expected_result
   end
 
   test "match struct pattern with property param", %{scope: scope} do
-    params = [{:%, [], [{:__aliases__, [alias: false], [:Hello]}, {:%{}, [], [key: {:key, [], Elixir }]}]}]
+    params = [{:%, [], [{:__aliases__, [alias: false], [:Hello]}, {:%{}, [], [key: {:key, [], Elixir}]}]}]
     result = PatternMatching.build_match(params, scope )
     expected_result = {
       [PatternMatching.type(JS.identifier("Hello"), JS.object_expression([
@@ -132,7 +132,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
         ]))
       ],
       [JS.identifier("key")]
-    }
+  }
 
     assert result == expected_result
   end
@@ -143,7 +143,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
     expected_result = {
       [PatternMatching.capture(JS.literal(1))],
       [JS.identifier("a")]
-    }
+  }
 
     assert result == expected_result
 
@@ -153,7 +153,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
     expected_result = {
       [PatternMatching.capture(JS.literal(1))],
       [JS.identifier("a")]
-    }
+  }
 
     assert result == expected_result
 
@@ -163,7 +163,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
     expected_result = {
       [PatternMatching.capture(PatternMatching.type(JS.identifier("AStruct"), JS.object_expression([])))],
       [JS.identifier("a")]
-    }
+  }
 
     assert result == expected_result
   end
@@ -174,7 +174,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
     expected_result = {
       [PatternMatching.capture(Primitive.make_list_no_translate([PatternMatching.parameter, PatternMatching.parameter, PatternMatching.parameter]))],
       [JS.identifier("a"), JS.identifier("b"), JS.identifier("c"), JS.identifier("d")]
-    }
+  }
 
     assert result == expected_result
   end
@@ -188,7 +188,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
         JS.array_expression([JS.literal(1), PatternMatching.parameter, JS.literal(3)])
         ) ] )) ],
       [JS.identifier("b")]
-    }
+  }
 
     assert result == expected_result
 
@@ -200,7 +200,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
         JS.array_expression([JS.literal(1), PatternMatching.parameter])
         ) ] )) ],
       [JS.identifier("b")]
-    }
+  }
 
     assert result == expected_result
   end
@@ -214,7 +214,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
           Map.make_property(Translator.translate!(:which, scope ), JS.literal(13))
             ])],
       []
-    }
+  }
 
     assert result == expected_result
   end
@@ -227,7 +227,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
     expected_result = {
       [PatternMatching.bound(JS.identifier("a"))],
       [nil]
-    }
+  }
 
     assert result == expected_result
   end

@@ -1,34 +1,39 @@
-import Core from '../core';
+import Core from "../core";
 
 //https://github.com/airportyh/protomorphism
-class Protocol{
-  constructor(spec){
+class Protocol {
+  constructor(spec) {
     this.registry = new Map();
     this.fallback = null;
 
-    for (let funName in spec){
+    for (let funName in spec) {
       this[funName] = createFun(funName).bind(this);
     }
 
-    function createFun(funName){
-
+    function createFun(funName) {
       return function(...args) {
         let thing = args[0];
         let fun = null;
 
-        if(Number.isInteger(thing) && this.hasImplementation(Core.Integer)){
+        if (Number.isInteger(thing) && this.hasImplementation(Core.Integer)) {
           fun = this.registry.get(Core.Integer)[funName];
-        }else if(typeof thing === "number" && !Number.isInteger(thing) && this.hasImplementation(Core.Float)){
+        } else if (
+          typeof thing === "number" &&
+          !Number.isInteger(thing) &&
+          this.hasImplementation(Core.Float)
+        ) {
           fun = this.registry.get(Core.Float)[funName];
-        }else if(typeof thing === "string" && this.hasImplementation(Core.BitString)){
+        } else if (
+          typeof thing === "string" && this.hasImplementation(Core.BitString)
+        ) {
           fun = this.registry.get(Core.BitString)[funName];
-        }else if(this.hasImplementation(thing)){
+        } else if (this.hasImplementation(thing)) {
           fun = this.registry.get(thing.constructor)[funName];
-        }else if(this.fallback){
+        } else if (this.fallback) {
           fun = this.fallback[funName];
         }
 
-        if(fun != null){
+        if (fun != null) {
           let retval = fun.apply(this, args);
           return retval;
         }
@@ -38,22 +43,23 @@ class Protocol{
     }
   }
 
-  implementation(type, implementation){
-    if(type === null){
+  implementation(type, implementation) {
+    if (type === null) {
       this.fallback = implementation;
-    }else{
+    } else {
       this.registry.set(type, implementation);
     }
   }
 
   hasImplementation(thing) {
-    if (thing === Core.Integer || thing === Core.Float || Core.BitString){
+    if (
+      thing === Core.Integer || thing === Core.Float || thing === Core.BitString
+    ) {
       return this.registry.has(thing);
     }
 
     return this.registry.has(thing.constructor);
   }
 }
-
 
 export default Protocol;
