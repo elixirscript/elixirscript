@@ -11,10 +11,33 @@ var expect = chai.expect;
 
 const $ = Patterns.variable();
 
+const collectable = {
+  into: function(original) {
+    const fun = Patterns.defmatch(
+      Patterns.clause(
+        [
+          $,
+          Patterns.type(Tuple, {
+            values: [Symbol.for("cont"), Patterns.variable()]
+          })
+        ],
+        (list, x) => list.concat([x])
+      ),
+      Patterns.clause([$, Symbol.for("done")], list => list)
+    );
+
+    return new Tuple([], fun);
+  }
+};
+
 describe("for", () => {
   it("simple for", () => {
     let gen = Patterns.list_generator($, [1, 2, 3, 4]);
-    let result = SpecialForms._for(Patterns.clause([$], x => x * 2), [gen]);
+    let result = SpecialForms._for(
+      Patterns.clause([$], x => x * 2),
+      [gen],
+      collectable
+    );
 
     expect(result).to.eql([2, 4, 6, 8]);
   });
@@ -24,10 +47,11 @@ describe("for", () => {
 
     let gen = Patterns.list_generator($, [1, 2]);
     let gen2 = Patterns.list_generator($, [2, 3]);
-    let result = SpecialForms._for(Patterns.clause([$, $], (x, y) => x * y), [
-      gen,
-      gen2
-    ]);
+    let result = SpecialForms._for(
+      Patterns.clause([$, $], (x, y) => x * y),
+      [gen, gen2],
+      collectable
+    );
 
     expect(result).to.eql([2, 3, 4, 6]);
   });
@@ -37,7 +61,8 @@ describe("for", () => {
     let gen = Patterns.list_generator($, [1, 2, 3, 4, 5, 6]);
     let result = SpecialForms._for(
       Patterns.clause([$], x => x, x => x % 2 === 0),
-      [gen]
+      [gen],
+      collectable
     );
 
     expect(result).to.eql([2, 4, 6]);
@@ -56,7 +81,8 @@ describe("for", () => {
 
     let result = SpecialForms._for(
       Patterns.clause([[Symbol.for("user"), $]], name => name.toUpperCase()),
-      [gen]
+      [gen],
+      collectable
     );
 
     expect(result).to.eql(["JOHN", "MEG"]);
@@ -98,7 +124,7 @@ describe("for", () => {
       (r, g, b) => new Tuple(r, g, b)
     );
 
-    let result = SpecialForms._for(expression, [gen]);
+    let result = SpecialForms._for(expression, [gen], collectable);
 
     expect(result).to.eql([
       new Tuple(213, 45, 132),

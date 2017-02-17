@@ -20,18 +20,21 @@ function map_update(map, values) {
   );
 }
 
-function _for(expression, generators, into = []) {
-  const generatedValues = run_list_generators(generators.pop()(), generators);
+function _for(expression, generators, collectable_protocol, into = []) {
+  let [result, fun] = collectable_protocol.into(into);
 
-  let result = into;
+  const generatedValues = run_list_generators(generators.pop()(), generators);
 
   for (let value of generatedValues) {
     if (expression.guard.apply(this, value)) {
-      result = result.concat([expression.fn.apply(this, value)]);
+      result = fun(result, new Core.Tuple(
+        Symbol.for("cont"),
+        expression.fn.apply(this, value)
+      ));
     }
   }
 
-  return result;
+  return fun(result, Symbol.for("done"));
 }
 
 function run_list_generators(generator, generators) {

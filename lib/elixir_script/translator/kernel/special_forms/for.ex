@@ -5,9 +5,11 @@ defmodule ElixirScript.Translator.For do
   alias ElixirScript.Translator.PatternMatching
   alias ElixirScript.Translator.Primitive
   alias ElixirScript.Translator.Function
+  alias ElixirScript.Translator.Utils
 
 
   def make_for(generators, env) do
+    ElixirScript.Translator.State.add_module_reference(env.state, env.module, ElixirScript.Collectable)
     args = handle_args(generators, env)
 
     generators = JS.array_expression(args.generators)   
@@ -36,7 +38,7 @@ defmodule ElixirScript.Translator.For do
         Primitive.special_forms(),
         JS.identifier("_for")
       ),
-      [expression, generators, into]
+      [expression, generators, JS.identifier(Utils.name_to_js_name(ElixirScript.Collectable)), into]
     )
 
     { js_ast, env }

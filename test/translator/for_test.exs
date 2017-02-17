@@ -23,7 +23,8 @@ defmodule ElixirScript.Translator.For.Test do
           Elixir.Core.Patterns.variable(),
           Object.freeze([1, 2, 3, 4])
         )
-      ],      
+      ],
+      Elixir$ElixirScript$Collectable,  
       Object.freeze([])
     )
     """   
@@ -52,7 +53,8 @@ defmodule ElixirScript.Translator.For.Test do
           Elixir.Core.Patterns.variable(),
           Object.freeze([1, 2, 3, 4])
         )
-      ],      
+      ],
+      Elixir$ElixirScript$Collectable,   
       Object.freeze([])
     )
     """
@@ -81,7 +83,8 @@ defmodule ElixirScript.Translator.For.Test do
           Elixir.Core.Patterns.variable(),
           'Opera'
         )
-      ],      
+      ],
+      Elixir$ElixirScript$Collectable,
       Object.freeze([])
     )
     """
@@ -114,7 +117,8 @@ defmodule ElixirScript.Translator.For.Test do
           Elixir.Core.Patterns.variable(),
           Object.freeze([2, 3])
         )
-      ],      
+      ],  
+      Elixir$ElixirScript$Collectable,    
       Object.freeze([])
     )
     """
@@ -152,6 +156,7 @@ defmodule ElixirScript.Translator.For.Test do
             Object.freeze([2, 3])
           )
         ],
+        Elixir$ElixirScript$Collectable,
         Object.freeze([])
       )
     );
@@ -181,7 +186,8 @@ defmodule ElixirScript.Translator.For.Test do
           Elixir.Core.Patterns.variable(),
           Object.freeze([1, 2, 3, 4, 5, 6])
         )
-      ],      
+      ],
+      Elixir$ElixirScript$Collectable, 
       Object.freeze([])
     )
     """
@@ -209,7 +215,8 @@ defmodule ElixirScript.Translator.For.Test do
           Elixir.Core.Patterns.list_generator(Elixir.Core.Patterns.type(Elixir.Core.Tuple, {
             values: [Symbol.for('user'), Elixir.Core.Patterns.variable()]
         }), Object.freeze([new Elixir.Core.Tuple(Symbol.for('user'), 'john'), new Elixir.Core.Tuple(Symbol.for('admin'), 'john'), new Elixir.Core.Tuple(Symbol.for('user'), 'meg')]))
-        ], 
+        ],
+        Elixir$ElixirScript$Collectable,
         Object.freeze([]))
     """
 
@@ -240,7 +247,7 @@ defmodule ElixirScript.Translator.For.Test do
          'value': Elixir.Core.Patterns.variable()
      }, 8), Elixir.Core.BitString.size({
          'value': Elixir.Core.Patterns.variable()
-     }, 8)), pixels)], Object.freeze([]))
+     }, 8)), pixels)], Elixir$ElixirScript$Collectable, Object.freeze([]))
     """
 
     assert_translation(ex_ast, js_code)
