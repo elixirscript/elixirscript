@@ -1,12 +1,12 @@
-import Core from '../core';
+import Core from "../core";
 
-function _case(condition, clauses){
+function _case(condition, clauses) {
   return Core.Patterns.defmatch(...clauses)(condition);
 }
 
-function cond(clauses){
-  for(let clause of clauses){
-    if(clause[0]){
+function cond(clauses) {
+  for (let clause of clauses) {
+    if (clause[0]) {
       return clause[1]();
     }
   }
@@ -14,155 +14,132 @@ function cond(clauses){
   throw new Error();
 }
 
-function map_update(map, values){
+function map_update(map, values) {
   return Object.freeze(
-    Object.assign(
-      Object.create(map.constructor.prototype), map, values
-    )
+    Object.assign(Object.create(map.constructor.prototype), map, values)
   );
 }
 
-function _for(collections, fun, filter = () => true, into = [], previousValues = []){
-  let pattern = collections[0][0];
-  let collection = collections[0][1];
+function _for(expression, generators, into = []) {
+  const generatedValues = run_list_generators(generators.pop()(), generators);
 
-  if(collections.length === 1){
-    if(collection instanceof Core.BitString){
-      let bsSlice = collection.slice(0, pattern.byte_size());
-      let i = 1;
+  let result = into;
 
-      while(bsSlice.byte_size == pattern.byte_size()){
-        let r = Core.Patterns.match_or_default(pattern, bsSlice);
-        let args = previousValues.concat(r);
-
-        if(r && filter.apply(this, args)){
-          into = into.concat([fun.apply(this, args)]);
-        }
-
-        bsSlice = collection.slice(pattern.byte_size() * i, pattern.byte_size() * (i + 1));
-        i++;
-      }
-
-      return into;
-    }else{
-      for(let elem of collection){
-        let r = Core.Patterns.match_or_default(pattern, elem);
-        let args = previousValues.concat(r);
-
-        if(r && filter.apply(this, args)){
-          into = into.concat([fun.apply(this, args)]);
-        }
-      }
-
-      return into;
+  for (let value of generatedValues) {
+    if (expression.guard.apply(this, value)) {
+      result = result.concat([expression.fn.apply(this, value)]);
     }
-  }else{
-    let _into = [];
+  }
 
-    if(collection instanceof Core.BitString){
-      let bsSlice = collection.slice(0, pattern.byte_size());
-      let i = 1;
+  return result;
+}
 
-      while(bsSlice.byte_size == pattern.byte_size()){
-        let r = Core.Patterns.match_or_default(pattern, bsSlice);
-        if(r){
-          _into = into.concat(this._for(collections.slice(1), fun, filter, _into, previousValues.concat(r)));
-        }
-
-        bsSlice = collection.slice(pattern.byte_size() * i, pattern.byte_size() * (i + 1));
-        i++;
+function run_list_generators(generator, generators) {
+  if (generators.length == 0) {
+    return generator.map(x => {
+      if (Array.isArray(x)) {
+        return x;
+      } else {
+        return [x];
       }
-    }else{
-      for(let elem of collection){
-        let r = Core.Patterns.match_or_default(pattern, elem);
-        if(r){
-          _into = into.concat(this._for(collections.slice(1), fun, filter, _into, previousValues.concat(r)));
-        }
+    });
+  } else {
+    const list = generators.pop();
+
+    let next_gen = [];
+    for (let j of list()) {
+      for (let i of generator) {
+        next_gen.push([j].concat(i));
       }
     }
 
-    return _into;
+    return run_list_generators(next_gen, generators);
   }
 }
 
-function _try(do_fun, rescue_function, catch_fun, else_function, after_function){
+function _try(
+  do_fun,
+  rescue_function,
+  catch_fun,
+  else_function,
+  after_function
+) {
   let result = null;
 
-  try{
+  try {
     result = do_fun();
-  }catch(e){
+  } catch (e) {
     let ex_result = null;
 
-    if(rescue_function){
-      try{
+    if (rescue_function) {
+      try {
         ex_result = rescue_function(e);
         return ex_result;
-      }catch(ex){
-        if(ex instanceof Core.Patterns.MatchError){
+      } catch (ex) {
+        if (ex instanceof Core.Patterns.MatchError) {
           throw ex;
         }
       }
     }
 
-    if(catch_fun){
-      try{
+    if (catch_fun) {
+      try {
         ex_result = catch_fun(e);
         return ex_result;
-      }catch(ex){
-        if(ex instanceof Core.Patterns.MatchError){
+      } catch (ex) {
+        if (ex instanceof Core.Patterns.MatchError) {
           throw ex;
         }
       }
     }
 
     throw e;
-
-  }finally{
-    if(after_function){
+  } finally {
+    if (after_function) {
       after_function();
     }
   }
 
-  if(else_function){
-    try{
+  if (else_function) {
+    try {
       return else_function(result);
-    }catch(ex){
-        if(ex instanceof Core.Patterns.MatchError){
-          throw new Error("No Match Found in Else");
-        }
+    } catch (ex) {
+      if (ex instanceof Core.Patterns.MatchError) {
+        throw new Error("No Match Found in Else");
+      }
 
       throw ex;
     }
-  }else{
+  } else {
     return result;
   }
 }
 
-function _with(...args){
+function _with(...args) {
   let argsToPass = [];
   let successFunction = null;
   let elseFunction = null;
 
-  if(typeof(args[args.length - 2]) === 'function'){
+  if (typeof args[args.length - 2] === "function") {
     [successFunction, elseFunction] = args.splice(-2);
-  }else{
+  } else {
     successFunction = args.pop();
   }
 
-  for(let i = 0; i < args.length; i++){
+  for (let i = 0; i < args.length; i++) {
     let [pattern, func] = args[i];
 
     let result = func.apply(null, argsToPass);
 
     let patternResult = Core.Patterns.match_or_default(pattern, result);
 
-    if(patternResult == null){
-      if(elseFunction){
+    if (patternResult == null) {
+      if (elseFunction) {
         return elseFunction.call(null, result);
-      }else{
+      } else {
         return result;
       }
-    }else{
+    } else {
       argsToPass = argsToPass.concat(patternResult);
     }
   }

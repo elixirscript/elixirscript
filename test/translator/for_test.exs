@@ -8,12 +8,25 @@ defmodule ElixirScript.Translator.For.Test do
     end
 
     js_code = """
-         Elixir.Core.SpecialForms._for(Object.freeze([Object.freeze([Elixir.Core.Patterns.variable(), Object.freeze([1, 2, 3, 4])])]),function(n)    {
-             return     n * 2;
-           },function()    {
-             return     true;
-           },Object.freeze([]))
-    """
+    Elixir.Core.SpecialForms._for(
+      Elixir.Core.Patterns.clause(
+        [Elixir.Core.Patterns.variable()],
+        function(n) {
+          return n * 2;
+        },
+        function() {
+          return true;
+        }
+      ),
+      [
+        Elixir.Core.Patterns.list_generator(
+          Elixir.Core.Patterns.variable(),
+          Object.freeze([1, 2, 3, 4])
+        )
+      ],      
+      Object.freeze([])
+    )
+    """   
 
     assert_translation(ex_ast, js_code)
   end
@@ -24,14 +37,24 @@ defmodule ElixirScript.Translator.For.Test do
     end
 
     js_code = """
-         Elixir.Core.SpecialForms._for(
-           Object.freeze([Object.freeze([Elixir.Core.Patterns.variable(), Object.freeze([1, 2, 3, 4])])]),
-           function(n)    {
-             return     n * 2;
-           },function()    {
-             return     true;
-           },
-           Object.freeze([]))
+    Elixir.Core.SpecialForms._for(
+      Elixir.Core.Patterns.clause(
+        [Elixir.Core.Patterns.variable()],
+        function(n) {
+          return n * 2;
+        },
+        function() {
+          return true;
+        }
+      ),
+      [
+        Elixir.Core.Patterns.list_generator(
+          Elixir.Core.Patterns.variable(),
+          Object.freeze([1, 2, 3, 4])
+        )
+      ],      
+      Object.freeze([])
+    )
     """
 
     assert_translation(ex_ast, js_code)
@@ -43,11 +66,24 @@ defmodule ElixirScript.Translator.For.Test do
     end
 
     js_code = """
-         Elixir.Core.SpecialForms._for(Object.freeze([Object.freeze([Elixir.Core.Patterns.variable(), 'Opera'])]),function(n)    {
-             return     n;
-           },function()    {
-             return     true;
-           },Object.freeze([]))
+    Elixir.Core.SpecialForms._for(
+      Elixir.Core.Patterns.clause(
+        [Elixir.Core.Patterns.variable()],
+        function(n) {
+          return n;
+        },
+        function() {
+          return true;
+        }
+      ),
+      [
+        Elixir.Core.Patterns.list_generator(
+          Elixir.Core.Patterns.variable(),
+          'Opera'
+        )
+      ],      
+      Object.freeze([])
+    )
     """
 
     assert_translation(ex_ast, js_code)
@@ -59,11 +95,28 @@ defmodule ElixirScript.Translator.For.Test do
     end
 
     js_code = """
-    Elixir.Core.SpecialForms._for(Object.freeze([Object.freeze([Elixir.Core.Patterns.variable(), Object.freeze([1, 2])]), Object.freeze([Elixir.Core.Patterns.variable(), Object.freeze([2, 3])])]),function(x,y)    {
-     return     x * y;
-    },function()    {
-     return     true;
-    },Object.freeze([]))
+    Elixir.Core.SpecialForms._for(
+      Elixir.Core.Patterns.clause(
+        [Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable()],
+        function(x, y) {
+          return x * y;
+        },
+        function() {
+          return true;
+        }
+      ),
+      [
+        Elixir.Core.Patterns.list_generator(
+          Elixir.Core.Patterns.variable(),
+          Object.freeze([1, 2])
+        ),
+        Elixir.Core.Patterns.list_generator(
+          Elixir.Core.Patterns.variable(),
+          Object.freeze([2, 3])
+        )
+      ],      
+      Object.freeze([])
+    )
     """
 
     assert_translation(ex_ast, js_code)
@@ -77,11 +130,31 @@ defmodule ElixirScript.Translator.For.Test do
     end
 
     js_code = """
-         let [r] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),Elixir.Core.SpecialForms._for(Object.freeze([Object.freeze([Elixir.Core.Patterns.variable(), Object.freeze([1, 2])]), Object.freeze([Elixir.Core.Patterns.variable(), Object.freeze([2, 3])])]),function(x,y)    {
-             return     x * y;
-           },function()    {
-             return     true;
-           },Object.freeze([])));
+    let [r] = Elixir.Core.Patterns.match(
+      Elixir.Core.Patterns.variable(),
+      Elixir.Core.SpecialForms._for(
+        Elixir.Core.Patterns.clause(
+          [Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable()],
+          function(x, y) {
+            return x * y;
+          },
+          function() {
+            return true;
+          }
+        ),
+        [
+          Elixir.Core.Patterns.list_generator(
+            Elixir.Core.Patterns.variable(),
+            Object.freeze([1, 2])
+          ),
+          Elixir.Core.Patterns.list_generator(
+            Elixir.Core.Patterns.variable(),
+            Object.freeze([2, 3])
+          )
+        ],
+        Object.freeze([])
+      )
+    );
     """
 
     assert_translation(ex_ast, js_code)
@@ -93,11 +166,24 @@ defmodule ElixirScript.Translator.For.Test do
     end
 
     js_code = """
-         Elixir.Core.SpecialForms._for(Object.freeze([Object.freeze([Elixir.Core.Patterns.variable(), Object.freeze([1, 2, 3, 4, 5, 6])])]),function(n)    {
-             return     n;
-           },function(n)    {
-             return     n % 2 == 0;
-           },Object.freeze([]))
+    Elixir.Core.SpecialForms._for(
+      Elixir.Core.Patterns.clause(
+        [Elixir.Core.Patterns.variable()],
+        function(n) {
+          return n;
+        },
+        function(n) {
+          return n % 2 == 0;
+        }
+      ),
+      [
+        Elixir.Core.Patterns.list_generator(
+          Elixir.Core.Patterns.variable(),
+          Object.freeze([1, 2, 3, 4, 5, 6])
+        )
+      ],      
+      Object.freeze([])
+    )
     """
 
     assert_translation(ex_ast, js_code)
@@ -111,13 +197,20 @@ defmodule ElixirScript.Translator.For.Test do
     end
 
     js_code = """
-         Elixir.Core.SpecialForms._for(Object.freeze([Object.freeze([Elixir.Core.Patterns.type(Elixir.Core.Tuple,{
-             values: [Symbol.for('user'), Elixir.Core.Patterns.variable()]
-       }), Object.freeze([new Elixir.Core.Tuple(Symbol.for('user'),'john'), new Elixir.Core.Tuple(Symbol.for('admin'),'john'), new Elixir.Core.Tuple(Symbol.for('user'),'meg')])])]),function(name)    {
-             return     Elixir$ElixirScript$String.upcase(name);
-           },function()    {
-             return     true;
-           },Object.freeze([]))
+    Elixir.Core.SpecialForms._for(
+      Elixir.Core.Patterns.clause([Elixir.Core.Patterns.type(Elixir.Core.Tuple, {
+            values: [Symbol.for('user'), Elixir.Core.Patterns.variable()]
+        })], function(name) {
+            return Elixir$ElixirScript$String.upcase(name);
+        }, function() {
+            return true;
+        }), 
+        [
+          Elixir.Core.Patterns.list_generator(Elixir.Core.Patterns.type(Elixir.Core.Tuple, {
+            values: [Symbol.for('user'), Elixir.Core.Patterns.variable()]
+        }), Object.freeze([new Elixir.Core.Tuple(Symbol.for('user'), 'john'), new Elixir.Core.Tuple(Symbol.for('admin'), 'john'), new Elixir.Core.Tuple(Symbol.for('user'), 'meg')]))
+        ], 
+        Object.freeze([]))
     """
 
     assert_translation(ex_ast, js_code)
@@ -131,22 +224,23 @@ defmodule ElixirScript.Translator.For.Test do
     end
 
     js_code = """
-    Elixir.Core.SpecialForms._for(Object.freeze([Object.freeze([Elixir.Core.Patterns.bitStringMatch(Elixir.Core.BitString.size({
-      'value': Elixir.Core.Patterns.variable()
-    },8),
-    Elixir.Core.BitString.size({
-      'value': Elixir.Core.Patterns.variable()
-    },8),
-    Elixir.Core.BitString.size({
-      'value': Elixir.Core.Patterns.variable()
-    },8)), pixels])]),
-    function(r,g,b)    {
-      return     new Elixir.Core.Tuple(r,g,b);
-    },
-    function()    {
-      return     true;
-    },
-    Object.freeze([]))
+     Elixir.Core.SpecialForms._for(Elixir.Core.Patterns.clause([Elixir.Core.Patterns.bitStringMatch(Elixir.Core.BitString.size({
+         'value': Elixir.Core.Patterns.variable()
+     }, 8), Elixir.Core.BitString.size({
+         'value': Elixir.Core.Patterns.variable()
+     }, 8), Elixir.Core.BitString.size({
+         'value': Elixir.Core.Patterns.variable()
+     }, 8))], function(r, g, b) {
+         return new Elixir.Core.Tuple(r, g, b);
+     }, function() {
+         return true;
+     }), [Elixir.Core.Patterns.bitstring_generator(Elixir.Core.Patterns.bitStringMatch(Elixir.Core.BitString.size({
+         'value': Elixir.Core.Patterns.variable()
+     }, 8), Elixir.Core.BitString.size({
+         'value': Elixir.Core.Patterns.variable()
+     }, 8), Elixir.Core.BitString.size({
+         'value': Elixir.Core.Patterns.variable()
+     }, 8)), pixels)], Object.freeze([]))
     """
 
     assert_translation(ex_ast, js_code)
