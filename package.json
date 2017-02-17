@@ -9,9 +9,10 @@
   "scripts": {
     "lint": "eslint src/javascript/lib/**/*.js src/javascript/tests/**/*.js",
     "lint:fix": "eslint src/javascript/lib/**/*.js src/javascript/tests/**/*.js --fix",
-    "build": "npm run build:es && npm run build:umd",
+    "build": "npm run build:es && npm run build:umd && npm run build:common",
     "build:es": "rollup -c rollup.config.js",
     "build:umd": "rollup -c rollup.config.js -f umd -o priv/umd/elixir/Elixir.Bootstrap.js",
+    "build:common": "rollup -c rollup.config.js -f cjs -o priv/common/elixir/Elixir.Bootstrap.js",
     "clean": "rm -rf priv",
     "test": "mocha src/javascript/tests --recursive --compilers js:babel-core/register"
   },
