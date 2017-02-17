@@ -3,7 +3,7 @@ defprotocol ElixirScript.Collectable do
   def into(collectable)
 end
 
-defimpl Collectable, for: List do
+defimpl ElixirScript.Collectable, for: List do
   def into(original) do
     {[], fn
       list, {:cont, x} -> list ++ [x]
@@ -13,7 +13,7 @@ defimpl Collectable, for: List do
   end
 end
 
-defimpl Collectable, for: BitString do
+defimpl ElixirScript.Collectable, for: BitString do
   def into(original) do
     {original, fn
       acc, {:cont, x} when is_bitstring(x) -> <<acc::bitstring, x::bitstring>>
@@ -23,7 +23,7 @@ defimpl Collectable, for: BitString do
   end
 end
 
-defimpl Collectable, for: Map do
+defimpl ElixirScript.Collectable, for: Map do
   def into(original) do
     {original, fn
       map, {:cont, {k, v}} -> Map.put(map, k, v)
