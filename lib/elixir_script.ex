@@ -132,7 +132,7 @@ defmodule ElixirScript do
 
     app_name = cond do
       !is_nil(built_opts[:app]) ->
-        opts[:app]
+        built_opts[:app]
       Code.ensure_loaded?(Mix) ->
         Mix.Project.config()[:app]
       true ->
@@ -143,7 +143,6 @@ defmodule ElixirScript do
   end
 
   def compile_path(path, opts) do
-
     opts = build_compiler_options(opts)
 
     deps = path
