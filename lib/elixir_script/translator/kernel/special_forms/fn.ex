@@ -20,7 +20,9 @@ defmodule ElixirScript.Translator.Function do
   def make_anonymous_function(functions, env, name) do
     clauses = functions
     |> Enum.map(fn
-      ({:->, _, [ [{:when, _, [params | guards]}], body ]}) ->
+      ({:->, _, [ [{:when, _, params}], body ]}) ->
+        guards = List.last(params) |> List.wrap
+        params = params |> Enum.reverse |> tl |> Enum.reverse
         process_function_body(params, body, env, name, guards)
 
       ({:->, _, [params, body]}) ->
