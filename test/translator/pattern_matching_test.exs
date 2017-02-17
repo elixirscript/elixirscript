@@ -11,7 +11,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
   setup do
     {:ok, pid} = ElixirScript.Translator.State.start_link(%{env: __ENV__}, [])
     ElixirScript.Translator.State.deserialize(pid, @std_lib_state)
-    scope = ElixirScript.Translator.LexicalScope.module_scope(ElixirScript.Temp, "temp.ex", __ENV__, pid)
+    scope = ElixirScript.Translator.LexicalScope.module_scope(ElixirScript.Temp, "temp.ex", __ENV__, pid, %{ format: :es, module_formatter: ElixirScript.ModuleSystems.ES })
 
     {:ok, [scope: scope]}
   end

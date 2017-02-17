@@ -34,13 +34,8 @@ defmodule ElixirScript.TestHelper do
   end
 
   def strip_spaces(js) do
-    js |> strip_new_lines |> String.replace(" ", "")
+    js |> String.replace(~r/\s+/, "")
   end
-
-  def strip_new_lines(js) do
-    js |> String.replace("\n", "")
-  end
-
 
   def assert_translation(ex_ast, js_code) do
     converted_code = ex_ast_to_js(ex_ast) |> Elixir.Enum.join("\n\n")

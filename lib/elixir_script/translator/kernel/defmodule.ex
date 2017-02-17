@@ -6,7 +6,6 @@ defmodule ElixirScript.Translator.Defmodule do
   alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.Group
   alias ElixirScript.Translator.Def
-  alias ElixirScript.ModuleSystems
   alias ElixirScript.Translator.Identifier
 
   def make_module(ElixirScript.Temp, body, env) do
@@ -25,14 +24,9 @@ defmodule ElixirScript.Translator.Defmodule do
 
     { exported_functions, private_functions } = process_functions(functions, env)
 
-    module_refs = ElixirScript.Translator.State.get_module_references(env.state, module) -- [env.module]
-
-    {imports, body} = extract_imports_from_body(body)
     {structs, body} = extract_structs_from_body(body, env)
 
     app_name = State.get_module(env.state, module).app
-
-    imports = imports ++ make_std_lib_import(env) ++ make_imports(app_name, module_refs, env)
 
     #Collect all the functions so that we can process their arity
     body = Enum.map(body, fn(x) ->
@@ -56,11 +50,12 @@ defmodule ElixirScript.Translator.Defmodule do
     exported_functions = Enum.map(exported_functions, fn({_key, value}) -> value end)
     private_functions = Enum.map(private_functions, fn({_key, value}) -> value end)
 
-    default = ModuleSystems.export_module(exported_object)
+    body = structs ++ private_functions ++ exported_functions ++ body
+    body = env.module_formatter.build(body, exported_object, env)
 
     result = %{
         name: Utils.quoted_to_name({:__aliases__, [], module }),
-        body: imports ++ structs ++ private_functions ++ exported_functions ++ body ++ [default],
+        body: body,
         app_name: app_name
     }
 
@@ -176,16 +171,6 @@ defmodule ElixirScript.Translator.Defmodule do
     end
   end
 
-  def make_std_lib_import(env) do
-    compiler_opts = ElixirScript.Translator.State.get(env.state).compiler_opts
-    case compiler_opts.import_standard_libs do
-      true ->
-        [ModuleSystems.import_module(:Elixir, Utils.make_local_file_path(:elixir, compiler_opts.core_path, env))]
-      false ->
-        []
-    end
-  end
-
   def process_functions(%{ exported: exported, private: private, exported_generators: exported_generators, private_generators: private_generators }, env) do
     exported_functions = Enum.map(Dict.keys(exported), fn(key) ->
       functions = Dict.get(exported, key)
@@ -223,15 +208,6 @@ defmodule ElixirScript.Translator.Defmodule do
     )
 
     JS.variable_declaration([declarator], :const)
-  end
-
-  def make_imports(current_app_name, enum, env) do
-    Enum.map(enum, fn(x) ->
-      module_name = Utils.name_to_js_name(x)
-      app_name = State.get_module(env.state, x).app
-      path = Utils.make_local_file_path(app_name, Utils.name_to_js_file_name(x), env)
-      ModuleSystems.import_module(module_name, path)
-    end)
   end
 
 end

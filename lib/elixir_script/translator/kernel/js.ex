@@ -4,7 +4,7 @@ defmodule ElixirScript.Translator.JS do
   alias ESTree.Tools.Builder
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Identifier
-  alias ElixirScript.ModuleSystems
+  alias ElixirScript.Translator.State
 
   @doc false
   def translate_js_function(name, params, env) do
@@ -81,15 +81,18 @@ defmodule ElixirScript.Translator.JS do
   end
 
   defp do_translate({:import, _, [module_name, from, [default: false]]}, env) do
-    ModuleSystems.import_namespace_module(module_name, from, env)
+    State.add_javascript_module_reference(env.state, env.module, module_name, from, false)
+    %ElixirScript.Translator.Empty{}
   end
 
   defp do_translate({:import, _, [module_name, from, [default: true]]}, env) do
-    ModuleSystems.import_module(module_name, from, env)
+    State.add_javascript_module_reference(env.state, env.module, module_name, from, true)
+    %ElixirScript.Translator.Empty{}
   end
 
   defp do_translate({:import, _, [module_name, from]}, env) do
-    ModuleSystems.import_module(module_name, from, env)
+    State.add_javascript_module_reference(env.state, env.module, module_name, from, true)
+    %ElixirScript.Translator.Empty{}
   end
 
   defp do_translate({:object, _, [args]}, env) do
