@@ -1,11 +1,11 @@
-import Core from "../core";
+import Core from '../core';
 
 function _case(condition, clauses) {
   return Core.Patterns.defmatch(...clauses)(condition);
 }
 
 function cond(clauses) {
-  for (let clause of clauses) {
+  for (const clause of clauses) {
     if (clause[0]) {
       return clause[1]();
     }
@@ -16,7 +16,7 @@ function cond(clauses) {
 
 function map_update(map, values) {
   return Object.freeze(
-    Object.assign(Object.create(map.constructor.prototype), map, values)
+    Object.assign(Object.create(map.constructor.prototype), map, values),
   );
 }
 
@@ -25,39 +25,37 @@ function _for(expression, generators, collectable_protocol, into = []) {
 
   const generatedValues = run_list_generators(generators.pop()(), generators);
 
-  for (let value of generatedValues) {
+  for (const value of generatedValues) {
     if (expression.guard.apply(this, value)) {
       result = fun(result, new Core.Tuple(
-        Symbol.for("cont"),
-        expression.fn.apply(this, value)
+        Symbol.for('cont'),
+        expression.fn.apply(this, value),
       ));
     }
   }
 
-  return fun(result, Symbol.for("done"));
+  return fun(result, Symbol.for('done'));
 }
 
 function run_list_generators(generator, generators) {
   if (generators.length == 0) {
-    return generator.map(x => {
+    return generator.map((x) => {
       if (Array.isArray(x)) {
         return x;
-      } else {
-        return [x];
       }
+      return [x];
     });
-  } else {
-    const list = generators.pop();
-
-    let next_gen = [];
-    for (let j of list()) {
-      for (let i of generator) {
-        next_gen.push([j].concat(i));
-      }
-    }
-
-    return run_list_generators(next_gen, generators);
   }
+  const list = generators.pop();
+
+  const next_gen = [];
+  for (const j of list()) {
+    for (const i of generator) {
+      next_gen.push([j].concat(i));
+    }
+  }
+
+  return run_list_generators(next_gen, generators);
 }
 
 function _try(
@@ -65,7 +63,7 @@ function _try(
   rescue_function,
   catch_fun,
   else_function,
-  after_function
+  after_function,
 ) {
   let result = null;
 
@@ -108,7 +106,7 @@ function _try(
       return else_function(result);
     } catch (ex) {
       if (ex instanceof Core.Patterns.MatchError) {
-        throw new Error("No Match Found in Else");
+        throw new Error('No Match Found in Else');
       }
 
       throw ex;
@@ -123,31 +121,29 @@ function _with(...args) {
   let successFunction = null;
   let elseFunction = null;
 
-  if (typeof args[args.length - 2] === "function") {
+  if (typeof args[args.length - 2] === 'function') {
     [successFunction, elseFunction] = args.splice(-2);
   } else {
     successFunction = args.pop();
   }
 
   for (let i = 0; i < args.length; i++) {
-    let [pattern, func] = args[i];
+    const [pattern, func] = args[i];
 
-    let result = func.apply(null, argsToPass);
+    const result = func(...argsToPass);
 
-    let patternResult = Core.Patterns.match_or_default(pattern, result);
+    const patternResult = Core.Patterns.match_or_default(pattern, result);
 
     if (patternResult == null) {
       if (elseFunction) {
         return elseFunction.call(null, result);
-      } else {
-        return result;
       }
-    } else {
-      argsToPass = argsToPass.concat(patternResult);
+      return result;
     }
+    argsToPass = argsToPass.concat(patternResult);
   }
 
-  return successFunction.apply(null, argsToPass);
+  return successFunction(...argsToPass);
 }
 
 export default {
@@ -156,5 +152,5 @@ export default {
   map_update,
   _for,
   _try,
-  _with
+  _with,
 };

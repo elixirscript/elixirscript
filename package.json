@@ -8,6 +8,7 @@
   },
   "scripts": {
     "lint": "eslint src/javascript/lib/**/*.js src/javascript/tests/**/*.js",
+    "lint:fix": "eslint src/javascript/lib/**/*.js src/javascript/tests/**/*.js --fix",
     "build": "npm run build:es && npm run build:umd",
     "build:es": "rollup -c rollup.config.js",
     "build:umd": "rollup -c rollup.config.js -f umd -o priv/umd/elixir/Elixir.Bootstrap.js",
@@ -34,7 +35,9 @@
     "babel-preset-react": "^6.5.0",
     "babel-preset-stage-0": "^6.5.0",
     "chai": "^3.5.0",
-    "eslint": "^2.9.0",
+    "eslint": "^3.15.0",
+    "eslint-config-airbnb-base": "^11.1.0",
+    "eslint-plugin-import": "^2.2.0",
     "gulp": "^3.9.1",
     "gulp-babel": "^6.1.2",
     "gulp-sourcemaps": "^2.0.0-alpha",

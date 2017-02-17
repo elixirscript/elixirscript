@@ -18,3 +18,4 @@ test/std_lib_compile_test.exs
 src/elixirscript
 priv/**/*.js
 stdlib_state.bin
+*.log

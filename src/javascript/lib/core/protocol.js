@@ -1,30 +1,30 @@
-import Core from "../core";
+import Core from '../core';
 
-//https://github.com/airportyh/protomorphism
+// https://github.com/airportyh/protomorphism
 class Protocol {
   constructor(spec) {
     this.registry = new Map();
     this.fallback = null;
 
-    for (let funName in spec) {
+    for (const funName in spec) {
       this[funName] = createFun(funName).bind(this);
     }
 
     function createFun(funName) {
-      return function(...args) {
-        let thing = args[0];
+      return function (...args) {
+        const thing = args[0];
         let fun = null;
 
         if (Number.isInteger(thing) && this.hasImplementation(Core.Integer)) {
           fun = this.registry.get(Core.Integer)[funName];
         } else if (
-          typeof thing === "number" &&
+          typeof thing === 'number' &&
           !Number.isInteger(thing) &&
           this.hasImplementation(Core.Float)
         ) {
           fun = this.registry.get(Core.Float)[funName];
         } else if (
-          typeof thing === "string" && this.hasImplementation(Core.BitString)
+          typeof thing === 'string' && this.hasImplementation(Core.BitString)
         ) {
           fun = this.registry.get(Core.BitString)[funName];
         } else if (this.hasImplementation(thing)) {
@@ -34,11 +34,11 @@ class Protocol {
         }
 
         if (fun != null) {
-          let retval = fun.apply(this, args);
+          const retval = fun.apply(this, args);
           return retval;
         }
 
-        throw new Error("No implementation found for " + thing);
+        throw new Error(`No implementation found for ${thing}`);
       };
     }
   }
