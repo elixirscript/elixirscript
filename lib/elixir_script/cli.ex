@@ -4,14 +4,14 @@ defmodule ElixirScript.CLI do
   @app_version Mix.Project.config()[:version]
 
   @switches [
-    output: :binary, elixir: :boolean,
-    help: :boolean, core_path: :binary,
+    output: :string, elixir: :boolean,
+    help: :boolean, core_path: :string,
     full_build: :boolean, version: :boolean,
-    watch: :boolean
+    watch: :boolean, format: :string
   ]
 
   @aliases [
-    o: :output, ex: :elixir, h: :help, v: :version
+    o: :output, ex: :elixir, h: :help, v: :version, f: :format
   ]
 
   def main(argv) do
@@ -44,11 +44,12 @@ defmodule ElixirScript.CLI do
   <input> path to elixir files or
   the elixir code string if the -ex flag is used
   options:
+  -f  --format [format] module format of output. options: es (default), common, umd
   -o  --output [path]   places output at the given path
   -ex --elixir          read input as elixir code string
   --full-build          informs the compiler to do a full build instead of an incremental one
   only used when output is specified
-  --core-path    es6 import path to the elixirscript standard lib
+  --core-path    import path to the elixirscript standard lib
   only used with the [output] option. When used, Elixir.js is not exported
   -v  --version         the current version number
   -h  --help            this message
