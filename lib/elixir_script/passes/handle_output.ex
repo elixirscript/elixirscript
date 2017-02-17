@@ -40,7 +40,7 @@ defmodule ElixirScript.Passes.HandleOutput do
 
   defp out(compiler_output, %{output: output_path, core_path: _} = compiler_opts) do
     if Map.get(compiler_opts, :std_lib, false) == false do
-      ElixirScript.copy_stdlib_to_destination(output_path)
+      ElixirScript.copy_stdlib_to_destination("es", output_path)
     end
 
     compiler_output = remove_load_only(compiler_output)

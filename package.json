@@ -8,7 +8,9 @@
   },
   "scripts": {
     "lint": "eslint src/javascript/lib/**/*.js src/javascript/tests/**/*.js",
-    "build": "rollup -c rollup.config.js",
+    "build": "npm run build:es && npm run build:umd",
+    "build:es": "rollup -c rollup.config.js",
+    "build:umd": "rollup -c rollup.config.js -f umd -o priv/umd/elixir/Elixir.Bootstrap.js",
     "clean": "rm -rf priv",
     "test": "mocha src/javascript/tests --recursive --compilers js:babel-core/register"
   },
@@ -37,8 +39,8 @@
     "gulp-babel": "^6.1.2",
     "gulp-sourcemaps": "^2.0.0-alpha",
     "mocha": "^2.4.5",
-    "rollup": "^0.28.0",
-    "rollup-plugin-babel": "^2.5.1",
-    "rollup-plugin-node-resolve": "^1.7.0"
+    "rollup": "^0.41.4",
+    "rollup-plugin-babel": "^2.7.1",
+    "rollup-plugin-node-resolve": "^2.0.0"
   }
 }
