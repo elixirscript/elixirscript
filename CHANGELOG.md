@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Add `Collectable` implementations
 - Updated `for` implementation to use Collectable
 - `format` option. Can now specify the module format of output. Choices are `es` (default), `umd`, or `common`
+- Default input, output and format for elixirscript mix compiler
 
 ### Removed
 - `receive`
