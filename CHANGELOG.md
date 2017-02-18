@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Updated elixir_script mix compiler to support compiling elixir_script paths in dependencies
 - Add `Collectable` implementations
 - Updated `for` implementation to use Collectable
+- `format` option. Can now specify the module format of output. Choices are `es` (default), `umd`, or `common`
 
 ### Fixed
 - JS module functions not translated properly when imported

@@ -1,4 +1,4 @@
-defmodule ElixirScript.ModuleSystems.Common do
+defmodule ElixirScript.ModuleSystems.ES do
   @moduledoc false
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
@@ -43,45 +43,49 @@ defmodule ElixirScript.ModuleSystems.Common do
   end
 
   def import_namespace_module(module_name, from, env) do
-    do_import_module(Translator.translate!(module_name, env), from)
+    import_specifier = JS.import_namespace_specifier(
+      Translator.translate!(module_name, env),
+      Translator.translate!(module_name, env)
+    )
+
+    do_import_module([import_specifier], from)
   end
 
   def import_module(:Elixir, from, env) do
-    do_import_module(JS.identifier("Elixir"), from)
-  end  
+    import_specifier = JS.import_default_specifier(
+      JS.identifier("Elixir"),
+      JS.identifier("Elixir")
+    )
+
+    do_import_module([import_specifier], from)
+  end
 
   def import_module(module_name, from, env) do
-    do_import_module(Translator.translate!(module_name, env), from)
+    import_specifier = JS.import_default_specifier(
+      Translator.translate!(module_name, env),
+      Translator.translate!(module_name, env)
+    )
+
+    do_import_module([import_specifier], from)
   end
 
   def import_module(import_name, from) do
-    do_import_module(JS.identifier(import_name), from)
-  end
-
-  defp do_import_module(ref, file_path) do
-
-    ref_declarator = JS.variable_declarator(
-      ref,
-      JS.call_expression(
-        JS.identifier("require"),
-        [JS.literal(file_path)]
-      )
+    import_specifier = JS.import_default_specifier(
+      JS.identifier(import_name)
     )
 
-    JS.variable_declaration([ref_declarator], :const)
+    do_import_module([import_specifier], from)
+  end
 
+  defp do_import_module(import_specifiers, file_path) do
+    JS.import_declaration(
+      import_specifiers,
+      JS.literal(file_path)
+    )
   end
 
   def export_module(exported_object) do
-    JS.assignment_expression(
-      :=,
-      JS.member_expression(
-        JS.identifier("module"),
-        JS.identifier("exports")
-      ),
-      exported_object
-    )
+    JS.export_default_declaration(exported_object)
   end
-
 
 end

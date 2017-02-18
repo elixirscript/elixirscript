@@ -2,7 +2,6 @@ defmodule ElixirScript.Passes.ConsolidateProtocols do
   @moduledoc false
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator.Utils
-  alias ElixirScript.ModuleSystems
   alias ElixirScript.Translator.State
   require Logger
 
@@ -55,8 +54,6 @@ defmodule ElixirScript.Passes.ConsolidateProtocols do
   end
 
   defp make_defimpl(name, { _, protocol }, implementations, compiler_opts) do
-    imports = [ModuleSystems.import_module(:Elixir, Utils.make_local_file_path(:elixir, compiler_opts.core_path, compiler_opts.root, nil))]
-
     declarator = JS.variable_declarator(
       JS.identifier("impls"),
       JS.array_expression([])
@@ -70,26 +67,47 @@ defmodule ElixirScript.Passes.ConsolidateProtocols do
 
     app_name = protocol.app
 
-    body = Enum.flat_map(implementations, fn({_, impl_data}) ->
+    imports = [compiler_opts.module_formatter.import_module(:Elixir, Utils.make_local_file_path(:elixir, compiler_opts.core_path, compiler_opts.root, nil))]
+
+    defimpl_imports = Enum.map(implementations, fn({_, impl_data}) ->
       x = Atom.to_string(Utils.quoted_to_name(impl_data.for))
       x = String.to_atom(protocol_name <> ".DefImpl." <> x)
       name = Utils.name_to_js_name(x)
-      imports = ModuleSystems.import_module(name, Utils.make_local_file_path(impl_data.app, Utils.name_to_js_file_name(x), compiler_opts.root, nil))
-      call = JS.call_expression(
+      compiler_opts.module_formatter.import_module(name, Utils.make_local_file_path(impl_data.app, Utils.name_to_js_file_name(x), compiler_opts.root, nil))
+    end)
+
+    body = Enum.map(implementations, fn({_, impl_data}) ->
+      x = Atom.to_string(Utils.quoted_to_name(impl_data.for))
+      x = String.to_atom(protocol_name <> ".DefImpl." <> x)
+      name = Utils.name_to_js_name(x)
+      JS.call_expression(
         JS.member_expression(
           JS.identifier("impls"),
           JS.identifier("push")
         ),
         [JS.identifier(name)]
       )
-
-      [imports, call]
     end)
+
+    imports = imports ++ defimpl_imports
+    body = [declaration] ++ body
+    exports = compiler_opts.module_formatter.export_module(JS.identifier("impls"))
+
+    body = case compiler_opts.format do
+      :umd ->
+        compiler_opts.module_formatter.make_umd(
+          imports,
+          body,
+          exports
+        )
+      _ ->
+        imports ++ body ++ [exports]
+    end
 
     module_name = String.to_atom(protocol_name <> ".DefImpl")
     module_data = %{
       module: String.to_atom(protocol_name <> ".DefImpl"),
-      javascript_ast: imports ++ [declaration] ++ body ++ [default],
+      javascript_ast: List.wrap(body),
       app: app_name,
       type: :consolidated,
       protocol: name

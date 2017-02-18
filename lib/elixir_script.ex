@@ -214,8 +214,22 @@ defmodule ElixirScript do
     |> Map.put(:full_build, false)
     |> Map.put(:output, nil)
     |> Map.put(:app, :app)
+    |> Map.put(:format, :es)
 
-    Map.merge(default_options, opts)
+    options = Map.merge(default_options, opts)
+    Map.put(options, :module_formatter, get_module_formatter(options[:format]))
+  end
+
+  defp get_module_formatter(:umd) do
+    ElixirScript.ModuleSystems.UMD
+  end
+
+  defp get_module_formatter(:common) do
+    ElixirScript.ModuleSystems.Common
+  end
+
+  defp get_module_formatter(_) do
+    ElixirScript.ModuleSystems.ES
   end
 
   @doc """
@@ -223,7 +237,7 @@ defmodule ElixirScript do
   to the specified location
   """
   def copy_stdlib_to_destination(module_format, destination) do
-    Enum.each(Path.wildcard(Path.join([operating_path, module_format, "elixir", "*.js"])), fn(path) ->
+    Enum.each(Path.wildcard(Path.join([operating_path, to_string(module_format), "elixir", "*.js"])), fn(path) ->
       base = Path.basename(path)
       File.mkdir_p!(Path.join([destination, "elixir"]))
       File.cp!(path, Path.join([destination, "elixir", base]))

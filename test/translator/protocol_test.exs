@@ -26,17 +26,18 @@ defmodule ElixirScript.Translator.Defprotocol.Test do
 
     js_code = """
          import Elixir from '../elixir/Elixir.Bootstrap';
-         let impls = [];
          import Elixir$Blank$DefImpl$Elixir$Integer from '../app/Elixir.Blank.DefImpl.Elixir.Integer';
-         impls.push(Elixir$Blank$DefImpl$Elixir$Integer)
          import Elixir$Blank$DefImpl$Elixir$List from '../app/Elixir.Blank.DefImpl.Elixir.List';
-         impls.push(Elixir$Blank$DefImpl$Elixir$List)
          import Elixir$Blank$DefImpl$Elixir$Atom from '../app/Elixir.Blank.DefImpl.Elixir.Atom';
+
+         let impls = [];
+         impls.push(Elixir$Blank$DefImpl$Elixir$Integer)
+         impls.push(Elixir$Blank$DefImpl$Elixir$List)
          impls.push(Elixir$Blank$DefImpl$Elixir$Atom)
          export default impls;
 
-         import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
          import Implementations from '../app/Elixir.Blank.Defimpl';
+         import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
          const Elixir$Blank = Elixir.Core.Functions.defprotocol({
              blank__qmark__: function()    {
 

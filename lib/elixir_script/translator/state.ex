@@ -117,7 +117,7 @@ defmodule ElixirScript.Translator.State do
   end
 
   def is_module_loaded?(pid, {:__aliases__, _, _} = module) do
-    
+
     is_module_loaded?(pid, Utils.quoted_to_name(module))
   end
 
@@ -175,5 +175,27 @@ defmodule ElixirScript.Translator.State do
 
   def stop(pid) do
     Agent.stop(pid)
+  end
+
+  def add_javascript_module_reference(pid, module_name, name, path, default \\ true) do
+    Agent.update(pid, fn(state) ->
+      case Keyword.get(state.modules, do_get_module_name(module_name, state)) do
+        nil ->
+          state
+        module ->
+          module = Map.update(module, :js_modules, [{name, path, default}], fn(x) -> Enum.uniq(x ++ [{name, path, default}]) end)
+          modules = Keyword.put(state.modules, module.name, module)
+          %{ state | modules: modules }
+      end
+    end)
+  end
+
+  def get_javascript_module_references(pid, module_name) do
+    case get_module(pid, module_name) do
+      nil ->
+        []
+      module ->
+        Map.get(module, :js_modules, [])
+    end
   end
 end
