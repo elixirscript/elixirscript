@@ -28,14 +28,14 @@ defmodule Mix.Tasks.Compile.ElixirScript do
 
     input_path = Keyword.fetch!(elixirscript_config, :input)
     |> List.wrap
-    |> Enum.map(fn(path) -> 
+    |> Enum.map(fn(path) ->
       Path.absname(path)
     end)
     |> Enum.join("\n")
 
     File.write!(elixirscript_path, input_path)
 
-    paths = Path.join([elixirscript_base, "*"]) 
+    paths = Path.join([elixirscript_base, "*"])
     |> Path.wildcard
     |> Enum.map(fn(path) ->
       {Path.basename(path), File.read!(path)}
@@ -43,7 +43,8 @@ defmodule Mix.Tasks.Compile.ElixirScript do
     |> Map.new
 
     output_path = Keyword.fetch!(elixirscript_config, :output)
-    ElixirScript.compile_path(paths, %{output: output_path})
+    format = Keyword.get(elixirscript_config, :format, :es)
+    ElixirScript.compile_path(paths, %{output: output_path, format: format})
     :ok
   end
 
