@@ -2,13 +2,14 @@ defmodule ElixirScript.ModuleSystems.Common do
   @moduledoc false
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
+  alias ElixirScript.Translator.State
+  alias ElixirScript.Translator.Utils
 
   def build(body, exports, env) do
     js_module_refs = State.get_javascript_module_references(env.state, env.module)
     std_import = make_std_lib_import(env)
     module_refs = State.get_module_references(env.state, env.module) -- [env.module]
     |> module_imports_to_js_imports(env)
-    app_name = State.get_module(env.state, env.module).app
 
     imports = js_module_refs ++ std_import
     |> Enum.map(fn

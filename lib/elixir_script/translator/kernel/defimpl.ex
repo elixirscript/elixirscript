@@ -1,16 +1,17 @@
 defmodule ElixirScript.Translator.Defimpl do
-  @moduledoc false  
+  @moduledoc false
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator.Defmodule
+  alias ElixirScript.Translator.State
+  alias ElixirScript.Translator.Utils
 
   def make(name, type, body, env) do
 
     type = map_to_js(type, env)
-    module = Defmodule.make_module(name, body, env)
+    {body, export} = Defmodule.process_module(name, body, env)
 
     protocol_name = Atom.to_string(name) |> String.split(".DefImpl.") |> hd |> String.to_atom
 
-    %ESTree.ExportDefaultDeclaration{ declaration: export } = List.last(module.body)
     export = JS.object_expression([
       JS.property(
         JS.literal("Type"),
@@ -22,12 +23,14 @@ defmodule ElixirScript.Translator.Defimpl do
       )
     ])
 
-    body = Enum.reverse(module.body)
-    |> tl
-    |> Enum.reverse
+    body = env.module_formatter.build(body, export, env)
 
-    %{ module | body: body ++ [JS.export_default_declaration(export)] }
-    |> Map.put(:protocol, protocol_name)
+    %{
+      name: Utils.quoted_to_name({:__aliases__, [], name }),
+      body: body,
+      app_name: State.get_module(env.state, name).app,
+      protocol: protocol_name
+    }
   end
 
   defp map_to_js({:__aliases__, _, [:Integer]}, _) do

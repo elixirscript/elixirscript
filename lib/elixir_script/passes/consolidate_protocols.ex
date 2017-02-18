@@ -90,11 +90,24 @@ defmodule ElixirScript.Passes.ConsolidateProtocols do
     end)
 
     imports = imports ++ defimpl_imports
+    body = [declaration] ++ body
+    exports = compiler_opts.module_formatter.export_module(JS.identifier("impls"))
+
+    body = case compiler_opts.format do
+      :umd ->
+        compiler_opts.module_formatter.make_umd(
+          imports,
+          body,
+          exports
+        )
+      _ ->
+        imports ++ body ++ [exports]
+    end
 
     module_name = String.to_atom(protocol_name <> ".DefImpl")
     module_data = %{
       module: String.to_atom(protocol_name <> ".DefImpl"),
-      javascript_ast: imports ++ [declaration] ++ body ++ [default],
+      javascript_ast: List.wrap(body),
       app: app_name,
       type: :consolidated,
       protocol: name

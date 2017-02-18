@@ -18,6 +18,20 @@ defmodule ElixirScript.Translator.Defmodule do
   end
 
   def make_module(module, body, env) do
+    {body, exported_object} = process_module(module, body, env)
+    body = env.module_formatter.build(body, exported_object, env)
+    app_name = State.get_module(env.state, module).app
+
+    result = %{
+        name: Utils.quoted_to_name({:__aliases__, [], module }),
+        body: body,
+        app_name: app_name
+    }
+
+    result
+  end
+
+  def process_module(module, body, env) do
     { body, functions } = extract_functions_from_module(body)
 
     { body, env } = translate_body(body, env)
@@ -25,8 +39,6 @@ defmodule ElixirScript.Translator.Defmodule do
     { exported_functions, private_functions } = process_functions(functions, env)
 
     {structs, body} = extract_structs_from_body(body, env)
-
-    app_name = State.get_module(env.state, module).app
 
     #Collect all the functions so that we can process their arity
     body = Enum.map(body, fn(x) ->
@@ -51,15 +63,7 @@ defmodule ElixirScript.Translator.Defmodule do
     private_functions = Enum.map(private_functions, fn({_key, value}) -> value end)
 
     body = structs ++ private_functions ++ exported_functions ++ body
-    body = env.module_formatter.build(body, exported_object, env)
-
-    result = %{
-        name: Utils.quoted_to_name({:__aliases__, [], module }),
-        body: body,
-        app_name: app_name
-    }
-
-    result
+    {body, exported_object}
   end
 
   def translate_body(body, env) do
