@@ -26,7 +26,7 @@ defmodule Mix.Tasks.Compile.ElixirScript do
     File.mkdir_p!(elixirscript_base)
     elixirscript_path = Path.join([elixirscript_base, "#{Mix.Project.config[:app]}"])
 
-    input_path = Keyword.fetch!(elixirscript_config, :input)
+    input_path = Keyword.get(elixirscript_config, :input)
     |> List.wrap
     |> Enum.map(fn(path) ->
       Path.absname(path)
@@ -38,19 +38,22 @@ defmodule Mix.Tasks.Compile.ElixirScript do
     paths = Path.join([elixirscript_base, "*"])
     |> Path.wildcard
     |> Enum.map(fn(path) ->
-      {Path.basename(path), File.read!(path)}
+      app = Path.basename(path)
+      paths = path |> File.read!() |> String.split("\n")
+      {app, paths}
     end)
     |> Map.new
 
-    output_path = Keyword.fetch!(elixirscript_config, :output)
-    format = Keyword.get(elixirscript_config, :format, :es)
+    output_path = Keyword.get(elixirscript_config, :output)
+    format = Keyword.get(elixirscript_config, :format)
+
     ElixirScript.compile_path(paths, %{output: output_path, format: format})
     :ok
   end
 
   def clean do
     elixirscript_config = get_elixirscript_config()
-    output_path = Keyword.fetch!(elixirscript_config, :output)
+    output_path = Keyword.get(elixirscript_config, :output)
 
     File.ls!(output_path)
     |> Enum.each(fn(x) ->
@@ -64,7 +67,24 @@ defmodule Mix.Tasks.Compile.ElixirScript do
 
   defp get_elixirscript_config() do
     config  = Mix.Project.config
-    Keyword.fetch!(config, :elixir_script) || Keyword.fetch!(config, :elixirscript)
+    exjs_config = cond do
+      Keyword.has_key?(config, :elixir_script) ->
+        Keyword.get(config, :elixir_script, [])
+      Keyword.has_key?(config, :elixirscript) ->
+        Keyword.get(config, :elixirscript, [])
+      true ->
+        defaults()
+    end
+
+    Keyword.merge(defaults(), exjs_config)
+  end
+
+  defp defaults() do
+    [
+      input: "lib/elixirscript",
+      output: "priv/elixirscript",
+      format: :es
+    ]
   end
 
 end
