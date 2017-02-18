@@ -51,6 +51,15 @@ defmodule ElixirScript.ModuleSystems.ES do
     do_import_module([import_specifier], from)
   end
 
+  def import_module(:Elixir, from, env) do
+    import_specifier = JS.import_default_specifier(
+      JS.identifier("Elixir"),
+      JS.identifier("Elixir")
+    )
+
+    do_import_module([import_specifier], from)
+  end
+
   def import_module(module_name, from, env) do
     import_specifier = JS.import_default_specifier(
       Translator.translate!(module_name, env),

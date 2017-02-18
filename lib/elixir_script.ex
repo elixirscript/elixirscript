@@ -237,7 +237,7 @@ defmodule ElixirScript do
   to the specified location
   """
   def copy_stdlib_to_destination(module_format, destination) do
-    Enum.each(Path.wildcard(Path.join([operating_path, module_format, "elixir", "*.js"])), fn(path) ->
+    Enum.each(Path.wildcard(Path.join([operating_path, to_string(module_format), "elixir", "*.js"])), fn(path) ->
       base = Path.basename(path)
       File.mkdir_p!(Path.join([destination, "elixir"]))
       File.cp!(path, Path.join([destination, "elixir", base]))

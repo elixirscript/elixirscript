@@ -47,6 +47,10 @@ defmodule ElixirScript.ModuleSystems.UMD do
     {Translator.translate!(module_name, env), JS.literal(from)}
   end
 
+  def import_module(:Elixir, from, env) do
+    {JS.identifier("Elixir"), JS.literal(from)}
+  end
+
   def import_module(module_name, from, env) do
     {Translator.translate!(module_name, env), JS.literal(from)}
   end

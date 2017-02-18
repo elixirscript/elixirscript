@@ -80,7 +80,7 @@ defmodule ElixirScript.CLI do
       core_path: Keyword.get(options, :core_path, "Elixir.Bootstrap"),
       full_build: Keyword.get(options, :full_build, false),
       output: Keyword.get(options, :output, :stdout),
-      format: Keyword.get(options, :format, :es)
+      format: String.to_atom(Keyword.get(options, :format, "es"))
     }
 
     case options[:elixir] do
