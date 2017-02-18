@@ -66,7 +66,7 @@ defmodule ElixirScript.Mixfile do
 
   def std_lib(_) do
     Mix.Task.run "app.start"
-    { _ , _ } = System.cmd("npm", ["run", "build"])
+    {_ , _} = System.cmd("npm", ["run", "build"])
     ElixirScript.compile_std_lib()
   end
 

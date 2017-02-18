@@ -2,7 +2,7 @@
   "certifi": {:hex, :certifi, "0.7.0", "861a57f3808f7eb0c2d1802afeaae0fa5de813b0df0979153cbafcd853ababaf", [:rebar3], []},
   "credo": {:hex, :credo, "0.6.1", "a941e2591bd2bd2055dc92b810c174650b40b8290459c89a835af9d59ac4a5f8", [:mix], [{:bunt, "~> 0.2.0", [hex: :bunt, optional: false]}]},
   "earmark": {:hex, :earmark, "1.1.1", "433136b7f2e99cde88b745b3a0cfc3fbc81fe58b918a09b40fce7f00db4d8187", [:mix], []},
-  "estree": {:hex, :estree, "2.5.0", "9776c1705a72dc5a0d56cdf431173c3e75f9e509278a857ec55374a49f5699ef", [:mix], []},
+  "estree": {:hex, :estree, "2.5.1", "c93a8fa8a29886e6a6f6c489ba6dc949b998d2985b189967e41e69a92b58e846", [:mix], []},
   "ex_doc": {:hex, :ex_doc, "0.14.5", "c0433c8117e948404d93ca69411dd575ec6be39b47802e81ca8d91017a0cf83c", [:mix], [{:earmark, "~> 1.0", [hex: :earmark, optional: false]}]},
   "excoveralls": {:hex, :excoveralls, "0.6.2", "0e993d096f1fbb6e70a3daced5c89aac066bda6bce57829622aa2d1e2b338cfb", [:mix], [{:exjsx, "~> 3.0", [hex: :exjsx, optional: false]}, {:hackney, ">= 0.12.0", [hex: :hackney, optional: false]}]},
   "exjsx": {:hex, :exjsx, "3.2.1", "1bc5bf1e4fd249104178f0885030bcd75a4526f4d2a1e976f4b428d347614f0f", [:mix], [{:jsx, "~> 2.8.0", [hex: :jsx, optional: false]}]},
