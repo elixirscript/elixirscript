@@ -42,13 +42,12 @@ defmodule ElixirScript.CLI do
   """
   usage: elixirscript <input> [options]
   <input> path to elixir files or
-  the elixir code string if the -ex flag is used
+  the elixir code string if passed the -ex flag
   options:
   -f  --format [format] module format of output. options: es (default), common, umd
   -o  --output [path]   places output at the given path
   -ex --elixir          read input as elixir code string
   --full-build          informs the compiler to do a full build instead of an incremental one
-  only used when output is specified
   --core-path    import path to the elixirscript standard lib
   only used with the [output] option. When used, Elixir.js is not exported
   -v  --version         the current version number
