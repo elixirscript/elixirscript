@@ -1,4 +1,7 @@
 defmodule Mix.Tasks.Elixirscript do
+  @moduledoc """
+  A command-line interface to the elixirscript compiler
+  """
   use Mix.Task
 
   @shortdoc "Translate Elixir to JavaScript"

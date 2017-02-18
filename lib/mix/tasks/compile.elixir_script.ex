@@ -4,21 +4,31 @@ defmodule Mix.Tasks.Compile.ElixirScript do
   @moduledoc """
   Mix compiler to allow mix to compile Elixirscript source files into JavaScript
 
-  Looks for an `elixir_script` key in your mix project config
+  Looks for an `elixir_script` or `elixirscript` key in your mix project config
 
       def project do
-      [
-        app: :my_app,
-        version: "0.1.0",
-        elixir: "~> 1.0",
-        deps: deps,
-        elixir_script: [ input: "src/exjs", output: "dest/js"],
-        compilers: [:elixir_script] ++ Mix.compilers
-      ]
+        [
+          app: :my_app,
+          version: "0.1.0",
+          elixir: "~> 1.0",
+          deps: deps,
+          elixir_script: [ input: "src/exjs", output: "dest/js"],
+          compilers: [:elixir_script] ++ Mix.compilers
+        ]
       end
+    
+  Available options are:
+  * `input`: The folder to look for Elixirscript files in. (defaults to `lib/elixirscript`)
+  * `output`: The folder to place generated JavaScript code in. (defaults to `priv/elixirscript`)
+  * `format`: The module format of generated JavaScript code. (defaults to `:es`).
+    Choices are:
+      * `:es` - ES Modules
+      * `:common` - CommonJS
+      * `:umd` - UMD
   """
 
 
+  @spec run(any()) :: :ok
   def run(_) do
     elixirscript_config = get_elixirscript_config()
 
@@ -26,7 +36,8 @@ defmodule Mix.Tasks.Compile.ElixirScript do
     File.mkdir_p!(elixirscript_base)
     elixirscript_path = Path.join([elixirscript_base, "#{Mix.Project.config[:app]}"])
 
-    input_path = Keyword.get(elixirscript_config, :input)
+    input_path = elixirscript_config
+    |> Keyword.get(:input)
     |> List.wrap
     |> Enum.map(fn(path) ->
       Path.absname(path)
@@ -35,7 +46,8 @@ defmodule Mix.Tasks.Compile.ElixirScript do
 
     File.write!(elixirscript_path, input_path)
 
-    paths = Path.join([elixirscript_base, "*"])
+    paths = [elixirscript_base, "*"]
+    |> Path.join()
     |> Path.wildcard
     |> Enum.map(fn(path) ->
       app = Path.basename(path)
@@ -55,7 +67,8 @@ defmodule Mix.Tasks.Compile.ElixirScript do
     elixirscript_config = get_elixirscript_config()
     output_path = Keyword.get(elixirscript_config, :output)
 
-    File.ls!(output_path)
+    output_path
+    |> File.ls!
     |> Enum.each(fn(x) ->
       if String.contains?(Path.basename(x), "Elixir.") do
         File.rm!(Path.join(output_path, x))

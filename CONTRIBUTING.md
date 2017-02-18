@@ -70,7 +70,7 @@ ElixirScript is broken up into the following parts:
 The ElixirScript compiler is in the `lib` folder of the project. 
 Here is where Elixir code is converted into JavaScript.
 
-The standard library modules are in the `lib/elixir_script/prelude` folder.
+The standard library modules are in the `lib/std_lib` folder.
 
 The JavaScript code is in the `src/javascript`. 
 This is where features such as pattern matching and the standard library are implemented.

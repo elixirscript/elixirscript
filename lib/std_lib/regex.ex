@@ -1,9 +1,10 @@
 defmodule ElixirScript.Regex do
+  @moduledoc false
   require JS
 
   def compile(source, options \\ "") do
     try do
-      {:ok, JS.new(RegExp, [source, options]) }
+      {:ok, JS.new(RegExp, [source, options])}
     rescue
       x ->
         {:error, x.message}

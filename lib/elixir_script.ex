@@ -187,9 +187,9 @@ defmodule ElixirScript do
   @doc false
   def compile_std_lib(output_path) do
     opts = build_compiler_options(%{std_lib: true, include_path: true, output: output_path, app: :elixir})
-    libs_path = Path.join([__DIR__, "elixir_script", "prelude"])
+    libs_path = Path.join([__DIR__, "std_lib"])
 
-    result = %{ data: [{:elixir, List.wrap(libs_path)}] }
+    result = %{data: [{:elixir, List.wrap(libs_path)}]}
     |> ElixirScript.Passes.Init.execute(opts)
     |> ElixirScript.Passes.ASTFromFile.execute(opts)
     |> ElixirScript.Passes.FindModules.execute(opts)
