@@ -159,42 +159,6 @@ defmodule ElixirScript.Kernel do
     term === nil
   end
 
-  def make_ref() do
-    Elixir.Core.processes.make_ref()
-  end
-
-  def spawn(gen) do
-    Elixir.Core.processes.spawn(gen)
-  end
-
-  def spawn(module, fun, args) do
-    Elixir.Core.processes.spawn(module, Atom.to_string(fun), args)
-  end
-
-  def spawn_link(gen) do
-    Elixir.Core.processes.spawn_link(gen)
-  end
-
-  def spawn_link(module, fun, args) do
-    Elixir.Core.processes.spawn_link(module, Atom.to_string(fun), args)
-  end
-
-  def spawn_monitor(gen) do
-    Elixir.Core.processes.spawn_monitor(gen)
-  end
-
-  def spawn_monitor(module, fun, args) do
-    Elixir.Core.processes.spawn_monitor(module, Atom.to_string(fun), args)
-  end
-
-  def send(pid, message) do
-    Elixir.Core.processes.send(pid, message)
-  end
-
-  def self() do
-    Elixir.Core.processes.pid()
-  end
-
   defmacro sigil_r({:<<>>, _meta, [string]}, options) do
     str_options = List.to_string(options)
     quote do
