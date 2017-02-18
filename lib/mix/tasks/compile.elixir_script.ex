@@ -25,6 +25,8 @@ defmodule Mix.Tasks.Compile.ElixirScript do
       * `:es` - ES Modules
       * `:common` - CommonJS
       * `:umd` - UMD
+
+  The mix compiler will also compile any dependencies that have the elixirscript compiler in its mix compilers as well
   """
 
 

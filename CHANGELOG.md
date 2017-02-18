@@ -6,11 +6,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [0.25.0-dev]
 ### Added
-- Updated elixir_script mix compiler to support compiling elixir_script paths in dependencies
-- Add `Collectable` implementations
-- Updated `for` implementation to use Collectable
-- `format` option. Can now specify the module format of output. Choices are `es` (default), `umd`, or `common`
-- Default input, output and format for elixirscript mix compiler
+- Updated elixir_script mix compiler to support compiling elixir_script paths in dependencies if dependency has mix compiler defined as well
+- Add `Collectable` protocol implementations
+- Updated `for` implementation to use `Collectable`
+- `format` option. Can now specify the module format of output. 
+    Choices are:
+        * `:es` (default) for ES Modules
+        * `:umd` for UMD
+        * `:common` for CommonJS
+
+- Default input, output and format for elixirscript mix compiler. In a mix project by default the elixirscript compiler will look in `lib/elixirscript` and input and place output in `priv/elixirscript`. The default format is `:es`
 
 ### Removed
 - `receive`
