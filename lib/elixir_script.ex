@@ -127,7 +127,7 @@ defmodule ElixirScript do
     compile_path([path], opts)
   end
 
-  def compile_path(path, opts) when is_list(path) do
+  def compile_path(path, opts) when is_list(path) do  
     built_opts = build_compiler_options(opts)
 
     app_name = cond do
