@@ -41,6 +41,7 @@ The compiler to this point has been focused on translating Kernel.SpecialForms a
 
 * Missing
     * `super(args)`
+    * `receive`
 
 * Caveats
     * `quote` - ignores `context` options
@@ -50,7 +51,6 @@ The compiler to this point has been focused on translating Kernel.SpecialForms a
 
         1 = a # may not work currently, but in some cases it will
         ```
-    * `send` and `receive` only work on functions defined with `defgen` or `defgenp`
 
 
 #### Completed Modules
@@ -91,8 +91,8 @@ You **can** use ElixirScript on your front ends and have it work and interoperat
 
 ## Q. Can I use processes?
 
-### A. Yes, with some caveats as mentioned above. Only current works with functions defined with `defgen` or `defgenp`
+### A. ElixirScript does not support processes
 
 ## Q. What about OTP?
 
-### A. Not yet. Maybe never.
+### A. ElixirScript does not support OTP

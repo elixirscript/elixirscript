@@ -24,7 +24,6 @@ defmodule ElixirScript.Translator do
   alias ElixirScript.Translator.JS, as: JSLib
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator.Rewriter
-  alias ElixirScript.Translator.Receive
 
   # A list of erlang modules. These are rewritten into equivalent
   # JavaScript functions using ElixirScript.Translator.Rewriter
@@ -460,8 +459,8 @@ defmodule ElixirScript.Translator do
     Function.make_anonymous_function(clauses, env)
   end
 
-  defp do_translate({:receive, _, [expressions] }, env) do
-    Receive.make_receive(expressions, env)
+  defp do_translate({:receive, _, _ }, _) do
+    raise ElixirScript.Translator.UnsupportedError, "receive"
   end
 
   defp do_translate({:{}, _, elements}, env) do

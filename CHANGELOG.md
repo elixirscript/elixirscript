@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Updated `for` implementation to use Collectable
 - `format` option. Can now specify the module format of output. Choices are `es` (default), `umd`, or `common`
 
+### Removed
+- `receive`
+- `Process` module
+
 ### Fixed
 - JS module functions not translated properly when imported
 - Update fs dependency to 2.12
