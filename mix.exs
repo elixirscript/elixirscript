@@ -10,7 +10,7 @@ defmodule ElixirScript.Mixfile do
       deps: deps(),
       description: description(),
       package: package(),
-      source_url: "https://github.com/bryanjos/elixirscript",
+      source_url: "https://github.com/elixirscript/elixirscript",
       aliases: aliases(),
       test_coverage: [tool: ExCoveralls],
       preferred_cli_env: [coveralls: :test],
@@ -52,7 +52,7 @@ defmodule ElixirScript.Mixfile do
       maintainers: ["Bryan Joseph"],
       licenses: ["MIT"],
       links: %{
-        "GitHub" => "https://github.com/bryanjos/elixirscript"
+        "GitHub" => "https://github.com/elixirscript/elixirscript"
       },
       build_tools: ["mix"]
     ]
