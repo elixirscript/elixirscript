@@ -499,6 +499,10 @@ defmodule ElixirScript.Translator do
     Def.process_function(name, [ast], env)
   end
 
+  defp do_translate({:defdelegate, _, [{name, _, params}, options]}, env) do
+    Def.process_delegate(name, params, options, env)
+  end
+
   defp do_translate({:defstruct, _, attributes}, env) do
     { Struct.make_defstruct(attributes, env), env }
   end

@@ -7,7 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.26.0] - Unreleased
 
 ### Added
-- Support for multiple when clauses in guards
+- Multiple `when` clauses in guards
+- Kernel.defdelegate/2
 
 ## [0.25.0] - 2017-02-19
 
