@@ -20,17 +20,17 @@ defmodule ElixirScript.Translator.Function do
   def make_anonymous_function(functions, env, name) do
     clauses = functions
     |> Enum.map(fn
-      ({:->, _, [ [{:when, _, params}], body ]}) ->
-        guards = List.last(params) |> List.wrap
+      ({:->, _, [[{:when, _, params}], body ]}) ->
+        guards = List.last(params)
         params = params |> Enum.reverse |> tl |> Enum.reverse
         process_function_body(params, body, env, name, guards)
 
       ({:->, _, [params, body]}) ->
         process_function_body(params, body, env, name)
 
-      ({_, _, [{:when, _, [{_, _, params} | guards]}, body]}) ->
+      ({_, _, [{:when, _, [{_, _, params}, guards]}, body]}) ->
         body = convert_to_try(body)
-        process_function_body(params, body, env, name, guards)
+        process_function_body(params, body, env, name, guards)     
 
       ({_, _, [{_, _, params}, body]}) ->
         body = convert_to_try(body)
@@ -78,16 +78,32 @@ defmodule ElixirScript.Translator.Function do
     {body, _} = make_function_body(body, env)
 
     if guards do
-      {guard_body, _} = guards
-      |> List.wrap
-      |> hd
-      |> prepare_function_body(%{env | context: :guard})
+      guards = case guards do
+        {:when, _, whens} ->
+          whens
+        wh ->
+          List.wrap(wh)
+      end
+
+      guards = guards
+      |> Enum.reverse
+      |> process_guards
+
+      {guard_body, _} = prepare_function_body(guards, %{env | context: :guard})
 
       guard_body = JS.block_statement(guard_body)
       make_function_clause(patterns, params, body, guard_body, env.context == :generator)
     else
       make_function_clause(patterns, params, body, nil, env.context == :generator)
     end
+  end
+
+  defp process_guards([guard]) do
+    guard
+  end
+
+  defp process_guards([head | tail]) do
+    {:or, [], [process_guards(tail), head]}
   end
 
   defp wrap_params(params) when is_atom(params), do: []

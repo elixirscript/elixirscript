@@ -84,6 +84,30 @@ defmodule ElixirScript.Translator.Case.Test do
     assert_translation(ex_ast, js_code)
   end
 
+  test "translate case with multiple guards" do
+    ex_ast = quote do
+      case data do
+        number when number in [1,2,3,4] when number in [4, 3, 2, 1] ->
+          value = 13
+        _  ->
+          true
+      end
+    end
+
+    js_code = """
+     Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Elixir.Core.Patterns.variable()],function(number)    {
+             let [value] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),13);
+             return     value;
+           },function(number)    {
+             return     Elixir.Core.Functions.contains(number,Object.freeze([1, 2, 3, 4])) || Elixir.Core.Functions.contains(number,Object.freeze([4, 3, 2, 1]));
+           }),Elixir.Core.Patterns.clause([Elixir.Core.Patterns.wildcard()],function()    {
+             return     true;
+           })).call(this,data)
+    """
+
+    assert_translation(ex_ast, js_code)
+  end  
+
   test "translate case with multiple statements in body" do
     ex_ast = quote do
       case data do

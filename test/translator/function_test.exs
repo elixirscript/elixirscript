@@ -842,4 +842,22 @@ defmodule ElixirScript.Translator.Function.Test do
 
     assert_translation(ex_ast, js_code)
   end
+
+  test "multiple when guards" do
+    ex_ast = quote do
+      def something(one) when is_number(one) when is_atom(one) do
+      end
+    end
+
+
+    js_code = """
+     const something = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Elixir.Core.Patterns.variable()],function(one)    {
+             return     null;
+           },function(one)    {
+             return Elixir$ElixirScript$Kernel.is_number(one) || Elixir$ElixirScript$Kernel.is_atom(one);
+           }));
+    """
+
+    assert_translation(ex_ast, js_code)    
+  end
 end
