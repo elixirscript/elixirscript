@@ -8,7 +8,7 @@ defmodule ElixirScript.Translator.Defimpl do
   def make(name, type, body, env) do
 
     type = map_to_js(type, env)
-    {body, export} = Defmodule.process_module(name, body, env)
+    {imports, js_imports, body, export} = Defmodule.process_module(name, body, env)
 
     protocol_name = Atom.to_string(name) |> String.split(".DefImpl.") |> hd |> String.to_atom
 
@@ -23,13 +23,16 @@ defmodule ElixirScript.Translator.Defimpl do
       )
     ])
 
-    body = env.module_formatter.build(body, export, env)
-
     %{
       name: Utils.quoted_to_name({:__aliases__, [], name }),
+      std_lib: Defmodule.make_std_lib_import(env),      
+      imports: imports,
+      js_imports: js_imports,
+      exports: export,
       body: body,
       app_name: State.get_module(env.state, name).app,
-      protocol: protocol_name
+      protocol: protocol_name,
+      env: env      
     }
   end
 

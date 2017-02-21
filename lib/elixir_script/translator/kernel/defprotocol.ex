@@ -78,12 +78,20 @@ defmodule ElixirScript.Translator.Defprotocol do
     )
 
     body = body ++ [declaration] ++ [implementations]
-    body = env.module_formatter.build(body, JS.identifier(Utils.name_to_js_name(name)), env)
+
+    module_refs = State.get_module_references(env.state, env.module) -- [env.module]
+    imports = Defmodule.process_module_refs(module_refs, env)
+    js_imports = State.get_javascript_module_references(env.state, env.module)
 
     %{
       name: name,
+      std_lib: Defmodule.make_std_lib_import(env),      
+      js_imports: js_imports,
+      imports: imports,
       body: body,
-      app_name: app_name
+      exports: JS.identifier(Utils.name_to_js_name(name)),
+      app_name: app_name,
+      env: env      
     }
   end
 
@@ -91,5 +99,5 @@ defmodule ElixirScript.Translator.Defprotocol do
     Enum.map(Keyword.keys(functions), fn(function_name) ->
       {function_name, JS.function_expression([], [], JS.block_statement([]))}
     end)
-  end
+  end 
 end

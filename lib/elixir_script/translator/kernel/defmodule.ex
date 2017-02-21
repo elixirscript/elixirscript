@@ -10,22 +10,44 @@ defmodule ElixirScript.Translator.Defmodule do
 
   def make_module(ElixirScript.Temp, body, env) do
     { body, _ } = translate_body(body, env)
-    %{ name: ElixirScript.Temp, body: body |> Group.inflate_groups, app_name: ElixirScript.Translator.State.get(env.state).compiler_opts.app }
+    %{ 
+      name: ElixirScript.Temp,
+      std_lib: make_std_lib_import(env),
+      js_imports: [],
+      imports: [],           
+      body: body |> Group.inflate_groups, 
+      exports: nil,      
+      app_name: ElixirScript.Translator.State.get(env.state).compiler_opts.app,
+      env: env 
+    }
   end
 
   def make_module(module, nil, env) do
-    %{ name: module, body: [], app_name: ElixirScript.Translator.State.get(env.state).compiler_opts.app }
+    %{ 
+      name: module, 
+      std_lib: make_std_lib_import(env),
+      js_imports: [],      
+      imports: [],      
+      body: [],
+      exports: nil,      
+      app_name: ElixirScript.Translator.State.get(env.state).compiler_opts.app,
+      env: env
+    }
   end
 
   def make_module(module, body, env) do
-    {body, exported_object} = process_module(module, body, env)
-    body = env.module_formatter.build(body, exported_object, env)
+    {imports, js_imports, body, exported_object} = process_module(module, body, env)
     app_name = State.get_module(env.state, module).app
 
     result = %{
         name: Utils.quoted_to_name({:__aliases__, [], module }),
+        std_lib: make_std_lib_import(env),
+        imports: imports,
+        js_imports: js_imports,
+        exports: exported_object,
         body: body,
-        app_name: app_name
+        app_name: app_name,
+        env: env
     }
 
     result
@@ -62,9 +84,32 @@ defmodule ElixirScript.Translator.Defmodule do
     exported_functions = Enum.map(exported_functions, fn({_key, value}) -> value end)
     private_functions = Enum.map(private_functions, fn({_key, value}) -> value end)
 
+    module_refs = State.get_module_references(env.state, env.module) -- [env.module]
+    imports = process_module_refs(module_refs, env)
+    js_imports = State.get_javascript_module_references(env.state, env.module)    
+
     body = structs ++ private_functions ++ exported_functions ++ body
-    {body, exported_object}
+    {imports, js_imports, body, exported_object}
   end
+
+  def make_std_lib_import(env) do
+    compiler_opts = State.get(env.state).compiler_opts
+    case compiler_opts.import_standard_libs do
+      true ->
+        {:Elixir, Utils.make_local_file_path(:elixir, compiler_opts.core_path, env), true }
+      false ->
+        nil
+    end
+  end
+
+  def process_module_refs(module_refs, env) do
+    Enum.map(module_refs, fn(x) ->
+      module_name = Utils.name_to_js_name(x)
+      app_name = State.get_module(env.state, x).app
+      path = Utils.make_local_file_path(app_name, Utils.name_to_js_file_name(x), env)
+      {module_name, path}
+    end)
+  end   
 
   def translate_body(body, env) do
     { body, env } = Translator.translate(body, env)
