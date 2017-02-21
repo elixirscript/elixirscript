@@ -5,20 +5,9 @@ defmodule ElixirScript.Passes.JavaScriptCode do
   def execute(compiler_data, _) do
     parent = self
 
-    data = Enum.map(compiler_data.data, fn({module_name, module_data}) ->
-
-      spawn_link fn ->
+    data = Enum.map(compiler_data.data, fn({module_name, module_data}) -> 
         module_data = compile(module_data)
-        result = {module_name, module_data}
-        send parent, {self, result }
-      end
-
-    end)
-    |> Enum.map(fn pid ->
-      receive do
-        {^pid, result} ->
-          result
-      end
+        {module_name, module_data}
     end)
 
     %{ compiler_data | data: data }
@@ -27,7 +16,6 @@ defmodule ElixirScript.Passes.JavaScriptCode do
   defp compile(%{load_only: true} = module_data) do
     module_data
   end
-
 
   defp compile(module_data) do
     js_ast = Builder.program(List.wrap(module_data.javascript_ast))

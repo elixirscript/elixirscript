@@ -4,21 +4,9 @@ defmodule ElixirScript.Passes.CreateJSModules do
 
   def execute(compiler_data, opts) do
     parent = self
-
-    data = Enum.map(compiler_data.data, fn({module_name, module_data}) ->
-
-      spawn_link fn ->
+    data = Enum.map(compiler_data.data, fn({module_name, module_data}) -> 
         module_data = compile(module_data, opts, compiler_data.state)
-        result = {module_name, module_data}
-        send parent, {self, result }
-      end
-
-    end)
-    |> Enum.map(fn pid ->
-      receive do
-        {^pid, result} ->
-          result
-      end
+        {module_name, module_data}
     end)
 
     %{ compiler_data | data: data }

@@ -8,23 +8,9 @@ defmodule ElixirScript.Passes.JavaScriptAST do
     State.set_module_data(compiler_data.state, compiler_data.data)
     State.set_loaded_modules(compiler_data.state, Map.get(compiler_data, :loaded_modules, []))
 
-    parent = self
-
-    data = State.get_module_data(compiler_data.state)
-    |> Enum.map(fn({module_name, module_data}) ->
-
-      spawn_link fn ->
+    data = Enum.map(State.get_module_data(compiler_data.state), fn({module_name, module_data}) -> 
         module_data = compile(module_data, opts, compiler_data.state)
-        result = {module_name, module_data}
-        send parent, {self, result }
-      end
-
-    end)
-    |> Enum.map(fn pid ->
-      receive do
-        {^pid, result} ->
-          result
-      end
+        {module_name, module_data}
     end)
 
     %{ compiler_data | data: data }
