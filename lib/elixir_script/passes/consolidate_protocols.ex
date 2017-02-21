@@ -67,13 +67,11 @@ defmodule ElixirScript.Passes.ConsolidateProtocols do
 
     app_name = protocol.app
 
-    imports = [compiler_opts.module_formatter.import_module(:Elixir, Utils.make_local_file_path(:elixir, compiler_opts.core_path, compiler_opts.root, nil))]
-
     defimpl_imports = Enum.map(implementations, fn({_, impl_data}) ->
       x = Atom.to_string(Utils.quoted_to_name(impl_data.for))
       x = String.to_atom(protocol_name <> ".DefImpl." <> x)
       name = Utils.name_to_js_name(x)
-      compiler_opts.module_formatter.import_module(name, Utils.make_local_file_path(impl_data.app, Utils.name_to_js_file_name(x), compiler_opts.root, nil))
+      {name, Utils.make_local_file_path(impl_data.app, Utils.name_to_js_file_name(x), compiler_opts.root, nil)}
     end)
 
     body = Enum.map(implementations, fn({_, impl_data}) ->
@@ -89,25 +87,18 @@ defmodule ElixirScript.Passes.ConsolidateProtocols do
       )
     end)
 
-    imports = imports ++ defimpl_imports
+    imports = defimpl_imports
     body = [declaration] ++ body
-    exports = compiler_opts.module_formatter.export_module(JS.identifier("impls"))
-
-    body = case compiler_opts.format do
-      :umd ->
-        compiler_opts.module_formatter.make_umd(
-          imports,
-          body,
-          exports
-        )
-      _ ->
-        imports ++ body ++ [exports]
-    end
 
     module_name = String.to_atom(protocol_name <> ".DefImpl")
     module_data = %{
+      name: name,
       module: String.to_atom(protocol_name <> ".DefImpl"),
-      javascript_ast: List.wrap(body),
+      std_lib: {:Elixir, Utils.make_local_file_path(:elixir, compiler_opts.core_path, compiler_opts.root, nil)},
+      js_imports: [],
+      imports: imports,
+      body: List.wrap(body),
+      exports: JS.identifier("impls"),
       app: app_name,
       type: :consolidated,
       protocol: name

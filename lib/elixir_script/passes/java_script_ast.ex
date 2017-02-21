@@ -47,6 +47,6 @@ defmodule ElixirScript.Passes.JavaScriptAST do
                  ElixirScript.Translator.Defimpl.make(module_data.name, module_data.for, module_data.ast, env)
              end
 
-    Map.put(module_data, :javascript_ast, module.body)
+    Map.put(module_data, :javascript_module, module)
   end
 end

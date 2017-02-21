@@ -20,6 +20,7 @@ defmodule ElixirScript.Translator.State do
       modules = state.modules
       modules = Enum.map(modules, fn {m, d} ->
         d = Map.delete(d, :javascript_ast)
+        |> Map.delete(:javascript_module)
         |> Map.delete(:javascript_code)
         |> Map.delete(:javascript_name)
 

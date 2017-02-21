@@ -30,7 +30,7 @@ defmodule ElixirScript.Passes.JavaScriptCode do
 
 
   defp compile(module_data) do
-    js_ast = Builder.program(module_data.javascript_ast)
+    js_ast = Builder.program(List.wrap(module_data.javascript_ast))
 
     js_code = js_ast
     |> prepare_js_ast

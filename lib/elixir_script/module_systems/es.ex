@@ -5,22 +5,20 @@ defmodule ElixirScript.ModuleSystems.ES do
   alias ElixirScript.Translator.State
   alias ElixirScript.Translator.Utils
 
-  def build(body, exports, env) do
-    js_module_refs = State.get_javascript_module_references(env.state, env.module)
-    std_import = make_std_lib_import(env)
-    module_refs = State.get_module_references(env.state, env.module) -- [env.module]
-    |> module_imports_to_js_imports(env)
+  def build(std_import, imports, js_imports, body, exports, env) do
+    module_imports = Enum.map(imports, fn {module, path} -> import_module(module, path) end)
 
-    imports = js_module_refs ++ std_import
+    imports = js_imports ++ List.wrap(std_import)
     |> Enum.map(fn
+      {module, path} -> import_module(module, path, env)      
       {module, path, true} -> import_module(module, path, env)
       {module, path, false} -> import_namespace_module(module, path, env)
     end)
 
-    imports = Enum.uniq(imports ++ module_refs)
+    imports = Enum.uniq(imports ++ module_imports)
 
-    export = export_module(exports)
-    imports ++ body ++ [export]
+    export = if is_nil(exports), do: [], else: [export_module(exports)]
+    imports ++ body ++ export
   end
 
   defp module_imports_to_js_imports(module_refs, env) do
