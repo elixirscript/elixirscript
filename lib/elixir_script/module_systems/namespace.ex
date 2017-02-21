@@ -6,18 +6,11 @@ defmodule ElixirScript.ModuleSystems.Namespace do
   alias ElixirScript.Translator.Utils
 
   def build(module_name, imports, body, exports, env) do
-    module_imports = Enum.map(imports, fn {module, path} -> import_module(module, env) end)
-    export = export_module(exports)
-    List.wrap(make_namespace_body(module_name, imports, body, export))
-  end
-
-  defp module_imports_to_js_imports(module_refs, env) do
-    Enum.map(module_refs, fn(x) ->
-      module_name = Utils.name_to_js_name(x)
-      app_name = State.get_module(env.state, x).app
-      path = Utils.make_local_file_path(app_name, Utils.name_to_js_file_name(x), env)
-      import_module(module_name, path)
+    module_imports = Enum.map(imports, fn {module, path} ->
+      IO.inspect module
+      import_module(module, env)
     end)
+    List.wrap(make_namespace_body(module_name, imports, body, exports))
   end
 
   def import_module(module_name, env) do
@@ -38,17 +31,13 @@ defmodule ElixirScript.ModuleSystems.Namespace do
                     ),
                     [JS.identifier("Elixir"), Utils.name_to_js_file_name(module_name)]
                   ),
-         JS.identifier("make")
+         JS.identifier("__make")
         ),
         []
       )
     )
 
     JS.variable_declaration([declarator], :const)
-  end
-
-  def export_module(exported_object) do
-    exported_object
   end
 
   def make_namespace_body(module_name, imports, body, exports) do
@@ -68,10 +57,12 @@ defmodule ElixirScript.ModuleSystems.Namespace do
                     ),
                     [JS.identifier("Elixir"), Utils.name_to_js_file_name(module_name)]
                   ),
-                  JS.identifier("make")
+                  JS.identifier("__make")
     )
 
-    func = JS.function_expression([JS.identifier("Elixir")], [], JS.block_statement(imports ++ body ++ exports))
+    func_body = JS.block_statement(imports ++ body ++ exports)
+
+    func = JS.function_expression([JS.identifier("Elixir")], [], func_body)
     JS.assignment_expression(
       :=,
       make,
