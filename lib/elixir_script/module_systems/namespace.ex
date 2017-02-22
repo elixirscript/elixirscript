@@ -43,7 +43,51 @@ defmodule ElixirScript.ModuleSystems.Namespace do
   end
 
   defp make_namespace_body(module_name, imports, body, exports) do
-    exports = if is_nil(exports), do: [], else: [JS.return_statement(exports)]
+    _self =
+          JS.call_expression(
+                    JS.member_expression(
+                      JS.identifier(:Elixir),
+                      JS.member_expression(
+                        JS.identifier(:Core),
+                        JS.member_expression(
+                          JS.identifier(:Functions),
+                          JS.identifier(:build_namespace)
+                        )
+                      )
+                    ),
+                    [JS.identifier("Elixir"), JS.literal(Utils.name_to_js_file_name(module_name))]
+                  )
+
+    values = JS.member_expression(
+      _self,
+      JS.identifier("values")
+    )
+
+    _if = JS.if_statement(
+      values,
+      JS.return_statement(values)
+    )
+
+    exports = if is_nil(exports) do
+      JS.object_expression([])
+    else 
+      exports
+    end
+
+    declarator = JS.variable_declarator(
+      JS.identifier("values"),
+      exports
+    )
+
+    declaration = JS.variable_declaration([declarator], :const)    
+
+    assign = JS.assignment_expression(
+      :=,
+      values,
+      JS.identifier("values")
+    )
+
+    exports = [JS.return_statement(JS.identifier("values"))]  
 
     make = JS.member_expression(
           JS.call_expression(
@@ -62,7 +106,7 @@ defmodule ElixirScript.ModuleSystems.Namespace do
                   JS.identifier("__make")
     )
 
-    func_body = JS.block_statement(imports ++ body ++ exports)
+    func_body = JS.block_statement([_if] ++ imports ++ body ++ [declaration, assign] ++ exports)
 
     func = JS.function_expression([JS.identifier("Elixir")], [], func_body)
     JS.assignment_expression(
