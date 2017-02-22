@@ -24,8 +24,7 @@ defmodule ElixirScript.Translator.Defimpl do
     ])
 
     %{
-      name: Utils.quoted_to_name({:__aliases__, [], name }),
-      std_lib: Defmodule.make_std_lib_import(env),      
+      name: Utils.quoted_to_name({:__aliases__, [], name }),   
       imports: imports,
       exports: export,
       body: body,
@@ -38,7 +37,7 @@ defmodule ElixirScript.Translator.Defimpl do
   defp map_to_js({:__aliases__, _, [:Integer]}, _) do
     JS.member_expression(
       JS.member_expression(
-        JS.identifier(:Elixir),
+        JS.identifier(:Bootstrap),
         JS.identifier(:Core)
       ),
       JS.identifier(:Integer)
@@ -48,7 +47,7 @@ defmodule ElixirScript.Translator.Defimpl do
   defp map_to_js({:__aliases__, _, [:Tuple]}, _) do
     JS.member_expression(
       JS.member_expression(
-        JS.identifier(:Elixir),
+        JS.identifier(:Bootstrap),
         JS.identifier(:Core)
       ),
       JS.identifier(:Tuple)
@@ -66,7 +65,7 @@ defmodule ElixirScript.Translator.Defimpl do
   defp map_to_js({:__aliases__, _, [:BitString]}, _) do
     JS.member_expression(
       JS.member_expression(
-        JS.identifier(:Elixir),
+        JS.identifier(:Bootstrap),
         JS.identifier(:Core)
       ),
       JS.identifier(:BitString)
@@ -76,7 +75,7 @@ defmodule ElixirScript.Translator.Defimpl do
   defp map_to_js({:__aliases__, _, [:Float]}, _) do
     JS.member_expression(
       JS.member_expression(
-        JS.identifier(:Elixir),
+        JS.identifier(:Bootstrap),
         JS.identifier(:Core)
       ),
       JS.identifier(:Float)
@@ -90,7 +89,7 @@ defmodule ElixirScript.Translator.Defimpl do
   defp map_to_js({:__aliases__, _, [:PID]}, _) do
     JS.member_expression(
       JS.member_expression(
-        JS.identifier(:Elixir),
+        JS.identifier(:Bootstrap),
         JS.identifier(:Core)
       ),
       JS.identifier(:PID)
@@ -99,14 +98,14 @@ defmodule ElixirScript.Translator.Defimpl do
 
   defp map_to_js({:__aliases__, _, [:Port]}, _) do
     JS.member_expression(
-      JS.identifier(:Elixir),
+      JS.identifier(:Bootstrap),
       JS.identifier(:Port)
     )
   end
 
   defp map_to_js({:__aliases__, _, [:Reference]}, _) do
     JS.member_expression(
-      JS.identifier(:Elixir),
+      JS.identifier(:Bootstrap),
       JS.identifier(:Reference)
     )
   end

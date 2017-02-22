@@ -8,9 +8,9 @@ defmodule ElixirScript.Translator.For.Test do
     end
 
     js_code = """
-    Elixir.Core.SpecialForms._for(
-      Elixir.Core.Patterns.clause(
-        [Elixir.Core.Patterns.variable()],
+    Bootstrap.Core.SpecialForms._for(
+      Bootstrap.Core.Patterns.clause(
+        [Bootstrap.Core.Patterns.variable()],
         function(n) {
           return n * 2;
         },
@@ -19,8 +19,8 @@ defmodule ElixirScript.Translator.For.Test do
         }
       ),
       [
-        Elixir.Core.Patterns.list_generator(
-          Elixir.Core.Patterns.variable(),
+        Bootstrap.Core.Patterns.list_generator(
+          Bootstrap.Core.Patterns.variable(),
           Object.freeze([1, 2, 3, 4])
         )
       ],
@@ -38,9 +38,9 @@ defmodule ElixirScript.Translator.For.Test do
     end
 
     js_code = """
-    Elixir.Core.SpecialForms._for(
-      Elixir.Core.Patterns.clause(
-        [Elixir.Core.Patterns.variable()],
+    Bootstrap.Core.SpecialForms._for(
+      Bootstrap.Core.Patterns.clause(
+        [Bootstrap.Core.Patterns.variable()],
         function(n) {
           return n * 2;
         },
@@ -49,8 +49,8 @@ defmodule ElixirScript.Translator.For.Test do
         }
       ),
       [
-        Elixir.Core.Patterns.list_generator(
-          Elixir.Core.Patterns.variable(),
+        Bootstrap.Core.Patterns.list_generator(
+          Bootstrap.Core.Patterns.variable(),
           Object.freeze([1, 2, 3, 4])
         )
       ],
@@ -68,9 +68,9 @@ defmodule ElixirScript.Translator.For.Test do
     end
 
     js_code = """
-    Elixir.Core.SpecialForms._for(
-      Elixir.Core.Patterns.clause(
-        [Elixir.Core.Patterns.variable()],
+    Bootstrap.Core.SpecialForms._for(
+      Bootstrap.Core.Patterns.clause(
+        [Bootstrap.Core.Patterns.variable()],
         function(n) {
           return n;
         },
@@ -79,8 +79,8 @@ defmodule ElixirScript.Translator.For.Test do
         }
       ),
       [
-        Elixir.Core.Patterns.list_generator(
-          Elixir.Core.Patterns.variable(),
+        Bootstrap.Core.Patterns.list_generator(
+          Bootstrap.Core.Patterns.variable(),
           'Opera'
         )
       ],
@@ -98,9 +98,9 @@ defmodule ElixirScript.Translator.For.Test do
     end
 
     js_code = """
-    Elixir.Core.SpecialForms._for(
-      Elixir.Core.Patterns.clause(
-        [Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable()],
+    Bootstrap.Core.SpecialForms._for(
+      Bootstrap.Core.Patterns.clause(
+        [Bootstrap.Core.Patterns.variable(), Bootstrap.Core.Patterns.variable()],
         function(x, y) {
           return x * y;
         },
@@ -109,12 +109,12 @@ defmodule ElixirScript.Translator.For.Test do
         }
       ),
       [
-        Elixir.Core.Patterns.list_generator(
-          Elixir.Core.Patterns.variable(),
+        Bootstrap.Core.Patterns.list_generator(
+          Bootstrap.Core.Patterns.variable(),
           Object.freeze([1, 2])
         ),
-        Elixir.Core.Patterns.list_generator(
-          Elixir.Core.Patterns.variable(),
+        Bootstrap.Core.Patterns.list_generator(
+          Bootstrap.Core.Patterns.variable(),
           Object.freeze([2, 3])
         )
       ],  
@@ -134,11 +134,11 @@ defmodule ElixirScript.Translator.For.Test do
     end
 
     js_code = """
-    let [r] = Elixir.Core.Patterns.match(
-      Elixir.Core.Patterns.variable(),
-      Elixir.Core.SpecialForms._for(
-        Elixir.Core.Patterns.clause(
-          [Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable()],
+    let [r] = Bootstrap.Core.Patterns.match(
+      Bootstrap.Core.Patterns.variable(),
+      Bootstrap.Core.SpecialForms._for(
+        Bootstrap.Core.Patterns.clause(
+          [Bootstrap.Core.Patterns.variable(), Bootstrap.Core.Patterns.variable()],
           function(x, y) {
             return x * y;
           },
@@ -147,12 +147,12 @@ defmodule ElixirScript.Translator.For.Test do
           }
         ),
         [
-          Elixir.Core.Patterns.list_generator(
-            Elixir.Core.Patterns.variable(),
+          Bootstrap.Core.Patterns.list_generator(
+            Bootstrap.Core.Patterns.variable(),
             Object.freeze([1, 2])
           ),
-          Elixir.Core.Patterns.list_generator(
-            Elixir.Core.Patterns.variable(),
+          Bootstrap.Core.Patterns.list_generator(
+            Bootstrap.Core.Patterns.variable(),
             Object.freeze([2, 3])
           )
         ],
@@ -171,9 +171,9 @@ defmodule ElixirScript.Translator.For.Test do
     end
 
     js_code = """
-    Elixir.Core.SpecialForms._for(
-      Elixir.Core.Patterns.clause(
-        [Elixir.Core.Patterns.variable()],
+    Bootstrap.Core.SpecialForms._for(
+      Bootstrap.Core.Patterns.clause(
+        [Bootstrap.Core.Patterns.variable()],
         function(n) {
           return n;
         },
@@ -182,8 +182,8 @@ defmodule ElixirScript.Translator.For.Test do
         }
       ),
       [
-        Elixir.Core.Patterns.list_generator(
-          Elixir.Core.Patterns.variable(),
+        Bootstrap.Core.Patterns.list_generator(
+          Bootstrap.Core.Patterns.variable(),
           Object.freeze([1, 2, 3, 4, 5, 6])
         )
       ],
@@ -203,18 +203,18 @@ defmodule ElixirScript.Translator.For.Test do
     end
 
     js_code = """
-    Elixir.Core.SpecialForms._for(
-      Elixir.Core.Patterns.clause([Elixir.Core.Patterns.type(Elixir.Core.Tuple, {
-            values: [Symbol.for('user'), Elixir.Core.Patterns.variable()]
+    Bootstrap.Core.SpecialForms._for(
+      Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.type(Bootstrap.Core.Tuple, {
+            values: [Symbol.for('user'), Bootstrap.Core.Patterns.variable()]
         })], function(name) {
             return Elixir$ElixirScript$String.upcase(name);
         }, function() {
             return true;
         }), 
         [
-          Elixir.Core.Patterns.list_generator(Elixir.Core.Patterns.type(Elixir.Core.Tuple, {
-            values: [Symbol.for('user'), Elixir.Core.Patterns.variable()]
-        }), Object.freeze([new Elixir.Core.Tuple(Symbol.for('user'), 'john'), new Elixir.Core.Tuple(Symbol.for('admin'), 'john'), new Elixir.Core.Tuple(Symbol.for('user'), 'meg')]))
+          Bootstrap.Core.Patterns.list_generator(Bootstrap.Core.Patterns.type(Bootstrap.Core.Tuple, {
+            values: [Symbol.for('user'), Bootstrap.Core.Patterns.variable()]
+        }), Object.freeze([new Bootstrap.Core.Tuple(Symbol.for('user'), 'john'), new Bootstrap.Core.Tuple(Symbol.for('admin'), 'john'), new Bootstrap.Core.Tuple(Symbol.for('user'), 'meg')]))
         ],
         Elixir$ElixirScript$Collectable,
         Object.freeze([]))
@@ -231,22 +231,22 @@ defmodule ElixirScript.Translator.For.Test do
     end
 
     js_code = """
-     Elixir.Core.SpecialForms._for(Elixir.Core.Patterns.clause([Elixir.Core.Patterns.bitStringMatch(Elixir.Core.BitString.size({
-         'value': Elixir.Core.Patterns.variable()
-     }, 8), Elixir.Core.BitString.size({
-         'value': Elixir.Core.Patterns.variable()
-     }, 8), Elixir.Core.BitString.size({
-         'value': Elixir.Core.Patterns.variable()
+     Bootstrap.Core.SpecialForms._for(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.bitStringMatch(Bootstrap.Core.BitString.size({
+         'value': Bootstrap.Core.Patterns.variable()
+     }, 8), Bootstrap.Core.BitString.size({
+         'value': Bootstrap.Core.Patterns.variable()
+     }, 8), Bootstrap.Core.BitString.size({
+         'value': Bootstrap.Core.Patterns.variable()
      }, 8))], function(r, g, b) {
-         return new Elixir.Core.Tuple(r, g, b);
+         return new Bootstrap.Core.Tuple(r, g, b);
      }, function() {
          return true;
-     }), [Elixir.Core.Patterns.bitstring_generator(Elixir.Core.Patterns.bitStringMatch(Elixir.Core.BitString.size({
-         'value': Elixir.Core.Patterns.variable()
-     }, 8), Elixir.Core.BitString.size({
-         'value': Elixir.Core.Patterns.variable()
-     }, 8), Elixir.Core.BitString.size({
-         'value': Elixir.Core.Patterns.variable()
+     }), [Bootstrap.Core.Patterns.bitstring_generator(Bootstrap.Core.Patterns.bitStringMatch(Bootstrap.Core.BitString.size({
+         'value': Bootstrap.Core.Patterns.variable()
+     }, 8), Bootstrap.Core.BitString.size({
+         'value': Bootstrap.Core.Patterns.variable()
+     }, 8), Bootstrap.Core.BitString.size({
+         'value': Bootstrap.Core.Patterns.variable()
      }, 8)), pixels)], Elixir$ElixirScript$Collectable, Object.freeze([]))
     """
 

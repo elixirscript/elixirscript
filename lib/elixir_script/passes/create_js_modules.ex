@@ -56,10 +56,45 @@ defmodule ElixirScript.Passes.CreateJSModules do
   end
 
   defp compile(body, opts) do
+    declarator = JS.variable_declarator(
+      JS.identifier("Elixir"),
+      JS.object_expression([])
+    )
+
+    elixir = JS.variable_declaration([declarator], :const)
+
+    start = JS.assignment_expression(
+      :=,
+      JS.member_expression(
+        JS.identifier("Elixir"),
+        JS.identifier("start")
+      ),
+      JS.function_expression(
+        [JS.identifier(:app), JS.identifier(:args)],
+        [],
+        JS.block_statement([
+          JS.call_expression(
+            JS.member_expression(
+              JS.call_expression(
+                JS.member_expression(
+                  JS.identifier(:app),
+                  JS.identifier("__load")
+                ),
+                [JS.identifier("Elixir")]
+              ),
+              JS.identifier("start")
+            ),
+            [ElixirScript.Translator.Primitive.make_atom(:normal), JS.identifier(:args)]
+          )
+        ])
+      )
+    )
+
+
     ast = opts.module_formatter.build(
       [],
-      [{:Elixir, "./Elixir.Bootstrap", true }] ++ opts.js_modules,
-      body,
+      [{:Bootstrap, "./Elixir.Bootstrap", true }] ++ opts.js_modules,
+      [elixir, start] ++ body,
       JS.identifier("Elixir")
     )
 

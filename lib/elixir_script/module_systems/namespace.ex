@@ -6,7 +6,15 @@ defmodule ElixirScript.ModuleSystems.Namespace do
   alias ElixirScript.Translator.Utils
 
   def build(module_name, imports, body, exports, env) do
-    module_imports = Enum.map(imports, fn {module, path} ->
+    module_imports = imports
+    |> Enum.filter(fn 
+      {mod, _} -> 
+        case Module.split(mod) do
+          ["JS"] -> false
+          _ -> true
+        end
+    end)
+    |> Enum.map(fn {module, path} ->
       import_module(module, env)
     end)
 
@@ -22,7 +30,7 @@ defmodule ElixirScript.ModuleSystems.Namespace do
         JS.member_expression(
           JS.call_expression(
                     JS.member_expression(
-                      JS.identifier(:Elixir),
+                      JS.identifier(:Bootstrap),
                       JS.member_expression(
                         JS.identifier(:Core),
                         JS.member_expression(
@@ -33,9 +41,9 @@ defmodule ElixirScript.ModuleSystems.Namespace do
                     ),
                     [JS.identifier("Elixir"), JS.literal(Utils.name_to_js_file_name(module_name))]
                   ),
-         JS.identifier("__make")
+         JS.identifier("__load")
         ),
-        []
+        [JS.identifier("Elixir")]
       )
     )
 
@@ -46,7 +54,7 @@ defmodule ElixirScript.ModuleSystems.Namespace do
     _self =
           JS.call_expression(
                     JS.member_expression(
-                      JS.identifier(:Elixir),
+                      JS.identifier(:Bootstrap),
                       JS.member_expression(
                         JS.identifier(:Core),
                         JS.member_expression(
@@ -60,7 +68,7 @@ defmodule ElixirScript.ModuleSystems.Namespace do
 
     values = JS.member_expression(
       _self,
-      JS.identifier("values")
+      JS.identifier("__exports")
     )
 
     _if = JS.if_statement(
@@ -75,7 +83,7 @@ defmodule ElixirScript.ModuleSystems.Namespace do
     end
 
     declarator = JS.variable_declarator(
-      JS.identifier("values"),
+      JS.identifier("__exports"),
       exports
     )
 
@@ -84,15 +92,15 @@ defmodule ElixirScript.ModuleSystems.Namespace do
     assign = JS.assignment_expression(
       :=,
       values,
-      JS.identifier("values")
+      JS.identifier("__exports")
     )
 
-    exports = [JS.return_statement(JS.identifier("values"))]  
+    exports = [JS.return_statement(JS.identifier("__exports"))]  
 
     make = JS.member_expression(
           JS.call_expression(
                     JS.member_expression(
-                      JS.identifier(:Elixir),
+                      JS.identifier(:Bootstrap),
                       JS.member_expression(
                         JS.identifier(:Core),
                         JS.member_expression(
@@ -103,10 +111,10 @@ defmodule ElixirScript.ModuleSystems.Namespace do
                     ),
                     [JS.identifier("Elixir"), JS.literal(Utils.name_to_js_file_name(module_name))]
                   ),
-                  JS.identifier("__make")
+                  JS.identifier("__load")
     )
 
-    func_body = JS.block_statement([_if] ++ imports ++ body ++ [declaration, assign] ++ exports)
+    func_body = JS.block_statement([_if] ++ body ++ [declaration, assign] ++ imports ++ exports)
 
     func = JS.function_expression([JS.identifier("Elixir")], [], func_body)
     JS.assignment_expression(

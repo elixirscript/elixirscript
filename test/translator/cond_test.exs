@@ -15,7 +15,7 @@ defmodule ElixirScript.Translator.Cond.Test do
     end
 
     js_code = """
-         Elixir.Core.SpecialForms.cond(Object.freeze([1 + 1 == 1, function()    {
+         Bootstrap.Core.SpecialForms.cond(Object.freeze([1 + 1 == 1, function()    {
              return     'This will never match';
            }]),Object.freeze([2 * 2 != 4, function()    {
              return     'Nor this';
@@ -41,14 +41,14 @@ defmodule ElixirScript.Translator.Cond.Test do
     end
 
     js_code = """
-         Elixir.Core.SpecialForms.cond(Object.freeze([1 + 1 == 1, function()    {
-             let [a] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),1);
+         Bootstrap.Core.SpecialForms.cond(Object.freeze([1 + 1 == 1, function()    {
+             let [a] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.variable(),1);
              return     'This will never match';
            }]),Object.freeze([2 * 2 != 4, function()    {
-             let [a] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),2);
+             let [a] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.variable(),2);
              return     'Nor this';
            }]),Object.freeze([true, function()    {
-             let [a] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),3);
+             let [a] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.variable(),3);
              return     'This will';
            }]))
     """

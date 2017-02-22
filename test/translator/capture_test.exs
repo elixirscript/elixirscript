@@ -8,7 +8,7 @@ defmodule ElixirScript.Translator.Capture.Test do
     end
 
     js_code = """
-    let [fun] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),Elixir$ElixirScript$Kernel.is_atom);
+    let [fun] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.variable(),Elixir$ElixirScript$Kernel.is_atom);
     """
 
     assert_translation(ex_ast, js_code)
@@ -22,7 +22,7 @@ defmodule ElixirScript.Translator.Capture.Test do
     end
 
     js_code = """
-     let [fun] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Elixir.Core.Patterns.variable()],function(__1)    {
+     let [fun] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.variable(),Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],function(__1)    {
              return     Elixir$ElixirScript$Kernel.is_atom(__1);
            })));
     """
@@ -39,7 +39,7 @@ defmodule ElixirScript.Translator.Capture.Test do
     end
 
     js_code = """
-    let [fun] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),local_function);
+    let [fun] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.variable(),local_function);
     """
 
     assert_translation(ex_ast, js_code)
@@ -53,7 +53,7 @@ defmodule ElixirScript.Translator.Capture.Test do
     end
 
     js_code = """
-     let [fun] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Elixir.Core.Patterns.variable()],function(__1)    {
+     let [fun] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.variable(),Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],function(__1)    {
              return     __1 * 2;
            })));
     """
@@ -69,8 +69,8 @@ defmodule ElixirScript.Translator.Capture.Test do
     end
 
     js_code = """
-     let [fun] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable()],function(__1,__2)    {
-             return     new Elixir.Core.Tuple(__1,__2);
+     let [fun] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.variable(),Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable(), Bootstrap.Core.Patterns.variable()],function(__1,__2)    {
+             return     new Bootstrap.Core.Tuple(__1,__2);
            })));
     """
 
@@ -81,8 +81,8 @@ defmodule ElixirScript.Translator.Capture.Test do
     end
 
     js_code = """
-     let [fun] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable()],function(__1,__2,__3)    {
-             return     new Elixir.Core.Tuple(__1,__2,__3);
+     let [fun] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.variable(),Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable(), Bootstrap.Core.Patterns.variable(), Bootstrap.Core.Patterns.variable()],function(__1,__2,__3)    {
+             return     new Bootstrap.Core.Tuple(__1,__2,__3);
            })));
     """
 
@@ -98,7 +98,7 @@ defmodule ElixirScript.Translator.Capture.Test do
     end
 
     js_code = """
-     Elixir.Enum.map(items,Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Elixir.Core.Patterns.variable()],function(__1)    {
+     Elixir.Enum.map(items,Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],function(__1)    {
              return     process(__1);
            })))
     """
@@ -111,7 +111,7 @@ defmodule ElixirScript.Translator.Capture.Test do
     end
 
     js_code = """
-     elem.keypress(Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Elixir.Core.Patterns.variable()],function(__1)    {
+     elem.keypress(Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],function(__1)    {
              return     process_event(__1);
            })))
     """

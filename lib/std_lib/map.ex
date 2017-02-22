@@ -6,7 +6,7 @@ defmodule ElixirScript.Map do
   end
 
   def keys(map) do
-    Elixir.Core.Functions.get_object_keys(map)
+    Bootstrap.Core.Functions.get_object_keys(map)
   end
 
   def size(map) do
@@ -34,13 +34,13 @@ defmodule ElixirScript.Map do
 
   def from_struct(struct) do
     struct
-    |> Elixir.Core.Functions.class_to_obj
+    |> Bootstrap.Core.Functions.class_to_obj
     |> delete(:__struct__)
   end
 
   def delete(map, key) do
     map
-    |> Elixir.Core.Functions.delete_property_from_map(key)
+    |> Bootstrap.Core.Functions.delete_property_from_map(key)
   end
 
   def equal?(map1, map2) do
@@ -70,7 +70,7 @@ defmodule ElixirScript.Map do
   end
 
   def merge(map1, map2) do
-    Elixir.Core.SpecialForms.map_update(map1, map2)
+    Bootstrap.Core.SpecialForms.map_update(map1, map2)
   end
 
   def split(map, keys) do
@@ -123,7 +123,7 @@ defmodule ElixirScript.Map do
   end
 
   def put(map, key, value) do
-    Elixir.Core.Functions.add_property_to_map(map, key, value)
+    Bootstrap.Core.Functions.add_property_to_map(map, key, value)
   end
 
   def get(map, key) do

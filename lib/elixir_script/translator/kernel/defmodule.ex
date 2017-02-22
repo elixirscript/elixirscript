@@ -12,7 +12,6 @@ defmodule ElixirScript.Translator.Defmodule do
     { body, _ } = translate_body(body, env)
     %{
       name: ElixirScript.Temp,
-      std_lib: make_std_lib_import(env),
       imports: [],
       body: body |> Group.inflate_groups,
       exports: nil,
@@ -24,7 +23,6 @@ defmodule ElixirScript.Translator.Defmodule do
   def make_module(module, nil, env) do
     %{
       name: module,
-      std_lib: make_std_lib_import(env),
       imports: [],
       body: [],
       exports: nil,
@@ -39,7 +37,6 @@ defmodule ElixirScript.Translator.Defmodule do
 
     result = %{
         name: Utils.quoted_to_name({:__aliases__, [], module }),
-        std_lib: make_std_lib_import(env),
         imports: imports,
         exports: exported_object,
         body: body,
@@ -59,7 +56,6 @@ defmodule ElixirScript.Translator.Defmodule do
 
     {structs, body} = extract_structs_from_body(body, env)
 
-    #Collect all the functions so that we can process their arity
     body = Enum.map(body, fn(x) ->
       case x do
         %ESTree.CallExpression{} ->
@@ -86,16 +82,6 @@ defmodule ElixirScript.Translator.Defmodule do
 
     body = structs ++ private_functions ++ exported_functions ++ body
     {imports, body, exported_object}
-  end
-
-  def make_std_lib_import(env) do
-    compiler_opts = State.get(env.state).compiler_opts
-    case compiler_opts.import_standard_libs do
-      true ->
-        {:Elixir, Utils.make_local_file_path(:elixir, compiler_opts.core_path, env), true }
-      false ->
-        nil
-    end
   end
 
   def process_module_refs(module_refs, env) do

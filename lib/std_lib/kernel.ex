@@ -44,11 +44,11 @@ defmodule ElixirScript.Kernel do
   end
 
   def apply(fun, args) do
-    Elixir.Core.Functions.apply(fun, args)
+    Bootstrap.Core.Functions.apply(fun, args)
   end
 
   def apply(module, fun, args) do
-    Elixir.Core.Functions.apply(module, Atom.to_string(fun), args)
+    Bootstrap.Core.Functions.apply(module, Atom.to_string(fun), args)
   end
 
   def binary_part(binary, start, len) do
@@ -72,7 +72,7 @@ defmodule ElixirScript.Kernel do
   end
 
   def is_bitstring(term) do
-    is_binary(term) || JS.instanceof(term, Elixir.Core.BitString)
+    is_binary(term) || JS.instanceof(term, Bootstrap.Core.BitString)
   end
 
   def is_boolean(term) do
@@ -104,11 +104,11 @@ defmodule ElixirScript.Kernel do
   end
 
   def is_pid(term) do
-    JS.instanceof(term, Elixir.Core.PID)
+    JS.instanceof(term, Bootstrap.Core.PID)
   end
 
   def is_tuple(term) do
-    JS.instanceof(term, Elixir.Core.Tuple)
+    JS.instanceof(term, Bootstrap.Core.Tuple)
   end
 
   def is_map(term) do
@@ -148,11 +148,11 @@ defmodule ElixirScript.Kernel do
   end
 
   def tuple_size(tuple) do
-    Elixir.Core.Functions.size(tuple)
+    Bootstrap.Core.Functions.size(tuple)
   end
 
   def elem(tuple, index) do
-    Elixir.Core.Functions.apply(tuple, "get", [index])
+    Bootstrap.Core.Functions.apply(tuple, "get", [index])
   end
 
   def is_nil(term) do
@@ -193,7 +193,7 @@ defmodule ElixirScript.Kernel do
 
   defmacro left in right do
     quote do
-      Elixir.Core.Functions.contains(unquote(left), unquote(right))
+      Bootstrap.Core.Functions.contains(unquote(left), unquote(right))
     end
   end
 

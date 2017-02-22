@@ -22,10 +22,10 @@ defmodule ElixirScript.Test do
     """, %{ env: make_custom_env() })
 
     assert_js_matches """
-         const something_else = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function()    {
+         const something_else = Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([],function()    {
              return     1 * 1;
            }));
-         const sandwich = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function()    {
+         const sandwich = Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([],function()    {
              return     null;
            }));
      """, js_code
@@ -46,10 +46,10 @@ defmodule ElixirScript.Test do
     """, %{ env: make_custom_env(), core_path: "elixirscript"} )
 
     assert_js_matches """
-         const something_else = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function()    {
+         const something_else = Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([],function()    {
              return     1 * 1;
            }));
-         const sandwich = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function()    {
+         const sandwich = Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([],function()    {
              return     null;
            }));
      """, js_code

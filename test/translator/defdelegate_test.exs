@@ -7,7 +7,7 @@ defmodule ElixirScript.Translator.Defdelegate.Test do
 
     js_code = """
      const reverse = function(list) {
-             return Elixir.Core.Functions.reverse(list);
+             return Bootstrap.Core.Functions.reverse(list);
          };
     """
 
@@ -19,7 +19,7 @@ defmodule ElixirScript.Translator.Defdelegate.Test do
 
     js_code = """
      const other_reverse = function(list) {
-             return Elixir.Core.Functions.reverse(list);
+             return Bootstrap.Core.Functions.reverse(list);
          };
     """
 

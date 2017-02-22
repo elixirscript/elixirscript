@@ -10,7 +10,7 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-        const Elixir$User = Elixir.Core.Functions.defstruct({
+        const Elixir$User = Bootstrap.Core.Functions.defstruct({
           [Symbol.for('__struct__')]: Symbol.for('Elixir.User'),
           [Symbol.for('name')]: 'john',
           [Symbol.for('age')]: 27
@@ -29,7 +29,7 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-    const Elixir$User = Elixir.Core.Functions.defstruct({
+    const Elixir$User = Bootstrap.Core.Functions.defstruct({
       [Symbol.for('__struct__')]: Symbol.for('Elixir.User'),
       [Symbol.for('name')]: null,
       [Symbol.for('age')]: null
@@ -50,7 +50,7 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-    const Elixir$User = Elixir.Core.Functions.defstruct({
+    const Elixir$User = Bootstrap.Core.Functions.defstruct({
         [Symbol.for('__struct__')]: Symbol.for('Elixir.User'),
         [Symbol.for('name')]: null,
         [Symbol.for('age')]: null
@@ -68,7 +68,7 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-    const Elixir$User = Elixir.Core.Functions.defstruct({
+    const Elixir$User = Bootstrap.Core.Functions.defstruct({
       [Symbol.for('__struct__')]: Symbol.for('Elixir.User'),
       [Symbol.for('name')]: null,
       [Symbol.for('age')]: null
@@ -85,7 +85,7 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-         let [user] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),Elixir.Core.SpecialForms.map_update(map,Object.freeze({
+         let [user] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.variable(),Bootstrap.Core.SpecialForms.map_update(map,Object.freeze({
              [Symbol.for('key')]: value
        })));
     """
@@ -98,7 +98,7 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-    let [user] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(),Elixir.Core.SpecialForms.map_update(map,Object.freeze({
+    let [user] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.variable(),Bootstrap.Core.SpecialForms.map_update(map,Object.freeze({
       [Symbol.for('key')]: value,     [Symbol.for('key1')]: value1
     })));
     """
@@ -114,7 +114,7 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-     const Elixir$MyAppError = Elixir.Core.Functions.defexception({
+     const Elixir$MyAppError = Bootstrap.Core.Functions.defexception({
           [Symbol.for('__struct__')]: Symbol.for('Elixir.MyAppError'),
           [Symbol.for('__exception__')]: true,
           [Symbol.for('message')]: 'This is a message'
@@ -130,7 +130,7 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-      const Elixir$MyAppError = Elixir.Core.Functions.defexception({
+      const Elixir$MyAppError = Bootstrap.Core.Functions.defexception({
              [Symbol.for('__struct__')]: Symbol.for('Elixir.MyAppError'),
              [Symbol.for('__exception__')]: true,
              [Symbol.for('message')]: null

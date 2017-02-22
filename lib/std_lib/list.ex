@@ -15,7 +15,7 @@ defmodule ElixirScript.List do
   end
 
   def to_tuple(list) do
-    JS.new(Elixir.Core.Tuple, list)
+    JS.new(Bootstrap.Core.Tuple, list)
   end
 
   def wrap(list) when is_list(list), do: list
@@ -247,6 +247,6 @@ defmodule ElixirScript.List do
   end
 
   def zip(list_of_lists) do
-    Elixir.Core.Functions.zip(list_of_lists)
+    Bootstrap.Core.Functions.zip(list_of_lists)
   end
 end

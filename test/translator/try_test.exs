@@ -13,9 +13,9 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-    Elixir.Core.SpecialForms._try(function() {
+    Bootstrap.Core.SpecialForms._try(function() {
         return do_something_that_may_fail(some_arg);
-    }, Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Elixir.Core.Patterns.type(ArgumentError, {})], function() {
+    }, Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.type(ArgumentError, {})], function() {
         return IO.puts('Invalid argument given');
     })), null, null, null)
     """
@@ -34,9 +34,9 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-    Elixir.Core.SpecialForms._try(function() {
+    Bootstrap.Core.SpecialForms._try(function() {
         return do_something_that_may_fail(some_arg);
-    }, Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Elixir.Core.Patterns.type(ArgumentError, {})], function() {
+    }, Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.type(ArgumentError, {})], function() {
         return IO.puts('Invalid argument given');
     })), null, null, null)
     """
@@ -55,12 +55,12 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-         Elixir.Core.SpecialForms._try(function()    {
+         Bootstrap.Core.SpecialForms._try(function()    {
              return     do_something_that_may_fail(some_arg);
-           },Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Elixir.Core.Patterns.variable()],function(x)    {
+           },Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],function(x)    {
              return     IO.puts('Invalid argument given');
            },function(x)    {
-             return     Elixir.Core.Functions.contains(x,Object.freeze([ArgumentError.create(Object.freeze({}))]));
+             return     Bootstrap.Core.Functions.contains(x,Object.freeze([ArgumentError.create(Object.freeze({}))]));
            })),null,null,null)
     """
 
@@ -78,9 +78,9 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-     Elixir.Core.SpecialForms._try(function()    {
+     Bootstrap.Core.SpecialForms._try(function()    {
              return     do_something_that_may_fail(some_arg);
-           },Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Elixir.Core.Patterns.variable()],function(x)    {
+           },Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],function(x)    {
              return     IO.puts('Invalid argument given');
            })),null,null,null)
     """
@@ -102,11 +102,11 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-    Elixir.Core.SpecialForms._try(function() {
+    Bootstrap.Core.SpecialForms._try(function() {
         return do_something_that_may_fail(some_arg);
-    }, Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Elixir.Core.Patterns.type(ArgumentError, {})], function() {
+    }, Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.type(ArgumentError, {})], function() {
         return IO.puts('ArgumentError');
-    }), Elixir.Core.Patterns.clause([Elixir.Core.Patterns.variable()], function(x) {
+    }), Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()], function(x) {
         return IO.puts('x');
     })), null, null, null)
     """
@@ -127,9 +127,9 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-    Elixir.Core.SpecialForms._try(function() {
+    Bootstrap.Core.SpecialForms._try(function() {
         return do_something_that_may_fail(some_arg);
-    }, Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Elixir.Core.Patterns.type(ArgumentError, {})], function() {
+    }, Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.type(ArgumentError, {})], function() {
         return IO.puts('Invalid argument given');
     })), null, null, function() {
         return IO.puts('This is printed regardless if it failed or succeed');
@@ -149,7 +149,7 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-     Elixir.Core.SpecialForms._try(function()    {
+     Bootstrap.Core.SpecialForms._try(function()    {
              return     do_something_that_may_fail(some_arg);
            },null,null,null,function()    {
              return     IO.puts('This is printed regardless if it failed or succeed');
@@ -172,13 +172,13 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-    Elixir.Core.SpecialForms._try(function() {
+    Bootstrap.Core.SpecialForms._try(function() {
       return 1 / x;
-    }, null, null, Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Elixir.Core.Patterns.variable()], function(y) {
+    }, null, null, Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()], function(y) {
       return Symbol.for('small');
     }, function(y) {
       return y < 1 && y > -1;
-    }), Elixir.Core.Patterns.clause([Elixir.Core.Patterns.wildcard()], function() {
+    }), Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.wildcard()], function() {
       return Symbol.for('large');
     })), null)
     """
@@ -200,11 +200,11 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-    Elixir.Core.SpecialForms._try(function() {
+    Bootstrap.Core.SpecialForms._try(function() {
         return do_something_that_may_fail(some_arg);
-    }, Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Elixir.Core.Patterns.type(ArgumentError, {})], function() {
+    }, Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.type(ArgumentError, {})], function() {
         return IO.puts('Invalid argument given');
-    })), Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Symbol.for('throw'), Symbol.for('Error')], function() {
+    })), Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Symbol.for('throw'), Symbol.for('Error')], function() {
         return IO.puts('caught error');
     })), null, null)
     """

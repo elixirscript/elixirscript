@@ -21,7 +21,7 @@ defmodule ElixirScript.Translator.For do
       JS.member_expression(
         JS.member_expression(
             JS.member_expression(
-              JS.identifier("Elixir"),
+              JS.identifier(:Bootstrap),
               JS.identifier("Core")
             ),
             JS.identifier("Patterns")
@@ -59,7 +59,7 @@ defmodule ElixirScript.Translator.For do
         JS.member_expression(
           JS.member_expression(
               JS.member_expression(
-                JS.identifier("Elixir"),
+                JS.identifier(:Bootstrap),
                 JS.identifier("Core")
               ),
               JS.identifier("Patterns")
@@ -78,7 +78,7 @@ defmodule ElixirScript.Translator.For do
           JS.member_expression(
             JS.member_expression(
                 JS.member_expression(
-                  JS.identifier("Elixir"),
+                  JS.identifier(:Bootstrap),
                   JS.identifier("Core")
                 ),
                 JS.identifier("Patterns")

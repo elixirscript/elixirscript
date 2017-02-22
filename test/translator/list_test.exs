@@ -31,7 +31,7 @@ defmodule ElixirScript.Translator.List.Test do
     assert_translation(ex_ast, js_code)
 
     ex_ast = quote do: this.list ++ [4, 5, 6]
-    js_code = "Elixir.Core.Functions.call_property(this,'list').concat(Object.freeze([4, 5, 6]))"
+    js_code = "Bootstrap.Core.Functions.call_property(this,'list').concat(Object.freeze([4, 5, 6]))"
 
     assert_translation(ex_ast, js_code)
   end
@@ -50,7 +50,7 @@ defmodule ElixirScript.Translator.List.Test do
     end
 
     js_code = """
-    Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Elixir.Core.Patterns.wildcard()],function(){
+    Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.wildcard()],function(){
       return Object.freeze([x]).concat(list);
     }))
     """
