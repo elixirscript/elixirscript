@@ -92,7 +92,6 @@ defmodule ElixirScript.Passes.ConsolidateProtocols do
       name: name,
       module: String.to_atom(protocol_name <> ".DefImpl"),
       std_lib: {:Elixir, Utils.make_local_file_path(:elixir, compiler_opts.core_path, compiler_opts.root, nil)},
-      js_imports: [],
       imports: defimpl_imports,
       body: [declaration] ++ body,
       exports: JS.identifier("impls"),

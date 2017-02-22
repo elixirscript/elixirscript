@@ -5,10 +5,10 @@ defmodule ElixirScript.ModuleSystems.ES do
   alias ElixirScript.Translator.State
   alias ElixirScript.Translator.Utils
 
-  def build(std_import, imports, js_imports, body, exports) do
+  def build(imports, js_imports, body, exports) do
     module_imports = Enum.map(imports, fn {module, path} -> import_module(module, path) end)
 
-    imports = js_imports ++ List.wrap(std_import)
+    imports = js_imports
     |> Enum.map(fn
       {module, path} -> import_module(module, path)
       {module, path, true} -> import_module(module, path)

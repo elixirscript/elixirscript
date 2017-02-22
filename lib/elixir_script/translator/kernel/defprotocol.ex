@@ -77,12 +77,10 @@ defmodule ElixirScript.Translator.Defprotocol do
 
     module_refs = State.get_module_references(env.state, env.module) -- [env.module]
     imports = Defmodule.process_module_refs(module_refs, env)
-    js_imports = State.get_javascript_module_references(env.state, env.module)
 
     %{
       name: name,
       std_lib: Defmodule.make_std_lib_import(env),
-      js_imports: js_imports,
       imports: imports ++ [{implementation_name_module, ""}],
       body: body,
       exports: JS.identifier(Utils.name_to_js_name(name)),

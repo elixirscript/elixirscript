@@ -218,6 +218,7 @@ defmodule ElixirScript do
     |> Map.put(:output, nil)
     |> Map.put(:app, :app)
     |> Map.put(:format, :es)
+    |> Map.put(:js_modules, [])
 
     options = Map.merge(default_options, opts)
     Map.put(options, :module_formatter, get_module_formatter(options[:format]))

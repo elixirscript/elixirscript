@@ -240,7 +240,6 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-          import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
          const example = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function()    {
              return     null;
            }),Elixir.Core.Patterns.clause([Elixir.Core.Patterns.variable()],function(oneArg)    {
@@ -252,7 +251,6 @@ defmodule ElixirScript.Translator.Function.Test do
            }),Elixir.Core.Patterns.clause([Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable()],function(oneArg,twoArg,redArg,blueArg)    {
              return     null;
            }));
-         export default {};
     """
     assert_translation(ex_ast, js_code)
 
@@ -277,7 +275,6 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-    import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
          const example = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function()    {
              return     null;
            }),Elixir.Core.Patterns.clause([Elixir.Core.Patterns.variable()],function(oneArg)    {
@@ -289,9 +286,6 @@ defmodule ElixirScript.Translator.Function.Test do
            }),Elixir.Core.Patterns.clause([Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable()],function(oneArg,twoArg,redArg,blueArg)    {
              return     null;
            }));
-         export default {
-             example
-       };
     """
     assert_translation(ex_ast, js_code)
 
@@ -304,13 +298,9 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-    import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
          const example = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Elixir.Core.Patterns.variable()],function(oneArg)    {
              return     null;
            }));
-         export default {
-             example
-       };
     """
     assert_translation(ex_ast, js_code)
 
@@ -422,7 +412,6 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-    import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
          const something = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Elixir.Core.Patterns.variable()],function(one)    {
              return     null;
            },function(one)    {
@@ -432,9 +421,6 @@ defmodule ElixirScript.Translator.Function.Test do
            },function(one)    {
              return     Elixir$ElixirScript$Kernel.is_number(one) || Elixir$ElixirScript$Kernel.is_atom(one);
            }));
-         export default {
-             something
-       };
     """
     assert_translation(ex_ast, js_code)
 
@@ -653,7 +639,6 @@ defmodule ElixirScript.Translator.Function.Test do
 
 
     js_code = """
-    import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
          const something = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([1],function()    {
              return     null;
            }),Elixir.Core.Patterns.clause([2],function()    {
@@ -665,9 +650,6 @@ defmodule ElixirScript.Translator.Function.Test do
            }),Elixir.Core.Patterns.clause([Elixir.Core.Patterns.variable()],function(one)    {
              return     null;
            }));
-         export default {
-             something
-       };
     """
 
     assert_translation(ex_ast, js_code)

@@ -4,12 +4,12 @@ defmodule ElixirScript.Passes.CreateJSModules do
   alias ESTree.Tools.Builder, as: JS
 
   def execute(compiler_data, opts) do
-    namespace_modules = Enum.reduce(compiler_data.data, %{ js_imports: [], body: [] }, fn
+    namespace_modules = Enum.reduce(compiler_data.data, [], fn
       ({_, %{load_only: true} = module_data}, acc) ->
         acc
 
       ({module_name, module_data}, acc) ->
-        {js_imports, body} = generate_namespace_module(
+        body = generate_namespace_module(
           module_data.type,
           module_name,
           Map.get(module_data, :javascript_module, module_data),
@@ -17,11 +17,10 @@ defmodule ElixirScript.Passes.CreateJSModules do
           compiler_data.state
         )
 
-        Map.update!(acc, :js_imports, fn x -> x ++ js_imports end)
-        |> Map.update!(:body, fn x -> x ++ body end)
+        acc ++ List.wrap(body)
     end)
 
-    compiled = compile(namespace_modules.js_imports, namespace_modules.body, opts)
+    compiled = compile(namespace_modules, opts)
     Map.put(compiler_data, :compiled, compiled)
   end
 
@@ -41,7 +40,7 @@ defmodule ElixirScript.Passes.CreateJSModules do
       env
     )
 
-    {js_module.js_imports, body}
+    body
   end
 
   defp generate_namespace_module(_, module_name, js_module, _, _) do
@@ -53,14 +52,13 @@ defmodule ElixirScript.Passes.CreateJSModules do
       js_module.env
     )
 
-    {js_module.js_imports, body}
+    body
   end
 
-  defp compile(js_imports, body, opts) do
+  defp compile(body, opts) do
     ast = opts.module_formatter.build(
-      {:Elixir, "./Elixir.Bootstrap", true },
       [],
-      js_imports,
+      [{:Elixir, "./Elixir.Bootstrap", true }] ++ opts.js_modules,
       body,
       JS.identifier("Elixir")
     )

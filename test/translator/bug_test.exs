@@ -46,10 +46,7 @@ defmodule ElixirScript.Translator.Bug.Test do
     end
 
     js_code = """
-    import JQuery from 'jquery';
-    import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
     JQuery(Elixir.Core.Functions.call_property(e,'target'));
-    export default {};
     """
 
     assert_translation(ex_ast, js_code)

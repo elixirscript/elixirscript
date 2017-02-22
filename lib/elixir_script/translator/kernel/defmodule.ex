@@ -13,7 +13,6 @@ defmodule ElixirScript.Translator.Defmodule do
     %{
       name: ElixirScript.Temp,
       std_lib: make_std_lib_import(env),
-      js_imports: [],
       imports: [],
       body: body |> Group.inflate_groups,
       exports: nil,
@@ -26,7 +25,6 @@ defmodule ElixirScript.Translator.Defmodule do
     %{
       name: module,
       std_lib: make_std_lib_import(env),
-      js_imports: [],
       imports: [],
       body: [],
       exports: nil,
@@ -36,14 +34,13 @@ defmodule ElixirScript.Translator.Defmodule do
   end
 
   def make_module(module, body, env) do
-    {imports, js_imports, body, exported_object} = process_module(module, body, env)
+    {imports, body, exported_object} = process_module(module, body, env)
     app_name = State.get_module(env.state, module).app
 
     result = %{
         name: Utils.quoted_to_name({:__aliases__, [], module }),
         std_lib: make_std_lib_import(env),
         imports: imports,
-        js_imports: js_imports,
         exports: exported_object,
         body: body,
         app_name: app_name,
@@ -86,10 +83,9 @@ defmodule ElixirScript.Translator.Defmodule do
 
     module_refs = State.get_module_references(env.state, env.module) -- [env.module]
     imports = process_module_refs(module_refs, env)
-    js_imports = State.get_javascript_module_references(env.state, env.module)
 
     body = structs ++ private_functions ++ exported_functions ++ body
-    {imports, js_imports, body, exported_object}
+    {imports, body, exported_object}
   end
 
   def make_std_lib_import(env) do
