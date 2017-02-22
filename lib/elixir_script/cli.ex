@@ -7,11 +7,11 @@ defmodule ElixirScript.CLI do
     output: :string, elixir: :boolean,
     help: :boolean, core_path: :string,
     full_build: :boolean, version: :boolean,
-    watch: :boolean, format: :string
+    watch: :boolean, format: :string, config: :boolean
   ]
 
   @aliases [
-    o: :output, ex: :elixir, h: :help, v: :version, f: :format
+    o: :output, ex: :elixir, h: :help, v: :version, f: :format, c: :config
   ]
 
   def main(argv) do
@@ -43,7 +43,9 @@ defmodule ElixirScript.CLI do
   usage: elixirscript <input> [options]
   <input> path to elixir files or
   the elixir code string if passed the -ex flag
+
   options:
+  -c  --config          a path to an elixirscript configuration file
   -f  --format [format] module format of output. options: es (default), common, umd
   -o  --output [path]   places output at the given path
   -ex --elixir          read input as elixir code string
@@ -52,6 +54,22 @@ defmodule ElixirScript.CLI do
   only used with the [output] option. When used, Elixir.js is not exported
   -v  --version         the current version number
   -h  --help            this message
+
+  Will check for an elixirscript.exs file in the current directory.
+  A specific file can be given with the -c flag.
+
+  A config file contain only a keyword list with have the following format:
+  [
+    input: (string or list) The input path(s),
+    output: (string) the output path,
+    format: (atom) the moduel format of the output,
+    js_modules: (keyword) a list of the js modules that will be used
+  ]
+
+  All fields are optional and will fallback to flags given
+  The config option is not compatible with the -ex flag
+
+
   """
   end
 
@@ -86,9 +104,15 @@ defmodule ElixirScript.CLI do
       true ->
         ElixirScript.compile(input, compile_opts)
       _ ->
-        input = input
-        |> Enum.map(fn(x) -> String.split(x, [" ", ","], trim: true) end)
-        |> List.flatten
+        config = options
+        |> Keyword.get(:config, "elixirscript.exs")
+        |> handle_config
+        |> Map.new
+
+        input = Map.get(config, :input, handle_input(input))
+        {_, config} = Map.pop(config, :input)
+
+        compile_opts = Map.merge(compile_opts, config)
 
         ElixirScript.compile_path(input, compile_opts)
 
@@ -107,6 +131,22 @@ defmodule ElixirScript.CLI do
         true
       end
     end)
+  end
+
+  defp handle_input(input) do
+        input = input
+        |> Enum.map(fn(x) -> String.split(x, [" ", ","], trim: true) end)
+        |> List.flatten
+  end
+
+
+  defp handle_config(path) do
+    if File.exists?(path) do
+      {config, _} = Code.eval_file(path)
+      config
+    else
+      []
+    end
   end
 
 end
