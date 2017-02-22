@@ -28,7 +28,7 @@ defmodule ElixirScript.Regex do
   end
 
   def opts(regex) do
-    regex.flags
+    regex.opts
   end
 
   def run(regex, string, options \\ []) do
@@ -47,7 +47,7 @@ defmodule ElixirScript.Regex do
       regex
     end
 
-    string.replace(regex, replacement)
+    string.replace(reg, replacement)
   end
 
   defp do_scan(regex, string, options, results) do
@@ -60,7 +60,7 @@ defmodule ElixirScript.Regex do
   end
 
   defp make_global(regex) do
-    if String.contains?(regex.flags, "g") do
+    if String.contains?(opts(regex), "g") do
       regex
     else
       JS.new(RegExp, [ source(regex), opts(regex) <> "g" ])
