@@ -14,15 +14,7 @@ defmodule ElixirScript.Translator.Defprotocol do
   """
   def make(name, functions, env) do
     { body, _ } = Defmodule.translate_body( {:__block__, [], [] }, env)
-
     app_name = State.get_module(env.state, name).app
-
-    State.add_javascript_module_reference(
-      env.state,
-      env.module,
-      {:__aliases__, [], [:Implementations]},
-      Utils.make_local_file_path(app_name, Utils.name_to_js_file_name(name) <> ".Defimpl", env)
-    )
 
     object = process_spec_functions(functions)
     |> Enum.map(fn({key, value}) ->
@@ -49,6 +41,10 @@ defmodule ElixirScript.Translator.Defprotocol do
 
     declaration = JS.variable_declaration([declarator], :const)
 
+    implementation_name_split = Module.split(name) ++ ["DefImpl"]
+    implementation_name = Enum.join(implementation_name_split, "$")
+    implementation_name_module = Module.concat(implementation_name_split)
+
     implementations = JS.for_of_statement(
       JS.variable_declaration([JS.variable_declarator(
                                   JS.object_pattern([
@@ -57,7 +53,7 @@ defmodule ElixirScript.Translator.Defprotocol do
                                   ]),
                                   nil
       )], :let),
-      JS.identifier("Implementations"),
+      JS.identifier(implementation_name),
       JS.call_expression(
         JS.member_expression(
           JS.identifier(:Elixir),
@@ -85,13 +81,13 @@ defmodule ElixirScript.Translator.Defprotocol do
 
     %{
       name: name,
-      std_lib: Defmodule.make_std_lib_import(env),      
+      std_lib: Defmodule.make_std_lib_import(env),
       js_imports: js_imports,
-      imports: imports,
+      imports: imports ++ [{implementation_name_module, ""}],
       body: body,
       exports: JS.identifier(Utils.name_to_js_name(name)),
       app_name: app_name,
-      env: env      
+      env: env
     }
   end
 
@@ -99,5 +95,5 @@ defmodule ElixirScript.Translator.Defprotocol do
     Enum.map(Keyword.keys(functions), fn(function_name) ->
       {function_name, JS.function_expression([], [], JS.block_statement([]))}
     end)
-  end 
+  end
 end

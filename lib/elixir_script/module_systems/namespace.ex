@@ -7,15 +7,17 @@ defmodule ElixirScript.ModuleSystems.Namespace do
 
   def build(module_name, imports, body, exports, env) do
     module_imports = Enum.map(imports, fn {module, path} ->
-      IO.inspect module
       import_module(module, env)
     end)
-    List.wrap(make_namespace_body(module_name, imports, body, exports))
+
+    List.wrap(make_namespace_body(module_name, module_imports, body, exports))
   end
 
-  def import_module(module_name, env) do
+  defp import_module(module_name, env) do
+    name = ["Elixir" | Module.split(module_name) ] |> Enum.join("$")
+
     declarator = JS.variable_declarator(
-      Translator.translate!(module_name, env),
+      JS.identifier(name),
       JS.call_expression(
         JS.member_expression(
           JS.call_expression(
@@ -29,7 +31,7 @@ defmodule ElixirScript.ModuleSystems.Namespace do
                         )
                       )
                     ),
-                    [JS.identifier("Elixir"), Utils.name_to_js_file_name(module_name)]
+                    [JS.identifier("Elixir"), JS.literal(Utils.name_to_js_file_name(module_name))]
                   ),
          JS.identifier("__make")
         ),
@@ -40,7 +42,7 @@ defmodule ElixirScript.ModuleSystems.Namespace do
     JS.variable_declaration([declarator], :const)
   end
 
-  def make_namespace_body(module_name, imports, body, exports) do
+  defp make_namespace_body(module_name, imports, body, exports) do
     exports = if is_nil(exports), do: [], else: [JS.return_statement(exports)]
 
     make = JS.member_expression(
@@ -55,7 +57,7 @@ defmodule ElixirScript.ModuleSystems.Namespace do
                         )
                       )
                     ),
-                    [JS.identifier("Elixir"), Utils.name_to_js_file_name(module_name)]
+                    [JS.identifier("Elixir"), JS.literal(Utils.name_to_js_file_name(module_name))]
                   ),
                   JS.identifier("__make")
     )
