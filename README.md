@@ -33,7 +33,7 @@ Get dependencies
 
 Compile
 
-    mix do clean, compile
+    mix compile
 
 Test
 
