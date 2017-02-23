@@ -90,7 +90,6 @@ defmodule ElixirScript.Passes.CreateJSModules do
       )
     )
 
-
     ast = opts.module_formatter.build(
       [],
       [{"Bootstrap", "./Elixir.Bootstrap", true }] ++ opts.js_modules,

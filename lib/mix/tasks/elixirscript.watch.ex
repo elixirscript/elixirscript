@@ -28,9 +28,13 @@ defmodule Mix.Tasks.Elixirscript.Watch do
     elixirscript_config = get_elixirscript_config()
     input_path = Keyword.get(elixirscript_config, :input)
     output_path = Keyword.get(elixirscript_config, :output)
-    format = Keyword.get(elixirscript_config, :format)    
+    format = Keyword.get(elixirscript_config, :format)
+    js_modules = Keyword.get(elixirscript_config, :js_modules, [])       
 
-    {:ok, _} = ElixirScript.Watcher.start_link(input_path, %{output: output_path, format: format})
+    {:ok, _} = ElixirScript.Watcher.start_link(
+      input_path, 
+      %{output: output_path, format: format, js_modules: js_modules}
+    )
 
     :timer.sleep :infinity
   end
