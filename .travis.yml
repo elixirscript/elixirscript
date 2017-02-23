@@ -13,7 +13,7 @@ script:
   - mix local.hex --force
   - mix local.rebar --force
   - mix deps.get
-  - mix do std_lib, clean, compile
+  - mix do clean, compile
   - mix test
   - npm test
 notifications:

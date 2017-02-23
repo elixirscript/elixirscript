@@ -73,12 +73,13 @@ defmodule ElixirScript do
     |> get_modules_from_quoted
     |> Enum.map(fn(x) -> %{ast: x, app: :app} end)
 
+    data = get_quoted_std_lib() ++ data
+
     result = %{data: data}
     |> ElixirScript.Passes.Init.execute(opts)
     |> ElixirScript.Passes.FindModules.execute(opts)
     |> ElixirScript.Passes.FindLoadOnly.execute(opts)
     |> ElixirScript.Passes.FindFunctions.execute(opts)
-    |> ElixirScript.Passes.AddStdLib.execute(opts)
     |> ElixirScript.Passes.JavaScriptAST.execute(opts)
     |> ElixirScript.Passes.ConsolidateProtocols.execute(opts)
     |> ElixirScript.Passes.CreateJSModules.execute(opts)    
@@ -87,6 +88,15 @@ defmodule ElixirScript do
     |> ElixirScript.Passes.HandleOutput.execute(opts)
 
     result
+  end
+
+  defp get_quoted_std_lib() do
+    Path.join([get_std_lib_path(), "**", "*.ex"])
+    |> Path.wildcard
+    |> Enum.map(fn path -> File.read!(path) end)
+    |> Enum.map(&Code.string_to_quoted!(&1))
+    |> Enum.flat_map(&get_modules_from_quoted(&1))
+    |> Enum.map(fn(x) -> %{ast: x, app: :elixir} end)
   end
 
   defp get_modules_from_quoted(quoted) do
@@ -150,6 +160,8 @@ defmodule ElixirScript do
     |> Map.to_list
     |> Enum.map(fn {app, path} -> {app, List.wrap(path)} end)
 
+    deps = [{:elixir, List.wrap(get_std_lib_path())}] ++ deps
+
     result = %{data: deps}
     |> ElixirScript.Passes.Init.execute(opts)
     |> ElixirScript.Passes.ASTFromFile.execute(opts)
@@ -157,7 +169,6 @@ defmodule ElixirScript do
     |> ElixirScript.Passes.FindModules.execute(opts)
     |> ElixirScript.Passes.FindLoadOnly.execute(opts)
     |> ElixirScript.Passes.FindFunctions.execute(opts)
-    |> ElixirScript.Passes.AddStdLib.execute(opts)
     |> ElixirScript.Passes.JavaScriptAST.execute(opts)
     |> ElixirScript.Passes.ConsolidateProtocols.execute(opts)
     |> ElixirScript.Passes.CreateJSModules.execute(opts)    
@@ -166,46 +177,10 @@ defmodule ElixirScript do
     |> ElixirScript.Passes.HandleOutput.execute(opts)
 
     result
-  end
-
-  @doc false
-  def get_stdlib_state() do
-    case @stdlib_state do
-      {:ok, data} ->
-        data
-      {:error, _} ->
-        raise RuntimeError, message: "Standard Library state not found. Please run `mix std_lib`"
-    end
   end
 
   @doc false
   def version(), do: @version
-
-  @doc false
-  def compile_std_lib() do
-    compile_std_lib(Path.join([File.cwd!, "priv"]))
-  end
-
-  @doc false
-  def compile_std_lib(output_path) do
-    opts = build_compiler_options(%{std_lib: true, include_path: true, output: output_path, app: :elixir})
-    libs_path = Path.join([__DIR__, "std_lib"])
-
-    result = %{data: [{:elixir, List.wrap(libs_path)}]}
-    |> ElixirScript.Passes.Init.execute(opts)
-    |> ElixirScript.Passes.ASTFromFile.execute(opts)
-    |> ElixirScript.Passes.FindModules.execute(opts)
-    |> ElixirScript.Passes.FindLoadOnly.execute(opts)
-    |> ElixirScript.Passes.FindFunctions.execute(opts)
-    |> ElixirScript.Passes.JavaScriptAST.execute(opts)
-    |> ElixirScript.Passes.ConsolidateProtocols.execute(opts)
-    |> ElixirScript.Passes.CreateJSModules.execute(opts)    
-    |> ElixirScript.Passes.JavaScriptCode.execute(opts)
-    |> ElixirScript.Passes.JavaScriptName.execute(opts)
-    |> ElixirScript.Passes.HandleOutput.execute(opts)
-
-    result
-  end
 
   defp build_compiler_options(opts) do
     default_options = Map.new
@@ -237,10 +212,10 @@ defmodule ElixirScript do
   end
 
   @doc """
-  Copies the javascript that makes up the ElixirScript stdlib
+  Copies the javascript that makes up the ElixirScript bootstrap
   to the specified location
   """
-  def copy_stdlib_to_destination(module_format, destination) do
+  def copy_bootstrap_to_destination(module_format, destination) do
     path = Path.join([operating_path, to_string(module_format), "elixir", "Elixir.Bootstrap.js"])
     base = Path.basename(path)
     File.mkdir_p!(destination)
@@ -249,11 +224,11 @@ defmodule ElixirScript do
 
   #Gets path to js files whether the mix project is available
   #or when used as an escript
-  defp operating_path do
+  defp operating_path() do
     case @lib_path do
       nil ->
         if Code.ensure_loaded?(Mix.Project) do
-          Mix.Project.build_path <> "/lib/elixir_script/priv"
+          Path.join([Mix.Project.build_path, "lib", "elixir_script", "priv"])
         else
           split_path = Path.split(Application.app_dir(:elixirscript))
           replaced_path = List.delete_at(split_path, length(split_path) - 1)
@@ -263,6 +238,10 @@ defmodule ElixirScript do
       lib_path ->
         lib_path
     end
+  end
+
+  defp get_std_lib_path() do
+    Path.join([operating_path(), "std_lib"])   
   end
 
 end
