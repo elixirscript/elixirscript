@@ -112,7 +112,7 @@ defmodule ElixirScript.Translator.Struct do
       JS.call_expression(
         JS.member_expression(
           JS.member_expression(
-            JS.identifier("Elixir"),
+            JS.identifier("Bootstrap"),
               JS.member_expression(
                 JS.identifier("Core"),
                 JS.identifier("Functions")

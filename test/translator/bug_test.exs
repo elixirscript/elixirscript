@@ -10,7 +10,7 @@ defmodule ElixirScript.Translator.Bug.Test do
     end
 
     js_code = """
-      const test = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function(){
+      const test = Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([],function(){
         return Symbol.for('atom');
       }));
     """
@@ -29,7 +29,7 @@ defmodule ElixirScript.Translator.Bug.Test do
 
     js_code = """
      React.createElement(React.Text,Object.freeze({
-             style: Elixir.Core.Functions.call_property(styles,'welcome')
+             style: Bootstrap.Core.Functions.call_property(styles,'welcome')
        }),'Welcome to React Native!')
     """
 
@@ -46,10 +46,7 @@ defmodule ElixirScript.Translator.Bug.Test do
     end
 
     js_code = """
-    import JQuery from 'jquery';
-    import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
-    JQuery(Elixir.Core.Functions.call_property(e,'target'));
-    export default {};
+    JQuery(Bootstrap.Core.Functions.call_property(e,'target'));
     """
 
     assert_translation(ex_ast, js_code)
@@ -61,7 +58,7 @@ defmodule ElixirScript.Translator.Bug.Test do
     end
 
     js_code = """
-      const graphic_store = Elixir.Core.Functions.call_property(App.Stores.GraphicStore, 'create_store');
+      const graphic_store = Bootstrap.Core.Functions.call_property(App.Stores.GraphicStore, 'create_store');
 
     """
 
@@ -86,7 +83,7 @@ defmodule ElixirScript.Translator.Bug.Test do
     end
 
     js_code = """
-      Elixir.Core.Functions.call_property(this, 'getRawCanvas').getContext('2d')
+      Bootstrap.Core.Functions.call_property(this, 'getRawCanvas').getContext('2d')
     """
 
     assert_translation(ex_ast, js_code)
@@ -117,15 +114,15 @@ defmodule ElixirScript.Translator.Bug.Test do
 
 
     js_code = """
-     const getDispatcher = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function()    {
+     const getDispatcher = Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([],function()    {
              return     DeLorean.Flux.createDispatcher(Object.freeze({
-             [Symbol.for('startPainting')]: Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function()    {
+             [Symbol.for('startPainting')]: Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([],function()    {
              return     this.dispatch('startPainting');
-           })),     [Symbol.for('stopPainting')]: Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function()    {
+           })),     [Symbol.for('stopPainting')]: Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([],function()    {
              return     this.dispatch('stopPainting');
-           })),     [Symbol.for('addPoint')]: Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Elixir.Core.Patterns.variable()],function(data)    {
+           })),     [Symbol.for('addPoint')]: Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],function(data)    {
              return     this.dispatch('addPoint',data);
-           })),     [Symbol.for('getStores')]: Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function()    {
+           })),     [Symbol.for('getStores')]: Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([],function()    {
              return     Object.freeze({
              [Symbol.for('graphic')]: GraphicStore
        });
@@ -146,8 +143,8 @@ defmodule ElixirScript.Translator.Bug.Test do
     end
 
     js_code = """
-    const my_func = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([Elixir.Core.Patterns.variable()],function(x){
-    return Object.freeze([Elixir.Core.Functions.call_property(x,'a'), Elixir.Core.Functions.call_property(x,'b')]);
+    const my_func = Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],function(x){
+    return Object.freeze([Bootstrap.Core.Functions.call_property(x,'a'), Bootstrap.Core.Functions.call_property(x,'b')]);
     }));
     """
 

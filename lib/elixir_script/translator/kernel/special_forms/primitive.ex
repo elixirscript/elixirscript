@@ -6,7 +6,7 @@ defmodule ElixirScript.Translator.Primitive do
 
   def special_forms() do
     JS.member_expression(
-      JS.identifier("Elixir"),
+      JS.identifier("Bootstrap"),
       JS.member_expression(
         JS.identifier("Core"),
         JS.identifier("SpecialForms")
@@ -17,7 +17,7 @@ defmodule ElixirScript.Translator.Primitive do
   def tuple_class() do
     JS.member_expression(
       JS.member_expression(
-        JS.identifier("Elixir"),
+        JS.identifier("Bootstrap"),
         JS.identifier("Core")
       ),
       JS.identifier("Tuple")
@@ -27,7 +27,7 @@ defmodule ElixirScript.Translator.Primitive do
   def list_ast() do
     JS.member_expression(
       JS.member_expression(
-        JS.identifier("Elixir"),
+        JS.identifier("Bootstrap"),
         JS.member_expression(
           JS.identifier("Core"),
           JS.identifier("SpecialForms")

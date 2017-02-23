@@ -42,9 +42,9 @@ defmodule ElixirScript.TestHelper do
   end
 
   def assert_translation(ex_ast, js_code, format) do
-    converted_code = ex_ast_to_js(ex_ast, format) |> Elixir.Enum.join("\n\n")
+    converted_code = ex_ast_to_js(ex_ast, format)
 
-    assert converted_code |> strip_spaces == strip_spaces(js_code), """
+    assert converted_code |> strip_spaces =~ strip_spaces(js_code), """
     **Code Does Not Match **
 
     ***Expected***
@@ -56,7 +56,7 @@ defmodule ElixirScript.TestHelper do
   end
 
   def assert_js_matches(expected_js_code, actual_js_code) do
-    assert strip_spaces(expected_js_code) == strip_spaces(actual_js_code), """
+    assert strip_spaces(hd(List.wrap(actual_js_code))) =~ strip_spaces(expected_js_code), """
     **Code Does Not Match **
 
     ***Expected***

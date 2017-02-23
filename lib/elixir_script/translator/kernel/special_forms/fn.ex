@@ -8,7 +8,7 @@ defmodule ElixirScript.Translator.Function do
 
   @patterns JS.member_expression(
     JS.member_expression(
-      JS.identifier("Elixir"),
+      JS.identifier("Bootstrap"),
       JS.identifier("Core")
     ),
     JS.identifier("Patterns")

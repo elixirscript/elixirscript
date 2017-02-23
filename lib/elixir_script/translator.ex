@@ -93,7 +93,7 @@ defmodule ElixirScript.Translator do
 
   defp do_translate({ one, two }, env) do
     quoted = quote do
-      JS.new(Elixir.Core.Tuple, [unquote(one), unquote(two)])
+      JS.new(Bootstrap.Core.Tuple, [unquote(one), unquote(two)])
     end
 
     translate(quoted, env)
@@ -186,10 +186,6 @@ defmodule ElixirScript.Translator do
     { %ElixirScript.Translator.Empty{}, env }
   end
 
-  defp do_translate({:@, _, [{:on_js_load, _, [value]}]}, env) do
-    Call.make_function_call(value, [], env)
-  end
-
   defp do_translate({:@, _, [{name, _, [value]}]}, env) do
     { Defmodule.make_attribute(name, value, env), env }
   end
@@ -277,7 +273,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({{:., context1, [{:__aliases__, context2, [:Enum]}, function_name]}, context3, params }, env) do
-    translate({{:., context1, [{:__aliases__, context2, [:Elixir, :Enum]}, function_name]}, context3, params }, env)
+    translate({{:., context1, [{:__aliases__, context2, [:Bootstrap, :Enum]}, function_name]}, context3, params }, env)
   end
 
   defp do_translate({{:., _, [{:__aliases__, _, [:JS]}, function_name]}, _, params }, env) when function_name in @generator_types do
@@ -465,7 +461,7 @@ defmodule ElixirScript.Translator do
 
   defp do_translate({:{}, _, elements}, env) do
     quoted = quote do
-      JS.new(Elixir.Core.Tuple, unquote(elements))
+      JS.new(Bootstrap.Core.Tuple, unquote(elements))
     end
 
     translate(quoted, env)

@@ -28,7 +28,7 @@ defmodule ElixirScript.Translator.Quote.Test do
         quote do: {1, 2}
     end
 
-    js_code = "new Elixir.Core.Tuple(1, 2)"
+    js_code = "new Bootstrap.Core.Tuple(1, 2)"
 
     assert_translation(ex_ast, js_code)
   end
@@ -39,7 +39,7 @@ defmodule ElixirScript.Translator.Quote.Test do
         quote do: {1, 2, 3}
     end
 
-    js_code = "new Elixir.Core.Tuple(Symbol.for('{}'), Object.freeze([]), Object.freeze([1, 2, 3]))"
+    js_code = "new Bootstrap.Core.Tuple(Symbol.for('{}'), Object.freeze([]), Object.freeze([1, 2, 3]))"
 
     assert_translation(ex_ast, js_code)
   end
@@ -51,9 +51,9 @@ defmodule ElixirScript.Translator.Quote.Test do
     end
 
     js_code = """
-    new Elixir.Core.Tuple(
+    new Bootstrap.Core.Tuple(
       Symbol.for('test'),
-      Object.freeze([new Elixir.Core.Tuple(Symbol.for('context'),Symbol.for('Elixir.ElixirScript.Translator.Quote.Test')), new Elixir.Core.Tuple(Symbol.for('import'),Symbol.for('Elixir.ExUnit.Case'))]),Object.freeze([1])
+      Object.freeze([new Bootstrap.Core.Tuple(Symbol.for('context'),Symbol.for('Elixir.ElixirScript.Translator.Quote.Test')), new Bootstrap.Core.Tuple(Symbol.for('import'),Symbol.for('Elixir.ExUnit.Case'))]),Object.freeze([1])
     )
     """
 
@@ -67,9 +67,9 @@ defmodule ElixirScript.Translator.Quote.Test do
     end
 
     js_code = """
-    new Elixir.Core.Tuple(
+    new Bootstrap.Core.Tuple(
       Symbol.for('test'),
-      Object.freeze([new Elixir.Core.Tuple(Symbol.for('context'), Symbol.for('Elixir.ElixirScript.Translator.Quote.Test')), new Elixir.Core.Tuple(Symbol.for('import'),Symbol.for('Elixir.ExUnit.Case'))]),Object.freeze([new Elixir.Core.Tuple(Symbol.for('x'),Object.freeze([]),Symbol.for('Elixir.ElixirScript.Translator.Quote.Test'))]))
+      Object.freeze([new Bootstrap.Core.Tuple(Symbol.for('context'), Symbol.for('Elixir.ElixirScript.Translator.Quote.Test')), new Bootstrap.Core.Tuple(Symbol.for('import'),Symbol.for('Elixir.ExUnit.Case'))]),Object.freeze([new Bootstrap.Core.Tuple(Symbol.for('x'),Object.freeze([]),Symbol.for('Elixir.ElixirScript.Translator.Quote.Test'))]))
     """
 
     assert_translation(ex_ast, js_code)
@@ -82,9 +82,9 @@ defmodule ElixirScript.Translator.Quote.Test do
     end
 
     js_code = """
-    new Elixir.Core.Tuple(
+    new Bootstrap.Core.Tuple(
       Symbol.for('test'),
-      Object.freeze([new Elixir.Core.Tuple(Symbol.for('context'),Symbol.for('Elixir.ElixirScript.Translator.Quote.Test')), new Elixir.Core.Tuple(Symbol.for('import'),Symbol.for('Elixir.ExUnit.Case'))]),Object.freeze([x])
+      Object.freeze([new Bootstrap.Core.Tuple(Symbol.for('context'),Symbol.for('Elixir.ElixirScript.Translator.Quote.Test')), new Bootstrap.Core.Tuple(Symbol.for('import'),Symbol.for('Elixir.ExUnit.Case'))]),Object.freeze([x])
     )
     """
 
@@ -98,7 +98,7 @@ defmodule ElixirScript.Translator.Quote.Test do
     end
 
     js_code = """
-    new Elixir.Core.Tuple(Symbol.for('sum'),Object.freeze([]),Elixir.Enum.concat(Object.freeze([1]),values,Object.freeze([5])))
+    new Bootstrap.Core.Tuple(Symbol.for('sum'),Object.freeze([]),Bootstrap.Enum.concat(Object.freeze([1]),values,Object.freeze([5])))
     """
 
     assert_translation(ex_ast, js_code)
@@ -112,9 +112,9 @@ defmodule ElixirScript.Translator.Quote.Test do
     end
 
     js_code = """
-    new Elixir.Core.Tuple(
+    new Bootstrap.Core.Tuple(
       Symbol.for('*'),
-      Object.freeze([new Elixir.Core.Tuple(Symbol.for('context'), Symbol.for('Elixir.ElixirScript.Translator.Quote.Test')), new Elixir.Core.Tuple(Symbol.for('import'),Symbol.for('Elixir.ElixirScript.Kernel'))]),Object.freeze([x, x])
+      Object.freeze([new Bootstrap.Core.Tuple(Symbol.for('context'), Symbol.for('Elixir.ElixirScript.Translator.Quote.Test')), new Bootstrap.Core.Tuple(Symbol.for('import'),Symbol.for('Elixir.ElixirScript.Kernel'))]),Object.freeze([x, x])
     )
     """
 
@@ -129,9 +129,9 @@ defmodule ElixirScript.Translator.Quote.Test do
     end
 
     js_code = """
-    new Elixir.Core.Tuple(
+    new Bootstrap.Core.Tuple(
     Symbol.for('test'),
-    Object.freeze([new Elixir.Core.Tuple(Symbol.for('context'),Symbol.for('Elixir')), new Elixir.Core.Tuple(Symbol.for('import'),Symbol.for('Elixir.ExUnit.Case'))]),Object.freeze([1])
+    Object.freeze([new Bootstrap.Core.Tuple(Symbol.for('context'),Symbol.for('Elixir')), new Bootstrap.Core.Tuple(Symbol.for('import'),Symbol.for('Elixir.ExUnit.Case'))]),Object.freeze([1])
     )
     """
 

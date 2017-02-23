@@ -218,6 +218,7 @@ defmodule ElixirScript do
     |> Map.put(:output, nil)
     |> Map.put(:app, :app)
     |> Map.put(:format, :es)
+    |> Map.put(:js_modules, [])
 
     options = Map.merge(default_options, opts)
     Map.put(options, :module_formatter, get_module_formatter(options[:format]))
@@ -240,11 +241,10 @@ defmodule ElixirScript do
   to the specified location
   """
   def copy_stdlib_to_destination(module_format, destination) do
-    Enum.each(Path.wildcard(Path.join([operating_path, to_string(module_format), "elixir", "*.js"])), fn(path) ->
-      base = Path.basename(path)
-      File.mkdir_p!(Path.join([destination, "elixir"]))
-      File.cp!(path, Path.join([destination, "elixir", base]))
-    end)
+    path = Path.join([operating_path, to_string(module_format), "elixir", "Elixir.Bootstrap.js"])
+    base = Path.basename(path)
+    File.mkdir_p!(destination)
+    File.cp!(path, Path.join([destination, base]))
   end
 
   #Gets path to js files whether the mix project is available

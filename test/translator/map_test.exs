@@ -45,7 +45,7 @@ defmodule ElixirScript.Translator.Map.Test do
   test "translate map update" do
     ex_ast = quote do: %{ map | value: 1 }
     js_code = """
-       Elixir.Core.SpecialForms.map_update(map,Object.freeze({
+       Bootstrap.Core.SpecialForms.map_update(map,Object.freeze({
              [Symbol.for('value')]: 1
        }))
     """
@@ -62,8 +62,8 @@ defmodule ElixirScript.Translator.Map.Test do
   test "translate bound map key" do
     ex_ast = quote do: %{^key => value} = %{key => value}
     js_code = """
-    let [value] = Elixir.Core.Patterns.match(
-      { [key]: Elixir.Core.Patterns.variable() },
+    let [value] = Bootstrap.Core.Patterns.match(
+      { [key]: Bootstrap.Core.Patterns.variable() },
       Object.freeze({ [key]: value })
       );
     """

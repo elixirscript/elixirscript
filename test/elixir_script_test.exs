@@ -4,7 +4,7 @@ defmodule ElixirScript.Test do
 
   test "turn javascript ast into javascript code strings" do
     js_code = ElixirScript.compile(":atom")
-    assert Enum.join(js_code, "\n") |> String.trim == "Symbol.for('atom')"
+    assert_js_matches "Symbol.for('atom')", js_code
   end
 
 
@@ -22,17 +22,13 @@ defmodule ElixirScript.Test do
     """, %{ env: make_custom_env() })
 
     assert_js_matches """
-         import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
-         const something_else = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function()    {
+         const something_else = Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([],function()    {
              return     1 * 1;
            }));
-         const sandwich = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function()    {
+         const sandwich = Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([],function()    {
              return     null;
            }));
-         export default {
-             sandwich
-       };
-     """, List.last(js_code)
+     """, js_code
   end
 
 
@@ -50,16 +46,12 @@ defmodule ElixirScript.Test do
     """, %{ env: make_custom_env(), core_path: "elixirscript"} )
 
     assert_js_matches """
-         import Elixir$ElixirScript$Kernel from '../elixir/Elixir.ElixirScript.Kernel';
-         const something_else = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function()    {
+         const something_else = Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([],function()    {
              return     1 * 1;
            }));
-         const sandwich = Elixir.Core.Patterns.defmatch(Elixir.Core.Patterns.clause([],function()    {
+         const sandwich = Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([],function()    {
              return     null;
            }));
-         export default {
-             sandwich
-       };
-     """, List.last(js_code)
+     """, js_code
   end
 end

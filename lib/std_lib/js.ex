@@ -70,7 +70,7 @@ defmodule JS do
   In node this would be the global object.
   """
   def global() do
-    Elixir.Core.Functions.get_global()
+    Bootstrap.Core.Functions.get_global()
   end
 
   @doc """

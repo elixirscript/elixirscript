@@ -60,8 +60,9 @@ defmodule Mix.Tasks.Compile.ElixirScript do
 
     output_path = Keyword.get(elixirscript_config, :output)
     format = Keyword.get(elixirscript_config, :format)
+    js_modules = Keyword.get(elixirscript_config, :js_modules, [])
 
-    ElixirScript.compile_path(paths, %{output: output_path, format: format})
+    ElixirScript.compile_path(paths, %{output: output_path, format: format, js_modules: js_modules})
     :ok
   end
 

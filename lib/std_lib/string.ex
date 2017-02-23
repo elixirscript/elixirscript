@@ -15,15 +15,15 @@ defmodule ElixirScript.String do
   end
 
   def to_float(str) do
-    Elixir.Core.get_global().parseFloat(str)
+    Bootstrap.Core.get_global().parseFloat(str)
   end
 
   def to_integer(str) do
-    Elixir.Core.get_global().parseInt(str, 10)
+    Bootstrap.Core.get_global().parseInt(str, 10)
   end
 
   def to_integer(str, base) do
-    Elixir.Core.get_global().parseInt(str, base)
+    Bootstrap.Core.get_global().parseInt(str, base)
   end
 
   def upcase(str) do
@@ -199,6 +199,6 @@ defmodule ElixirScript.String do
   end
 
   def valid_character?(codepoint) do
-    Elixir.Core.Functions.is_valid_character(codepoint)
+    Bootstrap.Core.Functions.is_valid_character(codepoint)
   end
 end

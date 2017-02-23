@@ -3,7 +3,7 @@ defmodule ElixirScript.Tuple do
   require JS
 
   def duplicate(data, size) do
-    JS.new(Elixir.Core.Tuple, do_duplicate(data, size, []))
+    JS.new(Bootstrap.Core.Tuple, do_duplicate(data, size, []))
   end
 
   defp do_duplicate(_, 0, list) do
@@ -19,7 +19,7 @@ defmodule ElixirScript.Tuple do
   end
 
   def insert_at(tuple, index, value) do
-    JS.new(Elixir.Core.Tuple, do_insert_at(tuple, index, value, 0, []))
+    JS.new(Bootstrap.Core.Tuple, do_insert_at(tuple, index, value, 0, []))
   end
 
   defp do_insert_at(tuple, index, value, current_index, list) do
@@ -38,7 +38,7 @@ defmodule ElixirScript.Tuple do
   end
 
   def delete_at(tuple, index) do
-    JS.new(Elixir.Core.Tuple, do_delete_at(tuple, index, 0, []))
+    JS.new(Bootstrap.Core.Tuple, do_delete_at(tuple, index, 0, []))
   end
 
   defp do_delete_at(tuple, index, current_index, list) do
@@ -57,7 +57,7 @@ defmodule ElixirScript.Tuple do
   end
 
   def append(tuple, value) do
-    JS.new(Elixir.Core.Tuple, to_list(tuple) ++ [value])
+    JS.new(Bootstrap.Core.Tuple, to_list(tuple) ++ [value])
   end
 
 end

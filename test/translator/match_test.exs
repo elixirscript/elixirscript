@@ -4,12 +4,12 @@ defmodule ElixirScript.Translator.Match.Test do
 
   test "translate simple match" do
     ex_ast = quote do: a = 1
-    js_code = "let [a] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(), 1);"
+    js_code = "let [a] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.variable(), 1);"
 
     assert_translation(ex_ast, js_code)
 
     ex_ast = quote do: a = :atom
-    js_code = "let [a] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.variable(), Symbol.for('atom'));"
+    js_code = "let [a] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.variable(), Symbol.for('atom'));"
 
     assert_translation(ex_ast, js_code)
   end
@@ -19,20 +19,20 @@ defmodule ElixirScript.Translator.Match.Test do
       {a, b} = {1, 2}
     end
     js_code = """
-    let [a, b] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.type(Elixir.Core.Tuple, {
-        values: [Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable()]
-    }), new Elixir.Core.Tuple(1, 2));
-    let _ref = new Elixir.Core.Tuple(a, b);
+    let [a, b] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.type(Bootstrap.Core.Tuple, {
+        values: [Bootstrap.Core.Patterns.variable(), Bootstrap.Core.Patterns.variable()]
+    }), new Bootstrap.Core.Tuple(1, 2));
+    let _ref = new Bootstrap.Core.Tuple(a, b);
     """
 
     assert_translation(ex_ast, js_code)
 
     ex_ast = quote do: {a, _, c} = {1, 2, 3}
     js_code = """
-    let [a, undefined, c] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.type(Elixir.Core.Tuple, {
-        values: [Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.wildcard(), Elixir.Core.Patterns.variable()]
-    }), new Elixir.Core.Tuple(1, 2, 3));
-    let _ref = new Elixir.Core.Tuple(a, undefined, c);
+    let [a, undefined, c] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.type(Bootstrap.Core.Tuple, {
+        values: [Bootstrap.Core.Patterns.variable(), Bootstrap.Core.Patterns.wildcard(), Bootstrap.Core.Patterns.variable()]
+    }), new Bootstrap.Core.Tuple(1, 2, 3));
+    let _ref = new Bootstrap.Core.Tuple(a, undefined, c);
     """
 
     assert_translation(ex_ast, js_code)
@@ -40,10 +40,10 @@ defmodule ElixirScript.Translator.Match.Test do
 
     ex_ast = quote do: {^a, _, c} = {1, 2, 3}
     js_code = """
-    let [, undefined, c] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.type(Elixir.Core.Tuple, {
-        values: [Elixir.Core.Patterns.bound(a), Elixir.Core.Patterns.wildcard(), Elixir.Core.Patterns.variable()]
-    }), new Elixir.Core.Tuple(1, 2, 3));
-    let _ref = new Elixir.Core.Tuple(undefined, undefined, c);
+    let [, undefined, c] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.type(Bootstrap.Core.Tuple, {
+        values: [Bootstrap.Core.Patterns.bound(a), Bootstrap.Core.Patterns.wildcard(), Bootstrap.Core.Patterns.variable()]
+    }), new Bootstrap.Core.Tuple(1, 2, 3));
+    let _ref = new Bootstrap.Core.Tuple(undefined, undefined, c);
     """
 
     assert_translation(ex_ast, js_code)
@@ -52,7 +52,7 @@ defmodule ElixirScript.Translator.Match.Test do
   test "translate bound match" do
     ex_ast = quote do: ^a = 1
     js_code = """
-     let [] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.bound(a),1);
+     let [] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.bound(a),1);
     """
 
     assert_translation(ex_ast, js_code)
@@ -61,7 +61,7 @@ defmodule ElixirScript.Translator.Match.Test do
   test "translate list match" do
     ex_ast = quote do: [a, b] = [1, 2]
     js_code = """
-         let [a,b] = Elixir.Core.Patterns.match(Object.freeze([Elixir.Core.Patterns.variable(), Elixir.Core.Patterns.variable()]),Object.freeze([1, 2]));
+         let [a,b] = Bootstrap.Core.Patterns.match(Object.freeze([Bootstrap.Core.Patterns.variable(), Bootstrap.Core.Patterns.variable()]),Object.freeze([1, 2]));
          let _ref = Object.freeze([a, b]);
     """
 
@@ -71,7 +71,7 @@ defmodule ElixirScript.Translator.Match.Test do
   test "translate head/tail match" do
     ex_ast = quote do: [a | b] = [1, 2, 3, 4]
     js_code = """
-    let [a,b] = Elixir.Core.Patterns.match(Elixir.Core.Patterns.headTail(Elixir.Core.Patterns.variable(),Elixir.Core.Patterns.variable()),Object.freeze([1, 2, 3, 4]));
+    let [a,b] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.headTail(Bootstrap.Core.Patterns.variable(),Bootstrap.Core.Patterns.variable()),Object.freeze([1, 2, 3, 4]));
     let _ref = Object.freeze([a, b]);
     """
 

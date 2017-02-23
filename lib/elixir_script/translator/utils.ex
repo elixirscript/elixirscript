@@ -12,9 +12,7 @@ defmodule ElixirScript.Translator.Utils do
 
   def name_to_quoted(name) do
     name = name
-    |> Atom.to_string
-    |> String.split(".")
-    |> tl
+    |> Module.split
     |> Enum.map(fn x -> String.to_atom(x) end)
 
     { :__aliases__, [], name }
