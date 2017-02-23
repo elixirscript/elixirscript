@@ -9,6 +9,39 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Multiple `when` clauses in guards
 - Kernel.defdelegate/2
+- CLI can now take a configuration file. By default it will look for `elixirscript.exs` in the current directory.
+  A configuration file can be explicitly given using the `-c` flag
+- `js_modules` configuration option has been added. This is a keyword list of JavaScript modules that will be used.
+  ```
+        js_modules: [
+          {React, "react"},
+          {ReactDOM, "react-dom"}
+        ]
+  ```
+  This is accepted in either the elixirscript.exs file described above or in the `elixir_script` mix configuration
+
+### Removed
+- `@on_js_load` has been removed in favor of having a `start/2` function defined. More info below
+- `JS.import` has been removed in favor of defining JavaScript modules used in configuration
+
+### Changed
+- All Modules are now bundled together as one js file. The `Elixir.Bootstrap.js` file is also still created
+  The exported object has Elixir modules in JavaScript namespaces that are lazily loaded when called.
+
+  To start your application import the bundle according to whichever module format was selected and 
+  then call start giving it the module and the initial args
+
+  ```javascript
+  //ES module example
+  import Elixir from './Elixir.App'
+  Elixir.start(Elixir.App, [])
+  ```
+
+  The `start` function will look for a `start/2` function there.
+  This is analogous to a [Application module callback](https://hexdocs.pm/elixir/Application.html#module-application-module-callback)
+
+
+
 
 ## [0.25.0] - 2017-02-19
 
