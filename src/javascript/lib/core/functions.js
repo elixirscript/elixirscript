@@ -33,9 +33,9 @@ function call_property(item, property) {
 
 function apply(...args) {
   if (args.length === 2) {
-    args[0].apply(null, args.slice(1));
+    return args[0].apply(args[0], args.slice(1));
   } else {
-    args[0][args[1]].apply(null, args.slice(2));
+    return args[0][args[1]].apply(args[0], args.slice(2));
   }
 }
 
