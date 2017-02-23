@@ -15,13 +15,13 @@ defmodule ElixirScript.ModuleSystems.Namespace do
         end
     end)
     |> Enum.map(fn {module, path} ->
-      import_module(module, env)
+      import_module(module)
     end)
 
     List.wrap(make_namespace_body(module_name, module_imports, body, exports))
   end
 
-  defp import_module(module_name, env) do
+  def import_module(module_name) do
     name = ["Elixir" | Module.split(module_name) ] |> Enum.join("$")
 
     declarator = JS.variable_declarator(
@@ -30,7 +30,7 @@ defmodule ElixirScript.ModuleSystems.Namespace do
         JS.member_expression(
           JS.call_expression(
                     JS.member_expression(
-                      JS.identifier(:Bootstrap),
+                      JS.identifier("Bootstrap"),
                       JS.member_expression(
                         JS.identifier(:Core),
                         JS.member_expression(
@@ -54,7 +54,7 @@ defmodule ElixirScript.ModuleSystems.Namespace do
     _self =
           JS.call_expression(
                     JS.member_expression(
-                      JS.identifier(:Bootstrap),
+                      JS.identifier("Bootstrap"),
                       JS.member_expression(
                         JS.identifier(:Core),
                         JS.member_expression(
@@ -100,7 +100,7 @@ defmodule ElixirScript.ModuleSystems.Namespace do
     make = JS.member_expression(
           JS.call_expression(
                     JS.member_expression(
-                      JS.identifier(:Bootstrap),
+                      JS.identifier("Bootstrap"),
                       JS.member_expression(
                         JS.identifier(:Core),
                         JS.member_expression(

@@ -22,15 +22,18 @@ defmodule ElixirScript.ModuleSystems.UMD do
   end
 
   def import_namespace_module(module_name, from) do
-    {JS.identifier(module_name), JS.literal(from)}
+    js_module_name = ElixirScript.Translator.Identifier.make_namespace_members(module_name)
+    {js_module_name, JS.literal(from)}
   end
 
   def import_module(module_name, from) do
-    {JS.identifier(module_name), JS.literal(from)}
+    js_module_name = ElixirScript.Translator.Identifier.make_namespace_members(module_name)    
+    {js_module_name, JS.literal(from)}
   end
 
-  def import_module(import_name, from) do
-    {JS.identifier(import_name), JS.literal(from)}
+  def import_module(module_name, from) do
+    js_module_name = ElixirScript.Translator.Identifier.make_namespace_members(module_name)    
+    {JS.identifier(module_name), JS.literal(from)}
   end
 
   def export_module(exported_object) do

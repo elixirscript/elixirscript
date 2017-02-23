@@ -16,7 +16,7 @@ defmodule ElixirScript.Translator.Match do
           JS.member_expression(
             JS.member_expression(
               JS.member_expression(
-              JS.identifier(:Bootstrap),
+              JS.identifier("Bootstrap"),
               JS.identifier("Core")
               ),
               JS.identifier("Patterns")
@@ -61,7 +61,7 @@ defmodule ElixirScript.Translator.Match do
       ref,
       JS.new_expression(
         JS.member_expression(
-          JS.identifier(:Bootstrap),
+          JS.identifier("Bootstrap"),
           JS.member_expression(
             JS.identifier("Core"),
             JS.identifier("Tuple")

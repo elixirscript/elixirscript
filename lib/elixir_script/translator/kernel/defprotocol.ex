@@ -26,7 +26,7 @@ defmodule ElixirScript.Translator.Defprotocol do
       JS.identifier(Utils.name_to_js_name(name)),
       JS.call_expression(
         JS.member_expression(
-          JS.identifier(:Bootstrap),
+          JS.identifier("Bootstrap"),
           JS.member_expression(
             JS.identifier(:Core),
             JS.member_expression(
@@ -42,7 +42,7 @@ defmodule ElixirScript.Translator.Defprotocol do
     declaration = JS.variable_declaration([declarator], :const)
 
     implementation_name_split = Module.split(name) ++ ["DefImpl"]
-    implementation_name = Enum.join(implementation_name_split, "$")
+    implementation_name = Enum.join(["Elixir"] ++ implementation_name_split, "$")
     implementation_name_module = Module.concat(implementation_name_split)
 
     implementations = JS.for_of_statement(
@@ -56,7 +56,7 @@ defmodule ElixirScript.Translator.Defprotocol do
       JS.identifier(implementation_name),
       JS.call_expression(
         JS.member_expression(
-          JS.identifier(:Bootstrap),
+          JS.identifier("Bootstrap"),
           JS.member_expression(
             JS.identifier(:Core),
             JS.member_expression(
@@ -77,11 +77,12 @@ defmodule ElixirScript.Translator.Defprotocol do
 
     module_refs = State.get_module_references(env.state, env.module) -- [env.module]
     imports = Defmodule.process_module_refs(module_refs, env)
+    defimpl_import = ElixirScript.ModuleSystems.Namespace.import_module(implementation_name_module)
 
     %{
       name: name,
-      imports: imports ++ [{implementation_name_module, ""}],
-      body: body,
+      imports: imports,
+      body: [defimpl_import] ++ body,
       exports: JS.identifier(Utils.name_to_js_name(name)),
       app_name: app_name,
       env: env

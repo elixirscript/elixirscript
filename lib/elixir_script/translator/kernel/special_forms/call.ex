@@ -17,7 +17,7 @@ defmodule ElixirScript.Translator.Call do
     js_ast = JS.call_expression(
       JS.member_expression(
         JS.member_expression(
-          JS.identifier(:Bootstrap),
+          JS.identifier("Bootstrap"),
           JS.member_expression(
             JS.identifier("Core"),
             JS.identifier("Functions")

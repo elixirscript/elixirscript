@@ -22,17 +22,21 @@ defmodule ElixirScript.ModuleSystems.ES do
   end
 
   def import_namespace_module(module_name, from) do
+    js_module_name = ElixirScript.Translator.Identifier.make_namespace_members(module_name)
+
     import_specifier = JS.import_namespace_specifier(
-      JS.identifier(module_name),
-      JS.identifier(module_name)
+      js_module_name,
+      js_module_name
     )
 
     do_import_module([import_specifier], from)
   end
 
   def import_module(import_name, from) do
+    js_module_name = ElixirScript.Translator.Identifier.make_namespace_members(import_name)
+
     import_specifier = JS.import_default_specifier(
-      JS.identifier(import_name)
+      js_module_name
     )
 
     do_import_module([import_specifier], from)

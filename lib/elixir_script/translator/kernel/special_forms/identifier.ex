@@ -35,7 +35,6 @@ defmodule ElixirScript.Translator.Identifier do
     :yield
   ]
 
-
   def make_identifier({:__aliases__, _, aliases}) do
     aliases
     |> Enum.reverse
@@ -68,6 +67,17 @@ defmodule ElixirScript.Translator.Identifier do
 
   defp make_alias([h|t]) do
     JS.member_expression(make_alias(t), make_identifier(h))
+  end
+
+  def make_namespace_members(module_name) do
+    case module_name do
+      m when is_binary(m) ->
+        String.split(m, ".")
+      m when is_atom(m) ->
+        Module.split(m)
+    end
+    |> Enum.reverse
+    |> make_alias
   end
 
 end

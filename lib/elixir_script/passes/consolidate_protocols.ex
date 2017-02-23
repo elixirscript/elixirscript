@@ -71,7 +71,7 @@ defmodule ElixirScript.Passes.ConsolidateProtocols do
       x = Atom.to_string(Utils.quoted_to_name(impl_data.for))
       x = String.to_atom(protocol_name <> ".DefImpl." <> x)
       name = Utils.name_to_js_name(x)
-      {x, ""}
+      ElixirScript.ModuleSystems.Namespace.import_module(x)
     end)
 
     body = Enum.map(implementations, fn({_, impl_data}) ->
@@ -92,8 +92,8 @@ defmodule ElixirScript.Passes.ConsolidateProtocols do
       name: name,
       module: String.to_atom(protocol_name <> ".DefImpl"),
       std_lib: {:Elixir, Utils.make_local_file_path(:elixir, compiler_opts.core_path, compiler_opts.root, nil)},
-      imports: defimpl_imports,
-      body: [declaration] ++ body,
+      imports: [],
+      body: defimpl_imports ++ [declaration] ++ body,
       exports: JS.identifier("impls"),
       app: app_name,
       type: :consolidated,

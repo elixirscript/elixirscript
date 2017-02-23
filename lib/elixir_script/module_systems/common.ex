@@ -22,11 +22,13 @@ defmodule ElixirScript.ModuleSystems.Common do
   end
 
   def import_namespace_module(module_name, from) do
-    do_import_module(JS.identifier(module_name), from)
+    js_module_name = ElixirScript.Translator.Identifier.make_namespace_members(module_name)
+    do_import_module(js_module_name, from)
   end
 
   def import_module(module_name, from) do
-    do_import_module(JS.identifier(module_name), from)
+    js_module_name = ElixirScript.Translator.Identifier.make_namespace_members(module_name)    
+    do_import_module(js_module_name, from)
   end
 
   defp do_import_module(ref, file_path) do
