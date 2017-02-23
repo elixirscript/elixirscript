@@ -1,5 +1,5 @@
 defmodule ElixirScript.List do
-  @moduledoc false  
+  @moduledoc false
   require JS
 
   def duplicate(data, size) do
@@ -50,14 +50,14 @@ defmodule ElixirScript.List do
     if current_index == length(list) do
       new_list
     else
-      new_list = case list[current_index] do
+      updated = case list[current_index] do
         ^item ->
           new_list
         _ ->
           new_list ++ [list[current_index]]
       end
 
-      do_delete(list, item, current_index + 1, new_list)
+      do_delete(list, item, current_index + 1, updated)
     end
   end
 
@@ -69,14 +69,14 @@ defmodule ElixirScript.List do
     if current_index == length(list) do
       new_list
     else
-      new_list = case current_index == index do
+      updated = case current_index == index do
         true ->
           new_list
         _ ->
           new_list ++ [list[current_index]]
       end
 
-      do_delete_at(list, index, current_index + 1, new_list)
+      do_delete_at(list, index, current_index + 1, updated)
     end
   end
 
@@ -88,14 +88,14 @@ defmodule ElixirScript.List do
     if current_index == length(list) do
       new_list
     else
-      new_list = case current_index == index do
+      updated = case current_index == index do
         true ->
           new_list ++ [value, list[current_index]]
         _ ->
           new_list ++ [list[current_index]]
       end
 
-      do_insert_at(list, index, value, current_index + 1, new_list)
+      do_insert_at(list, index, value, current_index + 1, updated)
     end
   end
 
@@ -107,14 +107,14 @@ defmodule ElixirScript.List do
     if current_index == length(list) do
       new_list
     else
-      new_list = case current_index == index do
+      updated = case current_index == index do
         true ->
           new_list ++ [value]
         _ ->
           new_list ++ [list[current_index]]
       end
 
-      do_replace_at(list, index, value, current_index + 1, new_list)
+      do_replace_at(list, index, value, current_index + 1, updated)
     end
   end
 
@@ -127,14 +127,14 @@ defmodule ElixirScript.List do
     if current_index == length(list) do
       new_list
     else
-      new_list = case current_index == index do
+      updated = case current_index == index do
         true ->
           new_list ++ [func.(list[current_index])]
         _ ->
           new_list ++ [list[current_index]]
       end
 
-      do_update_at(list, index, func, current_index + 1, new_list)
+      do_update_at(list, index, func, current_index + 1, updated)
     end
   end
 
@@ -169,14 +169,14 @@ defmodule ElixirScript.List do
   end
 
   defp do_flatten(list, flattened_list) do
-    flattened_list = case hd(list) do
+    updated = case hd(list) do
       l when is_list(l) ->
         flattened_list ++ do_flatten(l, [])
       item ->
         flattened_list ++ [item]
     end
 
-    do_flatten(tl(list), flattened_list)
+    do_flatten(tl(list), updated)
   end
 
 
@@ -191,13 +191,13 @@ defmodule ElixirScript.List do
   defp do_keydelete(list, key, position, new_list) do
     current_value = hd(list)
 
-    new_list = if elem(current_value, position) == key do
+    updated = if elem(current_value, position) == key do
       new_list
     else
       new_list ++ [current_value]
     end
 
-    do_keydelete(tl(list), key, position, new_list)
+    do_keydelete(tl(list), key, position, updated)
   end
 
   def keyfind(list, key, position) do
@@ -237,13 +237,13 @@ defmodule ElixirScript.List do
   defp do_keyreplace(list, key, position, new_list, new_tuple) do
     current_value = hd(list)
 
-    new_list = if elem(current_value, position) == key do
+    updated = if elem(current_value, position) == key do
       new_list ++ [new_tuple]
     else
       new_list ++ [current_value]
     end
 
-    do_keyreplace(tl(list), key, position, new_list, new_tuple)
+    do_keyreplace(tl(list), key, position, updated, new_tuple)
   end
 
   def zip(list_of_lists) do
