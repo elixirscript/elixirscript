@@ -90,6 +90,7 @@ defmodule ElixirScript.Mixfile do
     end
     File.cp_r!("priv/", "#{folder_name}")
     File.cp!("LICENSE", "#{folder_name}/LICENSE")
+    File.cp_r!("lib/std_lib", "#{folder_name}/std_lib")    
 
     System.cmd("tar", ["czf", archive_file_name, folder_name])
 
