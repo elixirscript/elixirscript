@@ -6,6 +6,7 @@ defmodule ElixirScript.Mixfile do
       app: :elixir_script,
       version: "0.26.0-dev",
       elixir: "~> 1.0",
+      elixirc_paths: elixirc_paths(),      
       escript: escript_config(),
       deps: deps(),
       description: description(),
@@ -36,6 +37,8 @@ defmodule ElixirScript.Mixfile do
     ]
   end
 
+  defp elixirc_paths(), do: ["lib", "priv/std_lib"]  
+
   defp escript_config do
     [main_module: ElixirScript.CLI, name: "elixirscript"]
   end
@@ -48,7 +51,7 @@ defmodule ElixirScript.Mixfile do
 
   defp package do
     [
-      files: ["lib", "priv/**/*.js", "mix.exs", "README.md", "LICENSE", "CHANGELOG.md"],
+      files: ["lib", "priv/**/*.*", "mix.exs", "README.md", "LICENSE", "CHANGELOG.md"],
       maintainers: ["Bryan Joseph"],
       licenses: ["MIT"],
       links: %{
@@ -60,14 +63,7 @@ defmodule ElixirScript.Mixfile do
 
   defp aliases do
     [dist: &dist/1,
-     install: &install/1,
-     std_lib: &std_lib/1]
-  end
-
-  def std_lib(_) do
-    Mix.Task.run "app.start"
-    {_ , _} = System.cmd("npm", ["run", "build"])
-    ElixirScript.compile_std_lib()
+     install: &install/1]
   end
 
   def dist(_) do

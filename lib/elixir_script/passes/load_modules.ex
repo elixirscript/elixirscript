@@ -1,11 +1,18 @@
 defmodule ElixirScript.Passes.LoadModules do
   @moduledoc false  
   def execute(compiler_data, _) do
-
-    ex_files = Enum.map(compiler_data.data, fn
+    ex_files = compiler_data.data
+    |> Enum.filter(fn 
+      {_, %{app: :elixir}} ->
+        false
+      %{app: :elixir} ->
+        false        
+      _ -> true
+    end) 
+    |> Enum.map(fn
       { _, %{path: path} } -> path
       %{path: path} -> path
-    end)
+    end)    
 
     loaded_modules = case Enum.reverse(ex_files) do
                        [] ->

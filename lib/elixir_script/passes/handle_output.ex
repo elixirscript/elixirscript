@@ -3,17 +3,8 @@ defmodule ElixirScript.Passes.HandleOutput do
   alias ElixirScript.Translator.State
 
   def execute(compiler_data, opts) do
-
-    if Map.get(opts, :std_lib, false) do
-      State.set_module_data(compiler_data.state, compiler_data.data)
-      new_std_state = State.serialize(compiler_data.state)
-      stdlib_state_path = Path.join([File.cwd!(), "lib", "elixir_script", "translator", "stdlib_state.bin"])
-      File.write!(stdlib_state_path, new_std_state)
-      State.stop(compiler_data.state)
-    else
-      State.stop(compiler_data.state)
-      out(compiler_data, opts)
-    end
+    State.stop(compiler_data.state)
+    out(compiler_data, opts)
   end
 
   defp out(compiler_output, %{output: nil} = compiler_opts) do
@@ -33,7 +24,7 @@ defmodule ElixirScript.Passes.HandleOutput do
 
   defp out(compiler_output, %{output: output_path, core_path: _} = compiler_opts) do
     if Map.get(compiler_opts, :std_lib, false) == false do
-      ElixirScript.copy_stdlib_to_destination(compiler_opts.format, output_path)
+      ElixirScript.copy_bootstrap_to_destination(compiler_opts.format, output_path)
     end
 
     file_name = Path.join([output_path, compiler_output.generated_name])

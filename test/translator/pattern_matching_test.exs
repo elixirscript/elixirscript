@@ -5,13 +5,23 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
   alias ElixirScript.Translator.PatternMatching
   alias ElixirScript.Translator.Map
   alias ESTree.Tools.Builder, as: JS
-
-  @std_lib_state File.read!(File.cwd!() <> "/lib/elixir_script/translator/stdlib_state.bin")
+  alias ElixirScript.Translator.State
 
   setup do
-    {:ok, pid} = ElixirScript.Translator.State.start_link(%{env: __ENV__}, [])
-    ElixirScript.Translator.State.deserialize(pid, @std_lib_state)
-    scope = ElixirScript.Translator.LexicalScope.module_scope(ElixirScript.Temp, "temp.ex", __ENV__, pid, %{ format: :es, module_formatter: ElixirScript.ModuleSystems.ES })
+    {:ok, pid} = State.start_link(%{env: __ENV__}, [])
+
+    State.set_module_data(pid, [{
+      ElixirScript.Kernel, 
+      %{app: :elixir, name: ElixirScript.Kernel, ast: {}, functions: []}
+      }])
+
+    scope = ElixirScript.Translator.LexicalScope.module_scope(
+      ElixirScript.Temp, 
+      "temp.ex", 
+      __ENV__, 
+      pid, 
+      %{ format: :es, module_formatter: ElixirScript.ModuleSystems.ES }
+    )
 
     {:ok, [scope: scope]}
   end

@@ -33,7 +33,7 @@ Get dependencies
 
 Compile
 
-    mix do std_lib, clean, compile
+    mix compile
 
 Test
 
@@ -43,7 +43,7 @@ Test
 
 Build
 =============
-    MIX_ENV=prod mix do clean, compile, std_lib, dist
+    MIX_ENV=prod mix do clean, compile, dist
 
 This will build a tarball in the dist folder.
 By default the escript built will look into the folder above it for the

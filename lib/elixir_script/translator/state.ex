@@ -70,8 +70,7 @@ defmodule ElixirScript.Translator.State do
 
   def set_module_data(pid, module_data) do
     Agent.update(pid, fn state ->
-      data = Enum.filter(state.modules, fn {module_name, data} -> data.app == :elixir end)
-      %{ state | modules: Keyword.merge(data, module_data) }
+      %{ state | modules: Keyword.merge(state.modules, module_data) }
     end)
   end
 
