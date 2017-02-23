@@ -20,7 +20,8 @@ defmodule ElixirScript.Regex do
   end
 
   def match?(regex, string) do
-    regex.test(string)
+    reg = if regex?(regex), do: regex, else: compile!(source(regex), opts(regex))
+    reg.test(string)
   end
 
   def source(regex) do
