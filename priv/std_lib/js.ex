@@ -12,9 +12,7 @@ defmodule JS do
   ex:
     JS.new User, ["first_name", "last_name"]
   """
-  defmacro new(module, params) do
-  end
-
+  defmacro new(module, params)
 
   @doc """
   Updates an existing JavaScript object.
@@ -22,46 +20,22 @@ defmodule JS do
   ex:
     JS.update elem, %{"width" => 100}
   """
-  defmacro update(object, map) do
-  end
-
-
-  @doc """
-  Imports a JavaScript module.
-
-  Elixir modules can use the normal `import`, `alias` and `require`,
-  but JavaScript modules work differently and have to be imported
-  using this.
-
-  If `default` is set to true then it is treated as a default import.
-  Otherwise it is treated as a namespace import.
-
-  ex:
-    JS.import A, "a" #translates to "import A from 'a'"
-
-    JS.import A, "a", default: false #translates to "import * as A from 'a'"
-  """
-  defmacro import(module, from, opts \\ [default: true]) do
-  end
+  defmacro update(object, map)
 
   @doc """
   Returns the type of the given value
   """
-  defmacro typeof(value) do
-  end
+  defmacro typeof(value)
 
   @doc """
   Determines if value is an instance of type.
   """
-  defmacro instanceof(value, type) do
-  end
+  defmacro instanceof(value, type)
 
   @doc """
   Throws the term given
   """
-  defmacro throw(term) do
-  end
-
+  defmacro throw(term)
 
   @doc """
   Returns a reference to the global JavaScript object.
@@ -102,20 +76,17 @@ defmodule JS do
   @doc """
   Yields the current generator function
   """
-  defmacro yield() do
-  end
+  defmacro yield()
 
   @doc """
   Yields the current generator function with the given term
   """
-  defmacro yield(term) do
-  end
+  defmacro yield(term)
 
   @doc """
   Yields control to the given generator
   """
-  defmacro yield_to(gen) do
-  end
+  defmacro yield_to(gen)
 
   @doc """
   Provides a convenient way to create a string-based map.
@@ -124,6 +95,5 @@ defmodule JS do
   one would have to do `%{"a" => "b"}` which turns into `{a: "b"}` in JavaScript. With `Kernel.object`, you can create string keyed maps
   conveniently, `object(a: "b")` which turns into `{a: "b"}`
   """
-  defmacro object(args) do
-  end
+  defmacro object(args)
 end

@@ -152,15 +152,21 @@ defmodule ElixirScript.Translator.Bug.Test do
   end
 
   test "Enum.member? translates to Bootstrap.Enum.member__qmark__" do
+
+  end  
+
+  test "pipe translates correctly" do
     ex_ast = quote do
-      Enum.member?([1, 2, 3], 1)
+       :document.getElementById("main") |> JS.update(%{"innerHTML" => @html})
     end
 
     js_code = """
-    Bootstrap.Enum.member__qmark__(Object.freeze([1, 2, 3]), 1)
+      Object.assign(document.getElementById('main'), Object.freeze({
+          innerHTML: html
+      }))
     """
 
-    assert_translation(ex_ast, js_code)
-  end  
+    assert_translation(ex_ast, js_code)   
+  end
 
 end
