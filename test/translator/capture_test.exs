@@ -94,11 +94,11 @@ defmodule ElixirScript.Translator.Capture.Test do
   test "translate capture operator with anonymous functions as parameters" do
 
     ex_ast = quote do
-      Elixir.Enum.map(items, &process(&1))
+      Bootstrap.Enum.map(items, &process(&1))
     end
 
     js_code = """
-     Elixir.Enum.map(items,Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],function(__1)    {
+     Bootstrap.Enum.map(items,Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],function(__1)    {
              return     process(__1);
            })))
     """

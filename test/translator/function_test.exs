@@ -206,11 +206,11 @@ defmodule ElixirScript.Translator.Function.Test do
 
   test "translate anonymous functions" do
     ex_ast = quote do
-      Elixir.Enum.map(list, fn(x) -> x * 2 end)
+      Bootstrap.Enum.map(list, fn(x) -> x * 2 end)
     end
 
     js_code = """
-     Elixir.Enum.map(list,Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],function(x)    {
+     Bootstrap.Enum.map(list,Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],function(x)    {
              return     x * 2;
            })))
     """
@@ -840,6 +840,6 @@ defmodule ElixirScript.Translator.Function.Test do
            }));
     """
 
-    assert_translation(ex_ast, js_code)    
+    assert_translation(ex_ast, js_code)
   end
 end

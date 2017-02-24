@@ -67,11 +67,11 @@ defmodule ElixirScript.Translator.Bug.Test do
 
   test "replace !" do
     ex_ast = quote do
-      Elixir.Enum.fetch!(data, i)
+      Bootstrap.Enum.fetch!(data, i)
     end
 
     js_code = """
-      Elixir.Enum.fetch__emark__(data, i)
+      Bootstrap.Enum.fetch__emark__(data, i)
     """
 
     assert_translation(ex_ast, js_code)
@@ -151,9 +151,17 @@ defmodule ElixirScript.Translator.Bug.Test do
     assert_translation(ex_ast, js_code)
   end
 
-  test "Enum.member? translates to Bootstrap.Enum.member__qmark__" do
+  test "Elixir.Enum.member__qmark__ does not show up in translation" do
+    ex_ast = quote do
+       Enum.member?([1, 2, 3], 1)
+    end
 
-  end  
+    js_code = """
+    Elixir.Enum.member__qmark__(Object.freeze([1, 2, 3]), 1)
+    """
+
+    refute_translation(ex_ast, js_code)
+  end
 
   test "pipe translates correctly" do
     ex_ast = quote do
@@ -166,7 +174,7 @@ defmodule ElixirScript.Translator.Bug.Test do
       }))
     """
 
-    assert_translation(ex_ast, js_code)   
+    assert_translation(ex_ast, js_code)
   end
 
 end
