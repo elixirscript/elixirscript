@@ -5,7 +5,7 @@ defmodule ElixirScript.Translator.Try.Test do
   test "translate with a rescue with one match" do
     ex_ast = quote do
       try do
-        do_something_that_may_fail(some_arg)
+        1
       rescue
         ArgumentError ->
           IO.puts "Invalid argument given"
@@ -14,7 +14,7 @@ defmodule ElixirScript.Translator.Try.Test do
 
     js_code = """
     Bootstrap.Core.SpecialForms._try(function() {
-        return do_something_that_may_fail(some_arg);
+        return 1;
     }, Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.type(ArgumentError, {})], function() {
         return IO.puts('Invalid argument given');
     })), null, null, null)
@@ -25,8 +25,9 @@ defmodule ElixirScript.Translator.Try.Test do
 
   test "translate with a rescue with a list match" do
     ex_ast = quote do
+
       try do
-        do_something_that_may_fail(some_arg)
+        1
       rescue
         [ArgumentError] ->
           IO.puts "Invalid argument given"
@@ -35,7 +36,7 @@ defmodule ElixirScript.Translator.Try.Test do
 
     js_code = """
     Bootstrap.Core.SpecialForms._try(function() {
-        return do_something_that_may_fail(some_arg);
+        return 1;
     }, Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.type(ArgumentError, {})], function() {
         return IO.puts('Invalid argument given');
     })), null, null, null)
@@ -46,8 +47,9 @@ defmodule ElixirScript.Translator.Try.Test do
 
   test "translate with a rescue with an in guard" do
     ex_ast = quote do
+
       try do
-        do_something_that_may_fail(some_arg)
+        1
       rescue
         x in [ArgumentError] ->
           IO.puts "Invalid argument given"
@@ -56,7 +58,7 @@ defmodule ElixirScript.Translator.Try.Test do
 
     js_code = """
          Bootstrap.Core.SpecialForms._try(function()    {
-             return     do_something_that_may_fail(some_arg);
+             return     1;
            },Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],function(x)    {
              return     IO.puts('Invalid argument given');
            },function(x)    {
@@ -69,8 +71,9 @@ defmodule ElixirScript.Translator.Try.Test do
 
   test "translate with a rescue with an identifier" do
     ex_ast = quote do
+
       try do
-        do_something_that_may_fail(some_arg)
+        1
       rescue
         x ->
           IO.puts "Invalid argument given"
@@ -79,7 +82,7 @@ defmodule ElixirScript.Translator.Try.Test do
 
     js_code = """
      Bootstrap.Core.SpecialForms._try(function()    {
-             return     do_something_that_may_fail(some_arg);
+             return     1;
            },Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],function(x)    {
              return     IO.puts('Invalid argument given');
            })),null,null,null)
@@ -91,8 +94,9 @@ defmodule ElixirScript.Translator.Try.Test do
 
   test "translate with a rescue with multiple patterns" do
     ex_ast = quote do
+
       try do
-        do_something_that_may_fail(some_arg)
+        1
       rescue
         [ArgumentError] ->
           IO.puts "ArgumentError"
@@ -103,7 +107,7 @@ defmodule ElixirScript.Translator.Try.Test do
 
     js_code = """
     Bootstrap.Core.SpecialForms._try(function() {
-        return do_something_that_may_fail(some_arg);
+        return 1;
     }, Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.type(ArgumentError, {})], function() {
         return IO.puts('ArgumentError');
     }), Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()], function(x) {
@@ -116,8 +120,9 @@ defmodule ElixirScript.Translator.Try.Test do
 
   test "translate with a rescue and after clause" do
     ex_ast = quote do
+
       try do
-        do_something_that_may_fail(some_arg)
+        1
       rescue
         ArgumentError ->
           IO.puts "Invalid argument given"
@@ -128,7 +133,7 @@ defmodule ElixirScript.Translator.Try.Test do
 
     js_code = """
     Bootstrap.Core.SpecialForms._try(function() {
-        return do_something_that_may_fail(some_arg);
+        return 1;
     }, Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.type(ArgumentError, {})], function() {
         return IO.puts('Invalid argument given');
     })), null, null, function() {
@@ -141,8 +146,9 @@ defmodule ElixirScript.Translator.Try.Test do
 
   test "translate with an after clause" do
     ex_ast = quote do
+
       try do
-        do_something_that_may_fail(some_arg)
+        1
       after
         IO.puts "This is printed regardless if it failed or succeed"
       end
@@ -150,7 +156,7 @@ defmodule ElixirScript.Translator.Try.Test do
 
     js_code = """
      Bootstrap.Core.SpecialForms._try(function()    {
-             return     do_something_that_may_fail(some_arg);
+             return     1;
            },null,null,null,function()    {
              return     IO.puts('This is printed regardless if it failed or succeed');
            })
@@ -161,6 +167,7 @@ defmodule ElixirScript.Translator.Try.Test do
 
   test "translate else" do
     ex_ast = quote do
+      x = 1
       try do
         1 / x
       else
@@ -189,7 +196,7 @@ defmodule ElixirScript.Translator.Try.Test do
   test "translate catch" do
     ex_ast = quote do
       try do
-        do_something_that_may_fail(some_arg)
+        1
       rescue
         ArgumentError ->
           IO.puts "Invalid argument given"
@@ -201,7 +208,7 @@ defmodule ElixirScript.Translator.Try.Test do
 
     js_code = """
     Bootstrap.Core.SpecialForms._try(function() {
-        return do_something_that_may_fail(some_arg);
+        return 1;
     }, Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.type(ArgumentError, {})], function() {
         return IO.puts('Invalid argument given');
     })), Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Symbol.for('throw'), Symbol.for('Error')], function() {

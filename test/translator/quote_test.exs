@@ -78,6 +78,7 @@ defmodule ElixirScript.Translator.Quote.Test do
 
   test "quote function call with unquote" do
     ex_ast = quote do
+        x = 1
         quote do: test(unquote(x))
     end
 
@@ -94,11 +95,11 @@ defmodule ElixirScript.Translator.Quote.Test do
 
   test "quote function call with unquote_slicing" do
     ex_ast = quote do
-        quote do: sum(1, unquote_splicing(values), 5)
+        quote do: sum(1, unquote_splicing([1, 2, 3]), 5)
     end
 
     js_code = """
-    new Bootstrap.Core.Tuple(Symbol.for('sum'),Object.freeze([]),Bootstrap.Enum.concat(Object.freeze([1]),values,Object.freeze([5])))
+    new Bootstrap.Core.Tuple(Symbol.for('sum'), Object.freeze([]), Bootstrap.Enum.concat(Object.freeze([1]), Object.freeze([1, 2, 3]), Object.freeze([5])))
     """
 
     assert_translation(ex_ast, js_code)
@@ -106,6 +107,7 @@ defmodule ElixirScript.Translator.Quote.Test do
 
   test "bind_quoted" do
     ex_ast = quote do
+      x = 1
       quote bind_quoted: [x: x] do
         x * x
       end

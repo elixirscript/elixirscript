@@ -2,9 +2,9 @@ defmodule ElixirScript.Translator.With.Test do
   use ExUnit.Case
   import ElixirScript.TestHelper
 
-
   test "translate with" do
     ex_ast = quote do
+      opts = %{}
       with {:ok, width} <- Map.fetch(opts, :width),
       {:ok, height} <- Map.fetch(opts, :height),
       do: {:ok, width * height}
@@ -29,6 +29,7 @@ defmodule ElixirScript.Translator.With.Test do
 
   test "translate with with bare expression" do
     ex_ast = quote do
+      opts = %{}
       with {:ok, width} <- Map.fetch(opts, :width),
       double_width = width * 2,
       {:ok, height} <- Map.fetch(opts, :height),
@@ -56,6 +57,7 @@ defmodule ElixirScript.Translator.With.Test do
 
   test "translate with with else" do
     ex_ast = quote do
+      opts = %{}
       with {:ok, width} <- Map.fetch(opts, :width),
            {:ok, height} <- Map.fetch(opts, :height) do
         {:ok, width * height}
