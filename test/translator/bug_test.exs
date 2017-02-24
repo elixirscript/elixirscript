@@ -151,4 +151,16 @@ defmodule ElixirScript.Translator.Bug.Test do
     assert_translation(ex_ast, js_code)
   end
 
+  test "Enum.member? translates to Bootstrap.Enum.member__qmark__" do
+    ex_ast = quote do
+      Enum.member?([1, 2, 3], 1)
+    end
+
+    js_code = """
+    Bootstrap.Enum.member__qmark__(Object.freeze([1, 2, 3]), 1)
+    """
+
+    assert_translation(ex_ast, js_code)
+  end  
+
 end
