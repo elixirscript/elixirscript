@@ -157,7 +157,7 @@ defmodule ElixirScript.Translator.Bug.Test do
     end
 
     js_code = """
-    Elixir.Enum.member__qmark__(Object.freeze([1, 2, 3]), 1)
+    Elixir.Enum.member__qmark__
     """
 
     refute_translation(ex_ast, js_code)
