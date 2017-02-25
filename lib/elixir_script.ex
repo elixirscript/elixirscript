@@ -83,7 +83,6 @@ defmodule ElixirScript do
     |> ElixirScript.Passes.ConsolidateProtocols.execute(opts)
     |> ElixirScript.Passes.CreateJSModules.execute(opts)
     |> ElixirScript.Passes.JavaScriptCode.execute(opts)
-    |> ElixirScript.Passes.JavaScriptName.execute(opts)
     |> ElixirScript.Passes.HandleOutput.execute(opts)
   end
 
@@ -186,14 +185,10 @@ defmodule ElixirScript do
     |> ElixirScript.Passes.ConsolidateProtocols.execute(opts)
     |> ElixirScript.Passes.CreateJSModules.execute(opts)
     |> ElixirScript.Passes.JavaScriptCode.execute(opts)
-    |> ElixirScript.Passes.JavaScriptName.execute(opts)
     |> ElixirScript.Passes.HandleOutput.execute(opts)
 
     result
   end
-
-  @doc false
-  def version(), do: @version
 
   defp build_compiler_options(opts) do
     default_options = Map.new

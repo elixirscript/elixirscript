@@ -71,6 +71,8 @@ defmodule ElixirScript.Translator.Identifier do
 
   def make_namespace_members(module_name) do
     case module_name do
+      m when is_list(m) ->
+        m
       m when is_binary(m) ->
         String.split(m, ".")
       m when is_atom(m) ->
@@ -78,6 +80,6 @@ defmodule ElixirScript.Translator.Identifier do
     end
     |> Enum.reverse
     |> make_alias
-  end
+  end 
 
 end

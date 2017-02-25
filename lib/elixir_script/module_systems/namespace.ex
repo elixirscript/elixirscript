@@ -4,6 +4,7 @@ defmodule ElixirScript.ModuleSystems.Namespace do
   alias ElixirScript.Translator
   alias ElixirScript.Translator.State
   alias ElixirScript.Translator.Utils
+  alias ElixirScript.Translator.Identifier
 
   def build(module_name, imports, body, exports, env) do
     module_imports = imports
@@ -21,28 +22,18 @@ defmodule ElixirScript.ModuleSystems.Namespace do
     List.wrap(make_namespace_body(module_name, module_imports, body, exports))
   end
 
+  defp module_name_function_call(module_name, function) do
+    members = ["Elixir"] ++ Module.split(module_name) ++ [function]
+    Identifier.make_namespace_members(members)
+  end
+
   def import_module(module_name) do
     name = ["Elixir" | Module.split(module_name) ] |> Enum.join("$")
 
     declarator = JS.variable_declarator(
       JS.identifier(name),
       JS.call_expression(
-        JS.member_expression(
-          JS.call_expression(
-                    JS.member_expression(
-                      JS.identifier("Bootstrap"),
-                      JS.member_expression(
-                        JS.identifier(:Core),
-                        JS.member_expression(
-                          JS.identifier(:Functions),
-                          JS.identifier(:build_namespace)
-                        )
-                      )
-                    ),
-                    [JS.identifier("Elixir"), JS.literal(Utils.name_to_js_file_name(module_name))]
-                  ),
-         JS.identifier("__load")
-        ),
+        module_name_function_call(module_name, "__load"),
         [JS.identifier("Elixir")]
       )
     )
@@ -50,26 +41,21 @@ defmodule ElixirScript.ModuleSystems.Namespace do
     JS.variable_declaration([declarator], :const)
   end
 
-  defp make_namespace_body(module_name, imports, body, exports) do
-    _self =
-          JS.call_expression(
-                    JS.member_expression(
-                      JS.identifier("Bootstrap"),
-                      JS.member_expression(
-                        JS.identifier(:Core),
-                        JS.member_expression(
-                          JS.identifier(:Functions),
-                          JS.identifier(:build_namespace)
-                        )
-                      )
-                    ),
-                    [JS.identifier("Elixir"), JS.literal(Utils.name_to_js_file_name(module_name))]
-                  )
+  defp build_namespace() do
+    JS.member_expression(
+      JS.identifier("Bootstrap"),
+      JS.member_expression(
+        JS.identifier(:Core),
+        JS.member_expression(
+          JS.identifier(:Functions),
+          JS.identifier(:build_namespace)
+        )
+      )
+    )   
+  end
 
-    values = JS.member_expression(
-      _self,
-      JS.identifier("__exports")
-    )
+  defp make_namespace_body(module_name, imports, body, exports) do
+    values = module_name_function_call(module_name, "__exports")
 
     _if = JS.if_statement(
       values,
@@ -99,19 +85,10 @@ defmodule ElixirScript.ModuleSystems.Namespace do
 
     make = JS.member_expression(
           JS.call_expression(
-                    JS.member_expression(
-                      JS.identifier("Bootstrap"),
-                      JS.member_expression(
-                        JS.identifier(:Core),
-                        JS.member_expression(
-                          JS.identifier(:Functions),
-                          JS.identifier(:build_namespace)
-                        )
-                      )
-                    ),
-                    [JS.identifier("Elixir"), JS.literal(Utils.name_to_js_file_name(module_name))]
-                  ),
-                  JS.identifier("__load")
+            build_namespace(),
+            [JS.identifier("Elixir"), JS.literal(Utils.name_to_js_file_name(module_name))]
+          ),
+          JS.identifier("__load")
     )
 
     func_body = JS.block_statement([_if] ++ body ++ [declaration, assign] ++ imports ++ exports)

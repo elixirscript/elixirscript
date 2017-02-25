@@ -1,6 +1,7 @@
 defmodule ElixirScript.Passes.HandleOutput do
   @moduledoc false
   alias ElixirScript.Translator.State
+  @generated_name "Elixir.App.js"
 
   def execute(compiler_data, opts) do
     State.stop(compiler_data.state)
@@ -27,7 +28,7 @@ defmodule ElixirScript.Passes.HandleOutput do
       ElixirScript.copy_bootstrap_to_destination(compiler_opts.format, output_path)
     end
 
-    file_name = Path.join([output_path, compiler_output.generated_name])
+    file_name = Path.join([output_path, @generated_name])
 
     if !File.exists?(Path.dirname(file_name)) do
       File.mkdir_p!(Path.dirname(file_name))
@@ -39,7 +40,7 @@ defmodule ElixirScript.Passes.HandleOutput do
   defp process_include_path(compiler_output, compiler_opts) do
       case compiler_opts.include_path do
         true ->
-          {compiler_output.generated, compiler_output.generated_name}
+          {compiler_output.generated, @generated_name}
         false ->
           compiler_output.generated
       end
