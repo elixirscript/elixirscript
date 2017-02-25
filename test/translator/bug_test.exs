@@ -124,7 +124,7 @@ defmodule ElixirScript.Translator.Bug.Test do
 
     js_code = """
     const my_func = Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],function(x){
-    return Object.freeze([Bootstrap.Core.Functions.call_property(x,'a'), Bootstrap.Core.Functions.call_property(x,'b')]);
+      return Object.freeze([Bootstrap.Core.Functions.call_property(x,'a'), Bootstrap.Core.Functions.call_property(x,'b')]);
     }));
     """
 

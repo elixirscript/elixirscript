@@ -22,22 +22,22 @@ defmodule ElixirScript.Translator.String.Test do
 
   test "translate string interpolation" do
     ex_ast = quote do: "Hello #{"world"}"
-    assert_translation(ex_ast, "'Hello ' + Elixir$ElixirScript$String$Chars.to_string('world')")
+    assert_translation(ex_ast, "'Hello ' + Elixir.ElixirScript.String.Chars.__load(Elixir).to_string('world')")
 
     ex_ast = quote do: "Hello #{length([])}"
-    assert_translation(ex_ast, "'Hello ' + Elixir$ElixirScript$String$Chars.to_string(Elixir$ElixirScript$Kernel.length(Object.freeze([])))")
+    assert_translation(ex_ast, "'Hello ' + Elixir.ElixirScript.String.Chars.__load(Elixir).to_string(Elixir.ElixirScript.Kernel.__load(Elixir).length(Object.freeze([])))")
   end
 
   test "translate multiline string interpolation" do
     ex_ast = quote do: """
     Hello #{length([])}
     """
-    assert_translation(ex_ast, "'Hello ' + (Elixir$ElixirScript$String$Chars.to_string(Elixir$ElixirScript$Kernel.length(Object.freeze([]))) + '\\n')")
+    assert_translation(ex_ast, "'Hello ' + (Elixir.ElixirScript.String.Chars.__load(Elixir).to_string(Elixir.ElixirScript.Kernel.__load(Elixir).length(Object.freeze([]))) + '\\n')")
 
     ex_ast = quote do: """
     Hello #{length([])}
     How are you, #{length([])}?
     """
-    assert_translation(ex_ast, "'Hello ' + (Elixir$ElixirScript$String$Chars.to_string(Elixir$ElixirScript$Kernel.length(Object.freeze([]))) + ('\\nHow are you, ' + (Elixir$ElixirScript$String$Chars.to_string(Elixir$ElixirScript$Kernel.length(Object.freeze([]))) + '?\\n')))")
+    assert_translation(ex_ast, "'Hello ' + (Elixir.ElixirScript.String.Chars.__load(Elixir).to_string(Elixir.ElixirScript.Kernel.__load(Elixir).length(Object.freeze([]))) + ('\\nHow are you, ' + (Elixir.ElixirScript.String.Chars.__load(Elixir).to_string(Elixir.ElixirScript.Kernel.__load(Elixir).length(Object.freeze([]))) + '?\\n')))")
   end
 end

@@ -8,7 +8,7 @@ defmodule ElixirScript.Translator.Capture.Test do
     end
 
     js_code = """
-    let [fun] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.variable(),Elixir$ElixirScript$Kernel.is_atom);
+    let [fun] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.variable(), Elixir.ElixirScript.Kernel.__load(Elixir).is_atom);
     """
 
     assert_translation(ex_ast, js_code)
@@ -23,7 +23,7 @@ defmodule ElixirScript.Translator.Capture.Test do
 
     js_code = """
      let [fun] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.variable(),Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],function(__1)    {
-             return     Elixir$ElixirScript$Kernel.is_atom(__1);
+             return Elixir.ElixirScript.Kernel.__load(Elixir).is_atom(__1);
            })));
     """
 
