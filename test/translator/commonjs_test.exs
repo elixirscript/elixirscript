@@ -5,13 +5,10 @@ defmodule ElixirScript.Translator.CommonJS.Test do
   test "translate module to commonjs" do
     ex_ast = quote do
       defmodule Elephant do
-        @ul JQuery.("#todo-list")
+        @ul "#todo-list"
 
         def something() do
           @ul
-        end
-
-        defgenp something_else() do
         end
       end
     end

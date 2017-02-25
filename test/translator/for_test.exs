@@ -24,10 +24,10 @@ defmodule ElixirScript.Translator.For.Test do
           Object.freeze([1, 2, 3, 4])
         )
       ],
-      Elixir$ElixirScript$Collectable,  
+      Elixir$ElixirScript$Collectable,
       Object.freeze([])
     )
-    """   
+    """
 
     assert_translation(ex_ast, js_code)
   end
@@ -52,36 +52,6 @@ defmodule ElixirScript.Translator.For.Test do
         Bootstrap.Core.Patterns.list_generator(
           Bootstrap.Core.Patterns.variable(),
           Object.freeze([1, 2, 3, 4])
-        )
-      ],
-      Elixir$ElixirScript$Collectable,   
-      Object.freeze([])
-    )
-    """
-
-    assert_translation(ex_ast, js_code)
-  end
-
-  test "translate for with string" do
-    ex_ast = quote do
-      for n <- "Opera", do: n
-    end
-
-    js_code = """
-    Bootstrap.Core.SpecialForms._for(
-      Bootstrap.Core.Patterns.clause(
-        [Bootstrap.Core.Patterns.variable()],
-        function(n) {
-          return n;
-        },
-        function() {
-          return true;
-        }
-      ),
-      [
-        Bootstrap.Core.Patterns.list_generator(
-          Bootstrap.Core.Patterns.variable(),
-          'Opera'
         )
       ],
       Elixir$ElixirScript$Collectable,
@@ -117,8 +87,8 @@ defmodule ElixirScript.Translator.For.Test do
           Bootstrap.Core.Patterns.variable(),
           Object.freeze([2, 3])
         )
-      ],  
-      Elixir$ElixirScript$Collectable,    
+      ],
+      Elixir$ElixirScript$Collectable,
       Object.freeze([])
     )
     """
@@ -187,7 +157,7 @@ defmodule ElixirScript.Translator.For.Test do
           Object.freeze([1, 2, 3, 4, 5, 6])
         )
       ],
-      Elixir$ElixirScript$Collectable, 
+      Elixir$ElixirScript$Collectable,
       Object.freeze([])
     )
     """
@@ -210,7 +180,7 @@ defmodule ElixirScript.Translator.For.Test do
             return Elixir$ElixirScript$String.upcase(name);
         }, function() {
             return true;
-        }), 
+        }),
         [
           Bootstrap.Core.Patterns.list_generator(Bootstrap.Core.Patterns.type(Bootstrap.Core.Tuple, {
             values: [Symbol.for('user'), Bootstrap.Core.Patterns.variable()]
@@ -225,6 +195,7 @@ defmodule ElixirScript.Translator.For.Test do
 
   test "translate for with bitstring" do
     ex_ast = quote do
+      pixels = <<1, 2, 3, 4, 5, 6>>
       for <<r::8, g::8, b::8 <- pixels >> do
         {r, g, b}
       end

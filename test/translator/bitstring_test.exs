@@ -15,26 +15,45 @@ defmodule ElixirScript.Translator.Bitstring.Test do
     ex_ast = quote do: <<1, "foo" :: utf8, "bar" :: utf32>>
     assert_translation(ex_ast, "new Bootstrap.Core.BitString(Bootstrap.Core.BitString.integer(1), Bootstrap.Core.BitString.utf8('foo'), Bootstrap.Core.BitString.utf32('bar'))")
 
-    ex_ast = quote do: <<102 :: integer-native, rest :: binary>>
+    ex_ast = quote do
+       rest = "oo"
+       <<102 :: integer-native, rest :: binary>>
+    end
     assert_translation(ex_ast, "new Bootstrap.Core.BitString(Bootstrap.Core.BitString.native(Bootstrap.Core.BitString.integer(102)), Bootstrap.Core.BitString.binary(rest))")
 
-    ex_ast = quote do: <<102 :: unsigned-big-integer, rest :: binary>>
+    ex_ast = quote do
+      rest = "oo"
+      <<102 :: unsigned-big-integer, rest :: binary>>
+    end
     assert_translation(ex_ast, "new Bootstrap.Core.BitString(Bootstrap.Core.BitString.integer(Bootstrap.Core.BitString.big(Bootstrap.Core.BitString.unsigned(102))), Bootstrap.Core.BitString.binary(rest))")
 
-    ex_ast = quote do: <<102, _rest :: size(16)>>
-    assert_translation(ex_ast, "new Bootstrap.Core.BitString(Bootstrap.Core.BitString.integer(102), Bootstrap.Core.BitString.size(_rest, 16))")
+    ex_ast = quote do
+      rest = 100
+       <<102, rest :: size(16)>>
+    end
 
-    ex_ast = quote do: <<102, _rest :: size(16)-unit(4)>>
-    assert_translation(ex_ast, "new Bootstrap.Core.BitString(Bootstrap.Core.BitString.integer(102), Bootstrap.Core.BitString.unit(Bootstrap.Core.BitString.size(_rest, 16), 4))")
+    assert_translation(ex_ast, "new Bootstrap.Core.BitString(Bootstrap.Core.BitString.integer(102), Bootstrap.Core.BitString.size(rest, 16))")
 
-    ex_ast = quote do: <<102, _rest :: 16 * 4>>
-    assert_translation(ex_ast, "new Bootstrap.Core.BitString(Bootstrap.Core.BitString.integer(102), Bootstrap.Core.BitString.unit(Bootstrap.Core.BitString.size(_rest, 16), 4))")
+    ex_ast = quote do
+      rest = 100
+       <<102, rest :: size(16)-unit(4)>>
+    end
 
-    ex_ast = quote do: <<102, _rest :: _ * 4>>
-    assert_translation(ex_ast, "new Bootstrap.Core.BitString(Bootstrap.Core.BitString.integer(102), Bootstrap.Core.BitString.unit(Bootstrap.Core.BitString.size(_rest, undefined), 4))")
+    assert_translation(ex_ast, "new Bootstrap.Core.BitString(Bootstrap.Core.BitString.integer(102), Bootstrap.Core.BitString.unit(Bootstrap.Core.BitString.size(rest, 16), 4))")
 
-    ex_ast = quote do: <<102, _rest :: 16>>
-    assert_translation(ex_ast, "new Bootstrap.Core.BitString(Bootstrap.Core.BitString.integer(102), Bootstrap.Core.BitString.size(_rest, 16))")
+    ex_ast = quote do
+      rest = 100
+       <<102, rest :: 16 * 4>>
+      end
+
+    assert_translation(ex_ast, "new Bootstrap.Core.BitString(Bootstrap.Core.BitString.integer(102), Bootstrap.Core.BitString.unit(Bootstrap.Core.BitString.size(rest, 16), 4))")
+
+    ex_ast = quote do
+      rest = 100
+       <<102, rest :: 16>>
+      end
+
+    assert_translation(ex_ast, "new Bootstrap.Core.BitString(Bootstrap.Core.BitString.integer(102), Bootstrap.Core.BitString.size(rest, 16))")
 
     ex_ast = quote do: << 1, <<2>> >>
     assert_translation(ex_ast, "new Bootstrap.Core.BitString(Bootstrap.Core.BitString.integer(1), new Bootstrap.Core.BitString(Bootstrap.Core.BitString.integer(2)))")

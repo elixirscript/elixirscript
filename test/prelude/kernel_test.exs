@@ -31,11 +31,11 @@ defmodule ElixirScript.Lib.Elixir.Kernel.Test do
 
   test "translate sigil_r with options" do
     ex_ast = quote do
-      ~r/foo/ig
+      ~r/foo/i
     end
 
     js_code = """
-    Elixir$ElixirScript$Regex.compile__emark__('foo', 'ig')
+    Elixir$ElixirScript$Regex.compile__emark__('foo', 'i')
     """
 
     assert_translation(ex_ast, js_code)

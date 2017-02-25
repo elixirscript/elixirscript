@@ -20,16 +20,18 @@ defmodule ElixirScript.Translator.Bug.Test do
 
   test "Translate react element" do
     ex_ast = quote do
+      def execute() do
       React.createElement(
         React.Text,
-        %{"style" => styles().welcome},
+        %{"style" => ""},
         "Welcome to React Native!"
       )
+      end
     end
 
     js_code = """
      React.createElement(React.Text,Object.freeze({
-             style: Bootstrap.Core.Functions.call_property(styles,'welcome')
+             style: ''
        }),'Welcome to React Native!')
     """
 
@@ -37,37 +39,11 @@ defmodule ElixirScript.Translator.Bug.Test do
 
   end
 
-  test "correctly not create 2 imports" do
-    ex_ast = quote do
-      defmodule App.Todo do
-        JS.import JQuery, "jquery"
-        JQuery.(e.target)
-      end
-    end
-
-    js_code = """
-    JQuery(Bootstrap.Core.Functions.call_property(e,'target'));
-    """
-
-    assert_translation(ex_ast, js_code)
-  end
-
-  test "correctly translate module names when used" do
-    ex_ast = quote do
-      @graphic_store App.Stores.GraphicStore.create_store()
-    end
-
-    js_code = """
-      const graphic_store = Bootstrap.Core.Functions.call_property(App.Stores.GraphicStore, 'create_store');
-
-    """
-
-    assert_translation(ex_ast, js_code)
-  end
-
   test "replace !" do
     ex_ast = quote do
-      Bootstrap.Enum.fetch!(data, i)
+      def execute(data, i) do
+        Enum.fetch!(data, i)
+      end
     end
 
     js_code = """
@@ -79,7 +55,9 @@ defmodule ElixirScript.Translator.Bug.Test do
 
   test "chain calls correctly" do
     ex_ast = quote do
-      :this.getRawCanvas().getContext("2d")
+      def execute() do
+        :this.getRawCanvas().getContext("2d")
+      end
     end
 
     js_code = """
@@ -90,7 +68,9 @@ defmodule ElixirScript.Translator.Bug.Test do
 
 
     ex_ast = quote do
-      :this.getRawCanvas(one).get("fg").getContext("2d")
+      def execute(one) do
+        :this.getRawCanvas(one).get("fg").getContext("2d")
+      end
     end
 
     js_code = """
@@ -104,9 +84,9 @@ defmodule ElixirScript.Translator.Bug.Test do
     ex_ast = quote do
       def getDispatcher() do
         DeLorean.Flux.createDispatcher(%{
-          startPainting: fn() -> this.dispatch("startPainting") end,
-          stopPainting: fn() -> this.dispatch("stopPainting") end,
-          addPoint: fn(data) -> this.dispatch("addPoint", data) end,
+          startPainting: fn() -> :this.dispatch("startPainting") end,
+          stopPainting: fn() -> :this.dispatch("stopPainting") end,
+          addPoint: fn(data) -> :this.dispatch("addPoint", data) end,
           getStores: fn() -> %{ graphic: GraphicStore } end
         })
       end
@@ -165,7 +145,9 @@ defmodule ElixirScript.Translator.Bug.Test do
 
   test "pipe translates correctly" do
     ex_ast = quote do
-       :document.getElementById("main") |> JS.update(%{"innerHTML" => @html})
+        def execute() do
+          :document.getElementById("main") |> JS.update(%{"innerHTML" => @html})
+        end
     end
 
     js_code = """

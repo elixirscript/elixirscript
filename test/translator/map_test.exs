@@ -43,7 +43,11 @@ defmodule ElixirScript.Translator.Map.Test do
 
 
   test "translate map update" do
-    ex_ast = quote do: %{ map | value: 1 }
+    ex_ast = quote do
+      map = %{value: 2}
+      %{ map | value: 1 }
+    end
+
     js_code = """
        Bootstrap.Core.SpecialForms.map_update(map,Object.freeze({
              [Symbol.for('value')]: 1
@@ -54,18 +58,28 @@ defmodule ElixirScript.Translator.Map.Test do
   end
 
   test "translate variable key" do
-    ex_ast = quote do: %{key => value}
+    ex_ast = quote do
+      key = 1
+      value = 2
+       %{key => value}
+      end
+
     js_code = "Object.freeze({ [key]: value })"
     assert_translation(ex_ast, js_code)
   end
 
   test "translate bound map key" do
-    ex_ast = quote do: %{^key => value} = %{key => value}
+    ex_ast = quote do
+      key = 1
+      value = 2
+       %{^key => value} = %{key => value}
+    end
     js_code = """
-    let [value] = Bootstrap.Core.Patterns.match(
-      { [key]: Bootstrap.Core.Patterns.variable() },
-      Object.freeze({ [key]: value })
-      );
+         let [value1] = Bootstrap.Core.Patterns.match({
+             [key]: Bootstrap.Core.Patterns.variable()
+         }, Object.freeze({
+             [key]: value
+         }));
     """
     assert_translation(ex_ast, js_code)
   end

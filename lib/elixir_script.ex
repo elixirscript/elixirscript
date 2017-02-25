@@ -41,8 +41,6 @@ defmodule ElixirScript do
   end
 
   # This is the serialized state of the ElixirScript.State module containing references to the standard library
-  @external_resource stdlib_state_path = Path.join([__DIR__, "elixir_script", "translator", "stdlib_state.bin"])
-  @stdlib_state File.read(stdlib_state_path)
   @lib_path Application.get_env(:elixir_script, :lib_path)
   @version  Mix.Project.config[:version]
 
@@ -73,30 +71,45 @@ defmodule ElixirScript do
     |> get_modules_from_quoted
     |> Enum.map(fn(x) -> %{ast: x, app: :app} end)
 
-    data = get_quoted_std_lib() ++ data
+    {loaded_modules, std_lib_quoted} = get_quoted_std_lib()
 
-    result = %{data: data}
+    %{data: std_lib_quoted ++ data, loaded_modules: loaded_modules}
     |> ElixirScript.Passes.Init.execute(opts)
+    |> ElixirScript.Passes.LoadModulesForQuoted.execute(opts)
     |> ElixirScript.Passes.FindModules.execute(opts)
     |> ElixirScript.Passes.FindLoadOnly.execute(opts)
     |> ElixirScript.Passes.FindFunctions.execute(opts)
     |> ElixirScript.Passes.JavaScriptAST.execute(opts)
     |> ElixirScript.Passes.ConsolidateProtocols.execute(opts)
-    |> ElixirScript.Passes.CreateJSModules.execute(opts)    
+    |> ElixirScript.Passes.CreateJSModules.execute(opts)
     |> ElixirScript.Passes.JavaScriptCode.execute(opts)
     |> ElixirScript.Passes.JavaScriptName.execute(opts)
     |> ElixirScript.Passes.HandleOutput.execute(opts)
-
-    result
   end
 
   defp get_quoted_std_lib() do
-    Path.join([get_std_lib_path(), "**", "*.ex"])
+    files = [get_std_lib_path(), "**", "*.ex"]
+    |> Path.join
     |> Path.wildcard
+
+    loaded_modules = if Code.ensure_loaded?(ElixirScript.Kernel) do
+      []
+    else
+      case files do
+        [] ->
+          []
+        files ->
+          Kernel.ParallelCompiler.files(files)
+      end
+    end
+
+    std_lib_quoted = files
     |> Enum.map(fn path -> File.read!(path) end)
     |> Enum.map(&Code.string_to_quoted!(&1))
     |> Enum.flat_map(&get_modules_from_quoted(&1))
     |> Enum.map(fn(x) -> %{ast: x, app: :elixir} end)
+
+    {loaded_modules, std_lib_quoted}
   end
 
   defp get_modules_from_quoted(quoted) do
@@ -138,7 +151,7 @@ defmodule ElixirScript do
     compile_path([path], opts)
   end
 
-  def compile_path(path, opts) when is_list(path) do  
+  def compile_path(path, opts) when is_list(path) do
     built_opts = build_compiler_options(opts)
 
     app_name = cond do
@@ -171,7 +184,7 @@ defmodule ElixirScript do
     |> ElixirScript.Passes.FindFunctions.execute(opts)
     |> ElixirScript.Passes.JavaScriptAST.execute(opts)
     |> ElixirScript.Passes.ConsolidateProtocols.execute(opts)
-    |> ElixirScript.Passes.CreateJSModules.execute(opts)    
+    |> ElixirScript.Passes.CreateJSModules.execute(opts)
     |> ElixirScript.Passes.JavaScriptCode.execute(opts)
     |> ElixirScript.Passes.JavaScriptName.execute(opts)
     |> ElixirScript.Passes.HandleOutput.execute(opts)
@@ -241,7 +254,7 @@ defmodule ElixirScript do
   end
 
   defp get_std_lib_path() do
-    Path.join([operating_path(), "std_lib"])   
+    Path.join([operating_path(), "std_lib"])
   end
 
 end

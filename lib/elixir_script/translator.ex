@@ -272,6 +272,10 @@ defmodule ElixirScript.Translator do
     end
   end
 
+  defp do_translate({{:., context1, [{:__aliases__, context2, [:Elixir, :Enum]}, function_name]}, context3, params }, env) do
+    translate({{:., context1, [{:__aliases__, context2, [:Enum]}, function_name]}, context3, params }, env)
+  end
+
   defp do_translate({{:., context1, [{:__aliases__, context2, [:Enum]}, function_name]}, context3, params }, env) do
     translate({{:., context1, [{:__aliases__, context2, [:Bootstrap, :Enum]}, function_name]}, context3, params }, env)
   end
@@ -628,7 +632,7 @@ defmodule ElixirScript.Translator do
   def create_module_name(module_name, env) do
     case module_name do
       {:__aliases__, _, _} ->
-        candiate_module_name = ElixirScript.Translator.State.get_module_name(env.state, 
+        candiate_module_name = ElixirScript.Translator.State.get_module_name(env.state,
         Utils.quoted_to_name(module_name))
 
         if ElixirScript.Translator.LexicalScope.get_module_name(env, candiate_module_name) in ElixirScript.Translator.State.list_module_names(env.state) do

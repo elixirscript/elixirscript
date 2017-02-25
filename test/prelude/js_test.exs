@@ -4,7 +4,11 @@ defmodule ElixirScript.Lib.JS.Test do
 
   test "translate new" do
     ex_ast = quote do
-      JS.new A.B, [1, 2, 3]
+      require JS
+
+      def execute() do
+        JS.new A.B, [1, 2, 3]
+      end
     end
 
     js_code = """
@@ -14,7 +18,11 @@ defmodule ElixirScript.Lib.JS.Test do
     assert_translation(ex_ast, js_code)
 
     ex_ast = quote do
-      JS.new A, [1, 2, 3]
+      require JS
+
+      def execute() do
+        JS.new A, [1, 2, 3]
+      end
     end
 
     js_code = """
@@ -26,7 +34,11 @@ defmodule ElixirScript.Lib.JS.Test do
 
   test "translate update" do
     ex_ast = quote do
-      JS.update A, %{"b" => [1, 2, 3]}
+      require JS
+
+      def execute() do
+        JS.update A, %{"b" => [1, 2, 3]}
+      end
     end
 
     js_code = """

@@ -5,15 +5,18 @@ defmodule ElixirScript.Translator.Case.Test do
   test "translate case" do
 
     ex_ast = quote do
-      case data do
-        :ok -> value
-        :error -> nil
+      def execute() do
+        data = :ok
+        case data do
+          :ok -> 1
+          :error -> nil
+        end
       end
     end
 
     js_code = """
      Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Symbol.for('ok')],function()    {
-             return     value;
+             return     1;
            }),Bootstrap.Core.Patterns.clause([Symbol.for('error')],function()    {
              return     null;
            })).call(this,data)
@@ -22,6 +25,7 @@ defmodule ElixirScript.Translator.Case.Test do
     assert_translation(ex_ast, js_code)
 
     ex_ast = quote do
+      data = true
       case data do
         false -> value = 13
         true  -> true
@@ -42,6 +46,7 @@ defmodule ElixirScript.Translator.Case.Test do
 
 
     ex_ast = quote do
+      data = :ok
       case data do
         false -> value = 13
         _  -> true
@@ -62,6 +67,7 @@ defmodule ElixirScript.Translator.Case.Test do
 
   test "translate case with guard" do
     ex_ast = quote do
+      data = :ok
       case data do
         number when number in [1,2,3,4] ->
           value = 13
@@ -86,6 +92,7 @@ defmodule ElixirScript.Translator.Case.Test do
 
   test "translate case with multiple guards" do
     ex_ast = quote do
+      data = :ok
       case data do
         number when number in [1,2,3,4] when number in [4, 3, 2, 1] ->
           value = 13
@@ -106,16 +113,19 @@ defmodule ElixirScript.Translator.Case.Test do
     """
 
     assert_translation(ex_ast, js_code)
-  end  
+  end
 
   test "translate case with multiple statements in body" do
     ex_ast = quote do
-      case data do
-        :ok ->
-          :console.info("info")
-          Todo.add(data)
-        :error ->
-          nil
+      def execute() do
+        data = :ok
+        case data do
+          :ok ->
+            :console.info("info")
+            Todo.add(data)
+          :error ->
+            nil
+        end
       end
     end
 
@@ -133,11 +143,14 @@ defmodule ElixirScript.Translator.Case.Test do
 
   test "translate case with destructing" do
     ex_ast = quote do
-      case data do
-        { one, two } ->
-          :console.info(one)
-        :error ->
-          nil
+      def execute() do
+        data = :ok
+        case data do
+          { one, two } ->
+            :console.info(one)
+          :error ->
+            nil
+        end
       end
     end
 
@@ -156,11 +169,14 @@ defmodule ElixirScript.Translator.Case.Test do
 
   test "translate case with nested destructing" do
     ex_ast = quote do
-      case data do
-        { {one, two} , three } ->
-          :console.info(one)
-        :error ->
-          nil
+      def execute() do
+        data = :error
+        case data do
+          { {one, two} , three } ->
+            :console.info(one)
+          :error ->
+            nil
+        end
       end
     end
 
@@ -179,6 +195,7 @@ defmodule ElixirScript.Translator.Case.Test do
     assert_translation(ex_ast, js_code)
 
     ex_ast = quote do
+      data = :error
       case data do
         { one, {two, three} } ->
           :console.info(one)
@@ -194,56 +211,6 @@ defmodule ElixirScript.Translator.Case.Test do
         })]
     })], function(one, two, three) {
         return console.info(one);
-    }), Bootstrap.Core.Patterns.clause([Symbol.for('error')], function() {
-        return null;
-    })).call(this, data)
-    """
-
-    assert_translation(ex_ast, js_code)
-
-
-    ex_ast = quote do
-      case data do
-        %AStruct{key: %BStruct{ key2: value }} ->
-          :console.info(value)
-        :error ->
-          nil
-      end
-    end
-
-    js_code = """
-    Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.type(AStruct, {
-        [Symbol.for('key')]: Bootstrap.Core.Patterns.type(BStruct, {
-            [Symbol.for('key2')]: Bootstrap.Core.Patterns.variable()
-        })
-    })], function(value) {
-        return console.info(value);
-    }), Bootstrap.Core.Patterns.clause([Symbol.for('error')], function() {
-        return null;
-    })).call(this, data)
-    """
-
-    assert_translation(ex_ast, js_code)
-
-
-    ex_ast = quote do
-      case data do
-        %AStruct{key: %BStruct{ key2: value, key3: %CStruct{ key4: value2 } }} ->
-          :console.info(value)
-        :error ->
-          nil
-      end
-    end
-
-    js_code = """
-    Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.type(AStruct, {
-        [Symbol.for('key')]: Bootstrap.Core.Patterns.type(BStruct, {
-            [Symbol.for('key2')]: Bootstrap.Core.Patterns.variable(), [Symbol.for('key3')]: Bootstrap.Core.Patterns.type(CStruct, {
-                [Symbol.for('key4')]: Bootstrap.Core.Patterns.variable()
-            })
-        })
-    })], function(value, value2) {
-        return console.info(value);
     }), Bootstrap.Core.Patterns.clause([Symbol.for('error')], function() {
         return null;
     })).call(this, data)
