@@ -71,11 +71,10 @@ defmodule ElixirScript do
     |> get_modules_from_quoted
     |> Enum.map(fn(x) -> %{ast: x, app: :app} end)
 
-    {loaded_modules, std_lib_quoted} = get_quoted_std_lib()
+    std_lib_quoted = get_quoted_std_lib()
 
-    %{data: std_lib_quoted ++ data, loaded_modules: loaded_modules}
+    %{data: std_lib_quoted ++ data}
     |> ElixirScript.Passes.Init.execute(opts)
-    |> ElixirScript.Passes.LoadModulesForQuoted.execute(opts)
     |> ElixirScript.Passes.FindModules.execute(opts)
     |> ElixirScript.Passes.FindLoadOnly.execute(opts)
     |> ElixirScript.Passes.FindFunctions.execute(opts)
@@ -91,24 +90,11 @@ defmodule ElixirScript do
     |> Path.join
     |> Path.wildcard
 
-    loaded_modules = if Code.ensure_loaded?(ElixirScript.Kernel) do
-      []
-    else
-      case files do
-        [] ->
-          []
-        files ->
-          Kernel.ParallelCompiler.files(files)
-      end
-    end
-
-    std_lib_quoted = files
+    files
     |> Enum.map(fn path -> File.read!(path) end)
     |> Enum.map(&Code.string_to_quoted!(&1))
     |> Enum.flat_map(&get_modules_from_quoted(&1))
     |> Enum.map(fn(x) -> %{ast: x, app: :elixir} end)
-
-    {loaded_modules, std_lib_quoted}
   end
 
   defp get_modules_from_quoted(quoted) do
