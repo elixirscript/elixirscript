@@ -70,7 +70,7 @@ defmodule ElixirScript.Passes.ConsolidateProtocols do
 
     body = Enum.map(implementations, fn({_, impl_data}) ->
       x = Utils.quoted_to_name(impl_data.for)
-      members = ["Elixir"] ++ Module.split(name) ++ ["DefImpl"] ++ Module.split(x) ++ ["__load"]
+      members = ["Elixir"] ++ Module.split(name) ++ ["DefImpl", "Elixir"] ++ Module.split(x) ++ ["__load"]
       ast = JS.call_expression(
         Identifier.make_namespace_members(members),
         [JS.identifier("Elixir")]

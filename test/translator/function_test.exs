@@ -451,7 +451,7 @@ defmodule ElixirScript.Translator.Function.Test do
 
 
     js_code = """
-    const something = Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.type(Elixir$AStruct.Elixir$AStruct, {})], function() {
+    const something = Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.type(Elixir.AStruct.__load(Elixir).Elixir$AStruct, {})], function() {
         return null;
     }));
     """
@@ -471,7 +471,7 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-    const something = Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.capture(Bootstrap.Core.Patterns.type(Elixir$AStruct.Elixir$AStruct, {}))], function(a) {
+    const something = Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.capture(Bootstrap.Core.Patterns.type(Elixir.AStruct.__load(Elixir).Elixir$AStruct, {}))], function(a) {
         return null;
     }));
     """
@@ -507,7 +507,7 @@ defmodule ElixirScript.Translator.Function.Test do
 
 
     js_code = """
-    const something = Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.type(Elixir$AStruct.Elixir$AStruct, {
+    const something = Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.type(Elixir.AStruct.__load(Elixir).Elixir$AStruct, {
         [Symbol.for('key')]: Bootstrap.Core.Patterns.variable(), [Symbol.for('key1')]: 2
     })], function(value) {
         return null;
@@ -527,7 +527,7 @@ defmodule ElixirScript.Translator.Function.Test do
 
 
     js_code = """
-    const something = Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.type(Elixir$AStruct.Elixir$AStruct, {
+    const something = Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.type(Elixir.AStruct.__load(Elixir).Elixir$AStruct, {
         [Symbol.for('key')]: Bootstrap.Core.Patterns.variable(), [Symbol.for('key1')]: 2
     })], function(value) {
         return null;

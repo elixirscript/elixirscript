@@ -9,7 +9,7 @@ defmodule ElixirScript.Lib.Elixir.Kernel.Test do
 
     js_code = """
     
-    Elixir$ElixirScript$Range.Elixir$ElixirScript$Range.create(Object.freeze({
+    Elixir.ElixirScript.Range.__load(Elixir).Elixir$ElixirScript$Range.create(Object.freeze({
       [Symbol.for('first')]: 1,
       [Symbol.for('last')]: 4
     }))
