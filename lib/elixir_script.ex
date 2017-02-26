@@ -206,11 +206,19 @@ defmodule ElixirScript do
   end
 
   @doc """
+  Returns the contents of the bootrstrap js file
+  """
+  def get_bootstrap_js(module_format) do
+    path = Path.join([operating_path, "build", to_string(module_format),"Elixir.Bootstrap.js"])
+    File.read!(path)
+  end  
+
+  @doc """
   Copies the javascript that makes up the ElixirScript bootstrap
   to the specified location
   """
   def copy_bootstrap_to_destination(module_format, destination) do
-    path = Path.join([operating_path, to_string(module_format), "elixir", "Elixir.Bootstrap.js"])
+    path = Path.join([operating_path, "build", to_string(module_format),"Elixir.Bootstrap.js"])
     base = Path.basename(path)
     File.mkdir_p!(destination)
     File.cp!(path, Path.join([destination, base]))

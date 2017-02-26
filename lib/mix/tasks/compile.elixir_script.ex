@@ -73,7 +73,7 @@ defmodule Mix.Tasks.Compile.ElixirScript do
     output_path
     |> File.ls!
     |> Enum.each(fn(x) ->
-      if String.contains?(Path.basename(x), "Elixir.") do
+      if String.contains?(Path.basename(x), "Elixir.App.js") do
         File.rm!(Path.join(output_path, x))
       end
     end)
