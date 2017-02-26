@@ -25,7 +25,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - `JS.import` has been removed in favor of defining JavaScript modules used in configuration
 
 ### Changed
-- All Modules are now bundled together as one js file. The `Elixir.Bootstrap.js` file is also still created
+- Now bundles all output, including the boostrap code.
   The exported object has Elixir modules in JavaScript namespaces that are lazily loaded when called.
 
   To start your application import the bundle according to whichever module format was selected and 
