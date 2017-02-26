@@ -20,7 +20,7 @@ defmodule ElixirScript.Translator.UMD.Test do
          } else if (typeof exports === 'object') {
              module.exports = factory()
          } else {
-             root.returnExports = factory()
+             root.Elixir = factory()
          }
     """
 

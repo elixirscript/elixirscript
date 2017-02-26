@@ -85,7 +85,7 @@ defmodule ElixirScript.ModuleSystems.UMD do
                   :=,
                   JS.member_expression(
                     JS.identifier("root"),
-                    JS.identifier("returnExports")
+                    JS.identifier("Elixir")
                   ),
                   JS.call_expression(
                     JS.identifier("factory"),
