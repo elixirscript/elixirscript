@@ -6,20 +6,8 @@ defmodule ElixirScript.ModuleSystems.Namespace do
   alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.Identifier
 
-  def build(module_name, imports, body, exports, env) do
-    module_imports = imports
-    |> Enum.filter(fn 
-      {mod, _} -> 
-        case Module.split(mod) do
-          ["JS"] -> false
-          _ -> true
-        end
-    end)
-    |> Enum.map(fn {module, path} ->
-      import_module(module)
-    end)
-
-    List.wrap(make_namespace_body(module_name, module_imports, body, exports))
+  def build(module_name, body, exports, env) do
+    List.wrap(make_namespace_body(module_name, body, exports))
   end
 
   defp module_name_function_call(module_name, function) do
@@ -54,7 +42,7 @@ defmodule ElixirScript.ModuleSystems.Namespace do
     )   
   end
 
-  defp make_namespace_body(module_name, imports, body, exports) do
+  defp make_namespace_body(module_name, body, exports) do
     values = module_name_function_call(module_name, "__exports")
 
     _if = JS.if_statement(
@@ -91,7 +79,7 @@ defmodule ElixirScript.ModuleSystems.Namespace do
           JS.identifier("__load")
     )
 
-    func_body = JS.block_statement([_if] ++ body ++ [declaration, assign] ++ imports ++ exports)
+    func_body = JS.block_statement([_if] ++ body ++ [declaration, assign] ++ exports)
 
     func = JS.function_expression([JS.identifier("Elixir")], [], func_body)
     JS.assignment_expression(

@@ -13,12 +13,20 @@ defmodule ElixirScript.Translator.Struct do
       name = ElixirScript.Translator.LexicalScope.get_module_name(env, candiate_module_name)
       ident = JS.identifier(Utils.name_to_js_name(name))
       ElixirScript.Translator.State.add_module_reference(env.state, env.module, name)
-      JS.member_expression(ident, ident)
+
+      members = ["Elixir"] ++ Module.split(name) ++ ["__load"]
+
+      JS.member_expression(
+        JS.call_expression(
+          Identifier.make_namespace_members(members),
+          [JS.identifier("Elixir")]
+        ),
+        ident
+      )
 
     else
       Identifier.make_identifier(module_name)
     end
-
   end
 
   def new_struct(module_name, data, env) do

@@ -130,7 +130,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
-    Bootstrap.Core.Functions.call_property(Elixir$Lions$Tigers$Bears, 'oh_my');
+    Elixir.Lions.Tigers.Bears.__load(Elixir).oh_my()
     """
 
     assert_translation(ex_ast, js_code)

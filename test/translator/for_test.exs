@@ -177,7 +177,7 @@ defmodule ElixirScript.Translator.For.Test do
       Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.type(Bootstrap.Core.Tuple, {
             values: [Symbol.for('user'), Bootstrap.Core.Patterns.variable()]
         })], function(name) {
-            return Elixir$ElixirScript$String.upcase(name);
+            return Elixir.ElixirScript.String.__load(Elixir).upcase(name);
         }, function() {
             return true;
         }),

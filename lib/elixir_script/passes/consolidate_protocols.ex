@@ -3,6 +3,7 @@ defmodule ElixirScript.Passes.ConsolidateProtocols do
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.State
+  alias ElixirScript.Translator.Identifier
   require Logger
 
   def execute(compiler_data, opts) do
@@ -67,23 +68,21 @@ defmodule ElixirScript.Passes.ConsolidateProtocols do
 
     app_name = protocol.app
 
-    defimpl_imports = Enum.map(implementations, fn({_, impl_data}) ->
-      x = Atom.to_string(Utils.quoted_to_name(impl_data.for))
-      x = String.to_atom(protocol_name <> ".DefImpl." <> x)
-      name = Utils.name_to_js_name(x)
-      ElixirScript.ModuleSystems.Namespace.import_module(x)
-    end)
-
     body = Enum.map(implementations, fn({_, impl_data}) ->
-      x = Atom.to_string(Utils.quoted_to_name(impl_data.for))
-      x = String.to_atom(protocol_name <> ".DefImpl." <> x)
-      name = Utils.name_to_js_name(x)
+      x = Utils.quoted_to_name(impl_data.for)
+      members = ["Elixir"] ++ Module.split(name) ++ ["DefImpl", "Elixir"] ++ Module.split(x) ++ ["__load"]
+      ast = JS.call_expression(
+        Identifier.make_namespace_members(members),
+        [JS.identifier("Elixir")]
+      )
+
+
       JS.call_expression(
         JS.member_expression(
           JS.identifier("impls"),
           JS.identifier("push")
         ),
-        [JS.identifier(name)]
+        [ast]
       )
     end)
 
@@ -92,8 +91,7 @@ defmodule ElixirScript.Passes.ConsolidateProtocols do
       name: name,
       module: String.to_atom(protocol_name <> ".DefImpl"),
       std_lib: {:Elixir, Utils.make_local_file_path(:elixir, compiler_opts.core_path, compiler_opts.root, nil)},
-      imports: [],
-      body: defimpl_imports ++ [declaration] ++ body,
+      body: [declaration] ++ body,
       exports: JS.identifier("impls"),
       app: app_name,
       type: :consolidated,

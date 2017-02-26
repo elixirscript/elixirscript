@@ -9,15 +9,19 @@ defmodule ElixirScript.Passes.CreateJSModules do
         acc
 
       ({module_name, module_data}, acc) ->
-        body = generate_namespace_module(
-          module_data.type,
-          module_name,
-          Map.get(module_data, :javascript_module, module_data),
-          opts,
-          compiler_data.state
-        )
+        if module_data.app == :elixir && opts.import_standard_libs == false do
+          acc
+        else
+          body = generate_namespace_module(
+            module_data.type,
+            module_name,
+            Map.get(module_data, :javascript_module, module_data),
+            opts,
+            compiler_data.state
+          )
 
-        acc ++ List.wrap(body)
+          acc ++ List.wrap(body)
+        end
     end)
 
     compiled = compile(namespace_modules, opts)
@@ -34,7 +38,6 @@ defmodule ElixirScript.Passes.CreateJSModules do
 
     body = ElixirScript.ModuleSystems.Namespace.build(
       module_name,
-      js_module.imports,
       js_module.body,
       js_module.exports,
       env
@@ -46,7 +49,6 @@ defmodule ElixirScript.Passes.CreateJSModules do
   defp generate_namespace_module(_, module_name, js_module, _, _) do
     body = ElixirScript.ModuleSystems.Namespace.build(
       module_name,
-      js_module.imports,
       js_module.body,
       js_module.exports,
       js_module.env
