@@ -5,13 +5,12 @@ defmodule ElixirScript.CLI do
 
   @switches [
     output: :string, elixir: :boolean,
-    help: :boolean, core_path: :string,
-    full_build: :boolean, version: :boolean,
-    watch: :boolean, format: :string, config: :boolean
+    help: :boolean, full_build: :boolean, version: :boolean,
+    watch: :boolean, format: :string, js_module: [:string, :keep]
   ]
 
   @aliases [
-    o: :output, ex: :elixir, h: :help, v: :version, f: :format, c: :config
+    o: :output, ex: :elixir, h: :help, v: :version, f: :format
   ]
 
   def main(argv) do
@@ -45,31 +44,14 @@ defmodule ElixirScript.CLI do
   the elixir code string if passed the -ex flag
 
   options:
-  -c  --config          a path to an elixirscript configuration file
+  --js-module [<identifer>:<path>] A js module used in your code. ex: React:react
+                        Multiple can be defined 
   -f  --format [format] module format of output. options: es (default), common, umd
   -o  --output [path]   places output at the given path
   -ex --elixir          read input as elixir code string
   --full-build          informs the compiler to do a full build instead of an incremental one
-  --core-path    import path to the elixirscript standard lib
-  only used with the [output] option. When used, Elixir.js is not exported
   -v  --version         the current version number
   -h  --help            this message
-
-  Will check for an elixirscript.exs file in the current directory.
-  A specific file can be given with the -c flag.
-
-  A config file contain only a keyword list with have the following format:
-  [
-    input: (string or list) The input path(s),
-    output: (string) the output path,
-    format: (atom) the moduel format of the output,
-    js_modules: (keyword) a list of the js modules that will be used
-  ]
-
-  All fields are optional and will fallback to flags given
-  The config option is not compatible with the -ex flag
-
-
   """
   end
 
@@ -92,28 +74,23 @@ defmodule ElixirScript.CLI do
   def do_process(input, options) do
     {watch, options} = Keyword.pop(options, :watch, false)
 
+    js_modules = Keyword.get_values(options, :js_module)
+    |> build_js_modules
+
     compile_opts = %{
       include_path: true,
       core_path: Keyword.get(options, :core_path, "Elixir.Bootstrap"),
       full_build: Keyword.get(options, :full_build, false),
       output: Keyword.get(options, :output, :stdout),
-      format: String.to_atom(Keyword.get(options, :format, "es"))
+      format: String.to_atom(Keyword.get(options, :format, "es")),
+      js_modules: js_modules
     }
 
     case options[:elixir] do
       true ->
         ElixirScript.compile(input, compile_opts)
       _ ->
-        config = options
-        |> Keyword.get(:config, "elixirscript.exs")
-        |> handle_config
-        |> Map.new
-
-        input = Map.get(config, :input, handle_input(input))
-        {_, config} = Map.pop(config, :input)
-
-        compile_opts = Map.merge(compile_opts, config)
-
+        input = handle_input(input)
         ElixirScript.compile_path(input, compile_opts)
 
         if watch do
@@ -134,19 +111,30 @@ defmodule ElixirScript.CLI do
   end
 
   defp handle_input(input) do
-        input = input
-        |> Enum.map(fn(x) -> String.split(x, [" ", ","], trim: true) end)
-        |> List.flatten
+    input = input
+    |> Enum.map(fn(x) -> String.split(x, [" ", ","], trim: true) end)
+    |> List.flatten
   end
 
-
-  defp handle_config(path) do
-    if File.exists?(path) do
-      {config, _} = Code.eval_file(path)
-      config
-    else
-      []
-    end
+  defp build_js_modules(values) do
+    values
+    |> Enum.map(fn x -> 
+      [identifier, path] = String.split(x,":", trim: true)
+      { format_identifier(identifier), format_path(path) }
+    end)
   end
 
+  defp format_identifier(id) do
+    id
+    |> String.split(".")
+    |> Module.concat
+  end
+  
+
+  defp format_path(path) do
+    path
+    |> String.replace("\"", "")
+    |> String.replace("`", "")
+    |> String.replace("'", "")
+  end
 end
