@@ -16,11 +16,11 @@ defmodule ElixirScript.Translator.UMD.Test do
     js_code = """
          (function(root, factory) {
          if (typeof define === 'function' && define.amd) {
-             define(['./Elixir.Bootstrap'], factory)
+             define([], factory)
          } else if (typeof exports === 'object') {
-             module.exports = factory(require('./Elixir.Bootstrap'))
+             module.exports = factory()
          } else {
-             root.returnExports = factory(root.Bootstrap)
+             root.returnExports = factory()
          }
     """
 

@@ -70,13 +70,11 @@ defmodule Mix.Tasks.Compile.ElixirScript do
     elixirscript_config = get_elixirscript_config()
     output_path = Keyword.get(elixirscript_config, :output)
 
-    output_path
-    |> File.ls!
-    |> Enum.each(fn(x) ->
-      if String.contains?(Path.basename(x), "Elixir.") do
-        File.rm!(Path.join(output_path, x))
-      end
-    end)
+    path = Path.join([output_path, "Elixir.App.js"])
+
+    if File.exists?(path) do
+      File.rm!(path)
+    end
 
     :ok
   end
