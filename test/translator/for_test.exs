@@ -24,7 +24,7 @@ defmodule ElixirScript.Translator.For.Test do
           Object.freeze([1, 2, 3, 4])
         )
       ],
-      Elixir$ElixirScript$Collectable,
+      Elixir.ElixirScript.Collectable.__load(Elixir),
       Object.freeze([])
     )
     """
@@ -54,7 +54,7 @@ defmodule ElixirScript.Translator.For.Test do
           Object.freeze([1, 2, 3, 4])
         )
       ],
-      Elixir$ElixirScript$Collectable,
+      Elixir.ElixirScript.Collectable.__load(Elixir),
       Object.freeze([])
     )
     """
@@ -88,7 +88,7 @@ defmodule ElixirScript.Translator.For.Test do
           Object.freeze([2, 3])
         )
       ],
-      Elixir$ElixirScript$Collectable,
+      Elixir.ElixirScript.Collectable.__load(Elixir),
       Object.freeze([])
     )
     """
@@ -126,7 +126,7 @@ defmodule ElixirScript.Translator.For.Test do
             Object.freeze([2, 3])
           )
         ],
-        Elixir$ElixirScript$Collectable,
+        Elixir.ElixirScript.Collectable.__load(Elixir),
         Object.freeze([])
       )
     );
@@ -157,7 +157,7 @@ defmodule ElixirScript.Translator.For.Test do
           Object.freeze([1, 2, 3, 4, 5, 6])
         )
       ],
-      Elixir$ElixirScript$Collectable,
+      Elixir.ElixirScript.Collectable.__load(Elixir),
       Object.freeze([])
     )
     """
@@ -186,7 +186,7 @@ defmodule ElixirScript.Translator.For.Test do
             values: [Symbol.for('user'), Bootstrap.Core.Patterns.variable()]
         }), Object.freeze([new Bootstrap.Core.Tuple(Symbol.for('user'), 'john'), new Bootstrap.Core.Tuple(Symbol.for('admin'), 'john'), new Bootstrap.Core.Tuple(Symbol.for('user'), 'meg')]))
         ],
-        Elixir$ElixirScript$Collectable,
+        Elixir.ElixirScript.Collectable.__load(Elixir),
         Object.freeze([]))
     """
 
@@ -218,7 +218,7 @@ defmodule ElixirScript.Translator.For.Test do
          'value': Bootstrap.Core.Patterns.variable()
      }, 8), Bootstrap.Core.BitString.size({
          'value': Bootstrap.Core.Patterns.variable()
-     }, 8)), pixels)], Elixir$ElixirScript$Collectable, Object.freeze([]))
+     }, 8)), pixels)], Elixir.ElixirScript.Collectable.__load(Elixir), Object.freeze([]))
     """
 
     assert_translation(ex_ast, js_code)
