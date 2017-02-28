@@ -59,7 +59,6 @@ The compiler to this point has been focused on translating Kernel.SpecialForms a
     * List
     * Atom
     * Range
-    * Logger
     * Map
     * MapSet
 
