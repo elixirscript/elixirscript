@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Multiple `when` clauses in guards
 - Kernel.defdelegate/2
-- `js_modules` configuration option has been added. This is a keyword list of JavaScript modules that will be used.
+- `js_modules` configuration option has been added. This is a list of JavaScript modules that will be used.
   ```
         js_modules: [
           {React, "react"},

@@ -29,27 +29,24 @@ This is the help output of elixirscript
      <input> path to elixir files or
      the elixir code string if passed the -ex flag
      options:
+    --js-module [<identifer>:<path>] A js module used in your code. ex: React:react
+                            Multiple can be defined      
      -f --format [format] module format of output. options: es (default), common, umd
      -o --output [path] places output at the given path
      -ex --elixir read input as elixir code string
      --full-build informs the compiler to do a full build instead of an incremental one
-     --core-path import path to the elixirscript standard lib
-     only used with the [output] option. When used, Elixir.js is not exported
      -v --version the current version number
      -h --help this message
 
 the `<input>` is the elixir code string or file path you want to convert from elixir to javascript. Below is an example of using a code string and turning it into JavaScript
 
     $ elixirscript ":atom" -ex
-     Symbol.for('atom')
-
-It changed the elixir code, `:atom` into the JavaScript code `Symbol.for('atom')`. The `-ex` parameter lets the script know that the input is an Elixir code string instead of a file.
 
 elixirscript also takes a path to your `.ex` files as well:
 
     $ elixirscript "src" -o "dist"
 
-If you look in the dist folder, you should see 2 folders. `app` contains your code and `elixir` contains the elixirscript standard library files.
+If you look in the dist folder you'll see a file called `Elixir.App.js`
 
 ### Mix dependency
 
@@ -58,7 +55,7 @@ Adding Elixirscript to your mix project gives you the ability to add it to your 
 Add dependency to your deps in mix.exs:
 
     ```elixir
-    {:elixir_script, "~> 0.25"}
+    {:elixir_script, "~> 0.26"}
     ```
 
     Elixirscript uses default input, output and module formats if options are not given. If you wish to change any or all options, add an `elixir_script` key to your project configuration.
@@ -69,7 +66,15 @@ Add dependency to your deps in mix.exs:
      version: "0.1.0",
      elixir: "~> 1.0",
      deps: deps,
-     elixir_script: [ input: "lib/elixirscript", output: "priv/elixirscript", format: :es],
+     elixir_script: [ 
+        input: "lib/elixirscript", 
+        output: "priv/elixirscript", 
+        format: :es,
+        js_modules: [
+          {React, "react"},
+          {ReactDOM, "react-dom"}
+        ]         
+     ],
      compilers: [:elixir_script] ++ Mix.compilers
     ]
     end
@@ -87,6 +92,8 @@ Available options are:
     *   `:common` - CommonJS
 
     *   `:umd` - UMD
+
+* `js_modules`: A list of JavaScript imports to add. Each item must be 2-tuple or a 3-tuple. The third element is an optional keyword list of options.
 
 ### Macros
 
@@ -117,27 +124,18 @@ You can call globally scoped modules you would an Elixir module
 
 Only works if module begins with a captial letter
 
-#### Importing Modules
-
-To import modules, first you must `require` the `JS` module. Then import the module using `JS.import`
-
-    defmodule MyModule do
-     require JS
-     JS.import React, "react"
-
-     def func() do
-       React.render(my_component)
-     end
-    end
-
 #### The JS module
 
 The JS module has many other functions and macros. For more information, check out the docs.
 
 #### Frontend Project Boilerplate
 
-There is an [elixirscript frontend boilerplate project](https://github.com/bryanjos/elixirscript-project-boilerplate). This setup uses gulp and webpack to build and bundle assets.
+There is an [elixirscript frontend boilerplate project](https://github.com/elixirscript/elixirscript-project-boilerplate). This setup uses gulp and webpack to build and bundle assets.
 
-#### ElixirScript-Brunch
+#### elixirscript-brunch
 
-There is an Brunch plugin, [ElixirScript-Brunch](https://www.npmjs.com/package/elixirscript-brunch). There are instructions there on how to use it with Phoenix.
+There is an Brunch plugin, [elixirscript-brunch](https://www.npmjs.com/package/elixirscript-brunch).
+
+#### 
+
+There is also a webpack loader, [elixirscript-loader](https://www.npmjs.com/package/elixirscript-loader).
