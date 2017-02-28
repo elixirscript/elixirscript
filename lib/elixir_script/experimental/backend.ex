@@ -1,4 +1,4 @@
-defmodule ElixirscriptBackend do
+defmodule Elixirscript.Experimental.Backend do
   def compile(line, file, module, attrs, defs, unreachable, opts) do
 
     # Print all arguments

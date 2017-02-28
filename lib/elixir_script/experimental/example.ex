@@ -2,6 +2,7 @@ defmodule Example do
   @compile {:undocumented_elixir_backend_option, ElixirscriptBackend}
 
   defmodule First do
+    @compile {:undocumented_elixir_backend_option, ElixirscriptBackend}
     def hello(e)  do
     end
   end
