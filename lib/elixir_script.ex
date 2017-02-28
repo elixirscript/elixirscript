@@ -41,8 +41,6 @@ defmodule ElixirScript do
   end
 
   # This is the serialized state of the ElixirScript.State module containing references to the standard library
-  @external_resource stdlib_state_path = Path.join([__DIR__, "elixir_script", "translator", "stdlib_state.bin"])
-  @stdlib_state File.read(stdlib_state_path)
   @lib_path Application.get_env(:elixir_script, :lib_path)
   @version  Mix.Project.config[:version]
 
@@ -67,32 +65,32 @@ defmodule ElixirScript do
   @spec compile_quoted(Macro.t, Map.t) :: [binary | {binary, binary} | :ok]
   def compile_quoted(quoted, opts \\ %{}) do
 
-    opts = build_compiler_options(Map.merge(opts, %{import_standard_libs: false}))
+    opts = build_compiler_options(opts)
 
     data = quoted
     |> get_modules_from_quoted
     |> Enum.map(fn(x) -> %{ast: x, app: :app} end)
 
-    data = get_quoted_std_lib() ++ data
+    std_lib_quoted = get_quoted_std_lib()
 
-    result = %{data: data}
+    %{data: std_lib_quoted ++ data}
     |> ElixirScript.Passes.Init.execute(opts)
     |> ElixirScript.Passes.FindModules.execute(opts)
     |> ElixirScript.Passes.FindLoadOnly.execute(opts)
     |> ElixirScript.Passes.FindFunctions.execute(opts)
     |> ElixirScript.Passes.JavaScriptAST.execute(opts)
     |> ElixirScript.Passes.ConsolidateProtocols.execute(opts)
-    |> ElixirScript.Passes.CreateJSModules.execute(opts)    
+    |> ElixirScript.Passes.CreateJSModules.execute(opts)
     |> ElixirScript.Passes.JavaScriptCode.execute(opts)
-    |> ElixirScript.Passes.JavaScriptName.execute(opts)
     |> ElixirScript.Passes.HandleOutput.execute(opts)
-
-    result
   end
 
   defp get_quoted_std_lib() do
-    Path.join([get_std_lib_path(), "**", "*.ex"])
+    files = [get_std_lib_path(), "**", "*.ex"]
+    |> Path.join
     |> Path.wildcard
+
+    files
     |> Enum.map(fn path -> File.read!(path) end)
     |> Enum.map(&Code.string_to_quoted!(&1))
     |> Enum.flat_map(&get_modules_from_quoted(&1))
@@ -138,7 +136,7 @@ defmodule ElixirScript do
     compile_path([path], opts)
   end
 
-  def compile_path(path, opts) when is_list(path) do  
+  def compile_path(path, opts) when is_list(path) do
     built_opts = build_compiler_options(opts)
 
     app_name = cond do
@@ -171,16 +169,12 @@ defmodule ElixirScript do
     |> ElixirScript.Passes.FindFunctions.execute(opts)
     |> ElixirScript.Passes.JavaScriptAST.execute(opts)
     |> ElixirScript.Passes.ConsolidateProtocols.execute(opts)
-    |> ElixirScript.Passes.CreateJSModules.execute(opts)    
+    |> ElixirScript.Passes.CreateJSModules.execute(opts)
     |> ElixirScript.Passes.JavaScriptCode.execute(opts)
-    |> ElixirScript.Passes.JavaScriptName.execute(opts)
     |> ElixirScript.Passes.HandleOutput.execute(opts)
 
     result
   end
-
-  @doc false
-  def version(), do: @version
 
   defp build_compiler_options(opts) do
     default_options = Map.new
@@ -212,14 +206,11 @@ defmodule ElixirScript do
   end
 
   @doc """
-  Copies the javascript that makes up the ElixirScript bootstrap
-  to the specified location
+  Returns the contents of the bootrstrap js file
   """
-  def copy_bootstrap_to_destination(module_format, destination) do
-    path = Path.join([operating_path, to_string(module_format), "elixir", "Elixir.Bootstrap.js"])
-    base = Path.basename(path)
-    File.mkdir_p!(destination)
-    File.cp!(path, Path.join([destination, base]))
+  def get_bootstrap_js(module_format) do
+    path = Path.join([operating_path, "build", to_string(module_format), "Elixir.Bootstrap.js"])
+    File.read!(path)
   end
 
   #Gets path to js files whether the mix project is available
@@ -241,7 +232,7 @@ defmodule ElixirScript do
   end
 
   defp get_std_lib_path() do
-    Path.join([operating_path(), "std_lib"])   
+    Path.join([operating_path(), "std_lib"])
   end
 
 end

@@ -3,14 +3,12 @@ import babel from "rollup-plugin-babel";
 
 export default {
   entry: "src/javascript/elixir.js",
-  dest: "priv/es/elixir/Elixir.Bootstrap.js",
-  sourceMap: "inline",
-  format: "es",
-  moduleName: "Elixir.Bootstrap",
+  moduleName: "Bootstrap",
   plugins: [
     nodeResolve({ jsnext: true }),
     babel({
       babelrc: false
     })
-  ]
+  ],
+  targets: [{ dest: "priv/build/iife/Elixir.Bootstrap.js", format: "iife" }]
 };

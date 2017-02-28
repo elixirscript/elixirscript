@@ -8,7 +8,7 @@ defmodule ElixirScript.Translator.Capture.Test do
     end
 
     js_code = """
-    let [fun] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.variable(),Elixir$ElixirScript$Kernel.is_atom);
+    let [fun] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.variable(), Elixir.ElixirScript.Kernel.__load(Elixir).is_atom);
     """
 
     assert_translation(ex_ast, js_code)
@@ -23,7 +23,7 @@ defmodule ElixirScript.Translator.Capture.Test do
 
     js_code = """
      let [fun] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.variable(),Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],function(__1)    {
-             return     Elixir$ElixirScript$Kernel.is_atom(__1);
+             return Elixir.ElixirScript.Kernel.__load(Elixir).is_atom(__1);
            })));
     """
 
@@ -35,11 +35,11 @@ defmodule ElixirScript.Translator.Capture.Test do
   test "translate capture operator with function, and arity" do
 
     ex_ast = quote do
-      fun = &local_function/1
+      fun = &is_atom/1
     end
 
     js_code = """
-    let [fun] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.variable(),local_function);
+    let [fun] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.variable(),is_atom);
     """
 
     assert_translation(ex_ast, js_code)
@@ -94,11 +94,16 @@ defmodule ElixirScript.Translator.Capture.Test do
   test "translate capture operator with anonymous functions as parameters" do
 
     ex_ast = quote do
-      Elixir.Enum.map(items, &process(&1))
+      def process(a) do
+      end
+
+      def execute() do
+        Enum.map([], &process(&1))
+      end
     end
 
     js_code = """
-     Elixir.Enum.map(items,Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],function(__1)    {
+     Bootstrap.Enum.map(Object.freeze([]),Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],function(__1)    {
              return     process(__1);
            })))
     """
@@ -107,11 +112,16 @@ defmodule ElixirScript.Translator.Capture.Test do
 
 
     ex_ast = quote do
-      elem.keypress(&process_event(&1))
+      def process_event(a) do
+      end
+
+      def execute() do
+        Elem.keypress(&process_event(&1))
+      end
     end
 
     js_code = """
-     elem.keypress(Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],function(__1)    {
+     Elem.keypress(Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],function(__1)    {
              return     process_event(__1);
            })))
     """

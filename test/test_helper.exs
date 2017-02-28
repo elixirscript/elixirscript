@@ -66,4 +66,22 @@ defmodule ElixirScript.TestHelper do
     #{actual_js_code}
     """
   end
+
+  def refute_translation(ex_ast, js_code) do
+    refute_translation(ex_ast, js_code, :es)
+  end
+
+  def refute_translation(ex_ast, js_code, format) do
+    converted_code = ex_ast_to_js(ex_ast, format)
+
+    refute converted_code |> strip_spaces =~ strip_spaces(js_code), """
+    **Code Does Not Match **
+
+    ***Expected***
+    #{js_code}
+
+    ***Actual***
+    #{converted_code}
+    """
+  end
 end

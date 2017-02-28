@@ -11,8 +11,7 @@ defmodule ElixirScript.ModuleSystems.UMD do
     imports = js_imports
     |> Enum.map(fn
       {module, path} -> import_module(module, path)
-      {module, path, true} -> import_module(module, path)
-      {module, path, false} -> import_namespace_module(module, path)
+      {module, path, _} -> import_module(module, path)
     end)
 
     imports = Enum.uniq(imports ++ module_imports)
@@ -21,26 +20,16 @@ defmodule ElixirScript.ModuleSystems.UMD do
     List.wrap(make_umd(imports, body, export))
   end
 
-  def import_namespace_module(module_name, from) do
-    js_module_name = ElixirScript.Translator.Identifier.make_namespace_members(module_name)
-    {js_module_name, JS.literal(from)}
-  end
-
-  def import_module(module_name, from) do
+  defp import_module(module_name, from) do
     js_module_name = ElixirScript.Translator.Identifier.make_namespace_members(module_name)    
     {js_module_name, JS.literal(from)}
   end
 
-  def import_module(module_name, from) do
-    js_module_name = ElixirScript.Translator.Identifier.make_namespace_members(module_name)    
-    {JS.identifier(module_name), JS.literal(from)}
-  end
-
-  def export_module(exported_object) do
+  defp export_module(exported_object) do
     exported_object
   end
 
-  def make_umd(imports, body, exports) do
+  defp make_umd(imports, body, exports) do
     import_paths = Enum.map(imports, fn({_, path}) -> path end)
     import_identifiers = Enum.map(imports, fn({id, _}) -> id end)
     exports = if is_nil(exports), do: [], else: [JS.return_statement(exports)]
@@ -96,7 +85,7 @@ defmodule ElixirScript.ModuleSystems.UMD do
                   :=,
                   JS.member_expression(
                     JS.identifier("root"),
-                    JS.identifier("returnExports")
+                    JS.identifier("Elixir")
                   ),
                   JS.call_expression(
                     JS.identifier("factory"),

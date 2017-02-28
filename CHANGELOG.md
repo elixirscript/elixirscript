@@ -4,28 +4,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [0.26.0] - Unreleased
+## [0.26.1] - 2017-02-27
+
+### Fixed
+- Fixed `for` translation
+- Updated documentation
+
+## [0.26.0] - 2017-02-27
 
 ### Added
 - Multiple `when` clauses in guards
 - Kernel.defdelegate/2
-- CLI can now take a configuration file. By default it will look for `elixirscript.exs` in the current directory.
-  A configuration file can be explicitly given using the `-c` flag
-- `js_modules` configuration option has been added. This is a keyword list of JavaScript modules that will be used.
+- `js_modules` configuration option has been added. This is a list of JavaScript modules that will be used.
   ```
         js_modules: [
           {React, "react"},
           {ReactDOM, "react-dom"}
         ]
   ```
-  This is accepted in either the elixirscript.exs file described above or in the `elixir_script` mix configuration
+
+- `js-module` flag has been added to the CLI in order to pass js modules.
+```
+elixirscript "app/elixirscript" -o dist --js-module React:react --js-module ReactDOM:react-dom
+```
 
 ### Removed
 - `@on_js_load` has been removed in favor of having a `start/2` function defined. More info below
 - `JS.import` has been removed in favor of defining JavaScript modules used in configuration
 
 ### Changed
-- All Modules are now bundled together as one js file. The `Elixir.Bootstrap.js` file is also still created
+- Now bundles all output, including the boostrap code.
   The exported object has Elixir modules in JavaScript namespaces that are lazily loaded when called.
 
   To start your application import the bundle according to whichever module format was selected and 

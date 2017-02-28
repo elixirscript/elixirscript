@@ -43,7 +43,7 @@ defmodule ElixirScript.Translator.Struct.Test do
   test "translate struct creation" do
     ex_ast = quote do
       defmodule User do
-        defstruct :name, :age
+        defstruct [:name, :age]
       end
 
       user = %User{}
@@ -61,7 +61,7 @@ defmodule ElixirScript.Translator.Struct.Test do
 
     ex_ast = quote do
       defmodule User do
-        defstruct :name, :age
+        defstruct [:name, :age]
       end
 
       user = %User{name: "John"}
@@ -81,12 +81,13 @@ defmodule ElixirScript.Translator.Struct.Test do
 
   test "translate struct update" do
     ex_ast = quote do
-      user = %{ map | key: value }
+      map = %{key: nil}
+      user = %{ map | key: 1 }
     end
 
     js_code = """
          let [user] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.variable(),Bootstrap.Core.SpecialForms.map_update(map,Object.freeze({
-             [Symbol.for('key')]: value
+             [Symbol.for('key')]: 1
        })));
     """
 
@@ -94,12 +95,13 @@ defmodule ElixirScript.Translator.Struct.Test do
 
 
     ex_ast = quote do
-      user = %{ map | key: value, key1: value1 }
+      map = %{key: nil, key1: nil}
+      user = %{ map | key: 1, key1: 11 }
     end
 
     js_code = """
     let [user] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.variable(),Bootstrap.Core.SpecialForms.map_update(map,Object.freeze({
-      [Symbol.for('key')]: value,     [Symbol.for('key1')]: value1
+      [Symbol.for('key')]: 1,     [Symbol.for('key1')]: 11
     })));
     """
 
@@ -145,13 +147,16 @@ defmodule ElixirScript.Translator.Struct.Test do
     ex_ast = quote do
       defmodule MyAppError do
         defexception [:message]
-      end
 
-      raise MyAppError, message: "did not get what was expected"
+        def do_it() do
+          raise MyAppError, message: "did not get what was expected"
+        end
+
+      end
     end
 
     js_code = """
-    throw Elixir$MyAppError.Elixir$MyAppError.create(Object.freeze({
+    throw Elixir.MyAppError.__load(Elixir).Elixir$MyAppError.create(Object.freeze({
     [Symbol.for('message')]: 'did not get what was expected'
     }));
     """
@@ -160,7 +165,10 @@ defmodule ElixirScript.Translator.Struct.Test do
 
 
     ex_ast = quote do
-      raise "did not get what was expected"
+        def do_it() do
+          raise "did not get what was expected"
+        end
+
     end
 
     js_code = """

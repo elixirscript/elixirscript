@@ -8,16 +8,26 @@ defmodule ElixirScript.Translator.Capture do
   alias ElixirScript.Translator.Identifier
   alias ElixirScript.Translator
 
-  def make_capture(function_name, arity, env) do
+  def make_capture(function_name, _, _) do
     Identifier.make_identifier(function_name)
   end
 
-  def make_capture(module_name, function_name, arity, env) do
-    JS.member_expression(
-      Translator.translate!(module_name, env),
-      JS.identifier(function_name)
-    )
+  def make_capture(module_name, function_name, _, env) do
+    members = ["Elixir"] ++ Module.split(module_name) ++ ["__load"]
+
+    ast = JS.member_expression(
+        JS.call_expression(
+          Identifier.make_namespace_members(members),
+          [JS.identifier("Elixir")]
+        ),
+        Identifier.make_identifier(function_name)        
+      )
   end
+
+  def make_extern_capture(module_name, function_name, _, env) do
+    members = Module.split(module_name) ++ [to_string(function_name)]
+    Identifier.make_namespace_members(members)    
+  end  
 
   def find_value_placeholders(ast) do
     case ast do

@@ -74,14 +74,10 @@ defmodule ElixirScript.Translator.Defprotocol do
     )
 
     body = body ++ [declaration] ++ [implementations]
-
-    module_refs = State.get_module_references(env.state, env.module) -- [env.module]
-    imports = Defmodule.process_module_refs(module_refs, env)
     defimpl_import = ElixirScript.ModuleSystems.Namespace.import_module(implementation_name_module)
 
     %{
       name: name,
-      imports: imports,
       body: [defimpl_import] ++ body,
       exports: JS.identifier(Utils.name_to_js_name(name)),
       app_name: app_name,

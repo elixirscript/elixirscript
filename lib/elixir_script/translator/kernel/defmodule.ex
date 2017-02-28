@@ -12,7 +12,6 @@ defmodule ElixirScript.Translator.Defmodule do
     { body, _ } = translate_body(body, env)
     %{
       name: ElixirScript.Temp,
-      imports: [],
       body: body |> Group.inflate_groups,
       exports: nil,
       app_name: ElixirScript.Translator.State.get(env.state).compiler_opts.app,
@@ -23,7 +22,6 @@ defmodule ElixirScript.Translator.Defmodule do
   def make_module(module, nil, env) do
     %{
       name: module,
-      imports: [],
       body: [],
       exports: nil,
       app_name: ElixirScript.Translator.State.get(env.state).compiler_opts.app,
@@ -32,12 +30,11 @@ defmodule ElixirScript.Translator.Defmodule do
   end
 
   def make_module(module, body, env) do
-    {imports, body, exported_object} = process_module(module, body, env)
+    {body, exported_object} = process_module(module, body, env)
     app_name = State.get_module(env.state, module).app
 
     result = %{
         name: Utils.quoted_to_name({:__aliases__, [], module }),
-        imports: imports,
         exports: exported_object,
         body: body,
         app_name: app_name,
@@ -77,11 +74,8 @@ defmodule ElixirScript.Translator.Defmodule do
     exported_functions = Enum.map(exported_functions, fn({_key, value}) -> value end)
     private_functions = Enum.map(private_functions, fn({_key, value}) -> value end)
 
-    module_refs = State.get_module_references(env.state, env.module) -- [env.module]
-    imports = process_module_refs(module_refs, env)
-
     body = structs ++ private_functions ++ exported_functions ++ body
-    {imports, body, exported_object}
+    {body, exported_object}
   end
 
   def process_module_refs(module_refs, env) do

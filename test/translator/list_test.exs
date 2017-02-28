@@ -30,14 +30,21 @@ defmodule ElixirScript.Translator.List.Test do
 
     assert_translation(ex_ast, js_code)
 
-    ex_ast = quote do: this.list ++ [4, 5, 6]
-    js_code = "Bootstrap.Core.Functions.call_property(this,'list').concat(Object.freeze([4, 5, 6]))"
+    ex_ast = quote do
+      list = []
+       list ++ [4, 5, 6]
+    end
+    js_code = "list.concat(Object.freeze([4, 5, 6]))"
 
     assert_translation(ex_ast, js_code)
   end
 
   test "prepend element" do
-    ex_ast = quote do: [x | list]
+    ex_ast = quote do
+      x = 1
+      list = []
+      [x | list]
+    end
 
     js_code = "Object.freeze([x]).concat(list)"
 
@@ -46,6 +53,9 @@ defmodule ElixirScript.Translator.List.Test do
 
   test "prepend element in function" do
     ex_ast = quote do
+        x = 1
+        list = []
+
        fn (_) -> [x|list] end
     end
 

@@ -5,13 +5,10 @@ defmodule ElixirScript.Translator.UMD.Test do
   test "translate module to umd" do
     ex_ast = quote do
       defmodule Elephant do
-        @ul JQuery.("#todo-list")
+        @ul "#todo-list"
 
         def something() do
           @ul
-        end
-
-        defgenp something_else() do
         end
       end
     end
@@ -19,11 +16,11 @@ defmodule ElixirScript.Translator.UMD.Test do
     js_code = """
          (function(root, factory) {
          if (typeof define === 'function' && define.amd) {
-             define(['./Elixir.Bootstrap'], factory)
+             define([], factory)
          } else if (typeof exports === 'object') {
-             module.exports = factory(require('./Elixir.Bootstrap'))
+             module.exports = factory()
          } else {
-             root.returnExports = factory(root.Bootstrap)
+             root.Elixir = factory()
          }
     """
 

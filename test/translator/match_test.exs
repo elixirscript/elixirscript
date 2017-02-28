@@ -38,7 +38,10 @@ defmodule ElixirScript.Translator.Match.Test do
     assert_translation(ex_ast, js_code)
 
 
-    ex_ast = quote do: {^a, _, c} = {1, 2, 3}
+    ex_ast = quote do
+      a = 1
+       {^a, _, c} = {1, 2, 3}
+    end
     js_code = """
     let [, undefined, c] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.type(Bootstrap.Core.Tuple, {
         values: [Bootstrap.Core.Patterns.bound(a), Bootstrap.Core.Patterns.wildcard(), Bootstrap.Core.Patterns.variable()]
@@ -50,7 +53,11 @@ defmodule ElixirScript.Translator.Match.Test do
   end
 
   test "translate bound match" do
-    ex_ast = quote do: ^a = 1
+    ex_ast = quote do
+      a = 1
+      ^a = 1
+    end
+
     js_code = """
      let [] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.bound(a),1);
     """

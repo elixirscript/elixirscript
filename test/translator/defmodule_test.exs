@@ -18,25 +18,32 @@ defmodule ElixirScript.Translator.Defmodule.Test do
   test "translate defmodules" do
     ex_ast = quote do
       defmodule Elephant do
-        @ul JQuery.("#todo-list")
+        require JS
+        @ul "#todo-list"
 
         def something() do
           @ul
         end
 
-        defgenp something_else() do
+        JS.defgenp something_else() do
         end
       end
     end
 
     js_code = """
-         const something_else = Bootstrap.Core.Patterns.defmatchgen(Bootstrap.Core.Patterns.clause([],function*()    {
-             return     null;
-           }));
-         const something = Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([],function()    {
-             return     ul;
-           }));
-         const ul = JQuery('#todo-list');
+         const something = Bootstrap.Core.Patterns.defmatchgen(Bootstrap.Core.Patterns.clause([], function*() {
+             return ul;
+         }));
+
+         const ul = '#todo-list';
+
+         const something_else = Bootstrap.Core.Patterns.defmatchgen(Bootstrap.Core.Patterns.clause([], function*() {
+             return null;
+         }));
+
+         const __exports = {
+             something
+         };
     """
 
     assert_translation(ex_ast, js_code)
@@ -47,11 +54,11 @@ defmodule ElixirScript.Translator.Defmodule.Test do
       defmodule Animals do
 
         defmodule Elephant do
-          defstruct trunk: true
+          defstruct [trunk: true]
         end
 
         def something() do
-          %Elephant{}
+          %Animals.Elephant{}
         end
 
         defp something_else() do
@@ -84,7 +91,7 @@ defmodule ElixirScript.Translator.Defmodule.Test do
 
 
         def something() do
-          %Elephant{}
+          %Animals.Elephant{}
         end
 
         defp something_else() do
@@ -105,17 +112,25 @@ defmodule ElixirScript.Translator.Defmodule.Test do
 
   test "Pull out module references and make them into imports if modules listed" do
     ex_ast = quote do
-      defmodule Animals do
-        Lions.Tigers.oh_my()
+      defmodule Lions.Tigers.Bears do
+        def oh_my() do
+        end
       end
 
       defmodule Lions.Tigers do
+        def oh_my() do
+        end
+
         Lions.Tigers.Bears.oh_my()
+      end
+
+      defmodule Animals do
+        Lions.Tigers.oh_my()
       end
     end
 
     js_code = """
-    Bootstrap.Core.Functions.call_property(Lions.Tigers.Bears,'oh_my');
+    Elixir.Lions.Tigers.Bears.__load(Elixir).oh_my()
     """
 
     assert_translation(ex_ast, js_code)

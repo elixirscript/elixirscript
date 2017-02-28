@@ -6,6 +6,7 @@ defmodule ElixirScript.Translator.For do
   alias ElixirScript.Translator.Primitive
   alias ElixirScript.Translator.Function
   alias ElixirScript.Translator.Utils
+  alias ElixirScript.Translator.Identifier  
 
   def make_for(generators, env) do
     ElixirScript.Translator.State.add_module_reference(env.state, env.module, ElixirScript.Collectable)
@@ -16,6 +17,14 @@ defmodule ElixirScript.Translator.For do
     into = args.into || Primitive.make_list_no_translate([])
     filter = args.filter || JS.function_expression([], [], JS.block_statement([JS.return_statement(JS.identifier("true"))]))
     fun = args.fun
+
+    members = ["Elixir"] ++ Module.split(ElixirScript.Collectable) ++ ["__load"]
+
+    collectable_module = JS.call_expression(
+          Identifier.make_namespace_members(members),
+          [JS.identifier("Elixir")]
+        )
+
 
     expression = JS.call_expression(
       JS.member_expression(
@@ -36,7 +45,7 @@ defmodule ElixirScript.Translator.For do
         Primitive.special_forms(),
         JS.identifier("_for")
       ),
-      [expression, generators, JS.identifier(Utils.name_to_js_name(ElixirScript.Collectable)), into]
+      [expression, generators, collectable_module, into]
     )
 
     {js_ast, env}
