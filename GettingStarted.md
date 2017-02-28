@@ -48,6 +48,26 @@ elixirscript also takes a path to your `.ex` files as well:
 
 If you look in the dist folder you'll see a file called `Elixir.App.js`
 
+To start your application import the bundle according to whichever module format was selected and 
+then call start giving it the module and the initial args.
+
+Ex. If you have a module like so 
+```elixir
+defmodule Example do
+    start(type, args) do
+        :console.log("Hello, world")
+    end
+end
+```
+
+You would start it like so
+
+```javascript
+//ES module example
+import Elixir from './Elixir.App'
+Elixir.start(Elixir.Example, [])
+```
+
 ### Mix dependency
 
 Adding Elixirscript to your mix project gives you the ability to add it to your list of mix compilers. This means when you `mix compile`, Elixirscript will compile your code as well.
