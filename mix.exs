@@ -10,6 +10,8 @@ defmodule ElixirScript.Mixfile do
       escript: escript_config(),
       deps: deps(),
       description: description(),
+      
+      
       package: package(),
       source_url: "https://github.com/elixirscript/elixirscript",
       aliases: aliases(),
