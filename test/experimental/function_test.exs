@@ -1,7 +1,7 @@
 defmodule ElixirScript.Experimental.Function.Test do
   use ExUnit.Case
   alias ESTree.Tools.Builder, as: J 
-  alias Elixirscript.Experimental.Function   
+  alias ElixirScript.Experimental.Function   
 
   test "compile function with no body" do
     result = Function.compile({{:hello, 0}, :defp, [line: 4], [{[line: 4], [], [], nil}]})

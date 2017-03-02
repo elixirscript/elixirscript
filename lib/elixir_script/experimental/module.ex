@@ -1,6 +1,6 @@
-defmodule Elixirscript.Experimental.Module do
+defmodule ElixirScript.Experimental.Module do
   alias ESTree.Tools.Builder, as: J
-  alias Elixirscript.Experimental.Function
+  alias ElixirScript.Experimental.Function
 
   def compile(_, _, module, attrs, defs, unreachable, opts) do
     reachable_defs = defs
@@ -12,6 +12,8 @@ defmodule Elixirscript.Experimental.Module do
 
     compiled_functions = reachable_defs
     |> Enum.map(&Function.compile(&1))
+
+    IO.inspect compiled_functions
 
     J.program(compiled_functions)
   end

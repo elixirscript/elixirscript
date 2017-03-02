@@ -1,7 +1,7 @@
 defmodule ElixirScript.Experimental.Module.Test do
   use ExUnit.Case
   alias ESTree.Tools.Builder, as: J 
-  alias Elixirscript.Experimental.Module   
+  alias ElixirScript.Experimental.Module   
 
   test "compile empty module" do
     args = [

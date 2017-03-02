@@ -1,6 +1,6 @@
-defmodule Elixirscript.Experimental.Function do
+defmodule ElixirScript.Experimental.Function do
   alias ESTree.Tools.Builder, as: J
-  alias Elixirscript.Experimental.Clause  
+  alias ElixirScript.Experimental.Clause  
 
   @patterns J.member_expression(
     J.member_expression(
