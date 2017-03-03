@@ -13,8 +13,6 @@ defmodule ElixirScript.Experimental.Module do
     compiled_functions = reachable_defs
     |> Enum.map(&Function.compile(&1))
 
-    IO.inspect compiled_functions
-
     J.program(compiled_functions)
   end
 end

@@ -1,6 +1,6 @@
 defmodule ElixirScript.Experimental.Form do
   alias ESTree.Tools.Builder, as: J
-  alias ElixirScript.Experimental.Forms.{Map, Bitstring, Match}
+  alias ElixirScript.Experimental.Forms.{Map, Bitstring, Match, Call}
 
   def compile(form) when is_integer(form) when is_float(form) when is_binary(form)  do
     J.literal(form)
@@ -18,7 +18,7 @@ defmodule ElixirScript.Experimental.Form do
         J.identifier("Symbol"),
         J.identifier("for")
       ),
-      J.identifier(form)
+      [J.literal(form)]
     )
   end
 
@@ -49,6 +49,10 @@ defmodule ElixirScript.Experimental.Form do
 
   def compile({:=, _, [left, right]} = match) do
     Match.compile(match)
+  end
+
+  def compile({{:., _, [_, _]}, _, _} = ast) do
+    Call.compile(ast)
   end
 
   def compile({var, _, nil}) do

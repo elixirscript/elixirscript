@@ -1,7 +1,7 @@
 defmodule Example do
   @compile {:undocumented_elixir_backend_option, ElixirScript.Experimental.Backend}
 
-  def hello() do
+  def hello(a) when is_atom(a) or is_binary(a) do
     1
     1.0
     "Hello"
