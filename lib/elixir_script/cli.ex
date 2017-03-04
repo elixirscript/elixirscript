@@ -47,7 +47,8 @@ defmodule ElixirScript.CLI do
   --js-module [<identifer>:<path>] A js module used in your code. ex: React:react
                         Multiple can be defined 
   -f  --format [format] module format of output. options: es (default), common, umd
-  -o  --output [path]   places output at the given path
+  -o  --output [path]   places output at the given path. 
+                        Can be a directory or filename.
   -e  --elixir          read input as elixir code string
   --full-build          informs the compiler to do a full build instead of an incremental one
   -v  --version         the current version number

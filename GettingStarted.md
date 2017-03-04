@@ -31,8 +31,9 @@ This is the help output of elixirscript
      options:
     --js-module [<identifer>:<path>] A js module used in your code. ex: React:react
                             Multiple can be defined      
-     -f --format [format] module format of output. options: es (default), common, umd
-     -o --output [path] places output at the given path
+     -f --format [format]   module format of output. options: es (default), common, umd
+     -o  --output [path]    places output at the given path. 
+                            Can be a directory or filename.
      -e --elixir read input as elixir code string
      --full-build informs the compiler to do a full build instead of an incremental one
      -v --version the current version number
@@ -88,7 +89,7 @@ Add dependency to your deps in mix.exs:
      deps: deps,
      elixir_script: [ 
         input: "lib/elixirscript", 
-        output: "priv/elixirscript", 
+        output: "priv/elixirscript/Elixir.App.js", 
         format: :es,
         js_modules: [
           {React, "react"},
@@ -103,7 +104,10 @@ Available options are:
 
 *   `input`: The folder to look for Elixirscript files in. (defaults to `lib/elixirscript`)
 
-*   `output`: The folder to place generated JavaScript code in. (defaults to `priv/elixirscript`)
+* `output`: The path of the generated JavaScript file. (defaults to `priv/elixirscript`)
+
+    If path ends in `.js` then that will be the name of the file. If a directory is given,
+    file will be named `Elixir.App.js`
 
 *   `format`: The module format of generated JavaScript code. (defaults to `:es`). Choices are:    
 
