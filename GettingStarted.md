@@ -27,20 +27,20 @@ This is the help output of elixirscript
 
     usage: elixirscript <input> [options]
      <input> path to elixir files or
-     the elixir code string if passed the -ex flag
+     the elixir code string if passed the -e flag
      options:
     --js-module [<identifer>:<path>] A js module used in your code. ex: React:react
                             Multiple can be defined      
      -f --format [format] module format of output. options: es (default), common, umd
      -o --output [path] places output at the given path
-     -ex --elixir read input as elixir code string
+     -e --elixir read input as elixir code string
      --full-build informs the compiler to do a full build instead of an incremental one
      -v --version the current version number
      -h --help this message
 
 the `<input>` is the elixir code string or file path you want to convert from elixir to javascript. Below is an example of using a code string and turning it into JavaScript
 
-    $ elixirscript ":atom" -ex
+    $ elixirscript ":atom" -e
 
 elixirscript also takes a path to your `.ex` files as well:
 

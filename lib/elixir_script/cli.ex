@@ -10,7 +10,7 @@ defmodule ElixirScript.CLI do
   ]
 
   @aliases [
-    o: :output, ex: :elixir, h: :help, v: :version, f: :format
+    o: :output, e: :elixir, h: :help, v: :version, f: :format
   ]
 
   def main(argv) do
@@ -41,14 +41,14 @@ defmodule ElixirScript.CLI do
   """
   usage: elixirscript <input> [options]
   <input> path to elixir files or
-  the elixir code string if passed the -ex flag
+  the elixir code string if passed the -e flag
 
   options:
   --js-module [<identifer>:<path>] A js module used in your code. ex: React:react
                         Multiple can be defined 
   -f  --format [format] module format of output. options: es (default), common, umd
   -o  --output [path]   places output at the given path
-  -ex --elixir          read input as elixir code string
+  -e  --elixir          read input as elixir code string
   --full-build          informs the compiler to do a full build instead of an incremental one
   -v  --version         the current version number
   -h  --help            this message
