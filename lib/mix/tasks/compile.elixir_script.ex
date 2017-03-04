@@ -19,7 +19,10 @@ defmodule Mix.Tasks.Compile.ElixirScript do
     
   Available options are:
   * `input`: The folder to look for Elixirscript files in. (defaults to `lib/elixirscript`)
-  * `output`: The folder to place generated JavaScript code in. (defaults to `priv/elixirscript`)
+  * `output`: The path of the generated JavaScript file. (defaults to `priv/elixirscript`)
+    
+    If path ends in `.js` then that will be the name of the file. If a directory is given,
+    file will be named `Elixir.App.js`
   * `format`: The module format of generated JavaScript code. (defaults to `:es`).
     Choices are:
       * `:es` - ES Modules
@@ -70,7 +73,7 @@ defmodule Mix.Tasks.Compile.ElixirScript do
     elixirscript_config = get_elixirscript_config()
     output_path = Keyword.get(elixirscript_config, :output)
 
-    path = Path.join([output_path, "Elixir.App.js"])
+    path = ElixirScript.Passes.HandleOutput.get_js_path(output_path)
 
     if File.exists?(path) do
       File.rm!(path)

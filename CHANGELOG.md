@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.27.0-dev]
+
+### Changed
+- `-ex` alias is now `-e`
+- A filename can be specified for output
+
 ## [0.26.1] - 2017-02-27
 
 ### Fixed
