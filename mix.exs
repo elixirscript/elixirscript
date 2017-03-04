@@ -79,6 +79,8 @@ defmodule ElixirScript.Mixfile do
       File.rm_rf(dist_folder)
     end
 
+    System.cmd("npm", ["run", "build"])
+
     File.mkdir_p(folder_name <> "/bin")
     File.cp!("elixirscript", "#{folder_name}/bin/elixirscript")
     if File.exists?("priv/.DS_Store") do
