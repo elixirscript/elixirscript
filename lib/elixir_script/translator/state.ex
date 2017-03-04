@@ -15,34 +15,6 @@ defmodule ElixirScript.Translator.State do
     end)
   end
 
-  def serialize(pid) do
-    Agent.get(pid, fn(state) ->
-      modules = state.modules
-      modules = Enum.map(modules, fn {m, d} ->
-        d = Map.delete(d, :javascript_ast)
-        |> Map.delete(:javascript_module)
-        |> Map.delete(:javascript_code)
-        |> Map.delete(:javascript_name)
-
-        {m, d}
-      end)
-      |> Enum.filter(fn {_, d} -> d.type != :consolidated end)
-
-      state = Map.delete(state, :changed_modules)
-      |> Map.put(:modules, modules)
-
-      :erlang.term_to_binary(state)
-    end)
-  end
-
-  def deserialize(pid, frozen_state, loaded_modules \\ []) do
-    Agent.update(pid, fn state ->
-      frozen_state = :erlang.binary_to_term(frozen_state)
-      modules = Keyword.delete(frozen_state.modules, ElixirScript.Temp)
-      %{ state | modules: modules, std_lib_map: frozen_state.std_lib_map, loaded_modules: [JS | loaded_modules] }
-    end)
-  end
-
   defp build_standard_lib_map() do
     Map.new
     |> Map.put(Kernel, ElixirScript.Kernel)
@@ -141,11 +113,11 @@ defmodule ElixirScript.Translator.State do
 
   def add_module_reference(pid, module_name, module_ref) do
     Agent.update(pid, fn(state) ->
-      case Keyword.get(state.modules, do_get_module_name(module_name, state)) do
+      case Keyword.get(state.modules, do_get_module_name(module_ref, state)) do
         nil ->
           state
         module ->
-          module = Map.update(module, :deps, [module_ref], fn(x) -> Enum.uniq(x ++ [module_ref]) end)
+          module = Map.update(module, :refs, [module_name], fn(x) -> Enum.uniq(x ++ [module_name]) end)
           modules = Keyword.put(state.modules, module.name, module)
           %{ state | modules: modules }
       end
@@ -157,8 +129,16 @@ defmodule ElixirScript.Translator.State do
       nil ->
         []
       module ->
-        Map.get(module, :deps, [])
+        Map.get(module, :refs, [])
     end
+  end
+
+  def list_module_references(pid) do
+    Agent.get(pid, fn(state) ->
+      Enum.map(state.modules, fn {name, module} -> 
+        {name, Map.get(module, :refs, [])}
+      end)
+    end)
   end
 
   def list_modules(pid) do
@@ -176,26 +156,5 @@ defmodule ElixirScript.Translator.State do
   def stop(pid) do
     Agent.stop(pid)
   end
-
-  def add_javascript_module_reference(pid, module_name, name, path, default \\ true) do
-    Agent.update(pid, fn(state) ->
-      case Keyword.get(state.modules, do_get_module_name(module_name, state)) do
-        nil ->
-          state
-        module ->
-          module = Map.update(module, :js_modules, [{name, path, default}], fn(x) -> Enum.uniq(x ++ [{name, path, default}]) end)
-          modules = Keyword.put(state.modules, module.name, module)
-          %{ state | modules: modules }
-      end
-    end)
-  end
-
-  def get_javascript_module_references(pid, module_name) do
-    case get_module(pid, module_name) do
-      nil ->
-        []
-      module ->
-        Map.get(module, :js_modules, [])
-    end
-  end
 end
+
