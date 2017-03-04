@@ -25,7 +25,7 @@ defmodule ElixirScript.Passes.HandleOutput do
     IO.write(concat(code)) 
   end
 
-  defp out(compiler_output, %{output: output_path, core_path: _} = compiler_opts) do
+  defp out(compiler_output, %{output: output_path, core_path: _}) do
     file_name = get_js_path(output_path)
 
     if !File.exists?(Path.dirname(file_name)) do
