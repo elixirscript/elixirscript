@@ -26,9 +26,7 @@ defmodule ElixirScript.Passes.HandleOutput do
   end
 
   defp out(compiler_output, %{output: output_path, core_path: _} = compiler_opts) do
-    js_name = get_js_name(output_path)
-
-    file_name = Path.join([output_path, js_name])
+    file_name = get_js_path(output_path)
 
     if !File.exists?(Path.dirname(file_name)) do
       File.mkdir_p!(Path.dirname(file_name))
@@ -41,22 +39,22 @@ defmodule ElixirScript.Passes.HandleOutput do
     "'use strict';\n" <> ElixirScript.get_bootstrap_js("iife") <> "\n" <> code
   end
 
-  def get_js_name(nil), do: @generated_name
-  def get_js_name(:stdout), do: @generated_name
+  def get_js_path(nil), do: @generated_name
+  def get_js_path(:stdout), do: @generated_name
 
-  def get_js_name(output_path) do
+  def get_js_path(output_path) do
     case Path.extname(output_path) do
       ".js" ->
-        Path.basename(output_path)
+        output_path
       _ ->
-        @generated_name
+        Path.join([output_path, @generated_name])
     end
   end
 
   defp process_include_path(compiler_output, compiler_opts) do
       case compiler_opts.include_path do
         true ->
-          {compiler_output.generated, get_js_name(compiler_opts.output)}
+          {compiler_output.generated, get_js_path(compiler_opts.output)}
         false ->
           compiler_output.generated
       end
