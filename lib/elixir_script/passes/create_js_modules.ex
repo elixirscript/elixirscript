@@ -92,10 +92,30 @@ defmodule ElixirScript.Passes.CreateJSModules do
       )
     )
 
+    load = JS.assignment_expression(
+      :=,
+      JS.member_expression(
+        JS.identifier("Elixir"),
+        JS.identifier("load")
+      ),
+      JS.function_expression(
+        [JS.identifier(:module)],
+        [],
+        JS.block_statement([
+          JS.return_statement(
+            JS.member_expression(
+              JS.identifier(:module),
+              JS.identifier("__exports")
+            )
+          )
+        ])
+      )
+    )
+
     ast = opts.module_formatter.build(
       [],
       opts.js_modules,
-      [elixir, start] ++ body,
+      [elixir, start, load] ++ body,
       JS.identifier("Elixir")
     )
 
