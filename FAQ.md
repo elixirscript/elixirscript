@@ -38,9 +38,9 @@ The compiler to this point has been focused on translating Kernel.SpecialForms a
     * `alias`
     * `__CALLER__`
     * `__ENV__`
+    * `super(args)`
 
 * Missing
-    * `super(args)`
     * `receive`
 
 * Caveats
