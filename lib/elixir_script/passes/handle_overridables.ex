@@ -1,5 +1,6 @@
 defmodule ElixirScript.Passes.HandleOverridables do
   @moduledoc false
+  @function_types [:def, :defp]
 
   def execute(compiler_data, opts) do
     new_data = Enum.map(compiler_data.data, fn { module_name, module_data } ->
@@ -36,7 +37,7 @@ defmodule ElixirScript.Passes.HandleOverridables do
   defp handle_overridable({:__block__, [], body}, overridables) do
     result = body
     |> Enum.reduce(%{overridables: [], overridable_found: false, body: []}, fn
-      {:def, def_context, [{name, context, params}, function_body] } = ast, %{overridable_found: false} = acc ->
+      {type, def_context, [{name, context, params}, function_body] } = ast, %{overridable_found: false} = acc when type in @function_types ->
         Map.put(acc, :overridables, acc.overridables ++ [ast]) 
 
       {:defoverridable, _, _}, acc ->
@@ -46,11 +47,11 @@ defmodule ElixirScript.Passes.HandleOverridables do
     end)
 
     processed_overridables = Enum.map(result.overridables, fn
-      {:def, def_context, [{name, context, params}, function_body] } = ast ->
+      {type, def_context, [{name, context, params}, function_body] } = ast when type in @function_types ->
         arity = get_arity(params)
 
         found = Enum.any?(result.body, fn 
-          {:def, _, [{name_from_body, _, params_from_body}, _] } ->
+          {type, _, [{name_from_body, _, params_from_body}, _] } ->
             if {name, arity} == {name_from_body, get_arity(params_from_body)} do
               true
             else
