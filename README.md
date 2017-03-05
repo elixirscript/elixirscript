@@ -29,7 +29,11 @@ Clone the repo
 Get dependencies
 
     mix deps.get
-    npm install
+    yarn
+    
+Create Elixir.Bootstrap.js
+
+    yarn build
 
 Compile
 
@@ -38,7 +42,7 @@ Compile
 Test
 
     mix test
-    npm test
+    yarn test
 
 
 Build
