@@ -17,6 +17,7 @@ defmodule Example do
     <<1, "foo" :: utf8, "bar" :: utf32>>
     rest = 100
     <<102 :: integer-native, rest :: binary>>    
-    <<102, rest :: size(16)>>    
+    <<102, rest :: size(16)>> 
+    1 + 1   
   end
 end
