@@ -1,14 +1,14 @@
-import Protocol from "./protocol";
-import Core from "../core";
+import Protocol from './protocol';
+import Core from '../core';
 
 function call_property(item, property) {
   let prop = null;
 
   if (
-    typeof item === "number" ||
-    typeof item === "symbol" ||
-    typeof item === "boolean" ||
-    typeof item === "string"
+    typeof item === 'number' ||
+    typeof item === 'symbol' ||
+    typeof item === 'boolean' ||
+    typeof item === 'string'
   ) {
     if (item[property] !== undefined) {
       prop = property;
@@ -50,15 +50,15 @@ function contains(left, right) {
 }
 
 function get_global() {
-  if (typeof self !== "undefined") {
+  if (typeof self !== 'undefined') {
     return self;
-  } else if (typeof window !== "undefined") {
+  } else if (typeof window !== 'undefined') {
     return window;
-  } else if (typeof global !== "undefined") {
+  } else if (typeof global !== 'undefined') {
     return global;
   }
 
-  throw new Error("No global state found");
+  throw new Error('No global state found');
 }
 
 function defstruct(defaults) {
@@ -78,7 +78,7 @@ function defstruct(defaults) {
 function defexception(defaults) {
   return class extends Error {
     constructor(update = {}) {
-      const message = update.message || "";
+      const message = update.message || '';
       super(message);
 
       const the_values = Object.assign(defaults, update);
@@ -86,7 +86,7 @@ function defexception(defaults) {
 
       this.name = this.constructor.name;
       this.message = message;
-      this[Symbol.for("__exception__")] = true;
+      this[Symbol.for('__exception__')] = true;
       Error.captureStackTrace(this, this.constructor.name);
     }
 
@@ -148,7 +148,7 @@ function update_map(map, property, value) {
     return add_property_to_map(map, property, value);
   }
 
-  throw "map does not have key";
+  throw 'map does not have key';
 }
 
 function bnot(expr) {
@@ -309,9 +309,9 @@ function reverse(list) {
 
 function maps_find(key, map) {
   if (key in get_object_keys(map)) {
-    return new Core.Tuple(Symbol.for("ok"), map[key]);
+    return new Core.Tuple(Symbol.for('ok'), map[key]);
   }
-  return Symbol.for("error");
+  return Symbol.for('error');
 }
 
 function flatten(list, tail = []) {
@@ -378,20 +378,24 @@ function maps_fold(fun, acc, map) {
 }
 
 function build_namespace(ns, ns_string) {
-  let parts = ns_string.split(".");
+  let parts = ns_string.split('.');
+  const root = ns;
   let parent = ns;
 
-  if (parts[0] === "Elixir") {
+  if (parts[0] === 'Elixir') {
     parts = parts.slice(1);
   }
 
   for (const part of parts) {
-    if (typeof parent[part] === "undefined") {
+    if (typeof parent[part] === 'undefined') {
       parent[part] = {};
     }
 
     parent = parent[part];
   }
+
+  root.__table = ns.__table || {};
+  root.__table[Symbol.for(ns_string)] = parent;
 
   return parent;
 }

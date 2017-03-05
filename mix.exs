@@ -4,7 +4,7 @@ defmodule ElixirScript.Mixfile do
   def project do
     [
       app: :elixir_script,
-      version: "0.26.1",
+      version: "0.27.0-dev",
       elixir: "~> 1.0",
       elixirc_paths: elixirc_paths(),      
       escript: escript_config(),
@@ -80,6 +80,8 @@ defmodule ElixirScript.Mixfile do
     if File.exists?(dist_folder) do
       File.rm_rf(dist_folder)
     end
+
+    System.cmd("npm", ["run", "build"])
 
     File.mkdir_p(folder_name <> "/bin")
     File.cp!("elixirscript", "#{folder_name}/bin/elixirscript")

@@ -78,12 +78,6 @@ defmodule ElixirScript.Translator.Defmodule do
     {body, exported_object}
   end
 
-  def process_module_refs(module_refs, env) do
-    Enum.map(module_refs, fn(x) ->
-      {x, ""}
-    end)
-  end
-
   def translate_body(body, env) do
     { body, env } = Translator.translate(body, env)
 
