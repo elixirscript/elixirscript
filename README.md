@@ -59,6 +59,7 @@ Communication
 ========
 
 [gitter room](https://gitter.im/elixirscript/elixirscript)
+
 [#elixirscript](https://elixir-lang.slack.com/messages/elixirscript/) on the elixir-lang Slack
 
 Contributing
