@@ -6,7 +6,7 @@ defmodule ElixirScript.Mixfile do
       app: :elixir_script,
       version: "0.27.0-dev",
       elixir: "~> 1.0",
-      elixirc_paths: elixirc_paths(),      
+      elixirc_paths: elixirc_paths(),
       escript: escript_config(),
       deps: deps(),
       description: description(),
@@ -37,7 +37,7 @@ defmodule ElixirScript.Mixfile do
     ]
   end
 
-  defp elixirc_paths(), do: ["lib", "priv/std_lib"]  
+  defp elixirc_paths(), do: ["lib", "priv/std_lib"]
 
   defp escript_config do
     [main_module: ElixirScript.CLI, name: "elixirscript"]
