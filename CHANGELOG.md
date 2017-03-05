@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [0.27.0-dev]
 
+### Added
+- `super`
+- `defoverridable`
+
 ### Changed
 - `-ex` alias is now `-e`
 - A filename can be specified for output

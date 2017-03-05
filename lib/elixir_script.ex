@@ -75,8 +75,14 @@ defmodule ElixirScript do
 
     %{data: std_lib_quoted ++ data}
     |> ElixirScript.Passes.Init.execute(opts)
+    |> shared_passes(opts)
+  end
+
+  defp shared_passes(compiler_data, opts) do
+    compiler_data
     |> ElixirScript.Passes.FindModules.execute(opts)
     |> ElixirScript.Passes.FindLoadOnly.execute(opts)
+    |> ElixirScript.Passes.HandleOverridables.execute(opts)
     |> ElixirScript.Passes.FindFunctions.execute(opts)
     |> ElixirScript.Passes.JavaScriptAST.execute(opts)
     |> ElixirScript.Passes.ConsolidateProtocols.execute(opts)
@@ -164,14 +170,7 @@ defmodule ElixirScript do
     |> ElixirScript.Passes.Init.execute(opts)
     |> ElixirScript.Passes.ASTFromFile.execute(opts)
     |> ElixirScript.Passes.LoadModules.execute(opts)
-    |> ElixirScript.Passes.FindModules.execute(opts)
-    |> ElixirScript.Passes.FindLoadOnly.execute(opts)
-    |> ElixirScript.Passes.FindFunctions.execute(opts)
-    |> ElixirScript.Passes.JavaScriptAST.execute(opts)
-    |> ElixirScript.Passes.ConsolidateProtocols.execute(opts)
-    |> ElixirScript.Passes.CreateJSModules.execute(opts)
-    |> ElixirScript.Passes.JavaScriptCode.execute(opts)
-    |> ElixirScript.Passes.HandleOutput.execute(opts)
+    |> shared_passes(opts)
 
     result
   end

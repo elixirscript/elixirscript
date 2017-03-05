@@ -243,6 +243,13 @@ defmodule ElixirScript.Translator do
     { Map.make_get_property(target, property, env), env }
   end
 
+  defp do_translate({:super, _, params }, env) do
+    { name, _ } = env.function
+    super_name = String.to_atom("__super__" <> to_string(name))
+
+    Call.make_local_function_call(super_name, params, env)    
+  end
+
   defp do_translate({{:., _, [function_name]}, _, params}, env) do
     Call.make_local_function_call(function_name, params, env)
   end
