@@ -1,14 +1,16 @@
 defmodule ElixirScript.Experimental.Function do
   alias ESTree.Tools.Builder, as: J
-  alias ElixirScript.Experimental.Clause  
+  alias ElixirScript.Experimental.Clause
 
-  @patterns J.member_expression(
+  def patterns_ast() do
     J.member_expression(
-      J.identifier("Bootstrap"),
-      J.identifier("Core")
-    ),
-    J.identifier("Patterns")
-  )
+      J.member_expression(
+        J.identifier("Bootstrap"),
+        J.identifier("Core")
+      ),
+      J.identifier("Patterns")
+    )
+  end
 
   def compile({{:__struct__, 0}, :def, _, clauses}) do
   end
@@ -21,7 +23,7 @@ defmodule ElixirScript.Experimental.Function do
       J.identifier("#{name}#{arity}"),
       J.call_expression(
         J.member_expression(
-          @patterns,
+          patterns_ast(),
           J.identifier("defmatch")
         ),
         Enum.map(clauses, &Clause.compile(&1))

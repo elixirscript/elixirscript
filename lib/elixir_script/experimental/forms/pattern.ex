@@ -6,10 +6,10 @@ defmodule ElixirScript.Experimental.Forms.Pattern do
 
   def compile(patterns) do
     patterns
-    |> Enum.reduce({[], []}, fn 
+    |> Enum.reduce({[], []}, fn
       x, { patterns, params } ->
         {pattern, param} = process_pattern(x)
-        { patterns ++ List.wrap(pattern), params ++ List.wrap(param) }      
+        { patterns ++ List.wrap(pattern), params ++ List.wrap(param) }
     end)
   end
 
@@ -25,7 +25,7 @@ defmodule ElixirScript.Experimental.Forms.Pattern do
     { [PM.wildcard()], [J.identifier("undefined")] }
   end
 
-  defp process_pattern({var, _, nil}) do
+  defp process_pattern({var, _, p}) when is_nil(p) or p == :elixir_fn do
     { [PM.parameter()], [J.identifier(var)] }
   end
 
@@ -81,12 +81,12 @@ defmodule ElixirScript.Experimental.Forms.Pattern do
       { props ++ [prop], params ++ param }
     end)
 
-    { J.object_expression(List.wrap(props)), params }    
+    { J.object_expression(List.wrap(props)), params }
   end
 
   defp process_pattern({:<<>>, _, elements}) do
     params = Enum.reduce(elements, [], fn
-      ({:::, _, [{ variable, _, params }, _]}, state) when is_nil(params) 
+      ({:::, _, [{ variable, _, params }, _]}, state) when is_nil(params)
                                                       when is_list(params) and length(params) == 0 ->
         state ++ [J.identifier(variable)]
       _, state ->
@@ -100,7 +100,7 @@ defmodule ElixirScript.Experimental.Forms.Pattern do
         Bitstring.compile_element(x)
     end)
 
-    { [PM.bitstring_match(elements)], params }    
+    { [PM.bitstring_match(elements)], params }
   end
 
   defp process_pattern([{:|, _, [head, tail]}]) do

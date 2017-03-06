@@ -8,7 +8,7 @@ defmodule ElixirScript.Experimental.Backend do
     IO.inspect binding()
     js_ast = Module.compile(line, file, module, attrs, defs, unreachable, opts)
     IO.puts Generator.generate(js_ast)
-    
+
     # Invoke the default backend - it returns the compiled beam binary
     :elixir_erl.compile(line, file, module, attrs, defs, unreachable, opts)
   end

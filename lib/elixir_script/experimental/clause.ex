@@ -39,13 +39,25 @@ defmodule ElixirScript.Experimental.Clause do
       [
         J.array_expression(patterns),
         J.function_expression(
-          params, 
-          [], 
+          params,
+          [],
           J.block_statement(body)
         ),
         guard
       ]
     )
+  end
+
+  def compile({:->, _, [[{:when, _, params}], body ]}) do
+    guards = List.last(params)
+    params = params |> Enum.reverse |> tl |> Enum.reverse
+
+    compile({[], params, guards, body})
+  end
+
+  def compile({:->, _, [params, body]}) do
+
+    compile({[], params, [], body})
   end
 
   defp return_last_statement([head]) do
@@ -63,14 +75,14 @@ defmodule ElixirScript.Experimental.Clause do
     |> Enum.reverse
     |> process_guards
     |> Form.compile
-    
+
     J.function_expression(
-      params, 
-      [], 
+      params,
+      [],
       J.block_statement([
             J.return_statement(guards)
           ])
-    )  
+    )
 
   end
 

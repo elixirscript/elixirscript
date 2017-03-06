@@ -159,6 +159,7 @@ defmodule ElixirScript.Experimental.Functions.Erlang do
         ),
         J.unary_expression(
           :!,
+          true,
           J.call_expression(
             J.member_expression(
               J.identifier("Number"),
@@ -437,6 +438,7 @@ defmodule ElixirScript.Experimental.Functions.Erlang do
   def rewrite({{:., _, [:erlang, operator]}, _, [value]}) when operator in [:+, :-] do
     J.unary_expression(
       operator,
+      true,
       Form.compile(value)
     )
   end
@@ -476,6 +478,7 @@ defmodule ElixirScript.Experimental.Functions.Erlang do
   def rewrite({{:., _, [:erlang, :not]}, _, [value]}) do
     J.unary_expression(
       :!,
+      true,
       Form.compile(value)
     )
   end
@@ -484,7 +487,7 @@ defmodule ElixirScript.Experimental.Functions.Erlang do
     J.binary_expression(
       :<=,
       Form.compile(left),
-      Form.compile(right)     
+      Form.compile(right)
     )
   end
 
@@ -492,7 +495,7 @@ defmodule ElixirScript.Experimental.Functions.Erlang do
     J.binary_expression(
       :!=,
       Form.compile(left),
-      Form.compile(right)     
+      Form.compile(right)
     )
   end
 
@@ -500,7 +503,7 @@ defmodule ElixirScript.Experimental.Functions.Erlang do
     J.binary_expression(
       :===,
       Form.compile(left),
-      Form.compile(right)     
+      Form.compile(right)
     )
   end
 
@@ -508,7 +511,7 @@ defmodule ElixirScript.Experimental.Functions.Erlang do
     J.binary_expression(
       :!==,
       Form.compile(left),
-      Form.compile(right)     
+      Form.compile(right)
     )
   end
 
@@ -551,7 +554,7 @@ defmodule ElixirScript.Experimental.Functions.Erlang do
     J.binary_expression(
       :||,
       Form.compile(left),
-      Form.compile(right)     
+      Form.compile(right)
     )
   end
 
@@ -559,7 +562,7 @@ defmodule ElixirScript.Experimental.Functions.Erlang do
     J.binary_expression(
       :||,
       Form.compile(left),
-      Form.compile(right)     
+      Form.compile(right)
     )
   end
 
@@ -567,7 +570,7 @@ defmodule ElixirScript.Experimental.Functions.Erlang do
     J.binary_expression(
       :&&,
       Form.compile(left),
-      Form.compile(right)     
+      Form.compile(right)
     )
   end
 
@@ -612,6 +615,7 @@ defmodule ElixirScript.Experimental.Functions.Erlang do
   def rewrite({{:., _, [:erlang, :bnot]}, _, [expr]}) do
     J.unary_expression(
       :"~",
+      true,
       Form.compile(expr)
     )
   end
@@ -723,6 +727,185 @@ defmodule ElixirScript.Experimental.Functions.Erlang do
       ),
       [Form.compile(index)]
     )
-  end  
+  end
+
+  def rewrite({{:., _, [:erlang, :binary_to_atom]}, _, [binary, _]}) do
+    J.call_expression(
+      J.member_expression(
+        J.identifier("Symbol"),
+        J.identifier("for")
+      ),
+      [Form.compile(binary)]
+    )
+  end
+
+  def rewrite({{:., _, [:erlang, :binary_to_existing_atom]}, _, [binary, _]}) do
+    J.call_expression(
+      J.member_expression(
+        J.identifier("Symbol"),
+        J.identifier("for")
+      ),
+      [Form.compile(binary)]
+    )
+  end
+
+  def rewrite({{:., _, [:erlang, :list_to_atom]}, _, [char_list]}) do
+    J.call_expression(
+      J.member_expression(
+        J.identifier("Symbol"),
+        J.identifier("for")
+      ),
+      [Form.compile(char_list)]
+    )
+  end
+
+  def rewrite({{:., _, [:erlang, :list_to_existing_atom]}, _, [char_list]}) do
+    J.call_expression(
+      J.member_expression(
+        J.identifier("Symbol"),
+        J.identifier("for")
+      ),
+      [Form.compile(char_list)]
+    )
+  end
+
+  def rewrite({{:., _, [:erlang, :list_to_tuple]}, _, [list]}) do
+    J.new_expression(
+      J.member_expression(
+        J.member_expression(
+          J.identifier("Bootstrap"),
+          J.identifier("Core")
+        ),
+        J.identifier("Tuple")
+      ),
+      [
+        J.rest_element(
+          Form.compile(list)
+        )
+      ]
+    )
+  end
+
+  def rewrite({{:., _, [:erlang, :list_to_float]}, _, [list]}) do
+    J.call_expression(
+      J.identifier("parseFloat"),
+      [Form.compile(list)]
+    )
+  end
+
+  def rewrite({{:., _, [:erlang, :list_to_integer]}, _, [list]}) do
+    J.call_expression(
+      J.identifier("parseInt"),
+      [Form.compile(list)]
+    )
+  end
+
+  def rewrite({{:., _, [:erlang, :list_to_integer]}, _, [list, base]}) do
+    J.call_expression(
+      J.identifier("parseInt"),
+      [Form.compile(list), Form.compile(base)]
+    )
+  end
+
+  def rewrite({{:., _, [:erlang, :integer_to_binary]}, _, [integer]}) do
+    J.call_expression(
+      J.member_expression(
+        Form.compile(integer),
+        J.identifier("toString")
+      ),
+      []
+    )
+  end
+
+  def rewrite({{:., _, [:erlang, :integer_to_binary]}, _, [integer, base]}) do
+    J.call_expression(
+      J.member_expression(
+        Form.compile(integer),
+        J.identifier("toString")
+      ),
+      [Form.compile(base)]
+    )
+  end
+
+  def rewrite({{:., _, [:erlang, :integer_to_list]}, _, [integer]}) do
+    J.call_expression(
+      J.member_expression(
+        Form.compile(integer),
+        J.identifier("toString")
+      ),
+      []
+    )
+  end
+
+  def rewrite({{:., _, [:erlang, :integer_to_list]}, _, [integer, base]}) do
+    J.call_expression(
+      J.member_expression(
+        Form.compile(integer),
+        J.identifier("toString")
+      ),
+      [Form.compile(base)]
+    )
+  end
+
+  def rewrite({{:., _, [:erlang, :float_to_binary]}, _, [float]}) do
+    J.call_expression(
+      J.member_expression(
+        Form.compile(float),
+        J.identifier("toString")
+      ),
+      []
+    )
+  end
+
+  def rewrite({{:., _, [:erlang, :float_to_binary]}, _, [float, base]}) do
+    J.call_expression(
+      J.member_expression(
+        Form.compile(float),
+        J.identifier("toString")
+      ),
+      [Form.compile(base)]
+    )
+  end
+
+  def rewrite({{:., _, [:erlang, :float_to_list]}, _, [float]}) do
+    J.call_expression(
+      J.member_expression(
+        Form.compile(float),
+        J.identifier("toString")
+      ),
+      []
+    )
+  end
+
+  def rewrite({{:., _, [:erlang, :float_to_list]}, _, [float, base]}) do
+    J.call_expression(
+      J.member_expression(
+        Form.compile(float),
+        J.identifier("toString")
+      ),
+      [Form.compile(base)]
+    )
+  end
+
+  def rewrite({{:., _, [:erlang, :binary_to_float]}, _, [binary]}) do
+    J.call_expression(
+      J.identifier("parseFloat"),
+      [Form.compile(binary)]
+    )
+  end
+
+  def rewrite({{:., _, [:erlang, :binary_to_integer]}, _, [binary]}) do
+    J.call_expression(
+      J.identifier("parseInt"),
+      [Form.compile(binary)]
+    )
+  end
+
+  def rewrite({{:., _, [:erlang, :binary_to_integer]}, _, [binary, base]}) do
+    J.call_expression(
+      J.identifier("parseInt"),
+      [Form.compile(binary), Form.compile(base)]
+    )
+  end
 
 end

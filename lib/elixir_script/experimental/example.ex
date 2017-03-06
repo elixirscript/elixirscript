@@ -16,8 +16,12 @@ defmodule Example do
     <<1, "foo" :: binary>>
     <<1, "foo" :: utf8, "bar" :: utf32>>
     rest = 100
-    <<102 :: integer-native, rest :: binary>>    
-    <<102, rest :: size(16)>> 
-    1 + 1   
+    <<102 :: integer-native, rest :: binary>>
+    <<102, rest :: size(16)>>
+    1 + 1
+    Enum.map([1, 2, 3], fn
+      x when is_integer(x) -> x * 2 end
+    )
+    Enum.map([1, 2, 3], &to_string(&1))
   end
 end

@@ -1,10 +1,11 @@
 defmodule ElixirScript.Experimental.Form do
   alias ESTree.Tools.Builder, as: J
   alias ElixirScript.Experimental.Forms.{Map, Bitstring, Match, Call}
-  alias ElixirScript.Experimental.Functions.{Erlang}
+  alias ElixirScript.Experimental.Functions.{Erlang, Lists}
   alias ElixirScript.Translator.Identifier
+  alias ElixirScript.Experimental.Clause
 
-  def compile(form) when is_integer(form) when is_float(form) when is_binary(form)  do
+  def compile(form) when is_boolean(form) when is_integer(form) when is_float(form) when is_binary(form)  do
     J.literal(form)
   end
 
@@ -61,20 +62,34 @@ defmodule ElixirScript.Experimental.Form do
     Match.compile(match)
   end
 
+  def compile({:fn, _, clauses}) do
+    J.call_expression(
+      J.member_expression(
+        ElixirScript.Experimental.Function.patterns_ast(),
+        J.identifier("defmatch")
+      ),
+      Enum.map(clauses, &Clause.compile(&1))
+    )
+  end
+
   def compile({{:., _, [:erlang, _]}, _, _} = ast) do
     Erlang.rewrite(ast)
+  end
+
+  def compile({{:., _, [:lists, _]}, _, _} = ast) do
+    Lists.rewrite(ast)
   end
 
   def compile({{:., _, [_, _]}, _, _} = ast) do
     Call.compile(ast)
   end
 
-  def compile({var, _, nil}) do
+  def compile({var, _, p}) when is_nil(p) or p == :elixir_fn do
     J.identifier(var)
   end
 
   def compile({var, _, []}) do
     J.identifier(var)
   end
-  
+
 end
