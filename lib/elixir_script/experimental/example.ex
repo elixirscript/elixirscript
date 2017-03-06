@@ -11,6 +11,8 @@ defmodule Example do
     {1, 2}
     %{a: 1}
     %{"b" => 2}
+    []
+    [1, 2, 3]
     <<1, 2, 3>>
     <<1, "foo">>
     <<1, "foo" :: binary>>
@@ -23,5 +25,6 @@ defmodule Example do
       x when is_integer(x) -> x * 2 end
     )
     Enum.map([1, 2, 3], &to_string(&1))
+    for n <- [1, 2, 3, 4], do: n * 2
   end
 end

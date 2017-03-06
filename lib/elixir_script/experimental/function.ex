@@ -12,11 +12,11 @@ defmodule ElixirScript.Experimental.Function do
     )
   end
 
-  def compile({{:__struct__, 0}, :def, _, clauses}) do
-  end
+  #def compile({{:__struct__, 0}, :def, _, clauses}) do
+  #end
 
-  def compile({{:__struct__, 1}, :def, _, clauses}) do
-  end
+  #def compile({{:__struct__, 1}, :def, _, clauses}) do
+  #end
 
   def compile({{name, arity}, type, _, clauses}) do
     declarator = J.variable_declarator(

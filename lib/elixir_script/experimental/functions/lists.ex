@@ -95,4 +95,20 @@ defmodule ElixirScript.Experimental.Functions.Lists do
     )
   end
 
+  def rewrite({{:., _, [:lists, :delete]}, _, [elem, list]}) do
+    J.call_expression(
+      J.member_expression(
+        J.member_expression(
+          J.member_expression(
+            J.identifier("Bootstrap"),
+            J.identifier("Core")
+          ),
+          J.identifier("Functions")
+        ),
+        J.identifier("remove_from_list")
+      ),
+      [Form.compile(list), Form.compile(elem)]
+    )
+  end
+
 end

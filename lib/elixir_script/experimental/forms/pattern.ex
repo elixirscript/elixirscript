@@ -21,12 +21,8 @@ defmodule ElixirScript.Experimental.Forms.Pattern do
     { [PM.bound(Form.compile(value))], [nil] }
   end
 
-  defp process_pattern({:_, _, nil}) do
+  defp process_pattern({:_, _, _}) do
     { [PM.wildcard()], [J.identifier("undefined")] }
-  end
-
-  defp process_pattern({var, _, p}) when is_nil(p) or p == :elixir_fn do
-    { [PM.parameter()], [J.identifier(var)] }
   end
 
   defp process_pattern({a, b}) do
@@ -124,6 +120,10 @@ defmodule ElixirScript.Experimental.Forms.Pattern do
 
   defp process_pattern({:=, _, [left, {name, _, _}]}) do
     unify(name, left)
+  end
+
+  defp process_pattern({var, _, _}) do
+    { [PM.parameter()], [J.identifier(var)] }
   end
 
   defp reduce_patterns(patterns) do

@@ -1,9 +1,13 @@
 defmodule ElixirScript.Experimental.Form do
   alias ESTree.Tools.Builder, as: J
   alias ElixirScript.Experimental.Forms.{Map, Bitstring, Match, Call}
-  alias ElixirScript.Experimental.Functions.{Erlang, Lists}
+  alias ElixirScript.Experimental.Functions.{Erlang, Lists, Maps}
   alias ElixirScript.Translator.Identifier
   alias ElixirScript.Experimental.Clause
+
+  def compile(nil) do
+    J.identifier("null")
+  end
 
   def compile(form) when is_boolean(form) when is_integer(form) when is_float(form) when is_binary(form)  do
     J.literal(form)
@@ -62,6 +66,30 @@ defmodule ElixirScript.Experimental.Form do
     Match.compile(match)
   end
 
+  def compile({:for, _, _}) do
+    raise "for not implemented"
+  end
+
+  def compile({:case, _, _}) do
+    raise "case not implemented"
+  end
+
+  def compile({:cond, _, _}) do
+    raise "cond not implemented"
+  end
+
+  def compile({:receive, _, _}) do
+    raise "receive not implemented"
+  end
+
+  def compile({:with, _, _}) do
+    raise "with not implemented"
+  end
+
+  def compile({:try, _, _}) do
+    raise "try not implemented"
+  end
+
   def compile({:fn, _, clauses}) do
     J.call_expression(
       J.member_expression(
@@ -80,15 +108,15 @@ defmodule ElixirScript.Experimental.Form do
     Lists.rewrite(ast)
   end
 
+  def compile({{:., _, [:maps, _]}, _, _} = ast) do
+    Maps.rewrite(ast)
+  end
+
   def compile({{:., _, [_, _]}, _, _} = ast) do
     Call.compile(ast)
   end
 
-  def compile({var, _, p}) when is_nil(p) or p == :elixir_fn do
-    J.identifier(var)
-  end
-
-  def compile({var, _, []}) do
+  def compile({var, _, _}) do
     J.identifier(var)
   end
 
