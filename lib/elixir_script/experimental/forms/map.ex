@@ -2,6 +2,25 @@ defmodule ElixirScript.Experimental.Forms.Map do
   alias ESTree.Tools.Builder, as: J
   alias ElixirScript.Experimental.Form
 
+  def compile({:%{}, _, [{:|, _, [map, new_values]}]}) do
+    map = Form.compile(map)
+    data = Form.compile({:%{}, [], new_values})
+
+    J.call_expression(
+      J.member_expression(
+        J.member_expression(
+          J.identifier("Bootstrap"),
+          J.member_expression(
+            J.identifier("Core"),
+            J.identifier("SpecialForms")
+          )
+        ),
+        J.identifier("map_update")
+      ),
+      [map, data]
+    )
+  end
+
   def compile({:%{}, _, properties}) do
     properties
     |> Enum.map(fn

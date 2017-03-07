@@ -3,10 +3,10 @@ defmodule Example do
 
   defstruct [:name]
 
-  def new(%x{}) do
-    IO.inspect x
-    %Example{name: "hello"}
-    new(%Example{})
+  def new() do
+    map = %{name: "A"}
+
+    %{map | name: "B"}
   end
 
 end
