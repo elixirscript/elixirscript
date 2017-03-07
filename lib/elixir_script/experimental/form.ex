@@ -1,6 +1,6 @@
 defmodule ElixirScript.Experimental.Form do
   alias ESTree.Tools.Builder, as: J
-  alias ElixirScript.Experimental.Forms.{Map, Bitstring, Match, Call}
+  alias ElixirScript.Experimental.Forms.{Map, Bitstring, Match, Call, Try, For, Struct}
   alias ElixirScript.Experimental.Functions.{Erlang, Lists, Maps}
   alias ElixirScript.Translator.Identifier
   alias ElixirScript.Experimental.Clause
@@ -20,21 +20,13 @@ defmodule ElixirScript.Experimental.Form do
   end
 
   def compile(form) when is_atom(form) do
-    first_char = String.first(to_string(form))
-
-    case Regex.match?(~r/[A-Z]/, first_char) do
-      true ->
-        members = ["Elixir"] ++ Module.split(form)
-        Identifier.make_namespace_members(members)
-      false ->
-        J.call_expression(
-          J.member_expression(
-            J.identifier("Symbol"),
-            J.identifier("for")
-          ),
-          [J.literal(form)]
-        )
-    end
+    J.call_expression(
+      J.member_expression(
+        J.identifier("Symbol"),
+        J.identifier("for")
+      ),
+      [J.literal(form)]
+    )
   end
 
   def compile({a, b}) do
@@ -66,28 +58,65 @@ defmodule ElixirScript.Experimental.Form do
     Match.compile(match)
   end
 
-  def compile({:for, _, _}) do
-    raise "for not implemented"
+  def compile({:%, _, [_, _]} = ast) do
+    Struct.compile(ast)
   end
 
-  def compile({:case, _, _}) do
-    raise "case not implemented"
+  def compile({:for, _, _} = ast) do
+    For.compile(ast)
   end
 
-  def compile({:cond, _, _}) do
-    raise "cond not implemented"
+  def compile({:case, _, [condition, [do: clauses]]}) do
+    func = J.call_expression(
+      J.member_expression(
+        ElixirScript.Experimental.Function.patterns_ast(),
+        J.identifier("defmatch")
+      ),
+      Enum.map(clauses, &Clause.compile(&1))
+    )
+
+    J.call_expression(
+      J.member_expression( func, J.identifier("call")),
+      [J.identifier(:this), compile(condition)]
+    )
+  end
+
+  def compile({:cond, _, [[do: clauses]]}) do
+    processed_clauses = Enum.map(clauses, fn({:->, _, [clause, clause_body]}) ->
+      translated_body = Enum.map(List.wrap(clause_body), &compile(&1))
+      |> Clause.return_last_statement
+      translated_body = J.function_expression([], [], J.block_statement(translated_body))
+
+      translated_clause = compile(hd(clause))
+
+
+      J.array_expression([translated_clause, translated_body])
+    end)
+
+
+    cond_function = J.member_expression(
+      J.member_expression(
+        J.identifier("Bootstrap"),
+        J.member_expression(
+          J.identifier("Core"),
+          J.identifier("SpecialForms")
+        )
+      ),
+      J.identifier("cond")
+    )
+
+    J.call_expression(
+      cond_function,
+      processed_clauses
+    )
   end
 
   def compile({:receive, _, _}) do
     raise "receive not implemented"
   end
 
-  def compile({:with, _, _}) do
-    raise "with not implemented"
-  end
-
-  def compile({:try, _, _}) do
-    raise "try not implemented"
+  def compile({:try, _, [blocks]}) do
+    Try.compile(blocks)
   end
 
   def compile({:fn, _, clauses}) do
@@ -114,6 +143,22 @@ defmodule ElixirScript.Experimental.Form do
 
   def compile({{:., _, [_, _]}, _, _} = ast) do
     Call.compile(ast)
+  end
+
+  def compile({:super, context, params}) do
+    {function_name, _} = Keyword.fetch!(context, :function)
+
+    J.call_expression(
+      J.identifier("#{function_name}#{length(params)}"),
+      Enum.map(params, &compile(&1))
+    )
+  end
+
+  def compile({function_name, _, params}) when is_list(params) do
+    J.call_expression(
+      J.identifier("#{function_name}#{length(params)}"),
+      Enum.map(params, &compile(&1))
+    )
   end
 
   def compile({var, _, _}) do

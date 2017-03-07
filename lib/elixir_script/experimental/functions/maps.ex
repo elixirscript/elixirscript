@@ -19,4 +19,20 @@ defmodule ElixirScript.Experimental.Functions.Maps do
     )
   end
 
+  def rewrite({{:., _, [:maps, :find]}, _, [key, map]}) do
+    J.call_expression(
+      J.member_expression(
+        J.member_expression(
+          J.member_expression(
+            J.identifier("Bootstrap"),
+            J.identifier("Core")
+          ),
+          J.identifier("Functions")
+        ),
+        J.identifier("update_map")
+      ),
+      [Form.compile(key), Form.compile(map)]
+    )
+  end
+
 end

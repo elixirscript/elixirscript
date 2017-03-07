@@ -12,13 +12,17 @@ defmodule ElixirScript.Experimental.Function do
     )
   end
 
-  #def compile({{:__struct__, 0}, :def, _, clauses}) do
-  #end
-
-  #def compile({{:__struct__, 1}, :def, _, clauses}) do
-  #end
-
   def compile({{name, arity}, type, _, clauses}) do
+    clauses = Enum.map(clauses, fn(clause) ->
+      Macro.prewalk(clause, fn
+        {subject, context, params} ->
+          {subject, Keyword.put(context, :function, {name, arity}), params }
+        ast ->
+          ast
+      end)
+    end)
+
+
     declarator = J.variable_declarator(
       J.identifier("#{name}#{arity}"),
       J.call_expression(

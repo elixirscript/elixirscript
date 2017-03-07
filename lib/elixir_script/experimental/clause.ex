@@ -25,11 +25,7 @@ defmodule ElixirScript.Experimental.Clause do
         Form.compile(body)
     end
 
-    body = body
-    |> List.wrap
-    |> Enum.reverse
-    |> return_last_statement
-    |> Enum.reverse
+    body = return_last_statement(body)
 
     J.call_expression(
       J.member_expression(
@@ -56,15 +52,22 @@ defmodule ElixirScript.Experimental.Clause do
   end
 
   def compile({:->, _, [params, body]}) do
-
     compile({[], params, [], body})
   end
 
-  defp return_last_statement([head]) do
+  def return_last_statement(body) do
+    body
+    |> List.wrap
+    |> Enum.reverse
+    |> do_return_last_statement
+    |> Enum.reverse
+  end
+
+  defp do_return_last_statement([head]) do
     [J.return_statement(head)]
   end
 
-  defp return_last_statement([head | tail]) do
+  defp do_return_last_statement([head | tail]) do
     [J.return_statement(head)] ++ tail
   end
 

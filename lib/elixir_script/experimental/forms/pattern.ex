@@ -22,7 +22,7 @@ defmodule ElixirScript.Experimental.Forms.Pattern do
   end
 
   defp process_pattern({:_, _, _}) do
-    { [PM.wildcard()], [J.identifier("undefined")] }
+    { [PM.wildcard()], [J.identifier(:_)] }
   end
 
   defp process_pattern({a, b}) do
