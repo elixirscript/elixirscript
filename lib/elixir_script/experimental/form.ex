@@ -115,8 +115,9 @@ defmodule ElixirScript.Experimental.Form do
     )
   end
 
-  def compile({:receive, _, _}) do
-    raise "receive not implemented"
+  def compile({:receive, context, _}) do
+    line = Keyword.get(context, :line, 1)
+    raise "Line: #{line} receive not supported"
   end
 
   def compile({:try, _, [blocks]}) do

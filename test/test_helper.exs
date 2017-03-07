@@ -21,6 +21,7 @@ end
 
 defmodule ElixirScript.TestHelper do
   use ExUnit.Case
+  alias ESTree.Tools.Generator
 
   def make_custom_env do
     use ElixirScript
@@ -83,5 +84,9 @@ defmodule ElixirScript.TestHelper do
     ***Actual***
     #{converted_code}
     """
+  end
+
+  def generate_js(js_ast) do
+    Generator.generate(js_ast)
   end
 end

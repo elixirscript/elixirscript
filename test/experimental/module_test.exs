@@ -1,14 +1,15 @@
 defmodule ElixirScript.Experimental.Module.Test do
   use ExUnit.Case
-  alias ESTree.Tools.Builder, as: J 
-  alias ElixirScript.Experimental.Module   
+  alias ESTree.Tools.Builder, as: J
+  alias ElixirScript.Experimental.Module
+  import ElixirScript.TestHelper
 
   test "compile empty module" do
     args = [
-      attrs: [], 
+      attrs: [],
       defs: [],
       file: "example.ex",
-      line: 1, 
+      line: 1,
       module: Example,
       opts: [],
       unreachable: []
@@ -24,15 +25,15 @@ defmodule ElixirScript.Experimental.Module.Test do
       args[:opts]
     )
 
-    assert result == J.program([])
+    assert generate_js(result) =~ "export default {}"
   end
 
   test "compile module with unreachable" do
     args = [
-      attrs: [], 
+      attrs: [],
       defs: [{{:hello, 0}, :defp, [line: 4], [{[line: 4], [], [], nil}]}],
       file: "example.ex",
-      line: 1, 
+      line: 1,
       module: Example,
       opts: [],
       unreachable: [hello: 0]
@@ -48,6 +49,6 @@ defmodule ElixirScript.Experimental.Module.Test do
       args[:opts]
     )
 
-    assert result == J.program([])
+    assert generate_js(result) =~ "export default {}"
   end
 end

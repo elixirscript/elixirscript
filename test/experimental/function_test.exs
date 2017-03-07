@@ -1,13 +1,15 @@
 defmodule ElixirScript.Experimental.Function.Test do
   use ExUnit.Case
-  alias ESTree.Tools.Builder, as: J 
-  alias ElixirScript.Experimental.Function   
+  alias ESTree.Tools.Builder, as: J
+  alias ElixirScript.Experimental.Function
+  import ElixirScript.TestHelper
 
   test "compile function with no body" do
     result = Function.compile({{:hello, 0}, :defp, [line: 4], [{[line: 4], [], [], nil}]})
+    generated_js = generate_js(result)
 
-    assert result.type == "VariableDeclaration"
-    assert hd(result.declarations).id == J.identifier("hello0")
-    assert hd(result.declarations).init.type == "CallExpression"
+    assert generated_js =~ "const hello0 ="
+    assert generated_js =~ "Bootstrap.Core.Patterns.defmatch"
+    assert generated_js =~ "return null"
   end
 end
