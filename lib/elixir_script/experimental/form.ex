@@ -5,6 +5,10 @@ defmodule ElixirScript.Experimental.Form do
   alias ElixirScript.Translator.Identifier
   alias ElixirScript.Experimental.Clause
 
+  @moduledoc """
+  Handles translation of all forms that are not functions or clauses
+  """
+
   def compile(nil) do
     J.identifier("null")
   end

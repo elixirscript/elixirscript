@@ -4,6 +4,10 @@ defmodule ElixirScript.Experimental.Forms.Pattern do
   alias ElixirScript.Experimental.Form
   alias ElixirScript.Experimental.Forms.{Bitstring, Map}
 
+  @moduledoc """
+  Handles all pattern matching translations
+  """
+
   def compile(patterns) do
     patterns
     |> Enum.reduce({[], []}, fn
@@ -109,9 +113,6 @@ defmodule ElixirScript.Experimental.Forms.Pattern do
 
   defp process_pattern({:<>, _, [prefix, value]}) do
     { [PM.starts_with(prefix)], [Form.compile(value)] }
-  end
-
-  defp process_pattern({:%{}, _, [__struct__: name]}) do
   end
 
   defp process_pattern({:=, _, [{name, _, _}, right]}) do

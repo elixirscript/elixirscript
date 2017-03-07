@@ -3,6 +3,10 @@ defmodule ElixirScript.Experimental.Clause do
   alias ElixirScript.Experimental.Form
   alias ElixirScript.Experimental.Forms.Pattern
 
+  @moduledoc """
+  Handles translation of all of the clause ASTs
+  """
+
   @patterns J.member_expression(
     J.member_expression(
       J.identifier("Bootstrap"),

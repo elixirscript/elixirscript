@@ -3,8 +3,10 @@ defmodule Example do
 
   defstruct [:name]
 
-  def new() do
+  def new(%x{}) do
+    IO.inspect x
     %Example{name: "hello"}
+    new(%Example{})
   end
 
 end

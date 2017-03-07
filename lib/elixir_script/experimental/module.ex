@@ -2,9 +2,13 @@ defmodule ElixirScript.Experimental.Module do
   alias ESTree.Tools.Builder, as: J
   alias ElixirScript.Experimental.Function
 
-  def compile(_, _, module, attrs, defs, unreachable, opts) do
+  @moduledoc """
+  Upper level module that handles compilation
+  """
+
+  def compile(_line, _file, module, attrs, defs, unreachable, opts) do
     reachable_defs = defs
-    |> Enum.filter(fn 
+    |> Enum.filter(fn
       { name, _, _, _} -> not(name in unreachable)
       { _, type, _, _} when type in [:defmacro, :defmacrop] -> false
       _ -> true

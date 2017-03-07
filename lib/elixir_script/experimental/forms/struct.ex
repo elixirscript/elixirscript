@@ -7,7 +7,7 @@ defmodule ElixirScript.Experimental.Forms.Struct do
     J.call_expression(
       J.member_expression(
         process_module_name(module),
-        J.identifier("__struct__0")
+        J.identifier("__struct__1")
       ),
       [Form.compile(params)]
     )
