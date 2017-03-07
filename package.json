@@ -10,7 +10,7 @@
     "lint": "eslint src/javascript/lib/**/*.js src/javascript/tests/**/*.js",
     "lint:fix": "eslint src/javascript/lib/**/*.js src/javascript/tests/**/*.js --fix",
     "build": "rollup -c rollup.config.js",
-    "clean": "rm -rf priv",
+    "clean": "rm -rf priv/build",
     "test": "mocha src/javascript/tests --recursive --compilers js:babel-core/register"
   },
   "repository": {
