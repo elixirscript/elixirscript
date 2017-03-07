@@ -6,13 +6,13 @@ defmodule ElixirScript.Translator.For do
   alias ElixirScript.Translator.Primitive
   alias ElixirScript.Translator.Function
   alias ElixirScript.Translator.Utils
-  alias ElixirScript.Translator.Identifier  
+  alias ElixirScript.Translator.Identifier
 
   def make_for(generators, env) do
     ElixirScript.Translator.State.add_module_reference(env.state, env.module, ElixirScript.Collectable)
     args = handle_args(generators, env)
 
-    generators = JS.array_expression(args.generators)   
+    generators = JS.array_expression(args.generators)
 
     into = args.into || Primitive.make_list_no_translate([])
     filter = args.filter || JS.function_expression([], [], JS.block_statement([JS.return_statement(JS.identifier("true"))]))
@@ -54,11 +54,11 @@ defmodule ElixirScript.Translator.For do
   defp handle_args(generators, env) do
     Enum.reduce(generators, %{generators: [], args: [], filter: nil, fun: nil, into: nil, patterns: []}, fn
 
-      ({:<<>>, [], body}, state) ->
+      ({:<<>>, _, body}, state) ->
       {bs_parts, collection} = Enum.map_reduce(body, nil, fn
         {:::, _, _} = ast, state ->
           {ast, state}
-        {:<-, [], [var, collection]}, _ ->
+        {:<-, _, [var, collection]}, _ ->
           {var, collection}
       end)
 

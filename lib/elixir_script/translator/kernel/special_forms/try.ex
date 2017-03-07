@@ -5,11 +5,11 @@ defmodule ElixirScript.Translator.Try do
   alias ElixirScript.Translator.Primitive
 
   def make_try(blocks, env) do
-    try_block = Dict.get(blocks, :do)
-    rescue_block = Dict.get(blocks, :rescue, nil)
-    catch_block = Dict.get(blocks, :catch, nil)
-    after_block = Dict.get(blocks, :after, nil)
-    else_block = Dict.get(blocks, :else, nil)
+    try_block = Keyword.get(blocks, :do)
+    rescue_block = Keyword.get(blocks, :rescue, nil)
+    catch_block = Keyword.get(blocks, :catch, nil)
+    after_block = Keyword.get(blocks, :after, nil)
+    else_block = Keyword.get(blocks, :else, nil)
 
     { translated_body, _ } = Function.prepare_function_body(try_block, env)
 

@@ -188,28 +188,28 @@ defmodule ElixirScript.Translator.Defmodule do
   end
 
   def process_functions(%{ exported: exported, private: private, exported_generators: exported_generators, private_generators: private_generators }, env) do
-    exported_functions = Enum.map(Dict.keys(exported), fn(key) ->
-      functions = Dict.get(exported, key)
+    exported_functions = Enum.map(Map.keys(exported), fn(key) ->
+      functions = Map.get(exported, key)
 
       { functions, _ } = Def.process_function(key, functions, env)
       { key, functions }
     end)
 
-    exported_generators = Enum.map(Dict.keys(exported_generators), fn(key) ->
-      functions = Dict.get(exported_generators, key)
+    exported_generators = Enum.map(Map.keys(exported_generators), fn(key) ->
+      functions = Map.get(exported_generators, key)
 
       { functions, _ } = Def.process_function(key, functions, %{ env | context: :generator})
       { key, functions }
     end)
 
-    private_functions = Enum.map(Dict.keys(private), fn(key) ->
-      functions = Dict.get(private, key)
+    private_functions = Enum.map(Map.keys(private), fn(key) ->
+      functions = Map.get(private, key)
       { functions, _ } = Def.process_function(key, functions, env)
       { key, functions }
     end)
 
-    private_generators = Enum.map(Dict.keys(private_generators), fn(key) ->
-      functions = Dict.get(private_generators, key)
+    private_generators = Enum.map(Map.keys(private_generators), fn(key) ->
+      functions = Map.get(private_generators, key)
       { functions, _ } = Def.process_function(key, functions, %{ env | context: :generator})
       { key, functions }
     end)
