@@ -14,14 +14,12 @@ defmodule ElixirScript.Experimental.Forms.Call do
   end
 
   defp process_module_name(module) do
-    first_char = String.first(to_string(module))
-
-    case Regex.match?(~r/[A-Z]/, first_char) do
-      true ->
-        members = ["Elixir"] ++ Module.split(module)
-        Identifier.make_namespace_members(members)
-      false ->
-        J.identifier(module)
+    if ElixirScript.Experimental.Module.is_elixir_module(module) do
+      members = ["Elixir"] ++ Module.split(module)
+      J.identifier(Enum.join(members, "_"))
+      #Identifier.make_namespace_members(members)
+    else
+      J.identifier(module)
     end
   end
 end

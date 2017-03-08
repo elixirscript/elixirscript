@@ -4,9 +4,7 @@ defmodule Example do
   defstruct [:name]
 
   def new() do
-    map = %{name: "A"}
-
-    %{map | name: "B"}
+    Hello.hi()
   end
 
 end
