@@ -52,7 +52,7 @@
         {Credo.Check.Consistency.MultiAliasImportRequireUse},
         {Credo.Check.Consistency.ParameterPatternMatching},
         {Credo.Check.Consistency.SpaceAroundOperators},
-        {Credo.Check.Consistency.SpaceInParentheses},
+        {Credo.Check.Consistency.SpaceInParentheses, false},
         {Credo.Check.Consistency.TabsOrSpaces},
 
         # For some checks, like AliasUsage, you can only customize the priority
