@@ -164,9 +164,9 @@ defmodule ElixirScript do
     |> Map.to_list
     |> Enum.map(fn {app, path} -> {app, List.wrap(path)} end)
 
-    deps = [{:elixir, List.wrap(get_std_lib_path())}] ++ deps
+    deps_wrapped = [{:elixir, List.wrap(get_std_lib_path())}] ++ deps
 
-    result = %{data: deps}
+    result = %{data: deps_wrapped}
     |> ElixirScript.Passes.Init.execute(opts)
     |> ElixirScript.Passes.ASTFromFile.execute(opts)
     |> ElixirScript.Passes.LoadModules.execute(opts)
@@ -207,6 +207,7 @@ defmodule ElixirScript do
   @doc """
   Returns the contents of the bootrstrap js file
   """
+  @spec get_bootstrap_js(string) :: string
   def get_bootstrap_js(module_format) do
     path = Path.join([operating_path, "build", to_string(module_format), "Elixir.Bootstrap.js"])
     File.read!(path)
