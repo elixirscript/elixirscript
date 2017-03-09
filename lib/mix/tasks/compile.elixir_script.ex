@@ -1,6 +1,8 @@
 defmodule Mix.Tasks.Compile.ElixirScript do
   use Mix.Task
 
+  @recursive true
+
   @moduledoc """
   Mix compiler to allow mix to compile Elixirscript source files into JavaScript
 
@@ -16,11 +18,11 @@ defmodule Mix.Tasks.Compile.ElixirScript do
           compilers: [:elixir_script] ++ Mix.compilers
         ]
       end
-    
+
   Available options are:
   * `input`: The folder to look for Elixirscript files in. (defaults to `lib/elixirscript`)
   * `output`: The path of the generated JavaScript file. (defaults to `priv/elixirscript`)
-    
+
     If path ends in `.js` then that will be the name of the file. If a directory is given,
     file will be named `Elixir.App.js`
   * `format`: The module format of generated JavaScript code. (defaults to `:es`).
@@ -35,11 +37,19 @@ defmodule Mix.Tasks.Compile.ElixirScript do
 
   @spec run(any()) :: :ok
   def run(_) do
-    elixirscript_config = get_elixirscript_config()
-
     elixirscript_base = Path.join([Mix.Project.build_path, "elixirscript"])
+    do_compile(elixirscript_base, Mix.Project.config[:app])
+    :ok
+  end
+
+  defp do_compile(_, nil) do
+    raise ElixirScriptCompileError, message: "Unable to find mix project app name"
+  end
+
+  defp do_compile(elixirscript_base, app) do
+    elixirscript_config = get_elixirscript_config()
     File.mkdir_p!(elixirscript_base)
-    elixirscript_path = Path.join([elixirscript_base, "#{Mix.Project.config[:app]}"])
+    elixirscript_path = Path.join([elixirscript_base, "#{app}"])
 
     input_path = elixirscript_config
     |> Keyword.get(:input)
@@ -66,7 +76,6 @@ defmodule Mix.Tasks.Compile.ElixirScript do
     js_modules = Keyword.get(elixirscript_config, :js_modules, [])
 
     ElixirScript.compile_path(paths, %{output: output_path, format: format, js_modules: js_modules})
-    :ok
   end
 
   def clean do
