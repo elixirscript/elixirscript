@@ -51,6 +51,11 @@ defmodule ElixirScript.Translator.Identifier do
     |> JS.identifier
   end
 
+  def make_function_name(name, arity) when is_atom(name) do
+    name = filter_name(name)
+    JS.identifier("#{name}#{arity}")
+  end
+
   defp filter_name(reserved_word) when reserved_word in @js_reserved_words do
     "__#{Atom.to_string(reserved_word)}__"
   end
@@ -80,6 +85,6 @@ defmodule ElixirScript.Translator.Identifier do
     end
     |> Enum.reverse
     |> make_alias
-  end 
+  end
 
 end

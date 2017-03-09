@@ -24,13 +24,18 @@ defmodule ElixirScript.Experimental.Form do
   end
 
   def compile(form) when is_atom(form) do
-    J.call_expression(
-      J.member_expression(
-        J.identifier("Symbol"),
-        J.identifier("for")
-      ),
-      [J.literal(form)]
-    )
+    if ElixirScript.Experimental.Module.is_elixir_module(form) do
+      members = ["Elixir"] ++ Module.split(form)
+      J.identifier(Enum.join(members, "_"))
+    else
+      J.call_expression(
+        J.member_expression(
+          J.identifier("Symbol"),
+          J.identifier("for")
+        ),
+        [J.literal(form)]
+      )
+    end
   end
 
   def compile({a, b}) do
@@ -154,20 +159,20 @@ defmodule ElixirScript.Experimental.Form do
     {function_name, _} = Keyword.fetch!(context, :function)
 
     J.call_expression(
-      J.identifier("#{function_name}#{length(params)}"),
+      ElixirScript.Translator.Identifier.make_function_name(function_name, length(params)),
       Enum.map(params, &compile(&1))
     )
   end
 
   def compile({function_name, _, params}) when is_list(params) do
     J.call_expression(
-      J.identifier("#{function_name}#{length(params)}"),
+      ElixirScript.Translator.Identifier.make_function_name(function_name, length(params)),
       Enum.map(params, &compile(&1))
     )
   end
 
   def compile({var, _, _}) do
-    J.identifier(var)
+    ElixirScript.Translator.Identifier.make_identifier(var)
   end
 
 end

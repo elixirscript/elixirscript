@@ -33,7 +33,7 @@ defmodule ElixirScript.Experimental.Function do
 
 
     declarator = J.variable_declarator(
-      J.identifier("#{name}#{arity}"),
+      ElixirScript.Translator.Identifier.make_function_name(name, arity),
       J.call_expression(
         J.member_expression(
           patterns_ast(),

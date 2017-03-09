@@ -44,7 +44,7 @@ defmodule ElixirScript.Experimental.Forms.Map do
       true ->
         J.literal(k)
       false ->
-        J.identifier(k)
+        ElixirScript.Translator.Identifier.make_identifier(k)
     end
 
     J.property(key, value)

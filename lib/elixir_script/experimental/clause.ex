@@ -67,8 +67,16 @@ defmodule ElixirScript.Experimental.Clause do
     |> Enum.reverse
   end
 
+  defp do_return_last_statement([%ESTree.ThrowStatement{} = ast]) do
+    [ast]
+  end
+
   defp do_return_last_statement([head]) do
     [J.return_statement(head)]
+  end
+
+  defp do_return_last_statement([%ESTree.ThrowStatement{} = head | tail]) do
+    [head] ++ tail
   end
 
   defp do_return_last_statement([head | tail]) do

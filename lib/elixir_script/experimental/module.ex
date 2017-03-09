@@ -26,7 +26,7 @@ defmodule ElixirScript.Experimental.Module do
   defp make_exports(reachable_defs) do
     exports = Enum.reduce(reachable_defs, [], fn
       {{name, arity}, :def, _, _}, list ->
-        function_name = J.identifier("#{name}#{arity}")
+      function_name = ElixirScript.Translator.Identifier.make_function_name(name, arity)
         list ++ [J.property(function_name, function_name, :init, true)]
       _, list ->
         list
@@ -50,9 +50,9 @@ defmodule ElixirScript.Experimental.Module do
   defp search_for_imports(clauses) do
     imports = Enum.map(clauses, fn(clause) ->
 
-      # Walk the AST and add the function to the context.
-      # This information is used when translating "super"
-     {ast, list} = Macro.prewalk(clause, [], fn
+      # Walk the AST and try to find module references
+      # We will turn these into imports
+     {ast, list} = Macro.postwalk(clause, [], fn
       {_, _, _, {{:., _, [module, _]}, _, _}} = ast, list ->
           if is_elixir_module(module) do
             {ast, list ++ [module_to_import(module)]}
@@ -85,11 +85,13 @@ defmodule ElixirScript.Experimental.Module do
     )
   end
 
-
-
-  def is_elixir_module(module) do
+  def is_elixir_module(module) when is_atom(module) do
     first_char = String.first(to_string(module))
     Regex.match?(~r/[A-Z]/, first_char)
+  end
+
+  def is_elixir_module(_) do
+    false
   end
 
 end
