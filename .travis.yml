@@ -16,10 +16,11 @@ script:
   - mix compile
   - mix test
   - npm test
+  - npm run test-app
 notifications:
   webhooks:
     urls:
       - https://webhooks.gitter.im/e/fbd8944d285c0696dc41
     on_success: always  # options: [always|never|change] default: always
     on_failure: always  # options: [always|never|change] default: always
-    on_start: never     # options: [always|never|change] default: always  
+    on_start: never     # options: [always|never|change] default: always
