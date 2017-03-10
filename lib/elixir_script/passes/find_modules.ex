@@ -3,6 +3,7 @@ defmodule ElixirScript.Passes.FindModules do
   alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.State
 
+  @spec execute(map, map) :: map
   def execute(compiler_data, opts) do
     data = Enum.reduce(compiler_data.data, [], fn(data, list) ->
       quoted = update_quoted(data.ast)
@@ -53,15 +54,22 @@ defmodule ElixirScript.Passes.FindModules do
     { ast, state }
   end
 
-  defp do_module_processing({:defmodule, context1, [{:__aliases__, _, name} = the_alias, [do: body]]}, state, opts) do
-    { body, inner_modules } = make_inner_module_aliases(name, body)
+
+  defp do_module_processing({:defmodule, _context1, [{:__aliases__, _, name} = the_alias, [do: body]]}, state, opts) do
+    { body, inner_modules } = make_inner_module_aliases(body)
 
     aliases = Enum.map(inner_modules, fn
-      ({:defmodule, _, [{:__aliases__, _, inner_module_name}, [do: inner_module_body]]}) ->
+      ({:defmodule, _, [{:__aliases__, _, inner_module_name}, [do: _inner_module_body]]}) ->
         { :alias, [], [{:__aliases__, [alias: false], name ++ inner_module_name}, [as: {:__aliases__, [alias: false], inner_module_name }] ] }
     end)
 
-    state = Enum.reduce(inner_modules, state, fn
+    state = do_module_processing_state(inner_modules, state, name, aliases, opts)
+
+    [%{name: Utils.quoted_to_name(the_alias), type: :module, ast: do_module_processing_body(body, aliases, opts) }] ++ state
+  end
+
+  defp do_module_processing_state(inner_modules, state, name, aliases, opts) do
+    Enum.reduce(inner_modules, state, fn
       ({:defmodule, context1, [{:__aliases__, context2, inner_module_name}, [do: inner_module_body]]}, state) ->
 
         module_name = Utils.quoted_to_name({:__aliases__, [], tl(name) ++ inner_module_name})
@@ -73,39 +81,36 @@ defmodule ElixirScript.Passes.FindModules do
           {:defmodule, context1, [{:__aliases__, context2, name ++ inner_module_name}, [do: add_aliases_to_body(inner_module_body, this_module_aliases)]]},
           state, opts)
     end)
+  end
 
-    body = case body do
-             {:__block__, context, list } ->
-               list = Enum.map(list, fn
-               {:use, _, [module, _] } = using ->
-                 {:use, handle_use_expression(using, module, opts) }
-               {:use, _, [module] } = using ->
-                 {:use, handle_use_expression(using, module, opts) }
-               ast ->
-                 {:expanded, ast}
-             end)
-             |> Enum.reduce([], fn
-                 {:use, ast}, state ->
-                   case ast do
-                     {:__block__, _, list} ->
-                       state ++ list
-                     _ ->
-                       state ++ [ast]
-                   end
+  defp do_module_processing_body(body, aliases, opts) do
+    body
+    |> case do
+      {:__block__, context, list } ->
+        list =
+          list
+          |> Enum.map(fn
+            {:use, _, [module, _] } = using ->
+              {:use, handle_use_expression(using, module, opts) }
+            {:use, _, [module] } = using ->
+              {:use, handle_use_expression(using, module, opts) }
+            ast ->
+              {:expanded, ast}
+          end)
+          |> Enum.reduce([], fn
+            {:use, {:__block__, _, list}}, state ->
+              state ++ list
+            {:use, ast}, state ->
+              state ++ [ast]
+            {:expanded, ast}, state ->
+              state ++ [ast]
+          end)
 
-                 {:expanded, ast}, state ->
-                   state ++ [ast]
-               end)
-
-               {:__block__, context, list}
-
-             _ ->
-               body
-           end
-
-    body = add_aliases_to_body(body, aliases)
-
-    [%{name: Utils.quoted_to_name(the_alias), type: :module, ast: body }] ++ state
+          {:__block__, context, list}
+      _ ->
+        body
+    end
+    |> add_aliases_to_body(aliases)
   end
 
   defp add_aliases_to_body(body, aliases) do
@@ -117,23 +122,21 @@ defmodule ElixirScript.Passes.FindModules do
     end
   end
 
-  defp make_inner_module_aliases(name, body) do
+  defp make_inner_module_aliases(body) do
     case body do
       nil ->
         { { :__block__, [], [] }, [] }
 
       {:__block__, context, list2 } ->
-        { list2, inner_modules } = Enum.partition(list2, fn(x) ->
-        case x do
-          {:defmodule, _, [{:__aliases__, _, inner_module_name}, [do: inner_module_body]]} ->
+        { list2, inner_modules } = Enum.partition(list2, fn
+          {:defmodule, _, [{:__aliases__, _, _inner_module_name}, [do: _inner_module_body]]} ->
             false
           _ ->
             true
-        end
       end)
 
         { {:__block__, context, list2}, inner_modules }
-      {:defmodule, _, [{:__aliases__, context, inner_module_name}, [do: inner_module_body]]} = mod ->
+      {:defmodule, _, [{:__aliases__, context, _inner_module_name}, [do: _inner_module_body]]} = mod ->
         { {:__block__, context, [] }, [mod] }
       _ ->
         { body, [] }
@@ -162,13 +165,14 @@ defmodule ElixirScript.Passes.FindModules do
   defp update_quoted(quoted) do
     Macro.prewalk(quoted, fn
       ({name, context, parms}) ->
-        context = if context[:import] == Kernel do
-          context = Keyword.update!(context, :import, fn(_) -> ElixirScript.Kernel end)
-        else
-          context
-        end
+        context =
+          if context[:import] == Kernel do
+            Keyword.update!(context, :import, fn(_) -> ElixirScript.Kernel end)
+          else
+            context
+          end
 
-      {name, context, parms}
+        {name, context, parms}
       (x) ->
         x
     end)
