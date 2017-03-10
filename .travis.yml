@@ -14,6 +14,7 @@ script:
   - mix local.rebar --force
   - mix deps.get
   - mix compile
+  - npm run build
   - mix test
   - npm test
   - npm run test-app
