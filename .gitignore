@@ -19,3 +19,4 @@ src/elixirscript
 priv/**/*.js
 stdlib_state.bin
 *.log
+test/app/build

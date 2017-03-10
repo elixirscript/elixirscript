@@ -1,0 +1,5 @@
+BASEDIR=$(dirname "$0")
+
+cd "$BASEDIR/../../"
+
+mix elixirscript test/app/src/ -f common -o test/app/build/
