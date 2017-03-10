@@ -103,9 +103,12 @@ defmodule ElixirScript.Passes.CreateJSModules do
         [],
         JS.block_statement([
           JS.return_statement(
-            JS.member_expression(
-              JS.identifier(:module),
-              JS.identifier("__exports")
+            JS.call_expression(
+              JS.member_expression(
+                JS.identifier(:module),
+                JS.identifier("__load")
+              ),
+              [JS.identifier("Elixir")]
             )
           )
         ])
