@@ -92,7 +92,18 @@ defmodule ElixirScript.Passes.CreateJSModules do
       )
     )
 
-    load = JS.assignment_expression(
+    ast = opts.module_formatter.build(
+      [],
+      opts.js_modules,
+      [elixir, start, load] ++ body,
+      JS.identifier("Elixir")
+    )
+
+    ast
+  end
+
+  def load do
+    JS.assignment_expression(
       :=,
       JS.member_expression(
         JS.identifier("Elixir"),
@@ -114,15 +125,5 @@ defmodule ElixirScript.Passes.CreateJSModules do
         ])
       )
     )
-
-    ast = opts.module_formatter.build(
-      [],
-      opts.js_modules,
-      [elixir, start, load] ++ body,
-      JS.identifier("Elixir")
-    )
-
-    ast
   end
-
 end
