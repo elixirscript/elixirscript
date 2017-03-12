@@ -8,16 +8,17 @@ env:
   - TRAVIS_NODE_VERSION="6"
 install:
   - rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm && (cd ~/.nvm && git checkout `git describe --abbrev=0 --tags`) && source ~/.nvm/nvm.sh && nvm install $TRAVIS_NODE_VERSION
-  - npm install
+  - npm install -g yarn
+  - yarn
 script:
   - mix local.hex --force
   - mix local.rebar --force
   - mix deps.get
   - mix compile
-  - npm run build
+  - yarn build
   - mix test
-  - npm test
-  - npm run test-app
+  - yarn test
+  - yarn test-app
 notifications:
   webhooks:
     urls:
