@@ -22,7 +22,7 @@ defmodule ElixirScript.Passes.HandleOutput do
       code -> code
     end
 
-    IO.write(concat(code)) 
+    IO.write(concat(code))
   end
 
   defp out(compiler_output, %{output: output_path, core_path: _}) do

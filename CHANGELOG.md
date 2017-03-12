@@ -9,10 +9,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - `super`
 - `defoverridable`
+- `Elixir.load` for loading generated JavaScript modules in bundled output.
+Unlike `Elixir.start`, this will only call `__load` on the module and return the functions on it
+
+```javascript
+const exports = Elixir.load(Elixir.MyApp);
+exports.hello();
+```
 
 ### Changed
 - `-ex` alias is now `-e`
 - A filename can be specified for output
+
+### Fixed
+- Make sure mix compiler works in umbrella apps
 
 ## [0.26.1] - 2017-02-27
 
@@ -46,7 +56,7 @@ elixirscript "app/elixirscript" -o dist --js-module React:react --js-module Reac
 - Now bundles all output, including the boostrap code.
   The exported object has Elixir modules in JavaScript namespaces that are lazily loaded when called.
 
-  To start your application import the bundle according to whichever module format was selected and 
+  To start your application import the bundle according to whichever module format was selected and
   then call start giving it the module and the initial args
 
   ```javascript
@@ -67,7 +77,7 @@ elixirscript "app/elixirscript" -o dist --js-module React:react --js-module Reac
 - Updated elixir_script mix compiler to support compiling elixir_script paths in dependencies if dependency has mix compiler defined as well
 - Add `Collectable` protocol implementations
 - Updated `for` implementation to use `Collectable`
-- `format` option. Can now specify the module format of output. 
+- `format` option. Can now specify the module format of output.
     Choices are:
         * `:es` (default) for ES Modules
         * `:umd` for UMD

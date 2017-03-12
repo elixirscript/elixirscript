@@ -12,7 +12,8 @@
     "build": "rollup -c rollup.config.js",
     "clean": "rm -rf priv/build",
     "test": "mocha src/javascript/tests --recursive --compilers js:babel-core/register",
-    "test-app": "./test/app/convert-exjs && NODE_ENV=test mocha 'test/app/spec/*.spec.js'"
+    "build:test-app": "mix elixirscript test/app/src/ -f common -o test/app/build/",
+    "test-app": "yarn run build:test-app && NODE_ENV=test mocha 'test/app/spec/*.spec.js'"
   },
   "repository": {
     "type": "git",

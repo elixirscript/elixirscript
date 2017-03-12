@@ -30,9 +30,9 @@ This is the help output of elixirscript
      the elixir code string if passed the -e flag
      options:
     --js-module [<identifer>:<path>] A js module used in your code. ex: React:react
-                            Multiple can be defined      
+                            Multiple can be defined
      -f --format [format]   module format of output. options: es (default), common, umd
-     -o  --output [path]    places output at the given path. 
+     -o  --output [path]    places output at the given path.
                             Can be a directory or filename.
      -e --elixir read input as elixir code string
      --full-build informs the compiler to do a full build instead of an incremental one
@@ -49,10 +49,10 @@ elixirscript also takes a path to your `.ex` files as well:
 
 If you look in the dist folder you'll see a file called `Elixir.App.js`
 
-To start your application import the bundle according to whichever module format was selected and 
+To start your application import the bundle according to whichever module format was selected and
 then call start giving it the module and the initial args.
 
-Ex. If you have a module like so 
+Ex. If you have a module like so
 ```elixir
 defmodule Example do
     start(type, args) do
@@ -87,14 +87,14 @@ Add dependency to your deps in mix.exs:
      version: "0.1.0",
      elixir: "~> 1.0",
      deps: deps,
-     elixir_script: [ 
-        input: "lib/elixirscript", 
-        output: "priv/elixirscript/Elixir.App.js", 
+     elixir_script: [
+        input: "lib/elixirscript",
+        output: "priv/elixirscript/Elixir.App.js",
         format: :es,
         js_modules: [
           {React, "react"},
           {ReactDOM, "react-dom"}
-        ]         
+        ]
      ],
      compilers: [:elixir_script] ++ Mix.compilers
     ]
@@ -160,6 +160,6 @@ There is an [elixirscript frontend boilerplate project](https://github.com/elixi
 
 There is an Brunch plugin, [elixirscript-brunch](https://www.npmjs.com/package/elixirscript-brunch).
 
-#### 
+#### elixirscript-loader
 
 There is also a webpack loader, [elixirscript-loader](https://www.npmjs.com/package/elixirscript-loader).
