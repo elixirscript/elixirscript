@@ -8,16 +8,12 @@ defmodule ElixirScript.Integer do
     rem(number, 2) != 0
   end
 
-  def to_char_list(number) do
-    to_char_list(number, 10)
-  end
-
-  def to_char_list(number, base) do
+  def to_char_list(number, base \\ 10) do
     number.toString(base).split('')
   end
 
-  def parse(bin) do
-    result = Bootstrap.Core.Functions.get_global().parseInt(bin)
+  def parse(bin, base \\ 10) do
+    result = Bootstrap.Core.Functions.get_global().parseInt(bin, base)
 
     if Bootstrap.Core.Functions.get_global().isNaN(result) do
       :error
