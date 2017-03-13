@@ -1,5 +1,5 @@
 defmodule ElixirScript.Tuple do
-  @moduledoc false  
+  @moduledoc false
   require JS
 
   def duplicate(data, size) do
@@ -15,7 +15,7 @@ defmodule ElixirScript.Tuple do
   end
 
   def to_list(tuple) do
-    tuple["value"]
+    tuple.values
   end
 
   def insert_at(tuple, index, value) do
@@ -26,14 +26,14 @@ defmodule ElixirScript.Tuple do
     if current_index == length(tuple) do
       list
     else
-      list = case index == current_index do
+      new_list = case index == current_index do
         true ->
           list ++ [value, tuple.get(current_index)]
         false ->
           list ++ [tuple.get(current_index)]
       end
 
-      do_insert_at(tuple, index, value, current_index + 1, list)
+      do_insert_at(tuple, index, value, current_index + 1, new_list)
     end
   end
 
@@ -45,14 +45,14 @@ defmodule ElixirScript.Tuple do
     if current_index == length(tuple) do
       list
     else
-      list = case index == current_index do
+      new_list = case index == current_index do
         true ->
           list
         false ->
           list ++ [tuple.get(current_index)]
       end
 
-      do_delete_at(tuple, index, current_index + 1, list)
+      do_delete_at(tuple, index, current_index + 1, new_list)
     end
   end
 
