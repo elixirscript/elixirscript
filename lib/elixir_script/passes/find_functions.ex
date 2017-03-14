@@ -1,16 +1,16 @@
 defmodule ElixirScript.Passes.FindFunctions do
-  @moduledoc false    
+  @moduledoc false
   @function_types [:def, :defp, :defgen, :defgenp, :defmacro, :defmacrop]
 
   def execute(data, _) do
     new_data = Enum.map(data.data, fn { module_name, module_data } ->
 
       %{
-        def: functions, 
-        defp: private_functions, 
-        defgen: generators, 
-        defgenp: private_generators, 
-        defmacro: macros, 
+        def: functions,
+        defp: private_functions,
+        defgen: generators,
+        defgenp: private_generators,
+        defmacro: macros,
         defmacrop: private_macros,
         defdelegate: delegates
       } = get_functions_from_module(module_data.ast)
@@ -54,7 +54,7 @@ defmodule ElixirScript.Passes.FindFunctions do
 
       ({:defdelegate, _, [{name, _, params}], _}, state) ->
         arity = length(params)
-        add_function_to_map(state, :defdelegate, name, arity)      
+        add_function_to_map(state, :defdelegate, name, arity)
 
       _, state ->
         state
@@ -63,12 +63,12 @@ defmodule ElixirScript.Passes.FindFunctions do
   end
 
   defp new_function_map() do
-    %{  
-      def: Keyword.new, 
-      defp: Keyword.new, 
-      defgen: Keyword.new, 
-      defgenp: Keyword.new, 
-      defmacro: Keyword.new, 
+    %{
+      def: Keyword.new,
+      defp: Keyword.new,
+      defgen: Keyword.new,
+      defgenp: Keyword.new,
+      defmacro: Keyword.new,
       defmacrop: Keyword.new,
       defdelegate: Keyword.new
     }
