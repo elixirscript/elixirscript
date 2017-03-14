@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - `super`
 - `defoverridable`
+- `IO.inspect\1`, `IO.puts\1`, `IO.puts\2`, `IO.warn\1`
 - `Elixir.load` for loading generated JavaScript modules in bundled output.
 Unlike `Elixir.start`, this will only call `__load` on the module and return the functions on it
 
