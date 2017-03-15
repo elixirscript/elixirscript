@@ -3,6 +3,39 @@ defmodule ElixirScript.Translator.JS do
 
   alias ESTree.Tools.Builder
   alias ElixirScript.Translator
+  alias ElixirScript.Translator.Utils
+  alias ElixirScript.Translator.Identifier
+
+  def call_property() do
+    Builder.member_expression(
+      Builder.member_expression(
+        Builder.identifier("Bootstrap"),
+        Builder.member_expression(
+          Builder.identifier("Core"),
+          Builder.identifier("Functions")
+        )
+      ),
+      Builder.identifier("call_property")
+    )
+  end
+
+  def global() do
+    Builder.member_expression(
+      Builder.member_expression(
+        Builder.identifier("Bootstrap"),
+        Builder.member_expression(
+          Builder.identifier("Core"),
+          Builder.identifier("Functions")
+        )
+      ),
+      Builder.identifier("get_global")
+    )
+  end
+
+  @doc false
+  def translate_js_function({:__aliases__, _, module}, name, params, env) do
+    { do_translate(module, {name, [], params}, env), env }
+  end
 
   @doc false
   def translate_js_function(name, params, env) do
@@ -87,6 +120,56 @@ defmodule ElixirScript.Translator.JS do
     end)
 
     Translator.translate!({ :%{}, [], args }, env)
+  end
+
+  defp do_translate({function, _, []}, env) do
+    Builder.call_expression(
+      call_property(),
+      [
+        Builder.call_expression(global(), []),
+        Translator.translate!(to_string(function), env)
+      ]
+    )
+  end
+
+  defp do_translate({function, _, params}, env) do
+    Builder.call_expression(
+      Builder.member_expression(
+        Builder.call_expression(global(), []),
+        Builder.identifier(function)
+      ),
+      Enum.map(params, &Translator.translate!(&1, env))
+    )
+  end
+
+  defp do_translate(module, {function, _, []}, env) do
+    members = Identifier.make_namespace_members(module)
+
+    Builder.call_expression(
+      call_property(),
+      [
+        Builder.member_expression(
+          Builder.call_expression(global(), []),
+          members
+        ),
+        Translator.translate!(to_string(function), env)
+      ]
+    )
+  end
+
+  defp do_translate(module, {function, _, params}, env) do
+    members = Identifier.make_namespace_members(module)
+
+    Builder.call_expression(
+      Builder.member_expression(
+        Builder.member_expression(
+          Builder.call_expression(global(), []),
+          members
+        ),
+        Builder.identifier(function)
+      ),
+      Enum.map(params, &Translator.translate!(&1, env))
+    )
   end
 
 end

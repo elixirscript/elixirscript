@@ -40,7 +40,7 @@ defmodule ElixirScript.Kernel do
   end
 
   def abs(number) do
-    Math.abs(number)
+    JS.Math.abs(number)
   end
 
   def apply(fun, args) do
@@ -128,23 +128,23 @@ defmodule ElixirScript.Kernel do
   end
 
   def map_size(term) do
-    Object.keys(term).length
+    JS.Object.keys(term).length
   end
 
   def max(first, second) do
-    Math.max(first, second)
+    JS.Math.max(first, second)
   end
 
   def min(first, second) do
-    Math.min(first, second)
+    JS.Math.min(first, second)
   end
 
   def round(number) do
-    Math.round(number)
+    JS.Math.round(number)
   end
 
   def trunc(number) do
-    Math.floor(number)
+    JS.Math.floor(number)
   end
 
   def tuple_size(tuple) do

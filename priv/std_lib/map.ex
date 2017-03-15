@@ -1,6 +1,6 @@
 defmodule ElixirScript.Map do
   @moduledoc false
-  
+
   def new() do
     %{}
   end
@@ -29,7 +29,7 @@ defmodule ElixirScript.Map do
   end
 
   def values(map) do
-    Object.values(map)
+    JS.Object.values(map)
   end
 
   def from_struct(struct) do

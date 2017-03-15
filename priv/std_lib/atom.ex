@@ -1,5 +1,5 @@
 defmodule ElixirScript.Atom do
-   @moduledoc false 
+   @moduledoc false
   import Kernel, except: [to_string: 1]
 
   def to_char_list(atom) do
@@ -7,7 +7,7 @@ defmodule ElixirScript.Atom do
   end
 
   def to_string(atom) do
-    Symbol.keyFor(atom)
+    JS.Symbol.keyFor(atom)
   end
 
 end

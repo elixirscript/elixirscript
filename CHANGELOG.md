@@ -21,6 +21,13 @@ exports.hello();
 ### Changed
 - `-ex` alias is now `-e`
 - A filename can be specified for output
+- To access global JavaScript functions, modules, and properties, use the `JS` module
+```elixir
+JS.length # translates to 'length'
+JS.alert() # translates to 'alert()'
+JS.String.raw("hi") # translate to String.raw('hi')
+JS.console.log("hi") # translates to console.log('hi')
+```
 
 ### Fixed
 - Make sure mix compiler works in umbrella apps

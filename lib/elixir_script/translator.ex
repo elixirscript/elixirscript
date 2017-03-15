@@ -71,6 +71,18 @@ defmodule ElixirScript.Translator do
     js_ast
   end
 
+  defp do_translate({{:., _, [{:__aliases__, _, [:JS]}, function_name]}, _, params }, env) when function_name in @generator_types do
+    do_translate({function_name, [], params}, env)
+  end
+
+  defp do_translate({{:., _, [{:__aliases__, _, [:JS]}, function_name]}, _, params }, env) do
+    JSLib.translate_js_function(function_name, params, env)
+  end
+
+  defp do_translate({{:., _, [{:__aliases__, context, [:JS | rest]}, function_name]}, _, params }, env) do
+    JSLib.translate_js_function({:__aliases__, context, rest}, function_name, params, env)
+  end
+
   defp do_translate(ast, env) when is_number(ast) or is_binary(ast) or is_boolean(ast) or is_nil(ast) do
     { Primitive.make_literal(ast), env }
   end
@@ -247,7 +259,7 @@ defmodule ElixirScript.Translator do
     { name, _ } = env.function
     super_name = String.to_atom("__super__" <> to_string(name))
 
-    Call.make_local_function_call(super_name, params, env)    
+    Call.make_local_function_call(super_name, params, env)
   end
 
   defp do_translate({{:., _, [function_name]}, _, params}, env) do
@@ -292,14 +304,6 @@ defmodule ElixirScript.Translator do
     translate({{:., context1, [{:__aliases__, context2, [:Bootstrap, :Enum]}, function_name]}, context3, params }, env)
   end
 
-  defp do_translate({{:., _, [{:__aliases__, _, [:JS]}, function_name]}, _, params }, env) when function_name in @generator_types do
-    do_translate({function_name, [], params}, env)
-  end
-
-  defp do_translate({{:., _, [{:__aliases__, _, [:JS]}, function_name]}, _, params }, env) do
-    JSLib.translate_js_function(function_name, params, env)
-  end
-
   defp do_translate({{:., _, [{:__aliases__, _, _} = module_name, function_name]}, _, params } = ast, env) do
     expanded_ast = Macro.expand(ast, env.env)
 
@@ -324,7 +328,7 @@ defmodule ElixirScript.Translator do
     else
       translate(expanded_ast, env)
     end
-  end  
+  end
 
   defp do_translate({{:., _, [module_name, function_name]}, _, params } = ast, env) do
     expanded_ast = Macro.expand(ast, env.env)
@@ -696,7 +700,7 @@ defmodule ElixirScript.Translator do
     else
       module_name
     end
-  end  
+  end
 
   def has_function?(module_name, name_arity, env) do
     case ElixirScript.Translator.State.get_module(env.state, module_name) do

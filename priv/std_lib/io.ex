@@ -1,22 +1,22 @@
 defmodule ElixirScript.IO do
 
   def inspect(item, opts \\ []) do
-    :console.log(item)
+    JS.console.log(item)
     item
   end
 
   def puts(device \\ :stdio, item) when is_binary(item) do
     case device do
       :stdio ->
-        :console.log(item)
+        JS.console.log(item)
       :stderr ->
-        :console.warn(item)
+        JS.console.warn(item)
     end
   end
 
   def warn(message) when is_binary(message) do
-    :console.warn("warning: #{message}")
-    :console.trace()
+    JS.console.warn("warning: #{message}")
+    JS.console.trace()
   end
 
 end

@@ -1,5 +1,5 @@
 defmodule ElixirScript.Base do
-  @moduledoc false  
+  @moduledoc false
 
   def encode64(data) do
     Bootstrap.Core.b64EncodeUnicode(data)
@@ -14,7 +14,7 @@ defmodule ElixirScript.Base do
   end
 
   def decode64!(data) do
-    Bootstrap.Core.get_global().atob(data)
+    JS.atob(data)
   end
 
 end

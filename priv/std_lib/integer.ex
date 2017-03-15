@@ -13,9 +13,9 @@ defmodule ElixirScript.Integer do
   end
 
   def parse(bin, base \\ 10) do
-    result = Bootstrap.Core.Functions.get_global().parseInt(bin, base)
+    result = JS.parseInt(bin, base)
 
-    if Bootstrap.Core.Functions.get_global().isNaN(result) do
+    if JS.isNaN(result) do
       :error
     else
       case bin.indexOf(".") do

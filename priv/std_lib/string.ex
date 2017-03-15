@@ -3,11 +3,11 @@ defmodule ElixirScript.String do
   import Kernel, except: [length: 1]
 
   def to_atom(str) do
-    Symbol.for(str)
+    JS.Symbol.for(str)
   end
 
   def to_existing_atom(str) do
-    Symbol.for(str)
+    JS.Symbol.for(str)
   end
 
   def to_char_list(str) do
@@ -15,15 +15,15 @@ defmodule ElixirScript.String do
   end
 
   def to_float(str) do
-    Bootstrap.Core.get_global().parseFloat(str)
+    JS.parseFloat(str)
   end
 
   def to_integer(str) do
-    Bootstrap.Core.get_global().parseInt(str, 10)
+    JS.parseInt(str, 10)
   end
 
   def to_integer(str, base) do
-    Bootstrap.Core.get_global().parseInt(str, base)
+    JS.parseInt(str, base)
   end
 
   def upcase(str) do
