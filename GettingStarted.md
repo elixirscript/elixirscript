@@ -93,7 +93,8 @@ Add dependency to your deps in mix.exs:
         format: :es,
         js_modules: [
           {React, "react"},
-          {ReactDOM, "react-dom"}
+          {ReactDOM, "react-dom"},
+          {Phoenix, "phoenix", default: false}
         ]
      ],
      compilers: [:elixir_script] ++ Mix.compilers
@@ -117,7 +118,9 @@ Available options are:
 
     *   `:umd` - UMD
 
-* `js_modules`: A list of JavaScript imports to add. Each item must be 2-tuple or a 3-tuple. The third element is an optional keyword list of options.
+* `js_modules`: A list of JavaScript imports to add. Each item must be 2-tuple or a 3-tuple. The third element is an optional keyword list of options:
+
+    * `default` - Defaults to true. Set to false if the imported module has no default export.
 
 ### Macros
 
