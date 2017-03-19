@@ -14,7 +14,7 @@ defmodule ElixirScript.Store do
       true ->
         real_key
       false ->
-        JS.throw JS.new(JS.Error("Key Not Found"))
+        JS.throw JS.new(JS.Error, ["Key Not Found"])
     end
   end
 

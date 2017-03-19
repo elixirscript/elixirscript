@@ -342,7 +342,7 @@ defmodule ElixirScript.Translator.Function.Test do
     const something = Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable(), Bootstrap.Core.Patterns.variable()],function(one,two)    {
       return null;
     },function(one,two)    {
-      return Bootstrap.Core.Functions.contains(one,Object.freeze([1, 2, 3]));
+    return Elixir.ElixirScript.Bootstrap.Functions.__load(Elixir).contains(one,Object.freeze([1, 2, 3]));
     }));
     """
 
@@ -362,7 +362,7 @@ defmodule ElixirScript.Translator.Function.Test do
          const something = Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],function(one)    {
              return     null;
            },function(one)    {
-             return     Bootstrap.Core.Functions.contains(one,Object.freeze([1, 2, 3]));
+           return     Elixir.ElixirScript.Bootstrap.Functions.__load(Elixir).contains(one,Object.freeze([1, 2, 3]));
            }),Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],function(one)    {
              return     null;
            },function(one)    {
