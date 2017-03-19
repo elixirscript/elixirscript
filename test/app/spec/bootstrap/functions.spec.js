@@ -6,8 +6,9 @@ describe('Functions', () => {
     const Functions = Elixir.load(Elixir.ElixirScript.Bootstrap.Functions);
     expect(Functions.contains(1, [])).to.eq(false);
     expect(Functions.contains(1, [1, 2, 3])).to.eq(true);
+    expect(Functions.contains(4, [1, 2, 3])).to.eq(false);
     expect(Functions.contains(1, [1])).to.eq(true);
-
+    expect(Functions.contains(4, [1])).to.eq(false);
     expect(Functions.contains('apple', [1])).to.eq(false);
   });
 
@@ -16,7 +17,7 @@ describe('Functions', () => {
     expect(Functions.get_object_keys({})).to.eql([]);
     expect(Functions.get_object_keys({ key: 1 })).to.eql(['key']);
     expect(
-      Functions.get_object_keys({ key: 1, [Symbol.for('hi')]: 2 }),
+      Functions.get_object_keys({ key: 1, [Symbol.for('hi')]: 2 })
     ).to.eql(['key', Symbol.for('hi')]);
   });
 

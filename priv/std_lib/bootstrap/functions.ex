@@ -5,14 +5,19 @@ defmodule ElixirScript.Bootstrap.Functions do
   end
 
   def contains(left, [right]) do
-    match?(left, right)
+    case right do
+      ^left ->
+        true
+      _ ->
+        false
+    end
   end
 
-  def contains(left, [h|t]) do   
-    case match?(left, h) do
-      true ->
+  def contains(left, [h|t]) do
+    case h do
+      ^left ->
         true
-      false ->
+      _ ->
         contains(left, t)
     end
   end
