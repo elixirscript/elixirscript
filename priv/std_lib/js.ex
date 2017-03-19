@@ -23,6 +23,14 @@ defmodule JS do
   defmacro update(object, map)
 
   @doc """
+  Updates an existing JavaScript object.
+
+  ex:
+    JS.update elem, "width", 100
+  """
+  defmacro update(object, key, value)
+
+  @doc """
   Returns the type of the given value
   """
   defmacro typeof(value)
@@ -89,11 +97,12 @@ defmodule JS do
   defmacro yield_to(gen)
 
   @doc """
-  Provides a convenient way to create a string-based map.
-
-  Elixirscript, by default turns the following, `%{a: "b"}` into `{[Symbol.for("a")]: "b"}` in JavaScript. In order to get string keys,
-  one would have to do `%{"a" => "b"}` which turns into `{a: "b"}` in JavaScript. With `Kernel.object`, you can create string keyed maps
-  conveniently, `object(a: "b")` which turns into `{a: "b"}`
+  Creates a breakpoint for JavaScript debuggers to stop at
   """
-  defmacro object(args)
+  defmacro debugger()
+
+  @doc """
+  The current JavaScript context
+  """
+  defmacro this()
 end

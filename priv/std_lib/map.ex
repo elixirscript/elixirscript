@@ -34,13 +34,13 @@ defmodule ElixirScript.Map do
 
   def from_struct(struct) do
     struct
-    |> Bootstrap.Core.Functions.class_to_obj
+    |> ElixirScript.Bootstrap.Functions.class_to_obj
     |> delete(:__struct__)
   end
 
   def delete(map, key) do
     map
-    |> Bootstrap.Core.Functions.delete_property_from_map(key)
+    |> ElixirScript.Bootstrap.Functions.delete_property_from_map(key)
   end
 
   def equal?(map1, map2) do
@@ -123,7 +123,7 @@ defmodule ElixirScript.Map do
   end
 
   def put(map, key, value) do
-    Bootstrap.Core.Functions.add_property_to_map(map, key, value)
+    ElixirScript.Bootstrap.Functions.add_property_to_map(map, key, value)
   end
 
   def get(map, key) do

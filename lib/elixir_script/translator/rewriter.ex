@@ -383,10 +383,6 @@ defmodule ElixirScript.Translator.Rewriter do
     quote do: List.duplicate(unquote(n), unquote(elem))
   end
 
-  def rewrite({{:., _, [:lists, :mapfoldl]}, _, [fun, acc, list]}) do
-    quote do: Bootstrap.Core.Functions.mapfoldl(unquote(fun), unquote(acc), unquote(list))
-  end
-
   def rewrite({{:., _, [:lists, :sort]}, _, [list]}) do
     quote do: unquote(list).sort()
   end
@@ -398,10 +394,6 @@ defmodule ElixirScript.Translator.Rewriter do
 
   def rewrite({{:., _, [:lists, :filter]}, _, [pred, list]}) do
     quote do: unquote(list).filter(unquote(pred))
-  end
-
-  def rewrite({{:., _, [:lists, :filtermap]}, _, [fun, list]}) do
-    quote do: Bootstrap.Core.Functions.filtermap(unquote(fun), unquote(list))
   end
 
   def rewrite({{:., _, [:lists, :concat]}, _, [things]}) do
@@ -489,7 +481,7 @@ defmodule ElixirScript.Translator.Rewriter do
   end
 
   def rewrite({{:., _, [:maps, :put]}, _, [key, value, map]}) do
-    quote do: Bootstrap.Core.Functions.add_property_to_map(unquote(map), unquote(key), unquote(value))
+    quote do: ElixirScript.Bootstrap.Functions.add_property_to_map(unquote(map), unquote(key), unquote(value))
   end
 
   def rewrite({{:., _, [:maps, :update]}, _, [key, value, map]}) do
@@ -497,7 +489,7 @@ defmodule ElixirScript.Translator.Rewriter do
   end
 
   def rewrite({{:., _, [:maps, :remove]}, _, [key, map]}) do
-    quote do: Bootstrap.Core.Functions.delete_property_from_map(unquote(map), unquote(key))
+    quote do: ElixirScript.Bootstrap.Functions.delete_property_from_map(unquote(map), unquote(key))
   end
 
 end

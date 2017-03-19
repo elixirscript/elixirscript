@@ -8,7 +8,7 @@ defmodule ElixirScript.Bootstrap.Functions do
     match?(left, right)
   end
 
-  def contains(left, [h|t]) do
+  def contains(left, [h|t]) do   
     case match?(left, h) do
       true ->
         true
@@ -40,18 +40,26 @@ defmodule ElixirScript.Bootstrap.Functions do
     )
   end
 
-  def can_decode64(data) do
-    try do
-      JS.atob(data)
-      true
-    rescue
-      _ ->
-        false
-    end
-  end
-
   def reverse(list) do
     list.concat([]).reverse()
   end
+
+ def class_to_obj(map) do
+   JS.Object.assign(JS.new(JS.Object, []), map)
+   |> JS.Object.freeze
+ end
+
+def delete_property_from_map(map, property) do
+  new_map = JS.Object.assign(JS.Object.create(map.constructor.prototype), map)
+  JS.delete(new_map[property])
+
+  JS.Object.freeze(new_map)
+end
+
+def add_property_to_map(map, property, value) do
+  JS.Object.assign(JS.new(JS.Object, []), map)
+  |> JS.update(property, value)
+  |> JS.Object.freeze
+end
 
 end

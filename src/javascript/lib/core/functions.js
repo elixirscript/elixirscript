@@ -1,5 +1,4 @@
 import Protocol from './protocol';
-import Core from '../core';
 
 function call_property(item, property) {
   let prop = null;
@@ -87,103 +86,6 @@ function defimpl(protocol, type, impl) {
   protocol.implementation(type, impl);
 }
 
-function delete_property_from_map(map, property) {
-  const new_map = Object.assign(Object.create(map.constructor.prototype), map);
-  delete new_map[property];
-
-  return Object.freeze(new_map);
-}
-
-function class_to_obj(map) {
-  const new_map = Object.assign({}, map);
-  return Object.freeze(new_map);
-}
-
-function add_property_to_map(map, property, value) {
-  const new_map = Object.assign({}, map);
-  new_map[property] = value;
-  return Object.freeze(new_map);
-}
-
-function bnot(expr) {
-  return ~expr;
-}
-
-function band(left, right) {
-  return left & right;
-}
-
-function bor(left, right) {
-  return left | right;
-}
-
-function bsl(left, right) {
-  return left << right;
-}
-
-function bsr(left, right) {
-  return left >> right;
-}
-
-function bxor(left, right) {
-  return left ^ right;
-}
-
-function zip(list_of_lists) {
-  if (list_of_lists.length === 0) {
-    return Object.freeze([]);
-  }
-
-  const new_value = [];
-  let smallest_length = list_of_lists[0];
-
-  for (const x of list_of_lists) {
-    if (x.length < smallest_length) {
-      smallest_length = x.length;
-    }
-  }
-
-  for (let i = 0; i < smallest_length; i++) {
-    const current_value = [];
-    for (let j = 0; j < list_of_lists.length; j++) {
-      current_value.push(list_of_lists[j][i]);
-    }
-
-    new_value.push(new Core.Tuple(...current_value));
-  }
-
-  return Object.freeze(new_value);
-}
-
-function mapfoldl(fun, acc, list) {
-  const newlist = [];
-  let new_acc = acc;
-
-  for (const x of list) {
-    const tup = fun(x, new_acc);
-    newlist.push(tup.get(0));
-    new_acc = tup.get(1);
-  }
-
-  return new Core.Tuple(Object.freeze(newlist), new_acc);
-}
-
-function filtermap(fun, list) {
-  const newlist = [];
-
-  for (const x of list) {
-    const result = fun(x);
-
-    if (result === true) {
-      newlist.push(x);
-    } else if (result instanceof Core.Tuple) {
-      newlist.push(result.get(1));
-    }
-  }
-
-  return Object.freeze(newlist);
-}
-
 function build_namespace(ns, ns_string) {
   let parts = ns_string.split('.');
   const root = ns;
@@ -214,17 +116,5 @@ export default {
   defexception,
   defprotocol,
   defimpl,
-  delete_property_from_map,
-  add_property_to_map,
-  class_to_obj,
-  bnot,
-  band,
-  bor,
-  bsl,
-  bsr,
-  bxor,
-  zip,
-  mapfoldl,
-  filtermap,
   build_namespace,
 };
