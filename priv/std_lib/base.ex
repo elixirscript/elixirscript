@@ -2,11 +2,11 @@ defmodule ElixirScript.Base do
   @moduledoc false
 
   def encode64(data) do
-    Bootstrap.Core.b64EncodeUnicode(data)
+    ElixirScript.Bootstrap.b64EncodeUnicode(data)
   end
 
   def decode64(data) do
-    if Bootstrap.Core.can_decode64(data) do
+    if ElixirScript.Bootstrap.can_decode64(data) do
       {:ok, decode64!(data) }
     else
       :error

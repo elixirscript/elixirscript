@@ -156,11 +156,7 @@ defmodule ElixirScript.List do
     do_foldl(tl(list), acc, func, new_list ++ [value])
   end
 
-  def flatten(list) do
-    do_flatten(list, [])
-  end
-
-  def flatten(list, tail) do
+  def flatten(list, tail \\ []) do
     do_flatten(list, []) ++ tail
   end
 

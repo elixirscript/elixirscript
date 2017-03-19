@@ -6,7 +6,7 @@ defmodule ElixirScript.Map do
   end
 
   def keys(map) do
-    Bootstrap.Core.Functions.get_object_keys(map)
+    ElixirScript.Bootstrap.Functions.get_object_keys(map)
   end
 
   def size(map) do
