@@ -42,6 +42,14 @@ defmodule ElixirScript.Translator.JS do
     { do_translate({name, [], params}, env), env }
   end
 
+  def translate_js_module(module, env) do
+    { do_translate(module, env), env }
+  end
+
+  defp do_translate({:__aliases__, _, module}, env) do
+    Identifier.make_namespace_members(module)
+  end
+
   defp do_translate({op, _, [param]}, env) when op in [:typeof, :delete, :void, :-, :+, :!, :"~"] do
     Builder.unary_expression(
       op,

@@ -36,10 +36,10 @@ defmodule ElixirScript.Bootstrap.Functions do
   end
 
   def b64EncodeUnicode(str) do
-    {:ok, regex} = Regex.compile("%([0-9A-F]{2})", "g")
+    regex = Regex.compile!("%([0-9A-F]{2})", "g")
 
     JS.btoa(
-      JS.encodeURIComponent(str).replace(regex, fn (match, p1) ->
+      JS.encodeURIComponent(str).replace(regex, fn (match, p1, _, _) ->
         JS.String.fromCharCode("0x#{p1}")
       end)
     )

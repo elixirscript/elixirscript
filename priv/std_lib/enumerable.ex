@@ -7,10 +7,10 @@ end
 
 defimpl ElixirScript.Enumerable, for: List do
   def count(list),
-    do: length(list)
+    do: {:ok, length(list) }
 
   def member?(list, value),
-    do: value in list
+    do: {:ok, value in list }
 
   def reduce(_,       {:halt, acc}, _fun),   do: {:halted, acc}
   def reduce(list,    {:suspend, acc}, fun), do: {:suspended, acc, &reduce(list, &1, fun)}

@@ -83,6 +83,10 @@ defmodule ElixirScript.Translator do
     JSLib.translate_js_function({:__aliases__, context, rest}, function_name, params, env)
   end
 
+  defp do_translate({:__aliases__, context, [:JS | rest]}, env) do
+    JSLib.translate_js_module({:__aliases__, context, rest}, env)
+  end
+
   defp do_translate(ast, env) when is_number(ast) or is_binary(ast) or is_boolean(ast) or is_nil(ast) do
     { Primitive.make_literal(ast), env }
   end
