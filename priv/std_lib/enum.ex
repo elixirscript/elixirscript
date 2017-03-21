@@ -38,9 +38,9 @@ defmodule ElixirScript.Enum do
         end)
 
         case result do
-          {:cont, _} ->
+          {:done, _} ->
             default
-          {:halt, item} ->
+          {:halted, item} ->
             item
         end
     end
@@ -125,9 +125,9 @@ defmodule ElixirScript.Enum do
     end)
 
     case result do
-      {:cont, _} ->
+      {:done, _} ->
         :error
-      {:halt, item} ->
+      {:halted, item} ->
         item
     end
   end
@@ -171,6 +171,20 @@ defmodule ElixirScript.Enum do
     end)
 
     result
+  end
+
+  def into(enumerable, collectable) do
+    {init, fun} = Collectable.into(collectable)
+    reduce(enumerable, init, fn x, acc ->
+      fun.(acc, {:cont, x})
+    end)
+  end
+
+  def into(enumerable, collectable, transform) do
+    {init, fun} = Collectable.into(collectable)
+    reduce(enumerable, init, fn x, acc ->
+      fun.(acc, {:cont, transform.(x)})
+    end)
   end
 
   def member?(enumerable, value) do
