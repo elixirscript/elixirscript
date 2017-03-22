@@ -154,10 +154,6 @@ defmodule ElixirScript.Translator.PatternMatching do
     { [bound(Translator.translate!(value, env))], [nil] }
   end
 
-  defp do_build_match({:_, _, _}, _) do
-    { [wildcard()], [JS.identifier(:undefined)] }
-  end
-
   defp do_build_match({:<<>>, _, elements}, env) do
     params = Enum.reduce(elements, [], fn
       ({:::, _, [{ variable, _, params }, _]}, state) when is_atom(params) ->

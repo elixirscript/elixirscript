@@ -6,7 +6,7 @@ function iterator_to_reducer(iterable, acc, fun) {
   let x = iterator.next();
   let _acc = acc;
 
-  while (x.done !== false) {
+  while (x.done === false) {
     _acc = fun(x.value, _acc.get(1));
     if (_acc.get(0) === Symbol.for('halt')) {
       return new Core.Tuple(Symbol.for('halted'), _acc.get(1));

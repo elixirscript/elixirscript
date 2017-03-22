@@ -344,10 +344,6 @@ defmodule ElixirScript.Translator do
     end
   end
 
-  defp do_translate({:_, _, _}, env) do
-    { Identifier.make_identifier(:undefined), env }
-  end
-
   defp do_translate({:__aliases__, _, aliases} = ast, env) do
     module_name = create_module_name2(ast, env)
     case module_name do

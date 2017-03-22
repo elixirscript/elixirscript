@@ -152,7 +152,7 @@ defmodule ElixirScript.Kernel do
   end
 
   def elem(tuple, index) do
-    apply(tuple, :get, [index])
+    tuple.get(index)
   end
 
   def is_nil(term) do

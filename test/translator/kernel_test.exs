@@ -54,7 +54,7 @@ defmodule ElixirScript.Translator.Kernel.Test do
     end
 
     js_code = """
-    Elixir.ElixirScript.Kernel.__load(Elixir).apply(Enum, Symbol.for('reverse'), Object.freeze([Object.freeze([1, 2, 3])]))
+    Elixir.ElixirScript.Kernel.__load(Elixir).apply(Elixir.ElixirScript.Enum, Symbol.for('reverse'), Object.freeze([Object.freeze([1, 2, 3])]))
     """
 
     assert_translation(ex_ast, js_code)

@@ -25,32 +25,46 @@ defmodule ElixirScript.Enum do
   end
 
   def at(enumerable, n, default \\ nil) do
-    cond do
-      n > Enumerable.count(enumerable) ->
-        default
-      true ->
-        result = Enumerable.reduce(enumerable, {:cont, 0}, fn(item, acc) ->
-          if n == acc do
-            {:halt, item}
-          else
-            {:cont, acc + 1}
-          end
-        end)
-
-        case result do
-          {:done, _} ->
-            default
-          {:halted, item} ->
-            item
-        end
+    index = if n < 0 do
+      {_, count} = Enumerable.count(enumerable) 
+      count + n
+    else
+      n
     end
+
+    result = Enumerable.reduce(enumerable, {:cont, 0}, fn(item, acc) ->
+      if index == acc do
+        {:halt, item}
+      else
+        {:cont, acc + 1}
+      end
+    end)
+
+    case result do
+      {:done, _} ->
+        default
+      {:halted, item} ->
+        item
+    end    
+  end
+
+  def concat([]) do
+    []
   end
 
   def concat([enumerable]) do
     enumerable
   end
 
+  def concat([h, t]) do
+    h.concat(t)
+  end
+
   def concat([h | t]) do
+    h.concat(concat(t))
+  end
+
+  def concat(h, t) do
     h.concat(t)
   end
 
@@ -199,17 +213,37 @@ defmodule ElixirScript.Enum do
     result
   end
 
+  def drop(enumerable, count) when count < 0 do
+    enumerable
+    |> reverse
+    |> drop(abs(count))
+    |> reverse   
+  end
+
   def drop(enumerable, count) do
-    {_, result} = Enumerable.reduce(enumerable, {:cont, {[], 0}}, fn
+    {_, {result, _}} = Enumerable.reduce(enumerable, {:cont, {[], 0}}, fn
       (item, {taken, drop_count}) ->
         if drop_count < count do
           {:cont, {[], drop_count + 1 }}
         else
-          {:cont, taken ++ [item]}
+          {:cont, {taken ++ [item], drop_count}}
         end
     end)
 
     result    
+  end
+
+  def drop_every(enumerable, nth) do
+      {_, {result, _count}} = Enumerable.reduce(enumerable, {:cont, {[], 0}}, fn
+        (item, {taken, count}) ->
+          if rem(count, nth) == 0 do
+            {:cont, {taken, count + 1}}
+          else
+            {:cont, {taken ++ [item], count + 1}}
+          end
+      end)
+
+      result
   end
 
   def drop_while(enumerable, fun) do

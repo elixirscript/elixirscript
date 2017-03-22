@@ -12,7 +12,7 @@ defimpl ElixirScript.Enumerable, for: List do
   def member?(list, value),
     do: {:ok, value in list }
 
-  def reduce(list, acc, fun), do
+  def reduce(list, acc, fun) do
     Bootstrap.Core.Functions.iterator_to_reducer(list, acc, fun)
   end
 end
@@ -34,6 +34,5 @@ defimpl ElixirScript.Enumerable, for: Map do
     map
     |> Map.to_list
     |> Bootstrap.Core.Functions.iterator_to_reducer(acc, fun)
-    do_reduce(Map.to_list(map), acc, fun)
   end
 end
