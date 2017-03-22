@@ -91,4 +91,22 @@ describe('Enum', () => {
     expect(Enum.drop_every([1, 2], 2)).to.eql([2]);
     expect(Enum.drop_every([1, 2, 3], 0)).to.eql([1, 2, 3]);
   });
+
+  it('drop_while/2', () => {
+    expect(Enum.drop_while([1, 2, 3, 4, 3, 2, 1], x => x <= 3)).to.eql([
+      4,
+      3,
+      2,
+      1,
+    ]);
+
+    expect(Enum.drop_while([1, 2, 3], _ => false)).to.eql([1, 2, 3]);
+    expect(Enum.drop_while([1, 2, 3], x => x <= 3)).to.eql([]);
+    expect(Enum.drop_while([], _ => false)).to.eql([]);
+  });
+
+  it('empty?/1', () => {
+    expect(Enum.empty__qmark__([])).to.eql(true);
+    expect(Enum.empty__qmark__([1, 2, 3])).to.eql(false);
+  });
 });

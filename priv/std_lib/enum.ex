@@ -9,6 +9,8 @@ defmodule ElixirScript.Enum do
       end
     end)
 
+    IO.inspect acc
+
     acc
   end
 
@@ -247,18 +249,32 @@ defmodule ElixirScript.Enum do
   end
 
   def drop_while(enumerable, fun) do
-    {_, result} = Enumerable.reduce(enumerable, {:cont, []}, fn
-      (item, taken) ->
+    {_, result} = Enumerable.reduce(enumerable, {:cont, :dropping}, fn
+      (item, :dropping) ->
         if fun.(item) do
-          {:cont, {taken}}
+          {:cont, :dropping}
         else
-          {:cont, taken ++ [item]}
+          {:cont, [item]}
         end
+
+      (item, taken) ->
+        {:cont, taken ++ [item]}
     end)
 
-    result
+    case result do
+      :dropping ->
+        []
+      :done ->
+        []
+      _ ->
+        result
+    end
   end
 
+  def empty?(enumerable) do
+    {:ok, count} = Enumerable.count(enumerable)
+    count == 0
+  end
 
   def take(enumerable, count) do
     if Enumerable.count(enumerable) < count do

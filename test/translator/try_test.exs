@@ -185,7 +185,7 @@ defmodule ElixirScript.Translator.Try.Test do
       return Symbol.for('small');
     }, function(y) {
       return y < 1 && y > -1;
-    }), Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.wildcard()], function() {
+    }), Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()], function(__ignored__) {
       return Symbol.for('large');
     })), null)
     """
