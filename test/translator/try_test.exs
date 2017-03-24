@@ -62,7 +62,7 @@ defmodule ElixirScript.Translator.Try.Test do
            },Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],function(x)    {
            return     Elixir.ElixirScript.IO.__load(Elixir).puts('Invalid argument given');
            },function(x)    {
-             return     Bootstrap.Core.Functions.contains(x,Object.freeze([ArgumentError.create(Object.freeze({}))]));
+           return     Elixir.ElixirScript.Bootstrap.Functions.__load(Elixir).contains(x,Object.freeze([ArgumentError.create(Object.freeze({}))]));
            })),null,null,null)
     """
 
@@ -185,7 +185,7 @@ defmodule ElixirScript.Translator.Try.Test do
       return Symbol.for('small');
     }, function(y) {
       return y < 1 && y > -1;
-    }), Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.wildcard()], function() {
+    }), Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()], function(__ignored__) {
       return Symbol.for('large');
     })), null)
     """

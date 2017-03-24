@@ -23,6 +23,8 @@ defmodule ElixirScript.Translator.State do
     |> Map.put(Collectable, ElixirScript.Collectable)
     |> Map.put(String.Chars, ElixirScript.String.Chars)
     |> Map.put(Enumerable, ElixirScript.Enumerable)
+    |> Map.put(Enum, ElixirScript.Enum)
+    |> Map.put(Enum.OutOfBoundsError, ElixirScript.Enum.OutOfBoundsError)
     |> Map.put(Integer, ElixirScript.Integer)
     |> Map.put(Macro.Env, ElixirScript.Macro.Env)
     |> Map.put(View, ElixirScript.View)

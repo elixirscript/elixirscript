@@ -1,5 +1,5 @@
 defmodule ElixirScript.Translator.Rewriter do
-  @moduledoc false  
+  @moduledoc false
 
   # :erlang, :lists, :maps, :beam_lib, :binary, :calendar, :digraph,
   # :epp, :erl_lint, :erl_internal, :erl_expand_records, :erl_eval,
@@ -331,35 +331,27 @@ defmodule ElixirScript.Translator.Rewriter do
   end
 
   def rewrite({{:., _, [:lists, :foldl]}, _, [fun, acc, list]}) do
-    quote do: Bootstrap.Core.Functions.foldl(unquote(fun), unquote(acc), unquote(list))
+    quote do: List.foldl(unquote(fun), unquote(acc), unquote(list))
   end
 
   def rewrite({{:., _, [:lists, :foldr]}, _, [fun, acc, list]}) do
-    quote do: Bootstrap.Core.Functions.foldr(unquote(fun), unquote(acc), unquote(list))
+    quote do: List.foldr(unquote(fun), unquote(acc), unquote(list))
   end
 
   def rewrite({{:., _, [:lists, :keymember]}, _, [key, n, list]}) do
-    quote do: Bootstrap.Core.Functions.keymember(unquote(key), unquote(n), unquote(list))
+    quote do: List.keymember?(unquote(list), unquote(key), unquote(n))
   end
 
   def rewrite({{:., _, [:lists, :keydelete]}, _, [key, n, list]}) do
-    quote do: Bootstrap.Core.Functions.keydelete(unquote(key), unquote(n), unquote(list))
-  end
-
-  def rewrite({{:., _, [:lists, :keystore]}, _, [key, n, list, newtuple]}) do
-    quote do: Bootstrap.Core.Functions.keystore(unquote(key), unquote(n), unquote(list),  unquote(newtuple))
-  end
-
-  def rewrite({{:., _, [:lists, :keytake]}, _, [key, n, list]}) do
-    quote do: Bootstrap.Core.Functions.keystore(unquote(key), unquote(n), unquote(list))
+    quote do: List.keydelete(unquote(list), unquote(key), unquote(n))
   end
 
   def rewrite({{:., _, [:lists, :keyfind]}, _, [key, n, list]}) do
-    quote do: Bootstrap.Core.Functions.keyfind(unquote(key), unquote(n), unquote(list))
+    quote do: List.keyfind(unquote(list), unquote(key), unquote(n))
   end
 
   def rewrite({{:., _, [:lists, :keyreplace]}, _, [key, n, list, newtuple]}) do
-    quote do: Bootstrap.Core.Functions.keyreplace(unquote(key), unquote(n), unquote(list), unquote(newtuple))
+    quote do: List.keyreplace(unquote(list), unquote(key), unquote(n), unquote(newtuple))
   end
 
   def rewrite({{:., _, [:lists, :keysort]}, _, [n, tuplelist]}) do
@@ -368,31 +360,27 @@ defmodule ElixirScript.Translator.Rewriter do
   end
 
   def rewrite({{:., _, [:lists, :reverse]}, _, [list]}) do
-    quote do: Bootstrap.Core.Functions.reverse(unquote(list))
+    quote do: ElixirScript.Bootstrap.Functions.reverse(unquote(list))
   end
 
   def rewrite({{:., _, [:lists, :reverse]}, _, [list, tail]}) do
-    quote do: Bootstrap.Core.Functions.reverse(unquote(list)) ++ unquote(tail)
+    quote do: ElixirScript.Bootstrap.Functions.reverse(unquote(list)) ++ unquote(tail)
   end
 
   def rewrite({{:., _, [:lists, :flatten]}, _, [list]}) do
-    quote do: Bootstrap.Core.Functions.flatten(unquote(list))
+    quote do: List.flatten(unquote(list))
   end
 
   def rewrite({{:., _, [:lists, :flatten]}, _, [list, tail]}) do
-    quote do: Bootstrap.Core.Functions.flatten(unquote(list), unquote(tail))
+    quote do: List.flatten(unquote(list), unquote(tail))
   end
 
   def rewrite({{:., _, [:lists, :delete]}, _, [elem, list]}) do
-    quote do: Bootstrap.Core.Functions.remove_from_list(unquote(list), unquote(elem))
+    quote do: List.delete(unquote(list), unquote(elem))
   end
 
   def rewrite({{:., _, [:lists, :duplicate]}, _, [n, elem]}) do
-    quote do: Bootstrap.Core.Functions.duplicate(unquote(n), unquote(elem))
-  end
-
-  def rewrite({{:., _, [:lists, :mapfoldl]}, _, [fun, acc, list]}) do
-    quote do: Bootstrap.Core.Functions.mapfoldl(unquote(fun), unquote(acc), unquote(list))
+    quote do: List.duplicate(unquote(n), unquote(elem))
   end
 
   def rewrite({{:., _, [:lists, :sort]}, _, [list]}) do
@@ -406,10 +394,6 @@ defmodule ElixirScript.Translator.Rewriter do
 
   def rewrite({{:., _, [:lists, :filter]}, _, [pred, list]}) do
     quote do: unquote(list).filter(unquote(pred))
-  end
-
-  def rewrite({{:., _, [:lists, :filtermap]}, _, [fun, list]}) do
-    quote do: Bootstrap.Core.Functions.filtermap(unquote(fun), unquote(list))
   end
 
   def rewrite({{:., _, [:lists, :concat]}, _, [things]}) do
@@ -437,15 +421,15 @@ defmodule ElixirScript.Translator.Rewriter do
   end
 
   def rewrite({{:., _, [:erlang, :list_to_float]}, _, [list]}) do
-    quote do: parseFloat(unquote(list))
+    quote do: JS.parseFloat(unquote(list))
   end
 
   def rewrite({{:., _, [:erlang, :list_to_integer]}, _, [list]}) do
-    quote do: parseInt(unquote(list))
+    quote do: JS.parseInt(unquote(list))
   end
 
   def rewrite({{:., _, [:erlang, :list_to_integer]}, _, [list, base]}) do
-    quote do: parseInt(unquote(list), unquote(base))
+    quote do: JS.parseInt(unquote(list), unquote(base))
   end
 
   def rewrite({{:., _, [:erlang, :integer_to_binary]}, _, [integer]}) do
@@ -481,43 +465,31 @@ defmodule ElixirScript.Translator.Rewriter do
   end
 
   def rewrite({{:., _, [:erlang, :binary_to_float]}, _, [binary]}) do
-    quote do: parseFloat(unquote(binary))
+    quote do: JS.parseFloat(unquote(binary))
   end
 
   def rewrite({{:., _, [:erlang, :binary_to_integer]}, _, [binary]}) do
-    quote do: parseInt(unquote(binary))
+    quote do: JS.parseInt(unquote(binary))
   end
 
   def rewrite({{:., _, [:erlang, :binary_to_integer]}, _, [binary, base]}) do
-    quote do: parseInt(unquote(binary), unquote(base))
+    quote do: JS.parseInt(unquote(binary), unquote(base))
   end
 
   def rewrite({{:., _, [:maps, :is_key]}, _, [key, map]}) do
-    quote do: unquote(key) in Bootstrap.Core.Functions.get_object_keys(unquote(map))
+    quote do: unquote(key) in ElixirScript.Bootstrap.Functions.get_object_keys(unquote(map))
   end
 
   def rewrite({{:., _, [:maps, :put]}, _, [key, value, map]}) do
-    quote do: Bootstrap.Core.Functions.add_property_to_map(unquote(map), unquote(key), unquote(value))
+    quote do: ElixirScript.Bootstrap.Functions.add_property_to_map(unquote(map), unquote(key), unquote(value))
   end
 
   def rewrite({{:., _, [:maps, :update]}, _, [key, value, map]}) do
-    quote do: Bootstrap.Core.Functions.update_map(unquote(map), unquote(key), unquote(value))
-  end
-
-  def rewrite({{:., _, [:maps, :find]}, _, [key, map]}) do
-    quote do: Bootstrap.Core.Functions.maps_find(unquote(key), unquote(map))
+    quote do: Map.update!(unquote(map), unquote(key), fn(_) -> unquote(value) end)
   end
 
   def rewrite({{:., _, [:maps, :remove]}, _, [key, map]}) do
-    quote do: Bootstrap.Core.Functions.delete_property_from_map(unquote(map), unquote(key))
-  end
-
-  def rewrite({{:., _, [:maps, :fold]}, _, [fun, init, map]}) do
-    quote do: Bootstrap.Core.Functions.maps_fold(unquote(fun), unquote(init), unquote(map))
-  end
-
-  def rewrite({{:., _, [:maps, :from_list]}, _, [list]}) do
-    quote do: Bootstrap.Core.Functions.maps_fold(unquote(list))
+    quote do: ElixirScript.Bootstrap.Functions.delete_property_from_map(unquote(map), unquote(key))
   end
 
 end

@@ -11,7 +11,7 @@ defmodule ElixirScript.Agent do
       nil
     end
 
-    Bootstrap.Core.Store.create(pid, fun.(), name)
+    ElixirScript.Store.create(pid, fun.(), name)
     { :ok, pid }
   end
 
@@ -24,30 +24,30 @@ defmodule ElixirScript.Agent do
       nil
     end
 
-    Bootstrap.Core.Store.create(pid, fun.(), name)
+    ElixirScript.Store.create(pid, fun.(), name)
     { :ok, pid }
   end
 
   def stop(agent) do
-    Bootstrap.Core.Store.remove(agent)
+    ElixirScript.Store.remove(agent)
     :ok
   end
 
   def update(agent, fun) do
-    current_state = Bootstrap.Core.Store.read(agent)
-    Bootstrap.Core.Store.update(agent, fun.(current_state))
+    current_state = ElixirScript.Store.read(agent)
+    ElixirScript.Store.update(agent, fun.(current_state))
     :ok
   end
 
   def get(agent, fun) do
-    current_state = Bootstrap.Core.Store.read(agent)
+    current_state = ElixirScript.Store.read(agent)
     fun.(current_state)
   end
 
   def get_and_update(agent, fun) do
-    current_state = Bootstrap.Core.Store.read(agent)
+    current_state = ElixirScript.Store.read(agent)
     {val, new_state} = fun.(current_state)
-    Bootstrap.Core.Store.update(agent, new_state)
+    ElixirScript.Store.update(agent, new_state)
     val
   end
 

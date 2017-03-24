@@ -29,7 +29,7 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
   test "match wildcard", %{scope: scope} do
     params = [{:_, [], Test}]
     result = PatternMatching.build_match(params, scope)
-    expected_result = {[PatternMatching.wildcard],  [JS.identifier(:undefined)]}
+    expected_result = {[PatternMatching.parameter()],  [JS.identifier(:__ignored__)]}
 
     assert result == expected_result
   end

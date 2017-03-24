@@ -199,6 +199,6 @@ defmodule ElixirScript.String do
   end
 
   def valid_character?(codepoint) do
-    Bootstrap.Core.Functions.is_valid_character(codepoint)
+    ElixirScript.Bootstrap.Functions.is_valid_character(codepoint)
   end
 end

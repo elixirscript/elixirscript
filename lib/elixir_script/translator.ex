@@ -83,6 +83,10 @@ defmodule ElixirScript.Translator do
     JSLib.translate_js_function({:__aliases__, context, rest}, function_name, params, env)
   end
 
+  defp do_translate({:__aliases__, context, [:JS | rest]}, env) do
+    JSLib.translate_js_module({:__aliases__, context, rest}, env)
+  end
+
   defp do_translate(ast, env) when is_number(ast) or is_binary(ast) or is_boolean(ast) or is_nil(ast) do
     { Primitive.make_literal(ast), env }
   end
@@ -338,10 +342,6 @@ defmodule ElixirScript.Translator do
     else
       translate(expanded_ast, env)
     end
-  end
-
-  defp do_translate({:_, _, _}, env) do
-    { Identifier.make_identifier(:undefined), env }
   end
 
   defp do_translate({:__aliases__, _, aliases} = ast, env) do
@@ -645,13 +645,20 @@ defmodule ElixirScript.Translator do
         is_from_js_module(name, params, env) ->
           do_translate({{:., [], [{:__aliases__, [], [:JS]}, name]}, [], params }, env)
         ElixirScript.Translator.LexicalScope.has_var?(env, name) ->
+          name = case env.vars[name] do
+            0 ->
+              name
+            num ->
+              String.to_atom("#{name}#{num}")
+          end
+
           { Identifier.make_identifier(name), env }
         has_function?(env.module, {name, 0}, env) ->
           Call.make_function_call(name, [], env)
         ElixirScript.Translator.LexicalScope.find_module(env, {name, 0}) ->
           imported_module_name = ElixirScript.Translator.LexicalScope.find_module(env, {name, 0})
           Call.make_module_function_call(imported_module_name, name, params, env)
-        true ->
+        true ->       
           { Identifier.make_identifier(name), env }
       end
   end
