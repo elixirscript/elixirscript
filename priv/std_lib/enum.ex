@@ -129,16 +129,16 @@ defmodule ElixirScript.Enum do
     count == 0
   end
 
-  def fetch(enumerable, something_unique) do
-    something_unique = if something_unique < 0 do
+  def fetch(enumerable, index) do
+    index = if index < 0 do
       {_, count} = Enumerable.count(enumerable) 
-      count + something_unique
+      count + index
     else
-      something_unique
+      index
     end
 
     result = Enumerable.reduce(enumerable, {:cont, 0}, fn(item, acc) ->
-      if something_unique == acc do
+      if index == acc do
         {:halt, {:ok, item}}
       else
         {:cont, acc + 1}
