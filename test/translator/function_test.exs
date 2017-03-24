@@ -95,7 +95,7 @@ defmodule ElixirScript.Translator.Function.Test do
                  return a;
              }, function(x) {
                  return x === null || x === false;
-             }), Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()], function(__ignored__) {
+             }), Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()], function(__ignored__1) {
                  return 4;
              })).call(this, 2 == 2);
          })).call(this, 1 == 1);
