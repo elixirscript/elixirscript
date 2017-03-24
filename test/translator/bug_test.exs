@@ -159,4 +159,18 @@ defmodule ElixirScript.Translator.Bug.Test do
     assert_translation(ex_ast, js_code)
   end
 
+
+  test "variable" do
+    ex_ast = quote do
+      Enum.fetch([2, 4, 6], 0)
+    end
+
+    js_code = """
+      Object.assign(document.getElementById('main'), Object.freeze({
+          innerHTML: html
+      }))
+    """
+
+    assert_translation(ex_ast, js_code)
+  end
 end

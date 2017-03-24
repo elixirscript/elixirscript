@@ -173,9 +173,8 @@ defmodule ElixirScript.Translator.Function do
         Enum.map_reduce(list, env, fn(x, env) ->
           Translator.translate(x, env)
         end)
-                      _ ->
-
-                        Enum.map_reduce(List.wrap(body), env, fn(x, env) ->
+       _ ->
+        Enum.map_reduce(List.wrap(body), env, fn(x, env) ->
           Translator.translate(x, env)
         end)
     end

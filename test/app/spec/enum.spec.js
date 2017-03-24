@@ -1,5 +1,6 @@
 const expect = require('chai').expect;
 const Elixir = require('../build/Elixir.App');
+const Tuple = require('../../../src/javascript/lib/core').default.Tuple;
 
 const Enum = Elixir.load(Elixir.ElixirScript.Enum);
 
@@ -108,5 +109,18 @@ describe('Enum', () => {
   it('empty?/1', () => {
     expect(Enum.empty__qmark__([])).to.eql(true);
     expect(Enum.empty__qmark__([1, 2, 3])).to.eql(false);
+  });
+
+  it('fetch/2', () => {
+    expect(Enum.fetch([66], 0)).to.eql(new Tuple(Symbol.for('ok'), 66));
+    expect(Enum.fetch([66], -1)).to.eql(new Tuple(Symbol.for('ok'), 66));
+    expect(Enum.fetch([66], 1)).to.eql(Symbol.for('error'));
+    expect(Enum.fetch([66], -2)).to.eql(Symbol.for('error'));
+  });
+
+  it('fetch!/2', () => {
+    expect(Enum.fetch__emark__([2, 4, 6], 0)).to.eql(2);
+    expect(Enum.fetch__emark__([2, 4, 6], 2)).to.eql(6);
+    expect(Enum.fetch__emark__([2, 4, 6], -2)).to.eql(4);
   });
 });
