@@ -51,6 +51,10 @@ defmodule ElixirScript.Translator.Identifier do
     |> JS.identifier
   end
 
+  def make_extern_function_name(name) when is_atom(name) do
+    JS.identifier("#{name}")
+  end
+
   def make_function_name(name, arity) when is_atom(name) do
     name = filter_name(name)
     JS.identifier("#{name}#{arity}")

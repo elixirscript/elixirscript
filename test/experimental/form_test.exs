@@ -23,10 +23,9 @@ defmodule ElixirScript.Experimental.Form.Test do
     assert generate_js(result) == "Symbol.for('atom')"
   end
 
-  test "upper case atom do
-  end" do
+  test "upper case atom" do
     result = Form.compile(Atom)
-    assert generate_js(result) == "Symbol.for('Elixir.Atom')"
+    assert generate_js(result) == "Elixir_Atom"
   end
 
   test "float" do

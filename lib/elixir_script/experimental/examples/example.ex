@@ -4,6 +4,7 @@ defmodule Example do
   defstruct [:name]
 
   def new() do
+    JS.Map.new()
     Hello.hi()
   end
 

@@ -2,12 +2,15 @@ defmodule ElixirScript.Experimental.Module do
   alias ESTree.Tools.Builder, as: J
   alias ElixirScript.Experimental.Function
   alias ElixirScript.Translator.Identifier
+  alias ElixirScript.Experimental.ModuleState
 
   @moduledoc """
   Upper level module that handles compilation
   """
 
   def compile(_line, _file, module, attrs, defs, unreachable, opts) do
+    ModuleState.start_link(module)
+ 
     reachable_defs = Enum.filter(defs, fn
       { name, _, _, _} -> not(name in unreachable)
       { _, type, _, _} when type in [:defmacro, :defmacrop] -> false
@@ -17,9 +20,10 @@ defmodule ElixirScript.Experimental.Module do
     compiled_functions = reachable_defs
     |> Enum.map(&Function.compile(&1))
 
-    imports = make_imports(reachable_defs)
+    imports = make_imports()
     exports = make_exports(reachable_defs)
 
+    ModuleState.stop()
     J.program(imports ++ compiled_functions ++ [J.export_default_declaration(exports)])
   end
 
@@ -35,39 +39,8 @@ defmodule ElixirScript.Experimental.Module do
     J.object_expression(exports)
   end
 
-  defp make_imports(reachable_defs) do
-    imports = Enum.reduce(reachable_defs, [], fn
-      {{name, arity}, type, _, clauses}, list when type in [:def, :defp] ->
-        imports = search_for_imports(clauses)
-        list ++ imports
-      _, list ->
-        list
-    end)
-
-    imports
-  end
-
-  defp search_for_imports(clauses) do
-    imports = Enum.map(clauses, fn(clause) ->
-
-      # Walk the AST and try to find module references
-      # We will turn these into imports
-     {ast, list} = Macro.postwalk(clause, [], fn
-      {_, _, _, {{:., _, [module, _]}, _, _}} = ast, list ->
-          if is_elixir_module(module) do
-            {ast, list ++ [module_to_import(module)]}
-          else
-            {ast, list}
-          end
-      ast, list ->
-          { ast, list }
-    end)
-
-      list
-
-    end)
-
-    List.flatten(imports) |> Enum.uniq
+  defp make_imports() do
+    Enum.map(ModuleState.get_module_refs(), fn(x) -> module_to_import(x) end)
   end
 
   defp module_to_import(module) do
@@ -92,6 +65,10 @@ defmodule ElixirScript.Experimental.Module do
 
   def is_elixir_module(_) do
     false
+  end
+
+  def is_js_module(module) do
+    is_elixir_module(module) and hd(Module.split(module)) == "JS"
   end
 
 end
