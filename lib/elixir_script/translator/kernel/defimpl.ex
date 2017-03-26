@@ -113,6 +113,11 @@ defmodule ElixirScript.Translator.Defimpl do
     JS.identifier(:Object)
   end
 
+  defp map_to_js({:__aliases__, context, [:JS | rest]}, env) do
+    ElixirScript.Translator.JS.translate_js_module({:__aliases__, context, rest}, env)
+    |> elem(0)
+  end
+
   defp map_to_js({:__aliases__, _, [:Any]}, _) do
     JS.identifier(:null)
   end
