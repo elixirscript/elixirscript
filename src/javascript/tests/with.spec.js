@@ -1,18 +1,16 @@
-import Core from "../lib/core";
+import Core from '../lib/core';
+import chai from 'chai';
 const Patterns = Core.Patterns;
 const SpecialForms = Core.SpecialForms;
 const Tuple = Core.Tuple;
 const MatchError = Core.Patterns.MatchError;
 
-import Enum from "../lib/enum";
-
-import chai from 'chai';
-var expect = chai.expect;
+const expect = chai.expect;
 
 const $ = Patterns.variable();
 
-function map_fetch(map, key){
-  if(key in map){
+function map_fetch(map, key) {
+  if (key in map) {
     return new Tuple(Symbol.for('ok'), map[key]);
   }
 
@@ -20,7 +18,6 @@ function map_fetch(map, key){
 }
 
 describe('with', () => {
-
   it('normal', () => {
     /*
      opts = %{width: 10, height: 15}
@@ -32,17 +29,16 @@ describe('with', () => {
      {:ok, 150}
      */
 
-    let opts = { width: 10, height: 15 };
+    const opts = { width: 10, height: 15 };
 
-    let value = SpecialForms._with(
-      [new Tuple(Symbol.for('ok'), $), () => map_fetch(opts, "width")],
-      [new Tuple(Symbol.for('ok'), $), (width) => map_fetch(opts, "height")],
-      (width, height) => new Tuple(Symbol.for('ok'), width * height)
+    const value = SpecialForms._with(
+      [new Tuple(Symbol.for('ok'), $), () => map_fetch(opts, 'width')],
+      [new Tuple(Symbol.for('ok'), $), width => map_fetch(opts, 'height')],
+      (width, height) => new Tuple(Symbol.for('ok'), width * height),
     );
 
     expect(value).to.eql(new Tuple(Symbol.for('ok'), 150));
   });
-
 
   it('without match', () => {
     /*
@@ -55,17 +51,16 @@ describe('with', () => {
      :error
      */
 
-    let opts = { width: 10 };
+    const opts = { width: 10 };
 
-    let value = SpecialForms._with(
-      [new Tuple(Symbol.for('ok'), $), () => map_fetch(opts, "width")],
-      [new Tuple(Symbol.for('ok'), $), (width) => map_fetch(opts, "height")],
-      (width, height) => new Tuple(Symbol.for('ok'), width * height)
+    const value = SpecialForms._with(
+      [new Tuple(Symbol.for('ok'), $), () => map_fetch(opts, 'width')],
+      [new Tuple(Symbol.for('ok'), $), width => map_fetch(opts, 'height')],
+      (width, height) => new Tuple(Symbol.for('ok'), width * height),
     );
 
     expect(value).to.eql(Symbol.for('error'));
   });
-
 
   it('bare expression', () => {
     /*
@@ -79,18 +74,21 @@ describe('with', () => {
      {:ok, 300}
      */
 
-    let opts = { width: 10, height: 15 };
+    const opts = { width: 10, height: 15 };
 
-    let value = SpecialForms._with(
-      [new Tuple(Symbol.for('ok'), $), () => map_fetch(opts, "width")],
-      [$, (width) => width * 2],
-      [new Tuple(Symbol.for('ok'), $), (width, double_width) => map_fetch(opts, "height")],
-      (width, double_width, height) => new Tuple(Symbol.for('ok'), double_width * height)
+    const value = SpecialForms._with(
+      [new Tuple(Symbol.for('ok'), $), () => map_fetch(opts, 'width')],
+      [$, width => width * 2],
+      [
+        new Tuple(Symbol.for('ok'), $),
+        (width, double_width) => map_fetch(opts, 'height'),
+      ],
+      (width, double_width, height) =>
+        new Tuple(Symbol.for('ok'), double_width * height),
     );
 
     expect(value).to.eql(new Tuple(Symbol.for('ok'), 300));
   });
-
 
   it('with else', () => {
     /*
@@ -106,18 +104,24 @@ describe('with', () => {
       {:error, :wrong_data}
     */
 
-    let opts = { width: 10 };
+    const opts = { width: 10 };
 
-    let value = SpecialForms._with(
-      [new Tuple(Symbol.for('ok'), $), () => map_fetch(opts, "width")],
-      [new Tuple(Symbol.for('ok'), $), (width) => map_fetch(opts, "height")],
+    const value = SpecialForms._with(
+      [new Tuple(Symbol.for('ok'), $), () => map_fetch(opts, 'width')],
+      [new Tuple(Symbol.for('ok'), $), width => map_fetch(opts, 'height')],
       (width, height) => new Tuple(Symbol.for('ok'), width * height),
       Patterns.defmatch(
-        Patterns.clause([Symbol.for('error')], () => new Tuple(Symbol.for('error'), Symbol.for('wrong_data')))
-      )
+        Patterns.clause(
+          [Symbol.for('error')],
+          () => new Tuple(Symbol.for('error'), Symbol.for('wrong_data')),
+        ),
+      ),
     );
 
-    expect(value).to.eql(new Tuple(Symbol.for('error'), Symbol.for('wrong_data')));
+    expect(value).to.eql(new Tuple(
+      Symbol.for('error'),
+      Symbol.for('wrong_data'),
+    ));
   });
 
   it('with else that don`t match', () => {
@@ -134,16 +138,19 @@ describe('with', () => {
       {:error, :wrong_data}
     */
 
-    let opts = { width: 10 };
+    const opts = { width: 10 };
 
-    let withFunction = SpecialForms._with.bind(
+    const withFunction = SpecialForms._with.bind(
       null,
-      [new Tuple(Symbol.for('ok'), $), () => map_fetch(opts, "width")],
-      [new Tuple(Symbol.for('ok'), $), (width) => map_fetch(opts, "height")],
+      [new Tuple(Symbol.for('ok'), $), () => map_fetch(opts, 'width')],
+      [new Tuple(Symbol.for('ok'), $), width => map_fetch(opts, 'height')],
       (width, height) => new Tuple(Symbol.for('ok'), width * height),
       Patterns.defmatch(
-        Patterns.clause([Symbol.for('fail')], () => new Tuple(Symbol.for('error'), Symbol.for('wrong_data')))
-      )
+        Patterns.clause(
+          [Symbol.for('fail')],
+          () => new Tuple(Symbol.for('error'), Symbol.for('wrong_data')),
+        ),
+      ),
     );
 
     expect(withFunction).to.throw(MatchError, 'No match for: Symbol(error)');

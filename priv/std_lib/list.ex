@@ -156,11 +156,7 @@ defmodule ElixirScript.List do
     do_foldl(tl(list), acc, func, new_list ++ [value])
   end
 
-  def flatten(list) do
-    do_flatten(list, [])
-  end
-
-  def flatten(list, tail) do
+  def flatten(list, tail \\ []) do
     do_flatten(list, []) ++ tail
   end
 
@@ -246,7 +242,24 @@ defmodule ElixirScript.List do
     do_keyreplace(tl(list), key, position, updated, new_tuple)
   end
 
-  def zip(list_of_lists) do
-    Bootstrap.Core.Functions.zip(list_of_lists)
+  def zip([]) do
+    []
+  end
+
+  def zip(list_of_lists) when is_list(list_of_lists) do
+    lengths = Enum.map(list_of_lists, fn(list) -> length(list) end)
+    length = apply(JS.Math, :min, lengths)
+    do_zip(list_of_lists, 0, length, [])
+  end
+
+  defp do_zip(list_of_lists, index, length, acc) when index == length do
+    acc
+  end
+
+  defp do_zip(list_of_lists, index, length, acc) do
+    values = Enum.map(list_of_lists, fn(list) -> Enum.at(list, index) end)
+    item = JS.new(Bootstrap.Core.Tuple, values)
+    
+    do_zip(list_of_lists, index + 1, length, acc ++ [item])
   end
 end

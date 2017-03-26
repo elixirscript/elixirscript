@@ -1,12 +1,22 @@
 defmodule ElixirScript.Base do
-  @moduledoc false  
+  @moduledoc false
 
   def encode64(data) do
-    Bootstrap.Core.b64EncodeUnicode(data)
+    ElixirScript.Bootstrap.Functions.b64EncodeUnicode(data)
+  end
+
+  defp can_decode64(data) do
+    try do
+      JS.atob(data)
+      true
+    rescue
+      _ ->
+        false
+    end
   end
 
   def decode64(data) do
-    if Bootstrap.Core.can_decode64(data) do
+    if can_decode64(data) do
       {:ok, decode64!(data) }
     else
       :error
@@ -14,7 +24,7 @@ defmodule ElixirScript.Base do
   end
 
   def decode64!(data) do
-    Bootstrap.Core.get_global().atob(data)
+    JS.atob(data)
   end
 
 end

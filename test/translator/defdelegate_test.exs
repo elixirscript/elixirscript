@@ -7,8 +7,8 @@ defmodule ElixirScript.Translator.Defdelegate.Test do
 
     js_code = """
      const reverse = function(list) {
-             return Bootstrap.Core.Functions.reverse(list);
-         };
+       return Elixir.ElixirScript.Bootstrap.Functions.__load(Elixir).reverse(list);
+     };
     """
 
     assert_translation(ex_ast, js_code)
@@ -19,8 +19,8 @@ defmodule ElixirScript.Translator.Defdelegate.Test do
 
     js_code = """
      const other_reverse = function(list) {
-             return Bootstrap.Core.Functions.reverse(list);
-         };
+       return Elixir.ElixirScript.Bootstrap.Functions.__load(Elixir).reverse(list);
+     };
     """
 
     assert_translation(ex_ast, js_code)

@@ -124,7 +124,7 @@ defmodule ElixirScript.Translator.LexicalScope do
   end
 
   def function_scope(env, { _, _ } = func) do
-    %{ env |  function: func, caller: env, vars: [] }
+    %{ env |  function: func, caller: env}
   end
 
   def function_scope(env, nil) do

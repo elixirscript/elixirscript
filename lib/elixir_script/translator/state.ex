@@ -23,6 +23,8 @@ defmodule ElixirScript.Translator.State do
     |> Map.put(Collectable, ElixirScript.Collectable)
     |> Map.put(String.Chars, ElixirScript.String.Chars)
     |> Map.put(Enumerable, ElixirScript.Enumerable)
+    |> Map.put(Enum, ElixirScript.Enum)
+    |> Map.put(Enum.OutOfBoundsError, ElixirScript.Enum.OutOfBoundsError)
     |> Map.put(Integer, ElixirScript.Integer)
     |> Map.put(Macro.Env, ElixirScript.Macro.Env)
     |> Map.put(View, ElixirScript.View)
@@ -38,6 +40,7 @@ defmodule ElixirScript.Translator.State do
     |> Map.put(List, ElixirScript.List)
     |> Map.put(Process, ElixirScript.Process)
     |> Map.put(Regex, ElixirScript.Regex)
+    |> Map.put(IO, ElixirScript.IO)
   end
 
   def set_module_data(pid, module_data) do
@@ -135,7 +138,7 @@ defmodule ElixirScript.Translator.State do
 
   def list_module_references(pid) do
     Agent.get(pid, fn(state) ->
-      Enum.map(state.modules, fn {name, module} -> 
+      Enum.map(state.modules, fn {name, module} ->
         {name, Map.get(module, :refs, [])}
       end)
     end)
@@ -157,4 +160,3 @@ defmodule ElixirScript.Translator.State do
     Agent.stop(pid)
   end
 end
-

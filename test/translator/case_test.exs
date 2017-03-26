@@ -57,7 +57,7 @@ defmodule ElixirScript.Translator.Case.Test do
      Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([false],function()    {
              let [value] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.variable(),13);
              return     value;
-           }),Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.wildcard()],function()    {
+           }),Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],function(__ignored__)    {
              return     true;
            })).call(this,data)
     """
@@ -71,7 +71,7 @@ defmodule ElixirScript.Translator.Case.Test do
       case data do
         number when number in [1,2,3,4] ->
           value = 13
-        _  ->
+          _  ->
           true
       end
     end
@@ -81,8 +81,8 @@ defmodule ElixirScript.Translator.Case.Test do
              let [value] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.variable(),13);
              return     value;
            },function(number)    {
-             return     Bootstrap.Core.Functions.contains(number,Object.freeze([1, 2, 3, 4]));
-           }),Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.wildcard()],function()    {
+           return     Elixir.ElixirScript.Bootstrap.Functions.__load(Elixir).contains(number,Object.freeze([1, 2, 3, 4]));
+           }),Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],function(__ignored__)    {
              return     true;
            })).call(this,data)
     """
@@ -106,8 +106,8 @@ defmodule ElixirScript.Translator.Case.Test do
              let [value] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.variable(),13);
              return     value;
            },function(number)    {
-             return     Bootstrap.Core.Functions.contains(number,Object.freeze([1, 2, 3, 4])) || Bootstrap.Core.Functions.contains(number,Object.freeze([4, 3, 2, 1]));
-           }),Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.wildcard()],function()    {
+           return     Elixir.ElixirScript.Bootstrap.Functions.__load(Elixir).contains(number,Object.freeze([1, 2, 3, 4])) || Elixir.ElixirScript.Bootstrap.Functions.__load(Elixir).contains(number,Object.freeze([4, 3, 2, 1]));
+           }),Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],function(__ignored__)    {
              return     true;
            })).call(this,data)
     """

@@ -155,7 +155,7 @@ defmodule ElixirScript.Translator.PatternMatching do
   end
 
   defp do_build_match({:_, _, _}, _) do
-    { [wildcard()], [JS.identifier(:undefined)] }
+    { [parameter()], [JS.identifier(:__ignored__)] }
   end
 
   defp do_build_match({:<<>>, _, elements}, env) do

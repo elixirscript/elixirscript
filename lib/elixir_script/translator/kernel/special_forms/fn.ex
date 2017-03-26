@@ -136,6 +136,7 @@ defmodule ElixirScript.Translator.Function do
   end
 
   defp make_function_clause(patterns, params, body, guard_body, is_generator?) do
+    params = Enum.filter(params, fn(x) -> is_nil(x) == false end)
 
     arguments = case guard_body do
                   nil ->
@@ -172,9 +173,8 @@ defmodule ElixirScript.Translator.Function do
         Enum.map_reduce(list, env, fn(x, env) ->
           Translator.translate(x, env)
         end)
-                      _ ->
-
-                        Enum.map_reduce(List.wrap(body), env, fn(x, env) ->
+       _ ->
+        Enum.map_reduce(List.wrap(body), env, fn(x, env) ->
           Translator.translate(x, env)
         end)
     end

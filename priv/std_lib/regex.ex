@@ -4,7 +4,7 @@ defmodule ElixirScript.Regex do
 
   def compile(source, options \\ "") do
     try do
-      {:ok, JS.new(RegExp, [source, options])}
+      {:ok, JS.new(JS.RegExp, [source, options])}
     rescue
       x ->
         {:error, x.message}
@@ -12,11 +12,11 @@ defmodule ElixirScript.Regex do
   end
 
   def compile!(source, options \\ "") do
-    JS.new(RegExp, [source, options])
+    JS.new(JS.RegExp, [source, options])
   end
 
   def regex?(term) do
-    JS.instanceof(term, RegExp)
+    JS.instanceof(term, JS.RegExp)
   end
 
   def match?(regex, string) do
@@ -64,7 +64,7 @@ defmodule ElixirScript.Regex do
     if String.contains?(opts(regex), "g") do
       regex
     else
-      JS.new(RegExp, [ source(regex), opts(regex) <> "g" ])
+      JS.new(JS.RegExp, [ source(regex), opts(regex) <> "g" ])
     end
   end
 

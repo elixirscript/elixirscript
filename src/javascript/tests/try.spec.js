@@ -1,15 +1,11 @@
-import Core from "../lib/core";
+import Core from '../lib/core';
 const Patterns = Core.Patterns;
 const SpecialForms = Core.SpecialForms;
 
-import Enum from "../lib/enum";
-
 import chai from 'chai';
-var expect = chai.expect;
-
+const expect = chai.expect;
 
 describe('try', () => {
-
   it('try', () => {
     /*
       try do
@@ -23,19 +19,31 @@ describe('try', () => {
 
     */
 
-    let x = 1;
+    const x = 1;
 
-    let value = SpecialForms._try(function() {
+    const value = SpecialForms._try(
+      () => {
         return 1 / x;
-    }, null, null, Patterns.defmatch(Patterns.clause([Patterns.variable()], function(y) {
-        return Symbol.for('small');
-    }, function(y) {
-        return (y < 1) && (y > -1);
-    }), Patterns.clause([Patterns.wildcard()], function() {
-        return Symbol.for('large');
-    })), null);
+      },
+      null,
+      null,
+      Patterns.defmatch(
+        Patterns.clause(
+          [Patterns.variable()],
+          y => {
+            return Symbol.for('small');
+          },
+          y => {
+            return y < 1 && y > -1;
+          },
+        ),
+        Patterns.clause([Patterns.wildcard()], () => {
+          return Symbol.for('large');
+        }),
+      ),
+      null,
+    );
 
     expect(value).to.equal(Symbol.for('large'));
   });
-
 });

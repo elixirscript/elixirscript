@@ -1,32 +1,36 @@
-import Core from "../lib/core";
+import Core from '../lib/core';
+import chai from 'chai';
 const Patterns = Core.Patterns;
 const SpecialForms = Core.SpecialForms;
 const Tuple = Core.Tuple;
 
-import Enum from "../lib/enum";
-
-import chai from 'chai';
-var expect = chai.expect;
-
+const expect = chai.expect;
 
 describe('case', () => {
-
   it('case', () => {
-    let clauses = [
+    const clauses = [
       Patterns.clause(
-        [new Tuple(Symbol.for("selector"), Patterns.variable(), Patterns.variable())],
-        function(i, value){ return value; },
-        function(i){ return Kernel.is_integer(i); }
+        [
+          new Tuple(
+            Symbol.for('selector'),
+            Patterns.variable(),
+            Patterns.variable(),
+          ),
+        ],
+        (i, value) => {
+          return value;
+        },
+        i => {
+          return Kernel.is_integer(i);
+        },
       ),
-      Patterns.clause(
-        [Patterns.variable()],
-        function(value){ return value; }
-      )
+      Patterns.clause([Patterns.variable()], value => {
+        return value;
+      }),
     ];
 
-    let result = SpecialForms._case("thing", clauses);
+    const result = SpecialForms._case('thing', clauses);
 
-    expect(result).to.equal("thing");
+    expect(result).to.equal('thing');
   });
-
 });

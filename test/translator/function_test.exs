@@ -60,7 +60,7 @@ defmodule ElixirScript.Translator.Function.Test do
              return     2;
            },function(x)    {
            return x === null || x === false;
-           }),Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.wildcard()],function()    {
+           }),Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],function(__ignored__)    {
              return     1;
            })).call(this,1 == 1);
            }));
@@ -88,14 +88,14 @@ defmodule ElixirScript.Translator.Function.Test do
              return 2;
          }, function(x) {
              return x === null || x === false;
-         }), Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.wildcard()], function() {
+         }), Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()], function(__ignored__) {
              return Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()], function(x) {
                  let [a] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.variable(), 1);
 
                  return a;
              }, function(x) {
                  return x === null || x === false;
-             }), Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.wildcard()], function() {
+             }), Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()], function(__ignored__1) {
                  return 4;
              })).call(this, 2 == 2);
          })).call(this, 1 == 1);
@@ -342,7 +342,7 @@ defmodule ElixirScript.Translator.Function.Test do
     const something = Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable(), Bootstrap.Core.Patterns.variable()],function(one,two)    {
       return null;
     },function(one,two)    {
-      return Bootstrap.Core.Functions.contains(one,Object.freeze([1, 2, 3]));
+    return Elixir.ElixirScript.Bootstrap.Functions.__load(Elixir).contains(one,Object.freeze([1, 2, 3]));
     }));
     """
 
@@ -362,7 +362,7 @@ defmodule ElixirScript.Translator.Function.Test do
          const something = Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],function(one)    {
              return     null;
            },function(one)    {
-             return     Bootstrap.Core.Functions.contains(one,Object.freeze([1, 2, 3]));
+           return     Elixir.ElixirScript.Bootstrap.Functions.__load(Elixir).contains(one,Object.freeze([1, 2, 3]));
            }),Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],function(one)    {
              return     null;
            },function(one)    {
@@ -749,7 +749,7 @@ defmodule ElixirScript.Translator.Function.Test do
         function(x) {
         return x === null || x === false;
         }),
-        Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.wildcard()], function() {
+        Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()], function(__ignored__) {
             return null;
         })).call(this, true);
       },

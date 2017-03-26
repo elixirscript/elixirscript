@@ -22,7 +22,7 @@ defmodule ElixirScript.Translator.Call do
      )
 
     {ast, env}
-  end  
+  end
 
   def make_local_function_call(function_name, params, env) do
     ast = JS.call_expression(
@@ -42,7 +42,7 @@ defmodule ElixirScript.Translator.Call do
           Identifier.make_namespace_members(members),
           [JS.identifier("Elixir")]
         ),
-        Identifier.make_identifier(function_name)        
+        Identifier.make_identifier(function_name)
       ),
       Enum.map(params, &Translator.translate!(&1, env))
      )
@@ -52,7 +52,7 @@ defmodule ElixirScript.Translator.Call do
 
   def make_module_function_call(module_name, function_name, env) do
     make_module_function_call(module_name, function_name, [], env)
-  end 
+  end
 
   def make_extern_function_or_property_call(module_name, function_name, env) do
     members = Module.split(module_name)
@@ -87,7 +87,7 @@ defmodule ElixirScript.Translator.Call do
      )
 
     {ast, env}
-  end 
+  end
 
   def make_function_or_property_call(module_name, function_name, env) do
     js_ast = JS.call_expression(
@@ -128,19 +128,19 @@ defmodule ElixirScript.Translator.Call do
       ]
     )
 
-    {js_ast, env}  
+    {js_ast, env}
   end
 
   def make_function_call(module_name, function_name, params, env) when is_atom(module_name) and is_atom(function_name) do
     js_ast = JS.call_expression(
        JS.member_expression(
         Identifier.make_identifier(module_name),
-        Identifier.make_identifier(function_name)    
+        Identifier.make_identifier(function_name)
        ),
        Enum.map(params, &Translator.translate!(&1, env))
     )
 
-    {js_ast, env}  
+    {js_ast, env}
   end
 
   def make_function_call({{:., _, _}, _, _} = module_name, function_name, [], env) do
@@ -161,19 +161,19 @@ defmodule ElixirScript.Translator.Call do
       ]
     )
 
-    {js_ast, env}  
+    {js_ast, env}
   end
 
   def make_function_call({{:., _, _}, _, _} = module_name, function_name, params, env) do
      js_ast = JS.call_expression(
        JS.member_expression(
         Translator.translate!(module_name, env),
-        Identifier.make_identifier(function_name)    
+        Identifier.make_identifier(function_name)
        ),
        Enum.map(params, &Translator.translate!(&1, env))
     )
 
-    {js_ast, env}   
+    {js_ast, env}
   end
 
   def make_function_call(module_name, function_name, [], env) do
@@ -195,7 +195,7 @@ defmodule ElixirScript.Translator.Call do
     )
 
     {js_ast, env}
-  end  
+  end
 
   def make_function_call(module_name, function_name, params, env) do
     call = JS.call_expression(

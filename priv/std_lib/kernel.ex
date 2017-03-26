@@ -40,15 +40,15 @@ defmodule ElixirScript.Kernel do
   end
 
   def abs(number) do
-    Math.abs(number)
+    JS.Math.abs(number)
   end
 
   def apply(fun, args) do
-    Bootstrap.Core.Functions.apply(fun, args)
+    fun.apply(fun, args)
   end
 
   def apply(module, fun, args) do
-    Bootstrap.Core.Functions.apply(module, Atom.to_string(fun), args)
+    module[Atom.to_string(fun)].apply(module[Atom.to_string(fun)], args)
   end
 
   def binary_part(binary, start, len) do
@@ -80,7 +80,7 @@ defmodule ElixirScript.Kernel do
   end
 
   def is_float(term) do
-    is_number(term) && !Number.isInteger(term)
+    is_number(term) && !JS.Number.isInteger(term)
   end
 
   def is_function(term) do
@@ -92,11 +92,11 @@ defmodule ElixirScript.Kernel do
   end
 
   def is_integer(term) do
-    Number.isInteger(term)
+    JS.Number.isInteger(term)
   end
 
   def is_list(term) do
-    Array.isArray(term)
+    JS.Array.isArray(term)
   end
 
   def is_number(term) do
@@ -128,31 +128,31 @@ defmodule ElixirScript.Kernel do
   end
 
   def map_size(term) do
-    Object.keys(term).length
+    JS.Object.keys(term).length
   end
 
   def max(first, second) do
-    Math.max(first, second)
+    JS.Math.max(first, second)
   end
 
   def min(first, second) do
-    Math.min(first, second)
+    JS.Math.min(first, second)
   end
 
   def round(number) do
-    Math.round(number)
+    JS.Math.round(number)
   end
 
   def trunc(number) do
-    Math.floor(number)
+    JS.Math.floor(number)
   end
 
   def tuple_size(tuple) do
-    Bootstrap.Core.Functions.size(tuple)
+    tuple.count()
   end
 
   def elem(tuple, index) do
-    Bootstrap.Core.Functions.apply(tuple, "get", [index])
+    tuple.get(index)
   end
 
   def is_nil(term) do
@@ -166,10 +166,10 @@ defmodule ElixirScript.Kernel do
     end
   end
 
-  defmacro match?(left, right) do
+  defmacro match?(pattern, expr) do
     quote do
-      case unquote(right) do
-        unquote(left) ->
+      case unquote(expr) do
+        unquote(pattern) ->
           true
         _ ->
           false
@@ -193,7 +193,7 @@ defmodule ElixirScript.Kernel do
 
   defmacro left in right do
     quote do
-      Bootstrap.Core.Functions.contains(unquote(left), unquote(right))
+      ElixirScript.Bootstrap.Functions.contains(unquote(left), unquote(right))
     end
   end
 
