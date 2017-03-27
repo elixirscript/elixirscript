@@ -86,6 +86,7 @@ defmodule ElixirScript do
     |> ElixirScript.Passes.FindFunctions.execute(opts)
     |> ElixirScript.Passes.JavaScriptAST.execute(opts)
     |> ElixirScript.Passes.ConsolidateProtocols.execute(opts)
+    |> ElixirScript.Passes.RemoveUnused.execute(opts)
     |> ElixirScript.Passes.CreateJSModules.execute(opts)
     |> ElixirScript.Passes.JavaScriptCode.execute(opts)
     |> ElixirScript.Passes.HandleOutput.execute(opts)
@@ -187,6 +188,7 @@ defmodule ElixirScript do
     |> Map.put(:app, :app)
     |> Map.put(:format, :es)
     |> Map.put(:js_modules, [])
+    |> Map.put(:remove_unused, false)
 
     options = Map.merge(default_options, opts)
     Map.put(options, :module_formatter, get_module_formatter(options[:format]))

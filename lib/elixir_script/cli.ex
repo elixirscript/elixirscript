@@ -6,7 +6,7 @@ defmodule ElixirScript.CLI do
   @switches [
     output: :string, elixir: :boolean,
     help: :boolean, full_build: :boolean, version: :boolean,
-    watch: :boolean, format: :string, js_module: [:string, :keep]
+    watch: :boolean, format: :string, js_module: [:string, :keep], remove_unused: :boolean
   ]
 
   @aliases [
@@ -50,6 +50,7 @@ defmodule ElixirScript.CLI do
   -o  --output [path]   places output at the given path. 
                         Can be a directory or filename.
   -e  --elixir          read input as elixir code string
+  --remove-unused       Removes unused modules from output
   --full-build          informs the compiler to do a full build instead of an incremental one
   -v  --version         the current version number
   -h  --help            this message
@@ -84,7 +85,8 @@ defmodule ElixirScript.CLI do
       full_build: Keyword.get(options, :full_build, false),
       output: Keyword.get(options, :output, :stdout),
       format: String.to_atom(Keyword.get(options, :format, "es")),
-      js_modules: js_modules
+      js_modules: js_modules,
+      remove_unused: Keyword.get(options, :remove_unused, false)
     }
 
     case options[:elixir] do
