@@ -11,7 +11,13 @@ defmodule ElixirScript.Translator.State do
 
   def start_link(compiler_opts, loaded_modules) do
     Agent.start_link(fn ->
-      %{ compiler_opts: compiler_opts, modules: Keyword.new, std_lib_map: build_standard_lib_map(), loaded_modules: [JS | loaded_modules] }
+      %{ 
+        compiler_opts: compiler_opts, 
+        modules: Keyword.new, 
+        std_lib_map: build_standard_lib_map(), 
+        loaded_modules: [JS | loaded_modules],
+        module_references: Keyword.new()
+      }
     end)
   end
 
@@ -120,27 +126,15 @@ defmodule ElixirScript.Translator.State do
         nil ->
           state
         module ->
-          module = Map.update(module, :refs, [module_name], fn(x) -> Enum.uniq(x ++ [module_name]) end)
-          modules = Keyword.put(state.modules, module.name, module)
-          %{ state | modules: modules }
+          module_references = Keyword.update(state.module_references, module.name, [module_name], fn(x) -> Enum.uniq(x ++ [module_name]) end)
+          %{ state | module_references: module_references }
       end
     end)
   end
 
-  def get_module_references(pid, module_name) do
-    case get_module(pid, module_name) do
-      nil ->
-        []
-      module ->
-        Map.get(module, :refs, [])
-    end
-  end
-
   def list_module_references(pid) do
     Agent.get(pid, fn(state) ->
-      Enum.map(state.modules, fn {name, module} ->
-        {name, Map.get(module, :refs, [])}
-      end)
+      state.module_references
     end)
   end
 

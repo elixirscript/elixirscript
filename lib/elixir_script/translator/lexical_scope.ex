@@ -228,6 +228,7 @@ defmodule ElixirScript.Translator.LexicalScope do
 
   def add_import(env, module_name) do
     check_for_module_existence(env, module_name)
+    ElixirScript.Translator.State.add_module_reference(env.state, env.module, module_name)
 
     env = if ElixirScript.Translator.State.is_module_loaded?(env.state, module_name) do
       add_import_macro(env, module_name, [])
@@ -247,6 +248,7 @@ defmodule ElixirScript.Translator.LexicalScope do
 
   def add_import(env, module_name, [only: :functions]) do
       module = get_module(env, module_name)
+      ElixirScript.Translator.State.add_module_reference(env.state, env.module, module_name)
 
       %{ env | functions: List.keydelete(env.functions, module_name, 0) ++ [{ module.name, module.functions }],
          requires: Enum.uniq(env.requires ++ [module.name])
@@ -263,6 +265,7 @@ defmodule ElixirScript.Translator.LexicalScope do
 
   def add_import(env, module_name, [only: only]) do
     check_for_module_existence(env, module_name)
+    ElixirScript.Translator.State.add_module_reference(env.state, env.module, module_name)
 
     env = if ElixirScript.Translator.State.is_module_loaded?(env.state, module_name) do
       list = module_name.__info__(:macros)
@@ -288,6 +291,7 @@ defmodule ElixirScript.Translator.LexicalScope do
 
   def add_import(env, module_name, [except: except]) do
     check_for_module_existence(env, module_name)
+    ElixirScript.Translator.State.add_module_reference(env.state, env.module, module_name)
 
     env = if ElixirScript.Translator.State.is_module_loaded?(env.state, module_name) do
       list = module_name.__info__(:macros)
@@ -312,6 +316,7 @@ defmodule ElixirScript.Translator.LexicalScope do
 
   def add_require(env, module_name) do
     check_for_module_existence(env, module_name)
+    ElixirScript.Translator.State.add_module_reference(env.state, env.module, module_name)
 
     env = if ElixirScript.Translator.State.is_module_loaded?(env.state, module_name) do
       add_require_macro(env, module_name, [])
@@ -329,6 +334,7 @@ defmodule ElixirScript.Translator.LexicalScope do
 
   def add_require(env, module_name, alias_name) do
     check_for_module_existence(env, module_name)
+    ElixirScript.Translator.State.add_module_reference(env.state, env.module, module_name)
 
     env = if ElixirScript.Translator.State.is_module_loaded?(env.state, module_name) do
       add_require_macro(env, module_name, [as: alias_name])

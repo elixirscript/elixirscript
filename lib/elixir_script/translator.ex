@@ -185,7 +185,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:&, _, [{:/, _, [{{:., _, [module_name, function_name]}, _, []}, arity]}]}, env) do
-    module_name = create_module_name2(module_name, env)
+    module_name = create_module_name(module_name, env)
     js_ast = case module_name do
       {mod, :local} ->
         Capture.make_capture(mod, function_name, arity, env)
@@ -278,7 +278,7 @@ defmodule ElixirScript.Translator do
     expanded_ast = Macro.expand(ast, env.env)
 
     if expanded_ast == ast do
-      module_name = create_module_name2(module_name, env)
+      module_name = create_module_name(module_name, env)
       case module_name do
         {mod, :local} ->
           Call.make_module_function_call(mod, function_name, env)
@@ -300,19 +300,11 @@ defmodule ElixirScript.Translator do
     end
   end
 
-  defp do_translate({{:., context1, [{:__aliases__, context2, [:Elixir, :Enum]}, function_name]}, context3, params }, env) do
-    translate({{:., context1, [{:__aliases__, context2, [:Enum]}, function_name]}, context3, params }, env)
-  end
-
-  defp do_translate({{:., context1, [{:__aliases__, context2, [:Enum]}, function_name]}, context3, params }, env) do
-    translate({{:., context1, [{:__aliases__, context2, [:Bootstrap, :Enum]}, function_name]}, context3, params }, env)
-  end
-
   defp do_translate({{:., _, [{:__aliases__, _, _} = module_name, function_name]}, _, params } = ast, env) do
     expanded_ast = Macro.expand(ast, env.env)
 
     if expanded_ast == ast do
-      module_name = create_module_name2(module_name, env)
+      module_name = create_module_name(module_name, env)
       case module_name do
         {mod, :local} ->
           Call.make_module_function_call(mod, function_name, params, env)
@@ -345,7 +337,7 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:__aliases__, _, aliases} = ast, env) do
-    module_name = create_module_name2(ast, env)
+    module_name = create_module_name(ast, env)
     case module_name do
       {mod, :local} ->
         Call.make_module_name(mod, env)
@@ -640,7 +632,7 @@ defmodule ElixirScript.Translator do
     end
   end
 
-  defp do_translate({ name, _, params }, env) when is_atom(params) do
+  defp do_translate({ name, _context, params }, env) when is_atom(params) do
       cond do
         is_from_js_module(name, params, env) ->
           do_translate({{:., [], [{:__aliases__, [], [:JS]}, name]}, [], params }, env)
@@ -683,22 +675,6 @@ defmodule ElixirScript.Translator do
   end
 
   def create_module_name(module_name, env) do
-    case module_name do
-      {:__aliases__, _, _} ->
-        candiate_module_name = ElixirScript.Translator.State.get_module_name(env.state,
-        Utils.quoted_to_name(module_name))
-
-        if ElixirScript.Translator.LexicalScope.get_module_name(env, candiate_module_name) in ElixirScript.Translator.State.list_module_names(env.state) do
-          ElixirScript.Translator.LexicalScope.get_module_name(env, candiate_module_name)
-        else
-          module_name
-        end
-      _ ->
-        module_name
-    end
-  end
-
-  def create_module_name2(module_name, env) do
     module_name = Utils.quoted_to_name(module_name)
     candiate_module_name = ElixirScript.Translator.State.get_module_name(env.state, module_name)
 

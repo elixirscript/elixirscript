@@ -12,14 +12,14 @@ defmodule ElixirScript.Passes.RemoveUnused do
 
    data = Enum.reject(compiler_data.data, fn
      {_, %{type: :impl} = module_data} ->
-       length(module_refs[module_data.implements]) == 0
+       length(Keyword.get(module_refs, module_data.implements, [])) == 0
      {_, %{type: :consolidated} = module_data} ->
-       length(module_refs[module_data.protocol]) == 0
+       length(Keyword.get(module_refs, module_data.protocol, [])) == 0
      {module, module_data} ->
         cond do
           Enum.member?(module_data.functions, {:start, 2}) ->
             false
-          length(module_refs[module]) > 0 ->
+          length(Keyword.get(module_refs, module, [])) > 0 ->
             false
           true ->
             true
