@@ -82,7 +82,7 @@ The compiler to this point has been focused on translating Kernel.SpecialForms a
 
 ### A. Yes, but realize this is not at 1.0 yet.
 
-You **can** use ElixirScript on your front ends and have it work and interoperate with JavaScript modules. The problem is since most of the standard library is incomplete.
+You **can** use ElixirScript on your front ends and have it work and interoperate with JavaScript modules. The problem is that most of the standard library is incomplete.
 
 ## Q. Can I use pattern matching?
 
