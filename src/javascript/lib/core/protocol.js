@@ -6,12 +6,8 @@ class Protocol {
     this.registry = new Map();
     this.fallback = null;
 
-    for (const funName in spec) {
-      this[funName] = createFun(funName).bind(this);
-    }
-
     function createFun(funName) {
-      return function (...args) {
+      return function(...args) {
         const thing = args[0];
         let fun = null;
 
@@ -40,6 +36,10 @@ class Protocol {
 
         throw new Error(`No implementation found for ${thing}`);
       };
+    }
+
+    for (const funName in spec) {
+      this[funName] = createFun(funName).bind(this);
     }
   }
 
