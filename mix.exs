@@ -14,7 +14,6 @@ defmodule ElixirScript.Mixfile do
       source_url: "https://github.com/elixirscript/elixirscript",
       aliases: aliases(),
       test_coverage: [tool: ExCoveralls],
-      preferred_cli_env: [coveralls: :test],
       docs: [
         extras: ["GettingStarted.md", "FAQ.md"]
       ]
@@ -32,8 +31,8 @@ defmodule ElixirScript.Mixfile do
       {:estree, "~> 2.5"},
       {:fs, "~> 2.12"},
       {:ex_doc, "~> 0.14", only: :dev},
-      {:excoveralls, "~> 0.5", only: :test},
-      {:credo, "~> 0.4", only: [:dev, :test]}
+      {:excoveralls, "~> 0.6", only: :test},
+      {:credo, "~> 0.7", only: [:dev, :test]}
     ]
   end
 
