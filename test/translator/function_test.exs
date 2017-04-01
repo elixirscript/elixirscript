@@ -176,7 +176,7 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-     Bootstrap.Enum.map(list,Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],function(x)    {
+     Elixir.ElixirScript.Enum.__load(Elixir).map(list,Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],function(x)    {
              return     x * 2;
            })))
     """

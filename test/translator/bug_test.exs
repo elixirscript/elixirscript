@@ -47,7 +47,7 @@ defmodule ElixirScript.Translator.Bug.Test do
     end
 
     js_code = """
-      Bootstrap.Enum.fetch__emark__(data, i)
+      Elixir.ElixirScript.Enum.__load(Elixir).fetch__emark__(data, i)
     """
 
     assert_translation(ex_ast, js_code)
