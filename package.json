@@ -13,7 +13,7 @@
     "clean": "rm -rf priv/build",
     "test": "mocha src/javascript/tests --recursive --compilers js:babel-core/register",
     "build:test-app": "mix elixirscript test/app/src/ -f common -o test/app/build/",
-    "test-app": "yarn run build:test-app && NODE_ENV=test mocha --recursive 'test/app/spec/**/*.spec.js' --compilers js:babel-core/register"
+    "test-app": "yarn run build:test-app && NODE_ENV=test mocha --recursive 'test/app/spec/**/*.spec.js' --compilers js:babel-register"
   },
   "repository": {
     "type": "git",
@@ -26,25 +26,18 @@
     "tailored": "2.4.1"
   },
   "devDependencies": {
-    "babel": "^6.5.2",
-    "babel-core": "^6.7.7",
-    "babel-plugin-transform-class-properties": "^6.9.1",
-    "babel-preset-es2015": "^6.6.0",
-    "babel-preset-es2015-rollup": "^1.1.1",
-    "babel-preset-react": "^6.5.0",
-    "babel-preset-stage-0": "^6.5.0",
+    "babel-core": "^6.24.0",
+    "babel-register": "^6.24.0",
+    "babel-preset-env": "^1.3.2",
     "chai": "^3.5.0",
     "eslint": "^3.15.0",
     "eslint-config-airbnb-base": "^11.1.0",
     "eslint-plugin-import": "^2.2.0",
-    "gulp": "^3.9.1",
-    "gulp-babel": "^6.1.2",
-    "gulp-sourcemaps": "^2.0.0-alpha",
-    "mocha": "^2.4.5",
-    "rollup": "^0.41.4",
+    "mocha": "^3.2.0",
+    "rollup": "^0.41.6",
     "rollup-plugin-babel": "^2.7.1",
-    "rollup-plugin-node-resolve": "^2.0.0",
     "rollup-plugin-babili": "^2.0.0",
+    "rollup-plugin-node-resolve": "^2.0.0",
     "sinon": "^1.17.7",
     "sinon-chai": "^2.8.0"
   }

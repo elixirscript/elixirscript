@@ -2,14 +2,14 @@ const sinon = require('sinon');
 const chai = require('chai');
 const sinonChai = require('sinon-chai');
 
-before(function () {
+before(function() {
   chai.use(sinonChai);
 });
 
-beforeEach(function () {
+beforeEach(function() {
   this.sandbox = sinon.sandbox.create();
 });
 
-afterEach(function () {
+afterEach(function() {
   this.sandbox.restore();
 });
