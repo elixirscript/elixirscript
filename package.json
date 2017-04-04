@@ -23,7 +23,7 @@
   "license": "MIT",
   "dependencies": {
     "erlang-types": "^1.0.0",
-    "tailored": "2.4.4"
+    "tailored": "2.4.5"
   },
   "devDependencies": {
     "babel-core": "^6.24.0",
