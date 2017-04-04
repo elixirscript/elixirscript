@@ -6,6 +6,10 @@ defmodule ElixirScript.Translator.Struct do
   alias ElixirScript.Translator.Map
   alias ElixirScript.Translator.Identifier
 
+  def get_struct_module_name(module_name, env) do
+      ElixirScript.Translator.State.get_module_name(env.state, Utils.quoted_to_name(module_name))
+  end
+
   def get_struct_class(module_name, env) do
     candiate_module_name = ElixirScript.Translator.State.get_module_name(env.state, Utils.quoted_to_name(module_name))
 

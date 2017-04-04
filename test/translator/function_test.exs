@@ -449,9 +449,11 @@ defmodule ElixirScript.Translator.Function.Test do
 
 
     js_code = """
-    const something = Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.type(Elixir.AStruct.__load(Elixir).Elixir$AStruct, {})], function() {
-        return null;
-    }));
+         const something = Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([{
+             [Symbol.for('__struct__')]: Symbol.for('Elixir.AStruct')
+         }], function() {
+             return null;
+         }));
     """
 
     assert_translation(ex_ast, js_code)
@@ -469,9 +471,11 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-    const something = Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.capture(Bootstrap.Core.Patterns.type(Elixir.AStruct.__load(Elixir).Elixir$AStruct, {}))], function(a) {
-        return null;
-    }));
+         const something = Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.capture({
+             [Symbol.for('__struct__')]: Symbol.for('Elixir.AStruct')
+         })], function(a) {
+             return null;
+         }));
     """
     assert_translation(ex_ast, js_code)
   end
@@ -505,11 +509,13 @@ defmodule ElixirScript.Translator.Function.Test do
 
 
     js_code = """
-    const something = Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.type(Elixir.AStruct.__load(Elixir).Elixir$AStruct, {
-        [Symbol.for('key')]: Bootstrap.Core.Patterns.variable(), [Symbol.for('key1')]: 2
-    })], function(value) {
-        return null;
-    }));
+         const something = Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([{
+             [Symbol.for('__struct__')]: Symbol.for('Elixir.AStruct'),
+             [Symbol.for('key')]: Bootstrap.Core.Patterns.variable(),
+             [Symbol.for('key1')]: 2
+         }], function(value) {
+             return null;
+         }));
     """
 
     assert_translation(ex_ast, js_code)
@@ -525,13 +531,15 @@ defmodule ElixirScript.Translator.Function.Test do
 
 
     js_code = """
-    const something = Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.type(Elixir.AStruct.__load(Elixir).Elixir$AStruct, {
-        [Symbol.for('key')]: Bootstrap.Core.Patterns.variable(), [Symbol.for('key1')]: 2
-    })], function(value) {
-        return null;
-    }, function(value) {
-        return Elixir.ElixirScript.Kernel.__load(Elixir).is_number(value);
-    }));
+         const something = Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([{
+             [Symbol.for('__struct__')]: Symbol.for('Elixir.AStruct'),
+             [Symbol.for('key')]: Bootstrap.Core.Patterns.variable(),
+             [Symbol.for('key1')]: 2
+         }], function(value) {
+             return null;
+         }, function(value) {
+             return Elixir.ElixirScript.Kernel.__load(Elixir).is_number(value);
+         }));
     """
 
     assert_translation(ex_ast, js_code)

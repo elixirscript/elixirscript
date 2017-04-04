@@ -112,7 +112,11 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
     params = [{:%, [], [{:__aliases__, [alias: false], [:Hello]}, {:%{}, [], []}]}]
     result = PatternMatching.build_match(params, scope )
     expected_result = {
-      [PatternMatching.type(JS.identifier("Hello"), JS.object_expression([]))],
+      [JS.object_expression([
+        JS.property(Primitive.make_atom(:__struct__), 
+        Primitive.make_atom(Hello),
+        :init, false, false, true),
+      ])],
       []
   }
 
@@ -123,10 +127,12 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
     params = [{:%, [], [{:__aliases__, [alias: false], [:Hello]}, {:%{}, [], [key: 1]}]}]
     result = PatternMatching.build_match(params, scope )
     expected_result = {
-      [PatternMatching.type(JS.identifier("Hello"), JS.object_expression([
-              Map.make_property(Translator.translate!(:key, scope ), Translator.translate!(1, scope ))
-        ]))
-      ],
+      [JS.object_expression([
+        JS.property(Primitive.make_atom(:__struct__), 
+        Primitive.make_atom(Hello),
+        :init, false, false, true),
+        Map.make_property(Translator.translate!(:key, scope ), Translator.translate!(1, scope))
+      ])],
       []
   }
 
@@ -137,10 +143,12 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
     params = [{:%, [], [{:__aliases__, [alias: false], [:Hello]}, {:%{}, [], [key: {:key, [], Elixir}]}]}]
     result = PatternMatching.build_match(params, scope )
     expected_result = {
-      [PatternMatching.type(JS.identifier("Hello"), JS.object_expression([
-              Map.make_property(Translator.translate!(:key, scope ), PatternMatching.parameter)
-        ]))
-      ],
+      [JS.object_expression([
+        JS.property(Primitive.make_atom(:__struct__), 
+        Primitive.make_atom(Hello),
+        :init, false, false, true),
+        Map.make_property(Translator.translate!(:key, scope ), PatternMatching.parameter())
+      ])],
       [JS.identifier("key")]
   }
 
@@ -171,7 +179,11 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
     params = [{:=, [], [{:%, [], [{:__aliases__, [alias: false], [:AStruct]}, {:%{}, [], []}]}, {:a, [], ElixirScript.Translator.Function.Test}]}]
     result = PatternMatching.build_match(params, scope )
     expected_result = {
-      [PatternMatching.capture(PatternMatching.type(JS.identifier("AStruct"), JS.object_expression([])))],
+      [PatternMatching.capture(JS.object_expression([
+        JS.property(Primitive.make_atom(:__struct__), 
+        Primitive.make_atom(AStruct),
+        :init, false, false, true),
+      ]))],
       [JS.identifier("a")]
   }
 

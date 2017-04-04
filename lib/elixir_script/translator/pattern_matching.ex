@@ -8,6 +8,7 @@ defmodule ElixirScript.Translator.PatternMatching do
   alias ElixirScript.Translator.Map
   alias ElixirScript.Translator.Struct
   alias ElixirScript.Translator.Bitstring
+  alias ElixirScript.Translator.Utils
 
   @patterns JS.member_expression(
     JS.member_expression(
@@ -208,11 +209,12 @@ defmodule ElixirScript.Translator.PatternMatching do
     { JS.object_expression(List.wrap(props)), params }
   end
 
-  defp do_build_match({:%, _, [{:__aliases__, _, _} = name, {:%{}, meta, props}]}, env) do
-    struct_name = Struct.get_struct_class(name, env)
-    {pattern, params} = do_build_match({:%{}, meta, props}, env)
+  defp do_build_match({:%, _, [{:__aliases__, _, name}, {:%{}, meta, props}]}, env) do
+    module_name = ElixirScript.Translator.State.get_module_name(env.state, Utils.quoted_to_name(name))
+    name = Utils.name_to_js_file_name(module_name)
+    {pattern, params} = do_build_match({:%{}, meta, [__struct__: String.to_atom(name)] ++ props}, env)
 
-    { [type(struct_name, pattern)], params }
+    { pattern, params }
   end
 
   defp do_build_match({:=, _, [{name, _, _}, right]}, env) when not name in [:%, :{}, :__aliases__, :^, :%{}] do
