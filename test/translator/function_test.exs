@@ -111,13 +111,13 @@ defmodule ElixirScript.Translator.Function.Test do
     end
 
     js_code = """
-    const test1 = Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable(), Bootstrap.Core.Patterns.variable()], function(alpha, beta) {
-        let [a, b] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.type(Bootstrap.Core.Tuple, {
-            values: [Bootstrap.Core.Patterns.variable(), Bootstrap.Core.Patterns.variable()]
-        }), new Bootstrap.Core.Tuple(1, 2));
-        let _ref = new Bootstrap.Core.Tuple(a, b);
-        return _ref;
-    }));
+         const test1 = Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable(), Bootstrap.Core.Patterns.variable()], function(alpha, beta) {
+             let [a, b] = Bootstrap.Core.Patterns.match(new Bootstrap.Core.Tuple(Bootstrap.Core.Patterns.variable(), Bootstrap.Core.Patterns.variable()), new Bootstrap.Core.Tuple(1, 2));
+
+             let _ref = new Bootstrap.Core.Tuple(a, b);
+
+             return _ref;
+         }));
     """
 
     assert_translation(ex_ast, js_code)
@@ -429,11 +429,9 @@ defmodule ElixirScript.Translator.Function.Test do
 
 
     js_code = """
-    const something = Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.type(Bootstrap.Core.Tuple, {
-        values: [Bootstrap.Core.Patterns.variable(), Bootstrap.Core.Patterns.variable()]
-    })], function(apple, fruits) {
-        return null;
-    }));
+         const something = Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([new Bootstrap.Core.Tuple(Bootstrap.Core.Patterns.variable(), Bootstrap.Core.Patterns.variable())], function(apple, fruits) {
+             return null;
+         }));
     """
 
     assert_translation(ex_ast, js_code)

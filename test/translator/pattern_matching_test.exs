@@ -193,10 +193,10 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
     params = [{:{}, [], [1, {:b, [], Elixir}, 3]}]
     result = PatternMatching.build_match(params, scope )
     expected_result = {
-      [PatternMatching.type(Primitive.tuple_class, JS.object_expression([JS.property(
-        JS.identifier("values"),
-        JS.array_expression([JS.literal(1), PatternMatching.parameter, JS.literal(3)])
-        ) ] )) ],
+      [JS.new_expression(
+        Primitive.tuple_class(),
+        [JS.literal(1), PatternMatching.parameter, JS.literal(3)]
+      )],
       [JS.identifier("b")]
   }
 
@@ -205,10 +205,10 @@ defmodule ElixirScript.Translator.PatternMatching.Test do
     params = [{1, {:b, [], Elixir}}]
     result = PatternMatching.build_match(params, scope )
     expected_result = {
-      [PatternMatching.type(Primitive.tuple_class, JS.object_expression([JS.property(
-        JS.identifier("values"),
-        JS.array_expression([JS.literal(1), PatternMatching.parameter])
-        ) ] )) ],
+      [JS.new_expression(
+        Primitive.tuple_class(),
+        [JS.literal(1), PatternMatching.parameter]
+      )],
       [JS.identifier("b")]
   }
 

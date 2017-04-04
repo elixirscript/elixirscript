@@ -244,14 +244,12 @@ defmodule ElixirScript.Translator.PatternMatching do
     |> Enum.map(&build_match([&1], env))
     |> reduce_patterns
 
-    pattern = JS.object_expression([
-      JS.property(
-        JS.identifier("values"),
-        JS.array_expression(patterns)
-      )
-      ])
+    tuple_pattern = JS.new_expression(
+      Primitive.tuple_class(),
+      patterns
+    )
 
-    { [type(Primitive.tuple_class, pattern)], params }
+    { [tuple_pattern], params }
   end
 
   defp do_build_match({:\\, _, [{name, _, _}, default]}, env) do
