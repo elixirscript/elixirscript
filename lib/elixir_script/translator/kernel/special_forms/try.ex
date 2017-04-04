@@ -14,7 +14,7 @@ defmodule ElixirScript.Translator.Try do
     { translated_body, _ } = Function.prepare_function_body(try_block, env)
 
     translated_body = JS.block_statement(translated_body)
-    try_block = JS.function_expression([], [], translated_body)
+    try_block = Function.function_ast([], translated_body)
 
     rescue_block = if rescue_block do
       process_rescue_block(rescue_block, env)
@@ -94,7 +94,7 @@ defmodule ElixirScript.Translator.Try do
     { translated_body, _ } = Function.prepare_function_body(after_block, env)
     translated_body = JS.block_statement(translated_body)
 
-    JS.function_expression([], [], translated_body)
+    Function.function_ast([], translated_body)
   end
 
   defp convert_to_struct([module]) do

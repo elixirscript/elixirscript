@@ -15,11 +15,11 @@ defmodule ElixirScript.Translator.Cond.Test do
     end
 
     js_code = """
-         Bootstrap.Core.SpecialForms.cond(Object.freeze([1 + 1 == 1, function()    {
+         Bootstrap.Core.SpecialForms.cond(Object.freeze([1 + 1 == 1, async function()    {
              return     'This will never match';
-           }]),Object.freeze([2 * 2 != 4, function()    {
+           }]),Object.freeze([2 * 2 != 4, async function()    {
              return     'Nor this';
-           }]),Object.freeze([true, function()    {
+           }]),Object.freeze([true, async function()    {
              return     'This will';
            }]))
     """
@@ -41,13 +41,13 @@ defmodule ElixirScript.Translator.Cond.Test do
     end
 
     js_code = """
-         Bootstrap.Core.SpecialForms.cond(Object.freeze([1 + 1 == 1, function()    {
+         Bootstrap.Core.SpecialForms.cond(Object.freeze([1 + 1 == 1, async function()    {
              let [a] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.variable(),1);
              return     'This will never match';
-           }]),Object.freeze([2 * 2 != 4, function()    {
+           }]),Object.freeze([2 * 2 != 4, async function()    {
              let [a] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.variable(),2);
              return     'Nor this';
-           }]),Object.freeze([true, function()    {
+           }]),Object.freeze([true, async function()    {
              let [a] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.variable(),3);
              return     'This will';
            }]))

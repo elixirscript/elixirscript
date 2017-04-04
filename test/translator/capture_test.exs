@@ -22,7 +22,7 @@ defmodule ElixirScript.Translator.Capture.Test do
     end
 
     js_code = """
-     let [fun] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.variable(),Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],function(__1)    {
+     let [fun] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.variable(),Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],async function(__1)    {
              return Elixir.ElixirScript.Kernel.__load(Elixir).is_atom(__1);
            })));
     """
@@ -53,7 +53,7 @@ defmodule ElixirScript.Translator.Capture.Test do
     end
 
     js_code = """
-     let [fun] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.variable(),Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],function(__1)    {
+     let [fun] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.variable(),Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],async function(__1)    {
              return     __1 * 2;
            })));
     """
@@ -69,7 +69,7 @@ defmodule ElixirScript.Translator.Capture.Test do
     end
 
     js_code = """
-     let [fun] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.variable(),Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable(), Bootstrap.Core.Patterns.variable()],function(__1,__2)    {
+     let [fun] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.variable(),Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable(), Bootstrap.Core.Patterns.variable()],async function(__1,__2)    {
              return     new Bootstrap.Core.Tuple(__1,__2);
            })));
     """
@@ -81,7 +81,7 @@ defmodule ElixirScript.Translator.Capture.Test do
     end
 
     js_code = """
-     let [fun] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.variable(),Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable(), Bootstrap.Core.Patterns.variable(), Bootstrap.Core.Patterns.variable()],function(__1,__2,__3)    {
+     let [fun] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.variable(),Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable(), Bootstrap.Core.Patterns.variable(), Bootstrap.Core.Patterns.variable()],async function(__1,__2,__3)    {
              return     new Bootstrap.Core.Tuple(__1,__2,__3);
            })));
     """
@@ -103,7 +103,7 @@ defmodule ElixirScript.Translator.Capture.Test do
     end
 
     js_code = """
-     Elixir.ElixirScript.Enum.__load(Elixir).map(Object.freeze([]),Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],function(__1)    {
+     Elixir.ElixirScript.Enum.__load(Elixir).map(Object.freeze([]),Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],async function(__1)    {
              return     process(__1);
            })))
     """
@@ -121,7 +121,7 @@ defmodule ElixirScript.Translator.Capture.Test do
     end
 
     js_code = """
-     Elem.keypress(Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],function(__1)    {
+     Elem.keypress(Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],async function(__1)    {
              return     process_event(__1);
            })))
     """

@@ -11,10 +11,10 @@ defmodule ElixirScript.Translator.For.Test do
     Bootstrap.Core.SpecialForms._for(
       Bootstrap.Core.Patterns.clause(
         [Bootstrap.Core.Patterns.variable()],
-        function(n) {
+        async function(n) {
           return n * 2;
         },
-        function() {
+        async function() {
           return true;
         }
       ),
@@ -41,10 +41,10 @@ defmodule ElixirScript.Translator.For.Test do
     Bootstrap.Core.SpecialForms._for(
       Bootstrap.Core.Patterns.clause(
         [Bootstrap.Core.Patterns.variable()],
-        function(n) {
+        async function(n) {
           return n * 2;
         },
-        function() {
+        async function() {
           return true;
         }
       ),
@@ -71,10 +71,10 @@ defmodule ElixirScript.Translator.For.Test do
     Bootstrap.Core.SpecialForms._for(
       Bootstrap.Core.Patterns.clause(
         [Bootstrap.Core.Patterns.variable(), Bootstrap.Core.Patterns.variable()],
-        function(x, y) {
+        async function(x, y) {
           return x * y;
         },
-        function() {
+        async function() {
           return true;
         }
       ),
@@ -109,10 +109,10 @@ defmodule ElixirScript.Translator.For.Test do
       Bootstrap.Core.SpecialForms._for(
         Bootstrap.Core.Patterns.clause(
           [Bootstrap.Core.Patterns.variable(), Bootstrap.Core.Patterns.variable()],
-          function(x, y) {
+          async function(x, y) {
             return x * y;
           },
-          function() {
+          async function() {
             return true;
           }
         ),
@@ -144,10 +144,10 @@ defmodule ElixirScript.Translator.For.Test do
     Bootstrap.Core.SpecialForms._for(
       Bootstrap.Core.Patterns.clause(
         [Bootstrap.Core.Patterns.variable()],
-        function(n) {
+        async function(n) {
           return n;
         },
-        function(n) {
+        async function(n) {
           return n % 2 == 0;
         }
       ),
@@ -176,9 +176,9 @@ defmodule ElixirScript.Translator.For.Test do
     Bootstrap.Core.SpecialForms._for(
       Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.type(Bootstrap.Core.Tuple, {
             values: [Symbol.for('user'), Bootstrap.Core.Patterns.variable()]
-        })], function(name) {
+        })], async function(name) {
             return Elixir.ElixirScript.String.__load(Elixir).upcase(name);
-        }, function() {
+        }, async function() {
             return true;
         }),
         [
@@ -208,9 +208,9 @@ defmodule ElixirScript.Translator.For.Test do
          'value': Bootstrap.Core.Patterns.variable()
      }, 8), Bootstrap.Core.BitString.size({
          'value': Bootstrap.Core.Patterns.variable()
-     }, 8))], function(r, g, b) {
+     }, 8))], async function(r, g, b) {
          return new Bootstrap.Core.Tuple(r, g, b);
-     }, function() {
+     }, async function() {
          return true;
      }), [Bootstrap.Core.Patterns.bitstring_generator(Bootstrap.Core.Patterns.bitStringMatch(Bootstrap.Core.BitString.size({
          'value': Bootstrap.Core.Patterns.variable()

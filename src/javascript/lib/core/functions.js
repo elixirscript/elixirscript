@@ -1,19 +1,23 @@
 import Protocol from './protocol';
 import Core from '../core';
 
-function iterator_to_reducer(iterable, acc, fun) {
+async function iterator_to_reducer(iterable, acc, fun) {
   const iterator = iterable[Symbol.iterator]();
   let x = iterator.next();
   let _acc = acc;
 
   while (x.done === false) {
-    _acc = fun(x.value, _acc.get(1));
+    _acc = await fun(x.value, _acc.get(1));
     if (_acc.get(0) === Symbol.for('halt')) {
       return new Core.Tuple(Symbol.for('halted'), _acc.get(1));
     } else if (_acc.get(0) === Symbol.for('suspend')) {
-      return new Core.Tuple(Symbol.for('suspended'), _acc.get(1), new_acc => {
-        return iterator_to_reducer(iterator, new_acc, fun);
-      });
+      return new Core.Tuple(
+        Symbol.for('suspended'),
+        _acc.get(1),
+        async new_acc => {
+          return iterator_to_reducer(iterator, new_acc, fun);
+        },
+      );
     }
 
     x = iterator.next();
@@ -22,7 +26,7 @@ function iterator_to_reducer(iterable, acc, fun) {
   return new Core.Tuple(Symbol.for('done'), _acc.get(1));
 }
 
-function call_property(item, property) {
+async function call_property(item, property) {
   let prop = null;
 
   if (
@@ -49,6 +53,7 @@ function call_property(item, property) {
   if (item[prop] instanceof Function) {
     return item[prop]();
   }
+
   return item[prop];
 }
 

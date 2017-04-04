@@ -5,8 +5,10 @@ import SpecialForms from './core/special_forms';
 
 class Integer {}
 class Float {}
-Functions.get_global().__elixirscript_store__ = new Map();
-Functions.get_global().__elixirscript_names__ = new Map();
+const global = Functions.get_global();
+
+global.__elixirscript_store__ = new Map();
+global.__elixirscript_names__ = new Map();
 
 export default {
   Tuple: ErlangTypes.Tuple,
@@ -17,4 +19,5 @@ export default {
   Float,
   Functions,
   SpecialForms,
+  global,
 };

@@ -6,7 +6,7 @@ defmodule ElixirScript.Translator.Defdelegate.Test do
     ex_ast = quote do: defdelegate reverse(list), to: :lists
 
     js_code = """
-     const reverse = function(list) {
+     const reverse = async function(list) {
        return Elixir.ElixirScript.Bootstrap.Functions.__load(Elixir).reverse(list);
      };
     """
@@ -18,7 +18,7 @@ defmodule ElixirScript.Translator.Defdelegate.Test do
     ex_ast = quote do: defdelegate other_reverse(list), to: :lists, as: :reverse
 
     js_code = """
-     const other_reverse = function(list) {
+     const other_reverse = async function(list) {
        return Elixir.ElixirScript.Bootstrap.Functions.__load(Elixir).reverse(list);
      };
     """

@@ -65,7 +65,7 @@ defmodule ElixirScript.Translator.Function do
     JS.call_expression(
       JS.member_expression(
         @patterns,
-        JS.identifier("defmatch")
+        JS.identifier("defmatchAsync")
       ),
       clauses
     )
@@ -142,13 +142,13 @@ defmodule ElixirScript.Translator.Function do
                   nil ->
                     [
                       JS.array_expression(patterns),
-                      JS.function_expression(params, [], body, is_generator?)
+                      function_ast(params, body, [generator: is_generator?, async: !is_generator?])
                     ]
                   _ ->
                     [
                       JS.array_expression(patterns),
-                      JS.function_expression(params, [], body, is_generator?),
-                      JS.function_expression(params, [], guard_body)
+                      function_ast(params, body, [generator: is_generator?, async: !is_generator?]),
+                      function_ast(params, guard_body)
                     ]
                 end
 
@@ -167,7 +167,7 @@ defmodule ElixirScript.Translator.Function do
       nil ->
         {[], env}
       list when is_list(list) ->
-        t = Translator.translate!(list, env)
+        t = Translator.translate!(list, env) 
         {[t], env}
       {:__block__, _, list} ->
         Enum.map_reduce(list, env, fn(x, env) ->
@@ -180,6 +180,7 @@ defmodule ElixirScript.Translator.Function do
     end
 
     list = Group.inflate_groups(list)
+    |> Enum.map(&applyAwait(&1))
     |> return_last_expression
 
     {list, env}
@@ -250,5 +251,38 @@ defmodule ElixirScript.Translator.Function do
     else
       list ++ [last_item]
     end
+  end
+
+  def function_ast(params, body, opts \\ []) do
+    generator? = Keyword.get(opts, :generator, false)
+    async = Keyword.get(opts, :async, true)
+
+    JS.function_expression(params, [], body, generator?, false, async)
+  end
+
+  def applyAwait(%ESTree.CallExpression{callee: %ESTree.MemberExpression{object: %ESTree.CallExpression{}}} = ast) do
+    callee = %{ ast.callee | object: JS.sequence_expression([JS.await_expression(ast.callee.object)]) }
+    ast = %{ast | callee: callee} 
+    JS.await_expression(ast)
+  end
+
+  def applyAwait(%ESTree.CallExpression{} = ast) do
+    JS.await_expression(ast)
+  end
+
+  def applyAwait(%ESTree.UnaryExpression{argument: %ESTree.CallExpression{}} = ast) do
+    JS.await_expression(ast)
+  end
+
+  def applyAwait(%ESTree.BinaryExpression{left: %ESTree.CallExpression{}} = ast) do
+    JS.await_expression(ast)
+  end
+
+  def applyAwait(%ESTree.BinaryExpression{right: %ESTree.CallExpression{}} = ast) do
+    JS.await_expression(ast)
+  end
+
+  def applyAwait(ast) do
+    ast
   end
 end

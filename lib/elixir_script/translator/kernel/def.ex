@@ -21,7 +21,8 @@ defmodule  ElixirScript.Translator.Def do
     to = options[:to]
     as = options[:as] || name
 
-    function = JS.function_expression(translated_params, [],
+    function = Function.function_ast(
+      translated_params,
       JS.block_statement([
         JS.return_statement(
           Translator.translate!({{:., [], [to, as]}, [], params}, env)

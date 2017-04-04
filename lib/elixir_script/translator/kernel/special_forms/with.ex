@@ -11,7 +11,7 @@ defmodule ElixirScript.Translator.With do
       {symbol, _, [pattern, expr] }, state when symbol in [:<-, :=] ->
         {body , _} = Function.prepare_function_body(expr, env)
         translated_body = JS.block_statement(body)
-        expr_function = JS.function_expression(state.arguments, [], translated_body)
+        expr_function = Function.function_ast(state.arguments, translated_body)
 
         { patterns, params, _ } = PatternMatching.process_match([pattern], env)
 
@@ -47,6 +47,6 @@ defmodule ElixirScript.Translator.With do
   defp process_do_block(expr, arguments, env) do
     {body , _} = Function.prepare_function_body(expr, env)
     translated_body = JS.block_statement(body)
-    JS.function_expression(arguments, [], translated_body)
+    Function.function_ast(arguments, translated_body)
   end
 end

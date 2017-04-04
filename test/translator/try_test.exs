@@ -13,9 +13,9 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-    Bootstrap.Core.SpecialForms._try(function() {
+    Bootstrap.Core.SpecialForms._try(async function() {
         return 1;
-    }, Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.type(ArgumentError, {})], function() {
+    }, Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.type(ArgumentError, {})], async function() {
     return Elixir.ElixirScript.IO.__load(Elixir).puts('Invalid argument given');
     })), null, null, null)
     """
@@ -35,9 +35,9 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-    Bootstrap.Core.SpecialForms._try(function() {
+    Bootstrap.Core.SpecialForms._try(async function() {
         return 1;
-    }, Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.type(ArgumentError, {})], function() {
+    }, Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.type(ArgumentError, {})], async function() {
     return Elixir.ElixirScript.IO.__load(Elixir).puts('Invalid argument given');
     })), null, null, null)
     """
@@ -57,11 +57,11 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-         Bootstrap.Core.SpecialForms._try(function()    {
+         Bootstrap.Core.SpecialForms._try(async function()    {
              return     1;
-           },Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],function(x)    {
+           },Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],async function(x)    {
            return     Elixir.ElixirScript.IO.__load(Elixir).puts('Invalid argument given');
-           },function(x)    {
+           },async function(x)    {
            return     Elixir.ElixirScript.Bootstrap.Functions.__load(Elixir).contains(x,Object.freeze([ArgumentError.create(Object.freeze({}))]));
            })),null,null,null)
     """
@@ -81,9 +81,9 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-     Bootstrap.Core.SpecialForms._try(function()    {
+     Bootstrap.Core.SpecialForms._try(async function()    {
              return     1;
-           },Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],function(x)    {
+           },Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],async function(x)    {
            return     Elixir.ElixirScript.IO.__load(Elixir).puts('Invalid argument given');
            })),null,null,null)
     """
@@ -106,11 +106,11 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-    Bootstrap.Core.SpecialForms._try(function() {
+    Bootstrap.Core.SpecialForms._try(async function() {
         return 1;
-    }, Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.type(ArgumentError, {})], function() {
+    }, Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.type(ArgumentError, {})], async function() {
     return Elixir.ElixirScript.IO.__load(Elixir).puts('ArgumentError');
-    }), Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()], function(x) {
+    }), Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()], async function(x) {
     return Elixir.ElixirScript.IO.__load(Elixir).puts('x');
     })), null, null, null)
     """
@@ -132,11 +132,11 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-    Bootstrap.Core.SpecialForms._try(function() {
+    Bootstrap.Core.SpecialForms._try(async function() {
         return 1;
-    }, Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.type(ArgumentError, {})], function() {
+    }, Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.type(ArgumentError, {})], async function() {
     return Elixir.ElixirScript.IO.__load(Elixir).puts('Invalid argument given');
-    })), null, null, function() {
+    })), null, null, async function() {
     return Elixir.ElixirScript.IO.__load(Elixir).puts('This is printed regardless if it failed or succeed');
     })
     """
@@ -155,9 +155,9 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-     Bootstrap.Core.SpecialForms._try(function()    {
+     Bootstrap.Core.SpecialForms._try(async function()    {
              return     1;
-           },null,null,null,function()    {
+           },null,null,null,async function()    {
            return     Elixir.ElixirScript.IO.__load(Elixir).puts('This is printed regardless if it failed or succeed');
            })
     """
@@ -179,13 +179,13 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-    Bootstrap.Core.SpecialForms._try(function() {
+    Bootstrap.Core.SpecialForms._try(async function() {
       return 1 / x;
-    }, null, null, Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()], function(y) {
+    }, null, null, Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()], async function(y) {
       return Symbol.for('small');
-    }, function(y) {
+    }, async function(y) {
       return y < 1 && y > -1;
-    }), Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()], function(__ignored__) {
+    }), Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()], async function(__ignored__) {
       return Symbol.for('large');
     })), null)
     """
@@ -207,11 +207,11 @@ defmodule ElixirScript.Translator.Try.Test do
     end
 
     js_code = """
-    Bootstrap.Core.SpecialForms._try(function() {
+    Bootstrap.Core.SpecialForms._try(async function() {
         return 1;
-    }, Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.type(ArgumentError, {})], function() {
+    }, Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.type(ArgumentError, {})], async function() {
     return Elixir.ElixirScript.IO.__load(Elixir).puts('Invalid argument given');
-    })), Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Symbol.for('throw'), Symbol.for('Error')], function() {
+    })), Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Symbol.for('throw'), Symbol.for('Error')], async function() {
     return Elixir.ElixirScript.IO.__load(Elixir).puts('caught error');
     })), null, null)
     """

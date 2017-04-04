@@ -23,7 +23,7 @@ defmodule ElixirScript.Translator.Cond do
       { translated_body, env } = Function.prepare_function_body(clause_body, env)
 
       translated_body = JS.block_statement(translated_body)
-      function = JS.function_expression([], [], translated_body)
+      function = Function.function_ast([], translated_body)
       translated_clause = Translator.translate!(hd(clause), env)
 
 

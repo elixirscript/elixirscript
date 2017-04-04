@@ -23,12 +23,9 @@ defmodule ElixirScript.Translator.JS do
     Builder.member_expression(
       Builder.member_expression(
         Builder.identifier("Bootstrap"),
-        Builder.member_expression(
-          Builder.identifier("Core"),
-          Builder.identifier("Functions")
-        )
+        Builder.identifier("Core")
       ),
-      Builder.identifier("get_global")
+      Builder.identifier("global")
     )
   end
 
@@ -191,7 +188,7 @@ defmodule ElixirScript.Translator.JS do
     Builder.call_expression(
       call_property(),
       [
-        Builder.call_expression(global(), []),
+        global(),
         Translator.translate!(to_string(function), env)
       ]
     )
@@ -200,7 +197,7 @@ defmodule ElixirScript.Translator.JS do
   defp do_translate({function, _, params}, env) do
     Builder.call_expression(
       Builder.member_expression(
-        Builder.call_expression(global(), []),
+        global(),
         Builder.identifier(function)
       ),
       Enum.map(params, &Translator.translate!(&1, env))
@@ -214,7 +211,7 @@ defmodule ElixirScript.Translator.JS do
       call_property(),
       [
         Builder.member_expression(
-          Builder.call_expression(global(), []),
+          global(),
           members
         ),
         Translator.translate!(to_string(function), env)
@@ -228,7 +225,7 @@ defmodule ElixirScript.Translator.JS do
     Builder.call_expression(
       Builder.member_expression(
         Builder.member_expression(
-          Builder.call_expression(global(), []),
+          global(),
           members
         ),
         Builder.identifier(function)

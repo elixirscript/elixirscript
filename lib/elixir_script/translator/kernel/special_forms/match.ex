@@ -3,7 +3,7 @@ defmodule ElixirScript.Translator.Match do
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
   alias ElixirScript.Translator.PatternMatching
-  alias ElixirScript.Translator.Primitive
+  alias ElixirScript.Translator.{Primitive, Function}
 
   def make_match(left, right, env) do
     { right_ast, env } = Translator.translate(right, env)
@@ -23,7 +23,7 @@ defmodule ElixirScript.Translator.Match do
             ),
             JS.identifier("match")
           ),
-          [hd(patterns), right_ast]
+          [hd(patterns), Function.applyAwait(right_ast)]
         )
       )
 

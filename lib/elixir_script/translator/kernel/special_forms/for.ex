@@ -15,7 +15,7 @@ defmodule ElixirScript.Translator.For do
     generators = JS.array_expression(args.generators)
 
     into = args.into || Primitive.make_list_no_translate([])
-    filter = args.filter || JS.function_expression([], [], JS.block_statement([JS.return_statement(JS.identifier("true"))]))
+    filter = args.filter || Function.function_ast([], JS.block_statement([JS.return_statement(JS.identifier("true"))]))
     fun = args.fun
 
     members = ["Elixir"] ++ Module.split(ElixirScript.Collectable) ++ ["__load"]
@@ -121,9 +121,8 @@ defmodule ElixirScript.Translator.For do
   defp create_function_expression(ast, env, state) do
     {ast, _} = Function.make_function_body(ast, env)
 
-    JS.function_expression(
+   Function.function_ast(
       state.args,
-      [],
       ast
     )
   end

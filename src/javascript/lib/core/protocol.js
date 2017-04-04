@@ -7,7 +7,7 @@ class Protocol {
     this.fallback = null;
 
     function createFun(funName) {
-      return function(...args) {
+      return async function(...args) {
         const thing = args[0];
         let fun = null;
 
@@ -30,8 +30,7 @@ class Protocol {
         }
 
         if (fun != null) {
-          const retval = fun.apply(this, args);
-          return retval;
+          return fun.apply(this, args);
         }
 
         throw new Error(`No implementation found for ${thing}`);

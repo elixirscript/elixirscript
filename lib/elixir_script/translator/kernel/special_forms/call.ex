@@ -4,6 +4,7 @@ defmodule ElixirScript.Translator.Call do
   alias ElixirScript.Translator
   alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.Identifier
+  alias ElixirScript.Translator.Function
 
   def make_module_name(module_name, env) do
     members = ["Elixir"] ++ Module.split(module_name)
@@ -18,7 +19,7 @@ defmodule ElixirScript.Translator.Call do
   def make_local_function_call({fun, _, nil}, params, env) do
     ast = JS.call_expression(
       Identifier.make_identifier(fun),
-      Enum.map(params, &Translator.translate!(&1, env))
+      Enum.map(params, fn(x) -> Translator.translate!(x, env) |> Function.applyAwait end)
      )
 
     {ast, env}
@@ -27,7 +28,7 @@ defmodule ElixirScript.Translator.Call do
   def make_local_function_call(function_name, params, env) do
     ast = JS.call_expression(
       Identifier.make_identifier(function_name),
-      Enum.map(params, &Translator.translate!(&1, env))
+      Enum.map(params, fn(x) -> Translator.translate!(x, env) |> Function.applyAwait end)
      )
 
     {ast, env}
@@ -46,7 +47,7 @@ defmodule ElixirScript.Translator.Call do
         ),
         Identifier.make_identifier(function_name)
       ),
-      Enum.map(params, &Translator.translate!(&1, env))
+      Enum.map(params, fn(x) -> Translator.translate!(x, env) |> Function.applyAwait end)
      )
 
     {ast, env}
@@ -61,7 +62,7 @@ defmodule ElixirScript.Translator.Call do
     members = Module.split(module_name)
     Identifier.make_namespace_members(members)
 
-    js_ast = JS.call_expression(
+    js_ast = JS.expression_statement(JS.call_expression(
       JS.member_expression(
         JS.member_expression(
           JS.identifier("Bootstrap"),
@@ -76,7 +77,7 @@ defmodule ElixirScript.Translator.Call do
         Identifier.make_namespace_members(members),
         Translator.translate!(to_string(function_name), env)
       ]
-    )
+    ))
 
     {js_ast, env}
   end
@@ -86,7 +87,7 @@ defmodule ElixirScript.Translator.Call do
 
     ast = JS.call_expression(
       Identifier.make_namespace_members(members),
-      Enum.map(params, &Translator.translate!(&1, env))
+      Enum.map(params, fn(x) -> Translator.translate!(x, env) |> Function.applyAwait end)
      )
 
     {ast, env}
@@ -140,7 +141,7 @@ defmodule ElixirScript.Translator.Call do
         Identifier.make_identifier(module_name),
         Identifier.make_identifier(function_name)
        ),
-       Enum.map(params, &Translator.translate!(&1, env))
+       Enum.map(params, fn(x) -> Translator.translate!(x, env) |> Function.applyAwait end)
     )
 
     {js_ast, env}
@@ -173,7 +174,7 @@ defmodule ElixirScript.Translator.Call do
         Translator.translate!(module_name, env),
         Identifier.make_identifier(function_name)
        ),
-       Enum.map(params, &Translator.translate!(&1, env))
+       Enum.map(params, fn(x) -> Translator.translate!(x, env) |> Function.applyAwait end)
     )
 
     {js_ast, env}
@@ -206,7 +207,7 @@ defmodule ElixirScript.Translator.Call do
         Translator.translate!(module_name, env),
         Identifier.make_identifier(function_name)
       ),
-      Enum.map(params, &Translator.translate!(&1, env))
+      Enum.map(params, fn(x) -> Translator.translate!(x, env) |> Function.applyAwait end)
     )
 
     { call, env }

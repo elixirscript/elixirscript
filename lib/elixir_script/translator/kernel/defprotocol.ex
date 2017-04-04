@@ -7,6 +7,7 @@ defmodule ElixirScript.Translator.Defprotocol do
   alias ElixirScript.Translator.Utils
   alias ElixirScript.Translator.State
   alias ElixirScript.Translator.Identifier
+  alias ElixirScript.Translator.Function
   require Logger
 
   @doc """
@@ -87,7 +88,7 @@ defmodule ElixirScript.Translator.Defprotocol do
 
   defp process_spec_functions(functions) do
     Enum.map(Keyword.keys(functions), fn(function_name) ->
-      {function_name, JS.function_expression([], [], JS.block_statement([]))}
+      {function_name, Function.function_ast([], JS.block_statement([]))}
     end)
   end
 end
