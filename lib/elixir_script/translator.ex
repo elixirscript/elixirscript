@@ -646,7 +646,7 @@ defmodule ElixirScript.Translator do
 
           { Identifier.make_identifier(name), env }
         has_function?(env.module, {name, 0}, env) ->
-          Call.make_function_call(name, [], env)
+          Call.make_local_function_call(name, [], env)
         ElixirScript.Translator.LexicalScope.find_module(env, {name, 0}) ->
           imported_module_name = ElixirScript.Translator.LexicalScope.find_module(env, {name, 0})
           Call.make_module_function_call(imported_module_name, name, params, env)

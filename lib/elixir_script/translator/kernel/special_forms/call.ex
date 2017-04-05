@@ -105,7 +105,7 @@ defmodule ElixirScript.Translator.Call do
         JS.identifier("call_property")
       ),
       [
-        Translator.translate!(module_name),
+        Translator.translate!(module_name, env),
         Translator.translate!(to_string(function_name), env)
       ]
     )
