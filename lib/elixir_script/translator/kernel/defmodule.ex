@@ -51,7 +51,11 @@ defmodule ElixirScript.Translator.Defmodule do
 
     { exported_functions, private_functions } = process_functions(functions, env)
 
-    {structs, body} = extract_structs_from_body(body, env)
+    struct_prop = if has_struct?(body) do
+      [JS.property(Identifier.make_identifier("__struct__"), Identifier.make_identifier("__struct__"), :init, true)]
+    else
+      []
+    end
 
     body = Enum.map(body, fn(x) ->
       case x do
@@ -65,7 +69,7 @@ defmodule ElixirScript.Translator.Defmodule do
     body = Group.inflate_groups(body)
 
     exported_object = JS.object_expression(
-      make_defstruct_property(module, structs) ++
+      struct_prop ++
       Enum.map(exported_functions, fn({key, _value}) ->
         JS.property(Identifier.make_identifier(key), Identifier.make_identifier(key), :init, true)
       end)
@@ -74,7 +78,7 @@ defmodule ElixirScript.Translator.Defmodule do
     exported_functions = Enum.map(exported_functions, fn({_key, value}) -> value end)
     private_functions = Enum.map(private_functions, fn({_key, value}) -> value end)
 
-    body = structs ++ private_functions ++ exported_functions ++ body
+    body = private_functions ++ exported_functions ++ body
     {body, exported_object}
   end
 
@@ -161,17 +165,17 @@ defmodule ElixirScript.Translator.Defmodule do
     end)
   end
 
-  def extract_structs_from_body(body, env) do
-    module_js_name = Utils.name_to_js_name(env.module)
-
-    Enum.partition(body, fn(x) ->
+  def has_struct?(body) do
+    val = Enum.find(body, fn(x) ->
       case x do
-        %ESTree.VariableDeclaration{declarations: [%ESTree.VariableDeclarator{id: %ESTree.Identifier{name: ^module_js_name} } ] } ->
+        %ESTree.VariableDeclaration{declarations: [%ESTree.VariableDeclarator{id: %ESTree.Identifier{name: "__struct__"} } ] } ->
           true
         _ ->
           false
       end
     end)
+
+    val != nil
   end
 
   defp make_defstruct_property(_, []) do

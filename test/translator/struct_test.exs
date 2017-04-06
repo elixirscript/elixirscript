@@ -10,11 +10,25 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-        const Elixir$User = Bootstrap.Core.Functions.defstruct({
-          [Symbol.for('__struct__')]: Symbol.for('Elixir.User'),
-          [Symbol.for('name')]: 'john',
-          [Symbol.for('age')]: 27
-        });
+    const __struct__ = function(values = {}) {
+        const allowed_keys = [Symbol.for('name'), Symbol.for('age')]
+
+        const value_keys = Object.keys(values)
+
+        const every_call_result = value_keys.every(function(key) {
+            return allowed_keys.includes(key);
+        })
+
+        if (every_call_result) {
+            return Object.assign({}, {
+                [Symbol.for('__struct__')]: Symbol.for('Elixir.User'),
+                [Symbol.for('name')]: 'john',
+                [Symbol.for('age')]: 27
+            }, values);
+        } else {
+            throw 'Unallowed key found';
+        }
+    };
     """
 
     assert_translation(ex_ast, js_code)
@@ -29,11 +43,25 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-    const Elixir$User = Bootstrap.Core.Functions.defstruct({
-      [Symbol.for('__struct__')]: Symbol.for('Elixir.User'),
-      [Symbol.for('name')]: null,
-      [Symbol.for('age')]: null
-    });
+    const __struct__ = function(values = {}) {
+        const allowed_keys = [Symbol.for('name'), Symbol.for('age')]
+
+        const value_keys = Object.keys(values)
+
+        const every_call_result = value_keys.every(function(key) {
+            return allowed_keys.includes(key);
+        })
+
+        if (every_call_result) {
+            return Object.assign({}, {
+                [Symbol.for('__struct__')]: Symbol.for('Elixir.User'),
+                [Symbol.for('name')]: null,
+                [Symbol.for('age')]: null
+            }, values);
+        } else {
+            throw 'Unallowed key found';
+        }
+    };
     """
 
     assert_translation(ex_ast, js_code)
@@ -50,11 +78,7 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-    const Elixir$User = Bootstrap.Core.Functions.defstruct({
-        [Symbol.for('__struct__')]: Symbol.for('Elixir.User'),
-        [Symbol.for('name')]: null,
-        [Symbol.for('age')]: null
-    });
+    Elixir.User.__load(Elixir).__struct__(Object.freeze({})
     """
 
     assert_translation(ex_ast, js_code)
@@ -68,12 +92,7 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-    const Elixir$User = Bootstrap.Core.Functions.defstruct({
-      [Symbol.for('__struct__')]: Symbol.for('Elixir.User'),
-      [Symbol.for('name')]: null,
-      [Symbol.for('age')]: null
-    });
-
+    Elixir.User.__load(Elixir).__struct__(Object.freeze({[Symbol.for('name')]: 'John'})
     """
 
     assert_translation(ex_ast, js_code)
@@ -86,9 +105,9 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-         let [user] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.variable(),Bootstrap.Core.SpecialForms.map_update(map,Object.freeze({
-             [Symbol.for('key')]: 1
-       })));
+    let [user] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.variable(), Object.freeze(Object.assign({}, map, Object.freeze({
+        [Symbol.for('key')]: 1
+    }))));
     """
 
     assert_translation(ex_ast, js_code)
@@ -100,9 +119,10 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-    let [user] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.variable(),Bootstrap.Core.SpecialForms.map_update(map,Object.freeze({
-      [Symbol.for('key')]: 1,     [Symbol.for('key1')]: 11
-    })));
+    let [user] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.variable(), Object.freeze(Object.assign({}, map, Object.freeze({
+        [Symbol.for('key')]: 1,
+        [Symbol.for('key1')]: 11
+    }))));
     """
 
     assert_translation(ex_ast, js_code)
@@ -116,11 +136,25 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-     const Elixir$MyAppError = Bootstrap.Core.Functions.defexception({
-          [Symbol.for('__struct__')]: Symbol.for('Elixir.MyAppError'),
-          [Symbol.for('__exception__')]: true,
-          [Symbol.for('message')]: 'This is a message'
-     });
+    const __struct__ = function(values = {}) {
+        const allowed_keys = [Symbol.for('message'), Symbol.for('__exception__')]
+
+        const value_keys = Object.keys(values)
+
+        const every_call_result = value_keys.every(function(key) {
+            return allowed_keys.includes(key);
+        })
+
+        if (every_call_result) {
+            return Object.assign({}, {
+                [Symbol.for('__struct__')]: Symbol.for('Elixir.MyAppError'),
+                [Symbol.for('message')]: 'This is a message',
+                [Symbol.for('__exception__')]: true
+            }, values);
+        } else {
+            throw 'Unallowed key found';
+        }
+    };
      """
 
     assert_translation(ex_ast, js_code)
@@ -132,11 +166,25 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-      const Elixir$MyAppError = Bootstrap.Core.Functions.defexception({
-             [Symbol.for('__struct__')]: Symbol.for('Elixir.MyAppError'),
-             [Symbol.for('__exception__')]: true,
-             [Symbol.for('message')]: null
-      });
+    const __struct__ = function(values = {}) {
+        const allowed_keys = [Symbol.for('message'), Symbol.for('__exception__')]
+
+        const value_keys = Object.keys(values)
+
+        const every_call_result = value_keys.every(function(key) {
+            return allowed_keys.includes(key);
+        })
+
+        if (every_call_result) {
+            return Object.assign({}, {
+                [Symbol.for('__struct__')]: Symbol.for('Elixir.MyAppError'),
+                [Symbol.for('message')]: null,
+                [Symbol.for('__exception__')]: true
+            }, values);
+        } else {
+            throw 'Unallowed key found';
+        }
+    };
     """
 
     assert_translation(ex_ast, js_code)

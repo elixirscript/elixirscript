@@ -219,7 +219,13 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:%, _, [alias_info, data]}, env) do
-    { Struct.new_struct(alias_info, data, env), env }
+    module = case create_module_name(alias_info, env) do
+        {module, _} ->
+          module
+        module ->
+          module
+      end
+    Call.make_module_function_call(module, :__struct__, [data], env)
   end
 
   defp do_translate({:%{}, _, [{:|, _, [map, data]}]}, env) do
@@ -541,12 +547,12 @@ defmodule ElixirScript.Translator do
     Def.process_delegate(name, params, options, env)
   end
 
-  defp do_translate({:defstruct, _, attributes}, env) do
-    { Struct.make_defstruct(attributes, env), env }
+  defp do_translate({:defstruct, _, [attributes]}, env) do
+    { Struct.make_struct(attributes, env), env }
   end
 
-  defp do_translate({:defexception, _, attributes}, env) do
-    { Struct.make_defexception(attributes, env), env }
+  defp do_translate({:defexception, _, [attributes]}, env) do
+    { Struct.make_struct(attributes ++ [__exception__: true], env), env }
   end
 
   defp do_translate({:defmodule, _, [{:__aliases__, _, module_name_list}, [do: body]]}, env) do

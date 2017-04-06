@@ -68,9 +68,24 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
-    const Elixir$Animals$Elephant = Bootstrap.Core.Functions.defstruct({
-        [Symbol.for('__struct__')]: Symbol.for('Elixir.Animals.Elephant'),     [Symbol.for('trunk')]: true
-    });
+    const __struct__ = function(values = {}) {
+        const allowed_keys = [Symbol.for('trunk')]
+
+        const value_keys = Object.keys(values)
+
+        const every_call_result = value_keys.every(function(key) {
+            return allowed_keys.includes(key);
+        })
+
+        if (every_call_result) {
+            return Object.assign({}, {
+                [Symbol.for('__struct__')]: Symbol.for('Elixir.Animals.Elephant'),
+                [Symbol.for('trunk')]: true
+            }, values);
+        } else {
+            throw 'Unallowed key found';
+        }
+    };
     """
 
     assert_translation(ex_ast, js_code)
@@ -101,10 +116,24 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
-    const Elixir$Animals$Elephant$Bear = Bootstrap.Core.Functions.defstruct({
-        [Symbol.for('__struct__')]: Symbol.for('Elixir.Animals.Elephant.Bear'),
-        [Symbol.for('trunk')]: true
-  });
+         const __struct__ = function(values = {}) {
+                 const allowed_keys = [Symbol.for('trunk')]
+
+                 const value_keys = Object.keys(values)
+
+                 const every_call_result = value_keys.every(function(key) {
+                     return allowed_keys.includes(key);
+                 })
+
+                 if (every_call_result) {
+                     return Object.assign({}, {
+                         [Symbol.for('__struct__')]: Symbol.for('Elixir.Animals.Elephant.Bear'),
+                         [Symbol.for('trunk')]: true
+                     }, values);
+                 } else {
+                     throw 'Unallowed key found';
+                 }
+             };
     """
 
     assert_translation(ex_ast, js_code)
