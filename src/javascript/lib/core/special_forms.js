@@ -144,7 +144,6 @@ function _with(...args) {
 export default {
   _case,
   cond,
-  map_update,
   _for,
   _try,
   _with,
