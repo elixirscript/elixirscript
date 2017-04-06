@@ -64,42 +64,6 @@ function get_global() {
   throw new Error('No global state found');
 }
 
-function defstruct(defaults) {
-  return class {
-    constructor(update = {}) {
-      const the_values = Object.assign(defaults, update);
-      Object.assign(this, the_values);
-    }
-
-    static create(updates = {}) {
-      const x = new this(updates);
-      return Object.freeze(x);
-    }
-  };
-}
-
-function defexception(defaults) {
-  return class extends Error {
-    constructor(update = {}) {
-      const message = update.message || '';
-      super(message);
-
-      const the_values = Object.assign(defaults, update);
-      Object.assign(this, the_values);
-
-      this.name = this.constructor.name;
-      this.message = message;
-      this[Symbol.for('__exception__')] = true;
-      Error.captureStackTrace(this, this.constructor.name);
-    }
-
-    static create(updates = {}) {
-      const x = new this(updates);
-      return Object.freeze(x);
-    }
-  };
-}
-
 function defprotocol(spec) {
   return new Protocol(spec);
 }
@@ -134,8 +98,6 @@ function build_namespace(ns, ns_string) {
 export default {
   call_property,
   get_global,
-  defstruct,
-  defexception,
   defprotocol,
   defimpl,
   build_namespace,
