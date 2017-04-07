@@ -124,10 +124,14 @@ defmodule ElixirScript.Translator.Defimpl do
 
 
   defp map_to_js({:__aliases__, _, _} = module, env) do
-    ElixirScript.Translator.Struct.get_struct_class(
-      module,
-      env
-    )
+    module = case ElixirScript.Translator.create_module_name(module, env) do
+        {module, _} ->
+          module
+        module ->
+          module
+      end
+
+    ElixirScript.Translator.translate!(module)
   end
 
 end

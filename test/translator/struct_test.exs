@@ -204,7 +204,7 @@ defmodule ElixirScript.Translator.Struct.Test do
     end
 
     js_code = """
-    throw Elixir.MyAppError.__load(Elixir).Elixir$MyAppError.create(Object.freeze({
+    throw Elixir.MyAppError.__load(Elixir).__struct__(Object.freeze({
     [Symbol.for('message')]: 'did not get what was expected'
     }));
     """

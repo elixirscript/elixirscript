@@ -47,6 +47,7 @@ defmodule ElixirScript.Translator.State do
     |> Map.put(Process, ElixirScript.Process)
     |> Map.put(Regex, ElixirScript.Regex)
     |> Map.put(IO, ElixirScript.IO)
+    |> Map.put(ArgumentError, ElixirScript.ArgumentError)
   end
 
   def set_module_data(pid, module_data) do

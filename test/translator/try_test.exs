@@ -16,7 +16,7 @@ defmodule ElixirScript.Translator.Try.Test do
          Bootstrap.Core.SpecialForms._try(function() {
              return 1;
          }, Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([{
-             [Symbol.for('__struct__')]: Symbol.for('Elixir.ArgumentError')
+             [Symbol.for('__struct__')]: Symbol.for('Elixir.ElixirScript.ArgumentError')
          }], function() {
              return Elixir.ElixirScript.IO.__load(Elixir).puts('Invalid argument given');
          })), null, null, null)
@@ -40,7 +40,7 @@ defmodule ElixirScript.Translator.Try.Test do
          Bootstrap.Core.SpecialForms._try(function() {
              return 1;
          }, Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([{
-             [Symbol.for('__struct__')]: Symbol.for('Elixir.ArgumentError')
+             [Symbol.for('__struct__')]: Symbol.for('Elixir.ElixirScript.ArgumentError')
          }], function() {
              return Elixir.ElixirScript.IO.__load(Elixir).puts('Invalid argument given');
          })), null, null, null)
@@ -66,7 +66,7 @@ defmodule ElixirScript.Translator.Try.Test do
            },Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],function(x)    {
            return     Elixir.ElixirScript.IO.__load(Elixir).puts('Invalid argument given');
            },function(x)    {
-           return Elixir.ElixirScript.Bootstrap.Functions.__load(Elixir).contains(x, Object.freeze([Elixir.ArgumentError.__load(Elixir).__struct__(Object.freeze({}))]));
+           return Elixir.ElixirScript.Bootstrap.Functions.__load(Elixir).contains(x, Object.freeze([Elixir.ElixirScript.ArgumentError.__load(Elixir).__struct__(Object.freeze({}))]));
            })),null,null,null)
     """
 
@@ -113,7 +113,7 @@ defmodule ElixirScript.Translator.Try.Test do
          Bootstrap.Core.SpecialForms._try(function() {
              return 1;
          }, Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([{
-             [Symbol.for('__struct__')]: Symbol.for('Elixir.ArgumentError')
+             [Symbol.for('__struct__')]: Symbol.for('Elixir.ElixirScript.ArgumentError')
          }], function() {
              return Elixir.ElixirScript.IO.__load(Elixir).puts('ArgumentError');
          }), Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()], function(x) {
@@ -141,7 +141,7 @@ defmodule ElixirScript.Translator.Try.Test do
          Bootstrap.Core.SpecialForms._try(function() {
              return 1;
          }, Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([{
-             [Symbol.for('__struct__')]: Symbol.for('Elixir.ArgumentError')
+             [Symbol.for('__struct__')]: Symbol.for('Elixir.ElixirScript.ArgumentError')
          }], function() {
              return Elixir.ElixirScript.IO.__load(Elixir).puts('Invalid argument given');
          })), null, null, function() {
@@ -218,7 +218,7 @@ defmodule ElixirScript.Translator.Try.Test do
          Bootstrap.Core.SpecialForms._try(function() {
              return 1;
          }, Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([{
-             [Symbol.for('__struct__')]: Symbol.for('Elixir.ArgumentError')
+             [Symbol.for('__struct__')]: Symbol.for('Elixir.ElixirScript.ArgumentError')
          }], function() {
              return Elixir.ElixirScript.IO.__load(Elixir).puts('Invalid argument given');
          })), Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Symbol.for('throw'), Symbol.for('Error')], function() {
