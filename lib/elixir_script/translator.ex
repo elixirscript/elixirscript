@@ -621,6 +621,21 @@ defmodule ElixirScript.Translator do
     { js_ast, env }
   end
 
+  defp do_translate({:raise, _, [{:__aliases__, _, _} = alias_info]}, env) do
+    module = case create_module_name(alias_info, env) do
+        {module, _} ->
+          module
+        module ->
+          module
+      end
+
+    {call, _} = Call.make_module_function_call(module, :__struct__, [], env)
+
+    js_ast = JS.throw_statement(call)
+
+    { js_ast, env }
+  end
+
   defp do_translate({:raise, _, [message]}, env) do
     js_ast = JS.throw_statement(
       JS.object_expression(

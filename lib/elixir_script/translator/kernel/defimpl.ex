@@ -131,7 +131,7 @@ defmodule ElixirScript.Translator.Defimpl do
           module
       end
 
-    ElixirScript.Translator.translate!(module)
+    ElixirScript.Translator.translate!(module, env)
   end
 
 end

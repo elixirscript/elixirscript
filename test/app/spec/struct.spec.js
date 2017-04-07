@@ -21,4 +21,16 @@ describe('Struct', () => {
 
     expect(struct[Symbol.for('first')]).to.eql('John');
   });
+
+  it('Protocol', () => {
+    const User = Elixir.load(Elixir.User);
+    const StringChars = Elixir.load(Elixir.ElixirScript.String.Chars);
+
+    const struct = User.__struct__({
+      [Symbol.for('first')]: 'John',
+      [Symbol.for('last')]: 'Doe',
+    });
+
+    expect(StringChars.to_string(struct)).to.eql('JohnDoe');
+  });
 });

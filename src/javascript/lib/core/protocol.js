@@ -61,7 +61,7 @@ class Protocol {
     ) {
       return this.registry.has(thing);
     } else if (thing[Symbol.for('__struct__')]) {
-      return this.registry.has(Symbol.for('__struct__'));
+      return this.registry.has(thing[Symbol.for('__struct__')]);
     }
 
     return this.registry.has(thing.constructor);
