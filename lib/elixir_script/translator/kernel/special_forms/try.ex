@@ -62,10 +62,10 @@ defmodule ElixirScript.Translator.Try do
     { func, _ } = Enum.map(rescue_block, fn(x) ->
       case x do
         {:->, _, [[{value, _, module}], block]} when not is_list(module) ->
-          {:->, [], [[{value, [], convert_to_struct(module)}], block]}
+          {:->, [], [[{value, [], convert_to_struct(module, env)}], block]}
         {:->, _, [[{:in, meta, [value, error_names]}], block]} ->
           error_names = Enum.map(error_names, fn(x) ->
-            convert_to_struct(x)
+            convert_to_struct(x, env)
           end)
 
           guards = {:in, meta, [value, error_names]}
@@ -73,7 +73,7 @@ defmodule ElixirScript.Translator.Try do
           {:->, [], [ [{:when, [], [value | [guards]]}], block ]}
         {:->, _, [error_names, block]} ->
           Enum.map(error_names, fn(x) ->
-            {:->, [], [[convert_to_struct(x)], block]}
+            {:->, [], [[convert_to_struct(x, env)], block]}
           end)
       end
     end)
@@ -97,13 +97,16 @@ defmodule ElixirScript.Translator.Try do
     JS.function_expression([], [], translated_body)
   end
 
-  defp convert_to_struct([module]) do
-    convert_to_struct(module)
+  defp convert_to_struct([module], env) do
+    convert_to_struct(module, env)
   end
 
-  defp convert_to_struct(module) do
+  defp convert_to_struct(module, env) do
     case module do
-      {:__aliases__, _, _}  = alias_ast->
+      {:__aliases__, _, _}  = alias_ast ->
+        alias_ast = ElixirScript.Translator.State.get_module_name(env.state, alias_ast)
+        |> ElixirScript.Translator.Utils.name_to_quoted
+
         {:%, [], [alias_ast, {:%{}, [], []}]}
       ast ->
         ast

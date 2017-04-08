@@ -22,31 +22,16 @@ defmodule ElixirScript.Translator.State do
   end
 
   defp build_standard_lib_map() do
-    Map.new
-    |> Map.put(Kernel, ElixirScript.Kernel)
-    |> Map.put(Tuple, ElixirScript.Tuple)
-    |> Map.put(Atom, ElixirScript.Atom)
-    |> Map.put(Collectable, ElixirScript.Collectable)
-    |> Map.put(String.Chars, ElixirScript.String.Chars)
-    |> Map.put(Enumerable, ElixirScript.Enumerable)
-    |> Map.put(Enum, ElixirScript.Enum)
-    |> Map.put(Enum.OutOfBoundsError, ElixirScript.Enum.OutOfBoundsError)
-    |> Map.put(Integer, ElixirScript.Integer)
-    |> Map.put(Macro.Env, ElixirScript.Macro.Env)
-    |> Map.put(View, ElixirScript.View)
-    |> Map.put(Agent, ElixirScript.Agent)
-    |> Map.put(Range, ElixirScript.Range)
-    |> Map.put(String, ElixirScript.String)
-    |> Map.put(Base, ElixirScript.Base)
-    |> Map.put(Module, ElixirScript.Module)
-    |> Map.put(Map, ElixirScript.Map)
-    |> Map.put(Keyword, ElixirScript.Keyword)
-    |> Map.put(Bitwise, ElixirScript.Bitwise)
-    |> Map.put(MapSet, ElixirScript.MapSet)
-    |> Map.put(List, ElixirScript.List)
-    |> Map.put(Process, ElixirScript.Process)
-    |> Map.put(Regex, ElixirScript.Regex)
-    |> Map.put(IO, ElixirScript.IO)
+    Application.spec(:elixir, :modules)
+    |> Enum.reduce(Map.new, fn(x, acc) -> 
+      try do
+        elixirscript_module = (["ElixirScript"] ++ Module.split(x)) |> Module.concat()
+        Map.put(acc, x, elixirscript_module)
+      rescue
+        FunctionClauseError ->
+          acc
+      end
+    end)
   end
 
   def set_module_data(pid, module_data) do

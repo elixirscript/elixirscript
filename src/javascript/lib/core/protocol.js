@@ -23,6 +23,10 @@ class Protocol {
           typeof thing === 'string' && this.hasImplementation(Core.BitString)
         ) {
           fun = this.registry.get(Core.BitString)[funName];
+        } else if (
+          thing[Symbol.for('__struct__')] && this.hasImplementation(thing)
+        ) {
+          fun = this.registry.get(thing[Symbol.for('__struct__')])[funName];
         } else if (this.hasImplementation(thing)) {
           fun = this.registry.get(thing.constructor)[funName];
         } else if (this.fallback) {
@@ -56,6 +60,8 @@ class Protocol {
       thing === Core.Integer || thing === Core.Float || thing === Core.BitString
     ) {
       return this.registry.has(thing);
+    } else if (thing[Symbol.for('__struct__')]) {
+      return this.registry.has(thing[Symbol.for('__struct__')]);
     }
 
     return this.registry.has(thing.constructor);

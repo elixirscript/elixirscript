@@ -14,12 +14,6 @@ function cond(clauses) {
   throw new Error();
 }
 
-function map_update(map, values) {
-  return Object.freeze(
-    Object.assign(Object.create(map.constructor.prototype), map, values),
-  );
-}
-
 function _for(expression, generators, collectable_protocol, into = []) {
   let [result, fun] = collectable_protocol.into(into);
 
@@ -150,7 +144,6 @@ function _with(...args) {
 export default {
   _case,
   cond,
-  map_update,
   _for,
   _try,
   _with,

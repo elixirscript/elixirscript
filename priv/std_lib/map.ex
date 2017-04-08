@@ -70,7 +70,8 @@ defmodule ElixirScript.Map do
   end
 
   def merge(map1, map2) do
-    Bootstrap.Core.SpecialForms.map_update(map1, map2)
+    JS.Object.assign(%{}, map1, map2)
+    |> JS.Object.freeze()
   end
 
   def split(map, keys) do
