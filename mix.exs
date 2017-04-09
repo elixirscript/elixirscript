@@ -15,7 +15,7 @@ defmodule ElixirScript.Mixfile do
       aliases: aliases(),
       test_coverage: [tool: ExCoveralls],
       docs: [
-        extras: ["GettingStarted.md", "FAQ.md"]
+        extras: ["GettingStarted.md", "FAQ.md", "Supported.md"]
       ]
     ]
   end

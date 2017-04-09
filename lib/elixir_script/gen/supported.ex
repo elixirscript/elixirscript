@@ -29,7 +29,7 @@ defmodule ElixirScript.Gen.Supported do
     module_map = get_module_map()
 
     Enum.each(module_map, fn({elixir_module, elixir_script_module}) ->
-      IO.puts(file, "## #{inspect elixir_module}")      
+      IO.puts(file, "## #{inspect elixir_module}")   
       exports = elixir_module.__info__(:functions) ++ elixir_module.__info__(:macros)
       elixir_script_exports = if Code.ensure_loaded?(elixir_script_module) do
         elixir_script_module.__info__(:functions) ++ elixir_script_module.__info__(:macros)
