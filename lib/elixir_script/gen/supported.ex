@@ -25,6 +25,7 @@ defmodule ElixirScript.Gen.Supported do
 
   def write_to_file(file) do
     IO.puts(file, "# Supported Elixir Modules")
+    IO.puts(file, "List all public modules in the Elixir Standard Libary. If a function or macro is supported in ElixirScript, it is checked")
     module_map = get_module_map()
 
     Enum.each(module_map, fn({elixir_module, elixir_script_module}) ->

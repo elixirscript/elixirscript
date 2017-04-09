@@ -1,4 +1,7 @@
 # Supported Elixir Modules
+
+List all public modules in the Elixir Standard Libary. If a function or macro is supported in ElixirScript, it is checked
+
 ## BadStructError
 - [ ] __struct__/0
 - [ ] __struct__/1
