@@ -244,8 +244,8 @@ List all public modules in the Elixir Standard Libary. If a function or macro is
 - [X] or/2
 - [ ] pop_in/1
 - [ ] put_in/2
-- [ ] raise/1
-- [ ] raise/2
+- [X] raise/1
+- [X] raise/2
 - [ ] reraise/2
 - [ ] reraise/3
 - [ ] sigil_C/2
