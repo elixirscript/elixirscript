@@ -1,0 +1,2004 @@
+# Supported Elixir Modules
+## BadStructError
+- [ ] __struct__/0
+- [ ] __struct__/1
+- [ ] exception/1
+- [ ] message/1
+## Collectable.List
+- [X] __impl__/1
+- [X] into/1
+## Inspect.Float
+- [ ] __impl__/1
+- [ ] inspect/2
+## String.Chars.Version.Requirement
+- [ ] __impl__/1
+- [ ] to_string/1
+## Inspect.NaiveDateTime
+- [ ] __impl__/1
+- [ ] inspect/2
+## Inspect.MapSet
+- [ ] __impl__/1
+- [ ] inspect/2
+## Inspect
+- [ ] __protocol__/1
+- [ ] impl_for/1
+- [ ] impl_for!/1
+- [ ] inspect/2
+## Inspect.Range
+- [ ] __impl__/1
+- [ ] inspect/2
+## ArgumentError
+- [X] __struct__/0
+- [X] __struct__/1
+- [X] exception/1
+- [X] message/1
+## Base
+- [ ] decode16/1
+- [ ] decode16/2
+- [ ] decode16!/1
+- [ ] decode16!/2
+- [ ] decode32/1
+- [ ] decode32/2
+- [ ] decode32!/1
+- [ ] decode32!/2
+- [X] decode64/1
+- [ ] decode64/2
+- [X] decode64!/1
+- [ ] decode64!/2
+- [ ] encode16/1
+- [ ] encode16/2
+- [ ] encode32/1
+- [ ] encode32/2
+- [X] encode64/1
+- [ ] encode64/2
+- [ ] hex_decode32/1
+- [ ] hex_decode32/2
+- [ ] hex_decode32!/1
+- [ ] hex_decode32!/2
+- [ ] hex_encode32/1
+- [ ] hex_encode32/2
+- [ ] url_decode64/1
+- [ ] url_decode64/2
+- [ ] url_decode64!/1
+- [ ] url_decode64!/2
+- [ ] url_encode64/1
+- [ ] url_encode64/2
+## Macro.Env
+- [X] __struct__/0
+- [X] __struct__/1
+- [ ] in_guard?/1
+- [ ] in_match?/1
+- [ ] location/1
+- [ ] stacktrace/1
+## Collectable.Map
+- [X] __impl__/1
+- [X] into/1
+## Inspect.Regex
+- [ ] __impl__/1
+- [ ] inspect/2
+## Behaviour
+- [ ] __using__/1
+- [ ] defcallback/1
+- [ ] defmacrocallback/1
+## Collectable
+- [X] __protocol__/1
+- [X] impl_for/1
+- [X] impl_for!/1
+- [X] into/1
+## String.Chars.Time
+- [ ] __impl__/1
+- [ ] to_string/1
+## String.Chars.Atom
+- [X] __impl__/1
+- [X] to_string/1
+## String.Chars
+- [X] __protocol__/1
+- [X] impl_for/1
+- [X] impl_for!/1
+- [X] to_string/1
+## Integer
+- [ ] digits/1
+- [ ] digits/2
+- [ ] floor_div/2
+- [ ] mod/2
+- [X] parse/1
+- [X] parse/2
+- [X] to_char_list/1
+- [ ] to_charlist/1
+- [ ] to_charlist/2
+- [ ] to_string/1
+- [ ] to_string/2
+- [ ] undigits/1
+- [ ] undigits/2
+- [X] is_even/1
+- [X] is_odd/1
+## String.Chars.NaiveDateTime
+- [ ] __impl__/1
+- [ ] to_string/1
+## Inspect.Any
+- [ ] __impl__/1
+- [ ] inspect/2
+## BadMapError
+- [ ] __struct__/0
+- [ ] __struct__/1
+- [ ] exception/1
+- [ ] message/1
+## BadArityError
+- [ ] __struct__/0
+- [ ] __struct__/1
+- [ ] exception/1
+- [ ] message/1
+## Kernel
+- [X] !=/2
+- [X] !==/2
+- [X] */2
+- [X] +/1
+- [X] +/2
+- [X] ++/2
+- [X] -/1
+- [X] -/2
+- [X] --/2
+- [X] //2
+- [X] </2
+- [X] <=/2
+- [X] ==/2
+- [X] ===/2
+- [X] =~/2
+- [X] >/2
+- [X] >=/2
+- [X] abs/1
+- [X] apply/2
+- [X] apply/3
+- [X] binary_part/3
+- [ ] bit_size/1
+- [ ] byte_size/1
+- [X] div/2
+- [X] elem/2
+- [ ] exit/1
+- [ ] function_exported?/3
+- [ ] get_and_update_in/3
+- [ ] get_in/2
+- [X] hd/1
+- [ ] inspect/1
+- [ ] inspect/2
+- [X] is_atom/1
+- [X] is_binary/1
+- [X] is_bitstring/1
+- [X] is_boolean/1
+- [X] is_float/1
+- [X] is_function/1
+- [X] is_function/2
+- [X] is_integer/1
+- [X] is_list/1
+- [X] is_map/1
+- [X] is_number/1
+- [X] is_pid/1
+- [X] is_port/1
+- [X] is_reference/1
+- [X] is_tuple/1
+- [X] length/1
+- [ ] macro_exported?/3
+- [ ] make_ref/0
+- [X] map_size/1
+- [X] max/2
+- [X] min/2
+- [ ] node/0
+- [ ] node/1
+- [ ] not/1
+- [ ] pop_in/2
+- [ ] put_elem/3
+- [ ] put_in/3
+- [X] rem/2
+- [X] round/1
+- [ ] self/0
+- [ ] send/2
+- [ ] spawn/1
+- [ ] spawn/3
+- [ ] spawn_link/1
+- [ ] spawn_link/3
+- [ ] spawn_monitor/1
+- [ ] spawn_monitor/3
+- [ ] struct/1
+- [ ] struct/2
+- [ ] struct!/1
+- [ ] struct!/2
+- [X] throw/1
+- [X] tl/1
+- [X] trunc/1
+- [X] tuple_size/1
+- [ ] update_in/3
+- [X] !/1
+- [X] &&/2
+- [X] ../2
+- [X] <>/2
+- [X] @/1
+- [ ] alias!/1
+- [X] and/2
+- [ ] binding/0
+- [ ] binding/1
+- [X] def/1
+- [X] def/2
+- [X] defdelegate/2
+- [X] defexception/1
+- [X] defimpl/2
+- [X] defimpl/3
+- [X] defmacro/1
+- [X] defmacro/2
+- [ ] defmacrop/1
+- [ ] defmacrop/2
+- [X] defmodule/2
+- [X] defoverridable/1
+- [X] defp/1
+- [X] defp/2
+- [X] defprotocol/2
+- [X] defstruct/1
+- [ ] destructure/2
+- [ ] get_and_update_in/2
+- [X] if/2
+- [X] in/2
+- [X] is_nil/1
+- [X] match?/2
+- [X] or/2
+- [ ] pop_in/1
+- [ ] put_in/2
+- [ ] raise/1
+- [ ] raise/2
+- [ ] reraise/2
+- [ ] reraise/3
+- [ ] sigil_C/2
+- [ ] sigil_D/2
+- [ ] sigil_N/2
+- [ ] sigil_R/2
+- [ ] sigil_S/2
+- [ ] sigil_T/2
+- [ ] sigil_W/2
+- [ ] sigil_c/2
+- [X] sigil_r/2
+- [ ] sigil_s/2
+- [ ] sigil_w/2
+- [ ] to_char_list/1
+- [ ] to_charlist/1
+- [X] to_string/1
+- [X] unless/2
+- [ ] update_in/2
+- [X] use/1
+- [X] use/2
+- [ ] var!/1
+- [ ] var!/2
+- [X] |>/2
+- [X] ||/2
+## Kernel.ParallelCompiler
+- [ ] files/1
+- [ ] files/2
+- [ ] files_to_path/2
+- [ ] files_to_path/3
+## File.Stream
+- [ ] __build__/3
+- [ ] __struct__/0
+- [ ] __struct__/1
+## Inspect.List
+- [ ] __impl__/1
+- [ ] inspect/2
+- [ ] keyword/2
+- [ ] keyword?/1
+- [ ] printable?/1
+## Path.Wildcard
+- [ ] list_dir/1
+- [ ] read_link_info/1
+## SyntaxError
+- [ ] __struct__/0
+- [ ] __struct__/1
+- [ ] exception/1
+- [ ] message/1
+## List.Chars.List
+- [ ] __impl__/1
+- [ ] to_charlist/1
+## CaseClauseError
+- [ ] __struct__/0
+- [ ] __struct__/1
+- [ ] exception/1
+- [ ] message/1
+## Path
+- [ ] absname/1
+- [ ] absname/2
+- [ ] basename/1
+- [ ] basename/2
+- [ ] dirname/1
+- [ ] expand/1
+- [ ] expand/2
+- [ ] extname/1
+- [ ] join/1
+- [ ] join/2
+- [ ] relative/1
+- [ ] relative_to/2
+- [ ] relative_to_cwd/1
+- [ ] rootname/1
+- [ ] rootname/2
+- [ ] split/1
+- [ ] type/1
+- [ ] wildcard/1
+- [ ] wildcard/2
+## UnicodeConversionError
+- [ ] __struct__/0
+- [ ] __struct__/1
+- [ ] exception/1
+- [ ] message/1
+## String.Chars.BitString
+- [X] __impl__/1
+- [X] to_string/1
+## DateTime
+- [ ] __struct__/0
+- [ ] __struct__/1
+- [ ] compare/2
+- [ ] from_iso8601/1
+- [ ] from_naive/2
+- [ ] from_naive!/2
+- [ ] from_unix/1
+- [ ] from_unix/2
+- [ ] from_unix!/1
+- [ ] from_unix!/2
+- [ ] to_date/1
+- [ ] to_iso8601/1
+- [ ] to_naive/1
+- [ ] to_string/1
+- [ ] to_time/1
+- [ ] to_unix/1
+- [ ] to_unix/2
+- [ ] utc_now/0
+## String.Chars.Float
+- [X] __impl__/1
+- [X] to_string/1
+## Collectable.File.Stream
+- [ ] __impl__/1
+- [ ] into/1
+## String.Chars.URI
+- [ ] __impl__/1
+- [ ] to_string/1
+## CompileError
+- [ ] __struct__/0
+- [ ] __struct__/1
+- [ ] exception/1
+- [ ] message/1
+## File
+- [ ] cd/1
+- [ ] cd!/1
+- [ ] cd!/2
+- [ ] chgrp/2
+- [ ] chgrp!/2
+- [ ] chmod/2
+- [ ] chmod!/2
+- [ ] chown/2
+- [ ] chown!/2
+- [ ] close/1
+- [ ] copy/2
+- [ ] copy/3
+- [ ] copy!/2
+- [ ] copy!/3
+- [ ] cp/2
+- [ ] cp/3
+- [ ] cp!/2
+- [ ] cp!/3
+- [ ] cp_r/2
+- [ ] cp_r/3
+- [ ] cp_r!/2
+- [ ] cp_r!/3
+- [ ] cwd/0
+- [ ] cwd!/0
+- [ ] dir?/1
+- [ ] exists?/1
+- [ ] ln_s/2
+- [ ] ls/0
+- [ ] ls/1
+- [ ] ls!/0
+- [ ] ls!/1
+- [ ] lstat/1
+- [ ] lstat/2
+- [ ] lstat!/1
+- [ ] lstat!/2
+- [ ] mkdir/1
+- [ ] mkdir!/1
+- [ ] mkdir_p/1
+- [ ] mkdir_p!/1
+- [ ] open/1
+- [ ] open/2
+- [ ] open/3
+- [ ] open!/1
+- [ ] open!/2
+- [ ] open!/3
+- [ ] read/1
+- [ ] read!/1
+- [ ] regular?/1
+- [ ] rename/2
+- [ ] rm/1
+- [ ] rm!/1
+- [ ] rm_rf/1
+- [ ] rm_rf!/1
+- [ ] rmdir/1
+- [ ] rmdir!/1
+- [ ] stat/1
+- [ ] stat/2
+- [ ] stat!/1
+- [ ] stat!/2
+- [ ] stream!/1
+- [ ] stream!/2
+- [ ] stream!/3
+- [ ] touch/1
+- [ ] touch/2
+- [ ] touch!/1
+- [ ] touch!/2
+- [ ] write/2
+- [ ] write/3
+- [ ] write!/2
+- [ ] write!/3
+- [ ] write_stat/2
+- [ ] write_stat/3
+- [ ] write_stat!/2
+- [ ] write_stat!/3
+## Dict
+- [ ] delete/2
+- [ ] drop/2
+- [ ] empty/1
+- [ ] equal?/2
+- [ ] fetch/2
+- [ ] fetch!/2
+- [ ] get/2
+- [ ] get/3
+- [ ] get_and_update/3
+- [ ] get_lazy/3
+- [ ] has_key?/2
+- [ ] keys/1
+- [ ] merge/2
+- [ ] merge/3
+- [ ] pop/2
+- [ ] pop/3
+- [ ] pop_lazy/3
+- [ ] put/3
+- [ ] put_new/3
+- [ ] put_new_lazy/3
+- [ ] size/1
+- [ ] split/2
+- [ ] take/2
+- [ ] to_list/1
+- [ ] update/4
+- [ ] update!/3
+- [ ] values/1
+- [ ] __using__/1
+## Version.Requirement
+- [ ] __struct__/0
+- [ ] __struct__/1
+## String
+- [X] at/2
+- [X] capitalize/1
+- [ ] chunk/2
+- [X] codepoints/1
+- [X] contains?/2
+- [X] downcase/1
+- [X] duplicate/2
+- [X] ends_with?/2
+- [ ] equivalent?/2
+- [X] first/1
+- [X] graphemes/1
+- [ ] jaro_distance/2
+- [X] last/1
+- [X] length/1
+- [ ] ljust/2
+- [ ] ljust/3
+- [ ] lstrip/1
+- [ ] lstrip/2
+- [X] match?/2
+- [ ] myers_difference/2
+- [X] next_codepoint/1
+- [X] next_grapheme/1
+- [ ] next_grapheme_size/1
+- [ ] normalize/2
+- [ ] pad_leading/2
+- [ ] pad_leading/3
+- [ ] pad_trailing/2
+- [ ] pad_trailing/3
+- [ ] printable?/1
+- [ ] replace/3
+- [ ] replace/4
+- [ ] replace_leading/3
+- [ ] replace_prefix/3
+- [ ] replace_suffix/3
+- [ ] replace_trailing/3
+- [X] reverse/1
+- [ ] rjust/2
+- [ ] rjust/3
+- [ ] rstrip/1
+- [ ] rstrip/2
+- [ ] slice/2
+- [ ] slice/3
+- [X] split/1
+- [X] split/2
+- [X] split/3
+- [ ] split_at/2
+- [ ] splitter/2
+- [ ] splitter/3
+- [X] starts_with?/2
+- [ ] strip/1
+- [ ] strip/2
+- [X] to_atom/1
+- [X] to_char_list/1
+- [ ] to_charlist/1
+- [X] to_existing_atom/1
+- [X] to_float/1
+- [X] to_integer/1
+- [X] to_integer/2
+- [ ] trim/1
+- [ ] trim/2
+- [ ] trim_leading/1
+- [ ] trim_leading/2
+- [ ] trim_trailing/1
+- [ ] trim_trailing/2
+- [X] upcase/1
+- [ ] valid?/1
+- [X] valid_character?/1
+## Record.Extractor
+- [ ] extract/2
+- [ ] extract_all/1
+## Collectable.HashSet
+- [ ] __impl__/1
+- [ ] into/1
+## String.Unicode
+- [ ] codepoints/1
+- [ ] graphemes/1
+- [ ] length/1
+- [ ] next_codepoint/1
+- [ ] next_grapheme_size/1
+- [ ] split_at/2
+- [ ] version/0
+## ErlangError
+- [ ] __struct__/0
+- [ ] __struct__/1
+- [ ] exception/1
+- [ ] message/1
+- [ ] normalize/2
+## File.Stat
+- [ ] __struct__/0
+- [ ] __struct__/1
+- [ ] from_record/1
+- [ ] to_record/1
+## Inspect.Version
+- [ ] __impl__/1
+- [ ] inspect/2
+## RuntimeError
+- [X] __struct__/0
+- [X] __struct__/1
+- [X] exception/1
+- [X] message/1
+## Range
+- [X] __struct__/0
+- [X] __struct__/1
+- [X] new/2
+- [X] range?/1
+## Exception
+- [ ] exception?/1
+- [ ] format/2
+- [ ] format/3
+- [ ] format_banner/2
+- [ ] format_banner/3
+- [ ] format_exit/1
+- [ ] format_fa/2
+- [ ] format_file_line/2
+- [ ] format_file_line/3
+- [ ] format_mfa/3
+- [ ] format_stacktrace/0
+- [ ] format_stacktrace/1
+- [ ] format_stacktrace_entry/1
+- [ ] message/1
+- [ ] normalize/2
+- [ ] normalize/3
+## Inspect.Function
+- [ ] __impl__/1
+- [ ] inspect/2
+## Enumerable.GenEvent.Stream
+- [ ] __impl__/1
+- [ ] count/1
+- [ ] member?/2
+- [ ] reduce/3
+## Enum.OutOfBoundsError
+- [X] __struct__/0
+- [X] __struct__/1
+- [X] exception/1
+- [X] message/1
+## Enumerable.Range
+- [ ] __impl__/1
+- [ ] count/1
+- [ ] member?/2
+- [ ] reduce/3
+## Date
+- [ ] __struct__/0
+- [ ] __struct__/1
+- [ ] compare/2
+- [ ] day_of_week/1
+- [ ] days_in_month/1
+- [ ] from_erl/1
+- [ ] from_erl!/1
+- [ ] from_iso8601/1
+- [ ] from_iso8601!/1
+- [ ] leap_year?/1
+- [ ] new/3
+- [ ] to_erl/1
+- [ ] to_iso8601/1
+- [ ] to_string/1
+- [ ] utc_today/0
+## Inspect.Time
+- [ ] __impl__/1
+- [ ] inspect/2
+## String.Casing
+- [ ] downcase/1
+- [ ] titlecase_once/1
+- [ ] upcase/1
+## Regex.CompileError
+- [ ] __struct__/0
+- [ ] __struct__/1
+- [ ] exception/1
+- [ ] message/1
+## Supervisor.Spec
+- [ ] supervise/2
+- [ ] supervisor/2
+- [ ] supervisor/3
+- [ ] worker/2
+- [ ] worker/3
+## Collectable.MapSet
+- [ ] __impl__/1
+- [ ] into/1
+## StringIO
+- [ ] close/1
+- [ ] code_change/3
+- [ ] contents/1
+- [ ] flush/1
+- [ ] handle_call/3
+- [ ] handle_cast/2
+- [ ] handle_info/2
+- [ ] init/1
+- [ ] open/1
+- [ ] open/2
+- [ ] terminate/2
+## Inspect.Port
+- [ ] __impl__/1
+- [ ] inspect/2
+## GenEvent.Stream
+- [ ] __struct__/0
+- [ ] __struct__/1
+- [ ] code_change/3
+- [ ] handle_call/2
+- [ ] handle_event/2
+- [ ] handle_info/2
+- [ ] init/1
+- [ ] terminate/2
+## Protocol.UndefinedError
+- [ ] __struct__/0
+- [ ] __struct__/1
+- [ ] exception/1
+- [ ] message/1
+## BadFunctionError
+- [ ] __struct__/0
+- [ ] __struct__/1
+- [ ] exception/1
+- [ ] message/1
+## Time
+- [ ] __struct__/0
+- [ ] __struct__/1
+- [ ] compare/2
+- [ ] from_erl/1
+- [ ] from_erl/2
+- [ ] from_erl!/1
+- [ ] from_erl!/2
+- [ ] from_iso8601/1
+- [ ] from_iso8601!/1
+- [ ] new/3
+- [ ] new/4
+- [ ] to_erl/1
+- [ ] to_iso8601/1
+- [ ] to_string/1
+- [ ] utc_now/0
+## List.Chars.BitString
+- [ ] __impl__/1
+- [ ] to_charlist/1
+## Registry
+- [ ] dispatch/3
+- [ ] keys/2
+- [ ] lookup/2
+- [ ] match/3
+- [ ] meta/2
+- [ ] put_meta/3
+- [ ] register/3
+- [ ] register_name/2
+- [ ] send/2
+- [ ] start_link/2
+- [ ] start_link/3
+- [ ] unregister/2
+- [ ] unregister_name/1
+- [ ] update_value/3
+- [ ] whereis_name/1
+## List.Chars.Float
+- [ ] __impl__/1
+- [ ] to_charlist/1
+## Code.LoadError
+- [ ] __struct__/0
+- [ ] __struct__/1
+- [ ] exception/1
+- [ ] message/1
+## ArithmeticError
+- [ ] __struct__/0
+- [ ] __struct__/1
+- [ ] exception/1
+- [ ] message/1
+## String.Chars.List
+- [X] __impl__/1
+- [X] to_string/1
+## Inspect.BitString
+- [ ] __impl__/1
+- [ ] escape/2
+- [ ] escape_char/1
+- [ ] inspect/2
+## Inspect.HashSet
+- [ ] __impl__/1
+- [ ] inspect/2
+## String.Chars.DateTime
+- [ ] __impl__/1
+- [ ] to_string/1
+## Inspect.Map
+- [ ] __impl__/1
+- [ ] inspect/2
+- [ ] inspect/3
+## HashDict
+- [ ] __struct__/0
+- [ ] __struct__/1
+- [ ] delete/2
+- [ ] dict_delete/2
+- [ ] drop/2
+- [ ] equal?/2
+- [ ] fetch/2
+- [ ] fetch!/2
+- [ ] get/2
+- [ ] get/3
+- [ ] get_and_update/3
+- [ ] get_lazy/3
+- [ ] has_key?/2
+- [ ] keys/1
+- [ ] merge/2
+- [ ] merge/3
+- [ ] new/0
+- [ ] pop/2
+- [ ] pop/3
+- [ ] pop_lazy/3
+- [ ] put/3
+- [ ] put_new/3
+- [ ] put_new_lazy/3
+- [ ] reduce/3
+- [ ] size/1
+- [ ] split/2
+- [ ] take/2
+- [ ] to_list/1
+- [ ] update/4
+- [ ] update!/3
+- [ ] values/1
+## NaiveDateTime
+- [ ] __struct__/0
+- [ ] __struct__/1
+- [ ] add/2
+- [ ] add/3
+- [ ] compare/2
+- [ ] diff/2
+- [ ] diff/3
+- [ ] from_erl/1
+- [ ] from_erl/2
+- [ ] from_erl!/1
+- [ ] from_erl!/2
+- [ ] from_iso8601/1
+- [ ] from_iso8601!/1
+- [ ] new/2
+- [ ] new/6
+- [ ] new/7
+- [ ] to_date/1
+- [ ] to_erl/1
+- [ ] to_iso8601/1
+- [ ] to_string/1
+- [ ] to_time/1
+- [ ] utc_now/0
+## IO.ANSI
+- [ ] black/0
+- [ ] black_background/0
+- [ ] blink_off/0
+- [ ] blink_rapid/0
+- [ ] blink_slow/0
+- [ ] blue/0
+- [ ] blue_background/0
+- [ ] bright/0
+- [ ] clear/0
+- [ ] clear_line/0
+- [ ] color/1
+- [ ] color/3
+- [ ] color_background/1
+- [ ] color_background/3
+- [ ] conceal/0
+- [ ] crossed_out/0
+- [ ] cyan/0
+- [ ] cyan_background/0
+- [ ] default_background/0
+- [ ] default_color/0
+- [ ] enabled?/0
+- [ ] encircled/0
+- [ ] faint/0
+- [ ] font_1/0
+- [ ] font_2/0
+- [ ] font_3/0
+- [ ] font_4/0
+- [ ] font_5/0
+- [ ] font_6/0
+- [ ] font_7/0
+- [ ] font_8/0
+- [ ] font_9/0
+- [ ] format/1
+- [ ] format/2
+- [ ] format_fragment/1
+- [ ] format_fragment/2
+- [ ] framed/0
+- [ ] green/0
+- [ ] green_background/0
+- [ ] home/0
+- [ ] inverse/0
+- [ ] inverse_off/0
+- [ ] italic/0
+- [ ] light_black/0
+- [ ] light_black_background/0
+- [ ] light_blue/0
+- [ ] light_blue_background/0
+- [ ] light_cyan/0
+- [ ] light_cyan_background/0
+- [ ] light_green/0
+- [ ] light_green_background/0
+- [ ] light_magenta/0
+- [ ] light_magenta_background/0
+- [ ] light_red/0
+- [ ] light_red_background/0
+- [ ] light_white/0
+- [ ] light_white_background/0
+- [ ] light_yellow/0
+- [ ] light_yellow_background/0
+- [ ] magenta/0
+- [ ] magenta_background/0
+- [ ] no_underline/0
+- [ ] normal/0
+- [ ] not_framed_encircled/0
+- [ ] not_italic/0
+- [ ] not_overlined/0
+- [ ] overlined/0
+- [ ] primary_font/0
+- [ ] red/0
+- [ ] red_background/0
+- [ ] reset/0
+- [ ] reverse/0
+- [ ] reverse_off/0
+- [ ] underline/0
+- [ ] white/0
+- [ ] white_background/0
+- [ ] yellow/0
+- [ ] yellow_background/0
+## Module
+- [ ] add_doc/5
+- [ ] add_doc/6
+- [ ] compile_doc/6
+- [ ] concat/1
+- [ ] concat/2
+- [ ] create/3
+- [ ] defines?/2
+- [ ] defines?/3
+- [ ] definitions_in/1
+- [ ] definitions_in/2
+- [ ] delete_attribute/2
+- [ ] eval_quoted/2
+- [ ] eval_quoted/3
+- [ ] eval_quoted/4
+- [ ] get_attribute/2
+- [ ] get_attribute/3
+- [ ] make_overridable/2
+- [ ] open?/1
+- [ ] overridable?/2
+- [ ] put_attribute/3
+- [ ] put_attribute/5
+- [ ] register_attribute/3
+- [ ] safe_concat/1
+- [ ] safe_concat/2
+- [ ] split/1
+- [ ] store_typespec/3
+## IO
+- [ ] binread/1
+- [ ] binread/2
+- [ ] binstream/2
+- [ ] binwrite/1
+- [ ] binwrite/2
+- [ ] chardata_to_string/1
+- [ ] each_binstream/2
+- [ ] each_stream/2
+- [ ] getn/1
+- [ ] getn/2
+- [ ] getn/3
+- [ ] gets/1
+- [ ] gets/2
+- [X] inspect/1
+- [X] inspect/2
+- [ ] inspect/3
+- [ ] iodata_length/1
+- [ ] iodata_to_binary/1
+- [X] puts/1
+- [X] puts/2
+- [ ] read/1
+- [ ] read/2
+- [ ] stream/2
+- [X] warn/1
+- [ ] warn/2
+- [ ] write/1
+- [ ] write/2
+## MatchError
+- [ ] __struct__/0
+- [ ] __struct__/1
+- [ ] exception/1
+- [ ] message/1
+## Enumerable.HashSet
+- [ ] __impl__/1
+- [ ] count/1
+- [ ] member?/2
+- [ ] reduce/3
+## Enumerable.HashDict
+- [ ] __impl__/1
+- [ ] count/1
+- [ ] member?/2
+- [ ] reduce/3
+## Agent
+- [ ] cast/2
+- [ ] cast/4
+- [X] get/2
+- [ ] get/3
+- [ ] get/4
+- [ ] get/5
+- [X] get_and_update/2
+- [ ] get_and_update/3
+- [ ] get_and_update/4
+- [ ] get_and_update/5
+- [X] start/1
+- [X] start/2
+- [ ] start/3
+- [ ] start/4
+- [X] start_link/1
+- [X] start_link/2
+- [ ] start_link/3
+- [ ] start_link/4
+- [X] stop/1
+- [ ] stop/2
+- [ ] stop/3
+- [X] update/2
+- [ ] update/3
+- [ ] update/4
+- [ ] update/5
+## String.Chars.Version
+- [ ] __impl__/1
+- [ ] to_string/1
+## System
+- [ ] argv/0
+- [ ] argv/1
+- [ ] at_exit/1
+- [ ] build_info/0
+- [ ] cmd/2
+- [ ] cmd/3
+- [ ] compiled_endianness/0
+- [ ] convert_time_unit/3
+- [ ] cwd/0
+- [ ] cwd!/0
+- [ ] delete_env/1
+- [ ] endianness/0
+- [ ] find_executable/1
+- [ ] get_env/0
+- [ ] get_env/1
+- [ ] get_pid/0
+- [ ] halt/0
+- [ ] halt/1
+- [ ] monotonic_time/0
+- [ ] monotonic_time/1
+- [ ] os_time/0
+- [ ] os_time/1
+- [ ] otp_release/0
+- [ ] put_env/1
+- [ ] put_env/2
+- [ ] schedulers/0
+- [ ] schedulers_online/0
+- [ ] stacktrace/0
+- [ ] system_time/0
+- [ ] system_time/1
+- [ ] time_offset/0
+- [ ] time_offset/1
+- [ ] tmp_dir/0
+- [ ] tmp_dir!/0
+- [ ] unique_integer/0
+- [ ] unique_integer/1
+- [ ] user_home/0
+- [ ] user_home!/0
+- [ ] version/0
+## Inspect.Tuple
+- [ ] __impl__/1
+- [ ] inspect/2
+## Collectable.BitString
+- [X] __impl__/1
+- [X] into/1
+## Enumerable.Map
+- [X] __impl__/1
+- [X] count/1
+- [X] member?/2
+- [X] reduce/3
+## Enum.EmptyError
+- [ ] __struct__/0
+- [ ] __struct__/1
+- [ ] exception/1
+- [ ] message/1
+## GenEvent
+- [ ] ack_notify/2
+- [ ] add_handler/3
+- [ ] add_mon_handler/3
+- [ ] call/3
+- [ ] call/4
+- [ ] format_status/2
+- [ ] init_hib/4
+- [ ] init_it/6
+- [ ] notify/2
+- [ ] remove_handler/3
+- [ ] start/0
+- [ ] start/1
+- [ ] start_link/0
+- [ ] start_link/1
+- [ ] stop/1
+- [ ] stop/2
+- [ ] stop/3
+- [ ] stream/1
+- [ ] stream/2
+- [ ] swap_handler/5
+- [ ] swap_mon_handler/5
+- [ ] sync_notify/2
+- [ ] system_code_change/4
+- [ ] system_continue/3
+- [ ] system_get_state/1
+- [ ] system_replace_state/2
+- [ ] system_terminate/4
+- [ ] which_handlers/1
+- [ ] __using__/1
+## Inspect.Error
+- [ ] __struct__/0
+- [ ] __struct__/1
+- [ ] exception/1
+- [ ] message/1
+## Enumerable.List
+- [X] __impl__/1
+- [X] count/1
+- [X] member?/2
+- [X] reduce/3
+## OptionParser.ParseError
+- [ ] __struct__/0
+- [ ] __struct__/1
+- [ ] exception/1
+- [ ] message/1
+## Map
+- [X] delete/2
+- [X] drop/2
+- [X] equal?/2
+- [X] fetch/2
+- [X] fetch!/2
+- [X] from_struct/1
+- [X] get/2
+- [X] get/3
+- [X] get_and_update/3
+- [ ] get_and_update!/3
+- [X] get_lazy/3
+- [X] has_key?/2
+- [X] keys/1
+- [X] merge/2
+- [ ] merge/3
+- [X] new/0
+- [ ] new/1
+- [ ] new/2
+- [X] pop/2
+- [X] pop/3
+- [X] pop_lazy/3
+- [X] put/3
+- [X] put_new/3
+- [X] put_new_lazy/3
+- [X] size/1
+- [X] split/2
+- [X] take/2
+- [X] to_list/1
+- [X] update/4
+- [X] update!/3
+- [X] values/1
+## OptionParser
+- [ ] get_option_key/1
+- [ ] next/1
+- [ ] next/2
+- [ ] parse/1
+- [ ] parse/2
+- [ ] parse!/1
+- [ ] parse!/2
+- [ ] parse_head/1
+- [ ] parse_head/2
+- [ ] parse_head!/1
+- [ ] parse_head!/2
+- [ ] split/1
+- [ ] to_argv/1
+- [ ] to_argv/2
+## Kernel.ErrorHandler
+- [ ] ensure_compiled/2
+- [ ] ensure_loaded/1
+- [ ] undefined_function/3
+- [ ] undefined_lambda/3
+## List.Chars.Integer
+- [ ] __impl__/1
+- [ ] to_charlist/1
+## HashSet
+- [ ] __struct__/0
+- [ ] __struct__/1
+- [ ] delete/2
+- [ ] difference/2
+- [ ] disjoint?/2
+- [ ] equal?/2
+- [ ] intersection/2
+- [ ] member?/2
+- [ ] new/0
+- [ ] put/2
+- [ ] reduce/3
+- [ ] size/1
+- [ ] subset?/2
+- [ ] to_list/1
+- [ ] union/2
+## Inspect.Date
+- [ ] __impl__/1
+- [ ] inspect/2
+## Code
+- [ ] append_path/1
+- [ ] available_compiler_options/0
+- [ ] compile_quoted/1
+- [ ] compile_quoted/2
+- [ ] compile_string/1
+- [ ] compile_string/2
+- [ ] compiler_options/0
+- [ ] compiler_options/1
+- [ ] delete_path/1
+- [ ] ensure_compiled/1
+- [ ] ensure_compiled?/1
+- [ ] ensure_loaded/1
+- [ ] ensure_loaded?/1
+- [ ] eval_file/1
+- [ ] eval_file/2
+- [ ] eval_quoted/1
+- [ ] eval_quoted/2
+- [ ] eval_quoted/3
+- [ ] eval_string/1
+- [ ] eval_string/2
+- [ ] eval_string/3
+- [ ] get_docs/2
+- [ ] load_file/1
+- [ ] load_file/2
+- [ ] loaded_files/0
+- [ ] prepend_path/1
+- [ ] require_file/1
+- [ ] require_file/2
+- [ ] string_to_quoted/1
+- [ ] string_to_quoted/2
+- [ ] string_to_quoted!/1
+- [ ] string_to_quoted!/2
+- [ ] unload_files/1
+## Kernel.SpecialForms
+- [X] %/2
+- [X] %{}/1
+- [X] &/1
+- [X] ./2
+- [X] ::/2
+- [X] <<>>/1
+- [X] =/2
+- [X] ^/1
+- [X] __CALLER__/0
+- [X] __DIR__/0
+- [X] __ENV__/0
+- [X] __MODULE__/0
+- [X] __aliases__/1
+- [X] __block__/1
+- [X] alias/2
+- [X] case/2
+- [X] cond/1
+- [X] fn/1
+- [X] for/1
+- [X] import/2
+- [X] quote/2
+- [ ] receive/1
+- [X] require/2
+- [X] super/1
+- [X] try/1
+- [X] unquote/1
+- [X] unquote_splicing/1
+- [X] with/1
+- [X] {}/1
+## Tuple
+- [X] append/2
+- [X] delete_at/2
+- [X] duplicate/2
+- [X] insert_at/3
+- [X] to_list/1
+## SystemLimitError
+- [ ] __struct__/0
+- [ ] __struct__/1
+- [ ] exception/1
+- [ ] message/1
+## Bitwise
+- [X] &&&/2
+- [X] <<</2
+- [X] >>>/2
+- [X] ^^^/2
+- [ ] __using__/1
+- [X] band/2
+- [X] bnot/1
+- [X] bor/2
+- [X] bsl/2
+- [X] bsr/2
+- [X] bxor/2
+- [X] |||/2
+- [X] ~~~/1
+## String.Chars.Integer
+- [X] __impl__/1
+- [X] to_string/1
+## Inspect.Reference
+- [ ] __impl__/1
+- [ ] inspect/2
+## IO.StreamError
+- [ ] __struct__/0
+- [ ] __struct__/1
+- [ ] exception/1
+- [ ] message/1
+## Process
+- [ ] alive?/1
+- [ ] cancel_timer/1
+- [ ] delete/1
+- [ ] demonitor/1
+- [ ] demonitor/2
+- [ ] exit/2
+- [ ] flag/2
+- [ ] flag/3
+- [ ] get/0
+- [ ] get/1
+- [ ] get/2
+- [ ] get_keys/0
+- [ ] get_keys/1
+- [ ] group_leader/0
+- [ ] group_leader/2
+- [ ] hibernate/3
+- [ ] info/1
+- [ ] info/2
+- [ ] link/1
+- [ ] list/0
+- [ ] monitor/1
+- [ ] put/2
+- [ ] read_timer/1
+- [ ] register/2
+- [ ] registered/0
+- [ ] send/3
+- [ ] send_after/3
+- [ ] send_after/4
+- [ ] sleep/1
+- [ ] spawn/2
+- [ ] spawn/4
+- [ ] unlink/1
+- [ ] unregister/1
+- [ ] whereis/1
+## Protocol
+- [ ] __builtin__/0
+- [ ] __derive__/3
+- [ ] __ensure_defimpl__/3
+- [ ] __functions_spec__/1
+- [ ] __impl__/2
+- [ ] __protocol__/2
+- [ ] __spec__?/3
+- [ ] assert_impl!/2
+- [ ] assert_protocol!/1
+- [ ] consolidate/2
+- [ ] consolidated?/1
+- [ ] extract_impls/2
+- [ ] extract_protocols/1
+- [ ] def/1
+- [ ] derive/2
+- [ ] derive/3
+## UndefinedFunctionError
+- [ ] __struct__/0
+- [ ] __struct__/1
+- [ ] exception/1
+- [ ] message/1
+## Version.InvalidVersionError
+- [ ] __struct__/0
+- [ ] __struct__/1
+- [ ] exception/1
+- [ ] message/1
+## Task
+- [ ] __struct__/0
+- [ ] __struct__/1
+- [ ] async/1
+- [ ] async/3
+- [ ] async_stream/2
+- [ ] async_stream/3
+- [ ] async_stream/4
+- [ ] async_stream/5
+- [ ] await/1
+- [ ] await/2
+- [ ] find/2
+- [ ] shutdown/1
+- [ ] shutdown/2
+- [ ] start/1
+- [ ] start/3
+- [ ] start_link/1
+- [ ] start_link/3
+- [ ] yield/1
+- [ ] yield/2
+- [ ] yield_many/1
+- [ ] yield_many/2
+## Float
+- [ ] ceil/1
+- [ ] ceil/2
+- [ ] floor/1
+- [ ] floor/2
+- [ ] parse/1
+- [ ] ratio/1
+- [ ] round/1
+- [ ] round/2
+- [ ] to_char_list/1
+- [ ] to_char_list/2
+- [ ] to_charlist/1
+- [ ] to_string/1
+- [ ] to_string/2
+## Supervisor
+- [ ] count_children/1
+- [ ] delete_child/2
+- [ ] restart_child/2
+- [ ] start_child/2
+- [ ] start_link/2
+- [ ] start_link/3
+- [ ] stop/1
+- [ ] stop/2
+- [ ] stop/3
+- [ ] terminate_child/2
+- [ ] which_children/1
+- [ ] __using__/1
+## Enumerable
+- [X] __protocol__/1
+- [X] count/1
+- [X] impl_for/1
+- [X] impl_for!/1
+- [X] member?/2
+- [X] reduce/3
+## Enum
+- [X] all?/1
+- [X] all?/2
+- [X] any?/1
+- [X] any?/2
+- [X] at/2
+- [X] at/3
+- [ ] chunk/2
+- [ ] chunk/3
+- [ ] chunk/4
+- [ ] chunk_by/2
+- [X] concat/1
+- [X] concat/2
+- [X] count/1
+- [X] count/2
+- [ ] dedup/1
+- [ ] dedup_by/2
+- [X] drop/2
+- [X] drop_every/2
+- [X] drop_while/2
+- [X] each/2
+- [X] empty?/1
+- [X] fetch/2
+- [X] fetch!/2
+- [X] filter/2
+- [X] filter_map/3
+- [X] find/2
+- [X] find/3
+- [ ] find_index/2
+- [ ] find_value/2
+- [ ] find_value/3
+- [ ] flat_map/2
+- [ ] flat_map_reduce/3
+- [ ] group_by/2
+- [ ] group_by/3
+- [ ] intersperse/2
+- [X] into/2
+- [X] into/3
+- [ ] join/1
+- [ ] join/2
+- [X] map/2
+- [ ] map_every/3
+- [ ] map_join/2
+- [ ] map_join/3
+- [X] map_reduce/3
+- [ ] max/1
+- [ ] max/2
+- [ ] max_by/2
+- [ ] max_by/3
+- [X] member?/2
+- [ ] min/1
+- [ ] min/2
+- [ ] min_by/2
+- [ ] min_by/3
+- [ ] min_max/1
+- [ ] min_max/2
+- [ ] min_max_by/2
+- [ ] min_max_by/3
+- [ ] partition/2
+- [ ] random/1
+- [X] reduce/2
+- [X] reduce/3
+- [ ] reduce_while/3
+- [ ] reject/2
+- [X] reverse/1
+- [X] reverse/2
+- [ ] reverse_slice/3
+- [ ] scan/2
+- [ ] scan/3
+- [ ] shuffle/1
+- [ ] slice/2
+- [ ] slice/3
+- [ ] sort/1
+- [ ] sort/2
+- [ ] sort_by/2
+- [ ] sort_by/3
+- [ ] split/2
+- [ ] split_while/2
+- [ ] split_with/2
+- [ ] sum/1
+- [X] take/2
+- [X] take_every/2
+- [ ] take_random/2
+- [X] take_while/2
+- [X] to_list/1
+- [ ] uniq/1
+- [ ] uniq/2
+- [ ] uniq_by/2
+- [ ] unzip/1
+- [ ] with_index/1
+- [ ] with_index/2
+- [ ] zip/1
+- [ ] zip/2
+## Keyword
+- [ ] delete/2
+- [ ] delete/3
+- [ ] delete_first/2
+- [ ] drop/2
+- [ ] equal?/2
+- [ ] fetch/2
+- [ ] fetch!/2
+- [X] get/2
+- [X] get/3
+- [ ] get_and_update/3
+- [ ] get_and_update!/3
+- [ ] get_lazy/3
+- [ ] get_values/2
+- [X] has_key?/2
+- [ ] keys/1
+- [ ] keyword?/1
+- [ ] merge/2
+- [ ] merge/3
+- [X] new/0
+- [ ] new/1
+- [ ] new/2
+- [ ] pop/2
+- [ ] pop/3
+- [ ] pop_first/2
+- [ ] pop_first/3
+- [ ] pop_lazy/3
+- [ ] put/3
+- [ ] put_new/3
+- [ ] put_new_lazy/3
+- [ ] size/1
+- [ ] split/2
+- [ ] take/2
+- [ ] to_list/1
+- [ ] update/4
+- [ ] update!/3
+- [ ] values/1
+## Collectable.HashDict
+- [ ] __impl__/1
+- [ ] into/1
+## Enumerable.File.Stream
+- [ ] __impl__/1
+- [ ] count/1
+- [ ] member?/2
+- [ ] reduce/3
+## Access
+- [ ] all/0
+- [ ] at/1
+- [ ] elem/1
+- [ ] fetch/2
+- [ ] get/2
+- [ ] get/3
+- [ ] get_and_update/3
+- [ ] key/1
+- [ ] key/2
+- [ ] key!/1
+- [ ] pop/2
+## IO.Stream
+- [ ] __build__/3
+- [ ] __struct__/0
+- [ ] __struct__/1
+## Enumerable.Stream
+- [ ] __impl__/1
+- [ ] count/1
+- [ ] member?/2
+- [ ] reduce/3
+## Stream
+- [ ] __struct__/0
+- [ ] __struct__/1
+- [ ] chunk/2
+- [ ] chunk/3
+- [ ] chunk/4
+- [ ] chunk_by/2
+- [ ] concat/1
+- [ ] concat/2
+- [ ] cycle/1
+- [ ] dedup/1
+- [ ] dedup_by/2
+- [ ] drop/2
+- [ ] drop_every/2
+- [ ] drop_while/2
+- [ ] each/2
+- [ ] filter/2
+- [ ] filter_map/3
+- [ ] flat_map/2
+- [ ] interval/1
+- [ ] into/2
+- [ ] into/3
+- [ ] iterate/2
+- [ ] map/2
+- [ ] map_every/3
+- [ ] reject/2
+- [ ] repeatedly/1
+- [ ] resource/3
+- [ ] run/1
+- [ ] scan/2
+- [ ] scan/3
+- [ ] take/2
+- [ ] take_every/2
+- [ ] take_while/2
+- [ ] timer/1
+- [ ] transform/3
+- [ ] transform/4
+- [ ] unfold/2
+- [ ] uniq/1
+- [ ] uniq/2
+- [ ] uniq_by/2
+- [ ] with_index/1
+- [ ] with_index/2
+- [ ] zip/1
+- [ ] zip/2
+## Task.Supervisor
+- [ ] async/2
+- [ ] async/4
+- [ ] async_nolink/2
+- [ ] async_nolink/4
+- [ ] async_stream/3
+- [ ] async_stream/4
+- [ ] async_stream/5
+- [ ] async_stream/6
+- [ ] async_stream_nolink/3
+- [ ] async_stream_nolink/4
+- [ ] async_stream_nolink/5
+- [ ] async_stream_nolink/6
+- [ ] children/1
+- [ ] start_child/2
+- [ ] start_child/4
+- [ ] start_link/0
+- [ ] start_link/1
+- [ ] terminate_child/2
+## Inspect.Version.Requirement
+- [ ] __impl__/1
+- [ ] inspect/2
+## TryClauseError
+- [ ] __struct__/0
+- [ ] __struct__/1
+- [ ] exception/1
+- [ ] message/1
+## Version
+- [ ] __struct__/0
+- [ ] __struct__/1
+- [ ] compare/2
+- [ ] compile_requirement/1
+- [ ] match?/2
+- [ ] match?/3
+- [ ] parse/1
+- [ ] parse!/1
+- [ ] parse_requirement/1
+## Record
+- [ ] __access__/4
+- [ ] __access__/5
+- [ ] __fields__/2
+- [ ] __keyword__/3
+- [ ] extract/2
+- [ ] extract_all/1
+- [ ] defrecord/2
+- [ ] defrecord/3
+- [ ] defrecordp/2
+- [ ] defrecordp/3
+- [ ] is_record/1
+- [ ] is_record/2
+## CondClauseError
+- [ ] __struct__/0
+- [ ] __struct__/1
+- [ ] exception/1
+- [ ] message/1
+## Inspect.Integer
+- [ ] __impl__/1
+- [ ] inspect/2
+## List
+- [X] delete/2
+- [X] delete_at/2
+- [X] duplicate/2
+- [X] first/1
+- [X] flatten/1
+- [X] flatten/2
+- [X] foldl/3
+- [X] foldr/3
+- [X] insert_at/3
+- [X] keydelete/3
+- [X] keyfind/3
+- [X] keyfind/4
+- [X] keymember?/3
+- [X] keyreplace/4
+- [ ] keysort/2
+- [ ] keystore/4
+- [ ] keytake/3
+- [X] last/1
+- [ ] myers_difference/2
+- [ ] pop_at/2
+- [ ] pop_at/3
+- [X] replace_at/3
+- [ ] to_atom/1
+- [ ] to_existing_atom/1
+- [ ] to_float/1
+- [ ] to_integer/1
+- [ ] to_integer/2
+- [ ] to_string/1
+- [X] to_tuple/1
+- [X] update_at/3
+- [X] wrap/1
+- [X] zip/1
+## Regex
+- [ ] __struct__/0
+- [ ] __struct__/1
+- [X] compile/1
+- [X] compile/2
+- [X] compile!/1
+- [X] compile!/2
+- [ ] escape/1
+- [X] match?/2
+- [ ] named_captures/2
+- [ ] named_captures/3
+- [ ] names/1
+- [X] opts/1
+- [ ] re_pattern/1
+- [X] regex?/1
+- [X] replace/3
+- [X] replace/4
+- [X] run/2
+- [X] run/3
+- [X] scan/2
+- [X] scan/3
+- [X] source/1
+- [ ] split/2
+- [ ] split/3
+- [ ] unescape_map/1
+## Collectable.IO.Stream
+- [ ] __impl__/1
+- [ ] into/1
+## File.Error
+- [ ] __struct__/0
+- [ ] __struct__/1
+- [ ] exception/1
+- [ ] message/1
+## Inspect.Algebra
+- [ ] break/0
+- [ ] break/1
+- [ ] color/3
+- [ ] concat/1
+- [ ] concat/2
+- [ ] empty/0
+- [ ] fold_doc/2
+- [ ] format/2
+- [ ] glue/2
+- [ ] glue/3
+- [ ] group/1
+- [ ] line/2
+- [ ] nest/2
+- [ ] space/2
+- [ ] surround/3
+- [ ] surround_many/5
+- [ ] surround_many/6
+- [ ] to_doc/2
+## Node
+- [ ] alive?/0
+- [ ] connect/1
+- [ ] disconnect/1
+- [ ] get_cookie/0
+- [ ] list/0
+- [ ] list/1
+- [ ] monitor/2
+- [ ] monitor/3
+- [ ] ping/1
+- [ ] self/0
+- [ ] set_cookie/1
+- [ ] set_cookie/2
+- [ ] spawn/2
+- [ ] spawn/3
+- [ ] spawn/4
+- [ ] spawn/5
+- [ ] spawn_link/2
+- [ ] spawn_link/4
+- [ ] start/1
+- [ ] start/2
+- [ ] start/3
+- [ ] stop/0
+## File.CopyError
+- [ ] __struct__/0
+- [ ] __struct__/1
+- [ ] exception/1
+- [ ] message/1
+## Port
+- [ ] close/1
+- [ ] command/2
+- [ ] command/3
+- [ ] connect/2
+- [ ] info/1
+- [ ] info/2
+- [ ] list/0
+- [ ] open/2
+## Enumerable.MapSet
+- [ ] __impl__/1
+- [ ] count/1
+- [ ] member?/2
+- [ ] reduce/3
+## Inspect.Stream
+- [ ] __impl__/1
+- [ ] inspect/2
+## Kernel.ParallelRequire
+- [ ] files/1
+- [ ] files/2
+## FunctionClauseError
+- [ ] __struct__/0
+- [ ] __struct__/1
+- [ ] exception/1
+- [ ] message/1
+## Enumerable.Function
+- [ ] __impl__/1
+- [ ] count/1
+- [ ] member?/2
+- [ ] reduce/3
+## GenServer
+- [ ] abcast/2
+- [ ] abcast/3
+- [ ] call/2
+- [ ] call/3
+- [ ] cast/2
+- [ ] multi_call/2
+- [ ] multi_call/3
+- [ ] multi_call/4
+- [ ] reply/2
+- [ ] start/2
+- [ ] start/3
+- [ ] start_link/2
+- [ ] start_link/3
+- [ ] stop/1
+- [ ] stop/2
+- [ ] stop/3
+- [ ] whereis/1
+- [ ] __using__/1
+## List.Chars
+- [ ] __protocol__/1
+- [ ] impl_for/1
+- [ ] impl_for!/1
+- [ ] to_char_list/1
+- [ ] to_charlist/1
+## Inspect.Atom
+- [ ] __impl__/1
+- [ ] inspect/1
+- [ ] inspect/2
+## Inspect.HashDict
+- [ ] __impl__/1
+- [ ] inspect/2
+## Enumerable.IO.Stream
+- [ ] __impl__/1
+- [ ] count/1
+- [ ] member?/2
+- [ ] reduce/3
+## Kernel.Typespec
+- [ ] beam_callbacks/1
+- [ ] beam_specs/1
+- [ ] beam_typedocs/1
+- [ ] beam_types/1
+- [ ] define_spec/3
+- [ ] define_type/3
+- [ ] define_type/4
+- [ ] defines_callback?/3
+- [ ] defines_spec?/3
+- [ ] defines_type?/3
+- [ ] defspec/3
+- [ ] deftype/3
+- [ ] spec_to_ast/2
+- [ ] spec_to_signature/1
+- [ ] translate_spec/3
+- [ ] translate_type/3
+- [ ] type_to_ast/1
+- [ ] type_to_signature/1
+- [ ] defcallback/1
+- [ ] defmacrocallback/1
+- [ ] defopaque/1
+- [ ] defoptional_callbacks/1
+- [ ] defspec/1
+- [ ] deftype/1
+- [ ] deftypep/1
+## KeyError
+- [ ] __struct__/0
+- [ ] __struct__/1
+- [ ] exception/1
+- [ ] message/1
+## MapSet
+- [X] __struct__/0
+- [X] __struct__/1
+- [X] delete/2
+- [X] difference/2
+- [X] disjoint?/2
+- [X] equal?/2
+- [X] intersection/2
+- [X] member?/2
+- [X] new/0
+- [ ] new/1
+- [ ] new/2
+- [X] put/2
+- [X] size/1
+- [X] subset?/2
+- [X] to_list/1
+- [X] union/2
+## Macro
+- [ ] camelize/1
+- [ ] decompose_call/1
+- [ ] escape/1
+- [ ] escape/2
+- [ ] expand/2
+- [ ] expand_once/2
+- [ ] pipe/3
+- [ ] pipe_warning/1
+- [ ] postwalk/2
+- [ ] postwalk/3
+- [ ] prewalk/2
+- [ ] prewalk/3
+- [ ] to_string/1
+- [ ] to_string/2
+- [ ] traverse/4
+- [ ] underscore/1
+- [ ] unescape_string/1
+- [ ] unescape_string/2
+- [ ] unescape_tokens/1
+- [ ] unescape_tokens/2
+- [ ] unpipe/1
+- [ ] update_meta/2
+- [ ] validate/1
+- [ ] var/2
+- [ ] binary_ops/0
+- [ ] unary_ops/0
+## URI
+- [ ] __struct__/0
+- [ ] __struct__/1
+- [ ] char_reserved?/1
+- [ ] char_unescaped?/1
+- [ ] char_unreserved?/1
+- [ ] decode/1
+- [ ] decode_query/1
+- [ ] decode_query/2
+- [ ] decode_www_form/1
+- [ ] default_port/1
+- [ ] default_port/2
+- [ ] encode/1
+- [ ] encode/2
+- [ ] encode_query/1
+- [ ] encode_www_form/1
+- [ ] merge/2
+- [ ] parse/1
+- [ ] path_to_segments/1
+- [ ] query_decoder/1
+- [ ] to_string/1
+## Inspect.Opts
+- [ ] __struct__/0
+- [ ] __struct__/1
+## Atom
+- [X] to_char_list/1
+- [ ] to_charlist/1
+- [X] to_string/1
+## TokenMissingError
+- [ ] __struct__/0
+- [ ] __struct__/1
+- [ ] exception/1
+- [ ] message/1
+## BadBooleanError
+- [ ] __struct__/0
+- [ ] __struct__/1
+- [ ] exception/1
+- [ ] message/1
+## String.Chars.Date
+- [ ] __impl__/1
+- [ ] to_string/1
+## Set
+- [ ] delete/2
+- [ ] difference/2
+- [ ] disjoint?/2
+- [ ] empty/1
+- [ ] equal?/2
+- [ ] intersection/2
+- [ ] member?/2
+- [ ] put/2
+- [ ] size/1
+- [ ] subset?/2
+- [ ] to_list/1
+- [ ] union/2
+## WithClauseError
+- [ ] __struct__/0
+- [ ] __struct__/1
+- [ ] exception/1
+- [ ] message/1
+## List.Chars.Atom
+- [ ] __impl__/1
+- [ ] to_charlist/1
+## Version.InvalidRequirementError
+- [ ] __struct__/0
+- [ ] __struct__/1
+- [ ] exception/1
+- [ ] message/1
+## Application
+- [ ] app_dir/1
+- [ ] app_dir/2
+- [ ] delete_env/2
+- [ ] delete_env/3
+- [ ] ensure_all_started/1
+- [ ] ensure_all_started/2
+- [ ] ensure_started/1
+- [ ] ensure_started/2
+- [ ] fetch_env/2
+- [ ] fetch_env!/2
+- [ ] format_error/1
+- [ ] get_all_env/1
+- [ ] get_application/1
+- [ ] get_env/2
+- [ ] get_env/3
+- [ ] load/1
+- [ ] loaded_applications/0
+- [ ] put_env/3
+- [ ] put_env/4
+- [ ] spec/1
+- [ ] spec/2
+- [ ] start/1
+- [ ] start/2
+- [ ] started_applications/0
+- [ ] started_applications/1
+- [ ] stop/1
+- [ ] unload/1
+- [ ] __using__/1
+## Inspect.PID
+- [ ] __impl__/1
+- [ ] inspect/2
+## Calendar.ISO
+- [ ] date/3
+- [ ] date_to_iso8601/3
+- [ ] date_to_string/3
+- [ ] datetime_to_iso8601/11
+- [ ] datetime_to_string/11
+- [ ] day_of_week/3
+- [ ] days_in_month/2
+- [ ] from_unix/2
+- [ ] leap_year?/1
+- [ ] naive_datetime_to_iso8601/7
+- [ ] naive_datetime_to_string/7
+- [ ] parse_microsecond/1
+- [ ] parse_offset/1
+- [ ] time_to_iso8601/4
+- [ ] time_to_string/4

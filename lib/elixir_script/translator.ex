@@ -167,11 +167,6 @@ defmodule ElixirScript.Translator do
     Expression.make_binary_expression(:%, left, right, env)
   end
 
-  defp do_translate({:throw, _, [params]}, env) do
-    { result, env } = translate(params, env)
-    { JS.throw_statement(result), env }
-  end
-
   defp do_translate({:<>, context, [left, right]}, env) do
     translate({:+, context, [left, right]}, env)
   end

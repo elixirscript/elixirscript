@@ -62,7 +62,8 @@ defmodule ElixirScript.Mixfile do
 
   defp aliases do
     [dist: &dist/1,
-     install: &install/1]
+     install: &install/1,
+     supported: &supported/1]
   end
 
   def dist(_) do
@@ -103,6 +104,12 @@ defmodule ElixirScript.Mixfile do
     System.cmd("mv", ["dist/elixirscript", "/usr/local/elixirscript"])
 
     IO.puts("installed at /usr/local/elixirscript")
+  end
+
+  def supported(_) do
+    Mix.Task.run "app.start"
+
+    ElixirScript.Gen.Supported.generate()
   end
 
 end
