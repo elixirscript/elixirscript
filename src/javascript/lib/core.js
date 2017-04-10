@@ -5,8 +5,24 @@ import SpecialForms from './core/special_forms';
 
 class Integer {}
 class Float {}
-Functions.get_global().__elixirscript_store__ = new Map();
-Functions.get_global().__elixirscript_names__ = new Map();
+
+function get_global() {
+  if (typeof self !== 'undefined') {
+    return self;
+  } else if (typeof window !== 'undefined') {
+    return window;
+  } else if (typeof global !== 'undefined') {
+    return global;
+  }
+
+  console.warn('No global state found');
+  return null;
+}
+
+const globalState = get_global();
+
+globalState.__elixirscript_store__ = new Map();
+globalState.__elixirscript_names__ = new Map();
 
 export default {
   Tuple: ErlangTypes.Tuple,
@@ -17,4 +33,5 @@ export default {
   Float,
   Functions,
   SpecialForms,
+  global: globalState,
 };

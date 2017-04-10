@@ -52,18 +52,6 @@ function call_property(item, property) {
   return item[prop];
 }
 
-function get_global() {
-  if (typeof self !== 'undefined') {
-    return self;
-  } else if (typeof window !== 'undefined') {
-    return window;
-  } else if (typeof global !== 'undefined') {
-    return global;
-  }
-
-  throw new Error('No global state found');
-}
-
 function defprotocol(spec) {
   return new Protocol(spec);
 }
@@ -97,7 +85,6 @@ function build_namespace(ns, ns_string) {
 
 export default {
   call_property,
-  get_global,
   defprotocol,
   defimpl,
   build_namespace,
