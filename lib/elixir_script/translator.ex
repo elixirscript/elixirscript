@@ -523,15 +523,18 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({function, _, [{:when, _, [{name, _, _params} | _guards] }, _] } = ast, env) when function in @generator_types do
-    Def.process_function(name, [ast], %{ env | context: :generator})
+    {js_ast, _} = Def.process_function(name, [ast], %{ env | context: :generator})
+    {js_ast, env}
   end
 
   defp do_translate({function, _, [{name, _, params}, _]} = ast, env) when function in @generator_types and is_atom(params) do
-    Def.process_function(name, [ast], %{ env | context: :generator})
+    {js_ast, _} = Def.process_function(name, [ast], %{ env | context: :generator})
+    {js_ast, env}
   end
 
   defp do_translate({function, _, [{name, _, _params}, _]} = ast, env) when function in @generator_types do
-    Def.process_function(name, [ast], %{ env | context: :generator})
+    {js_ast, _} = Def.process_function(name, [ast], %{ env | context: :generator})
+    {js_ast, env}
   end
 
   defp do_translate({function, _, [{:when, _, [{name, _, _params} | _guards] }, _] } = ast, env) when function in @function_types do

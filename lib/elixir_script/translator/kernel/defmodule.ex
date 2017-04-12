@@ -57,6 +57,8 @@ defmodule ElixirScript.Translator.Defmodule do
       []
     end
 
+    info_prop = [JS.property(Identifier.make_identifier("__info__"), Identifier.make_identifier("__info__"), :init, true)]
+
     body = Enum.map(body, fn(x) ->
       case x do
         %ESTree.CallExpression{} ->
@@ -69,7 +71,7 @@ defmodule ElixirScript.Translator.Defmodule do
     body = Group.inflate_groups(body)
 
     exported_object = JS.object_expression(
-      struct_prop ++
+      info_prop ++ struct_prop ++
       Enum.map(exported_functions, fn({key, _value}) ->
         JS.property(Identifier.make_identifier(key), Identifier.make_identifier(key), :init, true)
       end)
@@ -78,7 +80,7 @@ defmodule ElixirScript.Translator.Defmodule do
     exported_functions = Enum.map(exported_functions, fn({_key, value}) -> value end)
     private_functions = Enum.map(private_functions, fn({_key, value}) -> value end)
 
-    body = private_functions ++ exported_functions ++ body
+    body = private_functions ++ exported_functions ++ [make_info_function(env)] ++ body
     {body, exported_object}
   end
 
@@ -228,6 +230,38 @@ defmodule ElixirScript.Translator.Defmodule do
     )
 
     JS.variable_declaration([declarator], :const)
+  end
+
+  def make_info_function(env) do
+    functions = Keyword.get(env.functions, env.module, [])
+    macros = Keyword.get(env.macros, env.module, [])
+
+    info_case = quote do
+      case kind do
+        :functions ->
+          unquote(functions)
+        :macros ->
+          unquote(macros)
+        :module ->
+          unquote(env.module)
+      end
+    end
+
+    translated_case = ElixirScript.Translator.translate!(info_case, env)
+
+    declarator = JS.variable_declarator(
+      Identifier.make_identifier("__info__"),
+      JS.function_expression(
+        [JS.identifier("kind")],
+        [],
+        JS.block_statement([
+          JS.return_statement(translated_case)
+        ])
+      )
+    )
+
+    JS.variable_declaration([declarator], :const)    
+    
   end
 
 end

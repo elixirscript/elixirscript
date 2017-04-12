@@ -9,7 +9,9 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
-    const __exports = {};
+    const __exports = {
+        __info__
+    };
     """
 
     assert_translation(ex_ast, js_code)
@@ -31,19 +33,25 @@ defmodule ElixirScript.Translator.Defmodule.Test do
     end
 
     js_code = """
-         const something = Bootstrap.Core.Patterns.defmatchgen(Bootstrap.Core.Patterns.clause([], function*() {
+         const something = Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([], function() {
              return ul;
          }));
+
+         const __info__ = function(kind) {
+                 return Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Symbol.for('functions')], function() {
+                     return Object.freeze([new Bootstrap.Core.Tuple(Symbol.for('something'), 0)]);
+                 }), Bootstrap.Core.Patterns.clause([Symbol.for('macros')], function() {
+                     return Object.freeze([]);
+                 }), Bootstrap.Core.Patterns.clause([Symbol.for('module')], function() {
+                     return Symbol.for('Elixir.Elephant');
+                 })).call(this, kind);
+             };
 
          const ul = '#todo-list';
 
          const something_else = Bootstrap.Core.Patterns.defmatchgen(Bootstrap.Core.Patterns.clause([], function*() {
              return null;
          }));
-
-         const __exports = {
-             something
-         };
     """
 
     assert_translation(ex_ast, js_code)
