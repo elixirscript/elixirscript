@@ -28,9 +28,9 @@ defmodule ElixirScript.Mixfile do
 
   defp deps do
     [
-      {:estree, "~> 2.5"},
+      {:estree, "~> 2.6"},
       {:fs, "~> 2.12"},
-      {:ex_doc, "~> 0.14", only: :dev},
+      {:ex_doc, "~> 0.15", only: :dev},
       {:excoveralls, "~> 0.6", only: :test},
       {:credo, "~> 0.7", only: [:dev, :test]}
     ]
