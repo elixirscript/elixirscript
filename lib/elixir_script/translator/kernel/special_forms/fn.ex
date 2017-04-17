@@ -260,28 +260,6 @@ defmodule ElixirScript.Translator.Function do
     JS.function_expression(params, [], body, generator?, false, async)
   end
 
-  def applyAwait(%ESTree.CallExpression{callee: %ESTree.MemberExpression{object: %ESTree.CallExpression{}}} = ast) do
-    callee = %{ ast.callee | object: JS.sequence_expression([JS.await_expression(ast.callee.object)]) }
-    ast = %{ast | callee: callee} 
-    JS.await_expression(ast)
-  end
-
-  def applyAwait(%ESTree.CallExpression{} = ast) do
-    JS.await_expression(ast)
-  end
-
-  def applyAwait(%ESTree.UnaryExpression{argument: %ESTree.CallExpression{}} = ast) do
-    JS.await_expression(ast)
-  end
-
-  def applyAwait(%ESTree.BinaryExpression{left: %ESTree.CallExpression{}} = ast) do
-    JS.await_expression(ast)
-  end
-
-  def applyAwait(%ESTree.BinaryExpression{right: %ESTree.CallExpression{}} = ast) do
-    JS.await_expression(ast)
-  end
-
   def applyAwait(ast) do
     ast
   end
