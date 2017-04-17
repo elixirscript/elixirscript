@@ -49,9 +49,9 @@ defmodule ElixirScript.Translator.Map.Test do
     end
 
     js_code = """
-       Bootstrap.Core.SpecialForms.map_update(map,Object.freeze({
+         Object.freeze(Object.assign({}, map, Object.freeze({
              [Symbol.for('value')]: 1
-       }))
+         })))
     """
 
     assert_translation(ex_ast, js_code)

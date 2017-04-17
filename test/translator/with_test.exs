@@ -11,16 +11,12 @@ defmodule ElixirScript.Translator.With.Test do
     end
 
     js_code = """
-    Bootstrap.Core.SpecialForms._with([Bootstrap.Core.Patterns.type(Bootstrap.Core.Tuple,{
-    values: [Symbol.for('ok'), Bootstrap.Core.Patterns.variable()]
-    }), async function()    {
-    return     Elixir.ElixirScript.Map.__load(Elixir).fetch(opts,Symbol.for('width'));
-    }],[Bootstrap.Core.Patterns.type(Bootstrap.Core.Tuple,{
-    values: [Symbol.for('ok'), Bootstrap.Core.Patterns.variable()]
-    }), async function(width)    {
-    return     Elixir.ElixirScript.Map.__load(Elixir).fetch(opts,Symbol.for('height'));
-    }],async function(width,height)    {
-    return     new Bootstrap.Core.Tuple(Symbol.for('ok'),width * height);
+    Bootstrap.Core.SpecialForms._with([new Bootstrap.Core.Tuple(Symbol.for('ok'), Bootstrap.Core.Patterns.variable()), function() {
+        return Elixir.ElixirScript.Map.__load(Elixir).fetch(opts, Symbol.for('width'));
+    }], [new Bootstrap.Core.Tuple(Symbol.for('ok'), Bootstrap.Core.Patterns.variable()), function(width) {
+        return Elixir.ElixirScript.Map.__load(Elixir).fetch(opts, Symbol.for('height'));
+    }], function(width, height) {
+        return new Bootstrap.Core.Tuple(Symbol.for('ok'), width * height);
     })
     """
 
@@ -37,18 +33,14 @@ defmodule ElixirScript.Translator.With.Test do
     end
 
     js_code = """
-    Bootstrap.Core.SpecialForms._with([Bootstrap.Core.Patterns.type(Bootstrap.Core.Tuple,{
-    values: [Symbol.for('ok'), Bootstrap.Core.Patterns.variable()]
-    }), async function()    {
-    return     Elixir.ElixirScript.Map.__load(Elixir).fetch(opts,Symbol.for('width'));
-    }],[Bootstrap.Core.Patterns.variable(), async function(width)    {
-    return     width * 2;
-    }],[Bootstrap.Core.Patterns.type(Bootstrap.Core.Tuple,{
-    values: [Symbol.for('ok'), Bootstrap.Core.Patterns.variable()]
-    }), async function(width,double_width)    {
-    return     Elixir.ElixirScript.Map.__load(Elixir).fetch(opts,Symbol.for('height'));
-    }],async function(width,double_width,height)    {
-    return     new Bootstrap.Core.Tuple(Symbol.for('ok'),double_width * height);
+    Bootstrap.Core.SpecialForms._with([new Bootstrap.Core.Tuple(Symbol.for('ok'), Bootstrap.Core.Patterns.variable()), function() {
+        return Elixir.ElixirScript.Map.__load(Elixir).fetch(opts, Symbol.for('width'));
+    }], [Bootstrap.Core.Patterns.variable(), function(width) {
+        return width * 2;
+    }], [new Bootstrap.Core.Tuple(Symbol.for('ok'), Bootstrap.Core.Patterns.variable()), function(width, double_width) {
+        return Elixir.ElixirScript.Map.__load(Elixir).fetch(opts, Symbol.for('height'));
+    }], function(width, double_width, height) {
+        return new Bootstrap.Core.Tuple(Symbol.for('ok'), double_width * height);
     })
     """
 
@@ -67,19 +59,15 @@ defmodule ElixirScript.Translator.With.Test do
     end
 
     js_code = """
-    Bootstrap.Core.SpecialForms._with([Bootstrap.Core.Patterns.type(Bootstrap.Core.Tuple,{
-    values: [Symbol.for('ok'), Bootstrap.Core.Patterns.variable()]
-    }), async function()    {
-    return     Elixir.ElixirScript.Map.__load(Elixir).fetch(opts,Symbol.for('width'));
-    }],[Bootstrap.Core.Patterns.type(Bootstrap.Core.Tuple,{
-    values: [Symbol.for('ok'), Bootstrap.Core.Patterns.variable()]
-    }), async function(width)    {
-    return     Elixir.ElixirScript.Map.__load(Elixir).fetch(opts,Symbol.for('height'));
-    }],async function(width,height)    {
-    return     new Bootstrap.Core.Tuple(Symbol.for('ok'),width * height);
-    },Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Symbol.for('error')],async function()    {
-    return     new Bootstrap.Core.Tuple(Symbol.for('error'),Symbol.for('wrong_data'));
-    })))
+         Bootstrap.Core.SpecialForms._with([new Bootstrap.Core.Tuple(Symbol.for('ok'), Bootstrap.Core.Patterns.variable()), function() {
+             return Elixir.ElixirScript.Map.__load(Elixir).fetch(opts, Symbol.for('width'));
+         }], [new Bootstrap.Core.Tuple(Symbol.for('ok'), Bootstrap.Core.Patterns.variable()), function(width) {
+             return Elixir.ElixirScript.Map.__load(Elixir).fetch(opts, Symbol.for('height'));
+         }], function(width, height) {
+             return new Bootstrap.Core.Tuple(Symbol.for('ok'), width * height);
+         }, Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Symbol.for('error')], function() {
+             return new Bootstrap.Core.Tuple(Symbol.for('error'), Symbol.for('wrong_data'));
+         })))
     """
 
     assert_translation(ex_ast, js_code)

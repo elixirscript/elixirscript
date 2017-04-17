@@ -14,13 +14,7 @@ async function cond(clauses) {
   throw new Error();
 }
 
-function map_update(map, values) {
-  return Object.freeze(
-    Object.assign(Object.create(map.constructor.prototype), map, values),
-  );
-}
-
-async function _for(expression, generators, collectable_protocol, into = []) {
+function _for(expression, generators, collectable_protocol, into = []) {
   let [result, fun] = collectable_protocol.into(into);
 
   const generatedValues = run_list_generators(generators.pop()(), generators);
@@ -140,6 +134,7 @@ async function _with(...args) {
       }
       return result;
     }
+
     argsToPass = argsToPass.concat(patternResult);
   }
 
@@ -149,7 +144,6 @@ async function _with(...args) {
 export default {
   _case,
   cond,
-  map_update,
   _for,
   _try,
   _with,

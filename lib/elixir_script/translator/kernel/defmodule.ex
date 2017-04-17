@@ -51,7 +51,13 @@ defmodule ElixirScript.Translator.Defmodule do
 
     { exported_functions, private_functions } = process_functions(functions, env)
 
-    {structs, body} = extract_structs_from_body(body, env)
+    struct_prop = if has_struct?(body) do
+      [JS.property(Identifier.make_identifier("__struct__"), Identifier.make_identifier("__struct__"), :init, true)]
+    else
+      []
+    end
+
+    info_prop = [JS.property(Identifier.make_identifier("__info__"), Identifier.make_identifier("__info__"), :init, true)]
 
     body = Enum.map(body, fn(x) ->
       case x do
@@ -65,7 +71,7 @@ defmodule ElixirScript.Translator.Defmodule do
     body = Group.inflate_groups(body)
 
     exported_object = JS.object_expression(
-      make_defstruct_property(module, structs) ++
+      info_prop ++ struct_prop ++
       Enum.map(exported_functions, fn({key, _value}) ->
         JS.property(Identifier.make_identifier(key), Identifier.make_identifier(key), :init, true)
       end)
@@ -74,7 +80,7 @@ defmodule ElixirScript.Translator.Defmodule do
     exported_functions = Enum.map(exported_functions, fn({_key, value}) -> value end)
     private_functions = Enum.map(private_functions, fn({_key, value}) -> value end)
 
-    body = structs ++ private_functions ++ exported_functions ++ body
+    body = private_functions ++ exported_functions ++ [make_info_function(env)] ++ body
     {body, exported_object}
   end
 
@@ -161,17 +167,17 @@ defmodule ElixirScript.Translator.Defmodule do
     end)
   end
 
-  def extract_structs_from_body(body, env) do
-    module_js_name = Utils.name_to_js_name(env.module)
-
-    Enum.partition(body, fn(x) ->
+  def has_struct?(body) do
+    val = Enum.find(body, fn(x) ->
       case x do
-        %ESTree.VariableDeclaration{declarations: [%ESTree.VariableDeclarator{id: %ESTree.Identifier{name: ^module_js_name} } ] } ->
+        %ESTree.VariableDeclaration{declarations: [%ESTree.VariableDeclarator{id: %ESTree.Identifier{name: "__struct__"} } ] } ->
           true
         _ ->
           false
       end
     end)
+
+    val != nil
   end
 
   defp make_defstruct_property(_, []) do
@@ -224,6 +230,38 @@ defmodule ElixirScript.Translator.Defmodule do
     )
 
     JS.variable_declaration([declarator], :const)
+  end
+
+  def make_info_function(env) do
+    functions = Keyword.get(env.functions, env.module, [])
+    macros = Keyword.get(env.macros, env.module, [])
+
+    info_case = quote do
+      case kind do
+        :functions ->
+          unquote(functions)
+        :macros ->
+          unquote(macros)
+        :module ->
+          unquote(env.module)
+      end
+    end
+
+    translated_case = ElixirScript.Translator.translate!(info_case, env)
+
+    declarator = JS.variable_declarator(
+      Identifier.make_identifier("__info__"),
+      JS.function_expression(
+        [JS.identifier("kind")],
+        [],
+        JS.block_statement([
+          JS.return_statement(translated_case)
+        ])
+      )
+    )
+
+    JS.variable_declaration([declarator], :const)    
+    
   end
 
 end

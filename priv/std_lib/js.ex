@@ -52,7 +52,7 @@ defmodule JS do
   In node this would be the global object.
   """
   def global() do
-    Bootstrap.Core.global
+    Bootstrap.Core.global()
   end
 
   @doc """

@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - `remove-unused` option that will remove all unused modules from output
+- reimplemented structs to avoid creating JavaScript classes
 
 ## [0.27.0] - 2017-03-17
 

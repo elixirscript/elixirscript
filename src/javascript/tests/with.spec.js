@@ -118,10 +118,9 @@ describe('with', () => {
       ),
     );
 
-    expect(value).to.eql(new Tuple(
-      Symbol.for('error'),
-      Symbol.for('wrong_data'),
-    ));
+    expect(value).to.eql(
+      new Tuple(Symbol.for('error'), Symbol.for('wrong_data')),
+    );
   });
 
   it('with else that don`t match', () => {

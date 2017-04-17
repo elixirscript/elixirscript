@@ -19,20 +19,20 @@ defmodule ElixirScript.Translator.Match.Test do
       {a, b} = {1, 2}
     end
     js_code = """
-    let [a, b] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.type(Bootstrap.Core.Tuple, {
-        values: [Bootstrap.Core.Patterns.variable(), Bootstrap.Core.Patterns.variable()]
-    }), new Bootstrap.Core.Tuple(1, 2));
-    let _ref = new Bootstrap.Core.Tuple(a, b);
+    let [a, b] = Bootstrap.Core.Patterns.match(
+      new Bootstrap.Core.Tuple(
+        Bootstrap.Core.Patterns.variable(), 
+        Bootstrap.Core.Patterns.variable()
+      ), 
+      new Bootstrap.Core.Tuple(1, 2)
+    );
     """
 
     assert_translation(ex_ast, js_code)
 
     ex_ast = quote do: {a, _, c} = {1, 2, 3}
     js_code = """
-    let [a, __ignored__, c] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.type(Bootstrap.Core.Tuple, {
-        values: [Bootstrap.Core.Patterns.variable(), Bootstrap.Core.Patterns.variable(), Bootstrap.Core.Patterns.variable()]
-    }), new Bootstrap.Core.Tuple(1, 2, 3));
-    let _ref = new Bootstrap.Core.Tuple(a, __ignored__, c);
+         let [a, __ignored__, c] = Bootstrap.Core.Patterns.match(new Bootstrap.Core.Tuple(Bootstrap.Core.Patterns.variable(), Bootstrap.Core.Patterns.variable(), Bootstrap.Core.Patterns.variable()), new Bootstrap.Core.Tuple(1, 2, 3));
     """
 
     assert_translation(ex_ast, js_code)
@@ -43,10 +43,7 @@ defmodule ElixirScript.Translator.Match.Test do
        {^a, _, c} = {1, 2, 3}
     end
     js_code = """
-    let [, __ignored__, c] = Bootstrap.Core.Patterns.match(Bootstrap.Core.Patterns.type(Bootstrap.Core.Tuple, {
-        values: [Bootstrap.Core.Patterns.bound(a), Bootstrap.Core.Patterns.variable(), Bootstrap.Core.Patterns.variable()]
-    }), new Bootstrap.Core.Tuple(1, 2, 3));
-    let _ref = new Bootstrap.Core.Tuple(undefined, __ignored__, c);
+    let [, __ignored__, c] = Bootstrap.Core.Patterns.match(new Bootstrap.Core.Tuple(Bootstrap.Core.Patterns.bound(a), Bootstrap.Core.Patterns.variable(), Bootstrap.Core.Patterns.variable()), new Bootstrap.Core.Tuple(1, 2, 3));
     """
 
     assert_translation(ex_ast, js_code)

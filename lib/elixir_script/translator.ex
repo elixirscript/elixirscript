@@ -167,11 +167,6 @@ defmodule ElixirScript.Translator do
     Expression.make_binary_expression(:%, left, right, env)
   end
 
-  defp do_translate({:throw, _, [params]}, env) do
-    { result, env } = translate(params, env)
-    { JS.throw_statement(result), env }
-  end
-
   defp do_translate({:<>, context, [left, right]}, env) do
     translate({:+, context, [left, right]}, env)
   end
@@ -219,7 +214,13 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:%, _, [alias_info, data]}, env) do
-    { Struct.new_struct(alias_info, data, env), env }
+    module = case create_module_name(alias_info, env) do
+        {module, _} ->
+          module
+        module ->
+          module
+      end
+    Call.make_module_function_call(module, :__struct__, [data], env)
   end
 
   defp do_translate({:%{}, _, [{:|, _, [map, data]}]}, env) do
@@ -347,7 +348,15 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:__MODULE__, _, _ }, env) do
-    translate(env.module, env)
+    module_name = create_module_name(env.module, env)
+    mod = case module_name do
+      {mod, _} ->
+        mod
+      mod ->
+        mod
+    end
+
+    translate(mod, env)
   end
 
   defp do_translate({:__block__, _, expressions }, env) do
@@ -514,15 +523,18 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({function, _, [{:when, _, [{name, _, _params} | _guards] }, _] } = ast, env) when function in @generator_types do
-    Def.process_function(name, [ast], %{ env | context: :generator})
+    {js_ast, _} = Def.process_function(name, [ast], %{ env | context: :generator})
+    {js_ast, env}
   end
 
   defp do_translate({function, _, [{name, _, params}, _]} = ast, env) when function in @generator_types and is_atom(params) do
-    Def.process_function(name, [ast], %{ env | context: :generator})
+    {js_ast, _} = Def.process_function(name, [ast], %{ env | context: :generator})
+    {js_ast, env}
   end
 
   defp do_translate({function, _, [{name, _, _params}, _]} = ast, env) when function in @generator_types do
-    Def.process_function(name, [ast], %{ env | context: :generator})
+    {js_ast, _} = Def.process_function(name, [ast], %{ env | context: :generator})
+    {js_ast, env}
   end
 
   defp do_translate({function, _, [{:when, _, [{name, _, _params} | _guards] }, _] } = ast, env) when function in @function_types do
@@ -541,12 +553,12 @@ defmodule ElixirScript.Translator do
     Def.process_delegate(name, params, options, env)
   end
 
-  defp do_translate({:defstruct, _, attributes}, env) do
-    { Struct.make_defstruct(attributes, env), env }
+  defp do_translate({:defstruct, _, [attributes]}, env) do
+    { Struct.make_struct(attributes, env), env }
   end
 
-  defp do_translate({:defexception, _, attributes}, env) do
-    { Struct.make_defexception(attributes, env), env }
+  defp do_translate({:defexception, _, [attributes]}, env) do
+    { Struct.make_struct(attributes ++ [__exception__: true], env), env }
   end
 
   defp do_translate({:defmodule, _, [{:__aliases__, _, module_name_list}, [do: body]]}, env) do
@@ -578,17 +590,46 @@ defmodule ElixirScript.Translator do
   end
 
   defp do_translate({:raise, _, [alias_info, attributes]}, env) when is_list(attributes) do
-    js_ast = JS.throw_statement(
-      Struct.new_struct(alias_info, {:%{}, [], attributes }, env)
-    )
+    module = case create_module_name(alias_info, env) do
+        {module, _} ->
+          module
+        module ->
+          module
+      end
+
+    {call, _} = Call.make_module_function_call(module, :__struct__, [{:%{}, [], attributes }], env)
+
+    js_ast = JS.throw_statement(call)
 
     { js_ast, env }
   end
 
   defp do_translate({:raise, _, [alias_info, message]}, env) do
-    js_ast = JS.throw_statement(
-      Struct.new_struct(alias_info, {:%{}, [], [message: message] }, env)
-    )
+    module = case create_module_name(alias_info, env) do
+        {module, _} ->
+          module
+        module ->
+          module
+      end
+
+    {call, _} = Call.make_module_function_call(module, :__struct__, [{:%{}, [], [message: message] }], env)
+
+    js_ast = JS.throw_statement(call)
+
+    { js_ast, env }
+  end
+
+  defp do_translate({:raise, _, [{:__aliases__, _, _} = alias_info]}, env) do
+    module = case create_module_name(alias_info, env) do
+        {module, _} ->
+          module
+        module ->
+          module
+      end
+
+    {call, _} = Call.make_module_function_call(module, :__struct__, [], env)
+
+    js_ast = JS.throw_statement(call)
 
     { js_ast, env }
   end
@@ -646,7 +687,7 @@ defmodule ElixirScript.Translator do
 
           { Identifier.make_identifier(name), env }
         has_function?(env.module, {name, 0}, env) ->
-          Call.make_function_call(name, [], env)
+          Call.make_local_function_call(name, [], env)
         ElixirScript.Translator.LexicalScope.find_module(env, {name, 0}) ->
           imported_module_name = ElixirScript.Translator.LexicalScope.find_module(env, {name, 0})
           Call.make_module_function_call(imported_module_name, name, params, env)

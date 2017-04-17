@@ -11,7 +11,7 @@ defmodule ElixirScript.Translator.Kernel.Test do
     end
 
     js_code = """
-    throw ArgumentError.create(Object.freeze({
+    throw Elixir.ElixirScript.ArgumentError.__load(Elixir).__struct__(Object.freeze({
     [Symbol.for('message')]: 'cannot convert list to string. The list must contain only integers, strings or nested such lists; got: ' + Elixir.ElixirScript.String.Chars.__load(Elixir).to_string(inspect(list))
     }));
     """
@@ -27,7 +27,7 @@ defmodule ElixirScript.Translator.Kernel.Test do
     end
 
     js_code = """
-    throw ArgumentError.create(Object.freeze({
+    throw Elixir.ElixirScript.ArgumentError.__load(Elixir).__struct__(Object.freeze({
     [Symbol.for('message')]: 'cannot convert list to string. The list must contain only integers, strings or nested such lists; got'
     }));
     """

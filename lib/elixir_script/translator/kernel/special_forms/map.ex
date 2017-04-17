@@ -67,10 +67,22 @@ defmodule ElixirScript.Translator.Map do
 
     js_ast = JS.call_expression(
       JS.member_expression(
-        Primitive.special_forms(),
-        JS.identifier("map_update")
+        JS.identifier("Object"),
+        JS.identifier("freeze")
       ),
-      [map, data]
+      [
+        JS.call_expression(
+          JS.member_expression(
+            JS.identifier("Object"),
+            JS.identifier("assign")
+          ),
+          [
+            JS.object_expression([]),
+            map,
+            data       
+          ]
+        )
+      ]
     )
 
     { js_ast, env }

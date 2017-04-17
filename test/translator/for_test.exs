@@ -8,25 +8,11 @@ defmodule ElixirScript.Translator.For.Test do
     end
 
     js_code = """
-    Bootstrap.Core.SpecialForms._for(
-      Bootstrap.Core.Patterns.clause(
-        [Bootstrap.Core.Patterns.variable()],
-        async function(n) {
-          return n * 2;
-        },
-        async function() {
-          return true;
-        }
-      ),
-      [
-        Bootstrap.Core.Patterns.list_generator(
-          Bootstrap.Core.Patterns.variable(),
-          Object.freeze([1, 2, 3, 4])
-        )
-      ],
-      Elixir.ElixirScript.Collectable.__load(Elixir),
-      Object.freeze([])
-    )
+         Bootstrap.Core.SpecialForms._for(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()], function(n) {
+             return n * 2;
+         }, function() {
+             return true;
+         }), [Bootstrap.Core.Patterns.list_generator(Bootstrap.Core.Patterns.variable(), Object.freeze([1, 2, 3, 4]))], Elixir.ElixirScript.Collectable.__load(Elixir), Object.freeze([]))
     """
 
     assert_translation(ex_ast, js_code)
@@ -173,21 +159,11 @@ defmodule ElixirScript.Translator.For.Test do
     end
 
     js_code = """
-    Bootstrap.Core.SpecialForms._for(
-      Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.type(Bootstrap.Core.Tuple, {
-            values: [Symbol.for('user'), Bootstrap.Core.Patterns.variable()]
-        })], async function(name) {
-            return Elixir.ElixirScript.String.__load(Elixir).upcase(name);
-        }, async function() {
-            return true;
-        }),
-        [
-          Bootstrap.Core.Patterns.list_generator(Bootstrap.Core.Patterns.type(Bootstrap.Core.Tuple, {
-            values: [Symbol.for('user'), Bootstrap.Core.Patterns.variable()]
-        }), Object.freeze([new Bootstrap.Core.Tuple(Symbol.for('user'), 'john'), new Bootstrap.Core.Tuple(Symbol.for('admin'), 'john'), new Bootstrap.Core.Tuple(Symbol.for('user'), 'meg')]))
-        ],
-        Elixir.ElixirScript.Collectable.__load(Elixir),
-        Object.freeze([]))
+         Bootstrap.Core.SpecialForms._for(Bootstrap.Core.Patterns.clause([new Bootstrap.Core.Tuple(Symbol.for('user'), Bootstrap.Core.Patterns.variable())], function(name) {
+             return Elixir.ElixirScript.String.__load(Elixir).upcase(name);
+         }, function() {
+             return true;
+         }), [Bootstrap.Core.Patterns.list_generator(new Bootstrap.Core.Tuple(Symbol.for('user'), Bootstrap.Core.Patterns.variable()), Object.freeze([new Bootstrap.Core.Tuple(Symbol.for('user'), 'john'), new Bootstrap.Core.Tuple(Symbol.for('admin'), 'john'), new Bootstrap.Core.Tuple(Symbol.for('user'), 'meg')]))], Elixir.ElixirScript.Collectable.__load(Elixir), Object.freeze([]))
     """
 
     assert_translation(ex_ast, js_code)
