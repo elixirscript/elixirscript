@@ -77,8 +77,8 @@ function build_namespace(ns, ns_string) {
     parent = parent[part];
   }
 
-  root.__table = ns.__table || {};
-  root.__table[Symbol.for(ns_string)] = parent;
+  root.__table__ = ns.__table__ || {};
+  root.__table__[Symbol.for(ns_string)] = parent;
 
   return parent;
 }
