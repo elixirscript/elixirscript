@@ -1,53 +1,51 @@
-const expect = require('chai').expect;
+import test from 'ava';
 const Elixir = require('../build/Elixir.App');
 
-describe('Integer', () => {
-  it('is_odd/1', () => {
-    const Integer = Elixir.load(Elixir.ElixirScript.Integer);
+test('Integer.is_odd/1', t => {
+  const Integer = Elixir.load(Elixir.ElixirScript.Integer);
 
-    expect(Integer.is_odd(0)).to.eq(false);
-    expect(Integer.is_odd(1)).to.eq(true);
-    expect(Integer.is_odd(2)).to.eq(false);
-    expect(Integer.is_odd(3)).to.eq(true);
-    expect(Integer.is_odd(-1)).to.eq(true);
-    expect(Integer.is_odd(-2)).to.eq(false);
-    expect(Integer.is_odd(-3)).to.eq(true);
-  });
+  t.is(Integer.is_odd(0), false);
+  t.is(Integer.is_odd(1), true);
+  t.is(Integer.is_odd(2), false);
+  t.is(Integer.is_odd(3), true);
+  t.is(Integer.is_odd(-1), true);
+  t.is(Integer.is_odd(-2), false);
+  t.is(Integer.is_odd(-3), true);
+});
 
-  it('is_even/1', () => {
-    const Integer = Elixir.load(Elixir.ElixirScript.Integer);
+test('Integer.is_even/1', t => {
+  const Integer = Elixir.load(Elixir.ElixirScript.Integer);
 
-    expect(Integer.is_even(0)).to.eq(true);
-    expect(Integer.is_even(1)).to.eq(false);
-    expect(Integer.is_even(2)).to.eq(true);
-    expect(Integer.is_even(3)).to.eq(false);
-    expect(Integer.is_even(-1)).to.eq(false);
-    expect(Integer.is_even(-2)).to.eq(true);
-    expect(Integer.is_even(-3)).to.eq(false);
-  });
+  t.is(Integer.is_even(0), true);
+  t.is(Integer.is_even(1), false);
+  t.is(Integer.is_even(2), true);
+  t.is(Integer.is_even(3), false);
+  t.is(Integer.is_even(-1), false);
+  t.is(Integer.is_even(-2), true);
+  t.is(Integer.is_even(-3), false);
+});
 
-  it('parse/2', () => {
-    const Integer = Elixir.load(Elixir.ElixirScript.Integer);
-    expect(Integer.parse('12').values).to.eql([12, '']);
-    expect(Integer.parse('012').values).to.eql([12, '']);
-    expect(Integer.parse('+12').values).to.eql([12, '']);
-    expect(Integer.parse('-12').values).to.eql([-12, '']);
-    expect(Integer.parse('123456789').values).to.eql([123456789, '']);
-    expect(Integer.parse('12.5').values).to.eql([12, '.5']);
-    expect(Integer.parse('7.5e-3').values).to.eql([7, '.5e-3']);
-    // expect(Integer.parse('12x').values).to.eql([12, 'x']);
-    expect(Integer.parse('++1')).to.eql(Symbol.for('error'));
-    expect(Integer.parse('--1')).to.eql(Symbol.for('error'));
-    expect(Integer.parse('+-1')).to.eql(Symbol.for('error'));
-    expect(Integer.parse('three')).to.eql(Symbol.for('error'));
+test('Integer.parse/2', t => {
+  const Integer = Elixir.load(Elixir.ElixirScript.Integer);
+  t.deepEqual(Integer.parse('12').values, [12, '']);
+  t.deepEqual(Integer.parse('012').values, [12, '']);
+  t.deepEqual(Integer.parse('+12').values, [12, '']);
+  t.deepEqual(Integer.parse('-12').values, [-12, '']);
+  t.deepEqual(Integer.parse('123456789').values, [123456789, '']);
+  t.deepEqual(Integer.parse('12.5').values, [12, '.5']);
+  t.deepEqual(Integer.parse('7.5e-3').values, [7, '.5e-3']);
+  // t.deepEqual(Integer.parse('12x').values, [12, 'x']);
+  t.deepEqual(Integer.parse('++1'), Symbol.for('error'));
+  t.deepEqual(Integer.parse('--1'), Symbol.for('error'));
+  t.deepEqual(Integer.parse('+-1'), Symbol.for('error'));
+  t.deepEqual(Integer.parse('three'), Symbol.for('error'));
 
-    expect(Integer.parse('12', 10).values).to.eql([12, '']);
-    expect(Integer.parse('-12', 12).values).to.eql([-14, '']);
-    expect(Integer.parse('12345678', 9).values).to.eql([6053444, '']);
-    expect(Integer.parse('3.14', 4).values).to.eql([3, '.14']);
-    expect(Integer.parse('64eb', 16).values).to.eql([25835, '']);
-    // expect(Integer.parse('64eb', 10).values).to.eql([64, 'eb']);
-    expect(Integer.parse('10', 2).values).to.eql([2, '']);
-    expect(Integer.parse('++4', 10)).to.eql(Symbol.for('error'));
-  });
+  t.deepEqual(Integer.parse('12', 10).values, [12, '']);
+  t.deepEqual(Integer.parse('-12', 12).values, [-14, '']);
+  t.deepEqual(Integer.parse('12345678', 9).values, [6053444, '']);
+  t.deepEqual(Integer.parse('3.14', 4).values, [3, '.14']);
+  t.deepEqual(Integer.parse('64eb', 16).values, [25835, '']);
+  // t.deepEqual(Integer.parse('64eb', 10).values, [64, 'eb']);
+  t.deepEqual(Integer.parse('10', 2).values, [2, '']);
+  t.deepEqual(Integer.parse('++4', 10), Symbol.for('error'));
 });

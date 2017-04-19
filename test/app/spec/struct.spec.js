@@ -1,36 +1,34 @@
-const expect = require('chai').expect;
+import test from 'ava';
 const Elixir = require('../build/Elixir.App');
 
-describe('Struct', () => {
-  it('Create Struct', () => {
-    const User = Elixir.load(Elixir.User);
+test('Create Struct', t => {
+  const User = Elixir.load(Elixir.User);
 
-    let struct = User.__struct__();
+  let struct = User.__struct__();
 
-    expect(Object.getOwnPropertySymbols(struct)).to.eql([
-      Symbol.for('__struct__'),
-      Symbol.for('first'),
-      Symbol.for('last'),
-    ]);
+  t.deepEqual(Object.getOwnPropertySymbols(struct), [
+    Symbol.for('__struct__'),
+    Symbol.for('first'),
+    Symbol.for('last'),
+  ]);
 
-    expect(struct[Symbol.for('__struct__')]).to.eql(Symbol.for('Elixir.User'));
-    expect(struct[Symbol.for('first')]).to.eql(null);
-    expect(struct[Symbol.for('last')]).to.eql(null);
+  t.deepEqual(struct[Symbol.for('__struct__')], Symbol.for('Elixir.User'));
+  t.deepEqual(struct[Symbol.for('first')], null);
+  t.deepEqual(struct[Symbol.for('last')], null);
 
-    struct = User.__struct__({ [Symbol.for('first')]: 'John' });
+  struct = User.__struct__({ [Symbol.for('first')]: 'John' });
 
-    expect(struct[Symbol.for('first')]).to.eql('John');
+  t.deepEqual(struct[Symbol.for('first')], 'John');
+});
+
+test('Protocol', t => {
+  const User = Elixir.load(Elixir.User);
+  const StringChars = Elixir.load(Elixir.ElixirScript.String.Chars);
+
+  const struct = User.__struct__({
+    [Symbol.for('first')]: 'John',
+    [Symbol.for('last')]: 'Doe',
   });
 
-  it('Protocol', () => {
-    const User = Elixir.load(Elixir.User);
-    const StringChars = Elixir.load(Elixir.ElixirScript.String.Chars);
-
-    const struct = User.__struct__({
-      [Symbol.for('first')]: 'John',
-      [Symbol.for('last')]: 'Doe',
-    });
-
-    expect(StringChars.to_string(struct)).to.eql('JohnDoe');
-  });
+  t.deepEqual(StringChars.to_string(struct), 'JohnDoe');
 });

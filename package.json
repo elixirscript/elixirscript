@@ -11,9 +11,9 @@
     "lint:fix": "eslint src/javascript/lib/**/*.js src/javascript/tests/**/*.js --fix",
     "build": "rollup -c rollup.config.js",
     "clean": "rm -rf priv/build",
-    "test": "mocha src/javascript/tests --recursive --compilers js:babel-core/register",
+    "test": "ava src/javascript/tests",
     "build:test-app": "mix elixirscript test/app/src/ -f common -o test/app/build/",
-    "test-app": "yarn run build:test-app && NODE_ENV=test mocha --recursive 'test/app/spec/**/*.spec.js' --compilers js:babel-register"
+    "test-app": "yarn run build:test-app && NODE_ENV=test ava 'test/app/spec/**/*.spec.js'"
   },
   "repository": {
     "type": "git",
@@ -26,6 +26,7 @@
     "tailored": "2.4.5"
   },
   "devDependencies": {
+    "ava": "^0.19.1",
     "babel-core": "^6.24.0",
     "babel-preset-env": "^1.3.2",
     "babel-register": "^6.24.0",
@@ -40,5 +41,13 @@
     "rollup-plugin-node-resolve": "^2.0.0",
     "sinon": "^1.17.7",
     "sinon-chai": "^2.8.0"
+  },
+  "ava": {
+    "require": [
+      "babel-register"
+    ],
+    "babel": {
+      "babelrc": true
+    }
   }
 }
