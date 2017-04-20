@@ -1,10 +1,10 @@
 import test from 'ava';
 const Elixir = require('../build/Elixir.App');
 
-test('Create Struct', t => {
+test('Create Struct', async t => {
   const User = Elixir.load(Elixir.User);
 
-  let struct = User.__struct__();
+  let struct = await User.__struct__();
 
   t.deepEqual(Object.getOwnPropertySymbols(struct), [
     Symbol.for('__struct__'),
@@ -16,19 +16,19 @@ test('Create Struct', t => {
   t.deepEqual(struct[Symbol.for('first')], null);
   t.deepEqual(struct[Symbol.for('last')], null);
 
-  struct = User.__struct__({ [Symbol.for('first')]: 'John' });
+  struct = await User.__struct__({ [Symbol.for('first')]: 'John' });
 
   t.deepEqual(struct[Symbol.for('first')], 'John');
 });
 
-test('Protocol', t => {
+test('Protocol', async t => {
   const User = Elixir.load(Elixir.User);
   const StringChars = Elixir.load(Elixir.ElixirScript.String.Chars);
 
-  const struct = User.__struct__({
+  const struct = await User.__struct__({
     [Symbol.for('first')]: 'John',
     [Symbol.for('last')]: 'Doe',
   });
 
-  t.deepEqual(StringChars.to_string(struct), 'JohnDoe');
+  t.deepEqual(await StringChars.to_string(struct), 'JohnDoe');
 });

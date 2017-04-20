@@ -1,5 +1,6 @@
 import test from 'ava';
 import Core from '../../lib/core';
+
 const Functions = Core.Functions;
 
 test('call_property', t => {

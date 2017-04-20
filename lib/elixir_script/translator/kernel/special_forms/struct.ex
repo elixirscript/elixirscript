@@ -105,7 +105,11 @@ defmodule ElixirScript.Translator.Struct do
       value_keys,
       every_call_result,
       bottom
-    ]))
+    ]),
+    false,
+    false,
+    true
+    )
 
     JS.variable_declaration([JS.variable_declarator(
       JS.identifier("__struct__"),

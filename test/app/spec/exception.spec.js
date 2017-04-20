@@ -1,10 +1,11 @@
 import test from 'ava';
+
 const Elixir = require('../build/Elixir.App');
 
-test('Create Exception', t => {
+test('Create Exception', async t => {
   const ArgumentError = Elixir.load(Elixir.ElixirScript.ArgumentError);
 
-  let struct = ArgumentError.__struct__();
+  let struct = await ArgumentError.__struct__();
 
   t.deepEqual(Object.getOwnPropertySymbols(struct), [
     Symbol.for('__struct__'),
@@ -19,19 +20,19 @@ test('Create Exception', t => {
   t.is(struct[Symbol.for('__exception__')], true);
   t.is(struct[Symbol.for('message')], 'argument error');
 
-  struct = ArgumentError.__struct__({
+  struct = await ArgumentError.__struct__({
     [Symbol.for('message')]: 'new argument error',
   });
 
   t.is(struct[Symbol.for('message')], 'new argument error');
 });
 
-test('raise exception', t => {
+test('raise exception', async t => {
   const User = Elixir.load(Elixir.User);
   const ArgumentError = Elixir.load(Elixir.ElixirScript.ArgumentError);
 
   try {
-    User.throw_something();
+    await User.throw_something();
   } catch (e) {
     t.is(e[Symbol.for('message')], 'argument error');
   }

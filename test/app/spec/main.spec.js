@@ -11,10 +11,10 @@ test('Elixir.start:calls the modules start function', t => {
   t.true(callback.called);
 });
 
-test('Elixir.load:loads the modules exports', t => {
+test('Elixir.load:loads the modules exports', async t => {
   const main = Elixir.load(Elixir.Main);
 
   t.truthy(main.start);
   t.truthy(main.hello);
-  t.is(main.hello(), 'Hello!');
+  t.is(await main.hello(), 'Hello!');
 });
