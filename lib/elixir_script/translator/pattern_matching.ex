@@ -8,6 +8,7 @@ defmodule ElixirScript.Translator.PatternMatching do
   alias ElixirScript.Translator.Map
   alias ElixirScript.Translator.Struct
   alias ElixirScript.Translator.Bitstring
+  alias ElixirScript.Translator.Utils
 
   @patterns JS.member_expression(
     JS.member_expression(
@@ -208,11 +209,12 @@ defmodule ElixirScript.Translator.PatternMatching do
     { JS.object_expression(List.wrap(props)), params }
   end
 
-  defp do_build_match({:%, _, [{:__aliases__, _, _} = name, {:%{}, meta, props}]}, env) do
-    struct_name = Struct.get_struct_class(name, env)
-    {pattern, params} = do_build_match({:%{}, meta, props}, env)
+  defp do_build_match({:%, _, [{:__aliases__, _, name}, {:%{}, meta, props}]}, env) do
+    module_name = ElixirScript.Translator.State.get_module_name(env.state, Utils.quoted_to_name(name))
+    name = Utils.name_to_js_file_name(module_name)
+    {pattern, params} = do_build_match({:%{}, meta, [__struct__: String.to_atom(name)] ++ props}, env)
 
-    { [type(struct_name, pattern)], params }
+    { pattern, params }
   end
 
   defp do_build_match({:=, _, [{name, _, _}, right]}, env) when not name in [:%, :{}, :__aliases__, :^, :%{}] do
@@ -244,14 +246,12 @@ defmodule ElixirScript.Translator.PatternMatching do
     |> Enum.map(&build_match([&1], env))
     |> reduce_patterns
 
-    pattern = JS.object_expression([
-      JS.property(
-        JS.identifier("values"),
-        JS.array_expression(patterns)
-      )
-      ])
+    tuple_pattern = JS.new_expression(
+      Primitive.tuple_class(),
+      patterns
+    )
 
-    { [type(Primitive.tuple_class, pattern)], params }
+    { [tuple_pattern], params }
   end
 
   defp do_build_match({:\\, _, [{name, _, _}, default]}, env) do

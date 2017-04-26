@@ -6,12 +6,8 @@ class Protocol {
     this.registry = new Map();
     this.fallback = null;
 
-    for (const funName in spec) {
-      this[funName] = createFun(funName).bind(this);
-    }
-
     function createFun(funName) {
-      return function (...args) {
+      return function(...args) {
         const thing = args[0];
         let fun = null;
 
@@ -27,6 +23,10 @@ class Protocol {
           typeof thing === 'string' && this.hasImplementation(Core.BitString)
         ) {
           fun = this.registry.get(Core.BitString)[funName];
+        } else if (
+          thing[Symbol.for('__struct__')] && this.hasImplementation(thing)
+        ) {
+          fun = this.registry.get(thing[Symbol.for('__struct__')])[funName];
         } else if (this.hasImplementation(thing)) {
           fun = this.registry.get(thing.constructor)[funName];
         } else if (this.fallback) {
@@ -40,6 +40,10 @@ class Protocol {
 
         throw new Error(`No implementation found for ${thing}`);
       };
+    }
+
+    for (const funName in spec) {
+      this[funName] = createFun(funName).bind(this);
     }
   }
 
@@ -56,6 +60,8 @@ class Protocol {
       thing === Core.Integer || thing === Core.Float || thing === Core.BitString
     ) {
       return this.registry.has(thing);
+    } else if (thing[Symbol.for('__struct__')]) {
+      return this.registry.has(thing[Symbol.for('__struct__')]);
     }
 
     return this.registry.has(thing.constructor);

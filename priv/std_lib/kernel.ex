@@ -202,4 +202,8 @@ defmodule ElixirScript.Kernel do
       %ElixirScript.Range{ first: unquote(first), last: unquote(last) }
     end
   end
+
+  def throw(term) do
+    JS.throw(term)
+  end
 end

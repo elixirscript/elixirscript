@@ -4,7 +4,7 @@ defmodule ElixirScript.Mixfile do
   def project do
     [
       app: :elixir_script,
-      version: "0.27.0",
+      version: "0.28.0-dev",
       elixir: "~> 1.0",
       elixirc_paths: elixirc_paths(),
       escript: escript_config(),
@@ -15,10 +15,9 @@ defmodule ElixirScript.Mixfile do
       package: package(),
       source_url: "https://github.com/elixirscript/elixirscript",
       aliases: aliases(),
-      #test_coverage: [tool: ExCoveralls],
-      #preferred_cli_env: [coveralls: :test],
+      test_coverage: [tool: ExCoveralls],
       docs: [
-        extras: ["GettingStarted.md", "FAQ.md"]
+        extras: ["GettingStarted.md", "FAQ.md", "Supported.md", "JavaScriptInterop.md"]
       ]
     ]
   end
@@ -31,11 +30,11 @@ defmodule ElixirScript.Mixfile do
 
   defp deps do
     [
-      {:estree, "~> 2.5"},
+      {:estree, "~> 2.6"},
       {:fs, "~> 2.12"},
-      {:ex_doc, "~> 0.14", only: :dev},
-      #{:excoveralls, "~> 0.5", only: :test},
-      {:credo, "~> 0.4", only: [:dev, :test]}
+      {:ex_doc, "~> 0.15", only: :dev},
+      {:excoveralls, "~> 0.6", only: :test},
+      {:credo, "~> 0.7", only: [:dev, :test]}
     ]
   end
 
@@ -65,7 +64,8 @@ defmodule ElixirScript.Mixfile do
 
   defp aliases do
     [dist: &dist/1,
-     install: &install/1]
+     install: &install/1,
+     supported: &supported/1]
   end
 
   def dist(_) do
@@ -106,6 +106,12 @@ defmodule ElixirScript.Mixfile do
     System.cmd("mv", ["dist/elixirscript", "/usr/local/elixirscript"])
 
     IO.puts("installed at /usr/local/elixirscript")
+  end
+
+  def supported(_) do
+    Mix.Task.run "app.start"
+
+    ElixirScript.Gen.Supported.generate()
   end
 
 end

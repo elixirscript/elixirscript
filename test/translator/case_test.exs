@@ -155,13 +155,11 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-    Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.type(Bootstrap.Core.Tuple, {
-        values: [Bootstrap.Core.Patterns.variable(), Bootstrap.Core.Patterns.variable()]
-    })], function(one, two) {
-        return console.info(one);
-    }), Bootstrap.Core.Patterns.clause([Symbol.for('error')], function() {
-        return null;
-    })).call(this, data)
+Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([new Bootstrap.Core.Tuple(Bootstrap.Core.Patterns.variable(), Bootstrap.Core.Patterns.variable())], function(one, two) {
+                 return console.info(one);
+             }), Bootstrap.Core.Patterns.clause([Symbol.for('error')], function() {
+                 return null;
+             })).call(this, data);
     """
 
     assert_translation(ex_ast, js_code)
@@ -181,15 +179,11 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-    Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.type(Bootstrap.Core.Tuple, {
-        values: [Bootstrap.Core.Patterns.type(Bootstrap.Core.Tuple, {
-            values: [Bootstrap.Core.Patterns.variable(), Bootstrap.Core.Patterns.variable()]
-        }), Bootstrap.Core.Patterns.variable()]
-    })], function(one, two, three) {
-        return console.info(one);
-    }), Bootstrap.Core.Patterns.clause([Symbol.for('error')], function() {
-        return null;
-    })).call(this, data)
+Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([new Bootstrap.Core.Tuple(new Bootstrap.Core.Tuple(Bootstrap.Core.Patterns.variable(), Bootstrap.Core.Patterns.variable()), Bootstrap.Core.Patterns.variable())], function(one, two, three) {
+                 return console.info(one);
+             }), Bootstrap.Core.Patterns.clause([Symbol.for('error')], function() {
+                 return null;
+             })).call(this, data)
     """
 
     assert_translation(ex_ast, js_code)
@@ -205,15 +199,11 @@ defmodule ElixirScript.Translator.Case.Test do
     end
 
     js_code = """
-    Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.type(Bootstrap.Core.Tuple, {
-        values: [Bootstrap.Core.Patterns.variable(), Bootstrap.Core.Patterns.type(Bootstrap.Core.Tuple, {
-            values: [Bootstrap.Core.Patterns.variable(), Bootstrap.Core.Patterns.variable()]
-        })]
-    })], function(one, two, three) {
-        return console.info(one);
-    }), Bootstrap.Core.Patterns.clause([Symbol.for('error')], function() {
-        return null;
-    })).call(this, data)
+Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([new Bootstrap.Core.Tuple(Bootstrap.Core.Patterns.variable(), new Bootstrap.Core.Tuple(Bootstrap.Core.Patterns.variable(), Bootstrap.Core.Patterns.variable()))], function(one, two, three) {
+             return console.info(one);
+         }), Bootstrap.Core.Patterns.clause([Symbol.for('error')], function() {
+             return null;
+         })).call(this, data)
     """
 
     assert_translation(ex_ast, js_code)

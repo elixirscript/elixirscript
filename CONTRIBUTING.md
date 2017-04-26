@@ -64,27 +64,26 @@ found in Elixir in ElixirScript.
 ElixirScript is broken up into the following parts:
 
 * The compiler, written in Elixir
-* The standard library modules, mostly written in Elixir
+* The standard library modules, written in Elixir
 * The javascript core
 
 The ElixirScript compiler is in the `lib` folder of the project. 
 Here is where Elixir code is converted into JavaScript.
 
-The standard library modules are in the `lib/std_lib` folder.
+The standard library modules are in the `priv/std_lib` folder.
 
 The JavaScript code is in the `src/javascript`. 
-This is where features such as pattern matching and the standard library are implemented.
+This is where features such as pattern matching and the special forms are implemented.
 
 The ElixirScript tests can be run using `mix test`
 
-The JavaScript tests can be run using `npm test`
+The JavaScript tests can be run using `yarn test`
 
 Please make sure all tests pass after making changes. Also make sure to include tests for
 the changes you made.
 
-Contributing to the JavaScript code may be the easiest and most rewarding changes.
-Don't see a feature, module or function from Elixir in ElixirScript yet? You can implement it
-in the JavaScript code.
+Contributing to the standard library may be the easiest and most rewarding changes.
+Don't see a module, function or macro from Elixir in ElixirScript yet? You can help by implementing it.
 
 ## Pull requests
 
@@ -119,7 +118,7 @@ in order to craft an excellent pull request:
   # Navigate to the newly cloned directory
   cd elixirscript
   # Assign the original repo to a remote called "upstream"
-  git remote add upstream https://github.com/bryanjos/elixirscript
+  git remote add upstream https://github.com/elixirscript/elixirscript
   ```
 
 2. If you cloned a while ago, get the latest changes from upstream:
@@ -150,7 +149,7 @@ in order to craft an excellent pull request:
 
   ```sh
   mix test
-  npm test
+  yarn test
   ```
 
   This is needed to ensure your changes can

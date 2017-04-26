@@ -14,12 +14,6 @@ function cond(clauses) {
   throw new Error();
 }
 
-function map_update(map, values) {
-  return Object.freeze(
-    Object.assign(Object.create(map.constructor.prototype), map, values),
-  );
-}
-
 function _for(expression, generators, collectable_protocol, into = []) {
   let [result, fun] = collectable_protocol.into(into);
 
@@ -27,10 +21,10 @@ function _for(expression, generators, collectable_protocol, into = []) {
 
   for (const value of generatedValues) {
     if (expression.guard.apply(this, value)) {
-      result = fun(result, new Core.Tuple(
-        Symbol.for('cont'),
-        expression.fn.apply(this, value),
-      ));
+      result = fun(
+        result,
+        new Core.Tuple(Symbol.for('cont'), expression.fn.apply(this, value)),
+      );
     }
   }
 
@@ -39,7 +33,7 @@ function _for(expression, generators, collectable_protocol, into = []) {
 
 function run_list_generators(generator, generators) {
   if (generators.length == 0) {
-    return generator.map((x) => {
+    return generator.map(x => {
       if (Array.isArray(x)) {
         return x;
       }
@@ -140,6 +134,7 @@ function _with(...args) {
       }
       return result;
     }
+
     argsToPass = argsToPass.concat(patternResult);
   }
 
@@ -149,7 +144,6 @@ function _with(...args) {
 export default {
   _case,
   cond,
-  map_update,
   _for,
   _try,
   _with,

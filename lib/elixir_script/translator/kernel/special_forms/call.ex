@@ -34,6 +34,8 @@ defmodule ElixirScript.Translator.Call do
   end
 
   def make_module_function_call(module_name, function_name, params, env) do
+    ElixirScript.Translator.State.add_module_reference(env.state, env.module, module_name)
+
     members = ["Elixir"] ++ Module.split(module_name) ++ ["__load"]
 
     ast = JS.call_expression(
@@ -51,6 +53,7 @@ defmodule ElixirScript.Translator.Call do
   end
 
   def make_module_function_call(module_name, function_name, env) do
+    ElixirScript.Translator.State.add_module_reference(env.state, env.module, module_name)    
     make_module_function_call(module_name, function_name, [], env)
   end
 
@@ -102,7 +105,7 @@ defmodule ElixirScript.Translator.Call do
         JS.identifier("call_property")
       ),
       [
-        Translator.translate!(module_name),
+        Translator.translate!(module_name, env),
         Translator.translate!(to_string(function_name), env)
       ]
     )

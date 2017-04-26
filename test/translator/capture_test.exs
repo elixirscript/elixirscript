@@ -103,7 +103,7 @@ defmodule ElixirScript.Translator.Capture.Test do
     end
 
     js_code = """
-     Bootstrap.Enum.map(Object.freeze([]),Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],function(__1)    {
+     Elixir.ElixirScript.Enum.__load(Elixir).map(Object.freeze([]),Bootstrap.Core.Patterns.defmatch(Bootstrap.Core.Patterns.clause([Bootstrap.Core.Patterns.variable()],function(__1)    {
              return     process(__1);
            })))
     """

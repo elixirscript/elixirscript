@@ -11,36 +11,27 @@ defmodule ElixirScript.Translator.State do
 
   def start_link(compiler_opts, loaded_modules) do
     Agent.start_link(fn ->
-      %{ compiler_opts: compiler_opts, modules: Keyword.new, std_lib_map: build_standard_lib_map(), loaded_modules: [JS | loaded_modules] }
+      %{ 
+        compiler_opts: compiler_opts, 
+        modules: Keyword.new, 
+        std_lib_map: build_standard_lib_map(), 
+        loaded_modules: [JS | loaded_modules],
+        module_references: Keyword.new()
+      }
     end)
   end
 
   defp build_standard_lib_map() do
-    Map.new
-    |> Map.put(Kernel, ElixirScript.Kernel)
-    |> Map.put(Tuple, ElixirScript.Tuple)
-    |> Map.put(Atom, ElixirScript.Atom)
-    |> Map.put(Collectable, ElixirScript.Collectable)
-    |> Map.put(String.Chars, ElixirScript.String.Chars)
-    |> Map.put(Enumerable, ElixirScript.Enumerable)
-    |> Map.put(Enum, ElixirScript.Enum)
-    |> Map.put(Enum.OutOfBoundsError, ElixirScript.Enum.OutOfBoundsError)
-    |> Map.put(Integer, ElixirScript.Integer)
-    |> Map.put(Macro.Env, ElixirScript.Macro.Env)
-    |> Map.put(View, ElixirScript.View)
-    |> Map.put(Agent, ElixirScript.Agent)
-    |> Map.put(Range, ElixirScript.Range)
-    |> Map.put(String, ElixirScript.String)
-    |> Map.put(Base, ElixirScript.Base)
-    |> Map.put(Module, ElixirScript.Module)
-    |> Map.put(Map, ElixirScript.Map)
-    |> Map.put(Keyword, ElixirScript.Keyword)
-    |> Map.put(Bitwise, ElixirScript.Bitwise)
-    |> Map.put(MapSet, ElixirScript.MapSet)
-    |> Map.put(List, ElixirScript.List)
-    |> Map.put(Process, ElixirScript.Process)
-    |> Map.put(Regex, ElixirScript.Regex)
-    |> Map.put(IO, ElixirScript.IO)
+    Application.spec(:elixir, :modules)
+    |> Enum.reduce(Map.new, fn(x, acc) -> 
+      try do
+        elixirscript_module = (["ElixirScript"] ++ Module.split(x)) |> Module.concat()
+        Map.put(acc, x, elixirscript_module)
+      rescue
+        FunctionClauseError ->
+          acc
+      end
+    end)
   end
 
   def set_module_data(pid, module_data) do
@@ -120,27 +111,15 @@ defmodule ElixirScript.Translator.State do
         nil ->
           state
         module ->
-          module = Map.update(module, :refs, [module_name], fn(x) -> Enum.uniq(x ++ [module_name]) end)
-          modules = Keyword.put(state.modules, module.name, module)
-          %{ state | modules: modules }
+          module_references = Keyword.update(state.module_references, module.name, [module_name], fn(x) -> Enum.uniq(x ++ [module_name]) end)
+          %{ state | module_references: module_references }
       end
     end)
   end
 
-  def get_module_references(pid, module_name) do
-    case get_module(pid, module_name) do
-      nil ->
-        []
-      module ->
-        Map.get(module, :refs, [])
-    end
-  end
-
   def list_module_references(pid) do
     Agent.get(pid, fn(state) ->
-      Enum.map(state.modules, fn {name, module} ->
-        {name, Map.get(module, :refs, [])}
-      end)
+      state.module_references
     end)
   end
 

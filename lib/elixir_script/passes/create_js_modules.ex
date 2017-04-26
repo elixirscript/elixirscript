@@ -65,10 +65,15 @@ defmodule ElixirScript.Passes.CreateJSModules do
 
     elixir = JS.variable_declaration([declarator], :const)
 
+    table_additions = Enum.map(opts.js_modules, fn
+      {module, path} -> add_import_to_table(module)
+      {module, path, _} -> add_import_to_table(module)
+    end)
+
     ast = opts.module_formatter.build(
       [],
       opts.js_modules,
-      [elixir, start, load] ++ body,
+      [elixir, create_atom_table(), start, load] ++ table_additions ++ body,
       JS.identifier("Elixir")
     )
 
@@ -126,6 +131,39 @@ defmodule ElixirScript.Passes.CreateJSModules do
           )
         ])
       )
+    )
+  end
+
+  defp create_atom_table() do
+    JS.assignment_expression(
+      :=,
+      JS.member_expression(
+        JS.identifier("Elixir"),
+        JS.identifier("__table__")
+      ),
+      JS.object_expression([])
+    )
+  end
+
+  defp add_import_to_table(module_name) do
+    ref = ElixirScript.Translator.Identifier.make_namespace_members(module_name)
+    JS.assignment_expression(
+      :=,
+      JS.member_expression(
+        JS.member_expression(
+          JS.identifier("Elixir"),
+          JS.identifier("__table__")
+        ),
+        JS.call_expression(
+          JS.member_expression(
+            JS.identifier("Symbol"),
+            JS.identifier("for")            
+          ),
+          [JS.literal(ref.name)]
+        ),
+        true
+      ),
+      ref
     )
   end
 end
