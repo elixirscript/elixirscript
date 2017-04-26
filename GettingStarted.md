@@ -128,32 +128,7 @@ Elixirscript supports public macros. Private macros are currently unsupported.
 
 ### JavaScript Interop
 
-Elixirscript has a couple of ways of interacting with JavaScript.
-
-#### Globally scoped functions
-
-Use the erlang module syntax, to call JavaScript functions in the global scope.
-
-    # Calling alert
-    :window.alert("hi")
-
-    # console
-    :console.log("hello")
-
-    # document
-    :document.getElementById("main")
-
-#### Globally scoped modules
-
-You can call globally scoped modules you would an Elixir module
-
-    Date.now()
-
-Only works if module begins with a captial letter
-
-#### The JS module
-
-The JS module has many other functions and macros. For more information, check out the docs.
+Check out the [JavaScript Interoperability](JavaScriptInterop.html) documentation
 
 #### Frontend Project Boilerplate
 
