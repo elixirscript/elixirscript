@@ -4,8 +4,8 @@ defmodule ElixirScript.Experimental.Forms.For do
   alias ElixirScript.Experimental.Clause
   alias ElixirScript.Experimental.Forms.{Pattern}
 
- def compile({:for, _, generators}) do
-    args = handle_args(generators)
+ def compile({:for, _, generators}, state) do
+    args = handle_args(generators, state)
 
     generators = JS.array_expression(args.generators)
 
@@ -48,7 +48,7 @@ defmodule ElixirScript.Experimental.Forms.For do
     )
   end
 
-  defp handle_args(generators) do
+  defp handle_args(generators, module_state) do
     Enum.reduce(generators, %{generators: [], args: [], filter: nil, fun: nil, into: nil, patterns: []}, fn
 
       ({:<<>>, _, body}, state) ->
@@ -59,7 +59,7 @@ defmodule ElixirScript.Experimental.Forms.For do
         {var, collection}
       end)
 
-      {patterns, params} = Pattern.compile([{:<<>>, [], bs_parts}])
+      {patterns, params} = Pattern.compile([{:<<>>, [], bs_parts}], module_state)
 
       gen = JS.call_expression(
         JS.member_expression(
@@ -72,13 +72,13 @@ defmodule ElixirScript.Experimental.Forms.For do
             ),
           JS.identifier("bitstring_generator")
         ),
-        [hd(patterns), Form.compile(collection)]
+        [hd(patterns), Form.compile(collection, module_state)]
       )
 
       %{state | generators: state.generators ++ [gen], args: state.args ++ params, patterns: state.patterns ++ patterns}
 
       ({:<-, _, [identifier, enum]}, state) ->
-        {patterns, params} = Pattern.compile([identifier])
+        {patterns, params} = Pattern.compile([identifier], module_state)
 
         gen = JS.call_expression(
           JS.member_expression(
@@ -91,32 +91,32 @@ defmodule ElixirScript.Experimental.Forms.For do
               ),
             JS.identifier("list_generator")
           ),
-          [hd(patterns), Form.compile(enum)]
+          [hd(patterns), Form.compile(enum, module_state)]
         )
 
         %{state | generators: state.generators ++ [gen], args: state.args ++ params, patterns: state.patterns ++ patterns}
       ([into: expression], state) ->
-        %{state | into: Form.compile(expression)}
+        %{state | into: Form.compile(expression, module_state)}
 
       ([into: expression, do: expression2], state) ->
-        fun = create_function_expression(expression2, state)
+        fun = create_function_expression(expression2, state, module_state)
 
-        %{state | into: Form.compile(expression), fun: fun}
+        %{state | into: Form.compile(expression, module_state), fun: fun}
 
       ([do: expression], state) ->
-        fun = create_function_expression(expression, state)
+        fun = create_function_expression(expression, state, module_state)
 
         %{state | fun: fun}
       (filter, state) ->
-        fun = create_function_expression(filter, state)
+        fun = create_function_expression(filter, state, module_state)
 
         %{state | filter: fun}
     end)
   end
 
 
-  defp create_function_expression(ast, state) do
-    ast = Enum.map(List.wrap(ast), &Form.compile(&1))
+  defp create_function_expression(ast, state, module_state) do
+    ast = Enum.map(List.wrap(ast), &Form.compile(&1, module_state))
     |> Clause.return_last_statement
 
     JS.function_expression(

@@ -3,13 +3,13 @@ defmodule ElixirScript.Experimental.Forms.Struct do
   alias ElixirScript.Experimental.Form
   alias ElixirScript.Translator.Identifier
 
-  def compile({:%, _, [module, params]}) do
+  def compile({:%, _, [module, params]}, state) do
     J.call_expression(
       J.member_expression(
         process_module_name(module),
         J.identifier("__struct__1")
       ),
-      [Form.compile(params)]
+      [Form.compile(params, state)]
     )
   end
 

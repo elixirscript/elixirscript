@@ -18,7 +18,7 @@ defmodule ElixirScript.Experimental.Function do
     )
   end
 
-  def compile({{name, arity}, type, _, clauses}) do
+  def compile({{name, arity}, type, _, clauses}, state) do
     clauses = Enum.map(clauses, fn(clause) ->
 
       # Walk the AST and add the function to the context.
@@ -39,7 +39,7 @@ defmodule ElixirScript.Experimental.Function do
           patterns_ast(),
           J.identifier("defmatch")
         ),
-        Enum.map(clauses, &Clause.compile(&1))
+        Enum.map(clauses, &Clause.compile(&1, state))
       )
     )
 

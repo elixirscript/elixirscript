@@ -3,10 +3,10 @@ defmodule ElixirScript.Experimental.Forms.Match do
   alias ElixirScript.Experimental.Form
   alias ElixirScript.Experimental.Forms.{Pattern}
 
-  def compile({:=, _, [left, right]}) do
-    right_ast = Form.compile(right)
+  def compile({:=, _, [left, right]}, state) do
+    right_ast = Form.compile(right, state)
 
-    { patterns, params } = Pattern.compile([left])
+    { patterns, params } = Pattern.compile([left], state)
 
       declarator = J.variable_declarator(
         J.array_pattern(params),
@@ -29,7 +29,7 @@ defmodule ElixirScript.Experimental.Forms.Match do
 
     js_ast = case left do
       list when is_list(list) ->
-        make_list_ref(array_pattern, params)
+        make_list_ref(array_pattern, params, state)
       { _, _ } ->
         make_tuple_ref(array_pattern, params)
       {:{}, _, _ } ->
@@ -42,13 +42,13 @@ defmodule ElixirScript.Experimental.Forms.Match do
   end
 
 
-  defp make_list_ref(array_pattern, params) do
+  defp make_list_ref(array_pattern, params, state) do
     {ref, params} = make_params(params)
 
     ref_declarator = J.variable_declarator(
       ref,
       J.array_expression(
-        Enum.map(params, &Form.compile(&1))
+        Enum.map(params, &Form.compile(&1, state))
       )
     )
 

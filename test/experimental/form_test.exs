@@ -4,57 +4,57 @@ defmodule ElixirScript.Experimental.Form.Test do
   alias ElixirScript.Experimental.Form
 
   test "nil" do
-    result = Form.compile(nil)
+    result = Form.compile(nil, %{})
     assert generate_js(result) == "null"
   end
 
   test "integer" do
-    result = Form.compile(1)
+    result = Form.compile(1, %{})
     assert generate_js(result) == "1"
   end
 
   test "negative integer" do
-    result = Form.compile(-1)
+    result = Form.compile(-1, %{})
     assert generate_js(result) == "-1"
   end
 
   test "atom" do
-    result = Form.compile(:atom)
+    result = Form.compile(:atom, %{})
     assert generate_js(result) == "Symbol.for('atom')"
   end
 
   test "upper case atom" do
-    result = Form.compile(Atom)
+    result = Form.compile(Atom, %{})
     assert generate_js(result) == "Elixir_Atom"
   end
 
   test "float" do
-    result = Form.compile(1.0)
+    result = Form.compile(1.0, %{})
     assert generate_js(result) == "1.0"
   end
 
   test "binary" do
-    result = Form.compile("hello")
+    result = Form.compile("hello", %{})
     assert generate_js(result) == "'hello'"
   end
 
   test "2-element tuple" do
-    result = Form.compile({1, 2})
+    result = Form.compile({1, 2}, %{})
     assert generate_js(result) == "Bootstrap.Core.Tuple(1, 2)"
   end
 
   test "3-element tuple" do
-    result = Form.compile({:{}, [], [1, 2, 3]})
+    result = Form.compile({:{}, [], [1, 2, 3]}, %{})
     assert generate_js(result) == "Bootstrap.Core.Tuple(1, 2, 3)"
   end
 
   test "list" do
-    result = Form.compile([1, 2, 3])
+    result = Form.compile([1, 2, 3], %{})
     assert generate_js(result) == "[1, 2, 3]"
   end
 
   test "map" do
-    result = Form.compile({:%{}, [], [a: 1, b: 2, c: 3]})
+    result = Form.compile({:%{}, [], [a: 1, b: 2, c: 3]}, %{})
     generated_js = generate_js(result)
 
     assert generated_js =~ "[Symbol.for('a')]: 1"
@@ -63,7 +63,7 @@ defmodule ElixirScript.Experimental.Form.Test do
   end
 
   test "bitstring" do
-    result = Form.compile({:<<>>, [], [1, 2, 3]})
+    result = Form.compile({:<<>>, [], [1, 2, 3]}, %{})
     generated_js = generate_js(result)
 
     assert generated_js =~ "BitString.integer(1)"
@@ -71,7 +71,7 @@ defmodule ElixirScript.Experimental.Form.Test do
   end
 
   test "match" do
-    result = Form.compile({:=, [], [{:a, [], nil}, 1]})
+    result = Form.compile({:=, [], [{:a, [], nil}, 1]}, %{})
     generated_js = generate_js(result)
 
     assert generated_js =~ "let [a] ="
@@ -79,12 +79,12 @@ defmodule ElixirScript.Experimental.Form.Test do
   end
 
   test "variable" do
-    result = Form.compile({:a, [], nil})
+    result = Form.compile({:a, [], nil}, %{})
     assert generate_js(result) == "a"
   end
 
   test "super" do
-    result = Form.compile({:super, [function: {:name, 2}], []})
+    result = Form.compile({:super, [function: {:name, 2}], []}, %{})
     assert generate_js(result) == "name0()"
   end
 end

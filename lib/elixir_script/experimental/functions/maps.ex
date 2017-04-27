@@ -3,7 +3,7 @@ defmodule ElixirScript.Experimental.Functions.Maps do
   alias ESTree.Tools.Builder, as: J
   alias ElixirScript.Experimental.Form
 
-  def rewrite({{:., _, [:maps, :update]}, _, [key, value, map]}) do
+  def rewrite({{:., _, [:maps, :update]}, _, [key, value, map]}, state) do
     J.call_expression(
       J.member_expression(
         J.member_expression(
@@ -15,11 +15,11 @@ defmodule ElixirScript.Experimental.Functions.Maps do
         ),
         J.identifier("update_map")
       ),
-      [Form.compile(map), Form.compile(key), Form.compile(value)]
+      [Form.compile(map, state), Form.compile(key, state), Form.compile(value, state)]
     )
   end
 
-  def rewrite({{:., _, [:maps, :find]}, _, [key, map]}) do
+  def rewrite({{:., _, [:maps, :find]}, _, [key, map]}, state) do
     J.call_expression(
       J.member_expression(
         J.member_expression(
@@ -31,7 +31,7 @@ defmodule ElixirScript.Experimental.Functions.Maps do
         ),
         J.identifier("update_map")
       ),
-      [Form.compile(key), Form.compile(map)]
+      [Form.compile(key, state), Form.compile(map, state)]
     )
   end
 

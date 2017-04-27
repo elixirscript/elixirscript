@@ -1,20 +1,20 @@
 defmodule ElixirScript.Experimental.ModuleState do
   def start_link(module) do
-    Agent.start_link(fn -> %{ module: module, refs: [] } end, name: __MODULE__)
+    Agent.start_link(fn -> %{ module: module, refs: [] } end)
   end
 
-  def stop() do
-    Agent.stop(__MODULE__)
+  def stop(pid) do
+    Agent.stop(pid)
   end
 
-  def put_module_ref(module) do
-    Agent.update(__MODULE__, fn(x) ->
+  def put_module_ref(pid, module) do
+    Agent.update(pid, fn(x) ->
       %{x | refs: Enum.uniq([module | x.refs]) }
     end)
   end
 
-  def get_module_refs() do
-    Agent.get(__MODULE__, fn(x) ->
+  def get_module_refs(pid) do
+    Agent.get(pid, fn(x) ->
       x.refs
     end)    
   end

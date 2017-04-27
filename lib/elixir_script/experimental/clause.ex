@@ -15,18 +15,18 @@ defmodule ElixirScript.Experimental.Clause do
     J.identifier("Patterns")
   )
 
-  def compile({ _, args, guards, body}) do
-    {patterns, params} = Pattern.compile(args)
-    guard = compile_guard(params, guards)
+  def compile({ _, args, guards, body}, state) do
+    {patterns, params} = Pattern.compile(args, state)
+    guard = compile_guard(params, guards, state)
 
     body = case body do
       nil ->
         J.identifier("null")
       {:__block__, _, block_body} ->
-        Enum.map(block_body, &Form.compile(&1))
+        Enum.map(block_body, &Form.compile(&1, state))
         |> List.flatten
       _ ->
-        Form.compile(body)
+        Form.compile(body, state)
     end
 
     body = return_last_statement(body)
@@ -48,15 +48,15 @@ defmodule ElixirScript.Experimental.Clause do
     )
   end
 
-  def compile({:->, _, [[{:when, _, params}], body ]}) do
+  def compile({:->, _, [[{:when, _, params}], body ]}, state) do
     guards = List.last(params)
     params = params |> Enum.reverse |> tl |> Enum.reverse
 
-    compile({[], params, guards, body})
+    compile({[], params, guards, body}, state)
   end
 
-  def compile({:->, _, [params, body]}) do
-    compile({[], params, [], body})
+  def compile({:->, _, [params, body]}, state) do
+    compile({[], params, [], body}, state)
   end
 
   def return_last_statement(body) do
@@ -83,13 +83,13 @@ defmodule ElixirScript.Experimental.Clause do
     [J.return_statement(head)] ++ tail
   end
 
-  defp compile_guard(params, guards) do
+  defp compile_guard(params, guards, state) do
 
     guards = guards
     |> List.wrap
     |> Enum.reverse
     |> process_guards
-    |> Form.compile
+    |> Form.compile(state)
 
     J.function_expression(
       params,

@@ -3,25 +3,25 @@ defmodule ElixirScript.Experimental.Functions.Lists do
   alias ESTree.Tools.Builder, as: J
   alias ElixirScript.Experimental.Form
 
-  def rewrite({{:., _, [:lists, :map]}, _, [fun, list]}) do
+  def rewrite({{:., _, [:lists, :map]}, _, [fun, list]}, state) do
     J.call_expression(
       J.member_expression(
-        Form.compile(list),
+        Form.compile(list, state),
         J.identifier("map")
       ),
-      [Form.compile(fun)]
+      [Form.compile(fun, state)]
     )
   end
 
-  def rewrite({{:., _, [:lists, :member]}, _, [elem, list]}) do
+  def rewrite({{:., _, [:lists, :member]}, _, [elem, list]}, state) do
     J.binary_expression(
       :>,
       J.call_expression(
         J.member_expression(
-          Form.compile(list),
+          Form.compile(list, state),
           J.identifier("indexOf")
         ),
-        [Form.compile(elem)]
+        [Form.compile(elem, state)]
       ),
       J.unary_expression(
         :-,
@@ -31,12 +31,12 @@ defmodule ElixirScript.Experimental.Functions.Lists do
     )
   end
 
-  def rewrite({{:., _, [:lists, :reverse]}, _, [list]}) do
+  def rewrite({{:., _, [:lists, :reverse]}, _, [list]}, state) do
     J.call_expression(
       J.member_expression(
         J.call_expression(
           J.member_expression(
-            Form.compile(list),
+            Form.compile(list, state),
             J.identifier("concat")
           ),
           [J.array_expression([])]
@@ -47,14 +47,14 @@ defmodule ElixirScript.Experimental.Functions.Lists do
     )
   end
 
-  def rewrite({{:., _, [:lists, :reverse]}, _, [list, tail]}) do
+  def rewrite({{:., _, [:lists, :reverse]}, _, [list, tail]}, state) do
     J.call_expression(
       J.member_expression(
         J.call_expression(
           J.member_expression(
             J.call_expression(
               J.member_expression(
-                Form.compile(list),
+                Form.compile(list, state),
                 J.identifier("concat")
               ),
               [J.array_expression([])]
@@ -65,16 +65,16 @@ defmodule ElixirScript.Experimental.Functions.Lists do
         ),
         J.identifier("concat")
       ),
-      [Form.compile(tail)]
+      [Form.compile(tail, state)]
     )
   end
 
-  def rewrite({{:., _, [:lists, :sort]}, _, [list]}) do
+  def rewrite({{:., _, [:lists, :sort]}, _, [list]}, state) do
     J.call_expression(
       J.member_expression(
         J.call_expression(
           J.member_expression(
-            Form.compile(list),
+            Form.compile(list, state),
             J.identifier("concat")
           ),
           [J.array_expression([])]
@@ -85,17 +85,17 @@ defmodule ElixirScript.Experimental.Functions.Lists do
     )
   end
 
-  def rewrite({{:., _, [:lists, :filter]}, _, [pred, list]}) do
+  def rewrite({{:., _, [:lists, :filter]}, _, [pred, list]}, state) do
     J.call_expression(
       J.member_expression(
-        Form.compile(list),
+        Form.compile(list, state),
         J.identifier("filter")
       ),
-      [Form.compile(pred)]
+      [Form.compile(pred, state)]
     )
   end
 
-  def rewrite({{:., _, [:lists, :delete]}, _, [elem, list]}) do
+  def rewrite({{:., _, [:lists, :delete]}, _, [elem, list]}, state) do
     J.call_expression(
       J.member_expression(
         J.member_expression(
@@ -107,7 +107,7 @@ defmodule ElixirScript.Experimental.Functions.Lists do
         ),
         J.identifier("remove_from_list")
       ),
-      [Form.compile(list), Form.compile(elem)]
+      [Form.compile(list, state), Form.compile(elem, state)]
     )
   end
 

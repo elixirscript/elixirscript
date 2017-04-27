@@ -9,7 +9,11 @@ defmodule ElixirScript.Experimental.Module do
   """
 
   def compile(_line, _file, module, attrs, defs, unreachable, opts) do
-    ModuleState.start_link(module)
+    {:ok, pid} = ModuleState.start_link(module)
+
+    state = %{
+      pid: pid
+    }
  
     reachable_defs = Enum.filter(defs, fn
       { name, _, _, _} -> not(name in unreachable)
@@ -18,12 +22,12 @@ defmodule ElixirScript.Experimental.Module do
     end)
 
     compiled_functions = reachable_defs
-    |> Enum.map(&Function.compile(&1))
+    |> Enum.map(&Function.compile(&1, state))
 
-    imports = make_imports()
+    imports = make_imports(state)
     exports = make_exports(reachable_defs)
 
-    ModuleState.stop()
+    ModuleState.stop(pid)
     J.program(imports ++ compiled_functions ++ [J.export_default_declaration(exports)])
   end
 
@@ -39,8 +43,8 @@ defmodule ElixirScript.Experimental.Module do
     J.object_expression(exports)
   end
 
-  defp make_imports() do
-    Enum.map(ModuleState.get_module_refs(), fn(x) -> module_to_import(x) end)
+  defp make_imports(state) do
+    Enum.map(ModuleState.get_module_refs(state.pid), fn(x) -> module_to_import(x) end)
   end
 
   defp module_to_import(module) do

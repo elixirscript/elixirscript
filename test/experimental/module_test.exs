@@ -1,6 +1,5 @@
 defmodule ElixirScript.Experimental.Module.Test do
   use ExUnit.Case
-  alias ESTree.Tools.Builder, as: J
   alias ElixirScript.Experimental.Module
   import ElixirScript.TestHelper
 

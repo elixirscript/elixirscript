@@ -2,9 +2,9 @@ defmodule ElixirScript.Experimental.Forms.Map do
   alias ESTree.Tools.Builder, as: J
   alias ElixirScript.Experimental.Form
 
-  def compile({:%{}, _, [{:|, _, [map, new_values]}]}) do
-    map = Form.compile(map)
-    data = Form.compile({:%{}, [], new_values})
+  def compile({:%{}, _, [{:|, _, [map, new_values]}]}, state) do
+    map = Form.compile(map, state)
+    data = Form.compile({:%{}, [], new_values}, state)
 
     J.call_expression(
       J.member_expression(
@@ -21,15 +21,15 @@ defmodule ElixirScript.Experimental.Forms.Map do
     )
   end
 
-  def compile({:%{}, _, properties}) do
+  def compile({:%{}, _, properties}, state) do
     properties
     |> Enum.map(fn
       ({x, y}) ->
         case x do
           {_, _, nil } ->
-            J.property(Form.compile(x),  Form.compile(y), :init, false, false, true)
+            J.property(Form.compile(x, state),  Form.compile(y, state), :init, false, false, true)
           _ ->
-            make_property(Form.compile(x), Form.compile(y))
+            make_property(Form.compile(x, state), Form.compile(y, state))
         end
     end)
     |> J.object_expression

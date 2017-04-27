@@ -4,7 +4,7 @@ defmodule ElixirScript.Experimental.Forms.Bitstring do
   alias ElixirScript.Experimental.Form
 
 
-  def compile({:<<>>, _, elements}) do
+  def compile({:<<>>, _, elements}, state) do
     js_ast = JS.new_expression(
         JS.member_expression(
           JS.member_expression(
@@ -13,48 +13,48 @@ defmodule ElixirScript.Experimental.Forms.Bitstring do
           ),
           JS.identifier("BitString")
         ),
-        Enum.map(elements, &compile_element(&1))
+        Enum.map(elements, &compile_element(&1, state))
       )
 
     js_ast
   end
 
-  def compile_element(element) when is_number(element) do
-    do_compile_element({:integer, Form.compile(element)})
+  def compile_element(element, state) when is_number(element) do
+    do_compile_element({:integer, Form.compile(element, state)})
   end
 
-  def compile_element(element) when is_binary(element) do
-    do_compile_element({:binary, Form.compile(element)})
+  def compile_element(element, state) when is_binary(element) do
+    do_compile_element({:binary, Form.compile(element, state)})
   end
 
-  def compile_element({:<<>>, [], elements}) do
-    {ast, _} = compile(elements)
+  def compile_element({:<<>>, [], elements}, state) do
+    {ast, _} = compile(elements, state)
     ast
   end
 
-  def compile_element({:::, _, [element, {type, _, _}]}) when type in [:integer, :float, :bitstring, :bits, :binary, :bytes, :utf8, :utf16, :utf32, :signed, :unsigned] do
-    do_compile_element({type, translate_element(element)})
+  def compile_element({:::, _, [element, {type, _, _}]}, state) when type in [:integer, :float, :bitstring, :bits, :binary, :bytes, :utf8, :utf16, :utf32, :signed, :unsigned] do
+    do_compile_element({type, translate_element(element, state)})
   end
 
-  def compile_element({:::, _, [element, {type, _, params}]}) when type in [:size, :unit] do
-    do_compile_element({type, translate_element(element), Enum.map(params, &translate_element(&1))})
+  def compile_element({:::, _, [element, {type, _, params}]}, state) when type in [:size, :unit] do
+    do_compile_element({type, translate_element(element, state), Enum.map(params, &translate_element(&1, state))})
   end
 
-  def compile_element({:::, _, [element, {:*, _, [size, unit]}]}) do
-    size_ast = do_compile_element({:size, translate_element(element), [translate_element(size)]})
-    do_compile_element({:unit, size_ast, [translate_element(unit)]})
+  def compile_element({:::, _, [element, {:*, _, [size, unit]}]}, state) do
+    size_ast = do_compile_element({:size, translate_element(element, state), [translate_element(size, state)]})
+    do_compile_element({:unit, size_ast, [translate_element(unit, state)]})
   end
 
-  def compile_element({:::, _, [element, {:-, _, types}]}) do
-    handle_type_adjectives({:-, [], types}, translate_element(element))
+  def compile_element({:::, _, [element, {:-, _, types}]}, state) do
+    handle_type_adjectives({:-, [], types}, translate_element(element, state), state)
   end
 
-  def compile_element({:::, _, [element, size]}) do
-    do_compile_element({:size, translate_element(element), [translate_element(size)]})
+  def compile_element({:::, _, [element, size]}, state) do
+    do_compile_element({:size, translate_element(element, state), [translate_element(size, state)]})
   end
 
-  def compile_element(element) do
-    do_compile_element({:binary, translate_element(element)})
+  def compile_element(element, state) do
+    do_compile_element({:binary, translate_element(element, state)})
   end
 
   def translate_element(ElixirScript.Translator.PatternMatching, _) do
@@ -65,20 +65,20 @@ defmodule ElixirScript.Experimental.Forms.Bitstring do
                          ])
   end
 
-  def translate_element(element) do
-    Form.compile(element)
+  def translate_element(element, state) do
+    Form.compile(element, state)
   end
 
-  defp handle_type_adjectives({:-, _, types}, ast) do
+  defp handle_type_adjectives({:-, _, types}, ast, state) do
     Enum.reduce(types, ast, fn(type, current_ast) ->
       case type do
         {:-, _, sub_types} ->
-          handle_type_adjectives({:-, [], sub_types}, current_ast)
+          handle_type_adjectives({:-, [], sub_types}, current_ast, state)
         {:*, _, [size, unit]} ->
-          size_ast = do_compile_element({:size, current_ast, [Form.compile(size)]})
-          do_compile_element({:unit, size_ast, [Form.compile(unit)]})
+          size_ast = do_compile_element({:size, current_ast, [Form.compile(size, state)]})
+          do_compile_element({:unit, size_ast, [Form.compile(unit, state)]})
         {the_type, _, params} when is_list(params) ->
-          do_compile_element({the_type, current_ast, Enum.map(params, &Form.compile(&1))})
+          do_compile_element({the_type, current_ast, Enum.map(params, &Form.compile(&1, state))})
         {the_type, _, _} ->
           do_compile_element({the_type, current_ast})
       end
@@ -119,13 +119,13 @@ defmodule ElixirScript.Experimental.Forms.Bitstring do
     )
   end
 
-  def make_interpolated_string(elements) do
+  def make_interpolated_string(elements, state) do
     translated_elements = Enum.map(elements, fn(x)->
       case x do
         elem when is_binary(elem) ->
-          Form.compile(elem)
+          Form.compile(elem, state)
         {:::, _, data} ->
-          Form.compile(hd(data))
+          Form.compile(hd(data), state)
       end
     end)
 
