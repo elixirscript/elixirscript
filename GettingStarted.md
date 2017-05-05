@@ -75,12 +75,13 @@ Adding Elixirscript to your mix project gives you the ability to add it to your 
 
 Add dependency to your deps in mix.exs:
 
-```elixir
+``` elixir
     {:elixir_script, "~> 0.26"}
-    ```
+```
 
     Elixirscript uses default input, output and module formats if options are not given. If you wish to change any or all options, add an `elixir_script` key to your project configuration.
-
+    
+``` elixir
     def project do
     [
      app: :my_app,
