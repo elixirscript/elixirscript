@@ -75,7 +75,7 @@ Adding Elixirscript to your mix project gives you the ability to add it to your 
 
 Add dependency to your deps in mix.exs:
 
-    ```elixir
+```elixir
     {:elixir_script, "~> 0.26"}
     ```
 
@@ -100,6 +100,7 @@ Add dependency to your deps in mix.exs:
      compilers: [:elixir_script] ++ Mix.compilers
     ]
     end
+```
 
 Available options are:
 
