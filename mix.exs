@@ -32,7 +32,8 @@ defmodule ElixirScript.Mixfile do
       {:fs, "~> 2.12"},
       {:ex_doc, "~> 0.15", only: :dev},
       {:excoveralls, "~> 0.6", only: :test},
-      {:credo, "~> 0.7", only: [:dev, :test]}
+      {:credo, "~> 0.7", only: [:dev, :test]},
+      {:blueprint, github: "elixirscript/blueprint", only: :test}
     ]
   end
 

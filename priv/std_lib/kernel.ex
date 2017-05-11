@@ -63,6 +63,14 @@ defmodule ElixirScript.Kernel do
     list.slice(1)
   end
 
+  def inspect(args) do
+    IO.inspect(args, [])
+  end
+
+  def inspect(args, opts) do
+    IO.inspect(args, opts)
+  end
+
   def is_atom(term) do
     JS.typeof(term) === "symbol"
   end

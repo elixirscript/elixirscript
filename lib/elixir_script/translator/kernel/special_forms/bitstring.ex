@@ -143,5 +143,4 @@ defmodule ElixirScript.Translator.Bitstring do
       do_make_interpolated_string(tl(elements), hd(elements), env)
     )
   end
-
 end

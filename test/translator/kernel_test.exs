@@ -12,7 +12,7 @@ defmodule ElixirScript.Translator.Kernel.Test do
 
     js_code = """
     throw Elixir.ElixirScript.ArgumentError.__load(Elixir).__struct__(Object.freeze({
-    [Symbol.for('message')]: 'cannot convert list to string. The list must contain only integers, strings or nested such lists; got: ' + Elixir.ElixirScript.String.Chars.__load(Elixir).to_string(inspect(list))
+    [Symbol.for('message')]: 'cannot convert list to string. The list must contain only integers, strings or nested such lists; got: ' + Elixir.ElixirScript.String.Chars.__load(Elixir).to_string(Elixir.ElixirScript.Kernel.__load(Elixir).inspect(list))
     }));
     """
 
@@ -54,7 +54,7 @@ defmodule ElixirScript.Translator.Kernel.Test do
     end
 
     js_code = """
-    Elixir.ElixirScript.Kernel.__load(Elixir).apply(Elixir.ElixirScript.Enum, Symbol.for('reverse'), Object.freeze([Object.freeze([1, 2, 3])]))
+    Elixir.ElixirScript.Kernel.__load(Elixir).apply(Elixir.ElixirScript.Enum.__load(Elixir), Symbol.for('reverse'), Object.freeze([Object.freeze([1, 2, 3])]))
     """
 
     assert_translation(ex_ast, js_code)

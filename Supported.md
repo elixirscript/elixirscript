@@ -997,8 +997,8 @@ List all public modules in the Elixir Standard Libary. If a function or macro is
 - [ ] `get_and_update_in/3`
 - [ ] `get_in/2`
 - [X] `hd/1`
-- [ ] `inspect/1`
-- [ ] `inspect/2`
+- [X] `inspect/1`
+- [X] `inspect/2`
 - [X] `is_atom/1`
 - [X] `is_binary/1`
 - [X] `is_bitstring/1`
@@ -1432,7 +1432,7 @@ List all public modules in the Elixir Standard Libary. If a function or macro is
 - [ ] `start/3`
 - [ ] `stop/0`
 ## OptionParser
-- [ ] `get_option_key/1`
+- [ ] `get_option_key/2`
 - [ ] `next/1`
 - [ ] `next/2`
 - [ ] `parse/1`

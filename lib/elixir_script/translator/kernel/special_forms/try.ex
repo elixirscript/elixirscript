@@ -68,7 +68,9 @@ defmodule ElixirScript.Translator.Try do
             convert_to_struct(x, env)
           end)
 
-          guards = {:in, meta, [value, error_names]}
+          guards = quote do
+            Bootstrap.Core.Functions.error_in(unquote(value), unquote(error_names))
+          end
 
           {:->, [], [ [{:when, [], [value | [guards]]}], block ]}
         {:->, _, [error_names, block]} ->
@@ -104,10 +106,11 @@ defmodule ElixirScript.Translator.Try do
   defp convert_to_struct(module, env) do
     case module do
       {:__aliases__, _, _}  = alias_ast ->
-        alias_ast = ElixirScript.Translator.State.get_module_name(env.state, alias_ast)
-        |> ElixirScript.Translator.Utils.name_to_quoted
+        module_name = ElixirScript.Translator.State.get_module_name(env.state, alias_ast)
+        alias_ast = ElixirScript.Translator.Utils.name_to_quoted(module_name)
+        module_name = module_name |> to_string |> String.to_atom
 
-        {:%, [], [alias_ast, {:%{}, [], []}]}
+        {:%{}, [], [__struct__: module_name]}
       ast ->
         ast
     end

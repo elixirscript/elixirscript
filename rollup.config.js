@@ -10,7 +10,7 @@ export default {
     babel({
       babelrc: false,
     }),
-    babili({}),
+    //babili({}),
   ],
   targets: [{ dest: 'priv/build/iife/Elixir.Bootstrap.js', format: 'iife' }],
 };

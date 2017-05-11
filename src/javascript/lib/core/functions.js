@@ -83,10 +83,22 @@ function build_namespace(ns, ns_string) {
   return parent;
 }
 
+function error_in(candidate, errors) {
+  const __struct__ = Symbol.for('__struct__');
+  if (!Array.isArray(errors)) {
+    return candidate[__struct__] === errors[__struct__];
+  } else {
+    return errors.some(error => {
+      return candidate[__struct__] === error[__struct__];
+    });
+  }
+}
+
 export default {
   call_property,
   defprotocol,
   defimpl,
   build_namespace,
   iterator_to_reducer,
+  error_in,
 };

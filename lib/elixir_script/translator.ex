@@ -648,27 +648,34 @@ defmodule ElixirScript.Translator do
     { js_ast, env }
   end
 
+  defp do_translate({:in, _, [left, right]}, env) do
+    quoted = quote do
+      ElixirScript.Bootstrap.Functions.contains(unquote(left), unquote(right))
+    end
+
+    translate(quoted, env)
+  end
+
   defp do_translate({name, _, params} = ast, env) when is_list(params) do
     if is_from_js_module(name, params, env) do
       do_translate({{:., [], [{:__aliases__, [], [:JS]}, name]}, [], params }, env)
     else
-      expanded_ast = Macro.expand(ast, env.env)
-      if expanded_ast == ast do
-        name_arity = {name, length(params)}
-        module = ElixirScript.Translator.State.get_module(env.state, env.module)
+      name_arity = {name, length(params)}
+      module = ElixirScript.Translator.State.get_module(env.state, env.module)
 
-        cond do
-          name_arity in module.functions or name_arity in module.private_functions ->
+      cond do
+        name_arity in module.functions or name_arity in module.private_functions ->
+          Call.make_local_function_call(name, params, env)
+        ElixirScript.Translator.LexicalScope.find_module(env, name_arity) ->
+          imported_module_name = ElixirScript.Translator.LexicalScope.find_module(env, name_arity)   
+          Call.make_module_function_call(imported_module_name, name, params, env)
+        true ->
+          expanded_ast = Macro.expand(ast, env.env)
+          if expanded_ast == ast do
             Call.make_local_function_call(name, params, env)
-          ElixirScript.Translator.LexicalScope.find_module(env, name_arity) ->
-            imported_module_name = ElixirScript.Translator.LexicalScope.find_module(env, name_arity)
-            Call.make_module_function_call(imported_module_name, name, params, env)
-          true ->
-            Call.make_local_function_call(name, params, env)
-        end
-
-      else
-        translate(expanded_ast, env)
+          else
+            translate(expanded_ast, env)
+          end
       end
     end
   end

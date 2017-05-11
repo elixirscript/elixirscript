@@ -40,4 +40,9 @@ defmodule ElixirScript.Translator.String.Test do
     """
     assert_translation(ex_ast, "'Hello ' + (Elixir.ElixirScript.String.Chars.__load(Elixir).to_string(Elixir.ElixirScript.Kernel.__load(Elixir).length(Object.freeze([]))) + ('\\nHow are you, ' + (Elixir.ElixirScript.String.Chars.__load(Elixir).to_string(Elixir.ElixirScript.Kernel.__load(Elixir).length(Object.freeze([]))) + '?\\n')))")
   end
+
+  test "translate string interpolation 2" do
+    ex_ast = quote do: "Hello #{inspect []}"
+    assert_translation(ex_ast, "'Hello ' + Elixir.ElixirScript.String.Chars.__load(Elixir).to_string(Elixir.ElixirScript.Kernel.__load(Elixir).inspect(Object.freeze([])))")
+  end
 end

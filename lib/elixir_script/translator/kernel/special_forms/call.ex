@@ -6,8 +6,15 @@ defmodule ElixirScript.Translator.Call do
   alias ElixirScript.Translator.Identifier
 
   def make_module_name(module_name, env) do
-    members = ["Elixir"] ++ Module.split(module_name)
-    { Identifier.make_namespace_members(members), env }
+    members = ["Elixir"] ++ Module.split(module_name) ++ ["__load"]
+
+    ast = JS.call_expression(
+      Identifier.make_namespace_members(members),
+      [JS.identifier("Elixir")]
+    )
+
+    
+    { ast, env }
   end
 
   def make_extern_module_name(module_name, env) do
