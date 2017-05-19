@@ -57,7 +57,7 @@ defmodule ElixirScript.Passes.CreateJSModules do
     body
   end
 
-  defp compile(body, opts) do
+  def compile(body, opts) do
     declarator = JS.variable_declarator(
       JS.identifier("Elixir"),
       JS.object_expression([])
