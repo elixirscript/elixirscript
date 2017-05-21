@@ -25,6 +25,9 @@ defmodule ElixirScript.Experimental.Clause do
       {:__block__, _, block_body} ->
         Enum.map(block_body, &Form.compile(&1, state))
         |> List.flatten
+      b when is_list(b) ->
+        Enum.map(b, &Form.compile(&1, state))
+        |> List.flatten
       _ ->
         Form.compile(body, state)
     end
@@ -81,6 +84,10 @@ defmodule ElixirScript.Experimental.Clause do
 
   defp do_return_last_statement([head | tail]) do
     [J.return_statement(head)] ++ tail
+  end
+
+  defp do_return_last_statement([]) do
+    [J.return_statement(J.identifier("null"))]
   end
 
   defp compile_guard(params, guards, state) do

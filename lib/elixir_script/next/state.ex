@@ -27,7 +27,7 @@ defmodule ElixirScript.State do
 
   def get_javascript_modules(pid) do
     Agent.get(pid, fn(state) ->
-      Keyword.get(state.compiler_opts, :js_modules, [])
+      Map.get(state.compiler_opts, :js_modules, [])
       |> Enum.map(fn({module_name, _path}) ->
         module_name
       end)

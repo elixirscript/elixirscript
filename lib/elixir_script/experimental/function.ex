@@ -19,18 +19,7 @@ defmodule ElixirScript.Experimental.Function do
   end
 
   def compile({{name, arity}, type, _, clauses}, state) do
-    clauses = Enum.map(clauses, fn(clause) ->
-
-      # Walk the AST and add the function to the context.
-      # This information is used when translating "super"
-      Macro.prewalk(clause, fn
-        {subject, context, params} ->
-          {subject, Keyword.put(context, :function, {name, arity}), params }
-        ast ->
-          ast
-      end)
-    end)
-
+    state = Map.put(state, :function, {name, arity})
 
     declarator = J.variable_declarator(
       ElixirScript.Translator.Identifier.make_function_name(name, arity),

@@ -3,8 +3,14 @@ defmodule ElixirScript.Beam do
   @spec debug_info(atom) :: {:ok | :error, map | binary}
   def debug_info(module) when is_atom(module) do
     with  {_, beam, _} <- :code.get_object_code(module),
-          {:ok, {^module, [debug_info: {:debug_info_v1, backend, data}]}} <- :beam_lib.chunks(beam, [:debug_info]) do
-          backend.debug_info(:elixir_v1, module, data, [])
+          {:ok, {^module, [debug_info: {:debug_info_v1, backend, data}]}} <- :beam_lib.chunks(beam, [:debug_info]),
+          {:ok, {^module, attribute_info}} = :beam_lib.chunks(beam, [:attributes]) do
+
+          if Keyword.get(attribute_info[:attributes], :protocol) do
+            get_protocol_implementations(module)
+          else
+            backend.debug_info(:elixir_v1, module, data, [])
+          end
     else
       :error ->
         {:error, "Unknown module"}
@@ -13,7 +19,22 @@ defmodule ElixirScript.Beam do
       {:error,:beam_lib,{:file_error,"non_existing.beam",:enoent}} ->
         {:error, "Debug info not available"}
     end
+  end
 
+  defp get_protocol_implementations(module) do
+    implementations = module
+    |> Protocol.extract_impls(:code.get_path())
+    |> Enum.map(fn(x) -> Module.concat([module, x]) end)
+    |> Enum.map(fn(x) ->
+      case debug_info(x) do
+        {:ok, info} ->
+          {x, info}
+        _ ->
+          raise "Unable to compile protocol implementation #{inspect x}"
+      end
+    end)
+
+    {:ok, module, implementations}
   end
 
 end

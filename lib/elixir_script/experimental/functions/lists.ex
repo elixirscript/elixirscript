@@ -111,4 +111,68 @@ defmodule ElixirScript.Experimental.Functions.Lists do
     )
   end
 
+  def rewrite({{:., _, [:lists, _]}, _, [elem, list]}, state) do
+    J.call_expression(
+      J.member_expression(
+        J.member_expression(
+          J.member_expression(
+            J.identifier("Bootstrap"),
+            J.identifier("Core")
+          ),
+          J.identifier("Functions")
+        ),
+        J.identifier("remove_from_list")
+      ),
+      [Form.compile(list, state), Form.compile(elem, state)]
+    )
+  end
+
+  def rewrite({{:., _, [:lists, _]}, _, [elem, list, _, _]}, state) do
+    J.call_expression(
+      J.member_expression(
+        J.member_expression(
+          J.member_expression(
+            J.identifier("Bootstrap"),
+            J.identifier("Core")
+          ),
+          J.identifier("Functions")
+        ),
+        J.identifier("remove_from_list")
+      ),
+      [Form.compile(list, state), Form.compile(elem, state)]
+    )
+  end
+
+  def rewrite({{:., _, [:lists, _]}, _, [elem, list, _]}, state) do
+    J.call_expression(
+      J.member_expression(
+        J.member_expression(
+          J.member_expression(
+            J.identifier("Bootstrap"),
+            J.identifier("Core")
+          ),
+          J.identifier("Functions")
+        ),
+        J.identifier("remove_from_list")
+      ),
+      [Form.compile(list, state), Form.compile(elem, state)]
+    )
+  end
+
+  def rewrite({{:., _, [:lists, _]}, _, [list]}, state) do
+    J.call_expression(
+      J.member_expression(
+        J.call_expression(
+          J.member_expression(
+            Form.compile(list, state),
+            J.identifier("concat")
+          ),
+          [J.array_expression([])]
+        ),
+        J.identifier("reverse")
+      ),
+      []
+    )
+  end
+
 end

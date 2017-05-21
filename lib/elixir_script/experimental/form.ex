@@ -1,6 +1,6 @@
 defmodule ElixirScript.Experimental.Form do
   alias ESTree.Tools.Builder, as: J
-  alias ElixirScript.Experimental.Forms.{Map, Bitstring, Match, Call, Try, For, Struct}
+  alias ElixirScript.Experimental.Forms.{Bitstring, Match, Call, Try, For, Struct}
   alias ElixirScript.Experimental.Functions.{Erlang, Lists, Maps}
   alias ElixirScript.Translator.Identifier
   alias ElixirScript.Experimental.Clause
@@ -25,7 +25,7 @@ defmodule ElixirScript.Experimental.Form do
 
   def compile(form, state) when is_atom(form) do
     if ElixirScript.Experimental.Module.is_elixir_module(form) do
-      members = ["Elixir"] ++ Module.split(form)
+      members = if form == Elixir, do: ["Elixir"], else: ["Elixir"] ++ Module.split(form)
       J.identifier(Enum.join(members, "_"))
     else
       J.call_expression(
@@ -56,7 +56,7 @@ defmodule ElixirScript.Experimental.Form do
   end
 
   def compile({:%{}, _, _} = map, state) do
-    Map.compile(map, state)
+    ElixirScript.Experimental.Forms.Map.compile(map, state)
   end
 
   def compile({:<<>>, _, _} = bitstring, state) do
@@ -122,7 +122,8 @@ defmodule ElixirScript.Experimental.Form do
 
   def compile({:receive, context, _}, state) do
     line = Keyword.get(context, :line, 1)
-    raise ElixirScriptCompileError, message: "Line: #{line} receive not supported"
+    #raise ElixirScriptCompileError, message: "Line: #{line} receive not supported"
+    J.call_expression(J.identifier(:receive), [])
   end
 
   def compile({:try, _, [blocks]}, state) do
@@ -156,8 +157,7 @@ defmodule ElixirScript.Experimental.Form do
   end
 
   def compile({:super, context, params}, state) do
-    {function_name, _} = Keyword.fetch!(context, :function)
-    IO.inspect {"HERE!!!!", function_name}
+    {function_name, _} = Map.get(state, :function)
 
     J.call_expression(
       ElixirScript.Translator.Identifier.make_function_name(function_name, length(params)),

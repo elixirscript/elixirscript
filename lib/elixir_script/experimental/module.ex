@@ -9,13 +9,18 @@ defmodule ElixirScript.Experimental.Module do
   """
 
   def compile(module, pid) do
+    IO.inspect "Compiling #{inspect module}"
     info = case ElixirScript.Beam.debug_info(module) do
       {:ok, info} ->
-        info
+        compile_module(module, info, pid)
+      {:ok, module, implementations} ->
+        compile_protocol(module, implementations, pid)
       {:error, error} ->
         raise "An error occurred while compiling #{inspect module}: #{error}"
     end
+  end
 
+  defp compile_module(module, info, pid) do
     %{
       attributes: _attrs, 
       compile_opts: _compile_opts,
@@ -51,7 +56,13 @@ defmodule ElixirScript.Experimental.Module do
       nil
     )
 
-    ModuleState.put_module(pid, module, Map.put(module_info, :js_ast, hd(js_ast)))
+    ModuleState.put_module(pid, module, Map.put(module_info, :js_ast, hd(js_ast))) 
+  end
+
+  defp compile_protocol(module, implementations, pid) do
+    ModuleState.put_module(pid, module, %{})
+
+    Enum.each(implementations, fn({impl, info}) -> compile_module(impl, info, pid) end) 
   end
 
   defp make_exports(reachable_defs) do
@@ -66,9 +77,19 @@ defmodule ElixirScript.Experimental.Module do
     J.object_expression(exports)
   end
 
+  def is_elixir_module(Elixir) do
+    true
+  end
+
   def is_elixir_module(module) when is_atom(module) do
-    first_char = String.first(to_string(module))
-    Regex.match?(~r/[A-Z]/, first_char)
+    str_module = Atom.to_string(module)
+
+    case str_module do
+      "Elixir." <> _ ->
+        true
+      _ ->
+        false
+    end
   end
 
   def is_elixir_module(_) do

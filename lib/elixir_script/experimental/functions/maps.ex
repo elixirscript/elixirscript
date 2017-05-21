@@ -35,4 +35,51 @@ defmodule ElixirScript.Experimental.Functions.Maps do
     )
   end
 
+  def rewrite({{:., _, [:maps, :put]}, _, [key, map, _]}, state) do
+    J.call_expression(
+      J.member_expression(
+        J.member_expression(
+          J.member_expression(
+            J.identifier("Bootstrap"),
+            J.identifier("Core")
+          ),
+          J.identifier("Functions")
+        ),
+        J.identifier("update_map")
+      ),
+      [Form.compile(key, state), Form.compile(map, state)]
+    )
+  end
+
+  def rewrite({{:., _, [:maps, :is_key]}, _, [key, map]}, state) do
+    J.call_expression(
+      J.member_expression(
+        J.member_expression(
+          J.member_expression(
+            J.identifier("Bootstrap"),
+            J.identifier("Core")
+          ),
+          J.identifier("Functions")
+        ),
+        J.identifier("update_map")
+      ),
+      [Form.compile(key, state), Form.compile(map, state)]
+    )
+  end
+
+    def rewrite({{:., _, [:maps, _]}, _, _}, state) do
+    J.call_expression(
+      J.member_expression(
+        J.member_expression(
+          J.member_expression(
+            J.identifier("Bootstrap"),
+            J.identifier("Core")
+          ),
+          J.identifier("Functions")
+        ),
+        J.identifier("update_map")
+      ),
+      []
+    )
+  end
 end

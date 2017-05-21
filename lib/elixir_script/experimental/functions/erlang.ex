@@ -19,7 +19,7 @@ defmodule ElixirScript.Experimental.Functions.Erlang do
         Form.compile(fun, state),
         J.identifier("apply")
       ),
-      [Form.compile(fun, state), J.array_expression(Enum.map(args, &Form.compile(&1, state)))]
+      [Form.compile(fun, state), J.array_expression(Enum.map(List.wrap(args), &Form.compile(&1, state)))]
     )
   end
 
@@ -34,7 +34,7 @@ defmodule ElixirScript.Experimental.Functions.Erlang do
         mod,
         J.identifier("apply")
       ),
-      [mod, J.array_expression(Enum.map(args, &Form.compile(&1, state)))]
+      [mod, J.array_expression(Enum.map(List.wrap(args), &Form.compile(&1, state)))]
     )
   end
 
@@ -362,37 +362,37 @@ defmodule ElixirScript.Experimental.Functions.Erlang do
     )
   end
 
-  def rewrite({{:., _, [:erlang, :send]}, _, [dest, msg]}, state) do
-    raise ":erlang.send not supported"
-  end
-
-  def rewrite({{:., _, [:erlang, :self]}, _, []}, state) do
-    raise ":erlang.self not supported"
-  end
-
-  def rewrite({{:., _, [:erlang, :spawn]}, _, [_fun]}, state) do
-    raise ":erlang.spawn not supported"
-  end
-
-  def rewrite({{:., _, [:erlang, :spawn]}, _, [_module, _fun, _args]}, state) do
-    raise ":erlang.spawn not supported"
-  end
-
-  def rewrite({{:., _, [:erlang, :spawn_link]}, _, [_fun]}, state) do
-    raise ":erlang.spawn_link not supported"
-  end
-
-  def rewrite({{:., _, [:erlang, :spawn_link]}, _, [_module, _fun, _args]}, state) do
-    raise ":erlang.spawn_link not supported"
-  end
-
-  def rewrite({{:., _, [:erlang, :spawn_monitor]}, _, [_fun]}, state) do
-    raise ":erlang.spawn_monitor not supported"
-  end
-
-  def rewrite({{:., _, [:erlang, :spawn_monitor]}, _, [_module, _fun, _args]}, state) do
-    raise ":erlang.spawn_monitor not supported"
-  end
+#  def rewrite({{:., _, [:erlang, :send]}, _, [dest, msg]}, state) do
+#    raise ":erlang.send not supported"
+#  end
+#
+#  def rewrite({{:., _, [:erlang, :self]}, _, []}, state) do
+#    raise ":erlang.self not supported"
+#  end
+#
+#  def rewrite({{:., _, [:erlang, :spawn]}, _, [_fun]}, state) do
+#    raise ":erlang.spawn not supported"
+#  end
+#
+#  def rewrite({{:., _, [:erlang, :spawn]}, _, [_module, _fun, _args]}, state) do
+#    raise ":erlang.spawn not supported"
+#  end
+#
+#  def rewrite({{:., _, [:erlang, :spawn_link]}, _, [_fun]}, state) do
+#    raise ":erlang.spawn_link not supported"
+#  end
+#
+#  def rewrite({{:., _, [:erlang, :spawn_link]}, _, [_module, _fun, _args]}, state) do
+#    raise ":erlang.spawn_link not supported"
+#  end
+#
+#  def rewrite({{:., _, [:erlang, :spawn_monitor]}, _, [_fun]}, state) do
+#    raise ":erlang.spawn_monitor not supported"
+#  end
+#
+#  def rewrite({{:., _, [:erlang, :spawn_monitor]}, _, [_module, _fun, _args]}, state) do
+#    raise ":erlang.spawn_monitor not supported"
+#  end
 
   def rewrite({{:., _, [:erlang, :throw]}, _, [term]}, state) do
     J.throw_statement(
@@ -546,8 +546,6 @@ defmodule ElixirScript.Experimental.Functions.Erlang do
         Form.compile(value, state)
       ]
     )
-
-    quote do: unquote(tuple).put_elem(unquote(index) - 1, unquote(value))
   end
 
   def rewrite({{:., _, [:erlang, :orelse]}, _, [left, right]}, state) do
@@ -903,6 +901,13 @@ defmodule ElixirScript.Experimental.Functions.Erlang do
     J.call_expression(
       J.identifier("parseInt"),
       [Form.compile(binary, state), Form.compile(base, state)]
+    )
+  end
+
+  def rewrite({{:., _, [:erlang, _]}, _, _}, state) do
+    J.call_expression(
+        J.identifier("toString"),
+      []
     )
   end
 

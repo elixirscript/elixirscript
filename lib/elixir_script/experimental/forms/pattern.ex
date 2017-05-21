@@ -138,5 +138,4 @@ defmodule ElixirScript.Experimental.Forms.Pattern do
     { patterns, params } = compile([source], state)
     { [PM.capture(hd(patterns))], params ++ [ElixirScript.Translator.Identifier.make_identifier(target)] }
   end
-
 end

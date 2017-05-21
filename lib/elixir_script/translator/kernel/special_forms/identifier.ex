@@ -51,6 +51,10 @@ defmodule ElixirScript.Translator.Identifier do
     |> JS.identifier
   end
 
+  defp filter_name(name) when is_tuple(name) do
+    name
+  end
+
   defp filter_name(reserved_word) when reserved_word in @js_reserved_words do
     "__#{Atom.to_string(reserved_word)}__"
   end

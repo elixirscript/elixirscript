@@ -48,6 +48,10 @@ defmodule ElixirScript.Experimental.Forms.For do
     )
   end
 
+  defp handle_args(nil, module_state) do
+    %{generators: [], args: [], filter: nil, fun: nil, into: nil, patterns: []}
+  end
+
   defp handle_args(generators, module_state) do
     Enum.reduce(generators, %{generators: [], args: [], filter: nil, fun: nil, into: nil, patterns: []}, fn
 

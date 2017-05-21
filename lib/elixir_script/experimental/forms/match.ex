@@ -45,13 +45,7 @@ defmodule ElixirScript.Experimental.Forms.Match do
   defp make_list_ref(array_pattern, params, state) do
     {ref, params} = make_params(params)
 
-    ref_declarator = J.variable_declarator(
-      ref,
-      J.array_expression(
-        Enum.map(params, &Form.compile(&1, state))
-      )
-    )
-
+    ref_declarator = J.variable_declarator(ref, J.array_expression(params))
     make_variable_declaration_and_group(ref_declarator, array_pattern)
   end
 
@@ -89,7 +83,8 @@ defmodule ElixirScript.Experimental.Forms.Match do
 
   defp make_variable_declaration_and_group(ref_declarator, array_pattern) do
     ref_declaration = J.variable_declaration([ref_declarator], :let)
-    [array_pattern, ref_declaration]
+    #[array_pattern, ref_declaration]
+    array_pattern
   end
 
 end

@@ -16,7 +16,14 @@ defmodule ElixirScript.Compiler do
     end)
 
     modules = ElixirScript.State.list_modules(pid)
-    |> Enum.map(fn {_module, info} -> info.js_ast end)
+    |> Enum.filter_map(
+      fn {_, info} -> Map.has_key?(info, :js_ast) end,
+      fn {_module, info} -> 
+        info.js_ast 
+      end
+    )
+
+    Enum.map()
 
     bundle(modules, opts)
   
