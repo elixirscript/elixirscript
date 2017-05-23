@@ -8,19 +8,7 @@ defmodule ElixirScript.Experimental.Module do
   Upper level module that handles compilation
   """
 
-  def compile(module, pid) do
-    IO.inspect "Compiling #{inspect module}"
-    info = case ElixirScript.Beam.debug_info(module) do
-      {:ok, info} ->
-        compile_module(module, info, pid)
-      {:ok, module, implementations} ->
-        compile_protocol(module, implementations, pid)
-      {:error, error} ->
-        raise "An error occurred while compiling #{inspect module}: #{error}"
-    end
-  end
-
-  defp compile_module(module, info, pid) do
+  def compile(module, info, pid) do
     %{
       attributes: _attrs, 
       compile_opts: _compile_opts,
@@ -28,7 +16,8 @@ defmodule ElixirScript.Experimental.Module do
       file: _file,
       line: _line, 
       module: ^module, 
-      unreachable: unreachable
+      unreachable: _unreachable,
+      used: used
     } = info
 
     state = %{
@@ -36,13 +25,9 @@ defmodule ElixirScript.Experimental.Module do
     }
  
     reachable_defs = Enum.filter(defs, fn
-      { name, _, _, _} -> not(name in unreachable)
-      { _, type, _, _} when type in [:defmacro, :defmacrop] -> false
-      _ -> true
+      { name, _, _, _} -> name in used
+      _ -> false
     end)
-
-    module_info = %{module: module, defs: defs}
-    ModuleState.put_module(pid, module, module_info)
 
     compiled_functions = reachable_defs
     |> Enum.map(&Function.compile(&1, state))
@@ -56,13 +41,7 @@ defmodule ElixirScript.Experimental.Module do
       nil
     )
 
-    ModuleState.put_module(pid, module, Map.put(module_info, :js_ast, hd(js_ast))) 
-  end
-
-  defp compile_protocol(module, implementations, pid) do
-    ModuleState.put_module(pid, module, %{})
-
-    Enum.each(implementations, fn({impl, info}) -> compile_module(impl, info, pid) end) 
+    ModuleState.put_module(pid, module, Map.put(info, :js_ast, hd(js_ast))) 
   end
 
   defp make_exports(reachable_defs) do

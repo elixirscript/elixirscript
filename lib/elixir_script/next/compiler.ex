@@ -5,21 +5,21 @@ defmodule ElixirScript.Compiler do
     opts = build_compiler_options(opts)
     {:ok, pid} = ElixirScript.State.start_link(opts)
 
+    IO.puts "Finding used modules and functions"
     entry_modules
     |> List.wrap
     |> ElixirScript.FindUsed.find_used(pid)
-    |> Enum.each(fn(module) ->
-      case ElixirScript.State.get_module(pid, module) do
-        nil ->
-         ElixirScript.Experimental.Module.compile(module, pid)
-        _ ->
-          nil 
-      end
+    
+    modules = ElixirScript.State.list_modules(pid)
+    
+    IO.puts "Compiling"
+    Enum.each(modules, fn({module, info}) ->
+      ElixirScript.Experimental.Module.compile(module, info, pid)
     end)
 
-    modules = pid
-    |> ElixirScript.State.list_modules
-    |> Enum.filter_map(
+    modules = ElixirScript.State.list_modules(pid)
+
+    modules = Enum.filter_map(modules,
       fn {_, info} -> Map.has_key?(info, :js_ast) end,
       fn {_module, info} -> 
         info.js_ast 
@@ -42,6 +42,7 @@ defmodule ElixirScript.Compiler do
     |> Generator.generate
 
     concat(js_code)
+    |> IO.puts 
   end
 
   defp concat(code) do

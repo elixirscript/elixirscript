@@ -10,6 +10,7 @@ defmodule ElixirScript.FindUsed do
   end
 
   defp execute(module, pid) do
+    IO.inspect module
     case ElixirScript.Beam.debug_info(module) do
       {:ok, info} ->
         walk_module(module, info, pid)
@@ -23,7 +24,7 @@ defmodule ElixirScript.FindUsed do
   defp walk_module(module, info, pid) do
     %{
       attributes: _attrs, 
-      walk_opts: _walk_opts,
+      compile_opts: _compile_opts,
       definitions: defs,
       file: _file,
       line: _line, 
@@ -31,8 +32,7 @@ defmodule ElixirScript.FindUsed do
       unreachable: unreachable
     } = info
 
-    module_info = %{module: module, info: info}
-    ModuleState.put_module(pid, module, module_info)
+    ModuleState.put_module(pid, module, info)
 
     reachable_defs = Enum.filter(defs, fn
       { _, type, _, _} when type in [:defmacro, :defmacrop] -> false
@@ -41,7 +41,8 @@ defmodule ElixirScript.FindUsed do
     end)
 
     state = %{
-      pid: pid
+      pid: pid,
+      module: module
     }
 
     Enum.each(reachable_defs, &walk(&1, state))
@@ -81,25 +82,17 @@ defmodule ElixirScript.FindUsed do
     walk({[], params, [], body}, state)
   end
 
-  defp walk(nil, _) do
-    nil
-  end
-
-  defp walk(form, _) when is_boolean(form) when is_integer(form) when is_float(form) when is_binary(form)  do
-    nil
-  end
-
   defp walk(form, state) when is_list(form) do
     Enum.each(form, &walk(&1, state))
   end
 
-  defp walk(form, state) when is_atom(form) do
-    if ElixirScript.Experimental.Module.is_elixir_module(form) do
-      if ModuleState.get_module(state.pid, form) == nil do
-        execute(form, state.pid)
-      end
-    end
-  end
+  #defp walk(form, state) when is_atom(form) do
+    #if ElixirScript.Experimental.Module.is_elixir_module(form) do
+    #  if ModuleState.get_module(state.pid, form) == nil do
+    #    execute(form, state.pid)
+    #  end
+    #end
+  #end
 
   defp walk({a, b}, state) do
     walk({:{}, [], [a, b]}, state)
@@ -218,7 +211,7 @@ defmodule ElixirScript.FindUsed do
     nil
   end
 
-  defp walk({{:., _, [module, _]}, _, params}, state) do
+  defp walk({{:., _, [module, function]}, _, params}, state) do
     cond do
       ElixirScript.Experimental.Module.is_js_module(module, state) ->
         nil
@@ -226,6 +219,7 @@ defmodule ElixirScript.FindUsed do
         if ModuleState.get_module(state.pid, module) == nil do
           execute(module, state.pid)
         end
+        ModuleState.add_used(state.pid, module, {function, length(params)})
       true ->
         nil         
     end
@@ -237,11 +231,16 @@ defmodule ElixirScript.FindUsed do
     Enum.each(params, &walk(&1, state))
   end
 
+  defp walk({function, _, params}, state) when is_atom(function) and is_list(params) do
+    ModuleState.add_used(state.pid, state.module, {function, length(params)})    
+    Enum.each(params, &walk(&1, state))
+  end
+
   defp walk({_, _, params}, state) when is_list(params) do
     Enum.each(params, &walk(&1, state))
   end
 
-  defp walk({_, _, _}, _state) do
+  defp walk(_, _) do
     nil
   end
 

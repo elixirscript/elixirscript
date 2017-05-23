@@ -91,4 +91,8 @@ defmodule ElixirScript.Translator.Identifier do
     JS.identifier("#{name}#{arity}")
   end
 
+  def make_extern_function_name(name) do
+    JS.identifier("#{name}")  
+  end
+
 end

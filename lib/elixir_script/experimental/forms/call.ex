@@ -2,17 +2,11 @@ defmodule ElixirScript.Experimental.Forms.Call do
   alias ESTree.Tools.Builder, as: J
   alias ElixirScript.Experimental.Form
   alias ElixirScript.Translator.Identifier
-  alias ElixirScript.State, as: ModuleState
 
   def compile({{:., _, [module, function]}, _, params}, state) do
     function_name = cond do
       ElixirScript.Experimental.Module.is_js_module(module, state) ->
         ElixirScript.Translator.Identifier.make_extern_function_name(function)
-      ElixirScript.Experimental.Module.is_elixir_module(module) ->
-        if ModuleState.get_module(state.pid, module) == nil do
-          ElixirScript.Experimental.Module.compile(module, state.pid)
-        end
-        ElixirScript.Translator.Identifier.make_function_name(function, length(params))
       true ->
         ElixirScript.Translator.Identifier.make_function_name(function, length(params))            
     end
