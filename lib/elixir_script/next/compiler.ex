@@ -5,8 +5,10 @@ defmodule ElixirScript.Compiler do
     opts = build_compiler_options(opts)
     {:ok, pid} = ElixirScript.State.start_link(opts)
 
-    modules = List.wrap(entry_modules)
-    Enum.each(modules, fn(module) ->
+    entry_modules
+    |> List.wrap
+    |> ElixirScript.FindUsed.find_used(pid)
+    |> Enum.each(fn(module) ->
       case ElixirScript.State.get_module(pid, module) do
         nil ->
          ElixirScript.Experimental.Module.compile(module, pid)
@@ -15,15 +17,14 @@ defmodule ElixirScript.Compiler do
       end
     end)
 
-    modules = ElixirScript.State.list_modules(pid)
+    modules = pid
+    |> ElixirScript.State.list_modules
     |> Enum.filter_map(
       fn {_, info} -> Map.has_key?(info, :js_ast) end,
       fn {_module, info} -> 
         info.js_ast 
       end
     )
-
-    Enum.map()
 
     bundle(modules, opts)
   

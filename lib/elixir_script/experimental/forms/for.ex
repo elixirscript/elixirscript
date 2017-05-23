@@ -57,11 +57,11 @@ defmodule ElixirScript.Experimental.Forms.For do
 
       ({:<<>>, _, body}, state) ->
         {bs_parts, collection} = Enum.map_reduce(body, nil, fn
-      {:::, _, _} = ast, state ->
-        {ast, state}
-      {:<-, _, [var, collection]}, _ ->
-        {var, collection}
-      end)
+                                                              {:::, _, _} = ast, state ->
+                                                                {ast, state}
+                                                              {:<-, _, [var, collection]}, _ ->
+                                                                {var, collection}
+                                                              end)
 
       {patterns, params} = Pattern.compile([{:<<>>, [], bs_parts}], module_state)
 
