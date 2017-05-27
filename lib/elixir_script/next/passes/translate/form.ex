@@ -13,7 +13,7 @@ defmodule ElixirScript.Translate.Form do
     J.identifier("null")
   end
 
-  def compile(form, _) when is_boolean(form) when is_integer(form) when is_float(form) when is_binary(form)  do
+  def compile(form, _) when is_boolean(form) or is_integer(form) or is_float(form) or is_binary(form)  do
     J.literal(form)
   end
 
@@ -120,10 +120,9 @@ defmodule ElixirScript.Translate.Form do
     )
   end
 
-  def compile({:receive, context, _}, state) do
+  def compile({:receive, context, _}, _state) do
     line = Keyword.get(context, :line, 1)
-    #raise ElixirScriptCompileError, message: "Line: #{line} receive not supported"
-    J.call_expression(J.identifier(:receive), [])
+    raise ElixirScriptCompileError, message: "Line: #{line} receive not supported"
   end
 
   def compile({:try, _, [blocks]}, state) do
@@ -140,16 +139,20 @@ defmodule ElixirScript.Translate.Form do
     )
   end
 
-  def compile({{:., _, [:erlang, _]}, _, _} = ast, state) do
-    Erlang.rewrite(ast, state)
-  end
-
-  def compile({{:., _, [:lists, _]}, _, _} = ast, state) do
-    Lists.rewrite(ast, state)
-  end
-
-  def compile({{:., _, [:maps, _]}, _, _} = ast, state) do
-    Maps.rewrite(ast, state)
+  def compile({{:., _, [module, function]}, _, params}, state) when module in [:erlang, :lists, :maps] do
+    J.call_expression(
+      J.member_expression(
+        J.member_expression(
+          J.member_expression(
+            J.identifier("Bootstrap"),
+            J.identifier("Core")
+          ),
+          J.identifier(module)
+        ),
+        J.identifier(function)
+      ),
+      Enum.map(params, &compile(&1, state))
+    )
   end
 
   def compile({{:., _, [_, _]}, _, _} = ast, state) do

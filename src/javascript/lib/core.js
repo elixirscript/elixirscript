@@ -2,6 +2,9 @@ import Patterns from 'tailored';
 import ErlangTypes from 'erlang-types';
 import Functions from './core/functions';
 import SpecialForms from './core/special_forms';
+import erlang from './core/erlang_compat/erlang';
+import maps from './core/erlang_compat/maps';
+import lists from './core/erlang_compat/lists';
 
 class Integer {}
 class Float {}
@@ -34,4 +37,7 @@ export default {
   Functions,
   SpecialForms,
   global: globalState,
+  erlang,
+  maps,
+  lists,
 };
