@@ -1,6 +1,6 @@
-defmodule ElixirScript.Experimental.Forms.Map do
+defmodule ElixirScript.Translate.Forms.Map do
   alias ESTree.Tools.Builder, as: J
-  alias ElixirScript.Experimental.Form
+  alias ElixirScript.Translate.Form
 
   def compile({:%{}, _, [{:|, _, [map, new_values]}]}, state) do
     map = Form.compile(map, state)

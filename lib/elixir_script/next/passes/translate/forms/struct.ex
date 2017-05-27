@@ -1,6 +1,6 @@
-defmodule ElixirScript.Experimental.Forms.Struct do
+defmodule ElixirScript.Translate.Forms.Struct do
   alias ESTree.Tools.Builder, as: J
-  alias ElixirScript.Experimental.Form
+  alias ElixirScript.Translate.Form
   alias ElixirScript.Translator.Identifier
 
   def compile({:%, _, [module, params]}, state) do

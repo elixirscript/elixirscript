@@ -1,6 +1,6 @@
-defmodule ElixirScript.Experimental.Function do
+defmodule ElixirScript.Translate.Function do
   alias ESTree.Tools.Builder, as: J
-  alias ElixirScript.Experimental.Clause
+  alias ElixirScript.Translate.Clause
 
   @moduledoc """
   Translates the given Elixir function AST into the

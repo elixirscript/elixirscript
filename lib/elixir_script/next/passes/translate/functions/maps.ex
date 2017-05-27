@@ -1,7 +1,7 @@
-defmodule ElixirScript.Experimental.Functions.Maps do
+defmodule ElixirScript.Translate.Functions.Maps do
   @moduledoc false
   alias ESTree.Tools.Builder, as: J
-  alias ElixirScript.Experimental.Form
+  alias ElixirScript.Translate.Form
 
   def rewrite({{:., _, [:maps, :update]}, _, [key, value, map]}, state) do
     J.call_expression(

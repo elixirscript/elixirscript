@@ -1,7 +1,7 @@
-defmodule ElixirScript.Experimental.Functions.Erlang do
+defmodule ElixirScript.Translate.Functions.Erlang do
   @moduledoc false
   alias ESTree.Tools.Builder, as: J
-  alias ElixirScript.Experimental.Form
+  alias ElixirScript.Translate.Form
 
   def rewrite({{:., _, [:erlang, :abs]}, _, [number]}, state) do
     J.call_expression(

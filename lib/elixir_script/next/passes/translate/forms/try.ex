@@ -1,8 +1,8 @@
-defmodule ElixirScript.Experimental.Forms.Try do
+defmodule ElixirScript.Translate.Forms.Try do
   @moduledoc false
   alias ESTree.Tools.Builder, as: JS
-  alias ElixirScript.Experimental.Clause
-  alias ElixirScript.Experimental.Form
+  alias ElixirScript.Translate.Clause
+  alias ElixirScript.Translate.Form
 
   def compile(blocks, state) do
     try_block = Keyword.get(blocks, :do)
@@ -74,7 +74,7 @@ defmodule ElixirScript.Experimental.Forms.Try do
 
       JS.call_expression(
         JS.member_expression(
-          ElixirScript.Experimental.Function.patterns_ast(),
+          ElixirScript.Translate.Function.patterns_ast(),
           JS.identifier("defmatch")
         ),
         processed_clauses

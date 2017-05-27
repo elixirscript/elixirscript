@@ -1,9 +1,9 @@
-defmodule ElixirScript.Experimental.Form do
+defmodule ElixirScript.Translate.Form do
   alias ESTree.Tools.Builder, as: J
-  alias ElixirScript.Experimental.Forms.{Bitstring, Match, Call, Try, For, Struct}
-  alias ElixirScript.Experimental.Functions.{Erlang, Lists, Maps}
+  alias ElixirScript.Translate.Forms.{Bitstring, Match, Call, Try, For, Struct}
+  alias ElixirScript.Translate.Functions.{Erlang, Lists, Maps}
   alias ElixirScript.Translator.Identifier
-  alias ElixirScript.Experimental.Clause
+  alias ElixirScript.Translate.Clause
 
   @moduledoc """
   Handles translation of all forms that are not functions or clauses
@@ -24,7 +24,7 @@ defmodule ElixirScript.Experimental.Form do
   end
 
   def compile(form, state) when is_atom(form) do
-    if ElixirScript.Experimental.Module.is_elixir_module(form) do
+    if ElixirScript.Translate.Module.is_elixir_module(form) do
       members = if form == Elixir, do: ["Elixir"], else: ["Elixir"] ++ Module.split(form)
       J.identifier(Enum.join(members, "_"))
     else
@@ -56,7 +56,7 @@ defmodule ElixirScript.Experimental.Form do
   end
 
   def compile({:%{}, _, _} = map, state) do
-    ElixirScript.Experimental.Forms.Map.compile(map, state)
+    ElixirScript.Translate.Forms.Map.compile(map, state)
   end
 
   def compile({:<<>>, _, _} = bitstring, state) do
@@ -78,7 +78,7 @@ defmodule ElixirScript.Experimental.Form do
   def compile({:case, _, [condition, [do: clauses]]}, state) do
     func = J.call_expression(
       J.member_expression(
-        ElixirScript.Experimental.Function.patterns_ast(),
+        ElixirScript.Translate.Function.patterns_ast(),
         J.identifier("defmatch")
       ),
       Enum.map(clauses, &Clause.compile(&1, state))
@@ -133,7 +133,7 @@ defmodule ElixirScript.Experimental.Form do
   def compile({:fn, _, clauses}, state) do
     J.call_expression(
       J.member_expression(
-        ElixirScript.Experimental.Function.patterns_ast(),
+        ElixirScript.Translate.Function.patterns_ast(),
         J.identifier("defmatch")
       ),
       Enum.map(clauses, &Clause.compile(&1, state))

@@ -1,5 +1,12 @@
 defmodule ElixirScript.Beam do
+  @moduledoc false
 
+  @doc """
+  Takes a module and finds the expanded AST
+  from the debug info inside the beam file.
+  For protocols, this will return a list of
+  all the protocol implementations
+  """
   @spec debug_info(atom) :: {:ok | :error, map | binary}
   def debug_info(module) when is_atom(module) do
     with  {_, beam, _} <- :code.get_object_code(module),

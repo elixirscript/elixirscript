@@ -1,7 +1,7 @@
-defmodule ElixirScript.Experimental.Clause do
+defmodule ElixirScript.Translate.Clause do
   alias ESTree.Tools.Builder, as: J
-  alias ElixirScript.Experimental.Form
-  alias ElixirScript.Experimental.Forms.Pattern
+  alias ElixirScript.Translate.Form
+  alias ElixirScript.Translate.Forms.Pattern
 
   @moduledoc """
   Handles translation of all of the clause ASTs

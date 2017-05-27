@@ -1,6 +1,9 @@
 defmodule ElixirScript.Compiler do
-  alias ESTree.Tools.{Builder, Generator}
-  
+  @moduledoc """
+  Compiles the given modules to JavaScript.
+  """
+
+  @spec compile([atom], []) :: nil
   def compile(entry_modules, opts \\ []) do
     opts = build_compiler_options(opts)
     {:ok, pid} = ElixirScript.State.start_link(opts)
@@ -8,70 +11,21 @@ defmodule ElixirScript.Compiler do
     IO.puts "Finding used modules and functions"
     entry_modules
     |> List.wrap
-    |> ElixirScript.FindUsed.find_used(pid)
-    
-    modules = ElixirScript.State.list_modules(pid)
+    |> ElixirScript.FindUsed.execute(pid)
     
     IO.puts "Compiling"
-    Enum.each(modules, fn({module, info}) ->
-      ElixirScript.Experimental.Module.compile(module, info, pid)
-    end)
-
     modules = ElixirScript.State.list_modules(pid)
 
-    modules = Enum.filter_map(modules,
-      fn {_, info} -> Map.has_key?(info, :js_ast) end,
-      fn {_module, info} -> 
-        info.js_ast 
-      end
-    )
-
-    bundle(modules, opts)
+    ElixirScript.Translate.execute(modules, pid)
   
     ElixirScript.State.stop(pid)
   end
 
-  defp bundle(modules, opts) do
-    ElixirScript.Passes.CreateJSModules.compile(modules, opts)
-
-    js_code = modules
-    |> ElixirScript.Passes.CreateJSModules.compile(opts)
-    |> List.wrap
-    |> Builder.program
-    |> prepare_js_ast
-    |> Generator.generate
-
-    concat(js_code)
-    |> IO.puts 
-  end
-
-  defp concat(code) do
-    "'use strict';\n" <> ElixirScript.get_bootstrap_js("iife") <> "\n" <> code
-  end
-
-  defp prepare_js_ast(js_ast) do
-    case js_ast do
-      modules when is_list(modules) ->
-        modules
-        |> Enum.reduce([], &(&2 ++ &1.body))
-        |> Builder.program
-      %ElixirScript.Translator.Group{body: body} ->
-        Builder.program(body)
-      %ElixirScript.Translator.Empty{} ->
-        Builder.program([])
-      _ ->
-        js_ast
-    end
-  end
-
   defp build_compiler_options(opts) do
     default_options = Map.new
-    |> Map.put(:full_build, false)
     |> Map.put(:output, nil)
-    |> Map.put(:app, :app)
     |> Map.put(:format, :es)
     |> Map.put(:js_modules, Keyword.get(opts, :js_modules, []))
-    |> Map.put(:remove_unused, false)
 
     options = default_options
     Map.put(options, :module_formatter, get_module_formatter(options[:format]))

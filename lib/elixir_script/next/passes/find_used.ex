@@ -1,16 +1,22 @@
 defmodule ElixirScript.FindUsed do
+  @moduledoc false
   alias ElixirScript.State, as: ModuleState
 
-  def find_used(modules, pid) do
+  @doc """
+  Takes a list of entry modules and finds modules they use along with
+  documenting the functions used. The data collected about used functions
+  is used to filter only the used functions for compilation
+  """
+  @spec execute([atom], pid) :: nil
+  def execute(modules, pid) do
     Enum.each(List.wrap(modules), fn(module) ->
       if ElixirScript.State.get_module(pid, module) == nil do
-        execute(module, pid)
+        do_execute(module, pid)
       end
     end)
   end
 
-  defp execute(module, pid) do
-    IO.inspect module
+  defp do_execute(module, pid) do
     case ElixirScript.Beam.debug_info(module) do
       {:ok, info} ->
         walk_module(module, info, pid)
@@ -87,7 +93,7 @@ defmodule ElixirScript.FindUsed do
   end
 
   #defp walk(form, state) when is_atom(form) do
-    #if ElixirScript.Experimental.Module.is_elixir_module(form) do
+    #if ElixirScript.Translate.Module.is_elixir_module(form) do
     #  if ModuleState.get_module(state.pid, form) == nil do
     #    execute(form, state.pid)
     #  end
@@ -116,9 +122,9 @@ defmodule ElixirScript.FindUsed do
   end
 
   defp walk({:%, _, [module, params]}, state) do
-    if ElixirScript.Experimental.Module.is_elixir_module(module) do
+    if ElixirScript.Translate.Module.is_elixir_module(module) do
       if ModuleState.get_module(state.pid, module) == nil do
-        execute(module, state.pid)
+        do_execute(module, state.pid)
       end
     end
     Enum.each(params, &walk(&1, state))
@@ -213,9 +219,9 @@ defmodule ElixirScript.FindUsed do
 
   defp walk({{:., _, [module, function]}, _, params}, state) do
     cond do
-      ElixirScript.Experimental.Module.is_js_module(module, state) ->
+      ElixirScript.Translate.Module.is_js_module(module, state) ->
         nil
-      ElixirScript.Experimental.Module.is_elixir_module(module) ->
+      ElixirScript.Translate.Module.is_elixir_module(module) ->
         if ModuleState.get_module(state.pid, module) == nil do
           execute(module, state.pid)
         end

@@ -1,7 +1,7 @@
-defmodule ElixirScript.Experimental.Forms.Bitstring do
+defmodule ElixirScript.Translate.Forms.Bitstring do
   @moduledoc false
   alias ESTree.Tools.Builder, as: JS
-  alias ElixirScript.Experimental.Form
+  alias ElixirScript.Translate.Form
 
 
   def compile({:<<>>, _, elements}, state) do

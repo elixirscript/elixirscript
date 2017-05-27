@@ -1,4 +1,4 @@
-defmodule ElixirScript.Experimental.ModuleState do
+defmodule ElixirScript.Translate.ModuleState do
   def start_link(module) do
     Agent.start_link(fn -> %{ module: module, refs: [] } end)
   end

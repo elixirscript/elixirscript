@@ -1,4 +1,8 @@
 defmodule ElixirScript.State do
+  @moduledoc false
+
+  # Holds the state for the ElixirScript compiler
+
   def start_link(compiler_opts) do
     Agent.start_link(fn ->
       %{
@@ -11,6 +15,12 @@ defmodule ElixirScript.State do
 
   def stop(pid) do
     Agent.stop(pid)
+  end
+
+  def get_compiler_opts(pid) do
+    Agent.get(pid, fn(state) ->
+      state.compiler_opts
+    end)
   end
 
   def get_module(pid, module) do

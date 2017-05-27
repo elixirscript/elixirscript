@@ -1,13 +1,14 @@
-defmodule ElixirScript.Experimental.Module do
+defmodule ElixirScript.Translate.Module do
+  @moduledoc false
   alias ESTree.Tools.Builder, as: J
-  alias ElixirScript.Experimental.Function
+  alias ElixirScript.Translate.Function
   alias ElixirScript.Translator.Identifier
   alias ElixirScript.State, as: ModuleState
 
-  @moduledoc """
-  Upper level module that handles compilation
+  @doc """
+  Translate the given module's ast to
+  JavaScript AST
   """
-
   def compile(module, info, pid) do
     %{
       attributes: _attrs, 
@@ -24,15 +25,17 @@ defmodule ElixirScript.Experimental.Module do
       pid: pid
     }
  
-    reachable_defs = Enum.filter(defs, fn
+    # Filter so that we only have the
+    # Used functions to compile
+    used_defs = Enum.filter(defs, fn
       { name, _, _, _} -> name in used
       _ -> false
     end)
 
-    compiled_functions = reachable_defs
+    compiled_functions = used_defs
     |> Enum.map(&Function.compile(&1, state))
 
-    exports = make_exports(reachable_defs)
+    exports = make_exports(used_defs)
 
     js_ast = ElixirScript.ModuleSystems.Namespace.build(
       module,

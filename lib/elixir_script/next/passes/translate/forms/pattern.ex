@@ -1,8 +1,8 @@
-defmodule ElixirScript.Experimental.Forms.Pattern do
+defmodule ElixirScript.Translate.Forms.Pattern do
   alias ElixirScript.Translator.PatternMatching, as: PM
   alias ESTree.Tools.Builder, as: J
-  alias ElixirScript.Experimental.Form
-  alias ElixirScript.Experimental.Forms.{Bitstring, Map}
+  alias ElixirScript.Translate.Form
+  alias ElixirScript.Translate.Forms.{Bitstring, Map}
 
   @moduledoc """
   Handles all pattern matching translations
