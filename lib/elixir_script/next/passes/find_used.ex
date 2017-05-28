@@ -2,6 +2,19 @@ defmodule ElixirScript.FindUsed do
   @moduledoc false
   alias ElixirScript.State, as: ModuleState
 
+  @erlang_modules [
+    :erlang,
+    :maps,
+    :lists,
+    :gen,
+    :elixir_errors,
+    :supervisor,
+    :application,
+    :code,
+    :elixir_utils,
+    :file
+  ]  
+
   @doc """
   Takes a list of entry modules and finds modules they use along with
   documenting the functions used. The data collected about used functions
@@ -127,7 +140,8 @@ defmodule ElixirScript.FindUsed do
         do_execute(module, state.pid)
       end
     end
-    Enum.each(params, &walk(&1, state))
+
+    walk(params, state)
   end
 
   defp walk({:for, _, generators}, state) do
@@ -181,11 +195,11 @@ defmodule ElixirScript.FindUsed do
 
     if rescue_block do
       Enum.each(rescue_block, fn
-            {:->, _, [ [{:in, _, [param, names]}], body]} ->
-              walk({[], [param], [{{:., [], [Enum, :member?]}, [], [param, names]}], body}, state)
-            {:->, _, [ [param], body]} ->
-              walk({[], [param], [], body}, state)
-            end)
+        {:->, _, [ [{:in, _, [param, names]}], body]} ->
+          walk({[], [param], [{{:., [], [Enum, :member?]}, [], [param, names]}], body}, state)
+        {:->, _, [ [param], body]} ->
+          walk({[], [param], [], body}, state)
+      end)
     end
 
     if catch_block do
@@ -205,15 +219,8 @@ defmodule ElixirScript.FindUsed do
     Enum.each(clauses, &walk(&1, state))
   end
 
-  defp walk({{:., _, [:erlang, _]}, _, _}, _state) do
-    nil
-  end
-
-  defp walk({{:., _, [:lists, _]}, _, _}, _state) do
-    nil
-  end
-
-  defp walk({{:., _, [:maps, _]}, _, _}, _state) do
+  defp walk({{:., _, [module, function]}, _, params}, _state) when module in @erlang_modules do
+    IO.inspect {module, function, length(params)}
     nil
   end
 

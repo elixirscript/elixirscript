@@ -40,7 +40,7 @@ defmodule ElixirScript.Translate do
     |> Generator.generate
 
     concat(js_code)
-    |> IO.puts 
+    #|> IO.puts 
   end
 
   defp concat(code) do

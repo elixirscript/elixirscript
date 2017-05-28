@@ -1,10 +1,6 @@
 defmodule Example do
   def new() do
-    newnew()
-  end
-
-  def newnew() do
-    Atom.to_string("hello")
+   Base.encode16("hello")
   end
 
 end

@@ -23,6 +23,8 @@ defmodule ElixirScript.Beam do
         {:error, "Unknown module"}
       {:error,:beam_lib,{:unknown_chunk,"non_existing.beam",:debug_info}} ->
         {:error, "Unsupported version of Erlang"}
+      {:error,:beam_lib,{:missing_chunk, _ , _}} ->
+        {:error, "Debug info not available"}
       {:error,:beam_lib,{:file_error,"non_existing.beam",:enoent}} ->
         {:error, "Debug info not available"}
     end

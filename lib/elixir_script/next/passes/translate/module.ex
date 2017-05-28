@@ -17,7 +17,7 @@ defmodule ElixirScript.Translate.Module do
       file: _file,
       line: _line, 
       module: ^module, 
-      unreachable: _unreachable,
+      unreachable: unreachable,
       used: used
     } = info
 
@@ -27,7 +27,13 @@ defmodule ElixirScript.Translate.Module do
  
     # Filter so that we only have the
     # Used functions to compile
-    used_defs = Enum.filter(defs, fn
+    used_defs = defs
+    |> Enum.filter(fn
+      { _, type, _, _} when type in [:defmacro, :defmacrop] -> false
+      { name, _, _, _} -> not(name in unreachable)
+      _ -> true
+    end)
+    |> Enum.filter(fn
       { name, _, _, _} -> name in used
       _ -> false
     end)

@@ -4,7 +4,8 @@ The goal is to convert a subset (or full set) of Elixir code to JavaScript, prov
 
 Requirements
 ===========
-* Elixir
+* Erlang 20 or greater
+* Elixir 1.5 or greater
 * Node (only for development)
 
 Usage
