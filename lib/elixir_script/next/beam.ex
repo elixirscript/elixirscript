@@ -9,7 +9,8 @@ defmodule ElixirScript.Beam do
   """
   @spec debug_info(atom) :: {:ok | :error, map | binary}
   def debug_info(module) when is_atom(module) do
-    with  {_, beam, _} <- :code.get_object_code(module),
+    #TODO: Get modified date from _beam_path to check for cached version?
+    with  {_, beam, _beam_path} <- :code.get_object_code(module),
           {:ok, {^module, [debug_info: {:debug_info_v1, backend, data}]}} <- :beam_lib.chunks(beam, [:debug_info]),
           {:ok, {^module, attribute_info}} = :beam_lib.chunks(beam, [:attributes]) do
 

@@ -100,7 +100,7 @@ defmodule ElixirScript.Passes.CreateJSModules do
                 ),
                 [JS.identifier("Elixir")]
               ),
-              JS.identifier("start")
+              JS.identifier("start2")
             ),
             [ElixirScript.Translator.Primitive.make_atom(:normal), JS.identifier(:args)]
           )

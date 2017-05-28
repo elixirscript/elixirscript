@@ -43,7 +43,7 @@ defmodule Mix.Tasks.Compile.ElixirScript do
   end
 
   defp do_compile(_, nil) do
-    raise ElixirScriptCompileError, message: "Unable to find mix project app name"
+    raise ElixirScript.CompileError, message: "Unable to find mix project app name"
   end
 
   defp do_compile(elixirscript_base, app) do

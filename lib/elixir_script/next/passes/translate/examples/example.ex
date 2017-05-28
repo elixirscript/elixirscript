@@ -1,6 +1,6 @@
 defmodule Example do
-  def new() do
-   Base.encode16("hello")
+  def start(_, _) do
+   Atom.to_string(:gravity)
   end
 
 end

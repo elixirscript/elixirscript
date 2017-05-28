@@ -5,7 +5,7 @@ defmodule ElixirScript.Compiler do
 
   @spec compile([atom], []) :: nil
   def compile(entry_modules, opts \\ []) do
-    opts = build_compiler_options(opts)
+    opts = build_compiler_options(opts, entry_modules)
     {:ok, pid} = ElixirScript.State.start_link(opts)
 
     IO.puts "Finding used modules and functions"
@@ -15,19 +15,24 @@ defmodule ElixirScript.Compiler do
     
     IO.puts "Compiling"
     modules = ElixirScript.State.list_modules(pid)
-
     ElixirScript.Translate.execute(modules, pid)
+
+    IO.puts "Building Output"
+    modules = ElixirScript.State.list_modules(pid)
+    ElixirScript.Output.execute(modules, pid)
   
     ElixirScript.State.stop(pid)
   end
 
-  defp build_compiler_options(opts) do
+  defp build_compiler_options(opts, entry_modules) do
     default_options = Map.new
-    |> Map.put(:output, nil)
-    |> Map.put(:format, :es)
+    |> Map.put(:output, Keyword.get(opts, :output))
+    |> Map.put(:format, Keyword.get(opts, :format, :es))
     |> Map.put(:js_modules, Keyword.get(opts, :js_modules, []))
+    |> Map.put(:entry_modules, entry_modules)
 
     options = default_options
+    IO.inspect options
     Map.put(options, :module_formatter, get_module_formatter(options[:format]))
   end
 

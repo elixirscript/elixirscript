@@ -19,4 +19,5 @@ src/elixirscript
 priv/**/*.js
 stdlib_state.bin
 *.log
+.nyc_output
 test/app/build

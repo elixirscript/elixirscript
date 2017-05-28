@@ -34,6 +34,7 @@ defmodule ElixirScript.Translate.Module do
       _ -> true
     end)
     |> Enum.filter(fn
+      { {:start, 2}, _, _, _ } -> true
       { name, _, _, _} -> name in used
       _ -> false
     end)

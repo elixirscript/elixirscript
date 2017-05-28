@@ -1,3 +1,9 @@
 // http://erlang.org/doc/man/lists.html
 
-export default {};
+function reverse1(list) {
+  return [...list].reverse();
+}
+
+export default {
+  reverse1,
+};

@@ -122,7 +122,7 @@ defmodule ElixirScript.Translate.Form do
 
   def compile({:receive, context, _}, _state) do
     line = Keyword.get(context, :line, 1)
-    raise ElixirScriptCompileError, message: "Line: #{line} receive not supported"
+    raise ElixirScript.CompileError, message: "Line: #{line} receive not supported"
   end
 
   def compile({:try, _, [blocks]}, state) do
@@ -149,7 +149,7 @@ defmodule ElixirScript.Translate.Form do
           ),
           J.identifier(module)
         ),
-        J.identifier(function)
+        ElixirScript.Translator.Identifier.make_function_name(function, length(params))
       ),
       Enum.map(params, &compile(&1, state))
     )
