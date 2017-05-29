@@ -23,7 +23,7 @@ function _for(expression, generators, collectable_protocol, into = []) {
     if (expression.guard.apply(this, value)) {
       result = fun(
         result,
-        new Core.Tuple(Symbol.for('cont'), expression.fn.apply(this, value)),
+        new Core.Tuple(Symbol.for('cont'), expression.fn.apply(this, value))
       );
     }
   }
@@ -57,7 +57,7 @@ function _try(
   rescue_function,
   catch_fun,
   else_function,
-  after_function,
+  after_function
 ) {
   let result = null;
 
@@ -141,10 +141,15 @@ function _with(...args) {
   return successFunction(...argsToPass);
 }
 
+function receive(clauses, after) {
+  console.warn('Receive not supported');
+}
+
 export default {
   _case,
   cond,
   _for,
   _try,
   _with,
+  receive,
 };

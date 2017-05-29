@@ -90,7 +90,7 @@ defmodule ElixirScript.Translate.Clause do
     [J.return_statement(J.identifier("null"))]
   end
 
-  defp compile_guard(params, guards, state) do
+  def compile_guard(params, guards, state) do
 
     guards = guards
     |> List.wrap

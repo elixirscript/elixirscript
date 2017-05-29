@@ -1,9 +1,10 @@
 defmodule ElixirScript.Translate.Form do
   alias ESTree.Tools.Builder, as: J
-  alias ElixirScript.Translate.Forms.{Bitstring, Match, Call, Try, For, Struct}
+  alias ElixirScript.Translate.Forms.{Bitstring, Match, Call, Try, For, Struct, Receive}
   alias ElixirScript.Translate.Functions.{Erlang, Lists, Maps}
   alias ElixirScript.Translator.Identifier
   alias ElixirScript.Translate.Clause
+  require Logger
 
   @erlang_modules [
     :erlang,
@@ -133,9 +134,11 @@ defmodule ElixirScript.Translate.Form do
     )
   end
 
-  def compile({:receive, context, _}, _state) do
+  def compile({:receive, context, [blocks]}, state) do
     line = Keyword.get(context, :line, 1)
-    raise ElixirScript.CompileError, message: "Line: #{line} receive not supported"
+    {function, arity} = Map.get(state, :function)
+    Logger.warn "receive not supported, Module: #{inspect state.module}, Function: #{function}/#{arity}, Line: #{line}"
+    Receive.compile(blocks, state)
   end
 
   def compile({:try, _, [blocks]}, state) do

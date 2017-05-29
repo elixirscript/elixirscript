@@ -26,6 +26,7 @@ defmodule ElixirScript.Translate.Module do
     } = info
 
     state = %{
+      module: module,
       pid: pid
     }
  

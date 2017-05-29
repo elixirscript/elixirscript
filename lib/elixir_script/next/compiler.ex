@@ -32,7 +32,6 @@ defmodule ElixirScript.Compiler do
     |> Map.put(:entry_modules, entry_modules)
 
     options = default_options
-    IO.inspect options
     Map.put(options, :module_formatter, get_module_formatter(options[:format]))
   end
 
