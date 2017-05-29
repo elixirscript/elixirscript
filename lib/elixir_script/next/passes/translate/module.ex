@@ -9,9 +9,13 @@ defmodule ElixirScript.Translate.Module do
   Translate the given module's ast to
   JavaScript AST
   """
+  def compile(module, %{protocol: true} = info, pid) do
+    ElixirScript.Translate.Protocol.compile(module, info, pid)
+  end
+
   def compile(module, info, pid) do
     %{
-      attributes: _attrs, 
+      attributes: attrs, 
       compile_opts: _compile_opts,
       definitions: defs,
       file: _file,
@@ -27,17 +31,22 @@ defmodule ElixirScript.Translate.Module do
  
     # Filter so that we only have the
     # Used functions to compile
-    used_defs = defs
-    |> Enum.filter(fn
-      { _, type, _, _} when type in [:defmacro, :defmacrop] -> false
-      { name, _, _, _} -> not(name in unreachable)
-      _ -> true
-    end)
-    |> Enum.filter(fn
-      { {:start, 2}, _, _, _ } -> true
-      { name, _, _, _} -> name in used
-      _ -> false
-    end)
+    reachable_defs = Enum.filter(defs, fn
+        { _, type, _, _} when type in [:defmacro, :defmacrop] -> false
+        { name, _, _, _} -> not(name in unreachable)
+        _ -> true
+      end)
+
+    used_defs = if Keyword.has_key?(attrs, :protocol_impl) do
+      reachable_defs
+    else
+      Enum.filter(reachable_defs, fn
+        { {:start, 2}, _, _, _ } -> true
+        { name, _, _, _} -> name in used
+        _ -> false
+      end)
+    end
+
 
     compiled_functions = used_defs
     |> Enum.map(&Function.compile(&1, state))
@@ -57,8 +66,8 @@ defmodule ElixirScript.Translate.Module do
   defp make_exports(reachable_defs) do
     exports = Enum.reduce(reachable_defs, [], fn
       {{name, arity}, :def, _, _}, list ->
-      function_name = ElixirScript.Translator.Identifier.make_function_name(name, arity)
-        list ++ [J.property(function_name, function_name, :init, true)]
+        function_name = ElixirScript.Translator.Identifier.make_function_name(name, arity)
+          list ++ [J.property(function_name, function_name, :init, true)]
       _, list ->
         list
     end)

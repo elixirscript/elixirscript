@@ -69,8 +69,21 @@ defmodule ElixirScript.FindUsed do
   end
 
   defp walk_protocol(module, implementations, pid) do
-    ModuleState.put_module(pid, module, %{})
-    Enum.each(implementations, fn({impl, info}) -> walk_module(impl, info, pid) end) 
+    impls = Enum.map(implementations, fn {impl, %{attributes: attrs}} ->
+      protocol_impl = Keyword.fetch!(attrs, :protocol_impl)
+      impl_for = Keyword.fetch!(protocol_impl, :for)
+      {impl, impl_for}
+    end)
+
+    first_implementation_functions = implementations |> hd |> elem(1) |> Map.get(:definitions)
+
+    functions = Enum.map(first_implementation_functions, fn { name, _, _, _} -> name end)
+
+    ModuleState.put_module(pid, module, %{protocol: true, impls: impls, functions: functions})
+    
+    Enum.each(implementations, fn {impl, info} ->
+      walk_module(impl, info, pid) 
+    end) 
   end
 
   defp walk({{_name, _arity}, _type, _, clauses}, state) do
@@ -105,13 +118,13 @@ defmodule ElixirScript.FindUsed do
     Enum.each(form, &walk(&1, state))
   end
 
-  #defp walk(form, state) when is_atom(form) do
-    #if ElixirScript.Translate.Module.is_elixir_module(form) do
-    #  if ModuleState.get_module(state.pid, form) == nil do
-    #    execute(form, state.pid)
-    #  end
-    #end
-  #end
+  defp walk(form, state) when is_atom(form) and form not in [BitString, Function, PID, Port, Reference, Any, Elixir] do
+    if ElixirScript.Translate.Module.is_elixir_module(form) do
+      if ModuleState.get_module(state.pid, form) == nil do
+        execute(form, state.pid)
+      end
+    end
+  end
 
   defp walk({a, b}, state) do
     walk({:{}, [], [a, b]}, state)
@@ -219,6 +232,14 @@ defmodule ElixirScript.FindUsed do
     Enum.each(clauses, &walk(&1, state))
   end
 
+  defp walk({{:., _, [:erlang, :apply]}, _, [module, function, params]}, state) do
+    walk({{:., [], [module, function]}, [], params}, state)
+  end
+
+  defp walk({{:., _, [:erlang, :apply]}, _, [function, params]}, state) do
+    walk({function, [], params}, state)
+  end
+
   defp walk({{:., _, [module, function]}, _, params}, _state) when module in @erlang_modules do
     IO.inspect {module, function, length(params)}
     nil
@@ -237,11 +258,11 @@ defmodule ElixirScript.FindUsed do
         nil         
     end
 
-    Enum.each(params, &walk(&1, state))
+    walk(params, state)
   end
 
   defp walk({:super, _, params}, state) do
-    Enum.each(params, &walk(&1, state))
+    walk(params, state)
   end
 
   defp walk({function, _, params}, state) when is_atom(function) and is_list(params) do
