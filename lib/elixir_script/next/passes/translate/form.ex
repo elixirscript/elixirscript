@@ -5,6 +5,19 @@ defmodule ElixirScript.Translate.Form do
   alias ElixirScript.Translator.Identifier
   alias ElixirScript.Translate.Clause
 
+  @erlang_modules [
+    :erlang,
+    :maps,
+    :lists,
+    :gen,
+    :elixir_errors,
+    :supervisor,
+    :application,
+    :code,
+    :elixir_utils,
+    :file
+  ]
+
   @moduledoc """
   Handles translation of all forms that are not functions or clauses
   """
@@ -63,7 +76,7 @@ defmodule ElixirScript.Translate.Form do
     Bitstring.compile(bitstring, state)
   end
 
-  def compile({:=, _, [left, right]} = match, state) do
+  def compile({:=, _, [_, _]} = match, state) do
     Match.compile(match, state)
   end
 
@@ -139,7 +152,180 @@ defmodule ElixirScript.Translate.Form do
     )
   end
 
-  def compile({{:., _, [module, function]}, _, params}, state) when module in [:erlang, :lists, :maps] do
+  def compile({{:., _, [:erlang, function]}, _, [first]}, state) when function in [:+, :-] do
+    J.unary_expression(
+      function,
+      compile(first, state),
+      true
+    )
+  end
+
+  def compile({{:., _, [:erlang, :not]}, _, [first]}, state) do
+    J.unary_expression(
+      :!,
+      compile(first, state),
+      true
+    )
+  end
+
+  def compile({{:., _, [:erlang, :bnot]}, _, [first]}, state) do
+    J.unary_expression(
+      :"~",
+      compile(first, state),
+      true
+    )
+  end
+
+  def compile({{:., _, [:erlang, :=]}, _, [_, _] = match}, state) do
+    Match.compile(match, state)
+  end
+
+  def compile({{:., _, [:erlang, function]}, _, [first, second]}, state) when function in [:+, :-, :*, :/, :==, :>=] do
+    J.binary_expression(
+      function,
+      compile(first, state),
+      compile(second, state)
+    )
+  end
+
+  def compile({{:., _, [:erlang, :"/="]}, _, [first, second]}, state) do
+    J.binary_expression(
+      :!=,
+      compile(first, state),
+      compile(second, state)
+    )
+  end
+
+  def compile({{:., _, [:erlang, :"=<"]}, _, [first, second]}, state) do
+    J.binary_expression(
+      :<=,
+      compile(first, state),
+      compile(second, state)
+    )
+  end
+
+  def compile({{:., _, [:erlang, :"=:="]}, _, [first, second]}, state) do
+    J.binary_expression(
+      :===,
+      compile(first, state),
+      compile(second, state)
+    )
+  end
+
+  def compile({{:., _, [:erlang, :"=/="]}, _, [first, second]}, state) do
+    J.binary_expression(
+      :!==,
+      compile(first, state),
+      compile(second, state)
+    )
+  end
+
+  def compile({{:., _, [:erlang, function]}, _, [first, second]}, state) when function in [:andalso, :and] do
+    J.binary_expression(
+      :&&,
+      compile(first, state),
+      compile(second, state)
+    )
+  end
+
+  def compile({{:., _, [:erlang, function]}, _, [first, second]}, state) when function in [:orelse, :or] do
+    J.binary_expression(
+      :||,
+      compile(first, state),
+      compile(second, state)
+    )
+  end
+
+  def compile({{:., _, [:erlang, :div]}, _, [first, second]}, state) do
+    J.binary_expression(
+      :/,
+      compile(first, state),
+      compile(second, state)
+    )
+  end
+
+  def compile({{:., _, [:erlang, :rem]}, _, [first, second]}, state) do
+    J.binary_expression(
+      :mod,
+      compile(first, state),
+      compile(second, state)
+    )
+  end
+
+  def compile({{:., _, [:erlang, :band]}, _, [first, second]}, state) do
+    J.binary_expression(
+      :&,
+      compile(first, state),
+      compile(second, state)
+    )
+  end
+
+  def compile({{:., _, [:erlang, :bor]}, _, [first, second]}, state) do
+    J.binary_expression(
+      :|,
+      compile(first, state),
+      compile(second, state)
+    )
+  end
+
+  def compile({{:., _, [:erlang, :bsl]}, _, [first, second]}, state) do
+    J.binary_expression(
+      :"<<",
+      compile(first, state),
+      compile(second, state)
+    )
+  end
+
+  def compile({{:., _, [:erlang, :bsl]}, _, [first, second]}, state) do
+    J.binary_expression(
+      :">>",
+      compile(first, state),
+      compile(second, state)
+    )
+  end
+
+  def compile({{:., _, [:erlang, :bxor]}, _, [first, second]}, state) do
+    J.binary_expression(
+      :">>",
+      compile(first, state),
+      compile(second, state)
+    )
+  end
+
+  def compile({{:., _, [:erlang, :++]}, _, [_, _] = params}, state) do
+    J.call_expression(
+      J.member_expression(
+        J.member_expression(
+          J.member_expression(
+            J.identifier("Bootstrap"),
+            J.identifier("Core")
+          ),
+          J.identifier(:erlang)
+        ),
+        J.identifier("list_concatenation2")
+      ),
+      Enum.map(params, &compile(&1, state))
+    )
+  end
+
+  def compile({{:., _, [:erlang, :--]}, _, [_, _] = params}, state) do
+    J.call_expression(
+      J.member_expression(
+        J.member_expression(
+          J.member_expression(
+            J.identifier("Bootstrap"),
+            J.identifier("Core")
+          ),
+          J.identifier(:erlang)
+        ),
+        J.identifier("list_substraction2")
+      ),
+      Enum.map(params, &compile(&1, state))
+    )
+  end
+
+
+  def compile({{:., _, [module, function]}, _, params}, state) when module in @erlang_modules do
     J.call_expression(
       J.member_expression(
         J.member_expression(

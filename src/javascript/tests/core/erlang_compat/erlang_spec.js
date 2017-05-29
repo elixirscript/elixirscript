@@ -13,3 +13,24 @@ test('atom_to_binary2', t => {
     Error
   );
 });
+
+test('list_concatenation2', t => {
+  t.deepEqual(Core.erlang.list_concatenation2([], []), []);
+  t.deepEqual(Core.erlang.list_concatenation2([1], []), [1]);
+  t.deepEqual(Core.erlang.list_concatenation2([1, 2, 3], [4, 5, 6]), [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+  ]);
+});
+
+test('list_subtraction2', t => {
+  t.deepEqual(Core.erlang.list_subtraction2([], []), []);
+  t.deepEqual(Core.erlang.list_subtraction2([1], []), [1]);
+  t.deepEqual(Core.erlang.list_subtraction2([1, 2, 3], [4, 5, 6]), [1, 2, 3]);
+  t.deepEqual(Core.erlang.list_subtraction2([1, 2, 3], [1, 2, 3]), []);
+  t.deepEqual(Core.erlang.list_subtraction2([1, 2, 3], [1, 2]), [3]);
+});
