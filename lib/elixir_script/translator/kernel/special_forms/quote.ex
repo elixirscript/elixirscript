@@ -15,7 +15,7 @@ defmodule ElixirScript.Translator.Quote do
       (_) -> false
     end)
 
-    if(has_unquote_splicing) do
+    if has_unquote_splicing do
       expr = Enum.map(expr, fn
         ({:unquote_splicing, _, [param]}) ->
           make_unquote_slicing(param, env)

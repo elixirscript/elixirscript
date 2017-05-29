@@ -8,12 +8,12 @@ defmodule ElixirScript.Passes.JavaScriptAST do
     State.set_module_data(compiler_data.state, compiler_data.data)
     State.set_loaded_modules(compiler_data.state, Map.get(compiler_data, :loaded_modules, []))
 
-    data = compiler_data.state 
+    data = compiler_data.state
     |> State.get_module_data
-    |> Enum.reject(fn {_,module_data} ->
+    |> Enum.reject(fn {_, module_data} ->
       module_data.app == :elixir && opts.import_standard_libs == false
     end)
-    |> Enum.map(fn({module_name, module_data}) -> 
+    |> Enum.map(fn({module_name, module_data}) ->
         module_data = compile(module_data, opts, compiler_data.state)
         {module_name, module_data}
     end)
