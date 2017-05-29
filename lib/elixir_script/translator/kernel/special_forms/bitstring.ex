@@ -120,7 +120,7 @@ defmodule ElixirScript.Translator.Bitstring do
   end
 
   def make_interpolated_string(elements, env) do
-    translated_elements = Enum.map(elements, fn(x)->
+    translated_elements = Enum.map(elements, fn(x) ->
       case x do
         elem when is_binary(elem) ->
           Translator.translate!(elem, env)

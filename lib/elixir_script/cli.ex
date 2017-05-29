@@ -45,9 +45,9 @@ defmodule ElixirScript.CLI do
 
   options:
   --js-module [<identifer>:<path>] A js module used in your code. ex: React:react
-                        Multiple can be defined 
+                        Multiple can be defined
   -f  --format [format] module format of output. options: es (default), common, umd
-  -o  --output [path]   places output at the given path. 
+  -o  --output [path]   places output at the given path.
                         Can be a directory or filename.
   -e  --elixir          read input as elixir code string
   --remove-unused       Removes unused modules from output
@@ -121,8 +121,8 @@ defmodule ElixirScript.CLI do
 
   defp build_js_modules(values) do
     values
-    |> Enum.map(fn x -> 
-      [identifier, path] = String.split(x,":", trim: true)
+    |> Enum.map(fn x ->
+      [identifier, path] = String.split(x, ":", trim: true)
       { format_identifier(identifier), format_path(path) }
     end)
   end
@@ -132,7 +132,7 @@ defmodule ElixirScript.CLI do
     |> String.split(".")
     |> Module.concat
   end
-  
+
 
   defp format_path(path) do
     path

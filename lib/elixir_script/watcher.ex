@@ -23,7 +23,7 @@ defmodule ElixirScript.Watcher do
 
     try do
       if input_changed?(to_string(path), state) do
-        Logger.debug "Event: #{inspect event} Path: #{path}"
+        Logger.debug fn -> "Event: #{inspect event} Path: #{path}" end
         ElixirScript.compile_path(state[:input], state[:options])
       end
     rescue

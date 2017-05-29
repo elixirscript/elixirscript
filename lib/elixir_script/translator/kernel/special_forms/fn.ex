@@ -30,7 +30,7 @@ defmodule ElixirScript.Translator.Function do
 
       ({_, _, [{:when, _, [{_, _, params}, guards]}, body]}) ->
         body = convert_to_try(body)
-        process_function_body(params, body, env, name, guards)     
+        process_function_body(params, body, env, name, guards)
 
       ({_, _, [{_, _, params}, body]}) ->
         body = convert_to_try(body)
@@ -212,7 +212,7 @@ defmodule ElixirScript.Translator.Function do
 
         return_statement = case declaration do
           %ESTree.ArrayPattern{elements: elements} ->
-            if(length(elements) == 1) do
+            if length(elements) == 1 do
               JS.return_statement(hd(declaration.elements))
             else
               JS.return_statement(JS.array_expression(declaration.elements))
@@ -233,7 +233,7 @@ defmodule ElixirScript.Translator.Function do
     end
 
 
-    list = Enum.take(list, length(list)-1)
+    list = Enum.take(list, length(list) - 1)
     |> Enum.map(fn(x) ->
       case x do
         %ESTree.MemberExpression{} ->
