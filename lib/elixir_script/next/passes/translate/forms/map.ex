@@ -3,10 +3,10 @@ defmodule ElixirScript.Translate.Forms.Map do
   alias ElixirScript.Translate.Form
 
   def compile({:%{}, _, [{:|, _, [map, new_values]}]}, state) do
-    map = Form.compile(map, state)
-    data = Form.compile({:%{}, [], new_values}, state)
+    { map, state } = Form.compile(map, state)
+    { data, state } = Form.compile({:%{}, [], new_values}, state)
 
-    J.call_expression(
+    ast = J.call_expression(
       J.member_expression(
         J.member_expression(
           J.identifier("Bootstrap"),
@@ -19,20 +19,28 @@ defmodule ElixirScript.Translate.Forms.Map do
       ),
       [map, data]
     )
+
+    { ast, state }
   end
 
   def compile({:%{}, _, properties}, state) do
-    properties
+    ast = properties
     |> Enum.map(fn
       ({x, y}) ->
         case x do
           {_, _, nil } ->
-            J.property(Form.compile(x, state),  Form.compile(y, state), :init, false, false, true)
+            {key, _} = Form.compile(x, state)
+            {value, _} = Form.compile(y, state)
+            J.property(key,  value, :init, false, false, true)
           _ ->
-            make_property(Form.compile(x, state), Form.compile(y, state))
+            {key, _} = Form.compile(x, state)
+            {value, _} = Form.compile(y, state)
+            make_property(key, value)
         end
     end)
     |> J.object_expression
+
+    {ast, state}
   end
 
   def make_property(%ESTree.Identifier{} = key, value) do

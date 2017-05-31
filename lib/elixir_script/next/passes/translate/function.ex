@@ -52,14 +52,13 @@ defmodule ElixirScript.Translate.Function do
               )
     )
 
-    J.variable_declaration([declarator], :const)
+    { J.variable_declaration([declarator], :const), state }
   end
 
   defp compile_clauses(clauses, state) do
     clauses
     |> Enum.map(&compile_clause(&1, state))
     |> Enum.map(fn {patterns, params, guards, body} ->
-      IO.inspect guards
       match_or_default_call = J.call_expression(
         J.member_expression(
           patterns_ast(),
@@ -87,20 +86,22 @@ defmodule ElixirScript.Translate.Function do
   end
 
   defp compile_clause({ _, args, guards, body}, state) do
-    {patterns, params} = Pattern.compile(args, state)
+    state = Map.put(state, :vars, %{})
+
+    {patterns, params, state} = Pattern.compile(args, state)
     guard = Clause.compile_guard(params, guards, state)
 
     body = case body do
       nil ->
         J.identifier("null")
       {:__block__, _, block_body} ->
-        Enum.map(block_body, &Form.compile(&1, state))
-        |> List.flatten
+        {list, _} = Enum.map_reduce(block_body, state, &Form.compile(&1, &2))
+        List.flatten(list)
       b when is_list(b) ->
-        Enum.map(b, &Form.compile(&1, state))
-        |> List.flatten
+        {list, _} = Enum.map_reduce(b, state, &Form.compile(&1, &2))
+        List.flatten(list)
       _ ->
-        Form.compile(body, state)
+        Form.compile!(body, state)
     end
 
     body = Clause.return_last_statement(body)

@@ -2,7 +2,7 @@ defmodule ElixirScript.Translate.Forms.Pattern do
   alias ElixirScript.Translator.PatternMatching, as: PM
   alias ESTree.Tools.Builder, as: J
   alias ElixirScript.Translate.Form
-  alias ElixirScript.Translate.Forms.{Bitstring, Map}
+  alias ElixirScript.Translate.Forms.{Bitstring}
 
   @moduledoc """
   Handles all pattern matching translations
@@ -15,14 +15,43 @@ defmodule ElixirScript.Translate.Forms.Pattern do
         {pattern, param} = process_pattern(x, state)
         { patterns ++ List.wrap(pattern), params ++ List.wrap(param) }
     end)
+    |> update_env(state)
+  end
+
+  defp update_env({ patterns, params }, state) do
+    { params, state } = Enum.map_reduce(params, state, fn
+      (%ESTree.Identifier{name: :undefined} = param, state) ->
+        { param, state }
+
+      (%ESTree.Identifier{} = param, state) ->
+       state = update_variable(param.name, state)
+       new_name = get_variable_name(param.name, state)
+
+       { %{ param | name: new_name }, state }
+
+      (param, state) ->
+        { param, state }
+    end)
+
+    { patterns, params, state }
+  end
+
+  defp get_variable_name(function, state) do
+    number = Map.get(state.vars, function)
+    String.to_atom("#{function}#{number}")
+  end
+
+  defp update_variable(name, state) do
+    vars = Map.update(state.vars, name, 0, fn val -> val + 1 end)
+    Map.put(state, :vars, vars)
   end
 
   defp process_pattern(term, state) when is_number(term) or is_binary(term) or is_boolean(term) or is_atom(term) or is_nil(term) do
-    { [Form.compile(term, state)], [] }
+    { [Form.compile!(term, state)], [] }
   end
 
   defp process_pattern({:^, _, [value]}, state) do
-    { [PM.bound(Form.compile(value, state))], [nil] }
+    { [PM.bound(Form.compile!(value, state))], [nil] }
   end
 
   defp process_pattern({:_, _, _}, _) do
@@ -34,7 +63,7 @@ defmodule ElixirScript.Translate.Forms.Pattern do
   end
 
   defp process_pattern({:{}, _, elements }, state) do
-    { patterns, params } = elements
+    { patterns, params, state } = elements
     |> Enum.map(&compile([&1], state))
     |> reduce_patterns(state)
 
@@ -57,7 +86,7 @@ defmodule ElixirScript.Translate.Forms.Pattern do
   end
 
   defp process_pattern(list, state) when is_list(list) do
-    { patterns, params } = list
+    { patterns, params, state } = list
     |> Enum.map(&compile([&1], state))
     |> reduce_patterns(state)
 
@@ -69,9 +98,9 @@ defmodule ElixirScript.Translate.Forms.Pattern do
       {pattern, params} = process_pattern(value, state)
       property = case key do
                    {:^, _, [the_key]} ->
-                     J.property(Form.compile(the_key, state), hd(List.wrap(pattern)), :init, false, false, true)
+                     J.property(Form.compile!(the_key, state), hd(List.wrap(pattern)), :init, false, false, true)
                    _ ->
-                     Map.make_property(Form.compile(key, state), hd(List.wrap(pattern)))
+                     ElixirScript.Translate.Forms.Map.make_property(Form.compile!(key, state), hd(List.wrap(pattern)))
                  end
 
       { property, params }
@@ -112,7 +141,7 @@ defmodule ElixirScript.Translate.Forms.Pattern do
   end
 
   defp process_pattern({:<>, _, [prefix, value]}, state) do
-    { [PM.starts_with(prefix)], [Form.compile(value, state)] }
+    { [PM.starts_with(prefix)], [Form.compile!(value, state)] }
   end
 
   defp process_pattern({:=, _, [{name, _, _}, right]}, state) do

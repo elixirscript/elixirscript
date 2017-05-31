@@ -17,10 +17,11 @@ defmodule ElixirScript.Translate.Forms.Receive do
       J.identifier("receive")
     )
 
-    J.call_expression(
+    ast = J.call_expression(
       receive_function,
       []
     )
 
+    { ast, state }
   end
 end

@@ -4,9 +4,9 @@ defmodule ElixirScript.Translate.Forms.Match do
   alias ElixirScript.Translate.Forms.{Pattern}
 
   def compile({:=, _, [left, right]}, state) do
-    right_ast = Form.compile(right, state)
+    { right_ast, state } = Form.compile(right, state)
 
-    { patterns, params } = Pattern.compile([left], state)
+    { patterns, params, state } = Pattern.compile([left], state)
 
       declarator = J.variable_declarator(
         J.array_pattern(params),
@@ -38,7 +38,7 @@ defmodule ElixirScript.Translate.Forms.Match do
         array_pattern
     end
 
-    js_ast
+    { js_ast, state }
   end
 
 
@@ -83,8 +83,7 @@ defmodule ElixirScript.Translate.Forms.Match do
 
   defp make_variable_declaration_and_group(ref_declarator, array_pattern) do
     ref_declaration = J.variable_declaration([ref_declarator], :let)
-    #[array_pattern, ref_declaration]
-    array_pattern
+    [array_pattern, ref_declaration]
   end
 
 end

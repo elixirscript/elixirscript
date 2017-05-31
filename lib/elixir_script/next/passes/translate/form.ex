@@ -23,32 +23,42 @@ defmodule ElixirScript.Translate.Form do
   Handles translation of all forms that are not functions or clauses
   """
 
-  def compile(nil, _) do
-    J.identifier("null")
+  def compile!(ast, state) do
+    {js_ast, _} = compile(ast, state)
+
+    js_ast
   end
 
-  def compile(form, _) when is_boolean(form) or is_integer(form) or is_float(form) or is_binary(form)  do
-    J.literal(form)
+  def compile(nil, state) do
+    { J.identifier("null"), state }
+  end
+
+  def compile(form, state) when is_boolean(form) or is_integer(form) or is_float(form) or is_binary(form)  do
+    { J.literal(form), state }
   end
 
   def compile(form, state) when is_list(form) do
-    J.array_expression(
-      Enum.map(form, &compile(&1, state))
+    ast = J.array_expression(
+      Enum.map(form, &compile!(&1, state))
     )
+
+    { ast, state }
   end
 
   def compile(form, state) when is_atom(form) do
     if ElixirScript.Translate.Module.is_elixir_module(form) do
       members = if form == Elixir, do: ["Elixir"], else: ["Elixir"] ++ Module.split(form)
-      J.identifier(Enum.join(members, "_"))
+      { J.identifier(Enum.join(members, "_")), state }
     else
-      J.call_expression(
+      ast = J.call_expression(
         J.member_expression(
           J.identifier("Symbol"),
           J.identifier("for")
         ),
         [J.literal(form)]
       )
+
+      { ast, state }
     end
   end
 
@@ -57,7 +67,7 @@ defmodule ElixirScript.Translate.Form do
   end
 
   def compile({:{}, _, elements}, state) do
-    J.call_expression(
+    ast = J.call_expression(
       J.member_expression(
         J.member_expression(
           J.identifier("Bootstrap"),
@@ -65,7 +75,7 @@ defmodule ElixirScript.Translate.Form do
         ),
         J.identifier("Tuple")
       ),
-      Enum.map(elements, &compile(&1, state))
+      Enum.map(elements, &compile!(&1, state))
     )
   end
 
@@ -95,19 +105,22 @@ defmodule ElixirScript.Translate.Form do
         ElixirScript.Translate.Function.patterns_ast(),
         J.identifier("defmatch")
       ),
-      Enum.map(clauses, &Clause.compile(&1, state))
+      Enum.map(clauses, fn x -> Clause.compile(x, state) |> elem(0) end)
     )
 
-    J.call_expression(
+    ast = J.call_expression(
       J.member_expression( func, J.identifier("call")),
       [J.identifier(:this), compile(condition, state)]
     )
+
+    { ast, state }
   end
 
   def compile({:cond, _, [[do: clauses]]}, state) do
     processed_clauses = Enum.map(clauses, fn({:->, _, [clause, clause_body]}) ->
-      translated_body = Enum.map(List.wrap(clause_body), &compile(&1, state))
-      |> Clause.return_last_statement
+      { translated_body, state } = Enum.map_reduce(List.wrap(clause_body), state, &compile(&1, &2))
+      
+      translated_body = Clause.return_last_statement(translated_body)
       translated_body = J.function_expression([], [], J.block_statement(translated_body))
 
       translated_clause = compile(hd(clause), state)
@@ -128,10 +141,12 @@ defmodule ElixirScript.Translate.Form do
       J.identifier("cond")
     )
 
-    J.call_expression(
+    ast = J.call_expression(
       cond_function,
       processed_clauses
     )
+
+    { ast, state }
   end
 
   def compile({:receive, context, [blocks]}, state) do
@@ -146,37 +161,47 @@ defmodule ElixirScript.Translate.Form do
   end
 
   def compile({:fn, _, clauses}, state) do
-    J.call_expression(
+    {clauses_ast, _} = Enum.map_reduce(clauses, state, &Clause.compile(&1, &2))
+
+    ast = J.call_expression(
       J.member_expression(
         ElixirScript.Translate.Function.patterns_ast(),
         J.identifier("defmatch")
       ),
-      Enum.map(clauses, &Clause.compile(&1, state))
+      clauses_ast
     )
+
+    {ast, state}
   end
 
   def compile({{:., _, [:erlang, function]}, _, [first]}, state) when function in [:+, :-] do
-    J.unary_expression(
+    ast = J.unary_expression(
       function,
       compile(first, state),
       true
     )
+
+    {ast, state}
   end
 
   def compile({{:., _, [:erlang, :not]}, _, [first]}, state) do
-    J.unary_expression(
+    ast = J.unary_expression(
       :!,
       compile(first, state),
       true
     )
+
+    {ast, state}
   end
 
   def compile({{:., _, [:erlang, :bnot]}, _, [first]}, state) do
-    J.unary_expression(
+    ast = J.unary_expression(
       :"~",
       compile(first, state),
       true
     )
+
+    {ast, state}
   end
 
   def compile({{:., _, [:erlang, :=]}, _, [_, _] = match}, state) do
@@ -184,119 +209,147 @@ defmodule ElixirScript.Translate.Form do
   end
 
   def compile({{:., _, [:erlang, function]}, _, [first, second]}, state) when function in [:+, :-, :*, :/, :==, :>=] do
-    J.binary_expression(
+    ast = J.binary_expression(
       function,
       compile(first, state),
       compile(second, state)
     )
+
+    {ast, state}
   end
 
   def compile({{:., _, [:erlang, :"/="]}, _, [first, second]}, state) do
-    J.binary_expression(
+    ast = J.binary_expression(
       :!=,
       compile(first, state),
       compile(second, state)
     )
+
+    {ast, state}
   end
 
   def compile({{:., _, [:erlang, :"=<"]}, _, [first, second]}, state) do
-    J.binary_expression(
+    ast = J.binary_expression(
       :<=,
       compile(first, state),
       compile(second, state)
     )
+
+    {ast, state}
   end
 
   def compile({{:., _, [:erlang, :"=:="]}, _, [first, second]}, state) do
-    J.binary_expression(
+    ast = J.binary_expression(
       :===,
       compile(first, state),
       compile(second, state)
     )
+
+    {ast, state}
   end
 
   def compile({{:., _, [:erlang, :"=/="]}, _, [first, second]}, state) do
-    J.binary_expression(
+    ast = J.binary_expression(
       :!==,
       compile(first, state),
       compile(second, state)
     )
+
+    {ast, state}
   end
 
   def compile({{:., _, [:erlang, function]}, _, [first, second]}, state) when function in [:andalso, :and] do
-    J.binary_expression(
+    ast = J.binary_expression(
       :&&,
       compile(first, state),
       compile(second, state)
     )
+
+    {ast, state}
   end
 
   def compile({{:., _, [:erlang, function]}, _, [first, second]}, state) when function in [:orelse, :or] do
-    J.binary_expression(
+    ast = J.binary_expression(
       :||,
       compile(first, state),
       compile(second, state)
     )
+
+    {ast, state}
   end
 
   def compile({{:., _, [:erlang, :div]}, _, [first, second]}, state) do
-    J.binary_expression(
+    ast = J.binary_expression(
       :/,
       compile(first, state),
       compile(second, state)
     )
+
+    {ast, state}
   end
 
   def compile({{:., _, [:erlang, :rem]}, _, [first, second]}, state) do
-    J.binary_expression(
+    ast = J.binary_expression(
       :mod,
       compile(first, state),
       compile(second, state)
     )
+
+    {ast, state}
   end
 
   def compile({{:., _, [:erlang, :band]}, _, [first, second]}, state) do
-    J.binary_expression(
+    ast = J.binary_expression(
       :&,
       compile(first, state),
       compile(second, state)
     )
+
+    {ast, state}
   end
 
   def compile({{:., _, [:erlang, :bor]}, _, [first, second]}, state) do
-    J.binary_expression(
+    ast = J.binary_expression(
       :|,
       compile(first, state),
       compile(second, state)
     )
+
+    {ast, state}
   end
 
   def compile({{:., _, [:erlang, :bsl]}, _, [first, second]}, state) do
-    J.binary_expression(
+    ast = J.binary_expression(
       :"<<",
       compile(first, state),
       compile(second, state)
     )
+
+    {ast, state}
   end
 
   def compile({{:., _, [:erlang, :bsl]}, _, [first, second]}, state) do
-    J.binary_expression(
+    ast = J.binary_expression(
       :">>",
       compile(first, state),
       compile(second, state)
     )
+
+    {ast, state}
   end
 
   def compile({{:., _, [:erlang, :bxor]}, _, [first, second]}, state) do
-    J.binary_expression(
+    ast = J.binary_expression(
       :">>",
       compile(first, state),
       compile(second, state)
     )
+
+    {ast, state}
   end
 
   def compile({{:., _, [:erlang, :++]}, _, [_, _] = params}, state) do
-    J.call_expression(
+    ast = J.call_expression(
       J.member_expression(
         J.member_expression(
           J.member_expression(
@@ -309,10 +362,12 @@ defmodule ElixirScript.Translate.Form do
       ),
       Enum.map(params, &compile(&1, state))
     )
+
+    {ast, state}
   end
 
   def compile({{:., _, [:erlang, :--]}, _, [_, _] = params}, state) do
-    J.call_expression(
+    ast = J.call_expression(
       J.member_expression(
         J.member_expression(
           J.member_expression(
@@ -325,11 +380,13 @@ defmodule ElixirScript.Translate.Form do
       ),
       Enum.map(params, &compile(&1, state))
     )
+
+    {ast, state}
   end
 
 
   def compile({{:., _, [module, function]}, _, params}, state) when module in @erlang_modules do
-    J.call_expression(
+    ast = J.call_expression(
       J.member_expression(
         J.member_expression(
           J.member_expression(
@@ -340,7 +397,7 @@ defmodule ElixirScript.Translate.Form do
         ),
         ElixirScript.Translator.Identifier.make_function_name(function, length(params))
       ),
-      Enum.map(params, &compile(&1, state))
+      Enum.map(params, &compile!(&1, state))
     )
   end
 
@@ -351,29 +408,33 @@ defmodule ElixirScript.Translate.Form do
   def compile({:super, context, params}, state) do
     {function_name, _} = Map.get(state, :function)
 
-    J.call_expression(
+    ast = J.call_expression(
       ElixirScript.Translator.Identifier.make_function_name(function_name, length(params)),
-      Enum.map(params, &compile(&1, state))
+      Enum.map(params, &compile!(&1, state))
     )
+
+    {ast, state}
   end
 
   def compile({function_name, _, params}, state) when is_list(params) do
-    case function_name do
+    ast = case function_name do
       a when is_atom(a) ->
         J.call_expression(
           ElixirScript.Translator.Identifier.make_function_name(function_name, length(params)),
-          Enum.map(params, &compile(&1, state))
+          Enum.map(params, &compile!(&1, state))
         )
       _ ->
         J.call_expression(
           compile(function_name, state),
-          Enum.map(params, &compile(&1, state))
+          Enum.map(params, &compile!(&1, state))
         )        
     end
+
+    {ast, state}
   end
 
   def compile({var, _, _}, state) do
-    ElixirScript.Translator.Identifier.make_identifier(var)
+    { ElixirScript.Translator.Identifier.make_identifier(var), state }
   end
 
 end

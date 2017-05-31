@@ -23,7 +23,7 @@ defmodule ElixirScript.Translate.Forms.Try do
     end
 
     catch_block = if catch_block do
-      Form.compile({:fn, [], catch_block}, state)
+      Form.compile!({:fn, [], catch_block}, state)
     else
       JS.identifier(:null)
     end
@@ -35,7 +35,7 @@ defmodule ElixirScript.Translate.Forms.Try do
     end
 
     else_block = if else_block do
-      Form.compile({:fn, [], else_block}, state)
+      Form.compile!({:fn, [], else_block}, state)
     else
       JS.identifier(:null)
     end
@@ -60,15 +60,17 @@ defmodule ElixirScript.Translate.Forms.Try do
       ]
     )
 
-    js_ast
+    { js_ast, state }
   end
 
   defp process_rescue_block(rescue_block, state) do
     processed_clauses = Enum.map(rescue_block, fn
       {:->, _, [ [{:in, _, [param, names]} = pattern], body]} ->
-        Clause.compile({[], [param], [{{:., [], [Enum, :member?]}, [], [param, names]}], body}, state)
+        {ast, _} = Clause.compile({[], [param], [{{:., [], [Enum, :member?]}, [], [param, names]}], body}, state)
+        ast
       {:->, _, [ [param], body]} ->
-        Clause.compile({[], [param], [], body}, state)
+        {ast, _} = Clause.compile({[], [param], [], body}, state)
+        ast
       end)
 
 
@@ -90,9 +92,10 @@ defmodule ElixirScript.Translate.Forms.Try do
   end
 
   defp prepare_function_body(body, state) do
-    body
+    {ast, state} = body
     |> List.wrap
-    |> Enum.map(&Form.compile(&1, state))
-    |> Clause.return_last_statement
+    |> Enum.map_reduce(state, &Form.compile(&1, &2))
+
+    Clause.return_last_statement(ast)
   end
 end

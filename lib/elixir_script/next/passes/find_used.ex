@@ -241,7 +241,6 @@ defmodule ElixirScript.FindUsed do
   end
 
   defp walk({{:., _, [module, function]}, _, params}, _state) when module in @erlang_modules do
-    IO.inspect {module, function, length(params)}
     nil
   end
 

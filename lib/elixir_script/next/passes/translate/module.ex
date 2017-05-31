@@ -49,8 +49,8 @@ defmodule ElixirScript.Translate.Module do
     end
 
 
-    compiled_functions = used_defs
-    |> Enum.map(&Function.compile(&1, state))
+    { compiled_functions, _ } = used_defs
+    |> Enum.map_reduce(state, &Function.compile(&1, &2))
 
     exports = make_exports(used_defs)
 

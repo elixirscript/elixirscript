@@ -16,15 +16,15 @@ defmodule ElixirScript.Translate.Forms.Bitstring do
         Enum.map(elements, &compile_element(&1, state))
       )
 
-    js_ast
+    { js_ast, state }
   end
 
   def compile_element(element, state) when is_number(element) do
-    do_compile_element({:integer, Form.compile(element, state)})
+    do_compile_element({:integer, Form.compile!(element, state)})
   end
 
   def compile_element(element, state) when is_binary(element) do
-    do_compile_element({:binary, Form.compile(element, state)})
+    do_compile_element({:binary, Form.compile!(element, state)})
   end
 
   def compile_element({:<<>>, [], elements}, state) do
@@ -66,7 +66,7 @@ defmodule ElixirScript.Translate.Forms.Bitstring do
   end
 
   def translate_element(element, state) do
-    Form.compile(element, state)
+    Form.compile!(element, state)
   end
 
   defp handle_type_adjectives({:-, _, types}, ast, state) do
@@ -75,10 +75,10 @@ defmodule ElixirScript.Translate.Forms.Bitstring do
         {:-, _, sub_types} ->
           handle_type_adjectives({:-, [], sub_types}, current_ast, state)
         {:*, _, [size, unit]} ->
-          size_ast = do_compile_element({:size, current_ast, [Form.compile(size, state)]})
-          do_compile_element({:unit, size_ast, [Form.compile(unit, state)]})
+          size_ast = do_compile_element({:size, current_ast, [Form.compile!(size, state)]})
+          do_compile_element({:unit, size_ast, [Form.compile!(unit, state)]})
         {the_type, _, params} when is_list(params) ->
-          do_compile_element({the_type, current_ast, Enum.map(params, &Form.compile(&1, state))})
+          do_compile_element({the_type, current_ast, Enum.map(params, &Form.compile!(&1, state))})
         {the_type, _, _} ->
           do_compile_element({the_type, current_ast})
       end
@@ -123,9 +123,9 @@ defmodule ElixirScript.Translate.Forms.Bitstring do
     translated_elements = Enum.map(elements, fn(x)->
       case x do
         elem when is_binary(elem) ->
-          Form.compile(elem, state)
+          Form.compile!(elem, state)
         {:::, _, data} ->
-          Form.compile(hd(data), state)
+          Form.compile!(hd(data), state)
       end
     end)
 

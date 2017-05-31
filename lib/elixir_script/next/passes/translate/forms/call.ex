@@ -11,13 +11,15 @@ defmodule ElixirScript.Translate.Forms.Call do
         ElixirScript.Translator.Identifier.make_function_name(function, length(params))            
     end
 
-    J.call_expression(
+    ast = J.call_expression(
       J.member_expression(
         process_module_name(module, state),
         function_name
       ),
-      Enum.map(params, &Form.compile(&1, state))
+      Enum.map(params, &Form.compile!(&1, state))
     )
+
+    {ast, state}
   end
 
   defp process_module_name(module, state) when is_atom(module) do

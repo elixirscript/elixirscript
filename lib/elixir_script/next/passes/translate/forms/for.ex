@@ -33,7 +33,7 @@ defmodule ElixirScript.Translate.Forms.For do
       JS.identifier("Collectable")
     )
 
-    JS.call_expression(
+    ast = JS.call_expression(
       JS.member_expression(
         JS.member_expression(
           JS.identifier("Bootstrap"),
@@ -46,6 +46,8 @@ defmodule ElixirScript.Translate.Forms.For do
       ),
       [expression, generators, collectable, into]
     )
+
+    {ast, state}
   end
 
   defp handle_args(nil, module_state) do
@@ -63,7 +65,7 @@ defmodule ElixirScript.Translate.Forms.For do
                                                                 {var, collection}
                                                               end)
 
-      {patterns, params} = Pattern.compile([{:<<>>, [], bs_parts}], module_state)
+      {patterns, params, state} = Pattern.compile([{:<<>>, [], bs_parts}], module_state)
 
       gen = JS.call_expression(
         JS.member_expression(
@@ -76,13 +78,13 @@ defmodule ElixirScript.Translate.Forms.For do
             ),
           JS.identifier("bitstring_generator")
         ),
-        [hd(patterns), Form.compile(collection, module_state)]
+        [hd(patterns), Form.compile!(collection, module_state)]
       )
 
       %{state | generators: state.generators ++ [gen], args: state.args ++ params, patterns: state.patterns ++ patterns}
 
       ({:<-, _, [identifier, enum]}, state) ->
-        {patterns, params} = Pattern.compile([identifier], module_state)
+        {patterns, params, module_state} = Pattern.compile([identifier], module_state)
 
         gen = JS.call_expression(
           JS.member_expression(
@@ -95,17 +97,17 @@ defmodule ElixirScript.Translate.Forms.For do
               ),
             JS.identifier("list_generator")
           ),
-          [hd(patterns), Form.compile(enum, module_state)]
+          [hd(patterns), Form.compile!(enum, module_state)]
         )
 
         %{state | generators: state.generators ++ [gen], args: state.args ++ params, patterns: state.patterns ++ patterns}
       ([into: expression], state) ->
-        %{state | into: Form.compile(expression, module_state)}
+        %{state | into: Form.compile!(expression, module_state)}
 
       ([into: expression, do: expression2], state) ->
         fun = create_function_expression(expression2, state, module_state)
 
-        %{state | into: Form.compile(expression, module_state), fun: fun}
+        %{state | into: Form.compile!(expression, module_state), fun: fun}
 
       ([do: expression], state) ->
         fun = create_function_expression(expression, state, module_state)
@@ -120,8 +122,11 @@ defmodule ElixirScript.Translate.Forms.For do
 
 
   defp create_function_expression(ast, state, module_state) do
-    ast = Enum.map(List.wrap(ast), &Form.compile(&1, module_state))
-    |> Clause.return_last_statement
+    { ast, module_state } = Enum.map_reduce(List.wrap(ast), module_state, fn x, acc_state ->
+       Form.compile(x, acc_state)
+    end)
+
+    ast = Clause.return_last_statement(ast)
 
     JS.function_expression(
       state.args,
