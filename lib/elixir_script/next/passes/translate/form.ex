@@ -46,20 +46,20 @@ defmodule ElixirScript.Translate.Form do
   end
 
   def compile(form, state) when is_atom(form) do
-    if ElixirScript.Translate.Module.is_elixir_module(form) do
+    ast = if ElixirScript.Translate.Module.is_elixir_module(form) do
       members = if form == Elixir, do: ["Elixir"], else: ["Elixir"] ++ Module.split(form)
-      { J.identifier(Enum.join(members, "_")), state }
+      J.identifier(Enum.join(members, "_"))
     else
-      ast = J.call_expression(
+      J.call_expression(
         J.member_expression(
           J.identifier("Symbol"),
           J.identifier("for")
         ),
         [J.literal(form)]
       )
-
-      { ast, state }
     end
+
+    { ast, state }
   end
 
   def compile({a, b}, state) do
@@ -77,6 +77,8 @@ defmodule ElixirScript.Translate.Form do
       ),
       Enum.map(elements, &compile!(&1, state))
     )
+
+    {ast, state}
   end
 
   def compile({:%{}, _, _} = map, state) do
@@ -384,6 +386,15 @@ defmodule ElixirScript.Translate.Form do
     {ast, state}
   end
 
+  def compile({{:., _, [function_name]}, _, params}, state) do
+    ast = J.call_expression(
+      compile!(function_name, state),
+      Enum.map(params, &compile!(&1, state))
+    )
+
+    {ast, state}
+  end
+
 
   def compile({{:., _, [module, function]}, _, params}, state) when module in @erlang_modules do
     ast = J.call_expression(
@@ -399,6 +410,8 @@ defmodule ElixirScript.Translate.Form do
       ),
       Enum.map(params, &compile!(&1, state))
     )
+
+    {ast, state}
   end
 
   def compile({{:., _, [_, _]}, _, _} = ast, state) do
@@ -425,7 +438,7 @@ defmodule ElixirScript.Translate.Form do
         )
       _ ->
         J.call_expression(
-          compile(function_name, state),
+          compile!(function_name, state),
           Enum.map(params, &compile!(&1, state))
         )        
     end

@@ -10,12 +10,16 @@ defmodule ElixirScript.Translate.Forms.Pattern do
 
   def compile(patterns, state) do
     patterns
-    |> Enum.reduce({[], []}, fn
+    |> do_compile(state)
+    |> update_env(state)
+  end
+
+  defp do_compile(patterns, state) do
+    Enum.reduce(patterns, {[], []}, fn
       x, { patterns, params } ->
         {pattern, param} = process_pattern(x, state)
         { patterns ++ List.wrap(pattern), params ++ List.wrap(param) }
-    end)
-    |> update_env(state)
+    end) 
   end
 
   defp update_env({ patterns, params }, state) do
@@ -63,8 +67,8 @@ defmodule ElixirScript.Translate.Forms.Pattern do
   end
 
   defp process_pattern({:{}, _, elements }, state) do
-    { patterns, params, state } = elements
-    |> Enum.map(&compile([&1], state))
+    { patterns, params } = elements
+    |> Enum.map(&do_compile([&1], state))
     |> reduce_patterns(state)
 
     pattern = J.object_expression([
@@ -86,11 +90,19 @@ defmodule ElixirScript.Translate.Forms.Pattern do
   end
 
   defp process_pattern(list, state) when is_list(list) do
-    { patterns, params, state } = list
-    |> Enum.map(&compile([&1], state))
+    { patterns, params } = list
+    |> Enum.map(&do_compile([&1], state))
     |> reduce_patterns(state)
 
     {[J.array_expression(patterns)], params}
+  end
+
+  defp process_pattern({:|, _, [head, tail]}, state) do
+    { head_patterns, head_params } = process_pattern(head, state)
+    { tail_patterns, tail_params } = process_pattern(tail, state)
+    params = head_params ++ tail_params
+
+    { [PM.head_tail(hd(head_patterns), hd(tail_patterns))], params }  
   end
 
   defp process_pattern({:%{}, _, props}, state) do
@@ -164,7 +176,7 @@ defmodule ElixirScript.Translate.Forms.Pattern do
   end
 
   defp unify(target, source, state) do
-    { patterns, params } = compile([source], state)
+    { patterns, params } = do_compile([source], state)
     { [PM.capture(hd(patterns))], params ++ [ElixirScript.Translator.Identifier.make_identifier(target)] }
   end
 end
