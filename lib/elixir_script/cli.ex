@@ -4,13 +4,19 @@ defmodule ElixirScript.CLI do
   @app_version Mix.Project.config()[:version]
 
   @switches [
-    output: :string, elixir: :boolean,
-    help: :boolean, full_build: :boolean, version: :boolean,
-    watch: :boolean, format: :string, js_module: [:string, :keep], remove_unused: :boolean
+    output: :string,
+    help: :boolean, 
+    version: :boolean,
+    watch: :boolean, 
+    format: :string, 
+    js_module: [:string, :keep]
   ]
 
   @aliases [
-    o: :output, e: :elixir, h: :help, v: :version, f: :format
+    o: :output,
+    h: :help, 
+    v: :version, 
+    f: :format
   ]
 
   def main(argv) do
@@ -39,9 +45,8 @@ defmodule ElixirScript.CLI do
 
   def help_message() do
   """
-  usage: elixirscript <input> [options]
-  <input> path to elixir files or
-  the elixir code string if passed the -e flag
+  usage: elixirscript <module> [options]
+  <module> the entry module of your application
 
   options:
   --js-module [<identifer>:<path>] A js module used in your code. ex: React:react
@@ -49,9 +54,6 @@ defmodule ElixirScript.CLI do
   -f  --format [format] module format of output. options: es (default), common, umd
   -o  --output [path]   places output at the given path. 
                         Can be a directory or filename.
-  -e  --elixir          read input as elixir code string
-  --remove-unused       Removes unused modules from output
-  --full-build          informs the compiler to do a full build instead of an incremental one
   -v  --version         the current version number
   -h  --help            this message
   """
@@ -79,27 +81,18 @@ defmodule ElixirScript.CLI do
     js_modules = Keyword.get_values(options, :js_module)
     |> build_js_modules
 
-    compile_opts = %{
-      include_path: true,
-      core_path: Keyword.get(options, :core_path, "Elixir.Bootstrap"),
-      full_build: Keyword.get(options, :full_build, false),
+    compile_opts = [
       output: Keyword.get(options, :output, :stdout),
       format: String.to_atom(Keyword.get(options, :format, "es")),
       js_modules: js_modules,
-      remove_unused: Keyword.get(options, :remove_unused, false)
-    }
+    ]
 
-    case options[:elixir] do
-      true ->
-        ElixirScript.compile(input, compile_opts)
-      _ ->
-        input = handle_input(input)
-        ElixirScript.compile_path(input, compile_opts)
+    input = handle_input(input)
+    ElixirScript.Compiler.compile(input, compile_opts)
 
-        if watch do
-          ElixirScript.Watcher.start_link(input, compile_opts)
-          :timer.sleep :infinity
-        end
+    if watch do
+      ElixirScript.Watcher.start_link(input, compile_opts)
+      :timer.sleep :infinity
     end
   end
 
@@ -117,6 +110,7 @@ defmodule ElixirScript.CLI do
     input = input
     |> Enum.map(fn(x) -> String.split(x, [" ", ","], trim: true) end)
     |> List.flatten
+    |> Enum.map(fn(x) -> Module.concat([x]) end)
   end
 
   defp build_js_modules(values) do

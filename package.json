@@ -12,7 +12,7 @@
     "build": "rollup -c rollup.config.js",
     "clean": "rm -rf priv/build",
     "test": "nyc ava src/javascript/tests",
-    "build:test-app": "mix elixirscript test/app/src/ -f common -o test/app/build/",
+    "build:test-app": "MIX_ENV=test mix elixirscript Main -f common -o test/app/build/",
     "test-app": "yarn run build:test-app && NODE_ENV=test ava 'test/app/spec/**/*.spec.js'"
   },
   "repository": {

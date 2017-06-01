@@ -5,8 +5,8 @@ defmodule ElixirScript.Mixfile do
     [
       app: :elixir_script,
       version: "0.28.0-dev",
-      elixir: "~> 1.0",
-      elixirc_paths: elixirc_paths(),
+      elixir: "~> 1.5-dev",
+      elixirc_paths: elixirc_paths(Mix.env),
       escript: escript_config(),
       deps: deps(),
       description: description(),
@@ -36,7 +36,8 @@ defmodule ElixirScript.Mixfile do
     ]
   end
 
-  defp elixirc_paths(), do: ["lib", "priv/std_lib"]
+  defp elixirc_paths(:test), do: ["lib", "priv/std_lib", "test/support"]
+  defp elixirc_paths(_),     do: ["lib", "priv/std_lib"]
 
   defp escript_config do
     [main_module: ElixirScript.CLI, name: "elixirscript"]
@@ -62,8 +63,7 @@ defmodule ElixirScript.Mixfile do
 
   defp aliases do
     [dist: &dist/1,
-     install: &install/1,
-     supported: &supported/1]
+     install: &install/1]
   end
 
   def dist(_) do
@@ -104,12 +104,6 @@ defmodule ElixirScript.Mixfile do
     System.cmd("mv", ["dist/elixirscript", "/usr/local/elixirscript"])
 
     IO.puts("installed at /usr/local/elixirscript")
-  end
-
-  def supported(_) do
-    Mix.Task.run "app.start"
-
-    ElixirScript.Gen.Supported.generate()
   end
 
 end
