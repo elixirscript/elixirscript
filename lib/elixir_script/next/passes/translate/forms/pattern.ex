@@ -122,7 +122,7 @@ defmodule ElixirScript.Translate.Forms.Pattern do
       { props ++ [prop], params ++ param }
     end)
 
-    { J.object_expression(List.wrap(props)), params }
+    { [J.object_expression(List.wrap(props))], params }
   end
 
   defp process_pattern({:<<>>, _, elements}, state) do
@@ -150,6 +150,10 @@ defmodule ElixirScript.Translate.Forms.Pattern do
     params = head_params ++ tail_params
 
     { [PM.head_tail(hd(head_patterns), hd(tail_patterns))], params }
+  end
+
+  defp process_pattern({{:., _, [:erlang, :++]}, _, [prefix, value]}, state) do
+    { [PM.starts_with(prefix)], [Form.compile!(value, state)] }    
   end
 
   defp process_pattern({:<>, _, [prefix, value]}, state) do

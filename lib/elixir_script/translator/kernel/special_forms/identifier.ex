@@ -86,7 +86,7 @@ defmodule ElixirScript.Translator.Identifier do
     |> make_alias
   end
 
-  def make_function_name(name) when is_atom(name) do
+  def make_function_name(name) do
     name = filter_name(name)
     JS.identifier(name)
   end

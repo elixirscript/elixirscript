@@ -23,13 +23,13 @@ defmodule ElixirScript.Translate.Clause do
       nil ->
         J.identifier("null")
       {:__block__, _, block_body} ->
-        Enum.map(block_body, &Form.compile(&1, state))
-        |> List.flatten
+        {list, _} = Enum.map_reduce(block_body, state, &Form.compile(&1, &2))
+        List.flatten(list)
       b when is_list(b) ->
-        Enum.map(b, &Form.compile(&1, state))
-        |> List.flatten
+        {list, _} = Enum.map_reduce(b, state, &Form.compile(&1, &2))
+        List.flatten(list)
       _ ->
-        Form.compile(body, state)
+        Form.compile!(body, state)
     end
 
     body = return_last_statement(body)
