@@ -8,7 +8,7 @@ defmodule ElixirScript.Translate.Forms.Call do
       ElixirScript.Translate.Module.is_js_module(module, state) ->
         ElixirScript.Translator.Identifier.make_extern_function_name(function)
       true ->
-        ElixirScript.Translator.Identifier.make_function_name(function, length(params))            
+        ElixirScript.Translator.Identifier.make_function_name(function)            
     end
 
     ast = J.call_expression(

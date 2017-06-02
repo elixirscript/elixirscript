@@ -48,11 +48,21 @@ defmodule ElixirScript.Translate.Module do
       end)
     end
 
+    #we combine our function arities
+    combined_defs = used_defs
+    |> Enum.sort(fn { {name1, arity1}, _, _, _ }, { {name2, arity2}, _, _, _ } -> "#{name1}#{arity1}" < "#{name2}#{arity2}" end)
+    |> Enum.group_by(fn {{name, _}, _, _, _ } -> name end)
+    |> Enum.map(fn {group, funs} ->
+        {_, type, _, _} = hd(funs)
+        Enum.reduce(funs, {{group, nil}, type, [], []}, fn {_, _, _, clauses}, {name, type, context, acc_clauses} ->
+          {name, type, context, acc_clauses ++ clauses}
+        end)
+      end)
 
-    { compiled_functions, _ } = used_defs
+    { compiled_functions, _ } = combined_defs
     |> Enum.map_reduce(state, &Function.compile(&1, &2))
 
-    exports = make_exports(used_defs)
+    exports = make_exports(combined_defs)
 
     js_ast = ElixirScript.ModuleSystems.Namespace.build(
       module,
@@ -67,7 +77,7 @@ defmodule ElixirScript.Translate.Module do
   defp make_exports(reachable_defs) do
     exports = Enum.reduce(reachable_defs, [], fn
       {{name, arity}, :def, _, _}, list ->
-        function_name = ElixirScript.Translator.Identifier.make_function_name(name, arity)
+        function_name = ElixirScript.Translator.Identifier.make_identifier(name)
           list ++ [J.property(function_name, function_name, :init, true)]
       _, list ->
         list

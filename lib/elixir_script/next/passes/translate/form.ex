@@ -123,7 +123,7 @@ defmodule ElixirScript.Translate.Form do
       { translated_body, state } = Enum.map_reduce(List.wrap(clause_body), state, &compile(&1, &2))
       
       translated_body = Clause.return_last_statement(translated_body)
-      translated_body = J.function_expression([], [], J.block_statement(translated_body))
+      translated_body = J.arrow_function_expression([], [], J.block_statement(translated_body))
 
       translated_clause = compile(hd(clause), state)
 
@@ -406,7 +406,7 @@ defmodule ElixirScript.Translate.Form do
           ),
           J.identifier(module)
         ),
-        ElixirScript.Translator.Identifier.make_function_name(function, length(params))
+        ElixirScript.Translator.Identifier.make_function_name(function)
       ),
       Enum.map(params, &compile!(&1, state))
     )
@@ -422,7 +422,7 @@ defmodule ElixirScript.Translate.Form do
     {function_name, _} = Map.get(state, :function)
 
     ast = J.call_expression(
-      ElixirScript.Translator.Identifier.make_function_name(function_name, length(params)),
+      ElixirScript.Translator.Identifier.make_function_name(function_name),
       Enum.map(params, &compile!(&1, state))
     )
 
@@ -433,7 +433,7 @@ defmodule ElixirScript.Translate.Form do
     ast = case function_name do
       a when is_atom(a) ->
         J.call_expression(
-          ElixirScript.Translator.Identifier.make_function_name(function_name, length(params)),
+          ElixirScript.Translator.Identifier.make_function_name(function_name),
           Enum.map(params, &compile!(&1, state))
         )
       _ ->

@@ -5,7 +5,7 @@ const OK = Symbol.for('ok');
 const ERROR = Symbol.for('error');
 const BADMAP = Symbol.for('badmap');
 
-function find2(key, map) {
+function find(key, map) {
   if (map instanceof Object === false) {
     return new ErlangTypes.Tuple(BADMAP, map);
   }
@@ -19,7 +19,7 @@ function find2(key, map) {
   return ERROR;
 }
 
-function fold3(fun, init, map) {
+function fold(fun, init, map) {
   let acc = init;
 
   for (const [key, value] of Object.entries(map)) {
@@ -30,6 +30,6 @@ function fold3(fun, init, map) {
 }
 
 export default {
-  find2,
-  fold3,
+  find,
+  fold,
 };

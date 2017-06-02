@@ -14,7 +14,7 @@ defmodule ElixirScript.Translate.Forms.Try do
     translated_body = prepare_function_body(try_block, state)
 
     translated_body = JS.block_statement(translated_body)
-    try_block = JS.function_expression([], [], translated_body)
+    try_block = JS.arrow_function_expression([], [], translated_body)
 
     rescue_block = if rescue_block do
       process_rescue_block(rescue_block, state)
@@ -88,7 +88,7 @@ defmodule ElixirScript.Translate.Forms.Try do
     translated_body = prepare_function_body(after_block, state)
     translated_body = JS.block_statement(translated_body)
 
-    JS.function_expression([], [], translated_body)
+    JS.arrow_function_expression([], [], translated_body)
   end
 
   defp prepare_function_body(body, state) do

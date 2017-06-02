@@ -10,7 +10,7 @@ defmodule ElixirScript.Translate.Forms.For do
     generators = JS.array_expression(args.generators)
 
     into = args.into || JS.array_expression([])
-    filter = args.filter || JS.function_expression([], [], JS.block_statement([JS.return_statement(JS.identifier("true"))]))
+    filter = args.filter || JS.arrow_function_expression([], [], JS.block_statement([JS.return_statement(JS.identifier("true"))]))
     fun = args.fun
 
 
@@ -128,7 +128,7 @@ defmodule ElixirScript.Translate.Forms.For do
 
     ast = Clause.return_last_statement(ast)
 
-    JS.function_expression(
+    JS.arrow_function_expression(
       state.args,
       [],
       JS.block_statement(ast)

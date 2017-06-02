@@ -41,7 +41,7 @@ defmodule ElixirScript.Translate.Clause do
       ),
       [
         J.array_expression(patterns),
-        J.function_expression(
+        J.arrow_function_expression(
           params,
           [],
           J.block_statement(body)
@@ -117,7 +117,7 @@ defmodule ElixirScript.Translate.Clause do
     |> process_guards
     |> Form.compile!(state)
 
-    J.function_expression(
+    J.arrow_function_expression(
       params,
       [],
       J.block_statement([

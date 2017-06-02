@@ -11,8 +11,8 @@ defmodule ElixirScript.Translate.Protocol do
   This compiles and consolidates the given protocol
   """
   def compile(module, %{protocol: true, impls: impls, functions: functions} = info, pid) do
-    object = Enum.map(functions, fn {function, arity} ->
-      {Identifier.make_function_name(function, arity), J.function_expression([], [], J.block_statement([]))}
+    object = Enum.map(functions, fn {function, _} ->
+      {Identifier.make_function_name(function), J.function_expression([], [], J.block_statement([]))}
     end)
     |> Enum.map(fn({key, value}) -> ElixirScript.Translate.Forms.Map.make_property(key, value) end)
     |> J.object_expression

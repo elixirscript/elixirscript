@@ -32,7 +32,7 @@ defmodule ElixirScript.Translate.Function do
     arg_matches_declaration = J.variable_declaration([arg_matches_declarator], :let)
 
     declarator = J.variable_declarator(
-      ElixirScript.Translator.Identifier.make_function_name(name, arity),
+      ElixirScript.Translator.Identifier.make_function_name(name),
       J.function_expression(
                 [J.rest_element(J.identifier("__function_args__"))],
                 [],
