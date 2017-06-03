@@ -1,6 +1,6 @@
 defmodule ElixirScript.Translate.Form do
   alias ESTree.Tools.Builder, as: J
-  alias ElixirScript.Translate.Forms.{Bitstring, Match, Try, For, Struct, Receive, Remote}
+  alias ElixirScript.Translate.Forms.{Bitstring, Match, Try, For, Struct, Receive, Remote, Pattern}
   alias ElixirScript.Translate.Functions.{Erlang, Lists, Maps}
   alias ElixirScript.Translator.Identifier
   alias ElixirScript.Translate.Clause
@@ -62,7 +62,7 @@ defmodule ElixirScript.Translate.Form do
         ),
         J.identifier("Tuple")
       ),
-      Enum.map(elements, &compile!(&1, state))
+      Enum.map(elements, &compile!(&1, state)) |> List.flatten
     )
 
     {ast, state}
@@ -94,7 +94,7 @@ defmodule ElixirScript.Translate.Form do
         ElixirScript.Translate.Function.patterns_ast(),
         J.identifier("defmatch")
       ),
-      Enum.map(clauses, fn x -> Clause.compile(x, state) |> elem(0) end)
+      Enum.map(clauses, fn x -> Clause.compile(x, state) |> elem(0) end) |> List.flatten
     )
 
     ast = J.call_expression(
@@ -109,10 +109,13 @@ defmodule ElixirScript.Translate.Form do
     processed_clauses = Enum.map(clauses, fn({:->, _, [clause, clause_body]}) ->
       { translated_body, state } = Enum.map_reduce(List.wrap(clause_body), state, &compile(&1, &2))
       
-      translated_body = Clause.return_last_statement(translated_body)
+      translated_body = translated_body
+      |> List.flatten
+      |> Clause.return_last_statement
+      
       translated_body = J.arrow_function_expression([], [], J.block_statement(translated_body))
 
-      translated_clause = compile(hd(clause), state)
+      { translated_clause, _ }  = compile(hd(clause), state)
 
 
       J.array_expression([translated_clause, translated_body])
@@ -172,7 +175,16 @@ defmodule ElixirScript.Translate.Form do
 
     ast = J.call_expression(
       ElixirScript.Translator.Identifier.make_function_name(function_name),
-      Enum.map(params, &compile!(&1, state))
+      Enum.map(params, &compile!(&1, state)) |> List.flatten
+    )
+
+    {ast, state}
+  end
+
+  def compile({var, _, params}, state) when is_list(params) and is_atom(var) do
+    ast = J.call_expression(
+      ElixirScript.Translator.Identifier.make_function_name(var),
+      Enum.map(params, &compile!(&1, state)) |> List.flatten
     )
 
     {ast, state}
@@ -181,13 +193,14 @@ defmodule ElixirScript.Translate.Form do
   def compile({function, _, params}, state) when is_list(params) do
     ast = J.call_expression(
       compile!(function, state),
-      Enum.map(params, &compile!(&1, state))
+      Enum.map(params, &compile!(&1, state)) |> List.flatten
     )
 
     {ast, state}
   end
 
   def compile({var, _, _}, state) do
+    var = Pattern.get_variable_name(to_string(var), state)
     { ElixirScript.Translator.Identifier.make_identifier(var), state }
   end
 

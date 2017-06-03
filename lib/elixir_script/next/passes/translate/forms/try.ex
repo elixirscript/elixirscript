@@ -96,6 +96,8 @@ defmodule ElixirScript.Translate.Forms.Try do
     |> List.wrap
     |> Enum.map_reduce(state, &Form.compile(&1, &2))
 
-    Clause.return_last_statement(ast)
+    ast
+    |> List.flatten
+    |> Clause.return_last_statement
   end
 end

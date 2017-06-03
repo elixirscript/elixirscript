@@ -1,11 +1,5 @@
 defmodule Main do
-  def start(:normal, callback) do
-    elem({1, 2}, 0)
-    Enum.map([], fn(x) -> x end)
+  def start(:normal, [callback]) do
     callback.("started")
-  end
-
-  def hello do
-    "Hello!"
   end
 end

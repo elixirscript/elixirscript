@@ -30,9 +30,12 @@ defmodule ElixirScript.Translate.Clause do
         List.flatten(list)
       _ ->
         Form.compile!(body, state)
+        |> List.wrap
+        |> List.flatten
     end
 
-    body = return_last_statement(body)
+    body = body
+    |> return_last_statement
 
     ast = J.call_expression(
       J.member_expression(

@@ -40,7 +40,7 @@ defmodule ElixirScript.Translate.Forms.Pattern do
     { patterns, params, state }
   end
 
-  defp get_variable_name(function, state) do
+  def get_variable_name(function, state) do
     number = Map.get(state.vars, function)
     String.to_atom("#{function}#{number}")
   end

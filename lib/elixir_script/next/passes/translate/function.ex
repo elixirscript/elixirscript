@@ -104,7 +104,8 @@ defmodule ElixirScript.Translate.Function do
         Form.compile!(body, state)
     end
 
-    body = Clause.return_last_statement(body)
+    body = body 
+    |> Clause.return_last_statement
 
     declarator = J.variable_declarator(
       J.array_expression(params),

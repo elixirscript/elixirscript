@@ -65,7 +65,7 @@ defmodule ElixirScript.Translate.Forms.For do
                                                                 {var, collection}
                                                               end)
 
-      {patterns, params, state} = Pattern.compile([{:<<>>, [], bs_parts}], module_state)
+      {patterns, params, module_state} = Pattern.compile([{:<<>>, [], bs_parts}], module_state)
 
       gen = JS.call_expression(
         JS.member_expression(
@@ -126,7 +126,9 @@ defmodule ElixirScript.Translate.Forms.For do
        Form.compile(x, acc_state)
     end)
 
-    ast = Clause.return_last_statement(ast)
+    ast = ast
+    |> List.flatten
+    |> Clause.return_last_statement
 
     JS.arrow_function_expression(
       state.args,
