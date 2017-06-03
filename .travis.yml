@@ -1,7 +1,7 @@
 sudo: false
 language: elixir
 elixir:
-  - master
+  - 1.5.0-dev
 otp_release:
   - 20.0-rc1
 env:
@@ -11,8 +11,8 @@ install:
   - npm install -g yarn
   - yarn
 script:
-  - mix local.hex --force
   - mix local.rebar --force
+  - mix local.hex --force
   - mix deps.get
   - mix compile
   - yarn build
