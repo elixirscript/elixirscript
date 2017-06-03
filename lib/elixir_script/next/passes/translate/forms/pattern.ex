@@ -105,6 +105,10 @@ defmodule ElixirScript.Translate.Forms.Pattern do
     { [PM.head_tail(hd(head_patterns), hd(tail_patterns))], params }  
   end
 
+  defp process_pattern({{:., _, [:erlang, :++]}, context, [head, tail]}, state) do
+    process_pattern({:|, context, [head, tail]}, state)
+  end
+
   defp process_pattern({:%{}, _, props}, state) do
     properties = Enum.map(props, fn({key, value}) ->
       {pattern, params} = process_pattern(value, state)
@@ -142,18 +146,6 @@ defmodule ElixirScript.Translate.Forms.Pattern do
     end)
 
     { [PM.bitstring_match(elements)], params }
-  end
-
-  defp process_pattern([{:|, _, [head, tail]}], state) do
-    { head_patterns, head_params } = process_pattern(head, state)
-    { tail_patterns, tail_params } = process_pattern(tail, state)
-    params = head_params ++ tail_params
-
-    { [PM.head_tail(hd(head_patterns), hd(tail_patterns))], params }
-  end
-
-  defp process_pattern({{:., _, [:erlang, :++]}, _, [prefix, value]}, state) do
-    { [PM.starts_with(prefix)], [Form.compile!(value, state)] }    
   end
 
   defp process_pattern({:<>, _, [prefix, value]}, state) do

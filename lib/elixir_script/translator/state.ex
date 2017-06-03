@@ -30,6 +30,8 @@ defmodule ElixirScript.Translator.State do
       rescue
         FunctionClauseError ->
           acc
+        ArgumentError ->
+          acc
       end
     end)
   end
