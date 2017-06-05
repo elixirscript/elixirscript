@@ -14,6 +14,9 @@ defmodule ElixirScript.Translate.Module do
   end
 
   def compile(module, info, pid) do
+    if Atom.to_string(module) == "Elixir.Example" do
+      IO.inspect info
+    end
     %{
       attributes: attrs, 
       compile_opts: _compile_opts,
@@ -86,6 +89,10 @@ defmodule ElixirScript.Translate.Module do
     J.object_expression(exports)
   end
 
+  @doc """
+  Determins if the given atom
+  is an Elixir function
+  """
   def is_elixir_module(Elixir) do
     true
   end
@@ -105,6 +112,12 @@ defmodule ElixirScript.Translate.Module do
     false
   end
 
+  @doc """
+  Determines is given function is a JS module.
+  A JS module is either one that begins with "JS"
+  or is a module defined from the js_modules compiler
+  opt
+  """
   def is_js_module(module, state) do
     cond do
       module in ModuleState.get_javascript_modules(state.pid) ->

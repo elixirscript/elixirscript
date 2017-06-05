@@ -1,6 +1,6 @@
 defmodule ElixirScript.Translate.Form do
   alias ESTree.Tools.Builder, as: J
-  alias ElixirScript.Translate.Forms.{Bitstring, Match, Try, For, Struct, Receive, Remote, Pattern}
+  alias ElixirScript.Translate.Forms.{Bitstring, Match, Try, For, Receive, Remote, Pattern}
   alias ElixirScript.Translate.Functions.{Erlang, Lists, Maps}
   alias ElixirScript.Translator.Identifier
   alias ElixirScript.Translate.Clause
@@ -34,8 +34,7 @@ defmodule ElixirScript.Translate.Form do
 
   def compile(form, state) when is_atom(form) do
     ast = if ElixirScript.Translate.Module.is_elixir_module(form) do
-      members = if form == Elixir, do: ["Elixir"], else: ["Elixir"] ++ Module.split(form)
-      J.identifier(Enum.join(members, "_"))
+      Remote.process_module_name(form, state)
     else
       J.call_expression(
         J.member_expression(
@@ -80,8 +79,16 @@ defmodule ElixirScript.Translate.Form do
     Match.compile(match, state)
   end
 
-  def compile({:%, _, [_, _]} = ast, state) do
-    Struct.compile(ast, state)
+  def compile({:%, _, [module, params]}, state) do
+    ast = J.call_expression(
+      J.member_expression(
+        Remote.process_module_name(module),
+        J.identifier("__struct__")
+      ),
+      [Form.compile!(params, state)]
+    )
+
+    { ast, state }
   end
 
   def compile({:for, _, _} = ast, state) do

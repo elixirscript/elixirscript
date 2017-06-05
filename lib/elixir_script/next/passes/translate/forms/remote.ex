@@ -1,4 +1,6 @@
 defmodule ElixirScript.Translate.Forms.Remote do
+  @moduledoc false
+
   alias ESTree.Tools.Builder, as: J
   alias ElixirScript.Translate.Form
   alias ElixirScript.Translator.Identifier
@@ -16,6 +18,13 @@ defmodule ElixirScript.Translate.Forms.Remote do
     :file
   ]
 
+  @doc """
+  Compiles functions into JavaScript AST.
+  These are not actual function calls, but
+  the function identifiers themselves. Also
+  includes function heads for converting some
+  erlang functions into JavaScript functions.
+  """
   def compile({:., _, [:erlang, :+]}, state) do
     ast = erlang_compat_function("erlang", "plus")
     { ast, state }    
@@ -131,20 +140,24 @@ defmodule ElixirScript.Translate.Forms.Remote do
     {ast, state}
   end
 
-  defp process_module_name(module, state) when is_atom(module) do
+  def process_module_name(module, state) when is_atom(module) do
     cond do
       ElixirScript.Translate.Module.is_js_module(module, state) ->
         members = tl(Module.split(module))
         Identifier.make_namespace_members(members)      
       ElixirScript.Translate.Module.is_elixir_module(module) ->
-        members = ["Elixir"] ++ Module.split(module)
-        J.identifier(Enum.join(members, "_"))
+        members = ["Elixir"] ++ Module.split(module) ++ ["__load"]
+
+        J.call_expression(
+          Identifier.make_namespace_members(members),
+          [J.identifier("Elixir")]
+        )
       true ->
         ElixirScript.Translator.Identifier.make_identifier(module)
     end
   end
 
-  defp process_module_name(module, state) do
+  def process_module_name(module, state) do
     Form.compile!(module, state)
   end
 
