@@ -1,4 +1,5 @@
 // http://erlang.org/doc/man/erlang.html
+import ErlangTypes from 'erlang-types';
 
 function atom_to_binary(atom, encoding = Symbol.for('utf8')) {
   if (encoding !== Symbol.for('utf8')) {
@@ -122,6 +123,62 @@ function bxor(left, right) {
   return left ^ right;
 }
 
+function is_atom(value) {
+  return value instanceof Symbol || value.__MODULE__ === true;
+}
+
+function is_bitstring(value) {
+  return value instanceof ErlangTypes.BitString;
+}
+
+function is_boolean(value) {
+  return value instanceof Boolean;
+}
+
+function is_float(value) {
+  return value instanceof Number && !Number.isInteger(value);
+}
+
+function is_function(value) {
+  return value instanceof Function;
+}
+
+function is_integer(value) {
+  return Number.isInteger(value);
+}
+
+function is_list(value) {
+  return Array.isArray(value);
+}
+
+function is_map(value) {
+  return value instanceof Object;
+}
+
+function is_number(value) {
+  return value instanceof Number;
+}
+
+function is_pid(value) {
+  return value instanceof ErlangTypes.PID;
+}
+
+function is_port() {
+  return false;
+}
+
+function is_reference(value) {
+  return value instanceof ErlangTypes.Reference;
+}
+
+function is_tuple(value) {
+  return value instanceof ErlangTypes.Tuple;
+}
+
+function is_binary(value) {
+  return value instanceof String;
+}
+
 export default {
   atom_to_binary,
   list_concatenation,
@@ -148,4 +205,18 @@ export default {
   bsr,
   bxor,
   bnot,
+  is_bitstring,
+  is_boolean,
+  is_float,
+  is_function,
+  is_integer,
+  is_list,
+  is_map,
+  is_number,
+  is_pid,
+  is_port,
+  is_reference,
+  is_tuple,
+  is_atom,
+  is_binary,
 };
