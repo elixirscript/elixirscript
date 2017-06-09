@@ -1,7 +1,5 @@
 sudo: false
-language: elixir
-elixir:
-  - 1.5.0-dev
+language: erlang
 otp_release:
   - 20.0-rc1
 env:
@@ -10,11 +8,14 @@ install:
   - rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm && (cd ~/.nvm && git checkout `git describe --abbrev=0 --tags`) && source ~/.nvm/nvm.sh && nvm install $TRAVIS_NODE_VERSION
   - npm install -g yarn
   - yarn
-script:
+before_script:
+  - wget http://s3.hex.pm/builds/elixir/master.zip
+  - unzip -d elixir master.zip
+  - export PATH=$(pwd)/elixir/bin:${PATH}
   - mix local.rebar --force
   - mix local.hex --force
   - mix deps.get
-  - mix compile
+script:
   - yarn build
   - mix test
   - yarn test
