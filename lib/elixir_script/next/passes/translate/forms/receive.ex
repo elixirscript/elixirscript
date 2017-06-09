@@ -2,9 +2,13 @@ defmodule ElixirScript.Translate.Forms.Receive do
   @moduledoc false
   alias ESTree.Tools.Builder, as: J
 
+  @doc """
+  receive is not supported just yet, but we compile it
+  to a stub function for now
+  """
   def compile(blocks, state) do
-    receive_block = Keyword.get(blocks, :do)
-    after_block = Keyword.get(blocks, :after, nil)
+    _receive_block = Keyword.get(blocks, :do)
+    _after_block = Keyword.get(blocks, :after, nil)
 
     receive_function = J.member_expression(
       J.member_expression(

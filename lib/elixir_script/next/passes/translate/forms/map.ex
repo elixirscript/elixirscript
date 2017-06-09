@@ -8,16 +8,14 @@ defmodule ElixirScript.Translate.Forms.Map do
 
     ast = J.call_expression(
       J.member_expression(
-        J.member_expression(
-          J.identifier("Bootstrap"),
-          J.member_expression(
-            J.identifier("Core"),
-            J.identifier("SpecialForms")
-          )
-        ),
-        J.identifier("map_update")
+        J.identifier("Object"),
+        J.identifier("assign")
       ),
-      [map, data]
+      [
+        J.object_expression([]),
+        map,
+        data       
+      ]
     )
 
     { ast, state }

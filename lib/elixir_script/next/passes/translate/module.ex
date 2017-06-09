@@ -2,6 +2,7 @@ defmodule ElixirScript.Translate.Module do
   @moduledoc false
   alias ESTree.Tools.Builder, as: J
   alias ElixirScript.Translate.Function
+  alias ElixirScript.Translate.Form
   alias ElixirScript.Translator.Identifier
   alias ElixirScript.State, as: ModuleState
 
@@ -85,6 +86,13 @@ defmodule ElixirScript.Translate.Module do
       _, list ->
         list
     end)
+
+    # Add an attribute to use to determine if this is a module
+    # Will be used by the is_atom implementation
+    exports ++ [ElixirScript.Translate.Forms.Map.make_property(
+      Form.compile!("__MODULE__", %{}),
+      Form.compile!(true, %{})
+    )]
 
     J.object_expression(exports)
   end

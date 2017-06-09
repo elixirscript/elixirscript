@@ -82,10 +82,10 @@ defmodule ElixirScript.Translate.Form do
   def compile({:%, _, [module, params]}, state) do
     ast = J.call_expression(
       J.member_expression(
-        Remote.process_module_name(module),
+        Remote.process_module_name(module, state),
         J.identifier("__struct__")
       ),
-      [Form.compile!(params, state)]
+      [compile!(params, state)]
     )
 
     { ast, state }
