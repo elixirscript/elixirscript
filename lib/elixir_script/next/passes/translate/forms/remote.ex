@@ -144,7 +144,14 @@ defmodule ElixirScript.Translate.Forms.Remote do
     cond do
       ElixirScript.Translate.Module.is_js_module(module, state) ->
         members = tl(Module.split(module))
-        Identifier.make_namespace_members(members)      
+        Identifier.make_namespace_members(members)
+      module === Elixir ->
+        members = ["Elixir", "__load"]
+
+        J.call_expression(
+          Identifier.make_namespace_members(members),
+          [J.identifier("Elixir")]
+        )
       ElixirScript.Translate.Module.is_elixir_module(module) ->
         members = ["Elixir"] ++ Module.split(module) ++ ["__load"]
 

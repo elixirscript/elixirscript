@@ -36,7 +36,8 @@ defmodule ElixirScript.Output do
   end
 
   defp concat(code) do
-    "'use strict';\n" <> ElixirScript.get_bootstrap_js("iife") <> "\n" <> code
+    bootstrap_code = ElixirScript.get_bootstrap_js("iife")
+    "'use strict';\n#{bootstrap_code}\n#{code}"
   end
 
   defp prepare_js_ast(js_ast) do
@@ -54,8 +55,13 @@ defmodule ElixirScript.Output do
     end
   end
 
-  defp output(code, nil), do: code
-  defp output(code, :stdout), do: IO.puts(code)
+  defp output(code, nil) do
+     code
+  end
+
+  defp output(code, :stdout) do 
+    IO.puts(code)
+  end
 
   defp output(code, path) do
     file_name = case Path.extname(path) do

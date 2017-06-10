@@ -101,15 +101,11 @@ defmodule ElixirScript.Translate.Module do
   Determins if the given atom
   is an Elixir function
   """
-  def is_elixir_module(Elixir) do
-    true
-  end
-
   def is_elixir_module(module) when is_atom(module) do
     str_module = Atom.to_string(module)
 
     case str_module do
-      "Elixir." <> _ ->
+      "Elixir" <> _ ->
         true
       _ ->
         false
@@ -130,6 +126,8 @@ defmodule ElixirScript.Translate.Module do
     cond do
       module in ModuleState.get_javascript_modules(state.pid) ->
         true
+      module === Elixir ->
+        false
       is_elixir_module(module) and hd(Module.split(module)) == "JS" ->
         true
       true ->
