@@ -143,8 +143,7 @@ defmodule ElixirScript.Translate.Forms.Remote do
   def process_module_name(module, state) when is_atom(module) do
     cond do
       ElixirScript.Translate.Module.is_js_module(module, state) ->
-        members = tl(Module.split(module))
-        Identifier.make_namespace_members(members)
+        process_js_module_name(module, state)
       module === Elixir ->
         members = ["Elixir", "__load"]
 
@@ -166,6 +165,23 @@ defmodule ElixirScript.Translate.Forms.Remote do
 
   def process_module_name(module, state) do
     Form.compile!(module, state)
+  end
+
+  defp process_js_module_name(module, state) do
+    case Module.split(module) do
+      ["JS"] ->
+        J.member_expression(
+          J.member_expression(
+            J.identifier("Bootstrap"),
+            J.identifier("Core")
+          ),
+          J.identifier("global")
+        )
+      ["JS" | rest] ->
+        Identifier.make_namespace_members(rest)
+      x ->
+        Identifier.make_namespace_members(x)         
+    end
   end
 
   defp erlang_compat_function(module, function) do

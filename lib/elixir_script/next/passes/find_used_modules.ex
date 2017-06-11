@@ -99,12 +99,21 @@ defmodule ElixirScript.FindUsedModules do
     walk({[], params, [], body}, state)
   end
 
+  defp walk({:|, _, [head, tail]}, state) do
+    walk(head, state)
+    walk(tail, state)
+  end
+
+  defp walk({:::, _, _}, state) do
+    nil
+  end
+
   defp walk(form, state) when is_list(form) do
     Enum.each(form, &walk(&1, state))
   end
 
   defp walk(form, state) when is_atom(form) and form not in [BitString, Function, PID, Port, Reference, Any, Elixir] do
-    if ElixirScript.Translate.Module.is_elixir_module(form) do
+    if ElixirScript.Translate.Module.is_elixir_module(form) and !ElixirScript.Translate.Module.is_js_module(form, state) do
       if ModuleState.get_module(state.pid, form) == nil do
         execute(form, state.pid)
       end
@@ -133,7 +142,7 @@ defmodule ElixirScript.FindUsedModules do
   end
 
   defp walk({:%, _, [module, params]}, state) do
-    if ElixirScript.Translate.Module.is_elixir_module(module) do
+    if ElixirScript.Translate.Module.is_elixir_module(module) and !ElixirScript.Translate.Module.is_js_module(module, state) do
       if ModuleState.get_module(state.pid, module) == nil do
         do_execute(module, state.pid)
       end
@@ -233,7 +242,6 @@ defmodule ElixirScript.FindUsedModules do
         if ModuleState.get_module(state.pid, module) == nil do
           execute(module, state.pid)
         end
-        ModuleState.add_used(state.pid, module, {function, length(params)})
       true ->
         nil         
     end
@@ -245,8 +253,7 @@ defmodule ElixirScript.FindUsedModules do
     walk(params, state)
   end
 
-  defp walk({function, _, params}, state) when is_atom(function) and is_list(params) do
-    ModuleState.add_used(state.pid, state.module, {function, length(params)})    
+  defp walk({function, _, params}, state) when is_atom(function) and is_list(params) do   
     Enum.each(params, &walk(&1, state))
   end
 

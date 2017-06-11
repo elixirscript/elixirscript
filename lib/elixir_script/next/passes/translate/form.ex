@@ -24,6 +24,18 @@ defmodule ElixirScript.Translate.Form do
     { J.literal(form), state }
   end
 
+  def compile({:|, _, [head, tail]}, state) do
+    ast = J.call_expression(
+      J.member_expression(
+        J.array_expression([compile!(head, state)]),
+        J.identifier("concat")
+      ),
+      [compile!(tail, state)]
+    )
+
+    { ast, state }
+  end
+
   def compile(form, state) when is_list(form) do
     ast = J.array_expression(
       Enum.map(form, &compile!(&1, state))
@@ -151,7 +163,7 @@ defmodule ElixirScript.Translate.Form do
   def compile({:receive, context, [blocks]}, state) do
     line = Keyword.get(context, :line, 1)
     {function, arity} = Map.get(state, :function)
-    Logger.warn "receive not supported, Module: #{inspect state.module}, Function: #{function}/#{arity}, Line: #{line}"
+    Logger.warn "receive not supported, Module: #{inspect state.module}, Function: #{function}, Line: #{line}"
     Receive.compile(blocks, state)
   end
 

@@ -199,6 +199,11 @@ defmodule ElixirScript.String do
   end
 
   def valid_character?(codepoint) do
-    ElixirScript.Bootstrap.Functions.is_valid_character(codepoint)
+    try do
+      JS.String.fromCodePoint(codepoint) != nil
+    rescue
+      _ ->
+        false
+    end
   end
 end

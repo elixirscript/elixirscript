@@ -57,7 +57,7 @@ defmodule ElixirScript.Translate.Module do
     # any public functions
     case exports do
       %ESTree.ObjectExpression{ properties: [] } ->
-        ModuleState.put_module(pid, module, Map.put(info, :js_ast, J.program([])))
+        nil
       _ ->
         { compiled_functions, _ } = Enum.map_reduce(combined_defs, state, &Function.compile(&1, &2))
         

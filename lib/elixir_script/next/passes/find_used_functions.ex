@@ -46,34 +46,23 @@ defmodule ElixirScript.FindUsedFunctions do
 
   defp walk_module(module, function, arity, pid) do
     function = {function, arity}
-
     unless ModuleState.has_used?(pid, module, function) do
-      %{
-        attributes: _attrs, 
-        compile_opts: _compile_opts,
-        definitions: defs,
-        file: _file,
-        line: _line, 
-        module: ^module, 
-        unreachable: unreachable
-      } = ModuleState.get_module(pid, module)
+      info = ModuleState.get_module(pid, module)
 
       state = %{
         pid: pid,
         module: module
       }
 
-      reachable_defs = Enum.filter(defs, fn
-        { _, type, _, _} when type in [:defmacro, :defmacrop] -> false
-        { name, _, _, _} -> not(name in [function])
-        _ -> true
-      end)
+      reachable_def = Enum.find(Map.get(info, :definitions, []), fn { name, _, _, _} -> name == function end)
 
-      Enum.each(reachable_defs, fn({name, _type, _, _clauses}) -> 
-        ModuleState.add_used(state.pid, module, name)
-      end)
-
-      Enum.each(reachable_defs, &walk(&1, state))
+      case reachable_def do
+        nil ->
+          nil
+        {name, _type, _, _clauses} = func ->
+          ModuleState.add_used(state.pid, module, name)
+          walk(func, state)
+      end
     end
   end
 
@@ -103,6 +92,15 @@ defmodule ElixirScript.FindUsedFunctions do
 
   defp walk({:->, _, [params, body]}, state) do
     walk({[], params, [], body}, state)
+  end
+
+  defp walk({:|, _, [head, tail]}, state) do
+    walk(head, state)
+    walk(tail, state)
+  end
+
+  defp walk({:::, _, _}, state) do
+    nil
   end
 
   defp walk(form, state) when is_list(form) do
@@ -232,10 +230,6 @@ defmodule ElixirScript.FindUsedFunctions do
 
   defp walk({:super, _, params}, state) do
     walk(params, state)
-  end
-
-  defp walk({function, _, params}, state) when function in [:|, :::] do
-    nil
   end
 
   defp walk({function, _, params}, state) when is_atom(function) and is_list(params) do
