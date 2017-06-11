@@ -15,9 +15,6 @@ defmodule ElixirScript.Translate.Module do
   end
 
   def compile(module, info, pid) do
-    if Atom.to_string(module) == "Elixir.Example" do
-      IO.inspect info
-    end
     %{
       attributes: attrs, 
       compile_opts: _compile_opts,
@@ -53,7 +50,30 @@ defmodule ElixirScript.Translate.Module do
     end
 
     #we combine our function arities
-    combined_defs = used_defs
+    combined_defs = combine_defs(used_defs)
+    exports = make_exports(combined_defs)
+
+    # Don't skip compilation and output of modules that don't have
+    # any public functions
+    case exports do
+      %ESTree.ObjectExpression{ properties: [] } ->
+        ModuleState.put_module(pid, module, Map.put(info, :js_ast, J.program([])))
+      _ ->
+        { compiled_functions, _ } = Enum.map_reduce(combined_defs, state, &Function.compile(&1, &2))
+        
+        js_ast = ElixirScript.ModuleSystems.Namespace.build(
+          module,
+          compiled_functions,
+          exports,
+          nil
+        )
+
+        ModuleState.put_module(pid, module, Map.put(info, :js_ast, hd(js_ast)))
+    end
+  end
+
+  defp combine_defs(used_defs) do
+    used_defs
     |> Enum.sort(fn { {name1, arity1}, _, _, _ }, { {name2, arity2}, _, _, _ } -> "#{name1}#{arity1}" < "#{name2}#{arity2}" end)
     |> Enum.group_by(fn {{name, _}, _, _, _ } -> name end)
     |> Enum.map(fn {group, funs} ->
@@ -62,20 +82,6 @@ defmodule ElixirScript.Translate.Module do
           {name, type, context, acc_clauses ++ clauses}
         end)
       end)
-
-    { compiled_functions, _ } = combined_defs
-    |> Enum.map_reduce(state, &Function.compile(&1, &2))
-
-    exports = make_exports(combined_defs)
-
-    js_ast = ElixirScript.ModuleSystems.Namespace.build(
-      module,
-      compiled_functions,
-      exports,
-      nil
-    )
-
-    ModuleState.put_module(pid, module, Map.put(info, :js_ast, hd(js_ast))) 
   end
 
   defp make_exports(reachable_defs) do
