@@ -234,6 +234,10 @@ defmodule ElixirScript.FindUsedModules do
     walk({function, [], params}, state)
   end
 
+  defp walk({{:., _, [JS, _]}, _, params}, state) do
+    walk(params, state)
+  end
+
   defp walk({{:., _, [module, function]}, _, params}, state) do
     cond do
       ElixirScript.Translate.Module.is_js_module(module, state) ->
