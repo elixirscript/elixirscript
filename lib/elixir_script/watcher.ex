@@ -35,15 +35,11 @@ defmodule ElixirScript.Watcher do
   end
 
   defp input_changed?(path, state) do
-    file = Path.basename(path)
-
-    case file do
-      "." <> _ ->
-        false
+    case Path.extname(path) do
+      ".beam" ->
+        true
       _ ->
-        Enum.any?(List.wrap(state[:input]), fn(x) ->
-          path == Path.absname(Path.join([x, file]))
-        end)
+        false
     end
   end
 end

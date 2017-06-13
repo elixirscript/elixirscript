@@ -133,7 +133,7 @@ defmodule ElixirScript.Translate.Forms.Pattern do
     params = Enum.reduce(elements, [], fn
       ({:::, _, [{ variable, _, params }, _]}, state) when is_nil(params)
                                                       when is_list(params) and length(params) == 0 ->
-        state ++ [ElixirScript.Translator.Identifier.make_identifier(variable)]
+        state ++ [ElixirScript.Translate.Identifier.make_identifier(variable)]
       _, state ->
         state
     end)
@@ -161,7 +161,7 @@ defmodule ElixirScript.Translate.Forms.Pattern do
   end
 
   defp process_pattern({var, _, _}, _) do
-    { [PM.parameter()], [ElixirScript.Translator.Identifier.make_identifier(var)] }
+    { [PM.parameter()], [ElixirScript.Translate.Identifier.make_identifier(var)] }
   end
 
   defp reduce_patterns(patterns, _) do
@@ -173,6 +173,6 @@ defmodule ElixirScript.Translate.Forms.Pattern do
 
   defp unify(target, source, state) do
     { patterns, params } = do_compile([source], state)
-    { [PM.capture(hd(patterns))], params ++ [ElixirScript.Translator.Identifier.make_identifier(target)] }
+    { [PM.capture(hd(patterns))], params ++ [ElixirScript.Translate.Identifier.make_identifier(target)] }
   end
 end

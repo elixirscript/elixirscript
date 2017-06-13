@@ -23,16 +23,13 @@ defmodule ElixirScript.Output do
   end
 
   defp bundle(modules, opts) do
-    ElixirScript.Passes.CreateJSModules.compile(modules, opts)
-
-    js_code = modules
-    |> ElixirScript.Passes.CreateJSModules.compile(opts)
+    modules
+    |> ElixirScript.Output.JSModule.compile(opts)
     |> List.wrap
     |> Builder.program
     |> prepare_js_ast
     |> Generator.generate
-
-    concat(js_code)
+    |> concat
   end
 
   defp concat(code) do

@@ -2,7 +2,7 @@ defmodule ElixirScript.Translate.Form do
   alias ESTree.Tools.Builder, as: J
   alias ElixirScript.Translate.Forms.{Bitstring, Match, Try, For, Receive, Remote, Pattern}
   alias ElixirScript.Translate.Functions.{Erlang, Lists, Maps}
-  alias ElixirScript.Translator.Identifier
+  alias ElixirScript.Translate.Identifier
   alias ElixirScript.Translate.Clause
   require Logger
 
@@ -185,6 +185,10 @@ defmodule ElixirScript.Translate.Form do
     {ast, state}
   end
 
+  def compile({{:., _, [JS, _]}, _, _} = ast, state) do
+    ElixirScript.Translate.Forms.JS.compile(ast, state)
+  end
+
   def compile({:., _, call} = ast, state) when is_list(call) do
     Remote.compile(ast, state)
   end
@@ -193,7 +197,7 @@ defmodule ElixirScript.Translate.Form do
     {function_name, _} = Map.get(state, :function)
 
     ast = J.call_expression(
-      ElixirScript.Translator.Identifier.make_function_name(function_name),
+      ElixirScript.Translate.Identifier.make_function_name(function_name),
       Enum.map(params, &compile!(&1, state)) |> List.flatten
     )
 
@@ -202,7 +206,7 @@ defmodule ElixirScript.Translate.Form do
 
   def compile({var, _, params}, state) when is_list(params) and is_atom(var) do
     ast = J.call_expression(
-      ElixirScript.Translator.Identifier.make_function_name(var),
+      ElixirScript.Translate.Identifier.make_function_name(var),
       Enum.map(params, &compile!(&1, state)) |> List.flatten
     )
 
@@ -220,7 +224,7 @@ defmodule ElixirScript.Translate.Form do
 
   def compile({var, _, _}, state) do
     var = Pattern.get_variable_name(to_string(var), state)
-    { ElixirScript.Translator.Identifier.make_identifier(var), state }
+    { ElixirScript.Translate.Identifier.make_identifier(var), state }
   end
 
 end

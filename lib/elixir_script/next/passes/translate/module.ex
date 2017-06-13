@@ -3,7 +3,7 @@ defmodule ElixirScript.Translate.Module do
   alias ESTree.Tools.Builder, as: J
   alias ElixirScript.Translate.Function
   alias ElixirScript.Translate.Form
-  alias ElixirScript.Translator.Identifier
+  alias ElixirScript.Translate.Identifier
   alias ElixirScript.State, as: ModuleState
 
   @doc """
@@ -87,7 +87,7 @@ defmodule ElixirScript.Translate.Module do
   defp make_exports(reachable_defs) do
     exports = Enum.reduce(reachable_defs, [], fn
       {{name, arity}, :def, _, _}, list ->
-        function_name = ElixirScript.Translator.Identifier.make_identifier(name)
+        function_name = ElixirScript.Translate.Identifier.make_identifier(name)
           list ++ [J.property(function_name, function_name, :init, true)]
       _, list ->
         list

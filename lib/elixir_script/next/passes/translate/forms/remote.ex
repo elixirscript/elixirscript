@@ -3,7 +3,7 @@ defmodule ElixirScript.Translate.Forms.Remote do
 
   alias ESTree.Tools.Builder, as: J
   alias ElixirScript.Translate.Form
-  alias ElixirScript.Translator.Identifier
+  alias ElixirScript.Translate.Identifier
 
   @erlang_modules [
     :erlang,
@@ -25,6 +25,7 @@ defmodule ElixirScript.Translate.Forms.Remote do
   includes function heads for converting some
   erlang functions into JavaScript functions.
   """
+
   def compile({:., _, [:erlang, :+]}, state) do
     ast = erlang_compat_function("erlang", "plus")
     { ast, state }    
@@ -114,7 +115,7 @@ defmodule ElixirScript.Translate.Forms.Remote do
         ),
         J.identifier(module)
       ),
-      ElixirScript.Translator.Identifier.make_function_name(function)
+      ElixirScript.Translate.Identifier.make_function_name(function)
     )
 
     { ast, state }
@@ -127,9 +128,9 @@ defmodule ElixirScript.Translate.Forms.Remote do
   def compile({:., _, [module, function]}, state) do
     function_name = cond do
       ElixirScript.Translate.Module.is_js_module(module, state) ->
-        ElixirScript.Translator.Identifier.make_extern_function_name(function)
+        ElixirScript.Translate.Identifier.make_extern_function_name(function)
       true ->
-        ElixirScript.Translator.Identifier.make_function_name(function)            
+        ElixirScript.Translate.Identifier.make_function_name(function)            
     end
 
     ast = J.member_expression(
@@ -159,7 +160,7 @@ defmodule ElixirScript.Translate.Forms.Remote do
           [J.identifier("Elixir")]
         )
       true ->
-        ElixirScript.Translator.Identifier.make_identifier(module)
+        ElixirScript.Translate.Identifier.make_identifier(module)
     end
   end
 
@@ -193,7 +194,7 @@ defmodule ElixirScript.Translate.Forms.Remote do
         ),
         J.identifier(module)
       ),
-      ElixirScript.Translator.Identifier.make_function_name(function)
+      ElixirScript.Translate.Identifier.make_function_name(function)
     )   
   end
 end

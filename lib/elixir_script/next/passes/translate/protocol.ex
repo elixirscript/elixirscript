@@ -3,7 +3,7 @@ defmodule ElixirScript.Translate.Protocol do
   alias ESTree.Tools.Builder, as: J
   alias ElixirScript.Translate.Function
   alias ElixirScript.Translate.Form
-  alias ElixirScript.Translator.Identifier
+  alias ElixirScript.Translate.Identifier
   alias ElixirScript.State, as: ModuleState
 
 

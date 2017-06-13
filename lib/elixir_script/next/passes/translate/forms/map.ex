@@ -50,7 +50,7 @@ defmodule ElixirScript.Translate.Forms.Map do
       true ->
         J.literal(k)
       false ->
-        ElixirScript.Translator.Identifier.make_identifier(k)
+        ElixirScript.Translate.Identifier.make_identifier(k)
     end
 
     J.property(key, value)
