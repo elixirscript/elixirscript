@@ -2,7 +2,7 @@ defmodule ElixirScript.Translate.Forms.Try do
   @moduledoc false
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translate.Clause
-  alias ElixirScript.Translate.Form
+  alias ElixirScript.Translate.{Form, Function}
 
   def compile(blocks, state) do
     try_block = Keyword.get(blocks, :do)
@@ -92,12 +92,8 @@ defmodule ElixirScript.Translate.Forms.Try do
   end
 
   defp prepare_function_body(body, state) do
-    {ast, state} = body
-    |> List.wrap
-    |> Enum.map_reduce(state, &Form.compile(&1, &2))
+    {ast, state} = Function.compile_block(body, state)
 
-    ast
-    |> List.flatten
-    |> Clause.return_last_statement
+    Clause.return_last_statement(ast)
   end
 end

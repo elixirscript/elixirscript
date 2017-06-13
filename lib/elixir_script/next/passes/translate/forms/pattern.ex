@@ -109,6 +109,10 @@ defmodule ElixirScript.Translate.Forms.Pattern do
     process_pattern({:|, context, [head, tail]}, state)
   end
 
+  defp process_pattern({:%, _, [module, {:%{}, _, props}]}, state) do
+    process_pattern({:%{}, [], [__struct__: module] ++ props}, state)
+  end
+
   defp process_pattern({:%{}, _, props}, state) do
     properties = Enum.map(props, fn({key, value}) ->
       {pattern, params} = process_pattern(value, state)
@@ -152,11 +156,11 @@ defmodule ElixirScript.Translate.Forms.Pattern do
     { [PM.starts_with(prefix)], [Form.compile!(value, state)] }
   end
 
-  defp process_pattern({:=, _, [{name, _, _}, right]}, state) do
+  defp process_pattern({:=, _, [{name, _, _}, right]}, state) when not name in [:%, :{}, :^, :%{}, :<<>>] do
     unify(name, right, state)
   end
 
-  defp process_pattern({:=, _, [left, {name, _, _}]}, state) do
+  defp process_pattern({:=, _, [left, {name, _, _}]}, state) when not name in [:%, :{}, :^, :%{}, :<<>>] do
     unify(name, left, state)
   end
 

@@ -128,4 +128,21 @@ defmodule ElixirScript.Translate.Function do
   defp compile_clause({:->, _, [params, body]}, state) do
     compile_clause({[], params, [], body}, state)
   end
+
+  def compile_block(block, state) do
+    ast = case block do
+      nil ->
+        J.identifier("null")
+      {:__block__, _, block_body} ->
+        {list, _} = Enum.map_reduce(block_body, state, &Form.compile(&1, &2))
+        List.flatten(list)
+      b when is_list(b) ->
+        {list, _} = Enum.map_reduce(b, state, &Form.compile(&1, &2))
+        List.flatten(list)
+      _ ->
+        Form.compile!(block, state)
+    end
+
+    {ast, state}
+  end
 end

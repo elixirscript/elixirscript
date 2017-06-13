@@ -65,7 +65,7 @@ defmodule ElixirScript.Translate.Form do
   end
 
   def compile({:{}, _, elements}, state) do
-    ast = J.call_expression(
+    ast = J.new_expression(
       J.member_expression(
         J.member_expression(
           J.identifier("Bootstrap"),
@@ -76,6 +76,15 @@ defmodule ElixirScript.Translate.Form do
       Enum.map(elements, &compile!(&1, state)) |> List.flatten
     )
 
+    {ast, state}
+  end
+
+  def compile({:&, _, [{:/, _, [{{:., _, [_module, _function]} = ast, [], []}, _]}]}, state) do
+    Remote.compile(ast, state)
+  end
+
+  def compile({:&, _, [{:/, _, [{var, _, _}, _]}]}, state) do
+    ast = ElixirScript.Translate.Identifier.make_function_name(var)
     {ast, state}
   end
 
@@ -208,6 +217,15 @@ defmodule ElixirScript.Translate.Form do
     ast = J.call_expression(
       ElixirScript.Translate.Identifier.make_function_name(var),
       Enum.map(params, &compile!(&1, state)) |> List.flatten
+    )
+
+    {ast, state}
+  end
+
+  def compile({function, _, []}, state) do
+    ast = J.call_expression(
+      ElixirScript.Translate.Forms.JS.call_property(),
+      [compile!(function, state)]
     )
 
     {ast, state}
