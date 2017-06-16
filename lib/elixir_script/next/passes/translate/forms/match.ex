@@ -6,6 +6,13 @@ defmodule ElixirScript.Translate.Forms.Match do
   def compile({:=, _, [left, right]}, state) do
     { right_ast, state } = Form.compile(right, state)
 
+    {var_dec, right_ast} = case right_ast do
+      [variable_declaration, x] ->
+        {variable_declaration, x}
+      x ->
+        {nil, x}
+    end
+
     { patterns, params, state } = Pattern.compile([left], state)
 
       declarator = J.variable_declarator(
@@ -35,7 +42,14 @@ defmodule ElixirScript.Translate.Forms.Match do
       {:{}, _, _ } ->
         make_tuple_ref(array_pattern, params)
       _ ->
-        array_pattern
+        List.wrap(array_pattern)
+    end
+
+    js_ast = case var_dec do
+      nil ->
+        js_ast
+      x ->
+        [x] ++ js_ast
     end
 
     { js_ast, state }

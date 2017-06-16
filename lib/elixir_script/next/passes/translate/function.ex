@@ -31,9 +31,8 @@ defmodule ElixirScript.Translate.Function do
 
     arg_matches_declaration = J.variable_declaration([arg_matches_declarator], :let)
 
-    declarator = J.variable_declarator(
-      ElixirScript.Translate.Identifier.make_function_name(name),
-      J.function_expression(
+    function_dec = J.function_declaration(
+                ElixirScript.Translate.Identifier.make_function_name(name),    
                 [J.rest_element(J.identifier("__function_args__"))],
                 [],
                 J.block_statement([
@@ -50,9 +49,8 @@ defmodule ElixirScript.Translate.Function do
                   )
                 ])
               )
-    )
 
-    { J.variable_declaration([declarator], :const), state }
+    { function_dec, state }
   end
 
   defp compile_clauses(clauses, state) do
