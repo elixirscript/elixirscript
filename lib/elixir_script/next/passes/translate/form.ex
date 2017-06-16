@@ -188,18 +188,8 @@ defmodule ElixirScript.Translate.Form do
     Try.compile(blocks, state)
   end
 
-  def compile({:fn, _, clauses}, state) do
-    {clauses_ast, _} = Enum.map_reduce(clauses, state, &Clause.compile(&1, &2))
-
-    ast = J.call_expression(
-      J.member_expression(
-        ElixirScript.Translate.Function.patterns_ast(),
-        J.identifier("defmatch")
-      ),
-      clauses_ast
-    )
-
-    {ast, state}
+  def compile({:fn, _, _} = ast, state) do
+    ElixirScript.Translate.Function.compile(ast, state)
   end
 
   def compile({{:., _, [JS, _]}, _, _} = ast, state) do
@@ -212,22 +202,35 @@ defmodule ElixirScript.Translate.Form do
 
   def compile({:super, context, params}, state) when is_list(params) do
     {function_name, _} = Map.get(state, :function)
+    {var_decs, params} = compile_params(params, state)
 
     ast = J.call_expression(
       ElixirScript.Translate.Identifier.make_function_name(function_name),
-      Enum.map(params, &compile!(&1, state)) |> List.flatten
+      params
     )
 
-    {ast, state}
+    case var_decs do
+      [] ->
+        {ast, state}
+      _ ->
+        {var_decs ++ List.wrap(ast), state}
+    end
   end
 
   def compile({var, _, params}, state) when is_list(params) and is_atom(var) do
+    {var_decs, params} = compile_params(params, state)
+
     ast = J.call_expression(
       ElixirScript.Translate.Identifier.make_function_name(var),
-      Enum.map(params, &compile!(&1, state)) |> List.flatten
+      params
     )
 
-    {ast, state}
+    case var_decs do
+      [] ->
+        {ast, state}
+      _ ->
+        {var_decs ++ List.wrap(ast), state}
+    end
   end
 
   def compile({function, _, []}, state) do
@@ -240,17 +243,38 @@ defmodule ElixirScript.Translate.Form do
   end
 
   def compile({function, _, params}, state) when is_list(params) do
+    {var_decs, params} = compile_params(params, state)
+
     ast = J.call_expression(
       compile!(function, state),
-      Enum.map(params, &compile!(&1, state)) |> List.flatten
+      params
     )
 
-    {ast, state}
+    case var_decs do
+      [] ->
+        {ast, state}
+      _ ->
+        {var_decs ++ List.wrap(ast), state}
+    end
   end
 
-  def compile({var, _, _}, state) do
+  def compile({var, _, _} = ast, state) do
     var = Pattern.get_variable_name(to_string(var), state)
     { ElixirScript.Translate.Identifier.make_identifier(var), state }
+  end
+
+  defp compile_params(params, state) do
+    {params, var_decs} = Enum.map_reduce(params, [], fn
+      ({:=, _, [left, _]} = ast, acc) ->
+        {ast, state} = compile(ast, state)
+        left = compile!(left, state)
+
+        {left, acc ++ List.wrap(ast)}
+      (x, acc) ->
+        {compile!(x, state), acc}
+    end)
+
+    {var_decs, params}
   end
 
 end

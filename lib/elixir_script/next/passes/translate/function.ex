@@ -20,7 +20,38 @@ defmodule ElixirScript.Translate.Function do
     )
   end
 
-  def compile({{name, arity}, type, _, clauses}, state) do
+  def compile({:fn, _, clauses}, state) do
+    clauses = compile_clauses(clauses, state)
+
+    arg_matches_declarator = J.variable_declarator(
+      J.identifier("__arg_matches__"),
+      J.identifier("null")
+    )
+
+    arg_matches_declaration = J.variable_declaration([arg_matches_declarator], :let)
+
+    function_dec = J.arrow_function_expression( 
+      [J.rest_element(J.identifier("__function_args__"))],
+      [],
+      J.block_statement([
+        arg_matches_declaration,
+        clauses,
+        J.throw_statement(
+          J.call_expression(
+            J.member_expression(
+              patterns_ast(),
+              J.identifier("MatchError")
+            ),
+            [J.identifier("__function_args__")]
+          )
+        )
+      ])
+    )
+
+    { function_dec, state }
+  end
+
+  def compile({{name, arity}, _type, _, clauses}, state) do
     state = Map.put(state, :function, {name, arity})
     clauses = compile_clauses(clauses, state)
 
@@ -84,7 +115,11 @@ defmodule ElixirScript.Translate.Function do
   end
 
   defp compile_clause({ _, args, guards, body}, state) do
-    state = Map.put(state, :vars, %{})
+    state = if !Map.has_key?(state, :vars) do
+      Map.put(state, :vars, %{})
+    else
+      state
+    end
 
     {patterns, params, state} = Pattern.compile(args, state)
     guard = Clause.compile_guard(params, guards, state)

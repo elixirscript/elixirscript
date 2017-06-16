@@ -129,6 +129,8 @@ defmodule ElixirScript.FindUsedFunctions do
   end
 
   defp walk({:%, _, [module, params]}, state) do
+    ModuleState.add_used(state.pid, module, {:__struct__, 0})
+    ModuleState.add_used(state.pid, module, {:__struct__, 1})
     walk(params, state)
   end
 
