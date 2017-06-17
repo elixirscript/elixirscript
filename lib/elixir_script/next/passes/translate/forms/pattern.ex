@@ -55,7 +55,7 @@ defmodule ElixirScript.Translate.Forms.Pattern do
   end
 
   defp process_pattern({:^, _, [value]}, state) do
-    { [PM.bound(Form.compile!(value, state))], [nil] }
+    { [PM.bound(Form.compile!(value, state))], [] }
   end
 
   defp process_pattern({:_, _, _}, _) do

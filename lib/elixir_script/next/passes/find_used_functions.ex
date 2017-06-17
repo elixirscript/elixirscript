@@ -13,6 +13,14 @@ defmodule ElixirScript.FindUsedFunctions do
       module ->
         walk_module(module, pid)
     end)
+
+    modules = ElixirScript.State.list_modules(pid)
+    Enum.each(modules, fn
+      {module, info} ->
+        if get_in(info, [:attributes, :protocol_impl]) do
+          walk_module(module, pid)
+        end
+    end)
   end
 
   defp walk_module(module, pid) do
@@ -71,16 +79,7 @@ defmodule ElixirScript.FindUsedFunctions do
   end
 
   defp walk({ _, _args, _guards, body}, state) do
-    case body do
-      nil ->
-        nil
-      {:__block__, _, block_body} ->
-        Enum.map(block_body, &walk(&1, state))
-      b when is_list(b) ->
-        Enum.map(b, &walk(&1, state))
-      _ ->
-        walk(body, state)
-    end
+    walk_block(body, state)
   end
 
   defp walk({:->, _, [[{:when, _, params}], body ]}, state) do
@@ -112,7 +111,7 @@ defmodule ElixirScript.FindUsedFunctions do
   end
 
   defp walk({:{}, _, elements}, state) do
-    Enum.each(elements, &walk(&1, state))
+    walk(elements, state)
   end
 
   defp walk({:%{}, _, properties}, state) do
@@ -148,10 +147,10 @@ defmodule ElixirScript.FindUsedFunctions do
 
       [into: expression, do: expression2] ->
         walk(expression, state)
-        walk(expression2, state)
+        walk_block(expression2, state)
 
       [do: expression] ->
-        walk(expression, state)
+        walk_block(expression, state)
 
       filter ->
         walk(filter, state)
@@ -170,8 +169,15 @@ defmodule ElixirScript.FindUsedFunctions do
     end)
   end
 
-  defp walk({:receive, _context, _}, _state) do
-    nil
+  defp walk({:receive, _context, blocks}, state) do
+    do_block = Keyword.get(blocks, :do)
+    after_block = Keyword.get(blocks, :after, nil) 
+
+    walk_block(do_block, state)
+
+    if after_block do
+      Enum.each(List.wrap(after_block), &walk(&1, state))
+    end
   end
 
   defp walk({:try, _, [blocks]}, state) do
@@ -181,7 +187,7 @@ defmodule ElixirScript.FindUsedFunctions do
     after_block = Keyword.get(blocks, :after, nil)
     else_block = Keyword.get(blocks, :else, nil)
 
-    Enum.each(List.wrap(try_block), &walk(&1, state))
+    walk_block(try_block, state)
 
     if rescue_block do
       Enum.each(rescue_block, fn
@@ -240,15 +246,29 @@ defmodule ElixirScript.FindUsedFunctions do
 
   defp walk({function, _, params}, state) when is_atom(function) and is_list(params) do
     walk_module(state.module, function, length(params), state.pid)
-    Enum.each(params, &walk(&1, state))
+    walk(params, state)
   end
 
-  defp walk({_, _, params}, state) when is_list(params) do
-    Enum.each(params, &walk(&1, state))
+  defp walk({value, _, params}, state) when is_list(params) do
+    walk(value, state)
+    walk(params, state)
   end
 
   defp walk(_, _) do
     nil
+  end
+
+  defp walk_block(block, state) do
+    case block do
+      nil ->
+        nil
+      {:__block__, _, block_body} ->
+        Enum.each(block_body, &walk(&1, state))
+      b when is_list(b) ->
+        Enum.each(b, &walk(&1, state))
+      _ ->
+        walk(block, state)
+    end
   end
 
 end

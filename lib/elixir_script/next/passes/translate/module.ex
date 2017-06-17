@@ -44,6 +44,7 @@ defmodule ElixirScript.Translate.Module do
     else
       Enum.filter(reachable_defs, fn
         { {:start, 2}, _, _, _ } -> true
+        { {:__struct__, _}, _, _, _ } -> true
         { name, _, _, _} -> name in used
         _ -> false
       end)

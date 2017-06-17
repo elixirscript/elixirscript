@@ -68,7 +68,7 @@ defmodule ElixirScript.FindUsedModules do
     
     Enum.each(implementations, fn {impl, info} ->
       walk_module(impl, info, pid) 
-    end) 
+    end)
   end
 
   defp walk({{_name, _arity}, _type, _, clauses}, state) do
@@ -76,16 +76,7 @@ defmodule ElixirScript.FindUsedModules do
   end
 
   defp walk({ _, _args, _guards, body}, state) do
-    case body do
-      nil ->
-        nil
-      {:__block__, _, block_body} ->
-        Enum.map(block_body, &walk(&1, state))
-      b when is_list(b) ->
-        Enum.map(b, &walk(&1, state))
-      _ ->
-        walk(body, state)
-    end
+    walk_block(body, state)
   end
 
   defp walk({:->, _, [[{:when, _, params}], body ]}, state) do
@@ -165,10 +156,10 @@ defmodule ElixirScript.FindUsedModules do
 
       [into: expression, do: expression2] ->
         walk(expression, state)
-        walk(expression2, state)
+        walk_block(expression2, state)
 
       [do: expression] ->
-        walk(expression, state)
+        walk_block(expression, state)
 
       filter ->
         walk(filter, state)
@@ -187,8 +178,15 @@ defmodule ElixirScript.FindUsedModules do
     end)
   end
 
-  defp walk({:receive, _context, _}, _state) do
-    nil
+  defp walk({:receive, _context, blocks}, state) do
+    do_block = Keyword.get(blocks, :do)
+    after_block = Keyword.get(blocks, :after, nil) 
+
+    walk_block(do_block, state)
+
+    if after_block do
+      Enum.each(List.wrap(after_block), &walk(&1, state))
+    end
   end
 
   defp walk({:try, _, [blocks]}, state) do
@@ -198,7 +196,7 @@ defmodule ElixirScript.FindUsedModules do
     after_block = Keyword.get(blocks, :after, nil)
     else_block = Keyword.get(blocks, :else, nil)
 
-    Enum.each(List.wrap(try_block), &walk(&1, state))
+    walk_block(try_block, state)
 
     if rescue_block do
       Enum.each(rescue_block, fn
@@ -234,11 +232,11 @@ defmodule ElixirScript.FindUsedModules do
     walk({function, [], params}, state)
   end
 
-  defp walk({{:., _, [JS, _]}, _, params}, state) do
-    walk(params, state)
+  defp walk({:., _, [JS, _]}, state) do
+    nil
   end
 
-  defp walk({{:., _, [module, function]}, _, params}, state) do
+  defp walk({:., _, [module, function]}, state) do
     cond do
       ElixirScript.Translate.Module.is_js_module(module, state) ->
         nil
@@ -247,26 +245,35 @@ defmodule ElixirScript.FindUsedModules do
           execute(module, state.pid)
         end
       true ->
-        nil         
+        walk(module, state)
+        walk(function, state)    
     end
-
-    walk(params, state)
   end
 
   defp walk({:super, _, params}, state) do
     walk(params, state)
   end
 
-  defp walk({function, _, params}, state) when is_atom(function) and is_list(params) do   
-    Enum.each(params, &walk(&1, state))
-  end
-
-  defp walk({_, _, params}, state) when is_list(params) do
-    Enum.each(params, &walk(&1, state))
+  defp walk({function, _, params}, state) when is_list(params) do
+    walk(function, state)  
+    walk(params, state)
   end
 
   defp walk(_, _) do
     nil
+  end
+
+  defp walk_block(block, state) do
+    case block do
+      nil ->
+        nil
+      {:__block__, _, block_body} ->
+        Enum.each(block_body, &walk(&1, state))
+      b when is_list(b) ->
+        Enum.each(b, &walk(&1, state))
+      _ ->
+        walk(block, state)
+    end
   end
 
 end
