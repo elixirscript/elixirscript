@@ -22,8 +22,8 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "erlang-types": "^1.0.0",
-    "tailored": "2.4.5"
+    "erlang-types": "^1.0.1",
+    "tailored": "^2.4.6"
   },
   "devDependencies": {
     "ava": "^0.19.1",

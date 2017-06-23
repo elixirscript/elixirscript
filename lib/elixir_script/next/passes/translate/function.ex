@@ -37,7 +37,7 @@ defmodule ElixirScript.Translate.Function do
         arg_matches_declaration,
         clauses,
         J.throw_statement(
-          J.call_expression(
+          J.new_expression(
             J.member_expression(
               patterns_ast(),
               J.identifier("MatchError")
@@ -70,7 +70,7 @@ defmodule ElixirScript.Translate.Function do
                   arg_matches_declaration,
                   clauses,
                   J.throw_statement(
-                    J.call_expression(
+                    J.new_expression(
                       J.member_expression(
                         patterns_ast(),
                         J.identifier("MatchError")

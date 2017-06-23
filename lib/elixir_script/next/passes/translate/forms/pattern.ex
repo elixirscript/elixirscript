@@ -59,7 +59,7 @@ defmodule ElixirScript.Translate.Forms.Pattern do
   end
 
   defp process_pattern({:_, _, _}, _) do
-    { [PM.wildcard()], [J.identifier(:_)] }
+    { [PM.parameter()], [J.identifier(:_)] }
   end
 
   defp process_pattern({a, b}, state) do
@@ -110,20 +110,40 @@ defmodule ElixirScript.Translate.Forms.Pattern do
   end
 
   defp process_pattern({:%, _, [module, {:%{}, _, props}]}, state) do
-    process_pattern({:%{}, [], [__struct__: module] ++ props}, state)
+    process_pattern({:%{}, [], [__module__struct__: module] ++ props}, state)
   end
 
   defp process_pattern({:%{}, _, props}, state) do
-    properties = Enum.map(props, fn({key, value}) ->
-      {pattern, params} = process_pattern(value, state)
-      property = case key do
-                   {:^, _, [the_key]} ->
-                     J.property(Form.compile!(the_key, state), hd(List.wrap(pattern)), :init, false, false, true)
-                   _ ->
-                     ElixirScript.Translate.Forms.Map.make_property(Form.compile!(key, state), hd(List.wrap(pattern)))
-                 end
+    properties = Enum.map(props, fn
+      {:__module__struct__, module} ->
+        a = J.object_expression([%ESTree.Property{
+            key: J.identifier("__MODULE__"),
+            value: J.call_expression(
+              J.member_expression(
+                J.identifier("Symbol"),
+                J.identifier("for")
+              ),
+              [J.literal(to_string(module))]
+            )
+          }])
 
-      { property, params }
+        property = ElixirScript.Translate.Forms.Map.make_property(
+          Form.compile!(:__struct__, state),
+          a
+        )
+
+        { property, [] }
+
+      {key, value} ->
+        {pattern, params} = process_pattern(value, state)
+        property = case key do
+                    {:^, _, [the_key]} ->
+                      J.property(Form.compile!(the_key, state), hd(List.wrap(pattern)), :init, false, false, true)
+                    _ ->
+                      ElixirScript.Translate.Forms.Map.make_property(Form.compile!(key, state), hd(List.wrap(pattern)))
+                  end
+
+        { property, params }
     end)
 
     {props, params} = Enum.reduce(properties, {[], []}, fn({prop, param}, {props, params}) ->

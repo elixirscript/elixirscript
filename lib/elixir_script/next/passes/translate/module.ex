@@ -52,7 +52,7 @@ defmodule ElixirScript.Translate.Module do
 
     #we combine our function arities
     combined_defs = combine_defs(used_defs)
-    exports = make_exports(combined_defs)
+    exports = make_exports(module, combined_defs)
 
     # Don't skip compilation and output of modules that don't have
     # any public functions
@@ -85,7 +85,7 @@ defmodule ElixirScript.Translate.Module do
       end)
   end
 
-  defp make_exports(reachable_defs) do
+  defp make_exports(module, reachable_defs) do
     exports = Enum.reduce(reachable_defs, [], fn
       {{name, arity}, :def, _, _}, list ->
         function_name = ElixirScript.Translate.Identifier.make_identifier(name)
@@ -96,10 +96,16 @@ defmodule ElixirScript.Translate.Module do
 
     # Add an attribute to use to determine if this is a module
     # Will be used by the is_atom implementation
-    exports ++ [ElixirScript.Translate.Forms.Map.make_property(
-      Form.compile!("__MODULE__", %{}),
-      Form.compile!(true, %{})
-    )]
+    exports = exports ++ [%ESTree.Property{
+      key: J.identifier("__MODULE__"),
+      value: J.call_expression(
+        J.member_expression(
+          J.identifier("Symbol"),
+          J.identifier("for")
+        ),
+        [J.literal(to_string(module))]
+      )
+    }]
 
     J.object_expression(exports)
   end
