@@ -5,7 +5,7 @@ The goal is to convert a subset (or full set) of Elixir code to JavaScript, prov
 Requirements
 ===========
 * Erlang 20 or greater
-* Elixir 1.5 or greater
+* Elixir 1.5 or greater (must be compiled with Erlang 20 or greater)
 * Node (only for development)
 
 Usage
@@ -67,21 +67,3 @@ Contributing
 ========
 
 Please check the [CONTRIBUTING.md](CONTRIBUTING.md)
-
-
-### Example projects
-* [hello](https://github.com/bryanjos/hello) Shows using Phoenix + Elixirscript with file watching
-* [Elixirscript frontend boilerplate](https://github.com/elixirscript/elixirscript-project-boilerplate) A boilerplate project for elixirscript frontends
-* [Elixirscript React example](https://github.com/bryanjos/elixirscript_react) An example of using with React
-* [Elixirscript AWS Lambda example](https://github.com/bryanjos/elixirscript_lambda)
-
-#### Using with Brunch
-There is a plugin for using ElixirScript in your Brunch project
-[here](https://www.npmjs.com/package/elixirscript-brunch)
-
-#### Using with Webpack
-There is a loader for using ElixirScript in your Webpack project
-[here](https://www.npmjs.com/package/elixirscript-loader)
-
-#### 1.0 Roadmap
-There is a [1.0.0 Milestone](https://github.com/bryanjos/elixirscript/milestones/1.0.0) defined which includes issues that are needed to be cleared before 1.0 can be reached.
