@@ -76,7 +76,7 @@ defmodule ElixirScript.Translate.Forms.Test do
     state = %{}
 
     {js_ast, _} = Form.compile(ast, state)
-    assert js_ast == J.call_expression(
+    assert js_ast == J.new_expression(
       J.member_expression(
         J.member_expression(
           J.identifier("Bootstrap"),
