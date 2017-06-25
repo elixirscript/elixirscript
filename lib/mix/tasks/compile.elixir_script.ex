@@ -49,7 +49,7 @@ defmodule Mix.Tasks.Compile.ElixirScript do
   defp do_compile(elixirscript_base, app) do
 
     {input, opts} = get_compiler_params()
-    ElixirScript.compiler.compile(input, opts)
+    ElixirScript.Compiler.compile(input, opts)
   end
 
   def clean do

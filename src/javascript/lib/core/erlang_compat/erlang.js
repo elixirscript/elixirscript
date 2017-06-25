@@ -6,7 +6,23 @@ function atom_to_binary(atom, encoding = Symbol.for('utf8')) {
     throw new Error(`unsupported encoding ${encoding}`);
   }
 
+  if (atom.__MODULE__) {
+    return Symbol.keyFor(atom.__MODULE__);
+  }
+
   return Symbol.keyFor(atom);
+}
+
+function binary_to_atom(binary, encoding = Symbol.for('utf8')) {
+  if (encoding !== Symbol.for('utf8')) {
+    throw new Error(`unsupported encoding ${encoding}`);
+  }
+
+  return Symbol.for(binary);
+}
+
+function binary_to_existing_atom(binary, encoding = Symbol.for('utf8')) {
+  return binary_to_atom(binary, encoding);
 }
 
 function list_concatenation(list1, list2) {
@@ -124,7 +140,9 @@ function bxor(left, right) {
 }
 
 function is_atom(value) {
-  return value instanceof Symbol || value.__MODULE__ === true;
+  return (
+    typeof value === 'symbol' || value instanceof Symbol || value.__MODULE__
+  );
 }
 
 function is_bitstring(value) {
@@ -132,15 +150,19 @@ function is_bitstring(value) {
 }
 
 function is_boolean(value) {
-  return value instanceof Boolean;
+  return typeof value === 'boolean' || value instanceof Boolean;
+}
+
+function is_number(value) {
+  return typeof value === 'number' || value instanceof Number;
 }
 
 function is_float(value) {
-  return value instanceof Number && !Number.isInteger(value);
+  return is_number(value) && !Number.isInteger(value);
 }
 
 function is_function(value) {
-  return value instanceof Function;
+  return typeof value === 'function' || value instanceof Function;
 }
 
 function is_integer(value) {
@@ -152,11 +174,7 @@ function is_list(value) {
 }
 
 function is_map(value) {
-  return value instanceof Object;
-}
-
-function is_number(value) {
-  return value instanceof Number;
+  return typeof value === 'object' || value instanceof Object;
 }
 
 function is_pid(value) {
@@ -176,11 +194,13 @@ function is_tuple(value) {
 }
 
 function is_binary(value) {
-  return value instanceof String;
+  return typeof value === 'string' || value instanceof String;
 }
 
 export default {
   atom_to_binary,
+  binary_to_atom,
+  binary_to_existing_atom,
   list_concatenation,
   list_subtraction,
   plus,

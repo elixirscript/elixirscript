@@ -10,7 +10,10 @@ export default {
     babel({
       babelrc: false,
     }),
-    //babili({}),
+    babili({
+      keepFnName: true,
+      keepClassName: true,
+    }),
   ],
   targets: [{ dest: 'priv/build/iife/Elixir.Bootstrap.js', format: 'iife' }],
 };
