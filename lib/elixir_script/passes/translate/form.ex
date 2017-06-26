@@ -2,8 +2,7 @@ defmodule ElixirScript.Translate.Form do
   alias ESTree.Tools.Builder, as: J
   alias ElixirScript.Translate.Forms.{Bitstring, Match, Try, For, Receive, Remote, Pattern}
   alias ElixirScript.Translate.Functions.{Erlang, Lists, Maps}
-  alias ElixirScript.Translate.Identifier
-  alias ElixirScript.Translate.Clause
+  alias ElixirScript.Translate.{Identifier, Clause}
   require Logger
 
   @moduledoc """
@@ -180,7 +179,9 @@ defmodule ElixirScript.Translate.Form do
   def compile({:receive, context, [blocks]}, state) do
     line = Keyword.get(context, :line, 1)
     {function, arity} = Map.get(state, :function)
-    Logger.warn "receive not supported, Module: #{inspect state.module}, Function: #{function}, Line: #{line}"
+    Logger.warn fn() ->
+      "receive not supported, Module: #{inspect state.module}, Function: #{function}, Line: #{line}"
+    end
     Receive.compile(blocks, state)
   end
 

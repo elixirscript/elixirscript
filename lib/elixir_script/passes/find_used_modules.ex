@@ -21,7 +21,7 @@ defmodule ElixirScript.FindUsedModules do
       {:ok, module, implementations} ->
         walk_protocol(module, implementations, pid)
       {:error, error} ->
-        raise "An error occurred while compiling #{inspect module}: #{error}"
+        raise ElixirScript.CompileError, "An error occurred while compiling #{inspect module}: #{error}"
     end
   end
 

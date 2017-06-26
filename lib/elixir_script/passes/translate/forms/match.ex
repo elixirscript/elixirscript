@@ -1,7 +1,9 @@
 defmodule ElixirScript.Translate.Forms.Match do
+  @moduledoc false
+
   alias ESTree.Tools.Builder, as: J
   alias ElixirScript.Translate.Form
-  alias ElixirScript.Translate.Forms.{Pattern}
+  alias ElixirScript.Translate.Forms.Pattern
 
   def compile({:=, _, [left, right]}, state) do
     { right_ast, state } = Form.compile(right, state)

@@ -22,3 +22,4 @@ stdlib_state.bin
 .nyc_output
 test/app/build
 .vscode
+cover

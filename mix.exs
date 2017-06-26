@@ -7,7 +7,6 @@ defmodule ElixirScript.Mixfile do
       version: "0.29.0-dev",
       elixir: "~> 1.5-dev",
       elixirc_paths: elixirc_paths(Mix.env),
-      escript: escript_config(),
       deps: deps(),
       description: description(),
       package: package(),
@@ -15,7 +14,7 @@ defmodule ElixirScript.Mixfile do
       aliases: aliases(),
       test_coverage: [tool: ExCoveralls],
       docs: [
-        extras: ["GettingStarted.md", "FAQ.md", "Supported.md", "JavaScriptInterop.md"]
+        extras: ["GettingStarted.md", "JavaScriptInterop.md"]
       ]
     ]
   end
@@ -29,19 +28,15 @@ defmodule ElixirScript.Mixfile do
   defp deps do
     [
       {:estree, "~> 2.6"},
-      {:fs, "~> 2.12"},
-      {:ex_doc, "~> 0.15", only: :dev},
-      {:excoveralls, "~> 0.6", only: :test},
-      {:credo, "~> 0.7", only: [:dev, :test]}
+      {:fs, "~> 3.4"},
+      {:ex_doc, "~> 0.16", only: :dev},
+      {:excoveralls, "~> 0.7", only: :test},
+      {:credo, "~> 0.8", only: [:dev, :test]}
     ]
   end
 
-  defp elixirc_paths(:test), do: ["lib", "priv/std_lib", "test/support"]
-  defp elixirc_paths(_),     do: ["lib", "priv/std_lib"]
-
-  defp escript_config do
-    [main_module: ElixirScript.CLI, name: "elixirscript"]
-  end
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_),     do: ["lib"]
 
   defp description do
     """
@@ -62,48 +57,12 @@ defmodule ElixirScript.Mixfile do
   end
 
   defp aliases do
-    [dist: &dist/1,
-     install: &install/1]
+    [build_js: &build_js/1]
   end
 
-  def dist(_) do
+  def build_js(_) do
     Mix.Task.run "app.start"
-
-    dist_folder = "dist"
-    folder_name = "#{dist_folder}/elixirscript"
-    archive_file_name = "#{dist_folder}/elixirscript.tar.gz"
-
-    Mix.Tasks.Escript.Build.run([])
-
-    if File.exists?(dist_folder) do
-      File.rm_rf(dist_folder)
-    end
-
-    System.cmd("npm", ["run", "build"])
-
-    File.mkdir_p(folder_name <> "/bin")
-    File.cp!("elixirscript", "#{folder_name}/bin/elixirscript")
-    if File.exists?("priv/.DS_Store") do
-      File.rm!("priv/.DS_Store")
-    end
-    File.cp_r!("priv/", "#{folder_name}")
-    File.cp!("LICENSE", "#{folder_name}/LICENSE")
-
-    System.cmd("tar", ["czf", archive_file_name, folder_name])
-
-    File.rm_rf(folder_name)
-  end
-
-  def install(_) do
-    Mix.Task.run "app.start"
-
-    System.cmd("tar", ["-zxvf", "dist/elixirscript.tar.gz"])
-
-    File.rm_rf!("/usr/local/elixirscript")
-
-    System.cmd("mv", ["dist/elixirscript", "/usr/local/elixirscript"])
-
-    IO.puts("installed at /usr/local/elixirscript")
+    System.cmd("yarn", ["build"])
   end
 
 end

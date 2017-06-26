@@ -1,8 +1,7 @@
 defmodule ElixirScript.Translate.Function do
   alias ESTree.Tools.Builder, as: J
-  alias ElixirScript.Translate.Clause
+  alias ElixirScript.Translate.{Clause, Form}
   alias ElixirScript.Translate.Forms.Pattern
-  alias ElixirScript.Translate.Form
 
   @moduledoc """
   Translates the given Elixir function AST into the
@@ -115,10 +114,10 @@ defmodule ElixirScript.Translate.Function do
   end
 
   defp compile_clause({ _, args, guards, body}, state) do
-    state = if !Map.has_key?(state, :vars) do
-      Map.put(state, :vars, %{})
-    else
+    state = if Map.has_key?(state, :vars) do
       state
+    else
+      Map.put(state, :vars, %{})
     end
 
     {patterns, params, state} = Pattern.compile(args, state)

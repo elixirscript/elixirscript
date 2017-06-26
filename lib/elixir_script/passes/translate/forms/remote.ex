@@ -2,8 +2,7 @@ defmodule ElixirScript.Translate.Forms.Remote do
   @moduledoc false
 
   alias ESTree.Tools.Builder, as: J
-  alias ElixirScript.Translate.Form
-  alias ElixirScript.Translate.Identifier
+  alias ElixirScript.Translate.{Form, Identifier}
 
   @erlang_modules [
     :erlang,
@@ -126,10 +125,9 @@ defmodule ElixirScript.Translate.Forms.Remote do
   end
     
   def compile({:., _, [module, function]}, state) do
-    function_name = cond do
-      ElixirScript.Translate.Module.is_js_module(module, state) ->
+    function_name = if ElixirScript.Translate.Module.is_js_module(module, state) do
         ElixirScript.Translate.Identifier.make_extern_function_name(function)
-      true ->
+    else
         ElixirScript.Translate.Identifier.make_function_name(function)            
     end
 

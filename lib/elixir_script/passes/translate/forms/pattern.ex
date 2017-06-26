@@ -2,7 +2,7 @@ defmodule ElixirScript.Translate.Forms.Pattern do
   alias ElixirScript.Translate.Forms.Pattern.Patterns, as: PM
   alias ESTree.Tools.Builder, as: J
   alias ElixirScript.Translate.Form
-  alias ElixirScript.Translate.Forms.{Bitstring}
+  alias ElixirScript.Translate.Forms.Bitstring
 
   @moduledoc """
   Handles all pattern matching translations

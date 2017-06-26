@@ -1,4 +1,5 @@
 defmodule ElixirScript.Translate.Forms.Map do
+  @moduledoc false
   alias ESTree.Tools.Builder, as: J
   alias ElixirScript.Translate.Form
 

@@ -1,8 +1,7 @@
 defmodule ElixirScript.Translate.Forms.Try do
   @moduledoc false
   alias ESTree.Tools.Builder, as: JS
-  alias ElixirScript.Translate.Clause
-  alias ElixirScript.Translate.{Form, Function}
+  alias ElixirScript.Translate.{Form, Function, Clause}
 
   def compile(blocks, state) do
     try_block = Keyword.get(blocks, :do)

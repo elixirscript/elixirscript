@@ -84,7 +84,7 @@ defmodule ElixirScript.Translate.Clause do
 
     return_statement = case declaration do
       %ESTree.ArrayPattern{elements: elements} ->
-        if(length(elements) == 1) do
+        if length(elements) == 1 do
           J.return_statement(hd(declaration.elements))
         else
           J.return_statement(J.array_expression(declaration.elements))

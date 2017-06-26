@@ -1,8 +1,9 @@
 defmodule ElixirScript.Translate.Forms.For do
+  @moduledoc false
+
   alias ESTree.Tools.Builder, as: JS
-  alias ElixirScript.Translate.Form
-  alias ElixirScript.Translate.Clause
-  alias ElixirScript.Translate.Forms.{Pattern}
+  alias ElixirScript.Translate.{Form, Clause}
+  alias ElixirScript.Translate.Forms.Pattern
 
  def compile({:for, _, generators}, state) do
     args = handle_args(generators, state)

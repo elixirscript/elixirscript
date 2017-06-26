@@ -19,12 +19,6 @@ defmodule ElixirScript.CLI do
     f: :format
   ]
 
-  def main(argv) do
-    argv
-    |> parse_args
-    |> process
-  end
-
   def parse_args(args) do
     { options, input, errors } = OptionParser.parse(args, switches: @switches, aliases: @aliases)
 
@@ -43,7 +37,7 @@ defmodule ElixirScript.CLI do
 
   end
 
-  def help_message() do
+  defp help_message() do
   """
   usage: elixirscript <module> [options]
   <module> the entry module of your application

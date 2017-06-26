@@ -1,9 +1,7 @@
 defmodule ElixirScript.Translate.Module do
   @moduledoc false
   alias ESTree.Tools.Builder, as: J
-  alias ElixirScript.Translate.Function
-  alias ElixirScript.Translate.Form
-  alias ElixirScript.Translate.Identifier
+  alias ElixirScript.Translate.{Function, Form, Identifier}
   alias ElixirScript.State, as: ModuleState
 
   @doc """

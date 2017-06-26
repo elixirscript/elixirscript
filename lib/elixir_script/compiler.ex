@@ -28,9 +28,11 @@ defmodule ElixirScript.Compiler do
 
     IO.puts "Building Output"
     modules = ElixirScript.State.list_modules(pid)
-    ElixirScript.Output.execute(modules, pid)
+    result = ElixirScript.Output.execute(modules, pid)
   
     ElixirScript.State.stop(pid)
+
+    result
   end
 
   defp build_compiler_options(opts, entry_modules) do

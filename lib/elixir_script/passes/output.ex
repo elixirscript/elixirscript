@@ -63,17 +63,21 @@ defmodule ElixirScript.Output do
   end
 
   defp output(code, path) do
-    file_name = case Path.extname(path) do
-      ".js" ->
-        path
-      _ ->
-        Path.join([path, @generated_name])
-    end
+    file_name = get_output_file_name(path)
 
     if !File.exists?(Path.dirname(file_name)) do
       File.mkdir_p!(Path.dirname(file_name))
     end
 
     File.write!(file_name, code)
+  end
+
+  def get_output_file_name(path) do
+    case Path.extname(path) do
+      ".js" ->
+        path
+      _ ->
+        Path.join([path, @generated_name])
+    end 
   end
 end
