@@ -11,11 +11,6 @@ defmodule ElixirScript.Translate.Forms.Pattern.Patterns do
     J.identifier("Patterns")
   )
 
-  @wildcard J.member_expression(
-    @patterns,
-    J.identifier(:wildcard)
-  )
-
   @parameter J.member_expression(
     @patterns,
     J.identifier(:variable)
@@ -51,24 +46,10 @@ defmodule ElixirScript.Translate.Forms.Pattern.Patterns do
     J.identifier(:bitStringMatch)
   )
 
-  def wildcard() do
-    J.call_expression(
-      @wildcard,
-      []
-    )
-  end
-
   def parameter() do
     J.call_expression(
       @parameter,
       []
-    )
-  end
-
-  def parameter(default_value) do
-    J.call_expression(
-      @parameter,
-      [default_value]
     )
   end
 

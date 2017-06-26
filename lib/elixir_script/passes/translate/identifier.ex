@@ -35,18 +35,10 @@ defmodule ElixirScript.Translate.Identifier do
     :yield
   ]
 
-  def make_identifier([ast]) do
-    make_identifier(ast)
-  end
-
   def make_identifier(ast) do
     ast
     |> filter_name
     |> J.identifier
-  end
-
-  defp filter_name(name) when is_tuple(name) do
-    name
   end
 
   defp filter_name(reserved_word) when reserved_word in @js_reserved_words do
@@ -71,8 +63,6 @@ defmodule ElixirScript.Translate.Identifier do
     case module_name do
       m when is_list(m) ->
         m
-      m when is_binary(m) ->
-        String.split(m, ".")
       m when is_atom(m) ->
         Module.split(m)
     end
