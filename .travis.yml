@@ -16,7 +16,7 @@ script:
   - mix deps.get
   - mix compile
   - yarn build
-  - mix test
+  - mix test --cover
   - yarn test
   - yarn test-app
 notifications:
