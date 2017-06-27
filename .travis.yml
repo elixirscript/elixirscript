@@ -1,7 +1,5 @@
 sudo: false
-language: elixir
-elixir:
-  - 1.5.0-rc.0
+language: erlang
 otp_release:
   - 20.0
 env:
@@ -10,13 +8,16 @@ install:
   - rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm && (cd ~/.nvm && git checkout `git describe --abbrev=0 --tags`) && source ~/.nvm/nvm.sh && nvm install $TRAVIS_NODE_VERSION
   - npm install -g yarn
   - yarn
-script:
-  - mix local.hex --force
+before_script:
+  - wget https://repo.hex.pm/builds/elixir/v1.5.0-rc.0-otp-20.zip
+  - unzip -d elixir v1.5.0-rc.0-otp-20.zip
+  - export PATH=$(pwd)/elixir/bin:${PATH}
   - mix local.rebar --force
+  - mix local.hex --force
   - mix deps.get
-  - mix compile
+script:
   - yarn build
-  - mix test --cover
+  - mix test
   - yarn test
   - yarn test-app
 notifications:
