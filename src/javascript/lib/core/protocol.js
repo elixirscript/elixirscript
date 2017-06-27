@@ -11,7 +11,12 @@ class Protocol {
         const thing = args[0];
         let fun = null;
 
-        if (Number.isInteger(thing) && this.hasImplementation(Core.Integer)) {
+        if (thing === null && this.hasImplementation(Symbol('null'))) {
+          fun = this.registry.get(Symbol)[funName];
+        } else if (
+          Number.isInteger(thing) &&
+          this.hasImplementation(Core.Integer)
+        ) {
           fun = this.registry.get(Core.Integer)[funName];
         } else if (
           typeof thing === 'number' &&
@@ -20,14 +25,19 @@ class Protocol {
         ) {
           fun = this.registry.get(Core.Float)[funName];
         } else if (
-          typeof thing === 'string' && this.hasImplementation(Core.BitString)
+          typeof thing === 'string' &&
+          this.hasImplementation(Core.BitString)
         ) {
           fun = this.registry.get(Core.BitString)[funName];
         } else if (
-          thing[Symbol.for('__struct__')] && this.hasImplementation(thing)
+          thing &&
+          thing[Symbol.for('__struct__')] &&
+          this.hasImplementation(thing)
         ) {
-          fun = this.registry.get(thing[Symbol.for('__struct__')])[funName];
-        } else if (this.hasImplementation(thing)) {
+          fun = this.registry.get(thing[Symbol.for('__struct__')].__MODULE__)[
+            funName
+          ];
+        } else if (thing !== null && this.hasImplementation(thing)) {
           fun = this.registry.get(thing.constructor)[funName];
         } else if (this.fallback) {
           fun = this.fallback[funName];
@@ -57,11 +67,13 @@ class Protocol {
 
   hasImplementation(thing) {
     if (
-      thing === Core.Integer || thing === Core.Float || thing === Core.BitString
+      thing === Core.Integer ||
+      thing === Core.Float ||
+      thing === Core.BitString
     ) {
       return this.registry.has(thing);
-    } else if (thing[Symbol.for('__struct__')]) {
-      return this.registry.has(thing[Symbol.for('__struct__')]);
+    } else if (thing && thing[Symbol.for('__struct__')]) {
+      return this.registry.has(thing[Symbol.for('__struct__')].__MODULE__);
     }
 
     return this.registry.has(thing.constructor);

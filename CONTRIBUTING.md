@@ -18,7 +18,7 @@ Good bug reports are extremely helpful - thank you!
 Guidelines for bug reports:
 
 1. **Use the GitHub issue search** &mdash; [check if the issue has already been
-   reported](https://github.com/bryanjos/elixirscript/search?type=Issues).
+   reported](https://github.com/elixirscript/elixirscript/search?type=Issues).
 
 2. **Check if the issue has been fixed** &mdash; try to reproduce it using the
    `master` branch in the repository.
@@ -64,16 +64,13 @@ found in Elixir in ElixirScript.
 ElixirScript is broken up into the following parts:
 
 * The compiler, written in Elixir
-* The standard library modules, written in Elixir
-* The javascript core
+* The JavaScript core
 
 The ElixirScript compiler is in the `lib` folder of the project. 
 Here is where Elixir code is converted into JavaScript.
 
-The standard library modules are in the `priv/std_lib` folder.
-
 The JavaScript code is in the `src/javascript`. 
-This is where features such as pattern matching and the special forms are implemented.
+This is where the special forms and the Erlang Compatibility Layer are defined
 
 The ElixirScript tests can be run using `mix test`
 
@@ -81,9 +78,6 @@ The JavaScript tests can be run using `yarn test`
 
 Please make sure all tests pass after making changes. Also make sure to include tests for
 the changes you made.
-
-Contributing to the standard library may be the easiest and most rewarding changes.
-Don't see a module, function or macro from Elixir in ElixirScript yet? You can help by implementing it.
 
 ## Pull requests
 

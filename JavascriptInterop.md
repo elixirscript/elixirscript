@@ -58,12 +58,6 @@ If using ElixirScript in a mix project, you can do so inside of the ElixirScript
   end
 ```
 
-Or if using the CLI, you can do so by passing each module via the `js-module` flag
-
-```
-elixirscript "app/elixirscript" -o dist --js-module React:react --js-module ReactDOM:react-dom
-```
-
 Interacting with these modules works the same as interacting with an ElixirScript module
 
 ```elixir

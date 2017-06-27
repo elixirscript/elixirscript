@@ -2,8 +2,7 @@ defmodule ElixirScript.ModuleSystems.Common do
   @moduledoc false
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translator
-  alias ElixirScript.Translator.State
-  alias ElixirScript.Translator.Utils
+  alias ElixirScript.Translator.{State, Utils}
 
   def build(imports, js_imports, body, exports) do
     module_imports = Enum.map(imports, fn {module, path} -> import_module(module, path) end)
@@ -11,7 +10,6 @@ defmodule ElixirScript.ModuleSystems.Common do
     imports = js_imports
     |> Enum.map(fn
       {module, path} -> import_module(module, path)
-      {module, path, _} -> import_module(module, path)
     end)
 
     imports = Enum.uniq(imports ++ module_imports)
@@ -21,7 +19,7 @@ defmodule ElixirScript.ModuleSystems.Common do
   end
 
   defp import_module(module_name, from) do
-    js_module_name = ElixirScript.Translator.Identifier.make_namespace_members(module_name)    
+    js_module_name = ElixirScript.Translate.Identifier.make_namespace_members(module_name)    
     do_import_module(js_module_name, from)
   end
 

@@ -14,13 +14,13 @@ defmodule Mix.Tasks.Compile.ElixirScript do
           version: "0.1.0",
           elixir: "~> 1.0",
           deps: deps,
-          elixir_script: [ input: "src/exjs", output: "dest/js"],
-          compilers: [:elixir_script] ++ Mix.compilers
+          elixir_script: [ entry: Example, output: "dest/js"],
+          compilers: Mix.compilers ++ [:elixir_script]
         ]
       end
 
   Available options are:
-  * `input`: The folder to look for Elixirscript files in. (defaults to `lib/elixirscript`)
+  * `input`: The module or modules that are the entry to your application (required)
   * `output`: The path of the generated JavaScript file. (defaults to `priv/elixirscript`)
 
     If path ends in `.js` then that will be the name of the file. If a directory is given,
@@ -43,53 +43,41 @@ defmodule Mix.Tasks.Compile.ElixirScript do
   end
 
   defp do_compile(_, nil) do
-    raise ElixirScriptCompileError, message: "Unable to find mix project app name"
+    raise ElixirScript.CompileError, message: "Unable to find mix project app name"
   end
 
   defp do_compile(elixirscript_base, app) do
-    elixirscript_config = get_elixirscript_config()
-    File.mkdir_p!(elixirscript_base)
-    elixirscript_path = Path.join([elixirscript_base, "#{app}"])
 
-    input_path = elixirscript_config
-    |> Keyword.get(:input)
-    |> List.wrap
-    |> Enum.map(fn(path) ->
-      Path.absname(path)
-    end)
-    |> Enum.join("\n")
-
-    File.write!(elixirscript_path, input_path)
-
-    paths = [elixirscript_base, "*"]
-    |> Path.join()
-    |> Path.wildcard
-    |> Enum.map(fn(path) ->
-      app = Path.basename(path)
-      paths = path |> File.read!() |> String.split("\n")
-      {app, paths}
-    end)
-    |> Map.new
-
-    output_path = Keyword.get(elixirscript_config, :output)
-    format = Keyword.get(elixirscript_config, :format)
-    js_modules = Keyword.get(elixirscript_config, :js_modules, [])
-
-    ElixirScript.compile_path(paths, %{output: output_path, format: format, js_modules: js_modules})
+    {input, opts} = get_compiler_params()
+    ElixirScript.Compiler.compile(input, opts)
   end
 
   def clean do
-    elixirscript_config = get_elixirscript_config()
-    output_path = Keyword.get(elixirscript_config, :output)
+    {input, opts} = get_compiler_params()
 
-    path = ElixirScript.Passes.HandleOutput.get_js_path(output_path)
-
-    if File.exists?(path) do
-      File.rm!(path)
+    case opts[:output] do
+      path when is_binary(path) ->
+        file_name = ElixirScript.Output.get_output_file_name(path)
+        File.rm!(file_name)
+      _ ->
+        nil
     end
-
     :ok
   end
+
+  @doc false
+  def get_compiler_params() do
+    elixirscript_config = get_elixirscript_config()
+    input = Keyword.fetch!(elixirscript_config, :input)
+    opts = [
+      output: Keyword.get(elixirscript_config, :output),
+      format: Keyword.get(elixirscript_config, :format),
+      js_modules: Keyword.get(elixirscript_config, :js_modules, [])
+    ]   
+
+    {input, opts}
+  end
+
 
   defp get_elixirscript_config() do
     config  = Mix.Project.config
@@ -107,7 +95,6 @@ defmodule Mix.Tasks.Compile.ElixirScript do
 
   defp defaults() do
     [
-      input: "lib/elixirscript",
       output: "priv/elixirscript",
       format: :es
     ]

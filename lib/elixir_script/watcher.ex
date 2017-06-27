@@ -23,8 +23,10 @@ defmodule ElixirScript.Watcher do
 
     try do
       if input_changed?(to_string(path), state) do
-        Logger.debug fn -> "Event: #{inspect event} Path: #{path}" end
-        ElixirScript.compile_path(state[:input], state[:options])
+        Logger.debug fn() ->
+          "Event: #{inspect event} Path: #{path}"
+        end
+        ElixirScript.Compiler.compile(state[:input], state[:options])
       end
     rescue
       x ->
@@ -35,15 +37,11 @@ defmodule ElixirScript.Watcher do
   end
 
   defp input_changed?(path, state) do
-    file = Path.basename(path)
-
-    case file do
-      "." <> _ ->
-        false
+    case Path.extname(path) do
+      ".beam" ->
+        true
       _ ->
-        Enum.any?(List.wrap(state[:input]), fn(x) ->
-          path == Path.absname(Path.join([x, file]))
-        end)
+        false
     end
   end
 end

@@ -23,6 +23,14 @@ function iterator_to_reducer(iterable, acc, fun) {
 }
 
 function call_property(item, property) {
+  if (!property) {
+    if (item instanceof Function) {
+      return item();
+    }
+
+    return item;
+  }
+
   let prop = null;
 
   if (

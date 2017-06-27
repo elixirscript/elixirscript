@@ -1,10 +1,7 @@
 defmodule ElixirScript.ModuleSystems.Namespace do
   @moduledoc false
   alias ESTree.Tools.Builder, as: JS
-  alias ElixirScript.Translator
-  alias ElixirScript.Translator.State
-  alias ElixirScript.Translator.Utils
-  alias ElixirScript.Translator.Identifier
+  alias ElixirScript.Translate.Identifier
 
   def build(module_name, body, exports, env) do
     List.wrap(make_namespace_body(module_name, body, exports))
@@ -13,20 +10,6 @@ defmodule ElixirScript.ModuleSystems.Namespace do
   defp module_name_function_call(module_name, function) do
     members = ["Elixir"] ++ Module.split(module_name) ++ [function]
     Identifier.make_namespace_members(members)
-  end
-
-  def import_module(module_name) do
-    name = ["Elixir" | Module.split(module_name) ] |> Enum.join("$")
-
-    declarator = JS.variable_declarator(
-      JS.identifier(name),
-      JS.call_expression(
-        module_name_function_call(module_name, "__load"),
-        [JS.identifier("Elixir")]
-      )
-    )
-
-    JS.variable_declaration([declarator], :const)
   end
 
   defp build_namespace() do
@@ -69,12 +52,12 @@ defmodule ElixirScript.ModuleSystems.Namespace do
       JS.identifier("__exports")
     )
 
-    exports = [JS.return_statement(JS.identifier("__exports"))]  
+    exports = [JS.return_statement(JS.identifier("__exports"))]
 
     make = JS.member_expression(
           JS.call_expression(
             build_namespace(),
-            [JS.identifier("Elixir"), JS.literal(Utils.name_to_js_file_name(module_name))]
+            [JS.identifier("Elixir"), JS.literal(Enum.join(["Elixir"] ++ Module.split(module_name), "."))]
           ),
           JS.identifier("__load")
     )
