@@ -143,6 +143,10 @@ function mapfoldl(fun, acc0, list1) {
   return new ErlangTypes.Tuple(listResult, accResult);
 }
 
+function map(fun, list) {
+  return list.map(value => fun(value));
+}
+
 export default {
   reverse,
   foreach,
@@ -158,4 +162,5 @@ export default {
   keystore,
   keytake,
   mapfoldl,
+  map,
 };
