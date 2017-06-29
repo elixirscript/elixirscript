@@ -220,6 +220,26 @@ function splitwith(pred, list) {
   return new ErlangTypes.Tuple(list1, list2);
 }
 
+function sort(...args) {
+  if (args.length === 1) {
+    const list2 = [...args[0]];
+    return list2.sort();
+  }
+
+  const fun = args[0];
+  const list2 = [...args[1]];
+
+  return list2.sort((a, b) => {
+    const result = fun(a, b);
+
+    if (result === true) {
+      return -1;
+    }
+
+    return 1;
+  });
+}
+
 export default {
   reverse,
   foreach,
@@ -243,4 +263,5 @@ export default {
   all,
   any,
   splitwith,
+  sort,
 };
