@@ -36,7 +36,7 @@ function remove(key, map1) {
     return new ErlangTypes.Tuple(BADMAP, map1);
   }
 
-  const map2 = { ...map1 };
+  const map2 = Object.assign({}, map1);
 
   delete map2[key];
 
@@ -87,7 +87,7 @@ function put(key, value, map1) {
     return new ErlangTypes.Tuple(BADMAP, map1);
   }
 
-  const map2 = { ...map1, [key]: value };
+  const map2 = Object.assign({}, map1, { [key]: value });
 
   return map2;
 }
@@ -101,7 +101,7 @@ function merge(map1, map2) {
     return new ErlangTypes.Tuple(BADMAP, map2);
   }
 
-  return { ...map1, ...map2 };
+  return Object.assign({}, map1, map2);
 }
 
 function update(key, value, map1) {
@@ -113,7 +113,7 @@ function update(key, value, map1) {
     return new ErlangTypes.Tuple(BADKEY, key);
   }
 
-  return { ...map1, [key]: value };
+  return Object.assign({}, map1, { [key]: value });
 }
 
 function get(...args) {
@@ -145,7 +145,7 @@ function take(key, map1) {
   }
 
   const value = map1[key];
-  const map2 = { ...map1 };
+  const map2 = Object.assign({}, map1);
   delete map2[key];
 
   return new ErlangTypes.Tuple(value, map2);
