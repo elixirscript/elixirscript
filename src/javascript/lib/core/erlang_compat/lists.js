@@ -143,8 +143,81 @@ function mapfoldl(fun, acc0, list1) {
   return new ErlangTypes.Tuple(listResult, accResult);
 }
 
+function concat(things) {
+  return things.map(v => v.toString()).join();
+}
+
 function map(fun, list) {
   return list.map(value => fun(value));
+}
+
+function filter(pred, list1) {
+  return list1.filter(x => pred(x));
+}
+
+function filtermap(fun, list1) {
+  const list2 = [];
+
+  for (const item of list1) {
+    const value = fun(item);
+
+    if (value === true) {
+      list2.push(item);
+    } else if (value instanceof ErlangTypes.Tuple && value.get(0) === true) {
+      list2.push(value.get(1));
+    }
+  }
+
+  return list2;
+}
+
+function member(elem, list) {
+  for (const item of list) {
+    if (item === elem) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function all(pred, list) {
+  for (const item of list) {
+    if (pred(item) === false) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function any(pred, list) {
+  for (const item of list) {
+    if (pred(item) === true) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function splitwith(pred, list) {
+  let switchToList2 = false;
+  const list1 = [];
+  const list2 = [];
+
+  for (const item of list) {
+    if (switchToList2 === true) {
+      list2.push(item);
+    } else if (pred(item) === true) {
+      list1.push(item);
+    } else {
+      switchToList2 = true;
+      list2.push(item);
+    }
+  }
+
+  return new ErlangTypes.Tuple(list1, list2);
 }
 
 export default {
@@ -162,5 +235,12 @@ export default {
   keystore,
   keytake,
   mapfoldl,
+  concat,
   map,
+  filter,
+  filtermap,
+  member,
+  all,
+  any,
+  splitwith,
 };
