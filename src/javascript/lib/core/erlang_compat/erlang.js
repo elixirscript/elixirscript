@@ -197,6 +197,54 @@ function is_binary(value) {
   return typeof value === 'string' || value instanceof String;
 }
 
+function element(n, tuple) {
+  return tuple.get(n - 1);
+}
+
+function setelement(index, tuple1, value) {
+  const tupleData = [...tuple1.data];
+
+  tupleData[index - 1] = value;
+
+  return new ErlangTypes.Tuple(...tupleData);
+}
+
+function make_tuple(arity, initialValue) {
+  const list = [];
+
+  for (let i = 0; i < arity; i++) {
+    list.push(initialValue);
+  }
+
+  return new ErlangTypes.Tuple(...list);
+}
+
+function insert_element(index, tuple, term) {
+  const list = [...tuple.data];
+  list.splice(index - 1, 0, term);
+
+  return new ErlangTypes.Tuple(...list);
+}
+
+function append_element(tuple, term) {
+  const list = [...tuple.data];
+  list.push(term);
+
+  return new ErlangTypes.Tuple(...list);
+}
+
+function delete_element(index, tuple) {
+  const list = [...tuple.data];
+  list.splice(index - 1, 1);
+
+  return new ErlangTypes.Tuple(...list);
+}
+
+function tuple_to_list(tuple) {
+  const list = [...tuple.data];
+  return list;
+}
+
 export default {
   atom_to_binary,
   binary_to_atom,
@@ -239,4 +287,11 @@ export default {
   is_tuple,
   is_atom,
   is_binary,
+  element,
+  setelement,
+  make_tuple,
+  insert_element,
+  append_element,
+  delete_element,
+  tuple_to_list,
 };
