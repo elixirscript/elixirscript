@@ -45,7 +45,7 @@ function foldr(fun, acc0, list) {
 
 function keyfind(key, n, tupleList) {
   for (const tuple of tupleList) {
-    if (tuple.get(n) === key) {
+    if (tuple.get(n - 1) === key) {
       return tuple;
     }
   }
@@ -65,7 +65,7 @@ function keyreplace(key, n, tupleList, newTuple) {
   const newTupleList = [...tupleList];
 
   for (let index = 0; index < newTupleList.length; index++) {
-    if (newTupleList[index].get(n) === key) {
+    if (newTupleList[index].get(n - 1) === key) {
       newTupleList[index] = newTuple;
       return newTupleList;
     }
@@ -78,9 +78,9 @@ function keysort(n, tupleList) {
   const newTupleList = [...tupleList];
 
   return newTupleList.sort((a, b) => {
-    if (a.get(n) < b.get(n)) {
+    if (a.get(n - 1) < b.get(n - 1)) {
       return -1;
-    } else if (a.get(n) > b.get(n)) {
+    } else if (a.get(n - 1) > b.get(n - 1)) {
       return 1;
     }
 
@@ -92,7 +92,7 @@ function keystore(key, n, tupleList, newTuple) {
   const newTupleList = [...tupleList];
 
   for (let index = 0; index < newTupleList.length; index++) {
-    if (newTupleList[index].get(n) === key) {
+    if (newTupleList[index].get(n - 1) === key) {
       newTupleList[index] = newTuple;
       return newTupleList;
     }
@@ -106,7 +106,7 @@ function keydelete(key, n, tupleList) {
   let deleted = false;
 
   for (let index = 0; index < tupleList.length; index++) {
-    if (deleted === false && tupleList[index].get(n) === key) {
+    if (deleted === false && tupleList[index].get(n - 1) === key) {
       deleted = true;
     } else {
       newTupleList.push(tupleList[index]);
@@ -121,7 +121,7 @@ function keytake(key, n, tupleList) {
 
   if (result !== false) {
     return new ErlangTypes.Tuple(
-      result.get(n),
+      result.get(n - 1),
       result,
       keydelete(key, n, tupleList)
     );
