@@ -10,7 +10,7 @@ test('cond', t => {
     [true, () => 'This will'],
   ];
 
-  const result = SpecialForms.cond(clauses);
+  const result = SpecialForms.cond(...clauses);
 
   t.is(result, 'This will');
 });
