@@ -1,7 +1,7 @@
 defmodule ElixirScript.Translate.Module do
   @moduledoc false
   alias ESTree.Tools.Builder, as: J
-  alias ElixirScript.Translate.{Function, Form, Identifier}
+  alias ElixirScript.Translate.Function
   alias ElixirScript.State, as: ModuleState
 
   @doc """
@@ -28,7 +28,7 @@ defmodule ElixirScript.Translate.Module do
       module: module,
       pid: pid
     }
- 
+
     # Filter so that we only have the
     # Used functions to compile
     reachable_defs = Enum.filter(defs, fn
@@ -52,8 +52,7 @@ defmodule ElixirScript.Translate.Module do
     combined_defs = combine_defs(used_defs)
     exports = make_exports(module, combined_defs)
 
-    # Don't skip compilation and output of modules that don't have
-    # any public functions
+    # If there are no public exports, skip compilation
     case exports do
       %ESTree.ObjectExpression{ properties: [] } ->
         nil
@@ -85,7 +84,7 @@ defmodule ElixirScript.Translate.Module do
 
   defp make_exports(module, reachable_defs) do
     exports = Enum.reduce(reachable_defs, [], fn
-      {{name, arity}, :def, _, _}, list ->
+      {{name, _arity}, :def, _, _}, list ->
         function_name = ElixirScript.Translate.Identifier.make_identifier(name)
           list ++ [J.property(function_name, function_name, :init, true)]
       _, list ->
