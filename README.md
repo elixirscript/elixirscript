@@ -14,47 +14,27 @@ Usage
 Please check the [Getting Started Guide](GettingStarted.md) for usage
 
 
-FAQ, Limitations
-========
-
-Please check the [FAQ](FAQ.md)
-
-
 Development
 ===========
 
-Clone the repo
+```bash
+# Clone the repo
+git clone git@github.com:bryanjos/elixirscript.git
 
-    git clone git@github.com:bryanjos/elixirscript.git
-
-Get dependencies
-
-    mix deps.get
-    yarn
+#Get dependencies
+mix deps.get
+yarn
     
-Create Elixir.Bootstrap.js
+# Create Elixir.Bootstrap.js
+yarn build
 
-    yarn build
+# Compile
+mix compile
 
-Compile
-
-    mix compile
-
-Test
-
-    mix test
-    yarn test
-
-
-Build
-=============
-    MIX_ENV=prod mix do clean, compile, dist
-
-This will build a tarball in the dist folder.
-By default the escript built will look into the folder above it for the
-core JavaScript files needed for ElixirScript. To change the location,
-update the `lib_path` config variable in the `:elixir_script` config block
-to the path to look in and then do a clean build.
+# Test
+mix test
+yarn test
+```
 
 Communication
 ========
