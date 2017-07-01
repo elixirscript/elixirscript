@@ -111,7 +111,7 @@ defmodule ElixirScript.Output.JSModule do
         J.call_expression(
           J.member_expression(
             J.identifier("Symbol"),
-            J.identifier("for")            
+            J.identifier("for")
           ),
           [J.literal(ref.name)]
         ),

@@ -15,7 +15,7 @@ defmodule ElixirScript.Translate.Forms.Map do
       [
         J.object_expression([]),
         map,
-        data       
+        data
       ]
     )
 

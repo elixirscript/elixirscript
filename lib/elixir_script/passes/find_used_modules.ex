@@ -1,6 +1,6 @@
 defmodule ElixirScript.FindUsedModules do
   @moduledoc false
-  alias ElixirScript.State, as: ModuleState 
+  alias ElixirScript.State, as: ModuleState
 
   @doc """
   Takes a list of entry modules and finds modules they use.
@@ -27,12 +27,12 @@ defmodule ElixirScript.FindUsedModules do
 
   defp walk_module(module, info, pid) do
     %{
-      attributes: _attrs, 
+      attributes: _attrs,
       compile_opts: _compile_opts,
       definitions: defs,
       file: _file,
-      line: _line, 
-      module: ^module, 
+      line: _line,
+      module: ^module,
       unreachable: unreachable
     } = info
 
@@ -65,9 +65,9 @@ defmodule ElixirScript.FindUsedModules do
     functions = Enum.map(first_implementation_functions, fn { name, _, _, _} -> name end)
 
     ModuleState.put_module(pid, module, %{protocol: true, impls: impls, functions: functions})
-    
+
     Enum.each(implementations, fn {impl, info} ->
-      walk_module(impl, info, pid) 
+      walk_module(impl, info, pid)
     end)
   end
 
@@ -180,7 +180,7 @@ defmodule ElixirScript.FindUsedModules do
 
   defp walk({:receive, _context, blocks}, state) do
     do_block = Keyword.get(blocks, :do)
-    after_block = Keyword.get(blocks, :after, nil) 
+    after_block = Keyword.get(blocks, :after, nil)
 
     walk_block(do_block, state)
 
@@ -246,7 +246,7 @@ defmodule ElixirScript.FindUsedModules do
         end
       true ->
         walk(module, state)
-        walk(function, state)    
+        walk(function, state)
     end
   end
 
@@ -255,7 +255,7 @@ defmodule ElixirScript.FindUsedModules do
   end
 
   defp walk({function, _, params}, state) when is_list(params) do
-    walk(function, state)  
+    walk(function, state)
     walk(params, state)
   end
 

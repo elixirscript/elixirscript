@@ -23,10 +23,10 @@ defmodule Mix.Tasks.Elixirscript.Watch do
   def run(_) do
     Mix.Task.run "app.start"
 
-    {input, opts} = Mix.Tasks.Compile.ElixirScript.get_compiler_params() 
+    {input, opts} = Mix.Tasks.Compile.ElixirScript.get_compiler_params()
 
     {:ok, _} = ElixirScript.Watcher.start_link(
-      input, 
+      input,
       opts
     )
 

@@ -5,17 +5,17 @@ defmodule ElixirScript.CLI do
 
   @switches [
     output: :string,
-    help: :boolean, 
+    help: :boolean,
     version: :boolean,
-    watch: :boolean, 
-    format: :string, 
+    watch: :boolean,
+    format: :string,
     js_module: [:string, :keep]
   ]
 
   @aliases [
     o: :output,
-    h: :help, 
-    v: :version, 
+    h: :help,
+    v: :version,
     f: :format
   ]
 

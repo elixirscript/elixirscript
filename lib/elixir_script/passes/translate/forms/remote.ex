@@ -27,67 +27,67 @@ defmodule ElixirScript.Translate.Forms.Remote do
 
   def compile({:., _, [:erlang, :+]}, state) do
     ast = erlang_compat_function("erlang", "plus")
-    { ast, state }    
+    { ast, state }
   end
 
   def compile({:., _, [:erlang, :-]}, state) do
     ast = erlang_compat_function("erlang", "minus")
-    { ast, state }      
+    { ast, state }
   end
 
   def compile({:., _, [:erlang, :*]}, state) do
     ast = erlang_compat_function("erlang", "multiply")
-    { ast, state }  
+    { ast, state }
   end
 
   def compile({:., _, [:erlang, :/]}, state) do
     ast = erlang_compat_function("erlang", "div")
-    { ast, state }   
+    { ast, state }
   end
 
   def compile({:., _, [:erlang, :==]}, state) do
     ast = erlang_compat_function("erlang", "equal")
-    { ast, state }   
+    { ast, state }
   end
 
   def compile({:., _, [:erlang, :>]}, state) do
     ast = erlang_compat_function("erlang", "greaterThan")
-    { ast, state }   
+    { ast, state }
   end
 
   def compile({:., _, [:erlang, :>=]}, state) do
     ast = erlang_compat_function("erlang", "greaterThanOrEqualTo")
-    { ast, state }   
+    { ast, state }
   end
 
   def compile({:., _, [:erlang, :"/="]}, state) do
     ast = erlang_compat_function("erlang", "doesNotEqual")
-    { ast, state }   
+    { ast, state }
   end
 
   def compile({:., _, [:erlang, :"<"]}, state) do
     ast = erlang_compat_function("erlang", "lessThan")
-    { ast, state }   
+    { ast, state }
   end
 
   def compile({:., _, [:erlang, :"=<"]}, state) do
     ast = erlang_compat_function("erlang", "lessThanOrEqualTo")
-    { ast, state }   
+    { ast, state }
   end
 
   def compile({:., _, [:erlang, :"=:="]}, state) do
     ast = erlang_compat_function("erlang", "strictlyEqual")
-    { ast, state }   
+    { ast, state }
   end
 
   def compile({:., _, [:erlang, :"=/="]}, state) do
     ast = erlang_compat_function("erlang", "doesNotStrictlyEqual")
-    { ast, state }   
+    { ast, state }
   end
 
   def compile({:., _, [:erlang, function]}, state) when function in [:andalso, :and] do
     ast = erlang_compat_function("erlang", "and")
-    { ast, state }   
+    { ast, state }
   end
 
   def compile({:., _, [:erlang, function]}, state) when function in [:orelse, :or] do
@@ -97,12 +97,12 @@ defmodule ElixirScript.Translate.Forms.Remote do
 
   def compile({:., _, [:erlang, :++]}, state) do
     ast = erlang_compat_function("erlang", "list_concatenation")
-    { ast, state }   
+    { ast, state }
   end
 
   def compile({:., _, [:erlang, :--]}, state) do
     ast = erlang_compat_function("erlang", "list_substraction")
-    { ast, state }   
+    { ast, state }
   end
 
   def compile({:., _, [module, function]}, state) when module in @erlang_modules do
@@ -123,12 +123,12 @@ defmodule ElixirScript.Translate.Forms.Remote do
   def compile({:., _, [function_name]}, state) do
     Form.compile(function_name, state)
   end
-    
+
   def compile({:., _, [module, function]}, state) do
     function_name = if ElixirScript.Translate.Module.is_js_module(module, state) do
         ElixirScript.Translate.Identifier.make_extern_function_name(function)
     else
-        ElixirScript.Translate.Identifier.make_function_name(function)            
+        ElixirScript.Translate.Identifier.make_function_name(function)
     end
 
     ast = J.member_expression(
@@ -179,7 +179,7 @@ defmodule ElixirScript.Translate.Forms.Remote do
       ["JS" | rest] ->
         Identifier.make_namespace_members(rest)
       x ->
-        Identifier.make_namespace_members(x)         
+        Identifier.make_namespace_members(x)
     end
   end
 
@@ -193,6 +193,6 @@ defmodule ElixirScript.Translate.Forms.Remote do
         J.identifier(module)
       ),
       ElixirScript.Translate.Identifier.make_function_name(function)
-    )   
+    )
   end
 end

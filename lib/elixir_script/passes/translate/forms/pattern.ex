@@ -19,7 +19,7 @@ defmodule ElixirScript.Translate.Forms.Pattern do
       x, { patterns, params } ->
         {pattern, param} = process_pattern(x, state)
         { patterns ++ List.wrap(pattern), params ++ List.wrap(param) }
-    end) 
+    end)
   end
 
   defp update_env({ patterns, params }, state) do
@@ -102,7 +102,7 @@ defmodule ElixirScript.Translate.Forms.Pattern do
     { tail_patterns, tail_params } = process_pattern(tail, state)
     params = head_params ++ tail_params
 
-    { [PM.head_tail(hd(head_patterns), hd(tail_patterns))], params }  
+    { [PM.head_tail(hd(head_patterns), hd(tail_patterns))], params }
   end
 
   defp process_pattern({{:., _, [:erlang, :++]}, context, [head, tail]}, state) do

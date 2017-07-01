@@ -45,7 +45,7 @@ defmodule ElixirScript.Translate.Protocol do
       nil
     )
 
-    ModuleState.put_module(pid, module, Map.put(info, :js_ast, hd(js_ast))) 
+    ModuleState.put_module(pid, module, Map.put(info, :js_ast, hd(js_ast)))
   end
 
   defp build_implementations(impls, pid) do

@@ -19,7 +19,7 @@ defmodule ElixirScript.ModuleSystems.Common do
   end
 
   defp import_module(module_name, from) do
-    js_module_name = ElixirScript.Translate.Identifier.make_namespace_members(module_name)    
+    js_module_name = ElixirScript.Translate.Identifier.make_namespace_members(module_name)
     do_import_module(js_module_name, from)
   end
 

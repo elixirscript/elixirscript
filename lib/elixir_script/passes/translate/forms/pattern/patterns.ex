@@ -2,7 +2,7 @@ defmodule ElixirScript.Translate.Forms.Pattern.Patterns do
   @moduledoc false
 
   alias ESTree.Tools.Builder, as: J
-  
+
   @patterns J.member_expression(
     J.member_expression(
     J.identifier("Bootstrap"),

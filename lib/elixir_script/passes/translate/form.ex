@@ -144,10 +144,10 @@ defmodule ElixirScript.Translate.Form do
   def compile({:cond, _, [[do: clauses]]}, state) do
     processed_clauses = Enum.map(clauses, fn({:->, _, [clause, clause_body]}) ->
       { translated_body, state } = ElixirScript.Translate.Function.compile_block(clause_body, state)
-      
+
       translated_body = translated_body
       |> Clause.return_last_statement
-      
+
       translated_body = J.arrow_function_expression([], [], J.block_statement(translated_body))
 
       { translated_clause, _ }  = compile(hd(clause), state)

@@ -27,9 +27,12 @@ defmodule ElixirScript.Translate.Function do
       J.identifier("null")
     )
 
-    arg_matches_declaration = J.variable_declaration([arg_matches_declarator], :let)
+    arg_matches_declaration = J.variable_declaration(
+      [arg_matches_declarator],
+      :let
+    )
 
-    function_dec = J.arrow_function_expression( 
+    function_dec = J.arrow_function_expression(
       [J.rest_element(J.identifier("__function_args__"))],
       [],
       J.block_statement([
@@ -59,10 +62,13 @@ defmodule ElixirScript.Translate.Function do
       J.identifier("null")
     )
 
-    arg_matches_declaration = J.variable_declaration([arg_matches_declarator], :let)
+    arg_matches_declaration = J.variable_declaration(
+      [arg_matches_declarator],
+      :let
+    )
 
     function_dec = J.function_declaration(
-                ElixirScript.Translate.Identifier.make_function_name(name),    
+                ElixirScript.Translate.Identifier.make_function_name(name),
                 [J.rest_element(J.identifier("__function_args__"))],
                 [],
                 J.block_statement([
@@ -105,7 +111,7 @@ defmodule ElixirScript.Translate.Function do
       )
     end)
     |> Enum.reverse
-    |> Enum.reduce(nil, fn 
+    |> Enum.reduce(nil, fn
       if_ast, nil ->
         if_ast
       if_ast, ast ->
@@ -136,7 +142,7 @@ defmodule ElixirScript.Translate.Function do
         Form.compile!(body, state)
     end
 
-    body = body 
+    body = body
     |> Clause.return_last_statement
 
     declarator = J.variable_declarator(

@@ -1,6 +1,6 @@
 defmodule ElixirScript.FindUsedFunctions do
   @moduledoc false
-  alias ElixirScript.State, as: ModuleState 
+  alias ElixirScript.State, as: ModuleState
 
   @doc """
   Takes a list of entry modules and finds modules they use along with
@@ -25,12 +25,12 @@ defmodule ElixirScript.FindUsedFunctions do
 
   defp walk_module(module, pid) do
     %{
-      attributes: _attrs, 
+      attributes: _attrs,
       compile_opts: _compile_opts,
       definitions: defs,
       file: _file,
-      line: _line, 
-      module: ^module, 
+      line: _line,
+      module: ^module,
       unreachable: unreachable
     } = ModuleState.get_module(pid, module)
 
@@ -48,7 +48,7 @@ defmodule ElixirScript.FindUsedFunctions do
     Enum.each(reachable_defs, fn({name, _type, _, _clauses}) ->
       ModuleState.add_used(state.pid, module, name)
     end)
-    
+
     Enum.each(reachable_defs, &walk(&1, state))
   end
 
@@ -171,7 +171,7 @@ defmodule ElixirScript.FindUsedFunctions do
 
   defp walk({:receive, _context, blocks}, state) do
     do_block = Keyword.get(blocks, :do)
-    after_block = Keyword.get(blocks, :after, nil) 
+    after_block = Keyword.get(blocks, :after, nil)
 
     walk_block(do_block, state)
 
@@ -234,7 +234,7 @@ defmodule ElixirScript.FindUsedFunctions do
       ElixirScript.Translate.Module.is_elixir_module(module) ->
         walk_module(module, function, length(params), state.pid)
       true ->
-        nil         
+        nil
     end
 
     walk(params, state)

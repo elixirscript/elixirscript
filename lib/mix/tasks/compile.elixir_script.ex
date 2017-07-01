@@ -73,7 +73,7 @@ defmodule Mix.Tasks.Compile.ElixirScript do
       output: Keyword.get(elixirscript_config, :output),
       format: Keyword.get(elixirscript_config, :format),
       js_modules: Keyword.get(elixirscript_config, :js_modules, [])
-    ]   
+    ]
 
     {input, opts}
   end

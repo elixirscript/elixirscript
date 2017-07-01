@@ -6,7 +6,7 @@ defmodule ElixirScript.State do
   def start_link(compiler_opts) do
     Agent.start_link(fn ->
       %{
-        compiler_opts: compiler_opts, 
+        compiler_opts: compiler_opts,
         modules: Keyword.new,
         refs: []
       }
@@ -46,7 +46,7 @@ defmodule ElixirScript.State do
   def add_used(pid, module, {_function, _arity} = func) do
     Agent.update(pid, fn(state) ->
       module_info = Keyword.get(state.modules, module)
-      
+
       used = Map.get(module_info, :used, [])
       used = used ++ [func]
 
@@ -72,6 +72,6 @@ defmodule ElixirScript.State do
   def list_modules(pid) do
     Agent.get(pid, fn(state) ->
       state.modules
-    end) 
+    end)
   end
 end

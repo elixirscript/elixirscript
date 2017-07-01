@@ -3,7 +3,9 @@ defmodule ElixirScript.ModuleSystems.UMD do
   alias ESTree.Tools.Builder, as: JS
 
   def build(imports, js_imports, body, exports) do
-    module_imports = Enum.map(imports, fn {module, path} -> import_module(module, path) end)
+    module_imports = Enum.map(imports, fn
+      {module, path} -> import_module(module, path)
+    end)
 
     imports = js_imports
     |> Enum.map(fn
@@ -17,7 +19,7 @@ defmodule ElixirScript.ModuleSystems.UMD do
   end
 
   defp import_module(module_name, from) do
-    js_module_name = ElixirScript.Translate.Identifier.make_namespace_members(module_name)    
+    js_module_name = ElixirScript.Translate.Identifier.make_namespace_members(module_name)
     {js_module_name, JS.literal(from)}
   end
 

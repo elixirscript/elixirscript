@@ -137,7 +137,6 @@ defmodule ElixirScript.String do
     end
   end
 
-
   def ends_with?(str, suffix) when is_binary(suffix) do
     str.endsWith(suffix)
   end
@@ -163,7 +162,6 @@ defmodule ElixirScript.String do
     str.repeat(n)
   end
 
-
   def contains?(str, s) when is_binary(s) do
     str.indexOf(s) > -1
   end
@@ -184,7 +182,6 @@ defmodule ElixirScript.String do
         do_contains?(str, tl(prefixes))
     end
   end
-
 
   def codepoints(str) do
     do_codepoints(str, [])

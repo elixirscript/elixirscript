@@ -11,8 +11,8 @@ defmodule ElixirScript.Output do
   @spec execute([atom], pid) :: nil
   def execute(modules, pid) do
     modules = Enum.filter_map(modules, fn {_, info} -> Map.has_key?(info, :js_ast) end,
-      fn {_module, info} -> 
-        info.js_ast 
+      fn {_module, info} ->
+        info.js_ast
       end
     )
 
@@ -58,7 +58,7 @@ defmodule ElixirScript.Output do
      code
   end
 
-  defp output(code, :stdout) do 
+  defp output(code, :stdout) do
     IO.puts(code)
   end
 
@@ -78,6 +78,6 @@ defmodule ElixirScript.Output do
         path
       _ ->
         Path.join([path, @generated_name])
-    end 
+    end
   end
 end

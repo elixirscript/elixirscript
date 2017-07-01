@@ -22,7 +22,7 @@ defmodule ElixirScript.ModuleSystems.Namespace do
           JS.identifier(:build_namespace)
         )
       )
-    )   
+    )
   end
 
   defp make_namespace_body(module_name, body, exports) do
@@ -35,7 +35,7 @@ defmodule ElixirScript.ModuleSystems.Namespace do
 
     exports = if is_nil(exports) do
       JS.object_expression([])
-    else 
+    else
       exports
     end
 
@@ -44,7 +44,7 @@ defmodule ElixirScript.ModuleSystems.Namespace do
       exports
     )
 
-    declaration = JS.variable_declaration([declarator], :const)    
+    declaration = JS.variable_declaration([declarator], :const)
 
     assign = JS.assignment_expression(
       :=,

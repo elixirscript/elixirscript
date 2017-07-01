@@ -14,12 +14,12 @@ defmodule ElixirScript.Translate.Module do
 
   def compile(module, info, pid) do
     %{
-      attributes: attrs, 
+      attributes: attrs,
       compile_opts: _compile_opts,
       definitions: defs,
       file: _file,
-      line: _line, 
-      module: ^module, 
+      line: _line,
+      module: ^module,
       unreachable: unreachable,
       used: used
     } = info
@@ -58,7 +58,7 @@ defmodule ElixirScript.Translate.Module do
         nil
       _ ->
         { compiled_functions, _ } = Enum.map_reduce(combined_defs, state, &Function.compile(&1, &2))
-        
+
         js_ast = ElixirScript.ModuleSystems.Namespace.build(
           module,
           compiled_functions,
