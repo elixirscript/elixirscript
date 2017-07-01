@@ -4,7 +4,7 @@ function _case(condition, clauses) {
   return Core.Patterns.defmatch(...clauses)(condition);
 }
 
-function cond(clauses) {
+function cond(...clauses) {
   for (const clause of clauses) {
     if (clause[0]) {
       return clause[1]();
