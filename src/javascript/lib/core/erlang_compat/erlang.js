@@ -245,6 +245,70 @@ function tuple_to_list(tuple) {
   return list;
 }
 
+function abs(number) {
+  return Math.abs(number);
+}
+
+function apply(...args) {
+  if (args.length === 2) {
+    return args[0].apply(this, ...args[1]);
+  }
+
+  return args[0][atom_to_binary(args[1])].apply(this, ...args[2]);
+}
+
+function binary_part(binary, start, length) {
+  return binary.substring(start, start + length);
+}
+
+function bit_size(bitstring) {
+  return bitstring.bit_size;
+}
+
+function byte_size(bitstring) {
+  return bitstring.byte_size;
+}
+
+function hd(list) {
+  return list[0];
+}
+
+function length(list) {
+  return list.length;
+}
+
+function make_ref() {
+  return new ErlangTypes.Reference();
+}
+
+function map_size(map) {
+  return Object.keys(map).length;
+}
+
+function max(first, second) {
+  return Math.max(first, second);
+}
+
+function min(first, second) {
+  return Math.min(first, second);
+}
+
+function round(number) {
+  return Math.round(number);
+}
+
+function tl(list) {
+  return list.slice(1);
+}
+
+function trunc(number) {
+  return Math.trunc(number);
+}
+
+function tuple_size(tuple) {
+  return tuple.length;
+}
+
 export default {
   atom_to_binary,
   binary_to_atom,
@@ -294,4 +358,19 @@ export default {
   append_element,
   delete_element,
   tuple_to_list,
+  abs,
+  apply,
+  binary_part,
+  bit_size,
+  byte_size,
+  hd,
+  length,
+  make_ref,
+  map_size,
+  max,
+  min,
+  round,
+  tl,
+  trunc,
+  tuple_size
 };

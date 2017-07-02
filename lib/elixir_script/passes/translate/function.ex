@@ -68,23 +68,23 @@ defmodule ElixirScript.Translate.Function do
     )
 
     function_dec = J.function_declaration(
-                ElixirScript.Translate.Identifier.make_function_name(name),
-                [J.rest_element(J.identifier("__function_args__"))],
-                [],
-                J.block_statement([
-                  arg_matches_declaration,
-                  clauses,
-                  J.throw_statement(
-                    J.new_expression(
-                      J.member_expression(
-                        patterns_ast(),
-                        J.identifier("MatchError")
-                      ),
-                      [J.identifier("__function_args__")]
-                    )
-                  )
-                ])
-              )
+      ElixirScript.Translate.Identifier.make_function_name(name),
+      [J.rest_element(J.identifier("__function_args__"))],
+      [],
+      J.block_statement([
+        arg_matches_declaration,
+        clauses,
+        J.throw_statement(
+          J.new_expression(
+            J.member_expression(
+              patterns_ast(),
+              J.identifier("MatchError")
+            ),
+            [J.identifier("__function_args__")]
+          )
+        )
+      ])
+    )
 
     { function_dec, state }
   end
