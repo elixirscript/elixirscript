@@ -4,10 +4,12 @@ defmodule ElixirScript.Translate.Forms.Pattern do
   alias ElixirScript.Translate.Form
   alias ElixirScript.Translate.Forms.Bitstring
 
-  @moduledoc """
+  @moduledoc false
+
+  @doc """
   Handles all pattern matching translations
   """
-
+  @spec compile(list(), map()) :: { list(), list(), map() }
   def compile(patterns, state) do
     patterns
     |> do_compile(state)
@@ -40,6 +42,7 @@ defmodule ElixirScript.Translate.Forms.Pattern do
     { patterns, params, state }
   end
 
+  @spec get_variable_name(atom(), map()) :: atom()
   def get_variable_name(function, state) do
     number = Map.get(state.vars, function)
     String.to_atom("#{function}#{number}")

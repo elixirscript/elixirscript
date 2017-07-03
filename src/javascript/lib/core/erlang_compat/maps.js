@@ -24,7 +24,7 @@ function find(key, map) {
 function fold(fun, init, map) {
   let acc = init;
 
-  for (const [key, value] of Object.entries(map)) {
+  for (const [key, value] of to_list(map)) {
     acc = fun(key, value, acc);
   }
 
@@ -48,9 +48,13 @@ function to_list(map) {
     return new ErlangTypes.Tuple(BADMAP, map);
   }
 
-  return Object.entries(map).map(entry => {
-    return ErlangTypes.Tuple(...entry);
-  });
+  const list = [];
+
+  for (const key of keys(map)) {
+    list.push(new ErlangTypes.Tuple(key, map[key]));
+  }
+
+  return list;
 }
 
 function from_list(list) {
@@ -67,7 +71,17 @@ function keys(map) {
     return new ErlangTypes.Tuple(BADMAP, map);
   }
 
-  return Object.keys(map);
+  const keys = [];
+
+  for (const key of Object.getOwnPropertySymbols(map)) {
+    keys.push(key);
+  }
+
+  for (const key of Object.getOwnPropertyNames(map)) {
+    keys.push(key);
+  }
+
+  return keys;
 }
 
 function values(map) {
@@ -75,7 +89,13 @@ function values(map) {
     return new ErlangTypes.Tuple(BADMAP, map);
   }
 
-  return Object.values(map);
+  const theValues = [];
+
+  for (const key of keys(map)) {
+    theValues.push(map[key]);
+  }
+
+  return theValues;
 }
 
 function is_key(key, map) {
@@ -164,5 +184,5 @@ export default {
   merge,
   update,
   get,
-  take,
+  take
 };
