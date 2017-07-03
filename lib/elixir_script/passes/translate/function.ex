@@ -137,7 +137,7 @@ defmodule ElixirScript.Translate.Function do
         List.flatten(list)
       b when is_list(b) ->
         {list, _} = Enum.map_reduce(b, state, &Form.compile(&1, &2))
-        List.flatten(list)
+        J.array_expression(list)
       _ ->
         Form.compile!(body, state)
     end
