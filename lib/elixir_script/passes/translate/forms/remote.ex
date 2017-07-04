@@ -166,7 +166,7 @@ defmodule ElixirScript.Translate.Forms.Remote do
     Form.compile!(module, state)
   end
 
-  defp process_js_module_name(module, state) do
+  defp process_js_module_name(module, _) do
     case Module.split(module) do
       ["JS"] ->
         J.member_expression(

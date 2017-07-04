@@ -10,8 +10,9 @@ defmodule ElixirScript.Output do
   """
   @spec execute([atom], pid) :: nil
   def execute(modules, pid) do
-    modules = Enum.filter_map(modules, fn {_, info} -> Map.has_key?(info, :js_ast) end,
-      fn {_module, info} ->
+    modules = modules
+    |> Enum.filter(fn {_, info} -> Map.has_key?(info, :js_ast) end)
+    |> Enum.map(fn {_module, info} ->
         info.js_ast
       end
     )

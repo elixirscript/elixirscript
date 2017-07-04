@@ -51,7 +51,7 @@ defmodule ElixirScript.Translate.Forms.For do
     {ast, state}
   end
 
-  defp handle_args(nil, module_state) do
+  defp handle_args(nil, _) do
     %{generators: [], args: [], filter: nil, fun: nil, into: nil, patterns: []}
   end
 
@@ -123,7 +123,7 @@ defmodule ElixirScript.Translate.Forms.For do
 
 
   defp create_function_expression(ast, state, module_state) do
-    { ast, module_state } = Enum.map_reduce(List.wrap(ast), module_state, fn x, acc_state ->
+    { ast, _ } = Enum.map_reduce(List.wrap(ast), module_state, fn x, acc_state ->
        Form.compile(x, acc_state)
     end)
 

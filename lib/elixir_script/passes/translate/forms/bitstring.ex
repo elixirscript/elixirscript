@@ -98,7 +98,7 @@ defmodule ElixirScript.Translate.Forms.Bitstring do
   defp do_compile_element({type, ast}) do
     JS.call_expression(
       JS.member_expression(
-        bitstring_class,
+        bitstring_class(),
         JS.identifier(type)
       ),
       [
@@ -110,7 +110,7 @@ defmodule ElixirScript.Translate.Forms.Bitstring do
   defp do_compile_element({type, ast, params}) when is_list(params) do
     JS.call_expression(
       JS.member_expression(
-        bitstring_class,
+        bitstring_class(),
         JS.identifier(type)
       ),
       [

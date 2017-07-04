@@ -1,7 +1,7 @@
 defmodule ElixirScript.Translate.Protocol do
   @moduledoc false
   alias ESTree.Tools.Builder, as: J
-  alias ElixirScript.Translate.{Function, Form, Identifier}
+  alias ElixirScript.Translate.{Function, Identifier}
   alias ElixirScript.State, as: ModuleState
 
 
@@ -34,21 +34,20 @@ defmodule ElixirScript.Translate.Protocol do
 
     declaration = J.variable_declaration([declarator], :const)
 
-    body = build_implementations(impls, pid)
+    body = build_implementations(impls)
 
     body = [declaration] ++ body
 
     js_ast = ElixirScript.ModuleSystems.Namespace.build(
       module,
       body,
-      J.identifier("protocol"),
-      nil
+      J.identifier("protocol")
     )
 
     ModuleState.put_module(pid, module, Map.put(info, :js_ast, hd(js_ast)))
   end
 
-  defp build_implementations(impls, pid) do
+  defp build_implementations(impls) do
     Enum.map(impls, fn({impl, impl_for}) ->
       members = ["Elixir"] ++ Module.split(impl) ++ ["__load"]
 
@@ -165,7 +164,7 @@ defmodule ElixirScript.Translate.Protocol do
     case Module.split(module) do
       ["JS" | rest] ->
         Identifier.make_namespace_members(rest)
-      split_module ->
+      _ ->
         J.call_expression(
           J.member_expression(
             J.identifier("Symbol"),

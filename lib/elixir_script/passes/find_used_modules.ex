@@ -95,7 +95,7 @@ defmodule ElixirScript.FindUsedModules do
     walk(tail, state)
   end
 
-  defp walk({:::, _, _}, state) do
+  defp walk({:::, _, _}, _) do
     nil
   end
 
@@ -232,7 +232,7 @@ defmodule ElixirScript.FindUsedModules do
     walk({function, [], params}, state)
   end
 
-  defp walk({:., _, [JS, _]}, state) do
+  defp walk({:., _, [JS, _]}, _) do
     nil
   end
 

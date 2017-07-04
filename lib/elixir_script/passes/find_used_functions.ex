@@ -98,7 +98,7 @@ defmodule ElixirScript.FindUsedFunctions do
     walk(tail, state)
   end
 
-  defp walk({:::, _, _}, state) do
+  defp walk({:::, _, _}, _) do
     nil
   end
 
