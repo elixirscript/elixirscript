@@ -95,8 +95,8 @@ defmodule ElixirScript.FindUsedModules do
     walk(tail, state)
   end
 
-  defp walk({:::, _, _}, _) do
-    nil
+  defp walk({:::, _, [target, _type]}, state) do
+    walk(target, state)
   end
 
   defp walk(form, state) when is_list(form) do
