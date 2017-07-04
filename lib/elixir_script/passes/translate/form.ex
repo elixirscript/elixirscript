@@ -90,8 +90,23 @@ defmodule ElixirScript.Translate.Form do
     ElixirScript.Translate.Forms.Map.compile(map, state)
   end
 
-  def compile({:<<>>, _, _} = bitstring, state) do
-    Bitstring.compile(bitstring, state)
+  def compile({:<<>>, _, elements} = bitstring, state) do
+    is_interpolated_string = Enum.all?(elements, fn(x) ->
+      case x do
+        b when is_binary(b) ->
+          true
+        {:::, _, [_target, {:binary, _, _}]} ->
+          true
+        _ ->
+          false
+      end
+    end)
+
+    if is_interpolated_string do
+      Bitstring.make_interpolated_string(elements, state)
+    else
+      Bitstring.compile(bitstring, state)
+    end
   end
 
   def compile({:=, _, [_, _]} = match, state) do
