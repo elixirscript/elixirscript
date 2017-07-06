@@ -39,6 +39,13 @@ defmodule ElixirScript.Translate.Forms.JS do
   def compile({{:., _, [JS, :new]}, _, [module, params]}, state) do
     members = Module.split(module)
 
+    members = case members do
+      ["JS" | rest] ->
+        rest
+      x ->
+        x
+    end
+
     params = case params do
       p when is_list(p) ->
         Enum.map(params, &Form.compile!(&1, state))

@@ -36,7 +36,8 @@ defmodule ElixirScript.FindUsedFunctions do
 
     reachable_defs = Enum.filter(defs, fn
       { _, type, _, _} when type in [:defmacro, :defmacrop] -> false
-      { name, _, _, _} -> not(name in unreachable)
+      { name, _, _, _} ->
+        not(name in unreachable)
       _ -> true
     end)
 
@@ -128,8 +129,8 @@ defmodule ElixirScript.FindUsedFunctions do
   end
 
   defp walk({:%, _, [module, params]}, state) do
-    ModuleState.add_used(state.pid, module, {:__struct__, 0})
-    ModuleState.add_used(state.pid, module, {:__struct__, 1})
+    walk_module(module, :__struct__, 0, state.pid)
+    walk_module(module, :__struct__, 1, state.pid)
     walk(params, state)
   end
 

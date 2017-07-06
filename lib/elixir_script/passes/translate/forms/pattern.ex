@@ -118,6 +118,21 @@ defmodule ElixirScript.Translate.Forms.Pattern do
 
   defp process_pattern({:%{}, _, props}, state) do
     properties = Enum.map(props, fn
+      {:__module__struct__, {_, _, nil} = var } ->
+       {pattern, params} = process_pattern(var, state)
+
+        a = J.object_expression([%ESTree.Property{
+            key: J.identifier("__MODULE__"),
+            value: hd(List.wrap(pattern))
+          }])
+
+        property = ElixirScript.Translate.Forms.Map.make_property(
+          Form.compile!(:__struct__, state),
+          a
+        )
+
+        { property, params }
+
       {:__module__struct__, module} ->
         a = J.object_expression([%ESTree.Property{
             key: J.identifier("__MODULE__"),

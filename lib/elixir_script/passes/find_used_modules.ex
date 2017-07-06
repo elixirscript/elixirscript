@@ -232,6 +232,11 @@ defmodule ElixirScript.FindUsedModules do
     walk({function, [], params}, state)
   end
 
+  defp walk({{:., _, [module, function]} = ast, _, params}, state) do
+    walk(ast, state)
+    walk(params, state)
+  end
+
   defp walk({:., _, [JS, _]}, _) do
     nil
   end

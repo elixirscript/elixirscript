@@ -8,12 +8,12 @@ export default {
   plugins: [
     nodeResolve({ jsnext: true }),
     babel({
-      babelrc: false,
-    }),
-    babili({
-      keepFnName: true,
-      keepClassName: true,
-    }),
+      babelrc: false
+    })
+    //babili({
+    //  keepFnName: true,
+    //  keepClassName: true,
+    //}),
   ],
-  targets: [{ dest: 'priv/build/iife/Elixir.Bootstrap.js', format: 'iife' }],
+  targets: [{ dest: 'priv/build/iife/Elixir.Bootstrap.js', format: 'iife' }]
 };

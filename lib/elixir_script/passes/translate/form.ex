@@ -207,6 +207,15 @@ defmodule ElixirScript.Translate.Form do
     ElixirScript.Translate.Function.compile(ast, state)
   end
 
+  def compile({{:., _, [{_, _, nil} = var, func_or_prop]}, _, []}, state) do
+    ast = J.call_expression(
+      ElixirScript.Translate.Forms.JS.call_property(),
+      [compile!(var, state), J.literal(to_string(func_or_prop))]
+    )
+
+    {ast, state}
+  end
+
   def compile({{:., _, [JS, _]}, _, _} = ast, state) do
     ElixirScript.Translate.Forms.JS.compile(ast, state)
   end

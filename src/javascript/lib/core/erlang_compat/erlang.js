@@ -202,7 +202,7 @@ function element(n, tuple) {
 }
 
 function setelement(index, tuple1, value) {
-  const tupleData = [...tuple1.data];
+  const tupleData = [...tuple1.values];
 
   tupleData[index - 1] = value;
 
@@ -220,28 +220,28 @@ function make_tuple(arity, initialValue) {
 }
 
 function insert_element(index, tuple, term) {
-  const list = [...tuple.data];
+  const list = [...tuple.values];
   list.splice(index - 1, 0, term);
 
   return new ErlangTypes.Tuple(...list);
 }
 
 function append_element(tuple, term) {
-  const list = [...tuple.data];
+  const list = [...tuple.values];
   list.push(term);
 
   return new ErlangTypes.Tuple(...list);
 }
 
 function delete_element(index, tuple) {
-  const list = [...tuple.data];
+  const list = [...tuple.values];
   list.splice(index - 1, 1);
 
   return new ErlangTypes.Tuple(...list);
 }
 
 function tuple_to_list(tuple) {
-  const list = [...tuple.data];
+  const list = [...tuple.values];
   return list;
 }
 

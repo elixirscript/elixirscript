@@ -20,6 +20,16 @@ defmodule ElixirScript.Beam do
     end
   end
 
+  #Replacing Agent module with our ElixirScript's version
+  def debug_info(Agent) do
+    case debug_info(ElixirScript.Agent) do
+      {:ok, info} ->
+        {:ok, Map.put(info, :module, Agent)}
+      e ->
+        e
+    end
+  end
+
   def debug_info(module) when is_atom(module) do
     #TODO: Get modified date from _beam_path to check for cached version?
     with  {_, beam, _beam_path} <- :code.get_object_code(module),

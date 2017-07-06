@@ -129,7 +129,7 @@ function update(key, value, map1) {
     return new ErlangTypes.Tuple(BADMAP, map1);
   }
 
-  if (is_key(key) === false) {
+  if (is_key(key, map1) === false) {
     return new ErlangTypes.Tuple(BADKEY, key);
   }
 

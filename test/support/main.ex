@@ -2,6 +2,10 @@ defmodule Main do
   def start(:normal, [callback]) do
     callback.("started")
 
-    Enum.each(1..3, fn x -> JS.console.log(x)  end)
+    JS.fetch("/api/todo").then(fn(response) ->
+      response.json()
+    end).catch(fn(err) ->
+      :console.debug(err)
+    end)
   end
 end
