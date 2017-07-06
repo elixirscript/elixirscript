@@ -42,7 +42,7 @@ defmodule ElixirScript.Translate.Forms.JS do
     params = case params do
       p when is_list(p) ->
         Enum.map(params, &Form.compile!(&1, state))
-      p ->
+      _ ->
         [J.rest_element(Form.compile!(params, state))]
     end
 

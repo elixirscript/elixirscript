@@ -38,7 +38,7 @@ defmodule ElixirScript.Translate.Forms.Match do
 
     js_ast = case left do
       list when is_list(list) ->
-        make_list_ref(array_pattern, params, state)
+        make_list_ref(array_pattern, params)
       { _, _ } ->
         make_tuple_ref(array_pattern, params)
       {:{}, _, _ } ->
@@ -58,7 +58,7 @@ defmodule ElixirScript.Translate.Forms.Match do
   end
 
 
-  defp make_list_ref(array_pattern, params, state) do
+  defp make_list_ref(array_pattern, params) do
     {ref, params} = make_params(params)
 
     ref_declarator = J.variable_declarator(ref, J.array_expression(params))

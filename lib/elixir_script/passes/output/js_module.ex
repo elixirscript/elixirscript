@@ -12,14 +12,14 @@ defmodule ElixirScript.Output.JSModule do
     elixir = J.variable_declaration([declarator], :const)
 
     table_additions = Enum.map(opts.js_modules, fn
-      {module, path} -> add_import_to_table(module)
-      {module, path, _} -> add_import_to_table(module)
+      {module, _} -> add_import_to_table(module)
+      {module, _, _} -> add_import_to_table(module)
     end)
 
     ast = opts.module_formatter.build(
       [],
       opts.js_modules,
-      [elixir, create_atom_table(), start, load] ++ table_additions ++ body,
+      [elixir, create_atom_table(), start(), load()] ++ table_additions ++ body,
       J.identifier("Elixir")
     )
 

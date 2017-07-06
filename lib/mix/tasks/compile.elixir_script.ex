@@ -37,23 +37,17 @@ defmodule Mix.Tasks.Compile.ElixirScript do
 
   @spec run(any()) :: :ok
   def run(_) do
-    elixirscript_base = Path.join([Mix.Project.build_path, "elixirscript"])
-    do_compile(elixirscript_base, Mix.Project.config[:app])
+    do_compile()
     :ok
   end
 
-  defp do_compile(_, nil) do
-    raise ElixirScript.CompileError, message: "Unable to find mix project app name"
-  end
-
-  defp do_compile(elixirscript_base, app) do
-
+  defp do_compile() do
     {input, opts} = get_compiler_params()
     ElixirScript.Compiler.compile(input, opts)
   end
 
   def clean do
-    {input, opts} = get_compiler_params()
+    {_, opts} = get_compiler_params()
 
     case opts[:output] do
       path when is_binary(path) ->
@@ -77,7 +71,6 @@ defmodule Mix.Tasks.Compile.ElixirScript do
 
     {input, opts}
   end
-
 
   defp get_elixirscript_config() do
     config  = Mix.Project.config

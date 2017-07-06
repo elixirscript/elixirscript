@@ -31,7 +31,8 @@ defmodule ElixirScript.Mixfile do
       {:fs, "~> 3.4"},
       {:ex_doc, "~> 0.16", only: :dev},
       {:excoveralls, "~> 0.7", only: :test},
-      {:credo, "~> 0.8", only: [:dev, :test]}
+      {:credo, "~> 0.8", only: [:dev, :test]},
+      {:poison, "~> 3.1", only: [:dev, :test]}
     ]
   end
 

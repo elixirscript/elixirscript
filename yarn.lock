@@ -3771,9 +3771,9 @@ table@^3.7.8:
     slice-ansi "0.0.4"
     string-width "^2.0.0"
 
-tailored@^2.4.6:
-  version "2.4.6"
-  resolved "https://registry.yarnpkg.com/tailored/-/tailored-2.4.6.tgz#1425d01bfc0e69ae0f8edb7030f82d6f0239d00f"
+tailored@^2.4.7:
+  version "2.4.7"
+  resolved "https://registry.yarnpkg.com/tailored/-/tailored-2.4.7.tgz#1d90846b4885631be00cfd8bc9f56b0dec1686bf"
   dependencies:
     erlang-types "^1.0.0"
 

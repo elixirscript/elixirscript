@@ -22,7 +22,7 @@ defmodule ElixirScript.Watcher do
   def handle_info({_pid, {:fs, :file_event}, {path, event}}, state) do
 
     try do
-      if input_changed?(to_string(path), state) do
+      if input_changed?(to_string(path)) do
         Logger.debug fn() ->
           "Event: #{inspect event} Path: #{path}"
         end
@@ -36,7 +36,7 @@ defmodule ElixirScript.Watcher do
     {:noreply, state}
   end
 
-  defp input_changed?(path, state) do
+  defp input_changed?(path) do
     case Path.extname(path) do
       ".beam" ->
         true

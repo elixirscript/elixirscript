@@ -92,7 +92,7 @@ defmodule ElixirScript.Translate.Function do
   defp compile_clauses(clauses, state) do
     clauses
     |> Enum.map(&compile_clause(&1, state))
-    |> Enum.map(fn {patterns, params, guards, body} ->
+    |> Enum.map(fn {patterns, _params, guards, body} ->
       match_or_default_call = J.call_expression(
         J.member_expression(
           patterns_ast(),
@@ -129,18 +129,7 @@ defmodule ElixirScript.Translate.Function do
     {patterns, params, state} = Pattern.compile(args, state)
     guard = Clause.compile_guard(params, guards, state)
 
-    body = case body do
-      nil ->
-        J.identifier("null")
-      {:__block__, _, block_body} ->
-        {list, _} = Enum.map_reduce(block_body, state, &Form.compile(&1, &2))
-        List.flatten(list)
-      b when is_list(b) ->
-        {list, _} = Enum.map_reduce(b, state, &Form.compile(&1, &2))
-        J.array_expression(list)
-      _ ->
-        Form.compile!(body, state)
-    end
+    {body, _state} = compile_block(body, state)
 
     body = body
     |> Clause.return_last_statement
@@ -173,9 +162,6 @@ defmodule ElixirScript.Translate.Function do
         J.identifier("null")
       {:__block__, _, block_body} ->
         {list, _} = Enum.map_reduce(block_body, state, &Form.compile(&1, &2))
-        List.flatten(list)
-      b when is_list(b) ->
-        {list, _} = Enum.map_reduce(b, state, &Form.compile(&1, &2))
         List.flatten(list)
       _ ->
         Form.compile!(block, state)

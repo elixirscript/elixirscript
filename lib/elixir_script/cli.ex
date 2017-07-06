@@ -54,7 +54,7 @@ defmodule ElixirScript.CLI do
   end
 
   def process(:help) do
-    IO.write help_message
+    IO.write help_message()
   end
 
   def process(:version) do
@@ -101,7 +101,7 @@ defmodule ElixirScript.CLI do
   end
 
   defp handle_input(input) do
-    input = input
+    input
     |> Enum.map(fn(x) -> String.split(x, [" ", ","], trim: true) end)
     |> List.flatten
     |> Enum.map(fn(x) -> Module.concat([x]) end)

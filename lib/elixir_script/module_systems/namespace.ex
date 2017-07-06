@@ -3,7 +3,7 @@ defmodule ElixirScript.ModuleSystems.Namespace do
   alias ESTree.Tools.Builder, as: JS
   alias ElixirScript.Translate.Identifier
 
-  def build(module_name, body, exports, env) do
+  def build(module_name, body, exports) do
     List.wrap(make_namespace_body(module_name, body, exports))
   end
 
@@ -28,7 +28,7 @@ defmodule ElixirScript.ModuleSystems.Namespace do
   defp make_namespace_body(module_name, body, exports) do
     values = module_name_function_call(module_name, "__exports")
 
-    _if = JS.if_statement(
+    js_if = JS.if_statement(
       values,
       JS.return_statement(values)
     )
@@ -62,7 +62,7 @@ defmodule ElixirScript.ModuleSystems.Namespace do
           JS.identifier("__load")
     )
 
-    func_body = JS.block_statement([_if] ++ body ++ [declaration, assign] ++ exports)
+    func_body = JS.block_statement([js_if] ++ body ++ [declaration, assign] ++ exports)
 
     func = JS.function_expression([JS.identifier("Elixir")], [], func_body)
     JS.assignment_expression(

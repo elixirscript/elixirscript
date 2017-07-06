@@ -1,8 +1,7 @@
 defmodule ElixirScript.Translate.Form do
   alias ESTree.Tools.Builder, as: J
   alias ElixirScript.Translate.Forms.{Bitstring, Match, Try, For, Receive, Remote, Pattern}
-  alias ElixirScript.Translate.Functions.{Erlang, Lists, Maps}
-  alias ElixirScript.Translate.{Identifier, Clause}
+  alias ElixirScript.Translate.Clause
   require Logger
 
   @moduledoc """
@@ -91,8 +90,23 @@ defmodule ElixirScript.Translate.Form do
     ElixirScript.Translate.Forms.Map.compile(map, state)
   end
 
-  def compile({:<<>>, _, _} = bitstring, state) do
-    Bitstring.compile(bitstring, state)
+  def compile({:<<>>, _, elements} = bitstring, state) do
+    is_interpolated_string = Enum.all?(elements, fn(x) ->
+      case x do
+        b when is_binary(b) ->
+          true
+        {:::, _, [_target, {:binary, _, _}]} ->
+          true
+        _ ->
+          false
+      end
+    end)
+
+    if is_interpolated_string do
+      Bitstring.make_interpolated_string(elements, state)
+    else
+      Bitstring.compile(bitstring, state)
+    end
   end
 
   def compile({:=, _, [_, _]} = match, state) do
@@ -178,7 +192,7 @@ defmodule ElixirScript.Translate.Form do
 
   def compile({:receive, context, [blocks]}, state) do
     line = Keyword.get(context, :line, 1)
-    {function, arity} = Map.get(state, :function)
+    {function, _arity} = Map.get(state, :function)
     Logger.warn fn() ->
       "receive not supported, Module: #{inspect state.module}, Function: #{function}, Line: #{line}"
     end
@@ -201,7 +215,7 @@ defmodule ElixirScript.Translate.Form do
     Remote.compile(ast, state)
   end
 
-  def compile({:super, context, params}, state) when is_list(params) do
+  def compile({:super, _, params}, state) when is_list(params) do
     {function_name, _} = Map.get(state, :function)
     {var_decs, params} = compile_params(params, state)
 
@@ -259,7 +273,7 @@ defmodule ElixirScript.Translate.Form do
     end
   end
 
-  def compile({var, _, _} = ast, state) do
+  def compile({var, _, _}, state) do
     var = Pattern.get_variable_name(to_string(var), state)
     { ElixirScript.Translate.Identifier.make_identifier(var), state }
   end

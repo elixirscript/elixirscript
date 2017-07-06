@@ -64,7 +64,7 @@ defmodule ElixirScript.Translate.Forms.Try do
 
   defp process_rescue_block(rescue_block, state) do
     processed_clauses = Enum.map(rescue_block, fn
-      {:->, _, [ [{:in, _, [param, names]} = pattern], body]} ->
+      {:->, _, [ [{:in, _, [param, names]}], body]} ->
         {ast, _} = Clause.compile({[], [param], [{{:., [], [Enum, :member?]}, [], [param, names]}], body}, state)
         ast
       {:->, _, [ [param], body]} ->
@@ -91,7 +91,7 @@ defmodule ElixirScript.Translate.Forms.Try do
   end
 
   defp prepare_function_body(body, state) do
-    {ast, state} = Function.compile_block(body, state)
+    {ast, _} = Function.compile_block(body, state)
 
     Clause.return_last_statement(ast)
   end

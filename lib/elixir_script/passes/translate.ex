@@ -1,9 +1,6 @@
 defmodule ElixirScript.Translate do
   @moduledoc false
 
-  alias ElixirScript.State, as: ModuleState
-  alias ESTree.Tools.{Builder, Generator}
-
   @doc """
   Takes a list of modules and translates their ast into
   JavaScript AST. The modules are the ones collected from
