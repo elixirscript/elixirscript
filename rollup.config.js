@@ -9,11 +9,11 @@ export default {
     nodeResolve({ jsnext: true }),
     babel({
       babelrc: false
+    }),
+    babili({
+      keepFnName: true,
+      keepClassName: true
     })
-    //babili({
-    //  keepFnName: true,
-    //  keepClassName: true,
-    //}),
   ],
   targets: [{ dest: 'priv/build/iife/Elixir.Bootstrap.js', format: 'iife' }]
 };
