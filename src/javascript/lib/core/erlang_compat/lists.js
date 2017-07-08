@@ -263,5 +263,5 @@ export default {
   all,
   any,
   splitwith,
-  sort,
+  sort
 };

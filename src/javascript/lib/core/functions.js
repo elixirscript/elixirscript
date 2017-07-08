@@ -24,7 +24,7 @@ function iterator_to_reducer(iterable, acc, fun) {
 
 function call_property(item, property) {
   if (!property) {
-    if (item instanceof Function) {
+    if (item instanceof Function || typeof item === 'function') {
       return item();
     }
 
@@ -54,7 +54,7 @@ function call_property(item, property) {
     throw new Error(`Property ${property} not found in ${item}`);
   }
 
-  if (item[prop] instanceof Function) {
+  if (item[prop] instanceof Function || typeof item[prop] === 'function') {
     return item[prop]();
   }
   return item[prop];
@@ -96,5 +96,5 @@ export default {
   defprotocol,
   defimpl,
   build_namespace,
-  iterator_to_reducer,
+  iterator_to_reducer
 };
