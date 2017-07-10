@@ -12,6 +12,12 @@ defmodule ElixirScript.Translate.Module do
     ElixirScript.Translate.Protocol.compile(module, info, pid)
   end
 
+  def compile(module, %{attributes: [__foreign_info__: %{path: path}]}, pid) do
+    ModuleState.put_javascript_module(pid, module, path)
+
+    nil
+  end
+
   def compile(module, info, pid) do
     %{
       attributes: attrs,
@@ -133,12 +139,10 @@ defmodule ElixirScript.Translate.Module do
   """
   def is_js_module(module, state) do
     cond do
-      module in ModuleState.get_javascript_modules(state.pid) ->
+      module in ModuleState.list_javascript_modules(state.pid) ->
         true
       module === Elixir ->
         false
-      is_elixir_module(module) and hd(Module.split(module)) == "JS" ->
-        true
       true ->
         false
     end

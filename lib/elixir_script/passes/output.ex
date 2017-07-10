@@ -19,13 +19,13 @@ defmodule ElixirScript.Output do
 
     opts = ModuleState.get_compiler_opts(pid)
 
-    bundle(modules, opts)
+    bundle(modules, opts, ModuleState.js_modules(pid))
     |> output(Map.get(opts, :output))
   end
 
-  defp bundle(modules, opts) do
+  defp bundle(modules, opts, js_modules) do
     modules
-    |> ElixirScript.Output.JSModule.compile(opts)
+    |> ElixirScript.Output.JSModule.compile(opts, js_modules)
     |> List.wrap
     |> Builder.program
     |> prepare_js_ast

@@ -2,51 +2,47 @@ defmodule ElixirScript.Agent do
   @moduledoc false
 
   def start(fun, options \\ []) do
-    pid = JS.new JS.Bootstrap.Core.PID, []
-
     name = if Keyword.has_key?(options, :name) do
       Keyword.get(options, :name)
     else
       nil
     end
 
-    ElixirScript.Store.create(pid, fun.(), name)
+    pid = Bootstrap.Core.Store.create(fun.(), name)
     { :ok, pid }
   end
 
   def start_link(fun, options \\ []) do
-    pid = JS.new JS.Bootstrap.Core.PID, []
-
     name = if Keyword.has_key?(options, :name) do
       Keyword.get(options, :name)
     else
       nil
     end
 
-    ElixirScript.Store.create(pid, fun.(), name)
+    pid = Bootstrap.Core.Store.create(fun.(), name)
     { :ok, pid }
   end
 
   def stop(agent) do
-    ElixirScript.Store.remove(agent)
+    Bootstrap.Core.Store.remove(agent)
     :ok
   end
 
   def update(agent, fun) do
-    current_state = ElixirScript.Store.read(agent)
-    ElixirScript.Store.update(agent, fun.(current_state))
+    current_state = Bootstrap.Core.Store.read(agent)
+    Bootstrap.Core.Store.update(agent, fun.(current_state))
     :ok
   end
 
   def get(agent, fun) do
-    current_state = ElixirScript.Store.read(agent)
+    current_state = Bootstrap.Core.Store.read(agent)
     fun.(current_state)
   end
 
   def get_and_update(agent, fun) do
-    current_state = ElixirScript.Store.read(agent)
+    current_state = Bootstrap.Core.Store.read(agent)
     {val, new_state} = fun.(current_state)
-    ElixirScript.Store.update(agent, new_state)
+    Bootstrap.Core.Store.update(agent, new_state)
     val
   end
 

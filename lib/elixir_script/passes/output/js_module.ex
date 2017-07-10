@@ -3,7 +3,7 @@ defmodule ElixirScript.Output.JSModule do
 
   alias ESTree.Tools.Builder, as: J
 
-  def compile(body, opts) do
+  def compile(body, opts, js_modules) do
     declarator = J.variable_declarator(
       J.identifier("Elixir"),
       J.object_expression([])
@@ -11,14 +11,14 @@ defmodule ElixirScript.Output.JSModule do
 
     elixir = J.variable_declaration([declarator], :const)
 
-    table_additions = Enum.map(opts.js_modules, fn
+    table_additions = Enum.map(js_modules, fn
       {module, _} -> add_import_to_table(module)
       {module, _, _} -> add_import_to_table(module)
     end)
 
     ast = opts.module_formatter.build(
       [],
-      opts.js_modules,
+      js_modules,
       [elixir, create_atom_table(), start(), load()] ++ table_additions ++ body,
       J.identifier("Elixir")
     )

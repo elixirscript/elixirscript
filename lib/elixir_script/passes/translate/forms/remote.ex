@@ -167,20 +167,7 @@ defmodule ElixirScript.Translate.Forms.Remote do
   end
 
   defp process_js_module_name(module, _) do
-    case Module.split(module) do
-      ["JS"] ->
-        J.member_expression(
-          J.member_expression(
-            J.identifier("Bootstrap"),
-            J.identifier("Core")
-          ),
-          J.identifier("global")
-        )
-      ["JS" | rest] ->
-        Identifier.make_namespace_members(rest)
-      x ->
-        Identifier.make_namespace_members(x)
-    end
+    Identifier.make_namespace_members(module)
   end
 
   defp erlang_compat_function(module, function) do

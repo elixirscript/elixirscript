@@ -8,7 +8,8 @@ defmodule ElixirScript.State do
       %{
         compiler_opts: compiler_opts,
         modules: Keyword.new,
-        refs: []
+        refs: [],
+        js_modules: []
       }
     end)
   end
@@ -57,14 +58,43 @@ defmodule ElixirScript.State do
     end)
   end
 
-  def get_javascript_modules(pid) do
+  def put_javascript_module(pid, module, path) do
+    Agent.update(pid, fn(state) ->
+      js_modules = Map.get(state, :js_modules, [])
+      js_modules = js_modules ++ [{module, path}]
+
+      %{ state | js_modules: js_modules }
+    end)
+  end
+
+  def list_javascript_modules(pid) do
     Agent.get(pid, fn(state) ->
-      Map.get(state.compiler_opts, :js_modules, [])
+      state.js_modules
       |> Enum.map(fn
         {module_name, _path} ->
           module_name
         {module_name, _path, _opts} ->
           module_name
+      end)
+    end)
+  end
+
+  def js_modules(pid) do
+    Agent.get(pid, fn(state) ->
+      state.js_modules
+      |> Enum.filter(fn
+          {_, nil} -> false
+          _ -> true
+        end)
+    end)
+  end
+
+  def list_foreign_modules(pid) do
+    Agent.get(pid, fn(state) ->
+      state.modules
+      |> Enum.filter(fn
+        (%{attributes: [__foreign_info__: _]}) -> true
+        (_) -> false
       end)
     end)
   end

@@ -5,6 +5,7 @@ import SpecialForms from './core/special_forms';
 import erlang from './core/erlang_compat/erlang';
 import maps from './core/erlang_compat/maps';
 import lists from './core/erlang_compat/lists';
+import Store from './core/store';
 
 class Integer {}
 class Float {}
@@ -36,8 +37,9 @@ export default {
   Float,
   Functions,
   SpecialForms,
+  Store,
   global: globalState,
   erlang,
   maps,
-  lists,
+  lists
 };
