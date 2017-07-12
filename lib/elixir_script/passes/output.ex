@@ -19,6 +19,12 @@ defmodule ElixirScript.Output do
 
     opts = ModuleState.get_compiler_opts(pid)
 
+    #TODO: Combine Mix.Project.config()[:app] with Mix.Project.deps_paths() to
+    # get app names.
+    # File.exists? Path.join([:code.priv_dir(app), "src", "elixir_script"])
+    # to find out if app has interop files.
+    # If so, copy files and directories to output folder
+
     bundle(modules, opts, ModuleState.js_modules(pid))
     |> output(Map.get(opts, :output))
   end

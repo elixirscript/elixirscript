@@ -1,4 +1,4 @@
-defmodule JSON do
+defmodule Data.JSON do
   use ElixirScript.FFI
 
   foreign stringify(map)

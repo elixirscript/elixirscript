@@ -58,10 +58,10 @@ defmodule ElixirScript.State do
     end)
   end
 
-  def put_javascript_module(pid, module, path) do
+  def put_javascript_module(pid, module, name, path) do
     Agent.update(pid, fn(state) ->
       js_modules = Map.get(state, :js_modules, [])
-      js_modules = js_modules ++ [{module, path}]
+      js_modules = js_modules ++ [{module, name, path}]
 
       %{ state | js_modules: js_modules }
     end)
@@ -71,10 +71,8 @@ defmodule ElixirScript.State do
     Agent.get(pid, fn(state) ->
       state.js_modules
       |> Enum.map(fn
-        {module_name, _path} ->
-          module_name
-        {module_name, _path, _opts} ->
-          module_name
+        {module, _name, _path} ->
+          module
       end)
     end)
   end
@@ -82,10 +80,14 @@ defmodule ElixirScript.State do
   def js_modules(pid) do
     Agent.get(pid, fn(state) ->
       state.js_modules
-      |> Enum.filter(fn
-          {_, nil} -> false
-          _ -> true
-        end)
+    end)
+  end
+
+  def get_js_module_name(pid, module) do
+    Agent.get(pid, fn(state) ->
+      {_, name, _} = state.js_modules
+      |> Enum.find(fn {m, _, _} -> module == m end)
+      name
     end)
   end
 

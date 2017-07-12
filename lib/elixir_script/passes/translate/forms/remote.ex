@@ -3,6 +3,7 @@ defmodule ElixirScript.Translate.Forms.Remote do
 
   alias ESTree.Tools.Builder, as: J
   alias ElixirScript.Translate.{Form, Identifier}
+  alias ElixirScript.State, as: ModuleState
 
   @erlang_modules [
     :erlang,
@@ -166,8 +167,9 @@ defmodule ElixirScript.Translate.Forms.Remote do
     Form.compile!(module, state)
   end
 
-  defp process_js_module_name(module, _) do
-    Identifier.make_namespace_members(module)
+  defp process_js_module_name(module, state) do
+    name = ModuleState.get_js_module_name(state.pid, module)
+    J.identifier(name)
   end
 
   defp erlang_compat_function(module, function) do

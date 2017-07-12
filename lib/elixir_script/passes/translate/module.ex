@@ -12,8 +12,8 @@ defmodule ElixirScript.Translate.Module do
     ElixirScript.Translate.Protocol.compile(module, info, pid)
   end
 
-  def compile(module, %{attributes: [__foreign_info__: %{path: path}]}, pid) do
-    ModuleState.put_javascript_module(pid, module, path)
+  def compile(module, %{attributes: [__foreign_info__: %{path: path, name: name}]}, pid) do
+    ModuleState.put_javascript_module(pid, name, path)
 
     nil
   end

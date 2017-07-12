@@ -7,7 +7,7 @@ defmodule ElixirScript.ModuleSystems.Common do
 
     imports = js_imports
     |> Enum.map(fn
-      {module, path} -> import_module(module, path)
+      {_module, name, path} -> import_module(name, path)
     end)
 
     imports = Enum.uniq(imports ++ module_imports)
@@ -16,8 +16,8 @@ defmodule ElixirScript.ModuleSystems.Common do
     imports ++ body ++ export
   end
 
-  defp import_module(module_name, from) do
-    js_module_name = ElixirScript.Translate.Identifier.make_namespace_members(module_name)
+  defp import_module(name, from) do
+    js_module_name = JS.identifier(name)
     do_import_module(js_module_name, from)
   end
 
