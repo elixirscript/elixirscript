@@ -15,15 +15,15 @@ defmodule ElixirScript.String do
   end
 
   def to_float(str) do
-    JS.parseFloat(str)
+    :erlang.binary_to_float(str)
   end
 
   def to_integer(str) do
-    JS.parseInt(str, 10)
+    :erlang.binary_to_integer(str)
   end
 
   def to_integer(str, base) do
-    JS.parseInt(str, base)
+    :erlang.binary_to_integer(str, base)
   end
 
   def upcase(str) do

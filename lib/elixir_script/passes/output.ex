@@ -19,14 +19,18 @@ defmodule ElixirScript.Output do
 
     opts = ModuleState.get_compiler_opts(pid)
 
-    #TODO: Combine Mix.Project.config()[:app] with Mix.Project.deps_paths() to
-    # get app names.
-    # File.exists? Path.join([:code.priv_dir(app), "src", "elixir_script"])
-    # to find out if app has interop files.
-    # If so, copy files and directories to output folder
+    js_modules = ModuleState.js_modules(pid)
+    |> Enum.filter(fn
+      {_module, _name, nil} -> false
+      _ -> true
+    end)
+    |> Enum.map(fn
+      {module, name, path} ->
+        {module, name, Path.join(".", path)}
+    end)
 
-    bundle(modules, opts, ModuleState.js_modules(pid))
-    |> output(Map.get(opts, :output))
+    bundle(modules, opts, js_modules)
+    |> output(Map.get(opts, :output), js_modules)
   end
 
   defp bundle(modules, opts, js_modules) do
@@ -61,20 +65,26 @@ defmodule ElixirScript.Output do
     end
   end
 
-  defp output(code, nil) do
+  defp output(code, nil, _) do
      code
   end
 
-  defp output(code, :stdout) do
+  defp output(code, :stdout, _) do
     IO.puts(code)
   end
 
-  defp output(code, path) do
+  defp output(code, path, js_modules) do
     file_name = get_output_file_name(path)
 
     if !File.exists?(Path.dirname(file_name)) do
       File.mkdir_p!(Path.dirname(file_name))
     end
+
+    apps = get_app_names()
+    output_dir = Path.dirname(file_name)
+    Enum.each(js_modules, fn({_, _, path}) ->
+      copy_javascript_module(apps, output_dir, path)
+    end)
 
     File.write!(file_name, code)
   end
@@ -86,5 +96,28 @@ defmodule ElixirScript.Output do
       _ ->
         Path.join([path, @generated_name])
     end
+  end
+
+  defp get_app_names() do
+    Mix.Project.config()[:app]
+    deps = Mix.Project.deps_paths()
+    |> Map.keys
+
+    [Mix.Project.config()[:app]] ++ deps
+  end
+
+  defp copy_javascript_module(apps, output_dir, js_module_path) do
+    Enum.each(apps, fn(app) ->
+      full_path = Path.join([:code.priv_dir(app), "elixir_script", js_module_path]) <> ".js"
+
+      if File.exists?(full_path) do
+        js_output_path = Path.join(output_dir, js_module_path) <> ".js"
+        if !File.exists?(Path.dirname(js_output_path)) do
+          File.mkdir_p!(Path.dirname(js_output_path))
+        end
+
+        File.cp(full_path, js_output_path)
+      end
+    end)
   end
 end

@@ -62,7 +62,6 @@ defmodule ElixirScript.State do
     Agent.update(pid, fn(state) ->
       js_modules = Map.get(state, :js_modules, [])
       js_modules = js_modules ++ [{module, name, path}]
-
       %{ state | js_modules: js_modules }
     end)
   end

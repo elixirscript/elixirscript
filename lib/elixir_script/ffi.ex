@@ -1,15 +1,13 @@
 defmodule ElixirScript.FFI do
-  defmacro __using__(_) do
-    js_path = Path.join([".", Macro.underscore(__MODULE__)])
-
-    js_name = __MODULE__
-    |> Module.split()
-    |> Enum.join("_")
-
+  defmacro __using__(opts) do
     quote do
       import ElixirScript.FFI
       Module.register_attribute __MODULE__, :__foreign_info__, persist: true
-      @__foreign_info__ %{path: unquote(js_path), name: unquote(js_name)}
+      @__foreign_info__ %{
+        path: Macro.underscore(__MODULE__),
+        name: Enum.join(Module.split(__MODULE__), "_"),
+        global: unquote(Keyword.get(opts, :global, false))
+      }
     end
   end
 

@@ -168,8 +168,13 @@ defmodule ElixirScript.Translate.Forms.Remote do
   end
 
   defp process_js_module_name(module, state) do
-    name = ModuleState.get_js_module_name(state.pid, module)
-    J.identifier(name)
+    case ModuleState.get_js_module_name(state.pid, module) do
+      name when is_atom(name) ->
+        members = Module.split(module)
+        Identifier.make_namespace_members(members)
+      name ->
+        J.identifier(name)
+    end
   end
 
   defp erlang_compat_function(module, function) do

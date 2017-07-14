@@ -1,9 +1,7 @@
 defmodule Main do
   def start(:normal, [callback]) do
     callback.("started")
-
-    JSON.stringify(%{})
-
-    Enum.each(1..3, fn x -> JS.console.log(x)  end)
+    Agent.start(fn() -> nil end)
+    Data.JSON.stringify(%{})
   end
 end

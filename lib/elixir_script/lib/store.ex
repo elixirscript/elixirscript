@@ -1,6 +1,6 @@
 defmodule Bootstrap.Core.Store do
   @moduledoc false
-  use ElixirScript.FFI
+  use ElixirScript.FFI, global: true
 
   foreign create(value, name \\ nil)
 
