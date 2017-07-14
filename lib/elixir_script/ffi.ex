@@ -1,4 +1,8 @@
 defmodule ElixirScript.FFI do
+  @moduledoc """
+  The foreign function interface for interoperability with JavaScript.
+  """
+
   defmacro __using__(opts) do
     quote do
       import ElixirScript.FFI

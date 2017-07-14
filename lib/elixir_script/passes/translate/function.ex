@@ -5,8 +5,7 @@ defmodule ElixirScript.Translate.Function do
 
   @moduledoc """
   Translates the given Elixir function AST into the
-  equivalent JavaScript AST. Function names are
-  <name><arity>
+  equivalent JavaScript AST.
   """
 
   def patterns_ast() do

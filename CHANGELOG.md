@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+
+### Added
+- ElixirScript now has an FFI layer for interoperability with JavaScript. For more details, see documentation at `ElixirScript.FFI`
+
+### Changed
+- Compiler has been completely rewritten. ElixirScript now requires Erlang 20+ and Elixir 1.5+
+
 ## [0.28.0] - 2017-06-11
 
 ### Added
