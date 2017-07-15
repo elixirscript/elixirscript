@@ -10,21 +10,11 @@ defmodule ElixirScript.Beam do
   @spec debug_info(atom) :: {:ok | :error, map | binary}
   def debug_info(module)
 
-  #Replacing String module with our ElixirScript's version
-  def debug_info(String) do
-    case debug_info(ElixirScript.String) do
+  #Replace some modules with ElixirScript versions
+  def debug_info(module) when module in [String, Agent] do
+    case debug_info(Module.concat(ElixirScript, module)) do
       {:ok, info} ->
-        {:ok, Map.put(info, :module, String)}
-      e ->
-        e
-    end
-  end
-
-  #Replacing Agent module with our ElixirScript's version
-  def debug_info(Agent) do
-    case debug_info(ElixirScript.Agent) do
-      {:ok, info} ->
-        {:ok, Map.put(info, :module, Agent)}
+        {:ok, Map.put(info, :module, module)}
       e ->
         e
     end

@@ -6,8 +6,14 @@ defmodule ElixirScript.Compiler.Test do
     assert is_binary(result)
   end
 
+  test "Use defined module with FFI module" do
+    result = ElixirScript.Compiler.compile(Main)
+    assert is_binary(result)
+    assert result =~ "import Data_JSON from './data/json'"
+  end
+
   test "Can compile multiple entry modules" do
-    result = ElixirScript.Compiler.compile([Atom, String])
+    result = ElixirScript.Compiler.compile([Atom, String, Agent])
     assert is_binary(result)
   end
 
