@@ -126,11 +126,7 @@ defmodule ElixirScript.Translate.Forms.Remote do
   end
 
   def compile({:., _, [module, function]}, state) do
-    function_name = if ElixirScript.Translate.Module.is_js_module(module, state) do
-        ElixirScript.Translate.Identifier.make_extern_function_name(function)
-    else
-        ElixirScript.Translate.Identifier.make_function_name(function)
-    end
+    function_name = ElixirScript.Translate.Identifier.make_function_name(function)
 
     ast = J.member_expression(
       process_module_name(module, state),
