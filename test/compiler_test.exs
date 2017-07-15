@@ -52,4 +52,12 @@ defmodule ElixirScript.Compiler.Test do
     result = ElixirScript.Compiler.compile(Atom, [output: path])
     assert File.exists?(path)
   end
+
+  test "Output with FFI" do
+    path = System.tmp_dir()
+
+    result = ElixirScript.Compiler.compile(Main, [output: path])
+    assert File.exists?(Path.join([path, "Elixir.App.js"]))
+    assert File.exists?(Path.join([path, "data", "json.js"]))
+  end
 end
