@@ -21,22 +21,22 @@ function create(value, name = null) {
     __elixirscript_names__.set(name, key);
   }
 
-  __elixirscript_store__.set(key, value);
+  return __elixirscript_store__.set(key, value);
 }
 
 function update(key, value) {
   const real_key = get_key(key);
-  __elixirscript_store__.set(real_key, value);
+  return __elixirscript_store__.set(real_key, value);
 }
 
 function read(key) {
   const real_key = get_key(key);
-  __elixirscript_store__.get(real_key);
+  return __elixirscript_store__.get(real_key);
 }
 
 function remove(key) {
   const real_key = get_key(key);
-  __elixirscript_store__.delete(real_key);
+  return __elixirscript_store__.delete(real_key);
 }
 
 export default {
