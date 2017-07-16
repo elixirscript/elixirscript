@@ -53,6 +53,13 @@ defmodule ElixirScript.Translate.Forms.Pattern.Patterns do
     )
   end
 
+  def parameter(name) do
+    J.call_expression(
+      @parameter,
+      [name]
+    )
+  end
+
   def head_tail(headParameter, tailParameter) do
     J.call_expression(
       @head_tail,
