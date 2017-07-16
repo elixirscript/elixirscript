@@ -1,5 +1,6 @@
 import Core from '../lib/core';
 import test from 'ava';
+
 const Patterns = Core.Patterns;
 const SpecialForms = Core.SpecialForms;
 const Tuple = Core.Tuple;
@@ -78,7 +79,7 @@ test('with bare expression', t => {
     [$, width => width * 2],
     [
       new Tuple(Symbol.for('ok'), $),
-      (width, double_width) => map_fetch(opts, 'height'),
+      (width, double_width) => map_fetch(opts, 'height')
     ],
     (width, double_width, height) =>
       new Tuple(Symbol.for('ok'), double_width * height)

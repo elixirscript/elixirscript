@@ -151,5 +151,5 @@ export default {
   _for,
   _try,
   _with,
-  receive,
+  receive
 };

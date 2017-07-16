@@ -1,6 +1,6 @@
 defmodule ElixirScript.Translate.Form do
   alias ESTree.Tools.Builder, as: J
-  alias ElixirScript.Translate.Forms.{Bitstring, Match, Try, For, Receive, Remote, Pattern}
+  alias ElixirScript.Translate.Forms.{Bitstring, Match, Try, For, Receive, Remote, Pattern, With}
   alias ElixirScript.Translate.Clause
   require Logger
 
@@ -201,6 +201,10 @@ defmodule ElixirScript.Translate.Form do
 
   def compile({:try, _, [blocks]}, state) do
     Try.compile(blocks, state)
+  end
+
+  def compile({:with, _, args}, state) do
+    With.compile(args, state)
   end
 
   def compile({:fn, _, _} = ast, state) do

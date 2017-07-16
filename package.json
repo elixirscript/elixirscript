@@ -41,9 +41,7 @@
     "sinon": "^1.17.7"
   },
   "ava": {
-    "require": [
-      "babel-register"
-    ],
+    "require": ["babel-register"],
     "babel": {
       "babelrc": true
     }
