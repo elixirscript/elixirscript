@@ -23,7 +23,7 @@ defmodule ElixirScript.Translate.Forms.Match do
           J.member_expression(
             J.member_expression(
               J.member_expression(
-              J.identifier("Bootstrap"),
+              J.identifier("ElixirScript"),
               J.identifier("Core")
               ),
               J.identifier("Patterns")
@@ -72,7 +72,7 @@ defmodule ElixirScript.Translate.Forms.Match do
       ref,
       J.new_expression(
         J.member_expression(
-          J.identifier("Bootstrap"),
+          J.identifier("ElixirScript"),
           J.member_expression(
             J.identifier("Core"),
             J.identifier("Tuple")

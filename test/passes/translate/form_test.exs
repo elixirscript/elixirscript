@@ -79,7 +79,7 @@ defmodule ElixirScript.Translate.Forms.Test do
     assert js_ast == J.new_expression(
       J.member_expression(
         J.member_expression(
-          J.identifier("Bootstrap"),
+          J.identifier("ElixirScript"),
           J.identifier("Core")
         ),
         J.identifier("Tuple")

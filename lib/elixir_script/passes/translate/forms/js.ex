@@ -6,7 +6,7 @@ defmodule ElixirScript.Translate.Forms.JS do
   def call_property() do
     J.member_expression(
       J.member_expression(
-        J.identifier("Bootstrap"),
+        J.identifier("ElixirScript"),
         J.member_expression(
           J.identifier("Core"),
           J.identifier("Functions")

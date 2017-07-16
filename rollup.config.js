@@ -4,7 +4,7 @@ import babili from 'rollup-plugin-babili';
 
 export default {
   entry: 'src/javascript/elixir.js',
-  moduleName: 'Bootstrap',
+  moduleName: 'ElixirScript',
   plugins: [
     nodeResolve({ jsnext: true }),
     babel({
@@ -15,5 +15,5 @@ export default {
       keepClassName: true
     })
   ],
-  targets: [{ dest: 'priv/build/iife/Elixir.Bootstrap.js', format: 'iife' }]
+  targets: [{ dest: 'priv/build/iife/ElixirScript.Core.js', format: 'iife' }]
 };

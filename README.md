@@ -24,8 +24,8 @@ git clone git@github.com:bryanjos/elixirscript.git
 #Get dependencies
 mix deps.get
 yarn
-    
-# Create Elixir.Bootstrap.js
+
+# Create ElixirScript.Core.js
 yarn build
 
 # Compile

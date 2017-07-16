@@ -110,7 +110,7 @@ defmodule ElixirScript.Translate.Forms.Remote do
     ast = J.member_expression(
       J.member_expression(
         J.member_expression(
-          J.identifier("Bootstrap"),
+          J.identifier("ElixirScript"),
           J.identifier("Core")
         ),
         J.identifier(module)
@@ -177,7 +177,7 @@ defmodule ElixirScript.Translate.Forms.Remote do
     J.member_expression(
       J.member_expression(
         J.member_expression(
-          J.identifier("Bootstrap"),
+          J.identifier("ElixirScript"),
           J.identifier("Core")
         ),
         J.identifier(module)

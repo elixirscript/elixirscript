@@ -19,7 +19,7 @@ defmodule ElixirScript.Translate.Forms.For do
       JS.member_expression(
         JS.member_expression(
             JS.member_expression(
-              JS.identifier("Bootstrap"),
+              JS.identifier("ElixirScript"),
               JS.identifier("Core")
             ),
             JS.identifier("Patterns")
@@ -37,7 +37,7 @@ defmodule ElixirScript.Translate.Forms.For do
     ast = JS.call_expression(
       JS.member_expression(
         JS.member_expression(
-          JS.identifier("Bootstrap"),
+          JS.identifier("ElixirScript"),
           JS.member_expression(
             JS.identifier("Core"),
             JS.identifier("SpecialForms")
@@ -72,7 +72,7 @@ defmodule ElixirScript.Translate.Forms.For do
         JS.member_expression(
           JS.member_expression(
               JS.member_expression(
-                JS.identifier("Bootstrap"),
+                JS.identifier("ElixirScript"),
                 JS.identifier("Core")
               ),
               JS.identifier("Patterns")
@@ -91,7 +91,7 @@ defmodule ElixirScript.Translate.Forms.For do
           JS.member_expression(
             JS.member_expression(
                 JS.member_expression(
-                  JS.identifier("Bootstrap"),
+                  JS.identifier("ElixirScript"),
                   JS.identifier("Core")
                 ),
                 JS.identifier("Patterns")

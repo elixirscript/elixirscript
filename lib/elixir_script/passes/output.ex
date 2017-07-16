@@ -50,7 +50,7 @@ defmodule ElixirScript.Output do
 
   defp get_bootstrap_js() do
     operating_path = Path.join([Mix.Project.build_path, "lib", "elixir_script", "priv"])
-    path = Path.join([operating_path, "build", "iife", "Elixir.Bootstrap.js"])
+    path = Path.join([operating_path, "build", "iife", "ElixirScript.Core.js"])
     File.read!(path)
   end
 

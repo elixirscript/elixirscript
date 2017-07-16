@@ -19,7 +19,7 @@ defmodule ElixirScript.Translate.Protocol do
       J.identifier("protocol"),
       J.call_expression(
         J.member_expression(
-          J.identifier("Bootstrap"),
+          J.identifier("ElixirScript"),
           J.member_expression(
             J.identifier(:Core),
             J.member_expression(
@@ -58,7 +58,7 @@ defmodule ElixirScript.Translate.Protocol do
 
       J.call_expression(
         J.member_expression(
-          J.identifier("Bootstrap"),
+          J.identifier("ElixirScript"),
           J.member_expression(
             J.identifier(:Core),
             J.member_expression(
@@ -79,7 +79,7 @@ defmodule ElixirScript.Translate.Protocol do
   defp map_to_js(Integer) do
     J.member_expression(
       J.member_expression(
-        J.identifier("Bootstrap"),
+        J.identifier("ElixirScript"),
         J.identifier(:Core)
       ),
       J.identifier(:Integer)
@@ -89,7 +89,7 @@ defmodule ElixirScript.Translate.Protocol do
   defp map_to_js(Tuple) do
     J.member_expression(
       J.member_expression(
-        J.identifier("Bootstrap"),
+        J.identifier("ElixirScript"),
         J.identifier(:Core)
       ),
       J.identifier(:Tuple)
@@ -107,7 +107,7 @@ defmodule ElixirScript.Translate.Protocol do
   defp map_to_js(BitString) do
     J.member_expression(
       J.member_expression(
-        J.identifier("Bootstrap"),
+        J.identifier("ElixirScript"),
         J.identifier(:Core)
       ),
       J.identifier(:BitString)
@@ -117,7 +117,7 @@ defmodule ElixirScript.Translate.Protocol do
   defp map_to_js(Float) do
     J.member_expression(
       J.member_expression(
-        J.identifier("Bootstrap"),
+        J.identifier("ElixirScript"),
         J.identifier(:Core)
       ),
       J.identifier(:Float)
@@ -131,7 +131,7 @@ defmodule ElixirScript.Translate.Protocol do
   defp map_to_js(PID) do
     J.member_expression(
       J.member_expression(
-        J.identifier("Bootstrap"),
+        J.identifier("ElixirScript"),
         J.identifier(:Core)
       ),
       J.identifier(:PID)
@@ -140,14 +140,14 @@ defmodule ElixirScript.Translate.Protocol do
 
   defp map_to_js(Port) do
     J.member_expression(
-      J.identifier("Bootstrap"),
+      J.identifier("ElixirScript"),
       J.identifier(:Port)
     )
   end
 
   defp map_to_js(Reference) do
     J.member_expression(
-      J.identifier("Bootstrap"),
+      J.identifier("ElixirScript"),
       J.identifier(:Reference)
     )
   end

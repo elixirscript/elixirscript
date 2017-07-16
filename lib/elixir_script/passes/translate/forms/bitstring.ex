@@ -8,7 +8,7 @@ defmodule ElixirScript.Translate.Forms.Bitstring do
     js_ast = JS.new_expression(
         JS.member_expression(
           JS.member_expression(
-            JS.identifier("Bootstrap"),
+            JS.identifier("ElixirScript"),
             JS.identifier("Core")
           ),
           JS.identifier("BitString")
@@ -88,7 +88,7 @@ defmodule ElixirScript.Translate.Forms.Bitstring do
   defp bitstring_class() do
     JS.member_expression(
       JS.member_expression(
-        JS.identifier("Bootstrap"),
+        JS.identifier("ElixirScript"),
         JS.identifier("Core")
       ),
       JS.identifier("BitString")
