@@ -216,6 +216,29 @@ defmodule ElixirScript.FindUsedFunctions do
     Enum.each(clauses, &walk(&1, state))
   end
 
+  defp walk({:with, _, args}, state) do
+    Enum.each(args, fn
+      {:<-, _, [left, right]} ->
+        walk(left, state)
+        walk(right, state)
+
+      {:=, _, [left, right]} ->
+        walk(left, state)
+        walk(right, state)
+
+      [do: expression] ->
+        walk_block(expression, state)
+
+      [do: expression, else: elses] ->
+        walk_block(expression, state)
+        Enum.each(elses, fn
+          {:->, _, [left, right]} ->
+            walk(left, state)
+            walk(right, state)
+        end)
+    end)
+  end
+
   defp walk({{:., _, [:erlang, :apply]}, _, [module, function, params]}, state) do
     walk({{:., [], [module, function]}, [], params}, state)
   end
