@@ -5,7 +5,7 @@ defmodule ElixirScript.Translate.Forms.Pattern.Patterns do
 
   @patterns J.member_expression(
     J.member_expression(
-    J.identifier("Bootstrap"),
+    J.identifier("ElixirScript"),
     J.identifier("Core")
     ),
     J.identifier("Patterns")

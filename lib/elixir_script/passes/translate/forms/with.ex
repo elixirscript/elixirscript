@@ -36,7 +36,7 @@ defmodule ElixirScript.Translate.Forms.With do
     js_ast = JS.call_expression(
       JS.member_expression(
         JS.member_expression(
-          JS.identifier("Bootstrap"),
+          JS.identifier("ElixirScript"),
           JS.member_expression(
             JS.identifier("Core"),
             JS.identifier("SpecialForms")

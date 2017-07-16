@@ -66,7 +66,7 @@ defmodule ElixirScript.Translate.Form do
     ast = J.new_expression(
       J.member_expression(
         J.member_expression(
-          J.identifier("Bootstrap"),
+          J.identifier("ElixirScript"),
           J.identifier("Core")
         ),
         J.identifier("Tuple")
@@ -173,7 +173,7 @@ defmodule ElixirScript.Translate.Form do
 
     cond_function = J.member_expression(
       J.member_expression(
-        J.identifier("Bootstrap"),
+        J.identifier("ElixirScript"),
         J.member_expression(
           J.identifier("Core"),
           J.identifier("SpecialForms")

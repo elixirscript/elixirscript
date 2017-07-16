@@ -1,4 +1,4 @@
-defmodule Bootstrap.Core.Store do
+defmodule ElixirScript.Core.Store do
   @moduledoc false
   use ElixirScript.FFI, global: true
 

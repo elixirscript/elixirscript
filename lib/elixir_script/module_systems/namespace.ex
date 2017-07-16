@@ -14,7 +14,7 @@ defmodule ElixirScript.ModuleSystems.Namespace do
 
   defp build_namespace() do
     JS.member_expression(
-      JS.identifier("Bootstrap"),
+      JS.identifier("ElixirScript"),
       JS.member_expression(
         JS.identifier(:Core),
         JS.member_expression(
