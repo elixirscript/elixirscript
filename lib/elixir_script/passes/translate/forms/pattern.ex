@@ -203,7 +203,7 @@ defmodule ElixirScript.Translate.Forms.Pattern do
   end
 
   defp process_pattern({var, _, _}, _) do
-    { [PM.parameter()], [ElixirScript.Translate.Identifier.make_identifier(var)] }
+    { [PM.parameter(J.literal(to_string(var)))], [ElixirScript.Translate.Identifier.make_identifier(var)] }
   end
 
   defp reduce_patterns(patterns, _) do

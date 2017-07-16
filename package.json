@@ -23,7 +23,7 @@
   "license": "MIT",
   "dependencies": {
     "erlang-types": "^1.0.1",
-    "tailored": "^2.4.9"
+    "tailored": "^2.5.0"
   },
   "devDependencies": {
     "ava": "^0.19.1",
@@ -41,7 +41,9 @@
     "sinon": "^1.17.7"
   },
   "ava": {
-    "require": ["babel-register"],
+    "require": [
+      "babel-register"
+    ],
     "babel": {
       "babelrc": true
     }
