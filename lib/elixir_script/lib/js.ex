@@ -37,4 +37,18 @@ defmodule ElixirScript.JS do
   The current JavaScript context
   """
   defmacro this()
+
+  @doc """
+  Mutates an existing JavaScript object.
+  ex:
+    ElixirScript.JS.mutate elem, %{"width" => 100}
+  """
+  defmacro update(object, map)
+
+  @doc """
+  Mutates an existing JavaScript object.
+  ex:
+    ElixirScript.JS.mutate elem, "width", 100
+  """
+  defmacro update(object, key, value)
 end
