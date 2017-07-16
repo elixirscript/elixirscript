@@ -16,16 +16,6 @@ defmodule ElixirScript.Translate.Forms.JS do
     )
   end
 
-  def global() do
-    J.member_expression(
-      J.member_expression(
-        J.identifier("Bootstrap"),
-        J.identifier("Core")
-      ),
-      J.identifier("global")
-    )
-  end
-
   def compile({{:., _, [ElixirScript.JS, :debugger]}, _, _}, state) do
     ast = J.debugger_statement()
     {ast, state}
@@ -73,6 +63,37 @@ defmodule ElixirScript.Translate.Forms.JS do
     ast = J.call_expression(
       J.identifier("import"),
       [Form.compile!(term, state)]
+    )
+
+    {ast, state}
+  end
+
+  def compile({{:., _, [ElixirScript.JS, :mutate]}, _, [object, map]}, state) do
+    ast = J.call_expression(
+      J.member_expression(
+        J.identifier("Object"),
+        J.identifier("assign")
+      ),
+      [
+        Form.compile!(object, state),
+        Form.compile!(map, state)
+      ]
+    )
+
+    {ast, state}
+  end
+
+  def compile({{:., _, [ElixirScript.JS, :mutate]}, _, [object, key, value]}, state) do
+    ast = J.assignment_expression(
+      :=,
+      J.member_expression(
+        Form.compile!(object, state),
+        Form.compile!(key, state),
+        true
+      ),
+      [
+        Form.compile!(value, state)
+      ]
     )
 
     {ast, state}
