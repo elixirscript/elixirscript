@@ -97,8 +97,8 @@ defmodule ElixirScript.Translate.Forms.Test do
   end
 
   test "super" do
-    ast = {:super, [], [1]}
-    state = %{function: {:my_function, nil}}
+    ast =   {:super, [], [{:def, :my_function}, 1]}
+    state = %{function: {:my_function, nil}, vars: %{}}
 
     {js_ast, _} = Form.compile(ast, state)
     assert js_ast == J.call_expression(

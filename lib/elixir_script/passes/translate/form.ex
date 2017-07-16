@@ -228,7 +228,7 @@ defmodule ElixirScript.Translate.Form do
     Remote.compile(ast, state)
   end
 
-  def compile({:super, _, params}, state) when is_list(params) do
+  def compile({:super, _, [_ | params]}, state) when is_list(params) do
     {function_name, _} = Map.get(state, :function)
     {var_decs, params} = compile_params(params, state)
 
