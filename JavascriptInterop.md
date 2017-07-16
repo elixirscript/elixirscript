@@ -2,17 +2,17 @@
 
 ## ElixirScript Calling JavaScript
 
-### JS module
+### ElixirScript.JS module
 
-The `JS` module has functions and macros that help with interacting with JavaScript.
+The `ElixirScript.JS` module has functions and macros that help with interacting with JavaScript.
 These mostly correspond to JavaScript keywords that may be useful.
 
 ```elixir
 # Calling the JavaScript Debugger
-JS.debugger()
+ElixirScript.JS.debugger()
 
 # Getting the type of a value
-JS.typeof(my_value)
+ElixirScript.JS.typeof(my_value)
 ```
 
 ### Foreign Function Interface
@@ -53,7 +53,7 @@ export default {
 
   defmodule Main do
     def start(:normal, args) do
-      JS.console.log(args)
+      args
     end
   end
 
@@ -75,7 +75,7 @@ export default {
 
   defmodule MyModule do
     def hi() do
-      JS.alert("hello")
+      "hello"
     end
   end
   ```

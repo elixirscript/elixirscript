@@ -15,7 +15,7 @@ defmodule ElixirScript.Translate.Forms.JS.Test do
   end
 
   test "debugger" do
-    ast = {{:., [], [JS, :debugger]}, [], []}
+    ast = {{:., [], [ElixirScript.JS, :debugger]}, [], []}
     state = %{function: {:each, nil}, module: Enum, vars: %{:_ => 0, "entry" => 0, "enumerable" => 0, "fun" => 0}}
 
     {js_ast, _} = Form.compile(ast, state)
@@ -23,7 +23,7 @@ defmodule ElixirScript.Translate.Forms.JS.Test do
   end
 
   test "this" do
-    ast = {{:., [], [JS, :this]}, [], []}
+    ast = {{:., [], [ElixirScript.JS, :this]}, [], []}
     state = %{function: {:each, nil}, module: Enum, vars: %{:_ => 0, "entry" => 0, "enumerable" => 0, "fun" => 0}}
 
     {js_ast, _} = Form.compile(ast, state)
@@ -31,7 +31,7 @@ defmodule ElixirScript.Translate.Forms.JS.Test do
   end
 
   test "new" do
-    ast = {{:., [], [JS, :new]}, [], [BLT, ["bacon", "lettuce", "tomato"]]}
+    ast = {{:., [], [ElixirScript.JS, :new]}, [], [BLT, ["bacon", "lettuce", "tomato"]]}
     state = %{function: {:each, nil}, module: Enum, vars: %{:_ => 0, "entry" => 0, "enumerable" => 0, "fun" => 0}}
 
     {js_ast, _} = Form.compile(ast, state)
@@ -47,7 +47,7 @@ defmodule ElixirScript.Translate.Forms.JS.Test do
 
 
   test "throw" do
-    ast = {{:., [], [JS, :throw]}, [], [1]}
+    ast = {{:., [], [ElixirScript.JS, :throw]}, [], [1]}
     state = %{function: {:each, nil}, module: Enum, vars: %{:_ => 0, "entry" => 0, "enumerable" => 0, "fun" => 0}}
 
     {js_ast, _} = Form.compile(ast, state)
@@ -55,7 +55,7 @@ defmodule ElixirScript.Translate.Forms.JS.Test do
   end
 
   test "import" do
-    ast = {{:., [], [JS, :import]}, [], ["react"]}
+    ast = {{:., [], [ElixirScript.JS, :import]}, [], ["react"]}
     state = %{function: {:each, nil}, module: Enum, vars: %{:_ => 0, "entry" => 0, "enumerable" => 0, "fun" => 0}}
 
     {js_ast, _} = Form.compile(ast, state)

@@ -247,7 +247,7 @@ defmodule ElixirScript.FindUsedFunctions do
     walk({function, [], params}, state)
   end
 
-  defp walk({{:., _, [JS, _]}, _, params}, state) do
+  defp walk({{:., _, [ElixirScript.JS, _]}, _, params}, state) do
     walk(params, state)
   end
 

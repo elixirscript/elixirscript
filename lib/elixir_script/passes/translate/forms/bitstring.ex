@@ -132,7 +132,7 @@ defmodule ElixirScript.Translate.Forms.Bitstring do
     result = case translated_elements do
       [] ->
         JS.literal('')
-      [element] ->
+      [_] ->
         do_make_interpolated_string([], hd(translated_elements))
       elements ->
         do_make_interpolated_string(tl(elements), hd(elements))

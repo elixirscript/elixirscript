@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - Compiler has been completely rewritten. ElixirScript now requires Erlang 20+ and Elixir 1.5+
+- `JS` module renamed to `ElixirScript.JS`
 
 ## [0.28.0] - 2017-06-11
 

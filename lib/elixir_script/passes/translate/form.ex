@@ -220,7 +220,7 @@ defmodule ElixirScript.Translate.Form do
     {ast, state}
   end
 
-  def compile({{:., _, [JS, _]}, _, _} = ast, state) do
+  def compile({{:., _, [ElixirScript.JS, _]}, _, _} = ast, state) do
     ElixirScript.Translate.Forms.JS.compile(ast, state)
   end
 
