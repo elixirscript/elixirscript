@@ -26,17 +26,17 @@ defmodule ElixirScript.Translate.Forms.JS do
     )
   end
 
-  def compile({{:., _, [JS, :debugger]}, _, _}, state) do
+  def compile({{:., _, [ElixirScript.JS, :debugger]}, _, _}, state) do
     ast = J.debugger_statement()
     {ast, state}
   end
 
-  def compile({{:., _, [JS, :this]}, _, _}, state) do
+  def compile({{:., _, [ElixirScript.JS, :this]}, _, _}, state) do
     ast = J.this_expression()
     {ast, state}
   end
 
-  def compile({{:., _, [JS, :new]}, _, [module, params]}, state) do
+  def compile({{:., _, [ElixirScript.JS, :new]}, _, [module, params]}, state) do
     members = Module.split(module)
 
     members = case members do
@@ -61,7 +61,7 @@ defmodule ElixirScript.Translate.Forms.JS do
     {ast, state}
   end
 
-  def compile({{:., _, [JS, :throw]}, _, [term]}, state) do
+  def compile({{:., _, [ElixirScript.JS, :throw]}, _, [term]}, state) do
     ast = J.throw_statement(
       Form.compile!(term, state)
     )
@@ -69,31 +69,10 @@ defmodule ElixirScript.Translate.Forms.JS do
     {ast, state}
   end
 
-  def compile({{:., _, [JS, :import]}, _, [term]}, state) do
+  def compile({{:., _, [ElixirScript.JS, :import]}, _, [term]}, state) do
     ast = J.call_expression(
       J.identifier("import"),
       [Form.compile!(term, state)]
-    )
-
-    {ast, state}
-  end
-
-  def compile({{:., _, [JS, function]}, _, []}, state) do
-    ast = J.call_expression(
-      call_property(),
-      [
-        global(),
-        Form.compile!(to_string(function), state)
-      ]
-    )
-
-    {ast, state}
-  end
-
-  def compile({{:., _, [JS, function]}, _, params}, state) do
-    ast = J.call_expression(
-      J.identifier(function),
-      Enum.map(params, &Form.compile!(&1, state))
     )
 
     {ast, state}

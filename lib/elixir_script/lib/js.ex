@@ -1,4 +1,4 @@
-defmodule JS do
+defmodule ElixirScript.JS do
   @moduledoc """
   This module defines macros and functions which implement
   JavaScript functionality that may not translate easily to
@@ -9,7 +9,7 @@ defmodule JS do
   Creates new JavaScript objects.
 
   ex:
-    JS.new User, ["first_name", "last_name"]
+    ElixirScript.JS.new User, ["first_name", "last_name"]
   """
   defmacro new(module, params)
 
