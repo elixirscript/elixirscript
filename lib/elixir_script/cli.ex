@@ -8,8 +8,7 @@ defmodule ElixirScript.CLI do
     help: :boolean,
     version: :boolean,
     watch: :boolean,
-    format: :string,
-    js_module: [:string, :keep]
+    format: :string
   ]
 
   @aliases [
@@ -43,8 +42,6 @@ defmodule ElixirScript.CLI do
   <module> the entry module of your application
 
   options:
-  --js-module [<identifer>:<path>] A js module used in your code. ex: React:react
-                        Multiple can be defined
   -f  --format [format] module format of output. options: es (default), common, umd
   -o  --output [path]   places output at the given path.
                         Can be a directory or filename.
@@ -72,13 +69,9 @@ defmodule ElixirScript.CLI do
   def do_process(input, options) do
     {watch, options} = Keyword.pop(options, :watch, false)
 
-    js_modules = Keyword.get_values(options, :js_module)
-    |> build_js_modules
-
     compile_opts = [
       output: Keyword.get(options, :output, :stdout),
-      format: String.to_atom(Keyword.get(options, :format, "es")),
-      js_modules: js_modules,
+      format: String.to_atom(Keyword.get(options, :format, "es"))
     ]
 
     input = handle_input(input)
@@ -105,27 +98,5 @@ defmodule ElixirScript.CLI do
     |> Enum.map(fn(x) -> String.split(x, [" ", ","], trim: true) end)
     |> List.flatten
     |> Enum.map(fn(x) -> Module.concat([x]) end)
-  end
-
-  defp build_js_modules(values) do
-    values
-    |> Enum.map(fn x ->
-      [identifier, path] = String.split(x, ":", trim: true)
-      { format_identifier(identifier), format_path(path) }
-    end)
-  end
-
-  defp format_identifier(id) do
-    id
-    |> String.split(".")
-    |> Module.concat
-  end
-
-
-  defp format_path(path) do
-    path
-    |> String.replace("\"", "")
-    |> String.replace("`", "")
-    |> String.replace("'", "")
   end
 end

@@ -3,6 +3,7 @@ defmodule ElixirScript.Translate.Forms.Remote do
 
   alias ESTree.Tools.Builder, as: J
   alias ElixirScript.Translate.{Form, Identifier}
+  alias ElixirScript.State, as: ModuleState
 
   @erlang_modules [
     :erlang,
@@ -125,11 +126,7 @@ defmodule ElixirScript.Translate.Forms.Remote do
   end
 
   def compile({:., _, [module, function]}, state) do
-    function_name = if ElixirScript.Translate.Module.is_js_module(module, state) do
-        ElixirScript.Translate.Identifier.make_extern_function_name(function)
-    else
-        ElixirScript.Translate.Identifier.make_function_name(function)
-    end
+    function_name = ElixirScript.Translate.Identifier.make_function_name(function)
 
     ast = J.member_expression(
       process_module_name(module, state),
@@ -166,20 +163,13 @@ defmodule ElixirScript.Translate.Forms.Remote do
     Form.compile!(module, state)
   end
 
-  defp process_js_module_name(module, _) do
-    case Module.split(module) do
-      ["JS"] ->
-        J.member_expression(
-          J.member_expression(
-            J.identifier("Bootstrap"),
-            J.identifier("Core")
-          ),
-          J.identifier("global")
-        )
-      ["JS" | rest] ->
-        Identifier.make_namespace_members(rest)
-      x ->
-        Identifier.make_namespace_members(x)
+  defp process_js_module_name(module, state) do
+    case ModuleState.get_js_module_name(state.pid, module) do
+      name when is_atom(name) ->
+        members = Module.split(module)
+        Identifier.make_namespace_members(members)
+      name ->
+        J.identifier(name)
     end
   end
 

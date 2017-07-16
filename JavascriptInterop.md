@@ -13,55 +13,35 @@ JS.debugger()
 
 # Getting the type of a value
 JS.typeof(my_value)
-
-# Creating a new JavaScript Map
-map = JS.new(JS.Map, [])
 ```
 
-### Accessing Global Objects, Functions, and Properties
+### Foreign Function Interface
 
-In order to interact with JavaScript things in the global scope, append "JS" to them. The global scope corresponds to whatever the global object is in the JavaScript environment you are in. For example, in a browser this would be `window` or `self`:
+ElixirScript calls JavaScript modules through a Foreign Function Interface (FFI). A foreign module is defined by creating a new module and adding `use ElixirScript.FFI` to it.
+
+Here is an example of a foreign module for a JSON module
 
 ```elixir
-# Calling alert
-JS.alert("hello")
+defmodule MyApp.JSON do
+  use ElixirScript.FFI
 
-# Calling a method on Object
-JS.Object.keys(my_object)
-
-# Creating a new JavaScript Date
-JS.new(JS.Date, [])
-
-# Getting the outer width
-JS.outerWidth
+  foreign stringify(map)
+  foreign parse(string)
+end
 ```
 
-### JavaScript modules
+Foreign modules map to JavaScript files that export functions defined with the `foreign` macro.
+ElixirScript expects JavaScript modules to be in the `priv/elixir_script` directory.
+These modules are copied to the output directory upon compilation.
 
-ElixirScript can use JavaScript modules from the supported modules systems. 
-In order to do so, you must tell ElixirScript about them upfront.
+For our example, a JavaScript file must be placed at `priv/elixir_script/my_app/json.js`.
 
-If using ElixirScript in a mix project, you can do so inside of the ElixirScript configuration keyword list
-
-```elixir
-  def project do
-    [
-      app: :my_project,
-      elixir_script: [
-        format: :es,
-        js_modules: [
-          {React, "react"},
-          {ReactDOM, "react-dom"}
-        ]
-      ]
-    ]
-  end
-```
-
-Interacting with these modules works the same as interacting with an ElixirScript module
-
-```elixir
-React.createElement(...)
+It looks like this
+```javascript
+export default {
+  stringify: JSON.stringify,
+  parse: JSON.parse
+}
 ```
 
 ## JavaScript Calling ElixirScript

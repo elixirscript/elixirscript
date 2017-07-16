@@ -309,6 +309,14 @@ function tuple_size(tuple) {
   return tuple.length;
 }
 
+function binary_to_float(str) {
+  return parseFloat(str);
+}
+
+function binary_to_integer(str, base = 10) {
+  return parseInt(str, base);
+}
+
 export default {
   atom_to_binary,
   binary_to_atom,
@@ -372,5 +380,7 @@ export default {
   round,
   tl,
   trunc,
-  tuple_size
+  tuple_size,
+  binary_to_float,
+  binary_to_integer
 };

@@ -75,8 +75,4 @@ defmodule ElixirScript.Translate.Identifier do
     J.identifier(name)
   end
 
-  def make_extern_function_name(name) do
-    J.identifier("#{name}")
-  end
-
 end

@@ -25,6 +25,16 @@ defmodule ElixirScript.FindUsedModules do
     end
   end
 
+  defp walk_module(module, %{attributes: [__foreign_info__: %{path: path, name: name, global: global}]} = info, pid) do
+    path = if global, do: nil, else: path
+    name = if global, do: module, else: name
+
+    ModuleState.put_javascript_module(pid, module, name, path)
+    ModuleState.put_module(pid, module, info)
+
+    nil
+  end
+
   defp walk_module(module, info, pid) do
     %{
       attributes: _attrs,
@@ -232,7 +242,7 @@ defmodule ElixirScript.FindUsedModules do
     walk({function, [], params}, state)
   end
 
-  defp walk({{:., _, [module, function]} = ast, _, params}, state) do
+  defp walk({{:., _, [_module, _function]} = ast, _, params}, state) do
     walk(ast, state)
     walk(params, state)
   end
@@ -243,8 +253,6 @@ defmodule ElixirScript.FindUsedModules do
 
   defp walk({:., _, [module, function]}, state) do
     cond do
-      ElixirScript.Translate.Module.is_js_module(module, state) ->
-        nil
       ElixirScript.Translate.Module.is_elixir_module(module) ->
         if ModuleState.get_module(state.pid, module) == nil do
           execute(module, state.pid)

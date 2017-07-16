@@ -3,7 +3,7 @@ defmodule ElixirScript.Output.JSModule do
 
   alias ESTree.Tools.Builder, as: J
 
-  def compile(body, opts) do
+  def compile(body, opts, js_modules) do
     declarator = J.variable_declarator(
       J.identifier("Elixir"),
       J.object_expression([])
@@ -11,15 +11,10 @@ defmodule ElixirScript.Output.JSModule do
 
     elixir = J.variable_declaration([declarator], :const)
 
-    table_additions = Enum.map(opts.js_modules, fn
-      {module, _} -> add_import_to_table(module)
-      {module, _, _} -> add_import_to_table(module)
-    end)
-
     ast = opts.module_formatter.build(
       [],
-      opts.js_modules,
-      [elixir, create_atom_table(), start(), load()] ++ table_additions ++ body,
+      js_modules,
+      [elixir, create_atom_table(), start(), load()] ++ body,
       J.identifier("Elixir")
     )
 
@@ -96,28 +91,6 @@ defmodule ElixirScript.Output.JSModule do
         J.identifier("__table__")
       ),
       J.object_expression([])
-    )
-  end
-
-  defp add_import_to_table(module_name) do
-    ref = ElixirScript.Translate.Identifier.make_namespace_members(module_name)
-    J.assignment_expression(
-      :=,
-      J.member_expression(
-        J.member_expression(
-          J.identifier("Elixir"),
-          J.identifier("__table__")
-        ),
-        J.call_expression(
-          J.member_expression(
-            J.identifier("Symbol"),
-            J.identifier("for")
-          ),
-          [J.literal(ref.name)]
-        ),
-        true
-      ),
-      ref
     )
   end
 

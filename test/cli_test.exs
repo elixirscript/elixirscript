@@ -30,10 +30,4 @@ defmodule ElixirScript.CLI.Test do
       ElixirScript.CLI.process({["Atom"], []})
     end) =~ "export default Elixir"
   end
-
-  test "process js modules" do
-    assert capture_io(fn ->
-      ElixirScript.CLI.process({["Atom"], [js_module: "React:react"]})
-    end) =~ "import React from 'react'"
-  end
 end

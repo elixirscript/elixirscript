@@ -65,8 +65,7 @@ defmodule Mix.Tasks.Compile.ElixirScript do
     input = Keyword.fetch!(elixirscript_config, :input)
     opts = [
       output: Keyword.get(elixirscript_config, :output),
-      format: Keyword.get(elixirscript_config, :format),
-      js_modules: Keyword.get(elixirscript_config, :js_modules, [])
+      format: Keyword.get(elixirscript_config, :format)
     ]
 
     {input, opts}

@@ -7,7 +7,7 @@ defmodule ElixirScript.Compiler.Test do
   end
 
   test "Can compile multiple entry modules" do
-    result = ElixirScript.Compiler.compile([Atom, String])
+    result = ElixirScript.Compiler.compile([Atom, String, Agent])
     assert is_binary(result)
   end
 
