@@ -53,6 +53,19 @@ defmodule ElixirScript.FFI do
   ```
   """
   defmacro foreign({name, _, args}) do
+    args = Enum.map(args, fn
+      {:\\, meta0, [{name, meta, atom}, value]}->
+        name = String.to_atom("_" <> Atom.to_string(name))
+        {:\\, meta0, [{name, meta, atom}, value]}
+
+      {name, meta, atom} ->
+        name = String.to_atom("_" <> Atom.to_string(name))
+        {name, meta, atom}
+
+      other ->
+        other
+    end)
+
     quote do
       def unquote(name)(unquote_splicing(args)), do: nil
     end
