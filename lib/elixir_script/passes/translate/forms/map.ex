@@ -5,17 +5,19 @@ defmodule ElixirScript.Translate.Forms.Map do
 
   def compile({:%{}, _, [{:|, _, [map, new_values]}]}, state) do
     { map, state } = Form.compile(map, state)
-    { data, state } = Form.compile({:%{}, [], new_values}, state)
+    data = Enum.map(new_values, fn {x, y} ->
+      J.array_expression([
+        Form.compile!(x, state),
+        Form.compile!(y, state)
+      ])
+    end)
 
-    ast = J.call_expression(
-      J.member_expression(
-        J.identifier("Object"),
-        J.identifier("assign")
-      ),
+    ast = J.new_expression(
+      J.identifier("Map"),
       [
-        J.object_expression([]),
-        map,
-        data
+        J.array_expression(
+          [J.spread_element(map)] ++ data
+        )
       ]
     )
 
@@ -23,21 +25,22 @@ defmodule ElixirScript.Translate.Forms.Map do
   end
 
   def compile({:%{}, _, properties}, state) do
-    ast = properties
-    |> Enum.map(fn
-      ({x, y}) ->
-        case x do
-          {_, _, nil } ->
-            {key, _} = Form.compile(x, state)
-            {value, _} = Form.compile(y, state)
-            J.property(key,  value, :init, false, false, true)
-          _ ->
-            {key, _} = Form.compile(x, state)
-            {value, _} = Form.compile(y, state)
-            make_property(key, value)
-        end
-    end)
-    |> J.object_expression
+    ast = J.new_expression(
+      J.identifier("Map"),
+      [
+        J.array_expression(
+          Enum.map(properties, fn
+            {x, y} ->
+              J.array_expression(
+                [
+                  Form.compile!(x, state),
+                  Form.compile!(y, state)
+                ]
+              )
+          end)
+        )
+      ]
+    )
 
     {ast, state}
   end

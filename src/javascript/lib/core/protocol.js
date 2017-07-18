@@ -31,12 +31,12 @@ class Protocol {
           fun = this.registry.get(Core.BitString)[funName];
         } else if (
           thing &&
-          thing[Symbol.for('__struct__')] &&
+          thing.has(Symbol.for('__struct__')) &&
           this.hasImplementation(thing)
         ) {
-          fun = this.registry.get(thing[Symbol.for('__struct__')].__MODULE__)[
-            funName
-          ];
+          fun = this.registry.get(
+            thing.get(Symbol.for('__struct__')).__MODULE__
+          )[funName];
         } else if (thing !== null && this.hasImplementation(thing)) {
           fun = this.registry.get(thing.constructor)[funName];
         } else if (this.fallback) {
@@ -72,8 +72,8 @@ class Protocol {
       thing === Core.BitString
     ) {
       return this.registry.has(thing);
-    } else if (thing && thing[Symbol.for('__struct__')]) {
-      return this.registry.has(thing[Symbol.for('__struct__')].__MODULE__);
+    } else if (thing && thing.has(Symbol.for('__struct__'))) {
+      return this.registry.has(thing.get(Symbol.for('__struct__')).__MODULE__);
     }
 
     return this.registry.has(thing.constructor);
