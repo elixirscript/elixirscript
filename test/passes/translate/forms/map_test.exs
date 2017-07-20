@@ -9,19 +9,23 @@ defmodule ElixirScript.Translate.Forms.Map.Test do
     state = %{}
 
     {js_ast, _} = Form.compile(ast, state)
-    assert js_ast == J.object_expression([
-      J.property(
-        J.call_expression(
-          J.member_expression(
-            J.identifier("Symbol"),
-            J.identifier("for")
-          ),
-          [J.literal(:a)]
-        ),
-        J.literal(1),
-        :init, false, false, true      
-      )
-    ])
+    assert js_ast == J.new_expression(
+      J.identifier("Map"),
+      [
+        J.array_expression([
+          J.array_expression([
+              J.call_expression(
+                J.member_expression(
+                  J.identifier("Symbol"),
+                  J.identifier("for")
+                ),
+                [J.literal(:a)]
+              ),
+              J.literal(1),
+          ])
+        ])
+      ]
+    )
   end
 
   test "map with string key" do
@@ -30,12 +34,17 @@ defmodule ElixirScript.Translate.Forms.Map.Test do
     state = %{}
 
     {js_ast, _} = Form.compile(ast, state)
-    assert js_ast == J.object_expression([
-      J.property(
-        J.identifier("a"),
-        J.literal(1)  
-      )
-    ])
+    assert js_ast == J.new_expression(
+      J.identifier("Map"),
+      [
+        J.array_expression([
+          J.array_expression([
+            J.literal("a"),
+            J.literal(1),
+          ])
+        ])
+      ]
+    )
   end
 
 
@@ -47,26 +56,28 @@ defmodule ElixirScript.Translate.Forms.Map.Test do
 
     ast = {:%{}, [], [{:|, [], [map_ast, new_values]}]}
 
-    {js_ast, _} = Form.compile(ast, state)
-    assert js_ast == J.call_expression(
-      J.member_expression(
-        J.identifier("Object"),
-        J.identifier("assign")
-      ),
+    map_ast = J.new_expression(
+      J.identifier("Map"),
       [
-        J.object_expression([]),
-        J.object_expression([
-              J.property(
-                J.identifier("a"),
-                J.literal(1)  
-              )
-            ]),
-        J.object_expression([
-              J.property(
-                J.identifier("a"),
-                J.literal(2)  
-              )
-            ])        
+        J.array_expression([
+          J.array_expression([
+            J.literal("a"),
+            J.literal(1),
+          ])
+        ])
+      ]
+    )
+
+    {js_ast, _} = Form.compile(ast, state)
+    assert js_ast == J.new_expression(
+      J.identifier("Map"),
+      [
+        J.array_expression(
+          [J.spread_element(map_ast)] ++ [J.array_expression([
+            J.literal("a"),
+            J.literal(2)
+          ])]
+        )
       ]
     )
   end

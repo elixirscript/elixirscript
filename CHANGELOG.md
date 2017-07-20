@@ -8,7 +8,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - ElixirScript now has an FFI layer for interoperability with JavaScript. For more details, see documentation at `ElixirScript.FFI`
-- ElixirScript.JS.mutate/2
 - ElixirScript.JS.mutate/3
 
 ### Changed
