@@ -174,7 +174,7 @@ function is_list(value) {
 }
 
 function is_map(value) {
-  return typeof value === 'object' || value instanceof Object;
+  return value instanceof Map;
 }
 
 function is_pid(value) {
@@ -282,7 +282,7 @@ function make_ref() {
 }
 
 function map_size(map) {
-  return Object.keys(map).length;
+  return map.size;
 }
 
 function max(first, second) {

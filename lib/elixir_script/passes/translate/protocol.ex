@@ -153,7 +153,7 @@ defmodule ElixirScript.Translate.Protocol do
   end
 
   defp map_to_js(Map) do
-    J.identifier(:Object)
+    J.identifier(:Map)
   end
 
   defp map_to_js(Any) do

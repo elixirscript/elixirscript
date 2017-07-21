@@ -122,33 +122,33 @@ defmodule ElixirScript.Translate.Forms.Pattern do
        {pattern, params} = process_pattern(var, state)
 
         a = J.object_expression([%ESTree.Property{
-            key: J.identifier("__MODULE__"),
-            value: hd(List.wrap(pattern))
-          }])
+          key: J.identifier("__MODULE__"),
+          value: hd(List.wrap(pattern))
+        }])
 
-        property = ElixirScript.Translate.Forms.Map.make_property(
+        property = J.array_expression([
           Form.compile!(:__struct__, state),
           a
-        )
+        ])
 
         { property, params }
 
       {:__module__struct__, module} ->
         a = J.object_expression([%ESTree.Property{
-            key: J.identifier("__MODULE__"),
-            value: J.call_expression(
-              J.member_expression(
-                J.identifier("Symbol"),
-                J.identifier("for")
-              ),
-              [J.literal(to_string(module))]
-            )
-          }])
+          key: J.identifier("__MODULE__"),
+          value: J.call_expression(
+            J.member_expression(
+              J.identifier("Symbol"),
+              J.identifier("for")
+            ),
+            [J.literal(to_string(module))]
+          )
+        }])
 
-        property = ElixirScript.Translate.Forms.Map.make_property(
+        property = J.array_expression([
           Form.compile!(:__struct__, state),
           a
-        )
+        ])
 
         { property, [] }
 
@@ -156,9 +156,15 @@ defmodule ElixirScript.Translate.Forms.Pattern do
         {pattern, params} = process_pattern(value, state)
         property = case key do
                     {:^, _, [the_key]} ->
-                      J.property(Form.compile!(the_key, state), hd(List.wrap(pattern)), :init, false, false, true)
+                      J.array_expression([
+                        Form.compile!(the_key, state),
+                        hd(List.wrap(pattern))
+                      ])
                     _ ->
-                      ElixirScript.Translate.Forms.Map.make_property(Form.compile!(key, state), hd(List.wrap(pattern)))
+                      J.array_expression([
+                        Form.compile!(key, state),
+                        hd(List.wrap(pattern))
+                      ])
                   end
 
         { property, params }
@@ -168,7 +174,14 @@ defmodule ElixirScript.Translate.Forms.Pattern do
       { props ++ [prop], params ++ param }
     end)
 
-    { [J.object_expression(List.wrap(props))], params }
+    ast = J.new_expression(
+      J.identifier("Map"),
+      [
+        J.array_expression(List.wrap(props))
+      ]
+    )
+
+    { [ast], params }
   end
 
   defp process_pattern({:<<>>, _, elements}, state) do

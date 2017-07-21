@@ -65,53 +65,40 @@ defmodule ElixirScript.Translate.Forms.JS.Test do
     )
   end
 
-  test "mutate/2" do
-    properties = [{"a", 1}]
-    map_ast = {:%{}, [], properties}
-
-    ast = {{:., [], [ElixirScript.JS, :mutate]}, [], [{:%{}, [], []}, map_ast]}
-    state = %{function: {:each, nil}, module: Enum, vars: %{:_ => 0, "entry" => 0, "enumerable" => 0, "fun" => 0}}
-
-    {js_ast, _} = Form.compile(ast, state)
-    assert js_ast == J.call_expression(
-      J.member_expression(
-        J.identifier("Object"),
-        J.identifier("assign")
-      ),
-      [
-        J.object_expression([]),
-        J.object_expression([
-          J.property(
-            J.identifier("a"),
-            J.literal(1)
-          )
-        ])
-      ]
-    )
-  end
-
   test "mutate/3" do
-    properties = [{"a", 1}]
-    map_ast = {:%{}, [], properties}
-
-    ast = {{:., [], [ElixirScript.JS, :mutate]}, [], [map_ast, "a", 2]}
+    ast = {{:., [], [ElixirScript.JS, :mutate]}, [], [{:entry, [], nil}, "a", 2]}
     state = %{function: {:each, nil}, module: Enum, vars: %{:_ => 0, "entry" => 0, "enumerable" => 0, "fun" => 0}}
 
     {js_ast, _} = Form.compile(ast, state)
     assert js_ast == J.assignment_expression(
       :=,
       J.member_expression(
-        J.object_expression([
-          J.property(
-            J.identifier("a"),
-            J.literal(1)
-          )
-        ]),
+        J.identifier("entry0"),
         J.literal("a"),
         true
       ),
+      J.literal(2)
+    )
+  end
+
+  test "map_to_object/1" do
+    ast = {{:., [], [ElixirScript.JS, :map_to_object]}, [], [{:entry, [], nil}]}
+    state = %{function: {:each, nil}, module: Enum, vars: %{:_ => 0, "entry" => 0, "enumerable" => 0, "fun" => 0}}
+
+    {js_ast, _} = Form.compile(ast, state)
+    assert js_ast == J.call_expression(
+      J.member_expression(
+        J.member_expression(
+          J.identifier("ElixirScript"),
+          J.member_expression(
+            J.identifier("Core"),
+            J.identifier("Functions")
+          )
+        ),
+        J.identifier("map_to_object")
+      ),
       [
-        J.literal(2)
+        J.identifier("entry0")
       ]
     )
   end

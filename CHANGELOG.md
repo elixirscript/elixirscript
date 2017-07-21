@@ -8,8 +8,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - ElixirScript now has an FFI layer for interoperability with JavaScript. For more details, see documentation at `ElixirScript.FFI`
-- ElixirScript.JS.mutate/2
-- ElixirScript.JS.mutate/3
+- `ElixirScript.JS.mutate/3`
+- `ElixirScript.JS.map_to_object/1`
 
 ### Changed
 - Compiler has been completely rewritten. ElixirScript now requires Erlang 20+ and Elixir 1.5+

@@ -31,6 +31,28 @@ function call_property(item, property) {
     return item;
   }
 
+  if (item instanceof Map) {
+    let prop = null;
+
+    if (item.has(property)) {
+      prop = property;
+    } else if (item.has(Symbol.for(property))) {
+      prop = Symbol.for(property);
+    }
+
+    if (prop === null) {
+      throw new Error(`Property ${property} not found in ${item}`);
+    }
+
+    if (
+      item.get(prop) instanceof Function ||
+      typeof item.get(prop) === 'function'
+    ) {
+      return item.get(prop)();
+    }
+    return item.get(prop);
+  }
+
   let prop = null;
 
   if (
@@ -91,10 +113,25 @@ function build_namespace(ns, ns_string) {
   return parent;
 }
 
+function map_to_object(map) {
+  const object = {};
+
+  for (const [key, value] of map.entries()) {
+    if (value instanceof Map) {
+      object[key] = map_to_object(value);
+    } else {
+      object[key] = value;
+    }
+  }
+
+  return object;
+}
+
 export default {
   call_property,
   defprotocol,
   defimpl,
   build_namespace,
-  iterator_to_reducer
+  iterator_to_reducer,
+  map_to_object
 };

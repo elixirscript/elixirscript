@@ -91,8 +91,26 @@ defmodule ElixirScript.Translate.Forms.JS do
         Form.compile!(key, state),
         true
       ),
+      Form.compile!(value, state)
+    )
+
+    {ast, state}
+  end
+
+  def compile({{:., _, [ElixirScript.JS, :map_to_object]}, _, [object]}, state) do
+    ast = J.call_expression(
+      J.member_expression(
+        J.member_expression(
+          J.identifier("ElixirScript"),
+          J.member_expression(
+            J.identifier("Core"),
+            J.identifier("Functions")
+          )
+        ),
+        J.identifier("map_to_object")
+      ),
       [
-        Form.compile!(value, state)
+        Form.compile!(object, state)
       ]
     )
 
