@@ -317,6 +317,18 @@ function binary_to_integer(str, base = 10) {
   return parseInt(str, base);
 }
 
+function process_info(pid, item) {
+  if (item) {
+    if (item === Symbol.for('current_stacktrace')) {
+      return new ErlangTypes.Tuple(item, []);
+    }
+
+    return new ErlangTypes.Tuple(item, null);
+  }
+
+  return [];
+}
+
 export default {
   atom_to_binary,
   binary_to_atom,
@@ -382,5 +394,6 @@ export default {
   trunc,
   tuple_size,
   binary_to_float,
-  binary_to_integer
+  binary_to_integer,
+  process_info
 };

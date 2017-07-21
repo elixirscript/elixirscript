@@ -5,6 +5,7 @@ import SpecialForms from './core/special_forms';
 import erlang from './core/erlang_compat/erlang';
 import maps from './core/erlang_compat/maps';
 import lists from './core/erlang_compat/lists';
+import elixir_errors from './core/erlang_compat/elixir_errors';
 import Store from './core/store';
 
 class Integer {}
@@ -41,5 +42,6 @@ export default {
   global: globalState,
   erlang,
   maps,
-  lists
+  lists,
+  elixir_errors
 };
