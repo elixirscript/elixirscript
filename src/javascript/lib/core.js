@@ -6,6 +6,7 @@ import erlang from './core/erlang_compat/erlang';
 import maps from './core/erlang_compat/maps';
 import lists from './core/erlang_compat/lists';
 import elixir_errors from './core/erlang_compat/elixir_errors';
+import io from './core/erlang_compat/io';
 import Store from './core/store';
 
 class Integer {}
@@ -43,5 +44,6 @@ export default {
   erlang,
   maps,
   lists,
-  elixir_errors
+  elixir_errors,
+  io
 };
