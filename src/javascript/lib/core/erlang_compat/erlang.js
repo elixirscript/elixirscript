@@ -329,6 +329,32 @@ function process_info(pid, item) {
   return [];
 }
 
+function iolist_to_binary(ioListOrBinary) {
+  if (is_binary(ioListOrBinary)) {
+    return ioListOrBinary;
+  }
+
+  if (is_bitstring(ioListOrBinary)) {
+    return String.fromCodePoint(...ioListOrBinary.value);
+  }
+
+  const value = ioListOrBinary.reduce((acc, current) => {
+    if (is_integer(current)) {
+      return acc + String.fromCodePoint(current);
+    } else if (is_bitstring(current)) {
+      return acc + String.fromCodePoint(...current.value);
+    }
+
+    return acc + iolist_to_binary(current);
+  }, '');
+
+  return value;
+}
+
+function io_size(ioListOrBinary) {
+  return iolist_to_binary(ioListOrBinary).length;
+}
+
 export default {
   atom_to_binary,
   binary_to_atom,
@@ -395,5 +421,7 @@ export default {
   tuple_size,
   binary_to_float,
   binary_to_integer,
-  process_info
+  process_info,
+  iolist_to_binary,
+  io_size
 };
