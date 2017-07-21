@@ -113,10 +113,25 @@ function build_namespace(ns, ns_string) {
   return parent;
 }
 
+function map_to_object(map) {
+  const object = {};
+
+  for (const [key, value] of map.entries()) {
+    if (value instanceof Map) {
+      object[key] = map_to_object(value);
+    } else {
+      object[key] = value;
+    }
+  }
+
+  return object;
+}
+
 export default {
   call_property,
   defprotocol,
   defimpl,
   build_namespace,
-  iterator_to_reducer
+  iterator_to_reducer,
+  map_to_object
 };

@@ -44,4 +44,14 @@ defmodule ElixirScript.JS do
     ElixirScript.JS.mutate elem, "width", 100
   """
   defmacro mutate(object, key, value)
+
+
+  @doc """
+  Takes the given map and returns an object
+  Throws an error if any key is not a
+  number, binary, or atom
+  ex:
+    ElixirScript.JS.map_to_object(%{my: "map"})
+  """
+  defmacro map_to_object(object)
 end
