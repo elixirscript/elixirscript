@@ -7,6 +7,7 @@ import maps from './core/erlang_compat/maps';
 import lists from './core/erlang_compat/lists';
 import elixir_errors from './core/erlang_compat/elixir_errors';
 import io from './core/erlang_compat/io';
+import binary from './core/erlang_compat/binary';
 import Store from './core/store';
 
 class Integer {}
@@ -45,5 +46,6 @@ export default {
   maps,
   lists,
   elixir_errors,
-  io
+  io,
+  binary
 };

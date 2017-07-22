@@ -62,7 +62,7 @@ defmodule ElixirScript.Translate.Forms.Pattern do
   end
 
   defp process_pattern({:_, _, _}, _) do
-    { [PM.parameter()], [J.identifier(:_)] }
+    { [PM.parameter(J.literal("_"))], [] }
   end
 
   defp process_pattern({a, b}, state) do
@@ -90,6 +90,14 @@ defmodule ElixirScript.Translate.Forms.Pattern do
       )
 
     { [PM.type(tuple, pattern)], params }
+  end
+
+  defp process_pattern([{:|, _, [head, tail]}], state) do
+    { head_patterns, head_params } = process_pattern(head, state)
+    { tail_patterns, tail_params } = process_pattern(tail, state)
+    params = head_params ++ tail_params
+
+    { [PM.head_tail(hd(head_patterns), hd(tail_patterns))], params }
   end
 
   defp process_pattern(list, state) when is_list(list) do
