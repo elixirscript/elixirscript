@@ -43,68 +43,8 @@ function list_subtraction(list1, list2) {
   return list;
 }
 
-function plus(left, right) {
-  if (!right) {
-    return +left;
-  }
-
-  return left + right;
-}
-
-function minus(left, right) {
-  if (!right) {
-    return -left;
-  }
-
-  return left - right;
-}
-
-function multiply(left, right) {
-  return left * right;
-}
-
 function div(left, right) {
   return left / right;
-}
-
-function equal(left, right) {
-  return left == right;
-}
-
-function doesNotEqual(left, right) {
-  return left != right;
-}
-
-function greaterThan(left, right) {
-  return left > right;
-}
-
-function greaterThanOrEqualTo(left, right) {
-  return left >= right;
-}
-
-function lessThan(left, right) {
-  return left < right;
-}
-
-function lessThanOrEqualTo(left, right) {
-  return left <= right;
-}
-
-function strictlyEqual(left, right) {
-  return left === right;
-}
-
-function doesNotStrictlyEqual(left, right) {
-  return left !== right;
-}
-
-function and(left, right) {
-  return left && right;
-}
-
-function or(left, right) {
-  return left || right;
 }
 
 function not(x) {
@@ -365,20 +305,7 @@ export default {
   binary_to_existing_atom,
   list_concatenation,
   list_subtraction,
-  plus,
-  minus,
-  multiply,
   div,
-  equal,
-  greaterThan,
-  greaterThanOrEqualTo,
-  lessThan,
-  lessThanOrEqualTo,
-  doesNotEqual,
-  strictlyEqual,
-  doesNotStrictlyEqual,
-  and,
-  or,
   not,
   rem,
   band,

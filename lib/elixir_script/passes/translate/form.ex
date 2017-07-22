@@ -211,6 +211,86 @@ defmodule ElixirScript.Translate.Form do
     ElixirScript.Translate.Function.compile(ast, state)
   end
 
+  def compile({{:., _, [:erlang, op]}, _, [item]}, state) when op in [:+, :-] do
+    ast = J.unary_expression(
+      op,
+      true,
+      compile!(item, state)
+    )
+
+    {ast, state}
+  end
+
+  def compile({{:., _, [:erlang, op]}, _, [left, right]}, state) when op in [:+, :-, :*, :/, :==, :>, :<, :>=] do
+    ast = J.binary_expression(
+      op,
+      compile!(left, state),
+      compile!(right, state)
+    )
+
+    {ast, state}
+  end
+
+  def compile({{:., _, [:erlang, :"=<"]}, _, [left, right]}, state) do
+    ast = J.binary_expression(
+      :<=,
+      compile!(left, state),
+      compile!(right, state)
+    )
+
+    {ast, state}
+  end
+
+  def compile({{:., _, [:erlang, :"=:="]}, _, [left, right]}, state) do
+    ast = J.binary_expression(
+      :===,
+      compile!(left, state),
+      compile!(right, state)
+    )
+
+    {ast, state}
+  end
+
+  def compile({{:., _, [:erlang, :"=/="]}, _, [left, right]}, state) do
+    ast = J.binary_expression(
+      :!==,
+      compile!(left, state),
+      compile!(right, state)
+    )
+
+    {ast, state}
+  end
+
+  def compile({{:., _, [:erlang, :"/="]}, _, [left, right]}, state) do
+    ast = J.binary_expression(
+      :!=,
+      compile!(left, state),
+      compile!(right, state)
+    )
+
+    {ast, state}
+  end
+
+  def compile({{:., _, [:erlang, op]}, _, [left, right]}, state) when op in [:andalso, :and] do
+    ast = J.binary_expression(
+      :&&,
+      compile!(left, state),
+      compile!(right, state)
+    )
+
+    {ast, state}
+  end
+
+  def compile({{:., _, [:erlang, op]}, _, [left, right]}, state) when op in [:orelse, :or] do
+    ast = J.binary_expression(
+      :||,
+      compile!(left, state),
+      compile!(right, state)
+    )
+
+    {ast, state}
+  end
+
   def compile({{:., _, [{_, _, nil} = var, func_or_prop]}, _, []}, state) do
     ast = J.call_expression(
       ElixirScript.Translate.Forms.JS.call_property(),
