@@ -286,6 +286,12 @@ defmodule ElixirScript.Translate.Form do
     end
   end
 
+  def compile({:default, _, _}, state) do
+    var = :__default__
+    var = Pattern.get_variable_name(to_string(var), state)
+    { ElixirScript.Translate.Identifier.make_identifier(var), state }
+  end
+
   def compile({var, _, _}, state) do
     var = Pattern.get_variable_name(to_string(var), state)
     { ElixirScript.Translate.Identifier.make_identifier(var), state }

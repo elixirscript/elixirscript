@@ -355,6 +355,10 @@ function io_size(ioListOrBinary) {
   return iolist_to_binary(ioListOrBinary).length;
 }
 
+function integer_to_binary(integer, base = 10) {
+  return integer.toString(base);
+}
+
 export default {
   atom_to_binary,
   binary_to_atom,
@@ -423,5 +427,6 @@ export default {
   binary_to_integer,
   process_info,
   iolist_to_binary,
-  io_size
+  io_size,
+  integer_to_binary
 };

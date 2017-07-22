@@ -286,7 +286,7 @@ defmodule ElixirScript.FindUsedModules do
     end
   end
 
-  defp walk({:super, _, params}, state) do
+  defp walk({:super, _, [{_, _} | params]}, state) do
     walk(params, state)
   end
 
