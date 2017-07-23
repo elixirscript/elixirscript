@@ -1,11 +1,7 @@
-function put_chars(ioDevice, charData) {
-  let dataToWrite = null;
+import erlang from './erlang';
 
-  if (Array.isArray(charData)) {
-    dataToWrite = String.fromCodePoint(...charData);
-  } else {
-    dataToWrite = charData;
-  }
+function put_chars(ioDevice, charData) {
+  let dataToWrite = erlang.iolist_to_binary(charData);
 
   if (ioDevice === Symbol.for('stderr')) {
     console.error(dataToWrite);

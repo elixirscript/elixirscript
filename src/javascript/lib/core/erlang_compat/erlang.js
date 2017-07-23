@@ -1,5 +1,6 @@
 // http://erlang.org/doc/man/erlang.html
 import ErlangTypes from 'erlang-types';
+import lists from './lists';
 
 function atom_to_binary(atom, encoding = Symbol.for('utf8')) {
   if (encoding !== Symbol.for('utf8')) {
@@ -270,6 +271,10 @@ function process_info(pid, item) {
 }
 
 function iolist_to_binary(ioListOrBinary) {
+  if (ioListOrBinary === null) {
+    return '';
+  }
+
   if (is_binary(ioListOrBinary)) {
     return ioListOrBinary;
   }
@@ -278,8 +283,12 @@ function iolist_to_binary(ioListOrBinary) {
     return String.fromCodePoint(...ioListOrBinary.value);
   }
 
-  const value = ioListOrBinary.reduce((acc, current) => {
-    if (is_integer(current)) {
+  const iolistFlattened = lists.flatten(ioListOrBinary);
+
+  const value = iolistFlattened.reduce((acc, current) => {
+    if (current === null) {
+      return acc;
+    } else if (is_integer(current)) {
       return acc + String.fromCodePoint(current);
     } else if (is_bitstring(current)) {
       return acc + String.fromCodePoint(...current.value);
