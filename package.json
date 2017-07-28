@@ -23,7 +23,7 @@
   "license": "MIT",
   "dependencies": {
     "erlang-types": "^1.0.1",
-    "tailored": "^2.6.3"
+    "tailored": "^2.6.4"
   },
   "devDependencies": {
     "ava": "^0.21.0",

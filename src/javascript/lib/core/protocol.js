@@ -31,6 +31,7 @@ class Protocol {
           fun = this.registry.get(Core.BitString)[funName];
         } else if (
           thing &&
+          thing instanceof Map &&
           thing.has(Symbol.for('__struct__')) &&
           this.hasImplementation(thing)
         ) {
@@ -72,7 +73,11 @@ class Protocol {
       thing === Core.BitString
     ) {
       return this.registry.has(thing);
-    } else if (thing && thing.has(Symbol.for('__struct__'))) {
+    } else if (
+      thing &&
+      thing instanceof Map &&
+      thing.has(Symbol.for('__struct__'))
+    ) {
       return this.registry.has(thing.get(Symbol.for('__struct__')).__MODULE__);
     }
 
