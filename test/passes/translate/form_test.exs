@@ -120,10 +120,11 @@ defmodule ElixirScript.Translate.Forms.Test do
 
   test "function returning an array" do
     ast = {:fn, [], [{:foo, [], [], [1, 2, 3]}]}
-    state = %{}
+    state = %{function: {:something, nil}}
 
     {js_ast, _} = Form.compile(ast, state)
-    return_statement = Enum.at(Enum.at(js_ast.body.body, 1).consequent.body, 1)
+
+    return_statement = Enum.at(Enum.at(hd(js_ast.body.body).body.body, 1).consequent.body, 1)
 
     assert return_statement.argument == J.array_expression([
       J.literal(1),

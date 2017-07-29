@@ -35,7 +35,7 @@ defmodule ElixirScript.Compiler.Test do
   test "Output file with default name" do
     path = System.tmp_dir()
 
-    result = ElixirScript.Compiler.compile(Atom, [output: path])
+    ElixirScript.Compiler.compile(Atom, [output: path])
     assert File.exists?(Path.join([path, "Elixir.App.js"]))
   end
 
@@ -43,7 +43,7 @@ defmodule ElixirScript.Compiler.Test do
     path = System.tmp_dir()
     path = Path.join([path, "myfile.js"])
 
-    result = ElixirScript.Compiler.compile(Atom, [output: path])
+    ElixirScript.Compiler.compile(Atom, [output: path])
     assert File.exists?(path)
   end
 end

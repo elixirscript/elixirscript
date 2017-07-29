@@ -127,11 +127,29 @@ function map_to_object(map) {
   return object;
 }
 
+class Recurse {
+  constructor(func) {
+    this.func = func;
+  }
+}
+
+function trampoline(f) {
+  let currentValue = f;
+
+  while (currentValue && currentValue instanceof Recurse) {
+    currentValue = currentValue.func();
+  }
+
+  return currentValue;
+}
+
 export default {
   call_property,
   defprotocol,
   defimpl,
   build_namespace,
   iterator_to_reducer,
-  map_to_object
+  map_to_object,
+  trampoline,
+  Recurse
 };

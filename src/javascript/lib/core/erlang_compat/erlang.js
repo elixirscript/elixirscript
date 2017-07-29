@@ -283,6 +283,10 @@ function iolist_to_binary(ioListOrBinary) {
     return String.fromCodePoint(...ioListOrBinary.value);
   }
 
+  if (is_number(ioListOrBinary)) {
+    return String.fromCodePoint(ioListOrBinary);
+  }
+
   const iolistFlattened = lists.flatten(ioListOrBinary);
 
   const value = iolistFlattened.reduce((acc, current) => {
