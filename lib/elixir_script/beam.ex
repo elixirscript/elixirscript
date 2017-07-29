@@ -10,9 +10,24 @@ defmodule ElixirScript.Beam do
   @spec debug_info(atom) :: {:ok | :error, map | binary}
   def debug_info(module)
 
-  #Replace some modules with ElixirScript versions
-  def debug_info(module) when module in [String, Agent] do
-    case debug_info(Module.concat(ElixirScript, module)) do
+  # We get debug info from String and then replace
+  # functions in it with equivalents in ElixirScript.String.
+  # This is so that we don't include the unicode database
+  # in our output
+  def debug_info(String) do
+    {:ok, info} = do_debug_info(String)
+    {:ok, ex_string_info} = do_debug_info(ElixirScript.String)
+
+    definitions = replace_definitions(info.definitions, ex_string_info.definitions)
+
+    info = %{info | definitions: definitions}
+
+    {:ok, info}
+  end
+
+  # Replace some modules with ElixirScript versions
+  def debug_info(module) when module in [Agent] do
+    case do_debug_info(Module.concat(ElixirScript, module)) do
       {:ok, info} ->
         {:ok, Map.put(info, :module, module)}
       e ->
@@ -21,6 +36,10 @@ defmodule ElixirScript.Beam do
   end
 
   def debug_info(module) when is_atom(module) do
+    do_debug_info(module)
+  end
+
+  defp do_debug_info(module) when is_atom(module) do
     #TODO: Get modified date from _beam_path to check for cached version?
     with  {_, beam, _beam_path} <- :code.get_object_code(module),
           {:ok, {^module, [debug_info: {:debug_info_v1, backend, data}]}} <- :beam_lib.chunks(beam, [:debug_info]),
@@ -57,6 +76,23 @@ defmodule ElixirScript.Beam do
     end)
 
     {:ok, module, implementations}
+  end
+
+  defp replace_definitions(original_definitions, replacement_definitions) do
+    Enum.map(original_definitions, fn
+      {{function, arity}, type, _, _} = ast ->
+        ex_ast = Enum.find(replacement_definitions, fn
+          {{ex_function, ex_arity}, ex_type, _, _}  ->
+            ex_function == function and ex_arity == arity and ex_type == type
+        end)
+
+        case ex_ast do
+          nil ->
+            ast
+          _ ->
+            ex_ast
+        end
+    end)
   end
 
 end

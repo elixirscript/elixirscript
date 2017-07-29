@@ -17,7 +17,8 @@ defmodule ElixirScript.Translate.Forms.Remote do
     :elixir_utils,
     :file,
     :io,
-    :binary
+    :binary,
+    :unicode
   ]
 
   @doc """
