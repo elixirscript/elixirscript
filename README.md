@@ -13,6 +13,11 @@ Usage
 
 Please check the [Getting Started Guide](GettingStarted.md) for usage
 
+Examples
+==========
+
+[ElixirScript Todo Example](https://github.com/elixirscript/todo-elixirscript)
+
 
 Development
 ===========
