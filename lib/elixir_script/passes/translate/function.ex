@@ -31,7 +31,8 @@ defmodule ElixirScript.Translate.Function do
       :let
     )
 
-    function_dec = J.arrow_function_expression(
+    function_recur_dec = J.function_declaration(
+      J.identifier("recur"),
       [J.rest_element(J.identifier("__function_args__"))],
       [],
       J.block_statement([
@@ -45,6 +46,17 @@ defmodule ElixirScript.Translate.Function do
             ),
             [J.identifier("__function_args__")]
           )
+        )
+      ])
+    )
+
+    function_dec = J.arrow_function_expression(
+      [J.rest_element(J.identifier("__function_args__"))],
+      [],
+      J.block_statement([
+        function_recur_dec,
+        J.return_statement(
+          trampoline()
         )
       ])
     )
@@ -66,8 +78,8 @@ defmodule ElixirScript.Translate.Function do
       :let
     )
 
-    function_dec = J.function_declaration(
-      ElixirScript.Translate.Identifier.make_function_name(name),
+    function_recur_dec = J.function_declaration(
+      J.identifier("recur"),
       [J.rest_element(J.identifier("__function_args__"))],
       [],
       J.block_statement([
@@ -81,6 +93,18 @@ defmodule ElixirScript.Translate.Function do
             ),
             [J.identifier("__function_args__")]
           )
+        )
+      ])
+    )
+
+    function_dec = J.function_declaration(
+      ElixirScript.Translate.Identifier.make_function_name(name),
+      [J.rest_element(J.identifier("__function_args__"))],
+      [],
+      J.block_statement([
+        function_recur_dec,
+        J.return_statement(
+          trampoline()
         )
       ])
     )
@@ -132,6 +156,7 @@ defmodule ElixirScript.Translate.Function do
 
     body = body
     |> Clause.return_last_statement
+    |> update_last_call(state)
 
     declarator = J.variable_declarator(
       J.array_expression(params),
@@ -167,5 +192,71 @@ defmodule ElixirScript.Translate.Function do
     end
 
     {ast, state}
+  end
+
+  defp update_last_call(clause_body, %{function: {name, _}}) do
+    last_item = List.last(clause_body)
+    function_name = ElixirScript.Translate.Identifier.make_function_name(name)
+
+    case last_item do
+      %ESTree.ReturnStatement{ argument: %ESTree.CallExpression{ callee: ^function_name, arguments: arguments } } ->
+        new_last_item = J.return_statement(
+          recurse(
+            recur_bind(arguments)
+          )
+        )
+
+        List.replace_at(clause_body, length(clause_body) - 1, new_last_item)
+      _ ->
+        clause_body
+    end
+  end
+
+  defp recur_bind(args) do
+    J.call_expression(
+      J.member_expression(
+        J.identifier("recur"),
+        J.identifier("bind")
+      ),
+      [J.identifier("null")] ++ args
+    )
+  end
+
+  defp recurse(func) do
+    J.new_expression(
+      J.member_expression(
+        J.member_expression(
+          J.identifier("ElixirScript"),
+          J.member_expression(
+            J.identifier("Core"),
+            J.identifier("Functions")
+          )
+        ),
+        J.identifier("Recurse")
+      ),
+      [
+        func
+      ]
+    )
+  end
+
+  defp trampoline() do
+    J.call_expression(
+      J.member_expression(
+        J.member_expression(
+          J.identifier("ElixirScript"),
+          J.member_expression(
+            J.identifier("Core"),
+            J.identifier("Functions")
+          )
+        ),
+        J.identifier("trampoline")
+      ),
+      [
+        recurse(
+          recur_bind([J.rest_element(J.identifier("__function_args__"))])
+        )
+      ]
+    )
   end
 end
