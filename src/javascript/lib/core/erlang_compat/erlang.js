@@ -2,6 +2,10 @@
 import ErlangTypes from 'erlang-types';
 import lists from './lists';
 
+function atom_to_list(atom) {
+  return Symbol.keyFor(atom);
+}
+
 function atom_to_binary(atom, encoding = Symbol.for('utf8')) {
   if (encoding !== Symbol.for('utf8')) {
     throw new Error(`unsupported encoding ${encoding}`);
@@ -198,8 +202,8 @@ function apply(...args) {
   return args[0][atom_to_binary(args[1])].apply(this, ...args[2]);
 }
 
-function binary_part(binary, start, length) {
-  return binary.substring(start, start + length);
+function binary_part(binary, start, _length) {
+  return binary.substring(start, start + _length);
 }
 
 function bit_size(bitstring) {
@@ -368,5 +372,6 @@ export default {
   process_info,
   iolist_to_binary,
   io_size,
-  integer_to_binary
+  integer_to_binary,
+  atom_to_list
 };

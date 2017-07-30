@@ -30,18 +30,20 @@
     "babel-core": "^6.24.0",
     "babel-preset-env": "^1.6.0",
     "babel-register": "^6.24.0",
-    "eslint": "^4.2.0",
-    "eslint-config-airbnb-base": "^11.1.0",
+    "eslint": "^4.3.0",
+    "eslint-config-airbnb-base": "^11.3.1",
     "eslint-plugin-import": "^2.7.0",
-    "nyc": "^11.0.3",
+    "nyc": "^11.1.0",
     "rollup": "^0.45.2",
     "rollup-plugin-babel": "^2.7.1",
     "rollup-plugin-babili": "^3.1.0",
     "rollup-plugin-node-resolve": "^3.0.0",
-    "sinon": "^2.3.8"
+    "sinon": "^2.4.1"
   },
   "ava": {
-    "require": ["babel-register"],
+    "require": [
+      "babel-register"
+    ],
     "babel": {
       "babelrc": true
     }

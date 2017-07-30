@@ -6,6 +6,7 @@ import erlang from './core/erlang_compat/erlang';
 import maps from './core/erlang_compat/maps';
 import lists from './core/erlang_compat/lists';
 import elixir_errors from './core/erlang_compat/elixir_errors';
+import elixir_config from './core/erlang_compat/elixir_config';
 import io from './core/erlang_compat/io';
 import binary from './core/erlang_compat/binary';
 import unicode from './core/erlang_compat/unicode';
@@ -49,5 +50,6 @@ export default {
   elixir_errors,
   io,
   binary,
-  unicode
+  unicode,
+  elixir_config
 };

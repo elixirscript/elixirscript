@@ -11,6 +11,7 @@ defmodule ElixirScript.Translate.Forms.Remote do
     :lists,
     :gen,
     :elixir_errors,
+    :elixir_config,
     :supervisor,
     :application,
     :code,

@@ -60,7 +60,7 @@ defmodule ElixirScript.Translate.Module do
 
     #we combine our function arities
     combined_defs = combine_defs(used_defs)
-    exports = make_exports(module, combined_defs, defs, state)
+    exports = make_exports(module, combined_defs)
 
     # If there are no public exports, skip compilation
     case exports do
@@ -93,7 +93,7 @@ defmodule ElixirScript.Translate.Module do
       end)
   end
 
-  defp make_exports(module, reachable_defs, definitions, state) do
+  defp make_exports(module, reachable_defs) do
     exports = Enum.reduce(reachable_defs, [], fn
       {{name, _arity}, :def, _, _}, list ->
         function_name = ElixirScript.Translate.Identifier.make_identifier(name)

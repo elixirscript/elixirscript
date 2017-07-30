@@ -102,6 +102,10 @@ defmodule ElixirScript.Translate.Form do
     ElixirScript.Translate.Forms.Map.compile(map, state)
   end
 
+  def compile({:<<>>, _, []} = bitstring, state) do
+    Bitstring.compile(bitstring, state)
+  end
+
   def compile({:<<>>, _, elements} = bitstring, state) do
     is_interpolated_string = Enum.all?(elements, fn(x) ->
       case x do

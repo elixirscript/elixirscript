@@ -2,6 +2,7 @@ defmodule ElixirScript.Translate.Clause do
   alias ESTree.Tools.Builder, as: J
   alias ElixirScript.Translate.Form
   alias ElixirScript.Translate.Forms.Pattern
+  alias ElixirScript.Translate.Function
 
   @moduledoc """
   Handles translation of all of the clause ASTs
@@ -19,20 +20,7 @@ defmodule ElixirScript.Translate.Clause do
     {patterns, params, state} = Pattern.compile(args, state)
     guard = compile_guard(params, guards, state)
 
-    body = case body do
-      nil ->
-        J.identifier("null")
-      {:__block__, _, block_body} ->
-        {list, _} = Enum.map_reduce(block_body, state, &Form.compile(&1, &2))
-        List.flatten(list)
-      b when is_list(b) ->
-        {list, _} = Enum.map_reduce(b, state, &Form.compile(&1, &2))
-        List.flatten(list)
-      _ ->
-        Form.compile!(body, state)
-        |> List.wrap
-        |> List.flatten
-    end
+    {body, _state} = Function.compile_block(body, state)
 
     body = body
     |> return_last_statement
