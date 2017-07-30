@@ -223,8 +223,12 @@ defmodule ElixirScript.Translate.Forms.Pattern do
     unify(name, left, state)
   end
 
-  defp process_pattern({var, _, _}, _) do
+  defp process_pattern({var, _, a}, _) when is_atom(a) do
     { [PM.parameter(J.literal(to_string(var)))], [ElixirScript.Translate.Identifier.make_identifier(var)] }
+  end
+
+  defp process_pattern(ast, state) do
+    { [Form.compile!(ast, state)], [] }
   end
 
   defp reduce_patterns(patterns, _) do

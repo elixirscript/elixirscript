@@ -3,6 +3,7 @@ defmodule ElixirScript.Translate.Module do
   alias ESTree.Tools.Builder, as: J
   alias ElixirScript.Translate.Function
   alias ElixirScript.State, as: ModuleState
+  alias ElixirScript.Translate.Form
 
   @doc """
   Translate the given module's ast to
@@ -59,14 +60,16 @@ defmodule ElixirScript.Translate.Module do
 
     #we combine our function arities
     combined_defs = combine_defs(used_defs)
-    exports = make_exports(module, combined_defs)
+    exports = make_exports(module, combined_defs, defs, state)
 
     # If there are no public exports, skip compilation
     case exports do
-      %ESTree.ObjectExpression{ properties: [] } ->
+      %ESTree.ObjectExpression{ properties: props } when length(props) == 2 ->
         nil
       _ ->
         { compiled_functions, _ } = Enum.map_reduce(combined_defs, state, &Function.compile(&1, &2))
+
+        compiled_functions = compiled_functions ++ [make_info_function(module, defs, state)]
 
         js_ast = ElixirScript.ModuleSystems.Namespace.build(
           module,
@@ -90,7 +93,7 @@ defmodule ElixirScript.Translate.Module do
       end)
   end
 
-  defp make_exports(module, reachable_defs) do
+  defp make_exports(module, reachable_defs, definitions, state) do
     exports = Enum.reduce(reachable_defs, [], fn
       {{name, _arity}, :def, _, _}, list ->
         function_name = ElixirScript.Translate.Identifier.make_identifier(name)
@@ -110,7 +113,13 @@ defmodule ElixirScript.Translate.Module do
         ),
         [J.literal(to_string(module))]
       )
-    }]
+    },
+    J.property(
+      J.identifier("__info__"),
+      J.identifier("__info__"),
+      :init,
+      true
+    )]
 
     J.object_expression(exports)
   end
@@ -149,5 +158,113 @@ defmodule ElixirScript.Translate.Module do
       true ->
         false
     end
+  end
+
+  # Builds the __info__ function that Elixir modules
+  # have. Only supports the `functions`, `macros` and
+  # `module` kinds
+  defp make_info_function(module, definitions, state) do
+    functions = Enum.filter(definitions, fn
+      {_, :def, _, _} ->
+        true
+      _ ->
+        false
+    end)
+    |> Enum.map(fn
+      {func, _, _, _} ->
+        func
+    end)
+
+    functions = Form.compile!(functions, state)
+
+    macros = Enum.filter(definitions, fn
+      {_, :defmacro, _, _} ->
+        true
+      _ ->
+        false
+    end)
+    |> Enum.map(fn
+      {func, _, _, _} ->
+        func
+    end)
+
+    macros = Form.compile!(macros, state)
+
+    module = J.call_expression(
+      J.member_expression(
+        J.identifier("Symbol"),
+        J.identifier("for")
+      ),
+      [J.literal(to_string(module))]
+    )
+
+    body = J.if_statement(
+      J.binary_expression(
+        :===,
+        J.identifier("kind"),
+        J.call_expression(
+          J.member_expression(
+            J.identifier("Symbol"),
+            J.identifier("for")
+          ),
+          [J.literal("functions")]
+        )
+      ),
+      J.block_statement([
+        J.return_statement(functions)
+      ]),
+      J.if_statement(
+        J.binary_expression(
+          :===,
+          J.identifier("kind"),
+          J.call_expression(
+            J.member_expression(
+              J.identifier("Symbol"),
+              J.identifier("for")
+            ),
+            [J.literal("macros")]
+          )
+        ),
+        J.block_statement([
+          J.return_statement(macros)
+        ]),
+        J.if_statement(
+          J.binary_expression(
+            :===,
+            J.identifier("kind"),
+            J.call_expression(
+              J.member_expression(
+                J.identifier("Symbol"),
+                J.identifier("for")
+              ),
+              [J.literal("module")]
+            )
+          ),
+          J.block_statement([
+            J.return_statement(module)
+          ])
+        )
+      )
+    )
+
+    body = J.block_statement([
+      body,
+      J.throw_statement(
+        J.new_expression(
+          J.member_expression(
+            Function.patterns_ast(),
+            J.identifier("MatchError")
+          ),
+          [J.identifier("kind")]
+        )
+      )
+    ])
+
+    J.function_declaration(
+      J.identifier("__info__"),
+      [J.identifier("kind")],
+      [],
+      body
+    )
   end
 end
