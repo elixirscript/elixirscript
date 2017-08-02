@@ -6,7 +6,7 @@ Requirements
 ===========
 * Erlang 20 or greater
 * Elixir 1.5 or greater (must be compiled with Erlang 20 or greater)
-* Node (only for development)
+* Node 8.2.1 or greater (only for development)
 
 Usage
 ========
