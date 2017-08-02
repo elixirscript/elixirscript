@@ -2,6 +2,8 @@
 import ErlangTypes from 'erlang-types';
 import lists from './lists';
 
+const selfPID = new ErlangTypes.PID();
+
 function atom_to_list(atom) {
   return Symbol.keyFor(atom);
 }
@@ -274,6 +276,24 @@ function process_info(pid, item) {
   return [];
 }
 
+function list_to_binary(iolist) {
+  const iolistFlattened = lists.flatten(iolist);
+
+  const value = iolistFlattened.reduce((acc, current) => {
+    if (current === null) {
+      return acc;
+    } else if (is_integer(current)) {
+      return acc + String.fromCodePoint(current);
+    } else if (is_bitstring(current)) {
+      return acc + String.fromCodePoint(...current.value);
+    }
+
+    return acc + current;
+  }, '');
+
+  return value;
+}
+
 function iolist_to_binary(ioListOrBinary) {
   if (ioListOrBinary === null) {
     return '';
@@ -314,6 +334,44 @@ function io_size(ioListOrBinary) {
 
 function integer_to_binary(integer, base = 10) {
   return integer.toString(base);
+}
+
+function node() {
+  return Symbol.for('nonode@nohost');
+}
+
+function self() {
+  return selfPID;
+}
+
+function _throw(term) {
+  throw term;
+}
+
+function error(reason) {
+  throw new ErlangTypes.Tuple(reason, []);
+}
+
+function exit(...args) {
+  if (args.length === 2) {
+    throw args[1];
+  } else {
+    throw args[0];
+  }
+}
+
+function raise(_class, reason) {
+  if (_class === Symbol.for('throw')) {
+    _throw(reason);
+  } else if (_class === Symbol.for('error')) {
+    error(reason);
+  } else {
+    exit(reason);
+  }
+}
+
+function function_exported(module, _function) {
+  return module[_function] != null;
 }
 
 export default {
@@ -373,5 +431,12 @@ export default {
   iolist_to_binary,
   io_size,
   integer_to_binary,
-  atom_to_list
+  atom_to_list,
+  node,
+  self,
+  throw: _throw,
+  error,
+  exit,
+  raise,
+  list_to_binary
 };
