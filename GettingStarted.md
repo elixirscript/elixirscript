@@ -61,4 +61,4 @@ Elixirscript supports all macros
 
 ### JavaScript Interop
 
-Check out the [JavaScript Interoperability](JavaScriptInterop.html) documentation
+Check out the [JavaScript Interoperability](JavascriptInterop.html) documentation
