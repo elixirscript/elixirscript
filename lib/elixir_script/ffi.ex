@@ -3,7 +3,7 @@ defmodule ElixirScript.FFI do
   The foreign function interface for interacting with JavaScript
 
   To define a foreign module, make a new module and add `use ElixirScript.FFI`. to it
-  To define foreign functions, use the `foreign` macro.
+  To define external functions, use the `defexternal` macro.
 
   Here is an example of a foreign module for a JSON module
 
@@ -11,12 +11,12 @@ defmodule ElixirScript.FFI do
   defmodule MyApp.JSON do
     use ElixirScript.FFI
 
-    foreign stringify(map)
-    foreign parse(string)
+    defexternal stringify(map)
+    defexternal parse(string)
   end
   ```
 
-  Foreign modules map to JavaScript files that export functions defined with the `foreign` macro.
+  Foreign modules map to JavaScript files that export functions defined with the `defexternal` macro.
   ElixirScript expects JavaScript modules to be in the `priv/elixir_script` directory.
   These modules are copied to the output directory upon compilation.
 
@@ -46,13 +46,13 @@ defmodule ElixirScript.FFI do
   @doc """
   Defines a JavaScript function to be called from Elixir modules
 
-  To define a foreign function, pass the name and arguments to `foreign`
+  To define an external function, pass the name and arguments to `defexternal`
 
   ```elixir
-  foreign my_js_function(arg1, arg2, arg3)
+  defexternal my_js_function(arg1, arg2, arg3)
   ```
   """
-  defmacro foreign({name, _, args}) do
+  defmacro defexternal({name, _, args}) do
     args = Enum.map(args, fn
       {:\\, meta0, [{name, meta, atom}, value]}->
         name = String.to_atom("_" <> Atom.to_string(name))

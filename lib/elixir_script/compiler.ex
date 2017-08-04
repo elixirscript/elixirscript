@@ -16,17 +16,13 @@ defmodule ElixirScript.Compiler do
 
     entry_modules = List.wrap(entry_modules)
 
-    IO.puts "Finding used modules"
     ElixirScript.FindUsedModules.execute(entry_modules, pid)
 
-    IO.puts "Finding used functions"
     ElixirScript.FindUsedFunctions.execute(entry_modules, pid)
 
-    IO.puts "Compiling"
     modules = ElixirScript.State.list_modules(pid)
     ElixirScript.Translate.execute(modules, pid)
 
-    IO.puts "Building Output"
     modules = ElixirScript.State.list_modules(pid)
     result = ElixirScript.Output.execute(modules, pid)
 
