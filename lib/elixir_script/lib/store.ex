@@ -2,11 +2,11 @@ defmodule ElixirScript.Core.Store do
   @moduledoc false
   use ElixirScript.FFI, global: true
 
-  foreign create(value, name \\ nil)
+  defexternal create(value, name \\ nil)
 
-  foreign update(key, value)
+  defexternal update(key, value)
 
-  foreign read(key)
+  defexternal read(key)
 
-  foreign remove(key)
+  defexternal remove(key)
 end

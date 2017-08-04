@@ -4,7 +4,7 @@ defmodule ElixirScript.FFI.Test do
   defmodule MyTestModule do
     use ElixirScript.FFI
 
-    foreign my_test_function(arg1, arg2)
+    defexternal my_test_function(arg1, arg2)
   end
 
   test "FFI module has __foreign_info__ attribute" do

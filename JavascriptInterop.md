@@ -25,12 +25,12 @@ Here is an example of a foreign module for a JSON module
 defmodule MyApp.JSON do
   use ElixirScript.FFI
 
-  foreign stringify(map)
-  foreign parse(string)
+  defexternal stringify(map)
+  defexternal parse(string)
 end
 ```
 
-Foreign modules map to JavaScript files that export functions defined with the `foreign` macro.
+Foreign modules map to JavaScript files that export functions defined with the `defexternal` macro.
 ElixirScript expects JavaScript modules to be in the `priv/elixir_script` directory.
 These modules are copied to the output directory upon compilation.
 
