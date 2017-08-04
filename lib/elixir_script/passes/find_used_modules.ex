@@ -26,8 +26,14 @@ defmodule ElixirScript.FindUsedModules do
   end
 
   defp walk_module(module, %{attributes: [__foreign_info__: %{path: path, name: name, global: global}]} = info, pid) do
-    path = if global, do: nil, else: path
-    name = if global, do: module, else: name
+    {name, path} = if global do
+      name = if name, do: name, else: module
+      path = nil
+      {name, path}
+    else
+      name = Enum.join(Module.split(module), "_")
+      {name, path}
+    end
 
     ModuleState.put_javascript_module(pid, module, name, path)
     ModuleState.put_module(pid, module, info)

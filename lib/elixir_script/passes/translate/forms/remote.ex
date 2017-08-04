@@ -99,11 +99,16 @@ defmodule ElixirScript.Translate.Forms.Remote do
 
   defp process_js_module_name(module, state) do
     case ModuleState.get_js_module_name(state.pid, module) do
-      name when is_atom(name) ->
-        members = Module.split(module)
-        Identifier.make_namespace_members(members)
-      name ->
+      name when is_binary(name) ->
         J.identifier(name)
+      name when is_atom(name) ->
+        case to_string(name) do
+          "Elixir." <> _ ->
+            members = Module.split(module)
+            Identifier.make_namespace_members(members)
+          x ->
+            J.identifier(x)
+        end
     end
   end
 

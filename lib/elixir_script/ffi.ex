@@ -29,6 +29,13 @@ defmodule ElixirScript.FFI do
     parse: JSON.parse
   }
   ```
+
+  `ElixirScript.FFI` takes the following options
+  * `global`: If the module is defined in the global state or not. If this is set to `true`,
+  nothing is imported and instead ElixirScript will use the name of the module to call a module and
+  function in the global scope.
+  * `name`: Only applicable with `global` is set to `true`. This will use the name defined here
+  instead of the module name for calling modules and functions in the global scope
   """
 
   defmacro __using__(opts) do
@@ -37,7 +44,7 @@ defmodule ElixirScript.FFI do
       Module.register_attribute __MODULE__, :__foreign_info__, persist: true
       @__foreign_info__ %{
         path: Macro.underscore(__MODULE__),
-        name: Enum.join(Module.split(__MODULE__), "_"),
+        name: unquote(Keyword.get(opts, :name, nil)),
         global: unquote(Keyword.get(opts, :global, false))
       }
     end
@@ -54,7 +61,7 @@ defmodule ElixirScript.FFI do
   """
   defmacro defexternal({name, _, args}) do
     args = Enum.map(args, fn
-      {:\\, meta0, [{name, meta, atom}, value]}->
+      {:\\, meta0, [{name, meta, atom}, value]} ->
         name = String.to_atom("_" <> Atom.to_string(name))
         {:\\, meta0, [{name, meta, atom}, value]}
 
