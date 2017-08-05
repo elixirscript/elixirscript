@@ -36,6 +36,31 @@ defmodule ElixirScript.FFI do
   function in the global scope.
   * `name`: Only applicable with `global` is set to `true`. This will use the name defined here
   instead of the module name for calling modules and functions in the global scope
+
+  An example using the global option to reference the JSON module in browsers
+
+  ```elixir
+  defmodule JSON do
+    use ElixirScript.FFI, global: true
+
+    defexternal stringify(map)
+    defexternal parse(string)
+  end
+  ```
+
+  The calls above are translated to calls to the `JSON` module in the global scope
+
+  An example using global and name options
+
+  ```elixir
+  defmodule Console do
+    use ElixirScript.FFI, global: true, name: :console
+
+    defexternal log(term)
+  end
+  ```
+
+  With the above, calls in ElixirScript to `Console.log` will translate to `console.log` in JavaScript
   """
 
   defmacro __using__(opts) do
