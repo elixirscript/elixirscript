@@ -341,6 +341,10 @@ defmodule ElixirScript.Translate.Form do
     end
   end
 
+  def compile({:__block__, _, _} = ast, state) do
+    ElixirScript.Translate.Function.compile_block(ast, state)
+  end
+
   def compile({var, _, params}, state) when is_list(params) and is_atom(var) do
     {var_decs, params} = compile_params(params, state)
 
