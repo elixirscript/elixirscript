@@ -1,12 +1,12 @@
 defmodule ElixirScript.Translate.Clause do
+  @moduledoc false
+
+  # Handles translation of all of the clause ASTs
+
   alias ESTree.Tools.Builder, as: J
   alias ElixirScript.Translate.Form
   alias ElixirScript.Translate.Forms.Pattern
   alias ElixirScript.Translate.Function
-
-  @moduledoc """
-  Handles translation of all of the clause ASTs
-  """
 
   @patterns J.member_expression(
     J.member_expression(

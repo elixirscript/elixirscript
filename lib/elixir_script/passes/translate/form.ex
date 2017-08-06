@@ -1,12 +1,12 @@
 defmodule ElixirScript.Translate.Form do
+  @moduledoc false
+
+  # Handles translation of all forms that are not functions or clauses
+
   alias ESTree.Tools.Builder, as: J
   alias ElixirScript.Translate.Forms.{Bitstring, Match, Try, For, Receive, Remote, Pattern, With}
   alias ElixirScript.Translate.Clause
   require Logger
-
-  @moduledoc """
-  Handles translation of all forms that are not functions or clauses
-  """
 
   def compile!(ast, state) do
     {js_ast, _} = compile(ast, state)
