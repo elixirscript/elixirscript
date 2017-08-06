@@ -21,15 +21,10 @@ defmodule Mix.Tasks.Compile.ElixirScript do
 
   Available options are:
   * `input`: The module or modules that are the entry to your application (required)
-  * `output`: The path of the generated JavaScript file. (defaults to `priv/elixirscript`)
+  * `output`: The path of the generated JavaScript file. (defaults to `priv/elixir_script/build`)
 
     If path ends in `.js` then that will be the name of the file. If a directory is given,
     file will be named `Elixir.App.js`
-  * `format`: The module format of generated JavaScript code. (defaults to `:es`).
-    Choices are:
-      * `:es` - ES Modules
-      * `:common` - CommonJS
-      * `:umd` - UMD
 
   The mix compiler will also compile any dependencies that have the elixirscript compiler in its mix compilers as well
   """
@@ -64,8 +59,7 @@ defmodule Mix.Tasks.Compile.ElixirScript do
     elixirscript_config = get_elixirscript_config()
     input = Keyword.fetch!(elixirscript_config, :input)
     opts = [
-      output: Keyword.get(elixirscript_config, :output),
-      format: Keyword.get(elixirscript_config, :format)
+      output: Keyword.get(elixirscript_config, :output)
     ]
 
     {input, opts}
@@ -87,8 +81,7 @@ defmodule Mix.Tasks.Compile.ElixirScript do
 
   defp defaults() do
     [
-      output: "priv/elixirscript",
-      format: :es
+      output: "priv/elixir_script/build"
     ]
   end
 

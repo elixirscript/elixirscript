@@ -7,15 +7,13 @@ defmodule ElixirScript.CLI do
     output: :string,
     help: :boolean,
     version: :boolean,
-    watch: :boolean,
-    format: :string
+    watch: :boolean
   ]
 
   @aliases [
     o: :output,
     h: :help,
-    v: :version,
-    f: :format
+    v: :version
   ]
 
   def parse_args(args) do
@@ -42,7 +40,6 @@ defmodule ElixirScript.CLI do
   <module> the entry module of your application
 
   options:
-  -f  --format [format] module format of output. options: es (default), common, umd
   -o  --output [path]   places output at the given path.
                         Can be a directory or filename.
   -v  --version         the current version number
@@ -70,8 +67,7 @@ defmodule ElixirScript.CLI do
     {watch, options} = Keyword.pop(options, :watch, false)
 
     compile_opts = [
-      output: Keyword.get(options, :output, :stdout),
-      format: String.to_atom(Keyword.get(options, :format, "es"))
+      output: Keyword.get(options, :output, :stdout)
     ]
 
     input = handle_input(input)

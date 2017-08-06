@@ -3,8 +3,8 @@ defmodule ElixirScript.CLI.Test do
   import ExUnit.CaptureIO
 
   test "parse_args" do
-    {_, args} = ElixirScript.CLI.parse_args(["Atom", "--format", "umd"])
-    assert args == [format: "umd"]
+    {_, args} = ElixirScript.CLI.parse_args(["Atom", "--output", "build"])
+    assert args == [output: "build"]
   end
 
   test "process help" do
