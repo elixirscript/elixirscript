@@ -36,6 +36,7 @@ defmodule ElixirScript.Compiler do
     |> Map.put(:output, Keyword.get(opts, :output))
     |> Map.put(:format, :es)
     |> Map.put(:entry_modules, entry_modules)
+    |> Map.put(:root, Keyword.get(opts, :root, "."))
 
     options = default_options
     Map.put(options, :module_formatter, ElixirScript.ModuleSystems.ES)

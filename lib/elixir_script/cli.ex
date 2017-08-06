@@ -7,7 +7,8 @@ defmodule ElixirScript.CLI do
     output: :string,
     help: :boolean,
     version: :boolean,
-    watch: :boolean
+    watch: :boolean,
+    root: :string
   ]
 
   @aliases [
@@ -44,6 +45,7 @@ defmodule ElixirScript.CLI do
                         Can be a directory or filename.
   -v  --version         the current version number
   -h  --help            this message
+  --root                The root import path for FFI imports
   """
   end
 
@@ -67,7 +69,8 @@ defmodule ElixirScript.CLI do
     {watch, options} = Keyword.pop(options, :watch, false)
 
     compile_opts = [
-      output: Keyword.get(options, :output, :stdout)
+      output: Keyword.get(options, :output, :stdout),
+      root: Keyword.get(options, :root, ".")
     ]
 
     input = handle_input(input)

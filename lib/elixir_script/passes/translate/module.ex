@@ -13,21 +13,6 @@ defmodule ElixirScript.Translate.Module do
     ElixirScript.Translate.Protocol.compile(module, info, pid)
   end
 
-  def compile(module, %{attributes: [__foreign_info__: %{path: path, name: name, global: global}]}, pid) do
-    {name, path} = if global do
-      name = if name, do: name, else: module
-      path = nil
-      {name, path}
-    else
-      name = Enum.join(Module.split(module), "_")
-      {name, path}
-    end
-
-    ModuleState.put_javascript_module(pid, module, name, path)
-
-    nil
-  end
-
   def compile(module, info, pid) do
     %{
       attributes: attrs,

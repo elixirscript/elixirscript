@@ -26,7 +26,7 @@ defmodule ElixirScript.Output do
     end)
     |> Enum.map(fn
       {module, name, path} ->
-        {module, name, Path.join(".", path)}
+        {module, name, Path.join(opts.root, path)}
     end)
 
     bundle(modules, opts, js_modules)

@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - ElixirScript now has a Foreign Function Interface (FFI) for interoperability with JavaScript. For more details, see documentation at `ElixirScript.FFI`
 - `ElixirScript.JS.mutate/3`
 - `ElixirScript.JS.map_to_object/1`
+- `root` option for specifying the root import path for FFI JavaScript modules. Defaults to `"."`
+- For imports, now keeping the `.js` extension
 
 ### Changed
 - Compiler has been completely rewritten. ElixirScript now requires Erlang 20+ and Elixir 1.5+

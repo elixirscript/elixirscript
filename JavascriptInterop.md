@@ -44,6 +44,8 @@ export default {
 }
 ```
 
+For more information and options. Check the documentation for `ElixirScript.FFI`
+
 ## JavaScript Calling ElixirScript
 
   In order to start an ElixirScript application, you must first import it using whichever JavaScript module system you are using and then call `Elixir.start`
@@ -60,8 +62,7 @@ export default {
   ```
 
   ```javascript
-  //ES module example
-  import Elixir from './Elixir.App'
+  import Elixir from './Elixir.App.js'
   Elixir.start(Elixir.Main, [1, 2, 3])
   ```
 

@@ -32,6 +32,7 @@ defmodule ElixirScript.FindUsedModules do
       {name, path}
     else
       name = Enum.join(Module.split(module), "_")
+      path = path <> ".js"
       {name, path}
     end
 
