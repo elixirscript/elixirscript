@@ -1,12 +1,12 @@
 defmodule ElixirScript.Translate.Function do
+  @moduledoc false
+
+  # Translates the given Elixir function AST into the
+  # equivalent JavaScript AST.
+
   alias ESTree.Tools.Builder, as: J
   alias ElixirScript.Translate.{Clause, Form}
   alias ElixirScript.Translate.Forms.Pattern
-
-  @moduledoc """
-  Translates the given Elixir function AST into the
-  equivalent JavaScript AST.
-  """
 
   def patterns_ast() do
     J.member_expression(

@@ -1,12 +1,12 @@
 defmodule ElixirScript.Translate.Form do
+  @moduledoc false
+
+  # Handles translation of all forms that are not functions or clauses
+
   alias ESTree.Tools.Builder, as: J
   alias ElixirScript.Translate.Forms.{Bitstring, Match, Try, For, Receive, Remote, Pattern, With}
   alias ElixirScript.Translate.Clause
   require Logger
-
-  @moduledoc """
-  Handles translation of all forms that are not functions or clauses
-  """
 
   def compile!(ast, state) do
     {js_ast, _} = compile(ast, state)
@@ -339,6 +339,10 @@ defmodule ElixirScript.Translate.Form do
       _ ->
         {var_decs ++ List.wrap(ast), state}
     end
+  end
+
+  def compile({:__block__, _, _} = ast, state) do
+    ElixirScript.Translate.Function.compile_block(ast, state)
   end
 
   def compile({var, _, params}, state) when is_list(params) and is_atom(var) do
