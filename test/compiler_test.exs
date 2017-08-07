@@ -17,19 +17,9 @@ defmodule ElixirScript.Compiler.Test do
     end
   end
 
-  test "Output format: es" do
-    result = ElixirScript.Compiler.compile(Atom, [format: :es, js_modules: [{React, "react"}, {ReactDOM, "react-dom", default: false}]])
+  test "Output" do
+    result = ElixirScript.Compiler.compile(Atom, [])
     assert result =~ "export default Elixir"
-  end
-
-  test "Output format: umd" do
-    result = ElixirScript.Compiler.compile(Atom, [format: :umd, js_modules: [{React, "react"}]])
-    assert result =~ "factory"
-  end
-
-  test "Output format: common" do
-    result = ElixirScript.Compiler.compile(Atom, [format: :common, js_modules: [{React, "react"}]])
-    assert result =~ "module.exports = Elixir"
   end
 
   test "Output file with default name" do

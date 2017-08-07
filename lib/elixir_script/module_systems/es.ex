@@ -2,15 +2,11 @@ defmodule ElixirScript.ModuleSystems.ES do
   @moduledoc false
   alias ESTree.Tools.Builder, as: JS
 
-  def build(imports, js_imports, body, exports) do
-    module_imports = Enum.map(imports, fn {module, path} -> import_module(module, path) end)
-
+  def build(js_imports, body, exports) do
     imports = js_imports
     |> Enum.map(fn
-      {_module, name, path} -> import_module(name, path)
+      {_module, name, _path, import_path} -> import_module(name, import_path)
     end)
-
-    imports = Enum.uniq(imports ++ module_imports)
 
     export = if is_nil(exports), do: [], else: [export_module(exports)]
     imports ++ body ++ export

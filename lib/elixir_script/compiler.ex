@@ -34,22 +34,11 @@ defmodule ElixirScript.Compiler do
   defp build_compiler_options(opts, entry_modules) do
     default_options = Map.new
     |> Map.put(:output, Keyword.get(opts, :output))
-    |> Map.put(:format, Keyword.get(opts, :format, :es))
+    |> Map.put(:format, :es)
     |> Map.put(:entry_modules, entry_modules)
+    |> Map.put(:root, Keyword.get(opts, :root, "."))
 
     options = default_options
-    Map.put(options, :module_formatter, get_module_formatter(options[:format]))
-  end
-
-  defp get_module_formatter(:umd) do
-    ElixirScript.ModuleSystems.UMD
-  end
-
-  defp get_module_formatter(:common) do
-    ElixirScript.ModuleSystems.Common
-  end
-
-  defp get_module_formatter(_) do
-    ElixirScript.ModuleSystems.ES
+    Map.put(options, :module_formatter, ElixirScript.ModuleSystems.ES)
   end
 end

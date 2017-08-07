@@ -26,7 +26,8 @@ defmodule ElixirScript.Output do
     end)
     |> Enum.map(fn
       {module, name, path} ->
-        {module, name, Path.join(".", path)}
+        import_path = Path.join(opts.root, path)
+        {module, name, path, import_path}
     end)
 
     bundle(modules, opts, js_modules)
@@ -82,7 +83,7 @@ defmodule ElixirScript.Output do
 
     apps = get_app_names()
     output_dir = Path.dirname(file_name)
-    Enum.each(js_modules, fn({_, _, path}) ->
+    Enum.each(js_modules, fn({_, _, path, _}) ->
       copy_javascript_module(apps, output_dir, path)
     end)
 
@@ -108,16 +109,31 @@ defmodule ElixirScript.Output do
 
   defp copy_javascript_module(apps, output_dir, js_module_path) do
     Enum.each(apps, fn(app) ->
-      full_path = Path.join([:code.priv_dir(app), "elixir_script", js_module_path]) <> ".js"
+      base_path = Path.join([:code.priv_dir(app), "elixir_script"])
 
-      if File.exists?(full_path) do
-        js_output_path = Path.join(output_dir, js_module_path) <> ".js"
-        if !File.exists?(Path.dirname(js_output_path)) do
-          File.mkdir_p!(Path.dirname(js_output_path))
+      js_input_path = cond do
+        File.exists?(Path.join([base_path, js_module_path])) ->
+          Path.join([base_path, js_module_path])
+        File.exists?(Path.join([base_path, slashes_to_dots(js_module_path)])) ->
+          Path.join([base_path, slashes_to_dots(js_module_path)])
+        true ->
+          nil
+      end
+
+      if js_input_path != nil do
+        js_output_path = Path.join(output_dir, js_module_path)
+        js_output_dir = Path.dirname(js_output_path)
+        if !File.exists?(js_output_dir) do
+          File.mkdir_p!(js_output_dir)
         end
 
-        File.cp(full_path, js_output_path)
+        File.cp(js_input_path, js_output_path)
       end
     end)
+  end
+
+  defp slashes_to_dots(js_module_path) do
+    js_module_path
+    |> String.replace("/", ".")
   end
 end

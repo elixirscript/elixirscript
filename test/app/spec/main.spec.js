@@ -1,7 +1,7 @@
 import test from 'ava';
-const sinon = require('sinon');
+import Elixir from '../build/Elixir.App';
 
-const Elixir = require('../build/Elixir.App');
+const sinon = require('sinon');
 
 test('Elixir.start:calls the modules start function', t => {
   const callback = sinon.spy();

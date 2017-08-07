@@ -7,11 +7,11 @@ Adding Elixirscript to your mix project gives you the ability to add it to your 
 Add dependency to your deps in mix.exs:
 
 ``` elixir
-{:elixir_script, "~> 0.29"}
+{:elixir_script, "~> 0.30"}
 ```
 
 Elixirscript uses default output and module formats if options are not given. If you wish to change any or all options, add an `elixir_script` key to your project configuration.
-    
+
 ``` elixir
     def project do
     [
@@ -21,13 +21,7 @@ Elixirscript uses default output and module formats if options are not given. If
      deps: deps,
      elixir_script: [
         input: MyEntryModule,
-        output: "priv/elixirscript/Elixir.App.js",
-        format: :es,
-        js_modules: [
-          {React, "react"},
-          {ReactDOM, "react-dom"},
-          {Phoenix, "phoenix", default: false}
-        ]
+        output: "priv/elixir_script/build/Elixir.App.js"
      ],
      compilers: Mix.compilers ++ [:elixir_script]
     ]
@@ -38,22 +32,26 @@ Available options are:
 
 * `input`: The entry module(s) for your application or library
 
-* `output`: The path of the generated JavaScript file. (defaults to `priv/elixirscript`)
+* `output`: The path of the generated JavaScript file. (defaults to `priv/elixir_script/build`)
 
     If path ends in `.js` then that will be the name of the file. If a directory is given,
     file will be named `Elixir.App.js`
 
-*   `format`: The module format of generated JavaScript code. (defaults to `:es`). Choices are:    
+* `root`: Optional root for imports of FFI JavaScript modules. Defaults to `.`. If using output directly in a browser, you may want to make it something like `/js` or some uri.
 
-    *   `:es` - ES Modules
 
-    *   `:common` - CommonJS
+Now run `mix compile` and you should see a JavaScript file named `Elixir.App.js` in the `priv/elixir_script/build/` directory. ElixirScript outputs JavaScript in the ES Module format. If your browser supports it, you can include the output in a script tag with the type "module"
 
-    *   `:umd` - UMD
+```html
+<script type="module">
+  import Elixir from '/js/Elixir.App.js'
+  const myInitialArgs = []
 
-* `js_modules`: A list of JavaScript imports to add. Each item must be 2-tuple or a 3-tuple. The third element is an optional keyword list of options:
+  Elixir.start(Elixir.MyEntryModule, myInitialArgs)
+</script>
+```
 
-    * `default` - Defaults to true. Set to false if the imported module has no default export.
+If your browser does not yet support ES modules directly, use a tool such as [webpack](https://webpack.js.org/) or [brunch](http://brunch.io/) to convert it into something that can be used in the browser
 
 ### Macros
 

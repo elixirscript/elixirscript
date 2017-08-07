@@ -12,7 +12,6 @@ defmodule ElixirScript.Output.JSModule do
     elixir = J.variable_declaration([declarator], :const)
 
     ast = opts.module_formatter.build(
-      [],
       js_modules,
       [elixir, create_atom_table(), start(), load()] ++ body,
       J.identifier("Elixir")

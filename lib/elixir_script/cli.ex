@@ -8,14 +8,13 @@ defmodule ElixirScript.CLI do
     help: :boolean,
     version: :boolean,
     watch: :boolean,
-    format: :string
+    root: :string
   ]
 
   @aliases [
     o: :output,
     h: :help,
-    v: :version,
-    f: :format
+    v: :version
   ]
 
   def parse_args(args) do
@@ -42,11 +41,11 @@ defmodule ElixirScript.CLI do
   <module> the entry module of your application
 
   options:
-  -f  --format [format] module format of output. options: es (default), common, umd
   -o  --output [path]   places output at the given path.
                         Can be a directory or filename.
   -v  --version         the current version number
   -h  --help            this message
+  --root                The root import path for FFI imports
   """
   end
 
@@ -71,7 +70,7 @@ defmodule ElixirScript.CLI do
 
     compile_opts = [
       output: Keyword.get(options, :output, :stdout),
-      format: String.to_atom(Keyword.get(options, :format, "es"))
+      root: Keyword.get(options, :root, ".")
     ]
 
     input = handle_input(input)
