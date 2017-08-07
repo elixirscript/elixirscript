@@ -20,7 +20,9 @@ defmodule ElixirScript.FFI do
   ElixirScript expects JavaScript modules to be in the `priv/elixir_script` directory.
   These modules are copied to the output directory upon compilation.
 
-  For our example, a JavaScript file must be placed at `priv/elixir_script/my_app/json.js`.
+  For our example, a JavaScript file must be placed in the `priv/elixir_script` folder.
+  In our example, it could either be `priv/elixir_script/my_app/json.js` or
+  `priv/elixir_script/my_app.json.js`. ElixirScript will look for either path
 
   It looks like this
   ```javascript
