@@ -44,8 +44,11 @@ Run `mix compile`
 Examples
 ==========
 
+### Application
 [ElixirScript Todo Example](https://github.com/elixirscript/todo-elixirscript)
 
+### Library
+[ElixirScript React](https://github.com/elixirscript/elixirscript_react)
 
 Development
 ===========
