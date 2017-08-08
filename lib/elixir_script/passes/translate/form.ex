@@ -386,14 +386,18 @@ defmodule ElixirScript.Translate.Form do
     end
   end
 
-  def compile({:default, _, _}, state) do
+  def compile({:default, meta, _}, state) do
+    counter = Pattern.get_counter(meta)
+
     var = :__default__
-    var = Pattern.get_variable_name(to_string(var), state)
+    var = Pattern.get_variable_name(to_string(var) <> counter, state)
     { ElixirScript.Translate.Identifier.make_identifier(var), state }
   end
 
-  def compile({var, _, _}, state) do
-    var = Pattern.get_variable_name(to_string(var), state)
+  def compile({var, meta, _}, state) do
+    counter = Pattern.get_counter(meta)
+
+    var = Pattern.get_variable_name(to_string(var) <> counter, state)
     { ElixirScript.Translate.Identifier.make_identifier(var), state }
   end
 
