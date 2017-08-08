@@ -11,7 +11,35 @@ Requirements
 Usage
 ========
 
-Please check the [Getting Started Guide](GettingStarted.md) for usage
+Add dependency to your deps in mix.exs:
+
+``` elixir
+{:elixir_script, "~> x.x"}
+```
+
+Add `elixir_script` to list of mix compilers in mix.exs
+Also add `elixir_script` configuration
+
+```elixir
+  def project do
+  [
+    app: :my_app,
+    # ...
+    # Add elixir_script as a compilter
+    compilers: Mix.compilers ++ [:elixir_script],
+    # Our elixir_script configuration
+    elixir_script: [
+        # Entry module. Can also be a list of modules
+        input: MyEntryModule,
+        # Output path. Either a path to a js file or a directory
+        output: "priv/elixir_script/build/Elixir.App.js"
+    ]
+  ]
+  end
+```
+
+Run `mix compile`
+
 
 Examples
 ==========

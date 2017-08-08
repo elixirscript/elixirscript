@@ -14,7 +14,8 @@ defmodule ElixirScript.Mixfile do
       aliases: aliases(),
       test_coverage: [tool: ExCoveralls],
       docs: [
-        extras: ["GettingStarted.md", "JavaScriptInterop.md"]
+        main: "ElixirScript",
+        extras: ["JavaScriptInterop.md"]
       ]
     ]
   end
