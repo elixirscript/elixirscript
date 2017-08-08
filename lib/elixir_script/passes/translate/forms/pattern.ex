@@ -194,9 +194,12 @@ defmodule ElixirScript.Translate.Forms.Pattern do
 
   defp process_pattern({:<<>>, _, elements}, state) do
     params = Enum.reduce(elements, [], fn
-      ({:::, _, [{ variable, _, params }, _]}, state) when is_nil(params)
+      ({:::, _, [{ _, _, params } = ast, _]}, state) when is_nil(params)
                                                       when is_list(params) and length(params) == 0 ->
-        state ++ [ElixirScript.Translate.Identifier.make_identifier(variable)]
+
+        var_str = make_identifier(ast)
+        var_atom = String.to_atom(var_str)
+        state ++ [ElixirScript.Translate.Identifier.make_identifier(var_atom)]
       _, state ->
         state
     end)
@@ -215,16 +218,18 @@ defmodule ElixirScript.Translate.Forms.Pattern do
     { [PM.starts_with(prefix)], [Form.compile!(value, state)] }
   end
 
-  defp process_pattern({:=, _, [{name, _, _}, right]}, state) when not name in [:%, :{}, :^, :%{}, :<<>>] do
-    unify(name, right, state)
+  defp process_pattern({:=, _, [{name, _, _} = target, right]}, state) when not name in [:%, :{}, :^, :%{}, :<<>>] do
+    unify(target, right, state)
   end
 
-  defp process_pattern({:=, _, [left, {name, _, _}]}, state) when not name in [:%, :{}, :^, :%{}, :<<>>] do
-    unify(name, left, state)
+  defp process_pattern({:=, _, [left, {name, _, _} = target]}, state) when not name in [:%, :{}, :^, :%{}, :<<>>] do
+    unify(target, left, state)
   end
 
-  defp process_pattern({var, _, a}, _) when is_atom(a) do
-    { [PM.parameter(J.literal(to_string(var)))], [ElixirScript.Translate.Identifier.make_identifier(var)] }
+  defp process_pattern({_, _, a} = ast, _) when is_atom(a) do
+    var_str = make_identifier(ast)
+    var_atom = String.to_atom(var_str)
+    { [PM.parameter(J.literal(var_str))], [ElixirScript.Translate.Identifier.make_identifier(var_atom)] }
   end
 
   defp process_pattern(ast, state) do
@@ -240,6 +245,22 @@ defmodule ElixirScript.Translate.Forms.Pattern do
 
   defp unify(target, source, state) do
     { patterns, params } = do_compile([source], state)
-    { [PM.capture(hd(patterns))], params ++ [ElixirScript.Translate.Identifier.make_identifier(target)] }
+    { [_] , [param] } = process_pattern(target, state)
+    { [PM.capture(hd(patterns))], params ++ [param] }
+  end
+
+  def get_counter(meta) do
+    case Keyword.get(meta, :counter, nil) do
+      nil -> ""
+      counter ->
+        counter
+        |> Kernel.abs()
+        |> to_string()
+    end
+  end
+
+  defp make_identifier({var, meta, _}) do
+    counter = get_counter(meta)
+    to_string(var) <> counter
   end
 end
