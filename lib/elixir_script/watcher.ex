@@ -3,7 +3,10 @@ defmodule ElixirScript.Watcher do
   require Logger
 
   @moduledoc """
-  Watches the input folder for changes and calls the ElixirScript compiler
+  Watches for code changes and calls the ElixirScript compiler.
+
+  This module watches for changes in BEAM files. When there is a change,
+  it calls the ElixirScript compiler to recompile.
   """
 
 

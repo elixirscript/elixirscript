@@ -10,8 +10,9 @@ defmodule ElixirScript.JS do
   @doc """
   Creates new JavaScript objects.
 
-  ex:
-    ElixirScript.JS.new User, ["first_name", "last_name"]
+  ```elixir
+  ElixirScript.JS.new User, ["first_name", "last_name"]
+  ```
   """
   defexternal new(module, params)
 
@@ -42,8 +43,10 @@ defmodule ElixirScript.JS do
 
   @doc """
   Mutates an existing JavaScript object.
-  ex:
-    ElixirScript.JS.mutate elem, "width", 100
+
+  ```elixir
+  ElixirScript.JS.mutate elem, "width", 100
+  ```
   """
   defexternal mutate(object, key, value)
 
@@ -52,8 +55,11 @@ defmodule ElixirScript.JS do
   Takes the given map and returns an object
   Throws an error if any key is not a
   number, binary, or atom
-  ex:
-    ElixirScript.JS.map_to_object(%{my: "map"})
+
+
+  ```elixir
+  ElixirScript.JS.map_to_object(%{my: "map"})
+  ```
   """
   defexternal map_to_object(object)
 end

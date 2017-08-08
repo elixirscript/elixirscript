@@ -1,6 +1,8 @@
 defmodule ElixirScript.Compiler do
   @moduledoc """
-  Compiles the given modules to JavaScript.
+  The entry point for the ElixirScript compilation process.
+  Takes the given module(s) and compiles them and all modules
+  and functions they use into JavaScript
   """
 
   @doc """
@@ -8,8 +10,19 @@ defmodule ElixirScript.Compiler do
   the entry point(s) of an application/library. From there
   it will determine which modules and functions are needed
   to be compiled.
+
+  Available options are:
+  * `output`: The path of the generated JavaScript file.
+
+    If output is `nil`, then generated code is sent to standard out
+
+    If output is a path, the generated code placed in that path.
+    If path ends in `.js` then that will be the name of the file.
+    If a directory is given, file will be named `Elixir.App.js`
+
+  * `root`: Optional root for imports of FFI JavaScript modules. Defaults to `.`.
   """
-  @spec compile([atom], []) :: nil
+  @spec compile(atom | [atom], []) :: nil
   def compile(entry_modules, opts \\ []) do
     opts = build_compiler_options(opts, entry_modules)
     {:ok, pid} = ElixirScript.State.start_link(opts)

@@ -26,6 +26,9 @@ defmodule Mix.Tasks.Compile.ElixirScript do
     If path ends in `.js` then that will be the name of the file. If a directory is given,
     file will be named `Elixir.App.js`
 
+  * `root`: Optional root for imports of FFI JavaScript modules.
+  Defaults to `.`. If using output directly in a browser, you may want to make it something like `/js` or some uri.
+
   The mix compiler will also compile any dependencies that have the elixirscript compiler in its mix compilers as well
   """
 

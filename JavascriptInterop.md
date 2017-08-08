@@ -5,7 +5,7 @@
 ### ElixirScript.JS module
 
 The `ElixirScript.JS` module has functions and macros that help with interacting with JavaScript.
-These mostly correspond to JavaScript keywords that may be useful.
+Most of them correspond to JavaScript keywords that may be useful.
 
 ```elixir
 # Calling the JavaScript Debugger
@@ -17,7 +17,7 @@ ElixirScript.JS.typeof(my_value)
 
 ### Foreign Function Interface
 
-ElixirScript calls JavaScript modules through a Foreign Function Interface (FFI). A foreign module is defined by creating a new module and adding `use ElixirScript.FFI` to it.
+ElixirScript calls JavaScript modules through a Foreign Function Interface (FFI). A foreign module is defined by creating a new Elixir module and adding `use ElixirScript.FFI` to it.
 
 Here is an example of a foreign module for a JSON module
 
