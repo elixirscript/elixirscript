@@ -23,7 +23,7 @@ defmodule ElixirScript.FindUsedModules do
         walk_protocol(module, implementations, pid)
       {:error, "Unknown module"} ->
         Logger.warn fn() ->
-          "#{inspect module} is missing or unavailable"
+          "ElixirScript: #{inspect module} is missing or unavailable"
         end
       {:error, error} ->
         raise ElixirScript.CompileError, "An error occurred while compiling #{inspect module}: #{error}"

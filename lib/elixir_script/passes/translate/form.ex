@@ -210,7 +210,7 @@ defmodule ElixirScript.Translate.Form do
     line = Keyword.get(context, :line, 1)
     {function, _arity} = Map.get(state, :function)
     Logger.warn fn() ->
-      "receive not supported, Module: #{inspect state.module}, Function: #{function}, Line: #{line}"
+      "ElixirScript: receive not supported, Module: #{inspect state.module}, Function: #{function}, Line: #{line}"
     end
     Receive.compile(blocks, state)
   end
