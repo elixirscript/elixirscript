@@ -1,6 +1,7 @@
 defmodule ElixirScript.FindUsedModules do
   @moduledoc false
   alias ElixirScript.State, as: ModuleState
+  require Logger
 
   @doc """
   Takes a list of entry modules and finds modules they use.
@@ -20,6 +21,10 @@ defmodule ElixirScript.FindUsedModules do
         walk_module(module, info, pid)
       {:ok, module, implementations} ->
         walk_protocol(module, implementations, pid)
+      {:error, "Unknown module"} ->
+        Logger.warn fn() ->
+          "#{inspect module} is missing or unavailable"
+        end
       {:error, error} ->
         raise ElixirScript.CompileError, "An error occurred while compiling #{inspect module}: #{error}"
     end

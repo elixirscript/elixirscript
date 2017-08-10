@@ -11,12 +11,6 @@ defmodule ElixirScript.Compiler.Test do
     assert is_binary(result)
   end
 
-  test "Error on unknown module" do
-    assert_raise ElixirScript.CompileError, fn ->
-      ElixirScript.Compiler.compile(SomeModule)
-    end
-  end
-
   test "Output" do
     result = ElixirScript.Compiler.compile(Atom, [])
     assert result =~ "export default Elixir"
