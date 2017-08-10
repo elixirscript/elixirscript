@@ -1,5 +1,24 @@
 # JavaScript Interoperability
 
+## Data Type Conversions
+
+ElixirScript translates Elixir primitive types to the following:
+
+| Elixir | JavaScript |
+|--------|------------|
+| Integer | Number |
+| Float | Number |
+| Binary | String |
+| Atom | Symbol |
+| List | Array |
+| Map | Map |
+| Tuple | ErlangTypes.Tuple |
+| Bitstring | ErlangTypes.Bitstring |
+| PID | ErlangTypes.PID |
+| Reference | ErlangTypes.Reference |
+
+The ErlangTypes library can be found [here](https://github.com/elixirscript/erlang-types)
+
 ## ElixirScript Calling JavaScript
 
 ### ElixirScript.JS module
