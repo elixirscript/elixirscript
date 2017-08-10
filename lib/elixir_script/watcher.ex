@@ -22,7 +22,7 @@ defmodule ElixirScript.Watcher do
     {:ok, args}
   end
 
-  def handle_info({_pid, {:fs, :file_event}, {path, event}}, state) do
+  def handle_info({_pid, {:fs, :file_event}, {path, _event}}, state) do
 
     try do
       if input_changed?(to_string(path)) do
