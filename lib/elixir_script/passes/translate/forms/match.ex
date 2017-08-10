@@ -87,7 +87,7 @@ defmodule ElixirScript.Translate.Forms.Match do
 
 
   defp make_params(params) do
-    ref = J.identifier("_ref")
+    ref = J.identifier("_ref#{:rand.uniform(10000000)}")
 
     params = Enum.map(params, fn
       (nil) -> J.identifier(:undefined)
