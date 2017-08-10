@@ -67,5 +67,14 @@ defmodule ElixirScript do
   ### Limitations
 
   ElixirScript does not support `receive` or any of OTP at this time.
+
+  ### Dependencies
+
+  ElixirScript can use many of the same Hex packages and dependencies that currently exist.
+  It is also possible to make packages that are specific to ElixirScript. If you decide to
+  make such a package, please prepend `elixir_script` to the app name. For instance is making
+  a package for ElixirScript with FFI modules for interacting with React, the name would be
+  `elixir_script_react`. This is to make sure that other developers know that a package in Hex
+  is specifically for use with ElixirScript.
   """
 end
