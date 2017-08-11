@@ -19,6 +19,9 @@ defmodule ElixirScript.Translate.Function do
   end
 
   def compile({:fn, _, clauses}, state) do
+    anonymous? = Map.get(state, :anonymous_fn, false)
+
+    state = Map.put(state, :anonymous_fn, true)
     clauses = compile_clauses(clauses, state)
 
     arg_matches_declarator = J.variable_declarator(
@@ -61,11 +64,14 @@ defmodule ElixirScript.Translate.Function do
       ])
     )
 
+    state = Map.put(state, :anonymous_fn, anonymous?)
     { function_dec, state }
   end
 
   def compile({{name, arity}, _type, _, clauses}, state) do
     state = Map.put(state, :function, {name, arity})
+    |> Map.put(:anonymous_fn, false)
+
     clauses = compile_clauses(clauses, state)
 
     arg_matches_declarator = J.variable_declarator(
@@ -194,19 +200,23 @@ defmodule ElixirScript.Translate.Function do
     {ast, state}
   end
 
-  defp update_last_call(clause_body, %{function: {name, _}}) do
+  defp update_last_call(clause_body, %{function: {name, _}, anonymous_fn: anonymous?}) do
     last_item = List.last(clause_body)
     function_name = ElixirScript.Translate.Identifier.make_function_name(name)
 
     case last_item do
       %ESTree.ReturnStatement{ argument: %ESTree.CallExpression{ callee: ^function_name, arguments: arguments } } ->
-        new_last_item = J.return_statement(
-          recurse(
-            recur_bind(arguments)
+        if anonymous? do
+          clause_body
+        else
+          new_last_item = J.return_statement(
+            recurse(
+              recur_bind(arguments)
+            )
           )
-        )
 
-        List.replace_at(clause_body, length(clause_body) - 1, new_last_item)
+          List.replace_at(clause_body, length(clause_body) - 1, new_last_item)
+        end
       _ ->
         clause_body
     end
