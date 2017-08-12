@@ -20,7 +20,7 @@ defmodule ElixirScript.Compiler.Test do
     path = System.tmp_dir()
 
     ElixirScript.Compiler.compile(Atom, [output: path])
-    assert File.exists?(Path.join([path, "Elixir.App.js"]))
+    assert File.exists?(Path.join([path, "elixirscript.build.js"]))
   end
 
   test "Output file with custom name" do

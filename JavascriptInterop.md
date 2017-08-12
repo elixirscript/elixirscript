@@ -81,7 +81,7 @@ For more information and options. Check the documentation for `ElixirScript.FFI`
   ```
 
   ```javascript
-  import Elixir from './Elixir.App.js'
+  import Elixir from './elixirscript.build.js'
   Elixir.start(Elixir.Main, [1, 2, 3])
   ```
 

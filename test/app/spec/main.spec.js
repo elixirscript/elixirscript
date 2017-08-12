@@ -1,5 +1,5 @@
 import test from 'ava';
-import Elixir from '../build/Elixir.App';
+import Elixir from '../build/elixirscript.build.js';
 
 const sinon = require('sinon');
 

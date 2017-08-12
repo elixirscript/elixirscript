@@ -24,7 +24,7 @@ defmodule Mix.Tasks.Compile.ElixirScript do
   * `output`: The path of the generated JavaScript file. (defaults to `priv/elixir_script/build`)
 
     If path ends in `.js` then that will be the name of the file. If a directory is given,
-    file will be named `Elixir.App.js`
+    file will be named `elixirscript.build.js`
 
   * `root`: Optional root for imports of FFI JavaScript modules.
   Defaults to `.`. If using output directly in a browser, you may want to make it something like `/js` or some uri.

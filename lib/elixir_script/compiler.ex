@@ -18,7 +18,7 @@ defmodule ElixirScript.Compiler do
 
     If output is a path, the generated code placed in that path.
     If path ends in `.js` then that will be the name of the file.
-    If a directory is given, file will be named `Elixir.App.js`
+    If a directory is given, file will be named `elixirscript.build.js`
 
   * `root`: Optional root for imports of FFI JavaScript modules. Defaults to `.`.
   """
