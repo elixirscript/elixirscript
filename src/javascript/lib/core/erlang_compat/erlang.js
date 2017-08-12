@@ -4,25 +4,37 @@ import lists from './lists';
 
 const selfPID = new ErlangTypes.PID();
 
-function atom_to_list(atom) {
-  return Symbol.keyFor(atom);
-}
-
 function atom_to_binary(atom, encoding = Symbol.for('utf8')) {
   if (encoding !== Symbol.for('utf8')) {
     throw new Error(`unsupported encoding ${encoding}`);
   }
 
-  if (atom.__MODULE__) {
+  if (atom === null) {
+    return 'nil';
+  } else if (is_boolean(atom)) {
+    return atom.toString();
+  } else if (atom.__MODULE__) {
     return Symbol.keyFor(atom.__MODULE__);
   }
 
   return Symbol.keyFor(atom);
 }
 
+function atom_to_list(atom) {
+  return atom_to_binary(atom);
+}
+
 function binary_to_atom(binary, encoding = Symbol.for('utf8')) {
   if (encoding !== Symbol.for('utf8')) {
     throw new Error(`unsupported encoding ${encoding}`);
+  }
+
+  if (binary === 'nil') {
+    return null;
+  } else if (binary === 'true') {
+    return true;
+  } else if (binary === 'false') {
+    return false;
   }
 
   return Symbol.for(binary);
@@ -87,8 +99,16 @@ function bxor(left, right) {
 }
 
 function is_atom(value) {
+  if (value === null) {
+    return true;
+  } else if (is_boolean(value)) {
+    return true;
+  }
+
   return (
-    typeof value === 'symbol' || value instanceof Symbol || value.__MODULE__
+    typeof value === 'symbol' ||
+    value instanceof Symbol ||
+    value.__MODULE__ != null
   );
 }
 
