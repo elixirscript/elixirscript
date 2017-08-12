@@ -3,7 +3,7 @@ defmodule ElixirScript.Output do
 
   alias ElixirScript.State, as: ModuleState
   alias ESTree.Tools.{Builder, Generator}
-  @generated_name "Elixir.App.js"
+  @generated_name "elixirscript.build.js"
 
   @doc """
   Takes outputs the JavaScript code in the specified output

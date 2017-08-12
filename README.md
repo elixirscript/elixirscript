@@ -32,7 +32,7 @@ Also add `elixir_script` configuration
         # Entry module. Can also be a list of modules
         input: MyEntryModule,
         # Output path. Either a path to a js file or a directory
-        output: "priv/elixir_script/build/Elixir.App.js"
+        output: "priv/elixir_script/build/elixirscript.build.js"
     ]
   ]
   end
