@@ -1,27 +1,6 @@
 import Protocol from './protocol';
 import Core from '../core';
 
-function iterator_to_reducer(iterable, acc, fun) {
-  const iterator = iterable[Symbol.iterator]();
-  let x = iterator.next();
-  let _acc = acc;
-
-  while (x.done === false) {
-    _acc = fun(x.value, _acc.get(1));
-    if (_acc.get(0) === Symbol.for('halt')) {
-      return new Core.Tuple(Symbol.for('halted'), _acc.get(1));
-    } else if (_acc.get(0) === Symbol.for('suspend')) {
-      return new Core.Tuple(Symbol.for('suspended'), _acc.get(1), new_acc => {
-        return iterator_to_reducer(iterator, new_acc, fun);
-      });
-    }
-
-    x = iterator.next();
-  }
-
-  return new Core.Tuple(Symbol.for('done'), _acc.get(1));
-}
-
 function call_property(item, property) {
   if (!property) {
     if (item instanceof Function || typeof item === 'function') {
@@ -148,7 +127,6 @@ export default {
   defprotocol,
   defimpl,
   build_namespace,
-  iterator_to_reducer,
   map_to_object,
   trampoline,
   Recurse
