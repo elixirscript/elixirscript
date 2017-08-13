@@ -14,7 +14,7 @@ defmodule Mix.Tasks.Compile.ElixirScript do
           version: "0.1.0",
           elixir: "~> 1.0",
           deps: deps,
-          elixir_script: [ entry: Example, output: "dest/js"],
+          elixir_script: [ input: Example, output: "dest/js"],
           compilers: Mix.compilers ++ [:elixir_script]
         ]
       end

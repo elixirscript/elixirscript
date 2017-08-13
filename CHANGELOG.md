@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 - Support for CommonJS and UMD output formats has been removed. Output will be in ES module format
 - The `js_modules` option has been removed in favor of the new FFI
+- ElixirScript.Watcher has been removed
 
 ## [0.28.0] - 2017-06-11
 
