@@ -22,7 +22,7 @@ defmodule ElixirScript.Mixfile do
 
   def application do
     [
-      applications: [:logger, :estree]
+      extra_applications: [:logger]
     ]
   end
 
@@ -31,7 +31,8 @@ defmodule ElixirScript.Mixfile do
       {:estree, "~> 2.6"},
       {:ex_doc, "~> 0.16", only: :dev},
       {:excoveralls, "~> 0.7", only: :test},
-      {:credo, "~> 0.8", only: [:dev, :test]}
+      {:credo, "~> 0.8", only: [:dev, :test]},
+      {:stream_data, "~> 0.1", only: :test}
     ]
   end
 

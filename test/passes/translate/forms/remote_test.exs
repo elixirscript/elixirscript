@@ -3,7 +3,7 @@ defmodule ElixirScript.Translate.Forms.Remote.Test do
   alias ElixirScript.Translate.Form
   alias ESTree.Tools.Builder, as: J
 
-  test "call to variable" do
+  test "variable counter" do
     ast = {:., [line: 644], [{:fun, [line: 644], nil}]}
     state = %{function: {:each, nil}, module: Enum, vars: %{:_ => 0, "entry" => 0, "enumerable" => 0, "fun" => 0}}
 

@@ -7,7 +7,6 @@ defmodule ElixirScript.CLI do
     output: :string,
     help: :boolean,
     version: :boolean,
-    watch: :boolean,
     root: :string
   ]
 
@@ -66,8 +65,6 @@ defmodule ElixirScript.CLI do
   end
 
   def do_process(input, options) do
-    {watch, options} = Keyword.pop(options, :watch, false)
-
     compile_opts = [
       output: Keyword.get(options, :output, :stdout),
       root: Keyword.get(options, :root, ".")
@@ -75,11 +72,6 @@ defmodule ElixirScript.CLI do
 
     input = handle_input(input)
     ElixirScript.Compiler.compile(input, compile_opts)
-
-    if watch do
-      ElixirScript.Watcher.start_link(input, compile_opts)
-      :timer.sleep :infinity
-    end
   end
 
   defp options_contains_unknown_values(options) do

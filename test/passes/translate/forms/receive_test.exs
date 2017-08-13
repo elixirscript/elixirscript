@@ -3,7 +3,7 @@ defmodule ElixirScript.Translate.Forms.Receive.Test do
   alias ElixirScript.Translate.Form
   alias ESTree.Tools.Builder, as: J
 
-  test "call to variable" do
+  test "receive translation" do
     ast = {:receive, [line: 644], [[do: 1, after: 2]]}
     state = %{function: {:each, nil}, module: __MODULE__}
 

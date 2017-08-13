@@ -75,4 +75,8 @@ defmodule ElixirScript.Translate.Identifier do
     J.identifier(name)
   end
 
+  def js_reserved_words() do
+    @js_reserved_words
+  end
+
 end

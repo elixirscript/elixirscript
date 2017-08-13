@@ -2,84 +2,84 @@ defmodule ElixirScript.Translate.Forms.Map.Test do
   use ExUnit.Case
   alias ElixirScript.Translate.Form
   alias ESTree.Tools.Builder, as: J
+  require StreamData
+  import PropertyTest
 
-  test "map with atom key" do
-    properties = [a: 1]
-    ast = {:%{}, [], properties}
-    state = %{}
+  setup_all do
+    {:ok, pid} = ElixirScript.State.start_link(%{})
 
-    {js_ast, _} = Form.compile(ast, state)
-    assert js_ast == J.new_expression(
-      J.identifier("Map"),
-      [
-        J.array_expression([
-          J.array_expression([
-              J.call_expression(
-                J.member_expression(
-                  J.identifier("Symbol"),
-                  J.identifier("for")
-                ),
-                [J.literal(:a)]
-              ),
-              J.literal(1),
-          ])
-        ])
-      ]
-    )
+    state = %{
+      pid: pid
+    }
+
+    [state: state]
   end
 
-  test "map with string key" do
-    properties = [{"a", 1}]
-    ast = {:%{}, [], properties}
-    state = %{}
+  property "maps convert to Map objects", %{state: state} do
+    check all tuple <- StreamData.tuple({
+      StreamData.one_of([
+        StreamData.int(),
+        StreamData.boolean(),
+        StreamData.binary(),
+        StreamData.uniform_float()
+      ]),
+      StreamData.binary()
+      }) do
 
-    {js_ast, _} = Form.compile(ast, state)
-    assert js_ast == J.new_expression(
-      J.identifier("Map"),
-      [
-        J.array_expression([
+      properties = [tuple]
+      ast = {:%{}, [], properties}
+
+      {js_ast, _} = Form.compile(ast, state)
+      assert js_ast == J.new_expression(
+        J.identifier("Map"),
+        [
           J.array_expression([
-            J.literal("a"),
-            J.literal(1),
+            J.array_expression([
+              J.literal(elem(tuple, 0)),
+              J.literal(elem(tuple, 1)),
+            ])
           ])
-        ])
-      ]
-    )
+        ]
+      )
+    end
   end
 
+  property "maps update converts to new Map objects using old version", %{state: state} do
+    check all key <- StreamData.binary(),
+              old_value <- StreamData.int(),
+              new_value <- StreamData.int() do
 
-  test "map update" do
-    properties = [{"a", 1}]
-    map_ast = {:%{}, [], properties}
-    new_values = [{"a", 2}]
-    state = %{}
+      properties = [{key, old_value}]
+      map_ast = {:%{}, [], properties}
+      new_values = [{key, new_value}]
 
-    ast = {:%{}, [], [{:|, [], [map_ast, new_values]}]}
+      ast = {:%{}, [], [{:|, [], [map_ast, new_values]}]}
 
-    map_ast = J.new_expression(
-      J.identifier("Map"),
-      [
-        J.array_expression([
+      map_js_ast = J.new_expression(
+        J.identifier("Map"),
+        [
           J.array_expression([
-            J.literal("a"),
-            J.literal(1),
+            J.array_expression([
+              J.literal(key),
+              J.literal(old_value),
+            ])
           ])
-        ])
-      ]
-    )
+        ]
+      )
 
-    {js_ast, _} = Form.compile(ast, state)
-    assert js_ast == J.new_expression(
-      J.identifier("Map"),
-      [
-        J.array_expression(
-          [J.spread_element(map_ast)] ++ [J.array_expression([
-            J.literal("a"),
-            J.literal(2)
-          ])]
-        )
-      ]
-    )
+      {js_ast, _} = Form.compile(ast, state)
+      assert js_ast == J.new_expression(
+        J.identifier("Map"),
+        [
+          J.array_expression(
+            [J.spread_element(map_js_ast)] ++ [J.array_expression([
+              J.literal(key),
+              J.literal(new_value)
+            ])]
+          )
+        ]
+      )
+    end
   end
 
 end
