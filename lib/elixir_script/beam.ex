@@ -40,8 +40,7 @@ defmodule ElixirScript.Beam do
   end
 
   defp do_debug_info(module) when is_atom(module) do
-    #TODO: Get modified date from _beam_path to check for cached version?
-    with  {_, beam, _beam_path} <- :code.get_object_code(module),
+    with  {_, beam, beam_path} <- :code.get_object_code(module),
           {:ok, {^module, [debug_info: {:debug_info_v1, backend, data}]}} <- :beam_lib.chunks(beam, [:debug_info]),
           {:ok, {^module, attribute_info}} = :beam_lib.chunks(beam, [:attributes]) do
 
@@ -49,6 +48,7 @@ defmodule ElixirScript.Beam do
             get_protocol_implementations(module)
           else
             backend.debug_info(:elixir_v1, module, data, [])
+            |> process_debug_info(beam_path)
           end
     else
       :error ->
@@ -60,6 +60,21 @@ defmodule ElixirScript.Beam do
       {:error,:beam_lib,{:file_error,"non_existing.beam",:enoent}} ->
         {:error, "Debug info not available"}
     end
+  end
+
+  defp process_debug_info({:ok, info}, beam_path) do
+    info = case File.stat(beam_path, time: :posix) do
+      {:ok, file_info} ->
+        Map.put(info, :last_modified, file_info.mtime)
+      _ ->
+        Map.put(info, :last_modified, nil)
+    end
+
+    {:ok, info}
+  end
+
+  defp process_debug_info(error, _) do
+    error
   end
 
   defp get_protocol_implementations(module) do
