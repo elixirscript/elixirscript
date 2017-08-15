@@ -1,6 +1,6 @@
 import nodeResolve from 'rollup-plugin-node-resolve';
 import babel from 'rollup-plugin-babel';
-import babili from 'rollup-plugin-babili';
+import minify from 'rollup-plugin-babel-minify';
 
 export default {
   entry: 'src/javascript/elixir.js',
@@ -10,7 +10,7 @@ export default {
     babel({
       babelrc: false
     }),
-    babili({
+    minify({
       keepFnName: true,
       keepClassName: true
     })
