@@ -4,14 +4,13 @@ defmodule ElixirScript.Mixfile do
   def project do
     [
       app: :elixir_script,
-      version: "0.30.0-dev",
-      elixir: "~> 1.5-dev",
+      version: "0.30.0",
+      elixir: "~> 1.5",
       elixirc_paths: elixirc_paths(Mix.env),
       deps: deps(),
       description: description(),
       package: package(),
       source_url: "https://github.com/elixirscript/elixirscript",
-      aliases: aliases(),
       test_coverage: [tool: ExCoveralls],
       docs: [
         main: "ElixirScript",
@@ -55,15 +54,6 @@ defmodule ElixirScript.Mixfile do
       },
       build_tools: ["mix"]
     ]
-  end
-
-  defp aliases do
-    [build_js: &build_js/1]
-  end
-
-  def build_js(_) do
-    Mix.Task.run "app.start"
-    System.cmd("yarn", ["build"])
   end
 
 end

@@ -4,14 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [0.30.0] - 2017-08-15
 
 ### Added
 - ElixirScript now has a Foreign Function Interface (FFI) for interoperability with JavaScript. For more details, see documentation at `ElixirScript.FFI`
 - `ElixirScript.JS.mutate/3`
 - `ElixirScript.JS.map_to_object/1`
 - `root` option for specifying the root import path for FFI JavaScript modules. Defaults to `"."`
-- For imports, now keeping the `.js` extension
 
 ### Changed
 - Compiler has been completely rewritten. ElixirScript now requires Erlang 20+ and Elixir 1.5+
