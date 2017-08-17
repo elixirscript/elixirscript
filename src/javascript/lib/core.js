@@ -11,6 +11,7 @@ import io from './core/erlang_compat/io';
 import binary from './core/erlang_compat/binary';
 import unicode from './core/erlang_compat/unicode';
 import Store from './core/store';
+import ProcessSystem from './core/processes/process_system.js';
 
 class Integer {}
 class Float {}
@@ -32,6 +33,8 @@ const globalState = get_global();
 
 globalState.__elixirscript_store__ = new Map();
 globalState.__elixirscript_names__ = new Map();
+
+globalState.__process_system__ = new ProcessSystem();
 
 export default {
   Tuple: ErlangTypes.Tuple,

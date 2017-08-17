@@ -122,6 +122,18 @@ function trampoline(f) {
   return currentValue;
 }
 
+function trampoline2(f) {
+  const currentValue = f;
+
+  if (currentValue && currentValue instanceof Recurse) {
+    Core.global.__process_system__.schedule(() => {
+      trampoline(currentValue);
+    });
+  }
+
+  return currentValue;
+}
+
 export default {
   call_property,
   defprotocol,

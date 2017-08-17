@@ -41,6 +41,19 @@ defmodule ElixirScript.Output.JSModule do
         J.block_statement([
           J.call_expression(
             J.member_expression(
+              J.member_expression(
+                J.identifier("ElixirScript"),
+                J.member_expression(
+                  J.identifier(:Core),
+                  J.member_expression(
+                    J.identifier(:global),
+                    J.identifier(:__process_system__)
+                  )
+                )
+              ),
+              J.identifier(:spawn_link)
+            ),
+            [
               J.call_expression(
                 J.member_expression(
                   J.identifier(:app),
@@ -48,9 +61,9 @@ defmodule ElixirScript.Output.JSModule do
                 ),
                 [J.identifier("Elixir")]
               ),
-              J.identifier("start")
-            ),
-            [normal, J.identifier(:args)]
+              J.literal("start"),
+              J.array_expression([normal, J.identifier(:args)])
+            ]
           )
         ])
       )
