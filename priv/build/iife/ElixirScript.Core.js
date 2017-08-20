@@ -1460,16 +1460,15 @@ function map_to_object(map) {
 class Recurse {
   constructor(func) {
     this.func = func;
+    this.pid = Core.global.__process_system__.pid();
   }
 }
 
 function trampoline$1(f) {
-  const currentValue = f;
+  let currentValue = f;
 
-  if (currentValue && currentValue instanceof Recurse) {
-    Core.global.__process_system__.schedule(() => {
-      trampoline$1(currentValue);
-    });
+  while (currentValue && currentValue instanceof Recurse) {
+    currentValue = currentValue.func();
   }
 
   return currentValue;
@@ -2743,11 +2742,11 @@ class Process {
   start() {
     const function_scope = this;
     console.log('HERE!!!!');
-    const machine = this.main();
+    const machine = new Functions.Recurse(this.main.bind(null, []));
 
     this.system.schedule(() => {
       function_scope.system.set_current(function_scope.pid);
-      function_scope.run(machine, machine.next());
+      function_scope.run(machine);
     }, this.pid);
   }
 
@@ -2803,42 +2802,42 @@ class Process {
     return value;
   }
 
-  run(machine, step) {
-    const function_scope = this;
+  run(f) {
+    const currentValue = f;
 
-    if (!step.done) {
-      const value = step.value;
+    if (currentValue && currentValue instanceof Functions.Recurse) {
+      const function_scope = this;
 
-      if (is_sleep(value)) {
+      if (is_sleep(currentValue)) {
         this.system.delay(() => {
           function_scope.system.set_current(function_scope.pid);
-          function_scope.run(machine, machine.next());
-        }, value[1]);
-      } else if (is_receive(value) && receive_timed_out(value)) {
-        const result = value[3]();
+          function_scope.run(currentValue);
+        }, currentValue[1]);
+      } else if (is_receive(currentValue) && receive_timed_out(currentValue)) {
+        const result = currentValue[3]();
 
         this.system.schedule(() => {
           function_scope.system.set_current(function_scope.pid);
-          function_scope.run(machine, machine.next(result));
+          function_scope.run(currentValue.receivedTimedOut(result));
         });
-      } else if (is_receive(value)) {
-        const result = function_scope.receive(value[1]);
+      } else if (is_receive(currentValue)) {
+        const result = function_scope.receive(currentValue[1]);
 
         if (result === States.NOMATCH) {
           this.system.suspend(() => {
             function_scope.system.set_current(function_scope.pid);
-            function_scope.run(machine, step);
+            function_scope.run(currentValue);
           });
         } else {
           this.system.schedule(() => {
             function_scope.system.set_current(function_scope.pid);
-            function_scope.run(machine, machine.next(result));
+            function_scope.run(currentValue.received(result));
           });
         }
       } else {
         this.system.schedule(() => {
           function_scope.system.set_current(function_scope.pid);
-          function_scope.run(machine, machine.next(value));
+          function_scope.run(currentValue.received(value));
         });
       }
     }
@@ -2969,10 +2968,7 @@ class ProcessSystem {
     this.scheduler = new Scheduler(throttle);
     this.suspended = new Map();
 
-    this.main_process_pid = this.spawn(() => {
-      this.sleep(Symbol.for('Infinity'));
-    });
-
+    this.main_process_pid = new ErlangTypes.PID();
     this.set_current(this.main_process_pid);
   }
 
@@ -3121,7 +3117,7 @@ class ProcessSystem {
   }
 
   pid() {
-    return this.current_process.pid;
+    return this.current_process ? this.current_process.pid : this.main_process_pid;
   }
 
   pidof(id) {

@@ -17,10 +17,7 @@ class ProcessSystem {
     this.scheduler = new Scheduler(throttle);
     this.suspended = new Map();
 
-    this.main_process_pid = this.spawn(() => {
-      this.sleep(Symbol.for('Infinity'));
-    });
-
+    this.main_process_pid = new ErlangTypes.PID();
     this.set_current(this.main_process_pid);
   }
 
@@ -172,7 +169,9 @@ class ProcessSystem {
   }
 
   pid() {
-    return this.current_process.pid;
+    return this.current_process
+      ? this.current_process.pid
+      : this.main_process_pid;
   }
 
   pidof(id) {

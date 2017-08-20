@@ -109,6 +109,7 @@ function map_to_object(map) {
 class Recurse {
   constructor(func) {
     this.func = func;
+    this.pid = Core.global.__process_system__.pid();
   }
 }
 
@@ -117,18 +118,6 @@ function trampoline(f) {
 
   while (currentValue && currentValue instanceof Recurse) {
     currentValue = currentValue.func();
-  }
-
-  return currentValue;
-}
-
-function trampoline2(f) {
-  const currentValue = f;
-
-  if (currentValue && currentValue instanceof Recurse) {
-    Core.global.__process_system__.schedule(() => {
-      trampoline(currentValue);
-    });
   }
 
   return currentValue;

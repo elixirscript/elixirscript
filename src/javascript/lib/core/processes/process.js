@@ -1,5 +1,5 @@
 import States from './states';
-import Core from '../../core';
+import Functions from '../functions';
 
 function is_sleep(value) {
   return Array.isArray(value) && value[0] === States.SLEEP;
@@ -29,7 +29,7 @@ class Process {
   start() {
     const function_scope = this;
     console.log('HERE!!!!');
-    const machine = new Core.Functions.Recurse(this.main.bind(null, []));
+    const machine = new Functions.Recurse(this.main.bind(null, []));
 
     this.system.schedule(() => {
       function_scope.system.set_current(function_scope.pid);
@@ -95,14 +95,14 @@ class Process {
   run(f) {
     const currentValue = f;
 
-    if (currentValue && currentValue instanceof Recurse) {
+    if (currentValue && currentValue instanceof Functions.Recurse) {
       const function_scope = this;
 
       if (is_sleep(currentValue)) {
         this.system.delay(() => {
           function_scope.system.set_current(function_scope.pid);
           function_scope.run(currentValue);
-        }, value[1]);
+        }, currentValue[1]);
       } else if (is_receive(currentValue) && receive_timed_out(currentValue)) {
         const result = currentValue[3]();
 

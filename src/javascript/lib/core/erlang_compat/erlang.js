@@ -1,8 +1,7 @@
 // http://erlang.org/doc/man/erlang.html
 import ErlangTypes from 'erlang-types';
 import lists from './lists';
-
-const selfPID = new ErlangTypes.PID();
+import Core from '../../core';
 
 function atom_to_binary(atom, encoding = Symbol.for('utf8')) {
   if (encoding !== Symbol.for('utf8')) {
@@ -361,7 +360,7 @@ function node() {
 }
 
 function self() {
-  return selfPID;
+  return Core.global.__process_system__.pid();
 }
 
 function _throw(term) {

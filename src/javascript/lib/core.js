@@ -11,7 +11,7 @@ import io from './core/erlang_compat/io';
 import binary from './core/erlang_compat/binary';
 import unicode from './core/erlang_compat/unicode';
 import Store from './core/store';
-import ProcessSystem from './core/processes/process_system.js';
+import ProcessSystem from './core/processes/process_system';
 
 class Integer {}
 class Float {}
