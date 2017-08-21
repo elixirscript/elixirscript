@@ -198,4 +198,21 @@ defmodule ElixirScript.String do
   def valid?(str) do
     is_binary(str)
   end
+
+  def split_at(value, position) when position < 0 do
+    position = length(value) + position
+
+    if position >= 0 do
+      split_at(value, position)
+    else
+      {"", value}
+    end
+  end
+
+  def split_at(value, position) do
+    {
+      value.substring(0, position),
+      value.substring(position),
+    }
+  end
 end
