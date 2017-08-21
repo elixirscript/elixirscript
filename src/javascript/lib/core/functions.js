@@ -122,6 +122,33 @@ function trampoline(f) {
   return currentValue;
 }
 
+function split_at(value, position) {
+  if (position < 0) {
+    const newPosition = value.length + position;
+    if (newPosition < 0) {
+      return new Core.Tuple('', value);
+    }
+
+    return split_at(value, newPosition);
+  }
+
+  let first = '';
+  let second = '';
+  let index = 0;
+
+  for (const character of value) {
+    if (index < position) {
+      first = first + character;
+    } else {
+      second = second + character;
+    }
+
+    index = index + 1;
+  }
+
+  return new Core.Tuple(first, second);
+}
+
 export default {
   call_property,
   defprotocol,
@@ -129,5 +156,6 @@ export default {
   build_namespace,
   map_to_object,
   trampoline,
-  Recurse
+  Recurse,
+  split_at
 };
