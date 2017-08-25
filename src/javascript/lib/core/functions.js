@@ -106,6 +106,35 @@ function map_to_object(map) {
   return object;
 }
 
+function symbol_to_string(symbol) {
+  const REGEX = /^Symbol\((.*)\)$/;
+  const string = symbol.toString();
+  return REGEX.exec(string)[1];
+}
+
+function map_to_valid_object(map) {
+  const object = {};
+
+  for (const [key, value] of map.entries()) {
+    var key2 = key;
+    if (typeof key == 'number') {
+      key2 = key.toString()
+    } else if (typeof key == 'symbol') {
+      key2 = symbol_to_string(key)
+    }
+
+    if (value instanceof Map) {
+      object[key2] = map_to_object(value);
+    } else if (typeof value == 'symbol') {
+      object[key2] = symbol_to_string(value);
+    } else {
+      object[key2] = value;
+    }
+  }
+
+  return object;
+}
+
 class Recurse {
   constructor(func) {
     this.func = func;
@@ -155,6 +184,8 @@ export default {
   defimpl,
   build_namespace,
   map_to_object,
+  symbol_to_string,
+  map_to_valid_object,
   trampoline,
   Recurse,
   split_at
