@@ -19,7 +19,21 @@ defmodule ElixirScript.Translate.Forms.Remote do
     :file,
     :io,
     :binary,
-    :unicode
+    :unicode,
+    :math,
+    :calendar,
+    :filename,
+    :epp,
+    :re,
+    :ets,
+    :sys,
+    :global,
+    :os,
+    :rand,
+    :orddict,
+    :filelib,
+    :net_adm,
+    :net_kernel,
   ]
 
   @doc """
