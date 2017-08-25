@@ -95,6 +95,7 @@ defmodule ElixirScript.Translate.Forms.JS.Test do
         J.identifier("entry0")
       ]
     )
+  end
 
   test "map_to_valid_object/1" do
     ast = {{:., [], [ElixirScript.JS, :map_to_valid_object]}, [], [{:entry, [], nil}]}
