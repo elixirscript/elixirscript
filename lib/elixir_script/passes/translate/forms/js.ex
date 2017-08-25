@@ -79,8 +79,7 @@ defmodule ElixirScript.Translate.Forms.JS do
   end
 
   def compile({{:., _, [ElixirScript.JS, :mutate]}, _, [object, key, value]}, state) do
-    ast = J.assignment_expression(
-      :=,
+    ast = Helpers.assign(
       J.member_expression(
         Form.compile!(object, state),
         Form.compile!(key, state),

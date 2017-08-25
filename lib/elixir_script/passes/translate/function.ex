@@ -103,7 +103,7 @@ defmodule ElixirScript.Translate.Function do
       J.if_statement(
         J.binary_expression(
           :!==,
-          J.assignment_expression(:=, J.identifier("__arg_matches__"), match_or_default_call),
+          Helpers.assign(J.identifier("__arg_matches__"), match_or_default_call),
           J.identifier("null")
         ),
         J.block_statement(body)

@@ -42,11 +42,7 @@ defmodule ElixirScript.ModuleSystems.Namespace do
 
     declaration = Helpers.declare("__exports", exports)
 
-    assign = JS.assignment_expression(
-      :=,
-      values,
-      JS.identifier("__exports")
-    )
+    assign = Helpers.assign(values, JS.identifier("__exports"))
 
     exports = [JS.return_statement(JS.identifier("__exports"))]
 
@@ -61,8 +57,7 @@ defmodule ElixirScript.ModuleSystems.Namespace do
     func_body = JS.block_statement([js_if] ++ body ++ [declaration, assign] ++ exports)
 
     func = Helpers.function([JS.identifier("Elixir")], func_body)
-    JS.assignment_expression(
-      :=,
+    Helpers.assign(
       make,
       func
     )

@@ -19,8 +19,7 @@ defmodule ElixirScript.Output.JSModule do
   def start do
     normal = Helpers.symbol("normal")
 
-    J.assignment_expression(
-      :=,
+    Helpers.assign(
       J.member_expression(
         J.identifier("Elixir"),
         J.identifier("start")
@@ -47,8 +46,7 @@ defmodule ElixirScript.Output.JSModule do
   end
 
   def load do
-    J.assignment_expression(
-      :=,
+    Helpers.assign(
       J.member_expression(
         J.identifier("Elixir"),
         J.identifier("load")
@@ -71,8 +69,7 @@ defmodule ElixirScript.Output.JSModule do
   end
 
   defp create_atom_table() do
-    J.assignment_expression(
-      :=,
+    Helpers.assign(
       J.member_expression(
         J.identifier("Elixir"),
         J.identifier("__table__")

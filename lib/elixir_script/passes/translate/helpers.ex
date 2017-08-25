@@ -120,4 +120,12 @@ defmodule ElixirScript.Translate.Helpers do
     J.variable_declaration([declarator], :let)
   end
 
+  def assign(name, value) do
+    J.assignment_expression(
+      :=,
+      name,
+      value
+    )
+  end
+
 end
