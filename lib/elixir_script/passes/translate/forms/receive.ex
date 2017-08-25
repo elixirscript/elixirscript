@@ -1,6 +1,7 @@
 defmodule ElixirScript.Translate.Forms.Receive do
   @moduledoc false
   alias ESTree.Tools.Builder, as: J
+  alias ElixirScript.Translate.Helpers
 
   @doc """
   receive is not supported just yet, but we compile it
@@ -11,17 +12,11 @@ defmodule ElixirScript.Translate.Forms.Receive do
     _after_block = Keyword.get(blocks, :after, nil)
 
     receive_function = J.member_expression(
-      J.member_expression(
-        J.identifier("ElixirScript"),
-        J.member_expression(
-          J.identifier("Core"),
-          J.identifier("SpecialForms")
-        )
-      ),
+      Helpers.special_forms(),
       J.identifier("receive")
     )
 
-    ast = J.call_expression(
+    ast = Helpers.call(
       receive_function,
       []
     )

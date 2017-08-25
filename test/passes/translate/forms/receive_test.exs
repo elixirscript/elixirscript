@@ -1,6 +1,6 @@
 defmodule ElixirScript.Translate.Forms.Receive.Test do
   use ExUnit.Case
-  alias ElixirScript.Translate.Form
+  alias ElixirScript.Translate.{Form, Helpers}
   alias ESTree.Tools.Builder, as: J
 
   test "receive translation" do
@@ -10,13 +10,7 @@ defmodule ElixirScript.Translate.Forms.Receive.Test do
     {js_ast, _} = Form.compile(ast, state)
     assert js_ast == J.call_expression(
       J.member_expression(
-        J.member_expression(
-          J.identifier("ElixirScript"),
-          J.member_expression(
-            J.identifier("Core"),
-            J.identifier("SpecialForms")
-          )
-        ),
+        Helpers.special_forms(),
         J.identifier("receive")
       ),
       []

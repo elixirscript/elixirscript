@@ -1,6 +1,7 @@
 defmodule ElixirScript.Translate.Module do
   @moduledoc false
   alias ESTree.Tools.Builder, as: J
+  alias ElixirScript.Translate.Helpers
   alias ElixirScript.Translate.Function
   alias ElixirScript.State, as: ModuleState
   alias ElixirScript.Translate.Form
@@ -97,13 +98,7 @@ defmodule ElixirScript.Translate.Module do
     # Will be used by the is_atom implementation
     exports = exports ++ [%ESTree.Property{
       key: J.identifier("__MODULE__"),
-      value: J.call_expression(
-        J.member_expression(
-          J.identifier("Symbol"),
-          J.identifier("for")
-        ),
-        [J.literal(to_string(module))]
-      )
+      value: Helpers.symbol(to_string(module))
     },
     J.property(
       J.identifier("__info__"),
@@ -181,25 +176,13 @@ defmodule ElixirScript.Translate.Module do
 
     macros = Form.compile!(macros, state)
 
-    module = J.call_expression(
-      J.member_expression(
-        J.identifier("Symbol"),
-        J.identifier("for")
-      ),
-      [J.literal(to_string(module))]
-    )
+    module = Helpers.symbol(to_string(module))
 
     body = J.if_statement(
       J.binary_expression(
         :===,
         J.identifier("kind"),
-        J.call_expression(
-          J.member_expression(
-            J.identifier("Symbol"),
-            J.identifier("for")
-          ),
-          [J.literal("functions")]
-        )
+        Helpers.symbol("functions")
       ),
       J.block_statement([
         J.return_statement(functions)
@@ -208,13 +191,7 @@ defmodule ElixirScript.Translate.Module do
         J.binary_expression(
           :===,
           J.identifier("kind"),
-          J.call_expression(
-            J.member_expression(
-              J.identifier("Symbol"),
-              J.identifier("for")
-            ),
-            [J.literal("macros")]
-          )
+          Helpers.symbol("macros")
         ),
         J.block_statement([
           J.return_statement(macros)
@@ -223,13 +200,7 @@ defmodule ElixirScript.Translate.Module do
           J.binary_expression(
             :===,
             J.identifier("kind"),
-            J.call_expression(
-              J.member_expression(
-                J.identifier("Symbol"),
-                J.identifier("for")
-              ),
-              [J.literal("module")]
-            )
+            Helpers.symbol("module")
           ),
           J.block_statement([
             J.return_statement(module)
@@ -241,9 +212,9 @@ defmodule ElixirScript.Translate.Module do
     body = J.block_statement([
       body,
       J.throw_statement(
-        J.new_expression(
+        Helpers.new(
           J.member_expression(
-            Function.patterns_ast(),
+            Helpers.patterns(),
             J.identifier("MatchError")
           ),
           [J.identifier("kind")]
@@ -251,10 +222,9 @@ defmodule ElixirScript.Translate.Module do
       )
     ])
 
-    J.function_declaration(
-      J.identifier("__info__"),
+    Helpers.function(
+      "__info__",
       [J.identifier("kind")],
-      [],
       body
     )
   end

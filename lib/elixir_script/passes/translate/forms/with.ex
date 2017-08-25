@@ -1,7 +1,7 @@
 defmodule ElixirScript.Translate.Forms.With do
   @moduledoc false
   alias ESTree.Tools.Builder, as: JS
-  alias ElixirScript.Translate.{Function, Clause}
+  alias ElixirScript.Translate.{Function, Clause, Helpers}
   alias ElixirScript.Translate.Forms.Pattern
 
 
@@ -10,7 +10,7 @@ defmodule ElixirScript.Translate.Forms.With do
       {symbol, _, [pattern, body] }, state when symbol in [:<-, :=] ->
         {ast, module_state} = Function.compile_block(body, state.module_state)
         body = Clause.return_last_statement(ast)
-        expr_function = JS.arrow_function_expression(state.arguments, [], JS.block_statement(body))
+        expr_function = Helpers.arrow_function(state.arguments, JS.block_statement(body))
 
         { patterns, params, module_state } = Pattern.compile([pattern], module_state)
 
@@ -33,15 +33,9 @@ defmodule ElixirScript.Translate.Forms.With do
 
     expressions = result.expressions
 
-    js_ast = JS.call_expression(
+    js_ast = Helpers.call(
       JS.member_expression(
-        JS.member_expression(
-          JS.identifier("ElixirScript"),
-          JS.member_expression(
-            JS.identifier("Core"),
-            JS.identifier("SpecialForms")
-          )
-        ),
+        Helpers.special_forms(),
         JS.identifier("_with")
       ),
       expressions
@@ -56,6 +50,6 @@ defmodule ElixirScript.Translate.Forms.With do
     {ast, _} = Function.compile_block(body, module_state)
 
     body = Clause.return_last_statement(ast)
-    JS.arrow_function_expression(arguments, [], JS.block_statement(body))
+    Helpers.arrow_function(arguments, JS.block_statement(body))
   end
 end

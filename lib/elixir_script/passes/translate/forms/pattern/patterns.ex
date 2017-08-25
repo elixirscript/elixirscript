@@ -2,101 +2,94 @@ defmodule ElixirScript.Translate.Forms.Pattern.Patterns do
   @moduledoc false
 
   alias ESTree.Tools.Builder, as: J
-
-  @patterns J.member_expression(
-    J.member_expression(
-    J.identifier("ElixirScript"),
-    J.identifier("Core")
-    ),
-    J.identifier("Patterns")
-  )
+  alias ElixirScript.Translate.Helpers
 
   @parameter J.member_expression(
-    @patterns,
+    Helpers.patterns(),
     J.identifier(:variable)
   )
 
   @head_tail J.member_expression(
-    @patterns,
+    Helpers.patterns(),
     J.identifier(:headTail)
   )
 
   @starts_with J.member_expression(
-    @patterns,
+    Helpers.patterns(),
     J.identifier(:startsWith)
   )
 
   @capture J.member_expression(
-    @patterns,
+    Helpers.patterns(),
     J.identifier(:capture)
   )
 
   @bound J.member_expression(
-    @patterns,
+    Helpers.patterns(),
     J.identifier(:bound)
   )
 
   @_type J.member_expression(
-    @patterns,
+    Helpers.patterns(),
     J.identifier(:type)
   )
 
   @bitstring_match J.member_expression(
-    @patterns,
+    Helpers.patterns(),
     J.identifier(:bitStringMatch)
   )
 
   def parameter() do
-    J.call_expression(
+    Helpers.call(
       @parameter,
       []
     )
   end
 
   def parameter(name) do
-    J.call_expression(
+    Helpers.call(
       @parameter,
       [name]
     )
   end
 
   def head_tail(headParameter, tailParameter) do
-    J.call_expression(
+    Helpers.call(
       @head_tail,
       [headParameter, tailParameter]
     )
   end
 
   def starts_with(prefix) do
-    J.call_expression(
+    Helpers.call(
       @starts_with,
       [J.literal(prefix)]
     )
   end
 
   def capture(value) do
-    J.call_expression(
+    Helpers.call(
       @capture,
       [value]
     )
   end
 
   def bound(value) do
-    J.call_expression(
+    Helpers.call(
       @bound,
       [value]
     )
   end
 
   def type(prototype, value) do
-    J.call_expression(
+    Helpers.call(
       @_type,
       [prototype, value]
     )
   end
 
   def bitstring_match(values) do
-    J.call_expression(
+    Helpers.call(
       @bitstring_match,
       values
     )

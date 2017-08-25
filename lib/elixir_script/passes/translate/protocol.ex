@@ -1,6 +1,7 @@
 defmodule ElixirScript.Translate.Protocol do
   @moduledoc false
   alias ESTree.Tools.Builder, as: J
+  alias ElixirScript.Translate.Helpers
   alias ElixirScript.Translate.{Function, Identifier}
   alias ElixirScript.State, as: ModuleState
 
@@ -10,29 +11,21 @@ defmodule ElixirScript.Translate.Protocol do
   """
   def compile(module, %{protocol: true, impls: impls, functions: functions} = info, pid) do
     object = Enum.map(functions, fn {function, _} ->
-      {Identifier.make_function_name(function), J.function_expression([], [], J.block_statement([]))}
+      {Identifier.make_function_name(function), Helpers.function([], J.block_statement([]))}
     end)
     |> Enum.map(fn({key, value}) -> ElixirScript.Translate.Forms.Map.make_property(key, value) end)
     |> J.object_expression
 
-    declarator = J.variable_declarator(
-      J.identifier("protocol"),
-      J.call_expression(
+    declaration = Helpers.declare(
+      "protocol",
+      Helpers.call(
         J.member_expression(
-          J.identifier("ElixirScript"),
-          J.member_expression(
-            J.identifier(:Core),
-            J.member_expression(
-              J.identifier(:Functions),
-              J.identifier(:defprotocol)
-            )
-          )
+          Helpers.functions(),
+          J.identifier(:defprotocol)
         ),
         [object]
       )
     )
-
-    declaration = J.variable_declaration([declarator], :const)
 
     body = build_implementations(impls)
 
@@ -51,21 +44,15 @@ defmodule ElixirScript.Translate.Protocol do
     Enum.map(impls, fn({impl, impl_for}) ->
       members = ["Elixir"] ++ Module.split(impl) ++ ["__load"]
 
-      ast = J.call_expression(
+      ast = Helpers.call(
         Identifier.make_namespace_members(members),
         [J.identifier("Elixir")]
       )
 
-      J.call_expression(
+      Helpers.call(
         J.member_expression(
-          J.identifier("ElixirScript"),
-          J.member_expression(
-            J.identifier(:Core),
-            J.member_expression(
-              J.identifier(:Functions),
-              J.identifier(:defimpl)
-            )
-          )
+          Helpers.functions(),
+          J.identifier(:defimpl)
         ),
         [
           J.identifier("protocol"),
@@ -77,23 +64,11 @@ defmodule ElixirScript.Translate.Protocol do
   end
 
   defp map_to_js(Integer) do
-    J.member_expression(
-      J.member_expression(
-        J.identifier("ElixirScript"),
-        J.identifier(:Core)
-      ),
-      J.identifier(:Integer)
-    )
+    Helpers.core_module("Integer")
   end
 
   defp map_to_js(Tuple) do
-    J.member_expression(
-      J.member_expression(
-        J.identifier("ElixirScript"),
-        J.identifier(:Core)
-      ),
-      J.identifier(:Tuple)
-    )
+    Helpers.tuple()
   end
 
   defp map_to_js(Atom) do
@@ -105,23 +80,11 @@ defmodule ElixirScript.Translate.Protocol do
   end
 
   defp map_to_js(BitString) do
-    J.member_expression(
-      J.member_expression(
-        J.identifier("ElixirScript"),
-        J.identifier(:Core)
-      ),
-      J.identifier(:BitString)
-    )
+    Helpers.bitstring()
   end
 
   defp map_to_js(Float) do
-    J.member_expression(
-      J.member_expression(
-        J.identifier("ElixirScript"),
-        J.identifier(:Core)
-      ),
-      J.identifier(:Float)
-    )
+    Helpers.core_module("Float")
   end
 
   defp map_to_js(Function) do
@@ -129,27 +92,15 @@ defmodule ElixirScript.Translate.Protocol do
   end
 
   defp map_to_js(PID) do
-    J.member_expression(
-      J.member_expression(
-        J.identifier("ElixirScript"),
-        J.identifier(:Core)
-      ),
-      J.identifier(:PID)
-    )
+    Helpers.core_module("PID")
   end
 
   defp map_to_js(Port) do
-    J.member_expression(
-      J.identifier("ElixirScript"),
-      J.identifier(:Port)
-    )
+    Helpers.core_module("Port")
   end
 
   defp map_to_js(Reference) do
-    J.member_expression(
-      J.identifier("ElixirScript"),
-      J.identifier(:Reference)
-    )
+    Helpers.core_module("Reference")
   end
 
   defp map_to_js(Map) do
@@ -165,13 +116,7 @@ defmodule ElixirScript.Translate.Protocol do
       ["JS" | rest] ->
         Identifier.make_namespace_members(rest)
       _ ->
-        J.call_expression(
-          J.member_expression(
-            J.identifier("Symbol"),
-            J.identifier("for")
-          ),
-          [J.literal(module)]
-        )
+        Helpers.symbol(module)
     end
   end
 end

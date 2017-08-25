@@ -1,6 +1,7 @@
 defmodule ElixirScript.Translate.Forms.Pattern do
   alias ElixirScript.Translate.Forms.Pattern.Patterns, as: PM
   alias ESTree.Tools.Builder, as: J
+  alias ElixirScript.Translate.Helpers
   alias ElixirScript.Translate.Form
   alias ElixirScript.Translate.Forms.Bitstring
 
@@ -81,13 +82,7 @@ defmodule ElixirScript.Translate.Forms.Pattern do
       )
       ])
 
-    tuple = J.member_expression(
-        J.member_expression(
-          J.identifier("ElixirScript"),
-          J.identifier("Core")
-        ),
-        J.identifier("Tuple")
-      )
+    tuple = Helpers.tuple()
 
     { [PM.type(tuple, pattern)], params }
   end
@@ -144,13 +139,7 @@ defmodule ElixirScript.Translate.Forms.Pattern do
       {:__module__struct__, module} ->
         a = J.object_expression([%ESTree.Property{
           key: J.identifier("__MODULE__"),
-          value: J.call_expression(
-            J.member_expression(
-              J.identifier("Symbol"),
-              J.identifier("for")
-            ),
-            [J.literal(to_string(module))]
-          )
+          value: Helpers.symbol(to_string(module))
         }])
 
         property = J.array_expression([
@@ -182,7 +171,7 @@ defmodule ElixirScript.Translate.Forms.Pattern do
       { props ++ [prop], params ++ param }
     end)
 
-    ast = J.new_expression(
+    ast = Helpers.new(
       J.identifier("Map"),
       [
         J.array_expression(List.wrap(props))

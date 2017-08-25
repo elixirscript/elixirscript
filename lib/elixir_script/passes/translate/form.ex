@@ -4,6 +4,7 @@ defmodule ElixirScript.Translate.Form do
   # Handles translation of all forms that are not functions or clauses
 
   alias ESTree.Tools.Builder, as: J
+  alias ElixirScript.Translate.Helpers
   alias ElixirScript.Translate.Forms.{Bitstring, Match, Try, For, Receive, Remote, Pattern, With}
   alias ElixirScript.Translate.Clause
   require Logger
@@ -23,7 +24,7 @@ defmodule ElixirScript.Translate.Form do
   end
 
   def compile([{:|, _, [head, tail]}], state) do
-    ast = J.call_expression(
+    ast = Helpers.call(
       J.member_expression(
         J.array_expression([compile!(head, state)]),
         J.identifier("concat")
@@ -35,7 +36,7 @@ defmodule ElixirScript.Translate.Form do
   end
 
   def compile({:|, _, [head, tail]}, state) do
-    ast = J.call_expression(
+    ast = Helpers.call(
       J.member_expression(
         J.array_expression([compile!(head, state)]),
         J.identifier("concat")
@@ -58,13 +59,7 @@ defmodule ElixirScript.Translate.Form do
     ast = if ElixirScript.Translate.Module.is_elixir_module(form) do
       Remote.process_module_name(form, state)
     else
-      J.call_expression(
-        J.member_expression(
-          J.identifier("Symbol"),
-          J.identifier("for")
-        ),
-        [J.literal(form)]
-      )
+      Helpers.symbol(form)
     end
 
     { ast, state }
@@ -75,14 +70,8 @@ defmodule ElixirScript.Translate.Form do
   end
 
   def compile({:{}, _, elements}, state) do
-    ast = J.new_expression(
-      J.member_expression(
-        J.member_expression(
-          J.identifier("ElixirScript"),
-          J.identifier("Core")
-        ),
-        J.identifier("Tuple")
-      ),
+    ast = Helpers.new(
+      Helpers.tuple(),
       Enum.map(elements, &compile!(&1, state)) |> List.flatten
     )
 
@@ -130,7 +119,7 @@ defmodule ElixirScript.Translate.Form do
   end
 
   def compile({:%, _, [module, params]}, state) do
-    ast = J.call_expression(
+    ast = Helpers.call(
       J.member_expression(
         Remote.process_module_name(module, state),
         J.identifier("__struct__")
@@ -155,15 +144,15 @@ defmodule ElixirScript.Translate.Form do
   end
 
   def compile({:case, _, [condition, [do: clauses]]}, state) do
-    func = J.call_expression(
+    func = Helpers.call(
       J.member_expression(
-        ElixirScript.Translate.Function.patterns_ast(),
+        Helpers.patterns(),
         J.identifier("defmatch")
       ),
       Enum.map(clauses, fn x -> Clause.compile(x, state) |> elem(0) end) |> List.flatten
     )
 
-    ast = J.call_expression(
+    ast = Helpers.call(
       J.member_expression( func, J.identifier("call")),
       [J.identifier(:this), compile!(condition, state)]
     )
@@ -178,7 +167,7 @@ defmodule ElixirScript.Translate.Form do
       translated_body = translated_body
       |> Clause.return_last_statement
 
-      translated_body = J.arrow_function_expression([], [], J.block_statement(translated_body))
+      translated_body = Helpers.arrow_function([], J.block_statement(translated_body))
 
       { translated_clause, _ }  = compile(hd(clause), state)
 
@@ -188,17 +177,11 @@ defmodule ElixirScript.Translate.Form do
 
 
     cond_function = J.member_expression(
-      J.member_expression(
-        J.identifier("ElixirScript"),
-        J.member_expression(
-          J.identifier("Core"),
-          J.identifier("SpecialForms")
-        )
-      ),
+      Helpers.special_forms(),
       J.identifier("cond")
     )
 
-    ast = J.call_expression(
+    ast = Helpers.call(
       cond_function,
       processed_clauses
     )
@@ -308,7 +291,7 @@ defmodule ElixirScript.Translate.Form do
   end
 
   def compile({{:., _, [{_, _, nil} = var, func_or_prop]}, _, []}, state) do
-    ast = J.call_expression(
+    ast = Helpers.call(
       ElixirScript.Translate.Forms.JS.call_property(),
       [compile!(var, state), J.literal(to_string(func_or_prop))]
     )
@@ -328,7 +311,7 @@ defmodule ElixirScript.Translate.Form do
     {function_name, _} = Map.get(state, :function)
     {var_decs, params} = compile_params(params, state)
 
-    ast = J.call_expression(
+    ast = Helpers.call(
       ElixirScript.Translate.Identifier.make_function_name(function_name),
       params
     )
@@ -348,7 +331,7 @@ defmodule ElixirScript.Translate.Form do
   def compile({var, _, params}, state) when is_list(params) and is_atom(var) do
     {var_decs, params} = compile_params(params, state)
 
-    ast = J.call_expression(
+    ast = Helpers.call(
       ElixirScript.Translate.Identifier.make_function_name(var),
       params
     )
@@ -362,7 +345,7 @@ defmodule ElixirScript.Translate.Form do
   end
 
   def compile({function, _, []}, state) do
-    ast = J.call_expression(
+    ast = Helpers.call(
       ElixirScript.Translate.Forms.JS.call_property(),
       [compile!(function, state)]
     )
@@ -373,7 +356,7 @@ defmodule ElixirScript.Translate.Form do
   def compile({function, _, params}, state) when is_list(params) do
     {var_decs, params} = compile_params(params, state)
 
-    ast = J.call_expression(
+    ast = Helpers.call(
       compile!(function, state),
       params
     )

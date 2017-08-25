@@ -1,7 +1,7 @@
 defmodule ElixirScript.Translate.Forms.Try do
   @moduledoc false
   alias ESTree.Tools.Builder, as: JS
-  alias ElixirScript.Translate.{Form, Function, Clause}
+  alias ElixirScript.Translate.{Form, Function, Clause, Helpers}
 
   def compile(blocks, state) do
     try_block = Keyword.get(blocks, :do)
@@ -13,7 +13,7 @@ defmodule ElixirScript.Translate.Forms.Try do
     translated_body = prepare_function_body(try_block, state)
 
     translated_body = JS.block_statement(translated_body)
-    try_block = JS.arrow_function_expression([], [], translated_body)
+    try_block = Helpers.arrow_function([], translated_body)
 
     rescue_block = if rescue_block do
       process_rescue_block(rescue_block, state)
@@ -39,15 +39,9 @@ defmodule ElixirScript.Translate.Forms.Try do
       JS.identifier(:null)
     end
 
-    js_ast = JS.call_expression(
+    js_ast = Helpers.call(
       JS.member_expression(
-        JS.member_expression(
-          JS.identifier("ElixirScript"),
-          JS.member_expression(
-            JS.identifier("Core"),
-            JS.identifier("SpecialForms")
-          )
-        ),
+        Helpers.special_forms(),
         JS.identifier("_try")
       ),
       [
@@ -73,9 +67,9 @@ defmodule ElixirScript.Translate.Forms.Try do
       end)
 
 
-      JS.call_expression(
+      Helpers.call(
         JS.member_expression(
-          ElixirScript.Translate.Function.patterns_ast(),
+          Helpers.patterns(),
           JS.identifier("defmatch")
         ),
         processed_clauses
@@ -87,7 +81,7 @@ defmodule ElixirScript.Translate.Forms.Try do
     translated_body = prepare_function_body(after_block, state)
     translated_body = JS.block_statement(translated_body)
 
-    JS.arrow_function_expression([], [], translated_body)
+    Helpers.arrow_function([], translated_body)
   end
 
   defp prepare_function_body(body, state) do

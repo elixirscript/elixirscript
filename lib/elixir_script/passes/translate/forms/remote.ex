@@ -2,7 +2,7 @@ defmodule ElixirScript.Translate.Forms.Remote do
   @moduledoc false
 
   alias ESTree.Tools.Builder, as: J
-  alias ElixirScript.Translate.{Form, Identifier}
+  alias ElixirScript.Translate.{Form, Identifier, Helpers}
   alias ElixirScript.State, as: ModuleState
 
   @erlang_modules [
@@ -42,13 +42,7 @@ defmodule ElixirScript.Translate.Forms.Remote do
 
   def compile({:., _, [module, function]}, state) when module in @erlang_modules do
     ast = J.member_expression(
-      J.member_expression(
-        J.member_expression(
-          J.identifier("ElixirScript"),
-          J.identifier("Core")
-        ),
-        J.identifier(module)
-      ),
+      Helpers.core_module(module),
       ElixirScript.Translate.Identifier.make_function_name(function)
     )
 
@@ -77,14 +71,14 @@ defmodule ElixirScript.Translate.Forms.Remote do
       module === Elixir ->
         members = ["Elixir", "__load"]
 
-        J.call_expression(
+        Helpers.call(
           Identifier.make_namespace_members(members),
           [J.identifier("Elixir")]
         )
       ElixirScript.Translate.Module.is_elixir_module(module) ->
         members = ["Elixir"] ++ Module.split(module) ++ ["__load"]
 
-        J.call_expression(
+        Helpers.call(
           Identifier.make_namespace_members(members),
           [J.identifier("Elixir")]
         )
@@ -114,13 +108,7 @@ defmodule ElixirScript.Translate.Forms.Remote do
 
   defp erlang_compat_function(module, function) do
     J.member_expression(
-      J.member_expression(
-        J.member_expression(
-          J.identifier("ElixirScript"),
-          J.identifier("Core")
-        ),
-        J.identifier(module)
-      ),
+      Helpers.core_module(module),
       ElixirScript.Translate.Identifier.make_function_name(function)
     )
   end

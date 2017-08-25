@@ -2,14 +2,10 @@ defmodule ElixirScript.Output.JSModule do
   @moduledoc false
 
   alias ESTree.Tools.Builder, as: J
+  alias ElixirScript.Translate.Helpers
 
   def compile(body, opts, js_modules) do
-    declarator = J.variable_declarator(
-      J.identifier("Elixir"),
-      J.object_expression([])
-    )
-
-    elixir = J.variable_declaration([declarator], :const)
+    elixir = Helpers.declare("Elixir", J.object_expression([]))
 
     ast = opts.module_formatter.build(
       js_modules,
@@ -21,13 +17,7 @@ defmodule ElixirScript.Output.JSModule do
   end
 
   def start do
-    normal = J.call_expression(
-      J.member_expression(
-        J.identifier("Symbol"),
-        J.identifier("for")
-      ),
-      [J.literal("normal")]
-    )
+    normal = Helpers.symbol("normal")
 
     J.assignment_expression(
       :=,
@@ -35,13 +25,12 @@ defmodule ElixirScript.Output.JSModule do
         J.identifier("Elixir"),
         J.identifier("start")
       ),
-      J.function_expression(
+      Helpers.function(
         [J.identifier(:app), J.identifier(:args)],
-        [],
         J.block_statement([
-          J.call_expression(
+          Helpers.call(
             J.member_expression(
-              J.call_expression(
+              Helpers.call(
                 J.member_expression(
                   J.identifier(:app),
                   J.identifier("__load")
@@ -64,12 +53,11 @@ defmodule ElixirScript.Output.JSModule do
         J.identifier("Elixir"),
         J.identifier("load")
       ),
-      J.function_expression(
+      Helpers.function(
         [J.identifier(:module)],
-        [],
         J.block_statement([
           J.return_statement(
-            J.call_expression(
+            Helpers.call(
               J.member_expression(
                 J.identifier(:module),
                 J.identifier("__load")

@@ -1,6 +1,6 @@
 defmodule ElixirScript.Translate.Forms.JS.Test do
   use ExUnit.Case
-  alias ElixirScript.Translate.Form
+  alias ElixirScript.Translate.{Form, Helpers}
   alias ESTree.Tools.Builder, as: J
 
   setup_all do
@@ -88,13 +88,7 @@ defmodule ElixirScript.Translate.Forms.JS.Test do
     {js_ast, _} = Form.compile(ast, state)
     assert js_ast == J.call_expression(
       J.member_expression(
-        J.member_expression(
-          J.identifier("ElixirScript"),
-          J.member_expression(
-            J.identifier("Core"),
-            J.identifier("Functions")
-          )
-        ),
+        Helpers.functions(),
         J.identifier("map_to_object")
       ),
       [
