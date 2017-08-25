@@ -62,4 +62,26 @@ defmodule ElixirScript.JS do
   ```
   """
   defexternal map_to_object(object)
+
+  @doc """
+  Takes the given map and returns a valid object
+  Throws an error if any key is not a
+  number, binary, or atom
+
+
+  ```elixir
+  ElixirScript.JS.map_to_valid_object(%{my: "map"})
+  ```
+  """
+  defexternal map_to_valid_object(object)
+
+  @doc """
+  Takes the given symbol and returns a string
+
+
+  ```elixir
+  ElixirScript.JS.symbol_to_string(:js_symbol)
+  ```
+  """
+  defexternal symbol_to_string(symbol)
 end
