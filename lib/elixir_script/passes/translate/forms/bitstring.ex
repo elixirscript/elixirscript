@@ -1,18 +1,13 @@
 defmodule ElixirScript.Translate.Forms.Bitstring do
   @moduledoc false
   alias ESTree.Tools.Builder, as: JS
+  alias ElixirScript.Translate.Helpers
   alias ElixirScript.Translate.Form
 
 
   def compile({:<<>>, _, elements}, state) do
-    js_ast = JS.new_expression(
-        JS.member_expression(
-          JS.member_expression(
-            JS.identifier("ElixirScript"),
-            JS.identifier("Core")
-          ),
-          JS.identifier("BitString")
-        ),
+    js_ast = Helpers.new(
+        Helpers.bitstring(),
         Enum.map(elements, &compile_element(&1, state))
       )
 
@@ -85,20 +80,10 @@ defmodule ElixirScript.Translate.Forms.Bitstring do
     end)
   end
 
-  defp bitstring_class() do
-    JS.member_expression(
-      JS.member_expression(
-        JS.identifier("ElixirScript"),
-        JS.identifier("Core")
-      ),
-      JS.identifier("BitString")
-    )
-  end
-
   defp do_compile_element({type, ast}) do
-    JS.call_expression(
+    Helpers.call(
       JS.member_expression(
-        bitstring_class(),
+        Helpers.bitstring(),
         JS.identifier(type)
       ),
       [
@@ -108,9 +93,9 @@ defmodule ElixirScript.Translate.Forms.Bitstring do
   end
 
   defp do_compile_element({type, ast, params}) when is_list(params) do
-    JS.call_expression(
+    Helpers.call(
       JS.member_expression(
-        bitstring_class(),
+        Helpers.bitstring(),
         JS.identifier(type)
       ),
       [

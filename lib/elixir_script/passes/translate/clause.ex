@@ -4,17 +4,10 @@ defmodule ElixirScript.Translate.Clause do
   # Handles translation of all of the clause ASTs
 
   alias ESTree.Tools.Builder, as: J
+  alias ElixirScript.Translate.Helpers
   alias ElixirScript.Translate.Form
   alias ElixirScript.Translate.Forms.Pattern
   alias ElixirScript.Translate.Function
-
-  @patterns J.member_expression(
-    J.member_expression(
-      J.identifier("ElixirScript"),
-      J.identifier("Core")
-    ),
-    J.identifier("Patterns")
-  )
 
   def compile({ _, args, guards, body}, state) do
     {patterns, params, state} = Pattern.compile(args, state)
@@ -25,16 +18,15 @@ defmodule ElixirScript.Translate.Clause do
     body = body
     |> return_last_statement
 
-    ast = J.call_expression(
+    ast = Helpers.call(
       J.member_expression(
-        @patterns,
+        Helpers.patterns(),
         J.identifier("clause")
       ),
       [
         J.array_expression(patterns),
-        J.arrow_function_expression(
+        Helpers.arrow_function(
           params,
-          [],
           J.block_statement(body)
         ),
         guard
@@ -108,9 +100,8 @@ defmodule ElixirScript.Translate.Clause do
     |> process_guards
     |> Form.compile!(state)
 
-    J.arrow_function_expression(
+    Helpers.arrow_function(
       params,
-      [],
       J.block_statement([
             J.return_statement(guards)
           ])

@@ -5,18 +5,8 @@ defmodule ElixirScript.Translate.Function do
   # equivalent JavaScript AST.
 
   alias ESTree.Tools.Builder, as: J
-  alias ElixirScript.Translate.{Clause, Form}
+  alias ElixirScript.Translate.{Clause, Form, Helpers}
   alias ElixirScript.Translate.Forms.Pattern
-
-  def patterns_ast() do
-    J.member_expression(
-      J.member_expression(
-        J.identifier("ElixirScript"),
-        J.identifier("Core")
-      ),
-      J.identifier("Patterns")
-    )
-  end
 
   def compile({:fn, _, clauses}, state) do
     anonymous? = Map.get(state, :anonymous_fn, false)
@@ -24,27 +14,18 @@ defmodule ElixirScript.Translate.Function do
     state = Map.put(state, :anonymous_fn, true)
     clauses = compile_clauses(clauses, state)
 
-    arg_matches_declarator = J.variable_declarator(
-      J.identifier("__arg_matches__"),
-      J.identifier("null")
-    )
+    arg_matches_declaration = Helpers.declare_let("__arg_matches__", J.identifier("null"))
 
-    arg_matches_declaration = J.variable_declaration(
-      [arg_matches_declarator],
-      :let
-    )
-
-    function_recur_dec = J.function_declaration(
-      J.identifier("recur"),
+    function_recur_dec = Helpers.function(
+      "recur",
       [J.rest_element(J.identifier("__function_args__"))],
-      [],
       J.block_statement([
         arg_matches_declaration,
         clauses,
         J.throw_statement(
-          J.new_expression(
+          Helpers.new(
             J.member_expression(
-              patterns_ast(),
+              Helpers.patterns(),
               J.identifier("MatchError")
             ),
             [J.identifier("__function_args__")]
@@ -53,9 +34,8 @@ defmodule ElixirScript.Translate.Function do
       ])
     )
 
-    function_dec = J.arrow_function_expression(
+    function_dec = Helpers.arrow_function(
       [J.rest_element(J.identifier("__function_args__"))],
-      [],
       J.block_statement([
         function_recur_dec,
         J.return_statement(
@@ -74,27 +54,18 @@ defmodule ElixirScript.Translate.Function do
 
     clauses = compile_clauses(clauses, state)
 
-    arg_matches_declarator = J.variable_declarator(
-      J.identifier("__arg_matches__"),
-      J.identifier("null")
-    )
+    arg_matches_declaration = Helpers.declare_let("__arg_matches__", J.identifier("null"))
 
-    arg_matches_declaration = J.variable_declaration(
-      [arg_matches_declarator],
-      :let
-    )
-
-    function_recur_dec = J.function_declaration(
-      J.identifier("recur"),
+    function_recur_dec = Helpers.function(
+      "recur",
       [J.rest_element(J.identifier("__function_args__"))],
-      [],
       J.block_statement([
         arg_matches_declaration,
         clauses,
         J.throw_statement(
-          J.new_expression(
+          Helpers.new(
             J.member_expression(
-              patterns_ast(),
+              Helpers.patterns(),
               J.identifier("MatchError")
             ),
             [J.identifier("__function_args__")]
@@ -103,10 +74,9 @@ defmodule ElixirScript.Translate.Function do
       ])
     )
 
-    function_dec = J.function_declaration(
+    function_dec = Helpers.function(
       ElixirScript.Translate.Identifier.make_function_name(name),
       [J.rest_element(J.identifier("__function_args__"))],
-      [],
       J.block_statement([
         function_recur_dec,
         J.return_statement(
@@ -122,9 +92,9 @@ defmodule ElixirScript.Translate.Function do
     clauses
     |> Enum.map(&compile_clause(&1, state))
     |> Enum.map(fn {patterns, _params, guards, body} ->
-      match_or_default_call = J.call_expression(
+      match_or_default_call = Helpers.call(
         J.member_expression(
-          patterns_ast(),
+          Helpers.patterns(),
           J.identifier("match_or_default")
         ),
         [J.array_expression(patterns), J.identifier("__function_args__"), guards]
@@ -133,7 +103,7 @@ defmodule ElixirScript.Translate.Function do
       J.if_statement(
         J.binary_expression(
           :!==,
-          J.assignment_expression(:=, J.identifier("__arg_matches__"), match_or_default_call),
+          Helpers.assign(J.identifier("__arg_matches__"), match_or_default_call),
           J.identifier("null")
         ),
         J.block_statement(body)
@@ -164,12 +134,7 @@ defmodule ElixirScript.Translate.Function do
     |> Clause.return_last_statement
     |> update_last_call(state)
 
-    declarator = J.variable_declarator(
-      J.array_expression(params),
-      J.identifier("__arg_matches__")
-    )
-
-    declaration = J.variable_declaration([declarator], :const)
+    declaration = Helpers.declare_let(params, J.identifier("__arg_matches__"))
 
     body = [declaration] ++ body
     {patterns, params, guard, body}
@@ -223,7 +188,7 @@ defmodule ElixirScript.Translate.Function do
   end
 
   defp recur_bind(args) do
-    J.call_expression(
+    Helpers.call(
       J.member_expression(
         J.identifier("recur"),
         J.identifier("bind")
@@ -233,15 +198,9 @@ defmodule ElixirScript.Translate.Function do
   end
 
   defp recurse(func) do
-    J.new_expression(
+    Helpers.new(
       J.member_expression(
-        J.member_expression(
-          J.identifier("ElixirScript"),
-          J.member_expression(
-            J.identifier("Core"),
-            J.identifier("Functions")
-          )
-        ),
+        Helpers.functions(),
         J.identifier("Recurse")
       ),
       [
@@ -251,15 +210,9 @@ defmodule ElixirScript.Translate.Function do
   end
 
   defp trampoline() do
-    J.call_expression(
+    Helpers.call(
       J.member_expression(
-        J.member_expression(
-          J.identifier("ElixirScript"),
-          J.member_expression(
-            J.identifier("Core"),
-            J.identifier("Functions")
-          )
-        ),
+        Helpers.functions(),
         J.identifier("trampoline")
       ),
       [

@@ -1,7 +1,7 @@
 defmodule ElixirScript.Translate.Forms.Map do
   @moduledoc false
   alias ESTree.Tools.Builder, as: J
-  alias ElixirScript.Translate.Form
+  alias ElixirScript.Translate.{Form, Helpers}
 
   def compile({:%{}, _, [{:|, _, [map, new_values]}]}, state) do
     { map, state } = Form.compile(map, state)
@@ -12,7 +12,7 @@ defmodule ElixirScript.Translate.Forms.Map do
       ])
     end)
 
-    ast = J.new_expression(
+    ast = Helpers.new(
       J.identifier("Map"),
       [
         J.array_expression(
@@ -25,7 +25,7 @@ defmodule ElixirScript.Translate.Forms.Map do
   end
 
   def compile({:%{}, _, properties}, state) do
-    ast = J.new_expression(
+    ast = Helpers.new(
       J.identifier("Map"),
       [
         J.array_expression(

@@ -1,6 +1,7 @@
 defmodule ElixirScript.ModuleSystems.Namespace do
   @moduledoc false
   alias ESTree.Tools.Builder, as: JS
+  alias ElixirScript.Translate.Helpers
   alias ElixirScript.Translate.Identifier
 
   def build(module_name, body, exports) do
@@ -39,23 +40,14 @@ defmodule ElixirScript.ModuleSystems.Namespace do
       exports
     end
 
-    declarator = JS.variable_declarator(
-      JS.identifier("__exports"),
-      exports
-    )
+    declaration = Helpers.declare("__exports", exports)
 
-    declaration = JS.variable_declaration([declarator], :const)
-
-    assign = JS.assignment_expression(
-      :=,
-      values,
-      JS.identifier("__exports")
-    )
+    assign = Helpers.assign(values, JS.identifier("__exports"))
 
     exports = [JS.return_statement(JS.identifier("__exports"))]
 
     make = JS.member_expression(
-          JS.call_expression(
+          Helpers.call(
             build_namespace(),
             [JS.identifier("Elixir"), JS.literal(Enum.join(["Elixir"] ++ Module.split(module_name), "."))]
           ),
@@ -64,9 +56,8 @@ defmodule ElixirScript.ModuleSystems.Namespace do
 
     func_body = JS.block_statement([js_if] ++ body ++ [declaration, assign] ++ exports)
 
-    func = JS.function_expression([JS.identifier("Elixir")], [], func_body)
-    JS.assignment_expression(
-      :=,
+    func = Helpers.function([JS.identifier("Elixir")], func_body)
+    Helpers.assign(
       make,
       func
     )

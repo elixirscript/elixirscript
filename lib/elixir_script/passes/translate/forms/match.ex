@@ -2,6 +2,7 @@ defmodule ElixirScript.Translate.Forms.Match do
   @moduledoc false
 
   alias ESTree.Tools.Builder, as: J
+  alias ElixirScript.Translate.Helpers
   alias ElixirScript.Translate.Form
   alias ElixirScript.Translate.Forms.Pattern
 
@@ -17,24 +18,13 @@ defmodule ElixirScript.Translate.Forms.Match do
 
     { patterns, params, state } = Pattern.compile([left], state)
 
-      declarator = J.variable_declarator(
-        J.array_pattern(params),
-        J.call_expression(
-          J.member_expression(
-            J.member_expression(
-              J.member_expression(
-              J.identifier("ElixirScript"),
-              J.identifier("Core")
-              ),
-              J.identifier("Patterns")
-            ),
-            J.identifier("match")
-          ),
-          [hd(patterns), right_ast]
-        )
-      )
-
-    array_pattern = J.variable_declaration([declarator], :let)
+    array_pattern = Helpers.declare(params, Helpers.call(
+      J.member_expression(
+        Helpers.patterns(),
+        J.identifier("match")
+      ),
+      [hd(patterns), right_ast]
+    ))
 
     js_ast = case left do
       list when is_list(list) ->
@@ -60,29 +50,19 @@ defmodule ElixirScript.Translate.Forms.Match do
 
   defp make_list_ref(array_pattern, params) do
     {ref, params} = make_params(params)
+    ref_declaration = Helpers.declare(ref, J.array_expression(params))
 
-    ref_declarator = J.variable_declarator(ref, J.array_expression(params))
-    make_variable_declaration_and_group(ref_declarator, array_pattern)
+    [array_pattern, ref_declaration]
   end
 
   defp make_tuple_ref(array_pattern, params) do
     {ref, params} = make_params(params)
 
-    ref_declarator = J.variable_declarator(
-      ref,
-      J.new_expression(
-        J.member_expression(
-          J.identifier("ElixirScript"),
-          J.member_expression(
-            J.identifier("Core"),
-            J.identifier("Tuple")
-          )
-        ),
-        params
-      )
-    )
-
-    make_variable_declaration_and_group(ref_declarator, array_pattern)
+    ref_declaration = Helpers.declare(ref, Helpers.new(
+      Helpers.tuple(),
+      params
+    ))
+    [array_pattern, ref_declaration]
   end
 
 
@@ -95,11 +75,6 @@ defmodule ElixirScript.Translate.Forms.Match do
     end)
 
     { ref, params }
-  end
-
-  defp make_variable_declaration_and_group(ref_declarator, array_pattern) do
-    ref_declaration = J.variable_declaration([ref_declarator], :let)
-    [array_pattern, ref_declaration]
   end
 
 end

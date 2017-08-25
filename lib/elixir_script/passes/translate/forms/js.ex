@@ -1,17 +1,12 @@
 defmodule ElixirScript.Translate.Forms.JS do
   @moduledoc false
   alias ESTree.Tools.Builder, as: J
+  alias ElixirScript.Translate.Helpers
   alias ElixirScript.Translate.Form
 
   def call_property() do
     J.member_expression(
-      J.member_expression(
-        J.identifier("ElixirScript"),
-        J.member_expression(
-          J.identifier("Core"),
-          J.identifier("Functions")
-        )
-      ),
+      Helpers.functions(),
       J.identifier("call_property")
     )
   end
@@ -43,7 +38,7 @@ defmodule ElixirScript.Translate.Forms.JS do
         [J.rest_element(Form.compile!(params, state))]
     end
 
-    ast = J.new_expression(
+    ast = Helpers.new(
       ElixirScript.Translate.Identifier.make_namespace_members(members),
       params
     )
@@ -60,7 +55,7 @@ defmodule ElixirScript.Translate.Forms.JS do
   end
 
   def compile({{:., _, [ElixirScript.JS, :import]}, _, [term]}, state) do
-    ast = J.call_expression(
+    ast = Helpers.call(
       J.identifier("import"),
       [Form.compile!(term, state)]
     )
@@ -69,7 +64,7 @@ defmodule ElixirScript.Translate.Forms.JS do
   end
 
   def compile({{:., _, [ElixirScript.JS, :mutate]}, _, [object, map]}, state) do
-    ast = J.call_expression(
+    ast = Helpers.call(
       J.member_expression(
         J.identifier("Object"),
         J.identifier("assign")
@@ -84,8 +79,7 @@ defmodule ElixirScript.Translate.Forms.JS do
   end
 
   def compile({{:., _, [ElixirScript.JS, :mutate]}, _, [object, key, value]}, state) do
-    ast = J.assignment_expression(
-      :=,
+    ast = Helpers.assign(
       J.member_expression(
         Form.compile!(object, state),
         Form.compile!(key, state),
@@ -98,15 +92,9 @@ defmodule ElixirScript.Translate.Forms.JS do
   end
 
   def compile({{:., _, [ElixirScript.JS, :map_to_object]}, _, [object]}, state) do
-    ast = J.call_expression(
+    ast = Helpers.call(
       J.member_expression(
-        J.member_expression(
-          J.identifier("ElixirScript"),
-          J.member_expression(
-            J.identifier("Core"),
-            J.identifier("Functions")
-          )
-        ),
+        Helpers.functions(),
         J.identifier("map_to_object")
       ),
       [

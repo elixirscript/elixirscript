@@ -2,6 +2,7 @@ defmodule ElixirScript.Translate.Forms.For do
   @moduledoc false
 
   alias ESTree.Tools.Builder, as: JS
+  alias ElixirScript.Translate.Helpers
   alias ElixirScript.Translate.{Form, Clause}
   alias ElixirScript.Translate.Forms.Pattern
 
@@ -11,19 +12,13 @@ defmodule ElixirScript.Translate.Forms.For do
     generators = JS.array_expression(args.generators)
 
     into = args.into || JS.array_expression([])
-    filter = args.filter || JS.arrow_function_expression([], [], JS.block_statement([JS.return_statement(JS.identifier("true"))]))
+    filter = args.filter || Helpers.arrow_function([], JS.block_statement([JS.return_statement(JS.identifier("true"))]))
     fun = args.fun
 
 
-    expression = JS.call_expression(
+    expression = Helpers.call(
       JS.member_expression(
-        JS.member_expression(
-            JS.member_expression(
-              JS.identifier("ElixirScript"),
-              JS.identifier("Core")
-            ),
-            JS.identifier("Patterns")
-          ),
+        Helpers.patterns(),
         JS.identifier("clause")
       ),
       [JS.array_expression(args.patterns), fun, filter]
@@ -34,15 +29,9 @@ defmodule ElixirScript.Translate.Forms.For do
       JS.identifier("Collectable")
     )
 
-    ast = JS.call_expression(
+    ast = Helpers.call(
       JS.member_expression(
-        JS.member_expression(
-          JS.identifier("ElixirScript"),
-          JS.member_expression(
-            JS.identifier("Core"),
-            JS.identifier("SpecialForms")
-          )
-        ),
+        Helpers.special_forms(),
         JS.identifier("_for")
       ),
       [expression, generators, collectable, into]
@@ -68,15 +57,9 @@ defmodule ElixirScript.Translate.Forms.For do
 
       {patterns, params, module_state} = Pattern.compile([{:<<>>, [], bs_parts}], module_state)
 
-      gen = JS.call_expression(
+      gen = Helpers.call(
         JS.member_expression(
-          JS.member_expression(
-              JS.member_expression(
-                JS.identifier("ElixirScript"),
-                JS.identifier("Core")
-              ),
-              JS.identifier("Patterns")
-            ),
+          Helpers.patterns(),
           JS.identifier("bitstring_generator")
         ),
         [hd(patterns), Form.compile!(collection, module_state)]
@@ -87,15 +70,9 @@ defmodule ElixirScript.Translate.Forms.For do
       ({:<-, _, [identifier, enum]}, state) ->
         {patterns, params, module_state} = Pattern.compile([identifier], module_state)
 
-        gen = JS.call_expression(
+        gen = Helpers.call(
           JS.member_expression(
-            JS.member_expression(
-                JS.member_expression(
-                  JS.identifier("ElixirScript"),
-                  JS.identifier("Core")
-                ),
-                JS.identifier("Patterns")
-              ),
+            Helpers.patterns(),
             JS.identifier("list_generator")
           ),
           [hd(patterns), Form.compile!(enum, module_state)]
@@ -131,9 +108,8 @@ defmodule ElixirScript.Translate.Forms.For do
     |> List.flatten
     |> Clause.return_last_statement
 
-    JS.arrow_function_expression(
+    Helpers.arrow_function(
       state.args,
-      [],
       JS.block_statement(ast)
     )
   end
