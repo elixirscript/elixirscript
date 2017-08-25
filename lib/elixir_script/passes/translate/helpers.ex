@@ -111,6 +111,15 @@ defmodule ElixirScript.Translate.Helpers do
     declare(J.identifier(name), value)
   end
 
+  def declare_let(names, value) when is_list(names) do
+    declarator = J.variable_declarator(
+      J.array_pattern(names),
+      value
+    )
+
+    J.variable_declaration([declarator], :let)
+  end
+
   def declare_let(name, value) do
     declarator = J.variable_declarator(
       J.identifier(name),

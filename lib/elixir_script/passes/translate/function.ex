@@ -134,7 +134,7 @@ defmodule ElixirScript.Translate.Function do
     |> Clause.return_last_statement
     |> update_last_call(state)
 
-    declaration = Helpers.declare(params, J.identifier("__arg_matches__"))
+    declaration = Helpers.declare_let(params, J.identifier("__arg_matches__"))
 
     body = [declaration] ++ body
     {patterns, params, guard, body}
