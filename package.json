@@ -13,7 +13,8 @@
     "clean": "rm -rf priv/build",
     "test": "nyc ava src/javascript/tests",
     "build:test-app": "MIX_ENV=test mix elixirscript Main -o test/app/build/",
-    "test-app": "yarn build:test-app && NODE_ENV=test ava 'test/app/spec/**/*.spec.js'"
+    "test:test-app": "NODE_ENV=test ava 'test/app/spec/**/*.spec.js'",
+    "test-app": "yarn build && yarn build:test-app && yarn test:test-app"
   },
   "repository": {
     "type": "git",
@@ -23,7 +24,7 @@
   "license": "MIT",
   "dependencies": {
     "erlang-types": "^1.0.1",
-    "tailored": "^2.6.4"
+    "tailored": "^2.7.1"
   },
   "devDependencies": {
     "ava": "^0.21.0",
@@ -41,9 +42,7 @@
     "sinon": "^2.4.1"
   },
   "ava": {
-    "require": [
-      "babel-register"
-    ],
+    "require": ["babel-register"],
     "babel": {
       "babelrc": true
     }
