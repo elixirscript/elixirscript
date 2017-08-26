@@ -1,7 +1,7 @@
 import Core from '../core';
 
 function _case(condition, clauses) {
-  return Core.Patterns.defmatch(...clauses)(condition);
+  return Core.Patterns.defmatchAsync(...clauses)(condition);
 }
 
 function cond(...clauses) {

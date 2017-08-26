@@ -19,18 +19,26 @@ defmodule ElixirScript.Translate.Helpers do
     )
   end
 
-  def call(callee, arguments) do
+  def call_sync(callee, arguments) do
     J.call_expression(
       callee,
       arguments
     )
   end
 
+  def call(callee, arguments) do
+    call_sync(callee, arguments)
+    |> J.await_expression()
+  end
+
   def arrow_function(params, body) do
     J.arrow_function_expression(
       params,
       [],
-      body
+      body,
+      false,
+      false,
+      true
     )
   end
 
@@ -39,7 +47,10 @@ defmodule ElixirScript.Translate.Helpers do
       name,
       params,
       [],
-      body
+      body,
+      false,
+      false,
+      true
     )
   end
 

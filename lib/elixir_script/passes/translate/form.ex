@@ -144,17 +144,17 @@ defmodule ElixirScript.Translate.Form do
   end
 
   def compile({:case, _, [condition, [do: clauses]]}, state) do
-    func = Helpers.call(
-      J.member_expression(
-        Helpers.patterns(),
-        J.identifier("defmatch")
-      ),
-      Enum.map(clauses, fn x -> Clause.compile(x, state) |> elem(0) end) |> List.flatten
-    )
-
     ast = Helpers.call(
-      J.member_expression( func, J.identifier("call")),
-      [J.identifier(:this), compile!(condition, state)]
+      J.member_expression(
+        Helpers.special_forms(),
+        J.identifier("_case")
+      ),
+      [
+        compile!(condition, state),
+        Enum.map(clauses, fn x -> Clause.compile(x, state) |> elem(0) end)
+        |> List.flatten
+        |> J.array_expression()
+      ]
     )
 
     { ast, state }

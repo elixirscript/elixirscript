@@ -47,7 +47,7 @@ defmodule ElixirScript.ModuleSystems.Namespace do
     exports = [JS.return_statement(JS.identifier("__exports"))]
 
     make = JS.member_expression(
-          Helpers.call(
+          Helpers.call_sync(
             build_namespace(),
             [JS.identifier("Elixir"), JS.literal(Enum.join(["Elixir"] ++ Module.split(module_name), "."))]
           ),

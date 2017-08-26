@@ -1,7 +1,13 @@
+defmodule User do
+  defstruct name: "John", age: 27
+end
+
 defmodule Main do
   def start(:normal, [callback]) do
     callback.("started")
 
-    Enum.map(1..5, fn(x) -> x * 2 end)
+    a = %User{}
+    #:console.log(a.name)
+    #:console.log(a.age)
   end
 end

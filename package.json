@@ -23,7 +23,7 @@
   "license": "MIT",
   "dependencies": {
     "erlang-types": "^1.0.1",
-    "tailored": "^2.6.4"
+    "tailored": "file:/Users/bryanjos/projects/basstype/tailored"
   },
   "devDependencies": {
     "ava": "^0.21.0",
@@ -41,9 +41,7 @@
     "sinon": "^2.4.1"
   },
   "ava": {
-    "require": [
-      "babel-register"
-    ],
+    "require": ["babel-register"],
     "babel": {
       "babelrc": true
     }

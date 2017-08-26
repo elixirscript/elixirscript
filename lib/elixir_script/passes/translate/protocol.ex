@@ -18,7 +18,7 @@ defmodule ElixirScript.Translate.Protocol do
 
     declaration = Helpers.declare(
       "protocol",
-      Helpers.call(
+      Helpers.call_sync(
         J.member_expression(
           Helpers.functions(),
           J.identifier(:defprotocol)
@@ -44,12 +44,12 @@ defmodule ElixirScript.Translate.Protocol do
     Enum.map(impls, fn({impl, impl_for}) ->
       members = ["Elixir"] ++ Module.split(impl) ++ ["__load"]
 
-      ast = Helpers.call(
+      ast = Helpers.call_sync(
         Identifier.make_namespace_members(members),
         [J.identifier("Elixir")]
       )
 
-      Helpers.call(
+      Helpers.call_sync(
         J.member_expression(
           Helpers.functions(),
           J.identifier(:defimpl)

@@ -47,49 +47,49 @@ defmodule ElixirScript.Translate.Forms.Pattern.Patterns do
   end
 
   def parameter(name) do
-    Helpers.call(
+    Helpers.call_sync(
       @parameter,
       [name]
     )
   end
 
   def head_tail(headParameter, tailParameter) do
-    Helpers.call(
+    Helpers.call_sync(
       @head_tail,
       [headParameter, tailParameter]
     )
   end
 
   def starts_with(prefix) do
-    Helpers.call(
+    Helpers.call_sync(
       @starts_with,
       [J.literal(prefix)]
     )
   end
 
   def capture(value) do
-    Helpers.call(
+    Helpers.call_sync(
       @capture,
       [value]
     )
   end
 
   def bound(value) do
-    Helpers.call(
+    Helpers.call_sync(
       @bound,
       [value]
     )
   end
 
   def type(prototype, value) do
-    Helpers.call(
+    Helpers.call_sync(
       @_type,
       [prototype, value]
     )
   end
 
   def bitstring_match(values) do
-    Helpers.call(
+    Helpers.call_sync(
       @bitstring_match,
       values
     )

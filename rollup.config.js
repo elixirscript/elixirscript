@@ -9,11 +9,11 @@ export default {
     nodeResolve({ jsnext: true }),
     babel({
       babelrc: false
-    }),
-    minify({
-      keepFnName: true,
-      keepClassName: true
     })
+    //minify({
+    //  keepFnName: true,
+    //  keepClassName: true
+    //})
   ],
   targets: [{ dest: 'priv/build/iife/ElixirScript.Core.js', format: 'iife' }]
 };

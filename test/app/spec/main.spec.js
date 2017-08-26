@@ -3,10 +3,10 @@ import Elixir from '../build/elixirscript.build.js';
 
 const sinon = require('sinon');
 
-test('Elixir.start:calls the modules start function', t => {
+test('Elixir.start:calls the modules start function', async t => {
   const callback = sinon.spy();
 
-  Elixir.start(Elixir.Main, [callback]);
+  await Elixir.start(Elixir.Main, [callback]);
 
   t.true(callback.called);
 });

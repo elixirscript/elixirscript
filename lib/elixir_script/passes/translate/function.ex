@@ -95,7 +95,7 @@ defmodule ElixirScript.Translate.Function do
       match_or_default_call = Helpers.call(
         J.member_expression(
           Helpers.patterns(),
-          J.identifier("match_or_default")
+          J.identifier("match_or_default_async")
         ),
         [J.array_expression(patterns), J.identifier("__function_args__"), guards]
       )
@@ -134,7 +134,7 @@ defmodule ElixirScript.Translate.Function do
     |> Clause.return_last_statement
     |> update_last_call(state)
 
-    declaration = Helpers.declare_let(params, J.identifier("__arg_matches__"))
+    declaration = Helpers.declare(params, J.identifier("__arg_matches__"))
 
     body = [declaration] ++ body
     {patterns, params, guard, body}

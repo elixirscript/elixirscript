@@ -24,7 +24,7 @@ defmodule ElixirScript.Output.JSModule do
         J.identifier("Elixir"),
         J.identifier("start")
       ),
-      Helpers.function(
+      Helpers.arrow_function(
         [J.identifier(:app), J.identifier(:args)],
         J.block_statement([
           Helpers.call(
@@ -51,7 +51,7 @@ defmodule ElixirScript.Output.JSModule do
         J.identifier("Elixir"),
         J.identifier("load")
       ),
-      Helpers.function(
+      Helpers.arrow_function(
         [J.identifier(:module)],
         J.block_statement([
           J.return_statement(
