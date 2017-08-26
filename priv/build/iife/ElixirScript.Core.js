@@ -161,7 +161,7 @@ function is_array(value) {
 }
 
 function is_function(value) {
-  return Object.prototype.toString.call(value) == '[object Function]';
+  return typeof value === 'function' || value instanceof Function;
 }
 
 function is_map(value) {
@@ -917,6 +917,10 @@ function buildMatch(pattern) {
     return resolveWildcard(pattern);
   }
 
+  if (typeof pattern === 'function') {
+    return resolveFunction(pattern);
+  }
+
   const type$$1 = pattern.constructor.prototype;
   const resolver = patternMap.get(type$$1);
 
@@ -953,7 +957,6 @@ class MatchError extends Error {
       this.message = 'No match for: ' + arg;
     }
 
-    this.stack = new Error().stack;
     this.name = this.constructor.name;
   }
 }
@@ -1315,405 +1318,6 @@ var Patterns = {
   defmatchAsync
 };
 
-class Tuple$2 {
-  constructor(...args) {
-    this.values = Object.freeze(args);
-    this.length = this.values.length;
-  }
-
-  get(index) {
-    return this.values[index];
-  }
-
-  count() {
-    return this.values.length;
-  }
-
-  [Symbol.iterator]() {
-    return this.values[Symbol.iterator]();
-  }
-
-  toString() {
-    let i,
-        s = '';
-    for (i = 0; i < this.values.length; i++) {
-      if (s !== '') {
-        s += ', ';
-      }
-
-      const stringToAppend = this.values[i] ? this.values[i].toString() : '';
-
-      s += stringToAppend;
-    }
-
-    return '{' + s + '}';
-  }
-
-  put_elem(index, elem) {
-    if (index === this.length) {
-      let new_values = this.values.concat([elem]);
-      return new Tuple$2(...new_values);
-    }
-
-    let new_values = this.values.concat([]);
-    new_values.splice(index, 0, elem);
-    return new Tuple$2(...new_values);
-  }
-
-  remove_elem(index) {
-    let new_values = this.values.concat([]);
-    new_values.splice(index, 1);
-    return new Tuple$2(...new_values);
-  }
-}
-
-let process_counter$1 = -1;
-
-class PID$2 {
-  constructor() {
-    process_counter$1 = process_counter$1 + 1;
-    this.id = process_counter$1;
-  }
-
-  toString() {
-    return 'PID#<0.' + this.id + '.0>';
-  }
-}
-
-let ref_counter$1 = -1;
-
-class Reference$2 {
-  constructor() {
-    ref_counter$1 = ref_counter$1 + 1;
-    this.id = ref_counter$1;
-    this.ref = Symbol();
-  }
-
-  toString() {
-    return 'Ref#<0.0.0.' + this.id + '>';
-  }
-}
-
-class BitString$3 {
-  constructor(...args) {
-    this.value = Object.freeze(this.process(args));
-    this.length = this.value.length;
-    this.bit_size = this.length * 8;
-    this.byte_size = this.length;
-  }
-
-  get(index) {
-    return this.value[index];
-  }
-
-  count() {
-    return this.value.length;
-  }
-
-  slice(start, end = null) {
-    let s = this.value.slice(start, end);
-    let ms = s.map(elem => BitString$3.integer(elem));
-    return new BitString$3(...ms);
-  }
-
-  [Symbol.iterator]() {
-    return this.value[Symbol.iterator]();
-  }
-
-  toString() {
-    var i,
-        s = '';
-    for (i = 0; i < this.count(); i++) {
-      if (s !== '') {
-        s += ', ';
-      }
-      s += this.get(i).toString();
-    }
-
-    return '<<' + s + '>>';
-  }
-
-  process(bitStringParts) {
-    let processed_values = [];
-
-    var i;
-    for (i = 0; i < bitStringParts.length; i++) {
-      let processed_value = this['process_' + bitStringParts[i].type](bitStringParts[i]);
-
-      for (let attr of bitStringParts[i].attributes) {
-        processed_value = this['process_' + attr](processed_value);
-      }
-
-      processed_values = processed_values.concat(processed_value);
-    }
-
-    return processed_values;
-  }
-
-  process_integer(value) {
-    return value.value;
-  }
-
-  process_float(value) {
-    if (value.size === 64) {
-      return BitString$3.float64ToBytes(value.value);
-    } else if (value.size === 32) {
-      return BitString$3.float32ToBytes(value.value);
-    }
-
-    throw new Error('Invalid size for float');
-  }
-
-  process_bitstring(value) {
-    return value.value.value;
-  }
-
-  process_binary(value) {
-    return BitString$3.toUTF8Array(value.value);
-  }
-
-  process_utf8(value) {
-    return BitString$3.toUTF8Array(value.value);
-  }
-
-  process_utf16(value) {
-    return BitString$3.toUTF16Array(value.value);
-  }
-
-  process_utf32(value) {
-    return BitString$3.toUTF32Array(value.value);
-  }
-
-  process_signed(value) {
-    return new Uint8Array([value])[0];
-  }
-
-  process_unsigned(value) {
-    return value;
-  }
-
-  process_native(value) {
-    return value;
-  }
-
-  process_big(value) {
-    return value;
-  }
-
-  process_little(value) {
-    return value.reverse();
-  }
-
-  process_size(value) {
-    return value;
-  }
-
-  process_unit(value) {
-    return value;
-  }
-
-  static integer(value) {
-    return BitString$3.wrap(value, { type: 'integer', unit: 1, size: 8 });
-  }
-
-  static float(value) {
-    return BitString$3.wrap(value, { type: 'float', unit: 1, size: 64 });
-  }
-
-  static bitstring(value) {
-    return BitString$3.wrap(value, {
-      type: 'bitstring',
-      unit: 1,
-      size: value.bit_size
-    });
-  }
-
-  static bits(value) {
-    return BitString$3.bitstring(value);
-  }
-
-  static binary(value) {
-    return BitString$3.wrap(value, {
-      type: 'binary',
-      unit: 8,
-      size: value.length
-    });
-  }
-
-  static bytes(value) {
-    return BitString$3.binary(value);
-  }
-
-  static utf8(value) {
-    return BitString$3.wrap(value, { type: 'utf8', unit: 1, size: value.length });
-  }
-
-  static utf16(value) {
-    return BitString$3.wrap(value, {
-      type: 'utf16',
-      unit: 1,
-      size: value.length * 2
-    });
-  }
-
-  static utf32(value) {
-    return BitString$3.wrap(value, {
-      type: 'utf32',
-      unit: 1,
-      size: value.length * 4
-    });
-  }
-
-  static signed(value) {
-    return BitString$3.wrap(value, {}, 'signed');
-  }
-
-  static unsigned(value) {
-    return BitString$3.wrap(value, {}, 'unsigned');
-  }
-
-  static native(value) {
-    return BitString$3.wrap(value, {}, 'native');
-  }
-
-  static big(value) {
-    return BitString$3.wrap(value, {}, 'big');
-  }
-
-  static little(value) {
-    return BitString$3.wrap(value, {}, 'little');
-  }
-
-  static size(value, count) {
-    return BitString$3.wrap(value, { size: count });
-  }
-
-  static unit(value, count) {
-    return BitString$3.wrap(value, { unit: count });
-  }
-
-  static wrap(value, opt, new_attribute = null) {
-    let the_value = value;
-
-    if (!(value instanceof Object)) {
-      the_value = { value: value, attributes: [] };
-    }
-
-    the_value = Object.assign(the_value, opt);
-
-    if (new_attribute) {
-      the_value.attributes.push(new_attribute);
-    }
-
-    return the_value;
-  }
-
-  static toUTF8Array(str) {
-    var utf8 = [];
-    for (var i = 0; i < str.length; i++) {
-      var charcode = str.charCodeAt(i);
-      if (charcode < 0x80) {
-        utf8.push(charcode);
-      } else if (charcode < 0x800) {
-        utf8.push(0xc0 | charcode >> 6, 0x80 | charcode & 0x3f);
-      } else if (charcode < 0xd800 || charcode >= 0xe000) {
-        utf8.push(0xe0 | charcode >> 12, 0x80 | charcode >> 6 & 0x3f, 0x80 | charcode & 0x3f);
-      } else {
-        // surrogate pair
-        i++;
-        // UTF-16 encodes 0x10000-0x10FFFF by
-        // subtracting 0x10000 and splitting the
-        // 20 bits of 0x0-0xFFFFF into two halves
-        charcode = 0x10000 + ((charcode & 0x3ff) << 10 | str.charCodeAt(i) & 0x3ff);
-        utf8.push(0xf0 | charcode >> 18, 0x80 | charcode >> 12 & 0x3f, 0x80 | charcode >> 6 & 0x3f, 0x80 | charcode & 0x3f);
-      }
-    }
-    return utf8;
-  }
-
-  static toUTF16Array(str) {
-    var utf16 = [];
-    for (var i = 0; i < str.length; i++) {
-      var codePoint = str.codePointAt(i);
-
-      if (codePoint <= 255) {
-        utf16.push(0);
-        utf16.push(codePoint);
-      } else {
-        utf16.push(codePoint >> 8 & 0xff);
-        utf16.push(codePoint & 0xff);
-      }
-    }
-    return utf16;
-  }
-
-  static toUTF32Array(str) {
-    var utf32 = [];
-    for (var i = 0; i < str.length; i++) {
-      var codePoint = str.codePointAt(i);
-
-      if (codePoint <= 255) {
-        utf32.push(0);
-        utf32.push(0);
-        utf32.push(0);
-        utf32.push(codePoint);
-      } else {
-        utf32.push(0);
-        utf32.push(0);
-        utf32.push(codePoint >> 8 & 0xff);
-        utf32.push(codePoint & 0xff);
-      }
-    }
-    return utf32;
-  }
-
-  //http://stackoverflow.com/questions/2003493/javascript-float-from-to-bits
-  static float32ToBytes(f) {
-    var bytes = [];
-
-    var buf = new ArrayBuffer(4);
-    new Float32Array(buf)[0] = f;
-
-    let intVersion = new Uint32Array(buf)[0];
-
-    bytes.push(intVersion >> 24 & 0xff);
-    bytes.push(intVersion >> 16 & 0xff);
-    bytes.push(intVersion >> 8 & 0xff);
-    bytes.push(intVersion & 0xff);
-
-    return bytes;
-  }
-
-  static float64ToBytes(f) {
-    var bytes = [];
-
-    var buf = new ArrayBuffer(8);
-    new Float64Array(buf)[0] = f;
-
-    var intVersion1 = new Uint32Array(buf)[0];
-    var intVersion2 = new Uint32Array(buf)[1];
-
-    bytes.push(intVersion2 >> 24 & 0xff);
-    bytes.push(intVersion2 >> 16 & 0xff);
-    bytes.push(intVersion2 >> 8 & 0xff);
-    bytes.push(intVersion2 & 0xff);
-
-    bytes.push(intVersion1 >> 24 & 0xff);
-    bytes.push(intVersion1 >> 16 & 0xff);
-    bytes.push(intVersion1 >> 8 & 0xff);
-    bytes.push(intVersion1 & 0xff);
-
-    return bytes;
-  }
-}
-
-var ErlangTypes$1 = {
-  Tuple: Tuple$2,
-  PID: PID$2,
-  Reference: Reference$2,
-  BitString: BitString$3
-};
-
 // https://github.com/airportyh/protomorphism
 class Protocol {
   constructor(spec) {
@@ -1721,7 +1325,7 @@ class Protocol {
     this.fallback = null;
 
     function createFun(funName) {
-      return function (...args) {
+      return async function (...args) {
         const thing = args[0];
         let fun = null;
 
@@ -1742,7 +1346,7 @@ class Protocol {
         }
 
         if (fun != null) {
-          const retval = fun.apply(this, args);
+          const retval = await fun.apply(this, args);
           return retval;
         }
 
@@ -1774,7 +1378,7 @@ class Protocol {
   }
 }
 
-function call_property(item, property) {
+async function call_property(item, property) {
   if (!property) {
     if (item instanceof Function || typeof item === 'function') {
       return item();
@@ -1877,11 +1481,11 @@ class Recurse {
   }
 }
 
-function trampoline$1(f) {
+async function trampoline$1(f) {
   let currentValue = f;
 
   while (currentValue && currentValue instanceof Recurse) {
-    currentValue = currentValue.func();
+    currentValue = await currentValue.func();
   }
 
   return currentValue;
@@ -1925,11 +1529,11 @@ var Functions = {
   split_at
 };
 
-function _case(condition, clauses) {
+async function _case(condition, clauses) {
   return Core.Patterns.defmatchAsync(...clauses)(condition);
 }
 
-function cond(...clauses) {
+async function cond(...clauses) {
   for (const clause of clauses) {
     if (clause[0]) {
       return clause[1]();
@@ -1939,14 +1543,14 @@ function cond(...clauses) {
   throw new Error();
 }
 
-function _for(expression, generators, collectable_protocol, into = []) {
+async function _for(expression, generators, collectable_protocol, into = []) {
   let [result, fun] = collectable_protocol.into(into);
 
   const generatedValues = run_list_generators(generators.pop()(), generators);
 
   for (const value of generatedValues) {
-    if (expression.guard.apply(this, value)) {
-      result = fun(result, new Core.Tuple(Symbol.for('cont'), expression.fn.apply(this, value)));
+    if (await expression.guard.apply(this, value)) {
+      result = await fun(result, new Core.Tuple(Symbol.for('cont'), (await expression.fn.apply(this, value))));
     }
   }
 
@@ -1954,7 +1558,7 @@ function _for(expression, generators, collectable_protocol, into = []) {
 }
 
 function run_list_generators(generator, generators) {
-  if (generators.length == 0) {
+  if (generators.length === 0) {
     return generator.map(x => {
       if (Array.isArray(x)) {
         return x;
@@ -1974,17 +1578,17 @@ function run_list_generators(generator, generators) {
   return run_list_generators(next_gen, generators);
 }
 
-function _try(do_fun, rescue_function, catch_fun, else_function, after_function) {
+async function _try(do_fun, rescue_function, catch_fun, else_function, after_function) {
   let result = null;
 
   try {
-    result = do_fun();
+    result = await do_fun();
   } catch (e) {
     let ex_result = null;
 
     if (rescue_function) {
       try {
-        ex_result = rescue_function(e);
+        ex_result = await rescue_function(e);
         return ex_result;
       } catch (ex) {
         if (ex instanceof Core.Patterns.MatchError) {
@@ -1995,7 +1599,7 @@ function _try(do_fun, rescue_function, catch_fun, else_function, after_function)
 
     if (catch_fun) {
       try {
-        ex_result = catch_fun(e);
+        ex_result = await catch_fun(e);
         return ex_result;
       } catch (ex) {
         if (ex instanceof Core.Patterns.MatchError) {
@@ -2007,7 +1611,7 @@ function _try(do_fun, rescue_function, catch_fun, else_function, after_function)
     throw e;
   } finally {
     if (after_function) {
-      after_function();
+      await after_function();
     }
   }
 
@@ -2026,7 +1630,7 @@ function _try(do_fun, rescue_function, catch_fun, else_function, after_function)
   }
 }
 
-function _with(...args) {
+async function _with(...args) {
   let argsToPass = [];
   let successFunction = null;
   let elseFunction = null;
@@ -2040,9 +1644,9 @@ function _with(...args) {
   for (let i = 0; i < args.length; i++) {
     const [pattern, func] = args[i];
 
-    const result = func(...argsToPass);
+    const result = await func(...argsToPass);
 
-    const patternResult = Core.Patterns.match_or_default(pattern, result);
+    const patternResult = await Core.Patterns.match_or_default_async(pattern, result);
 
     if (patternResult == null) {
       if (elseFunction) {
@@ -2075,8 +1679,10 @@ function reverse(list) {
   return [...list].reverse();
 }
 
-function foreach(fun, list) {
-  list.forEach(x => fun(x));
+async function foreach(fun, list) {
+  for (const x of list) {
+    await fun(x);
+  }
 
   return Symbol.for('ok');
 }
@@ -2103,13 +1709,17 @@ function flatten(deepList, tail = []) {
   return val.concat(tail);
 }
 
-function foldl(fun, acc0, list) {
-  return list.reduce((acc, value) => {
-    return fun(value, acc);
-  }, acc0);
+async function foldl(fun, acc0, list) {
+  let acc = acc0;
+
+  for (const value of list) {
+    acc = await fun(value, acc);
+  }
+
+  return acc;
 }
 
-function foldr(fun, acc0, list) {
+async function foldr(fun, acc0, list) {
   return foldl(fun, acc0, reverse(list));
 }
 
@@ -2190,46 +1800,62 @@ function keytake(key, n, tupleList) {
   const result = keyfind(key, n, tupleList);
 
   if (result !== false) {
-    return new ErlangTypes$1.Tuple(result.get(n - 1), result, keydelete(key, n, tupleList));
+    return new ErlangTypes.Tuple(result.get(n - 1), result, keydelete(key, n, tupleList));
   }
 
   return false;
 }
 
-function mapfoldl(fun, acc0, list1) {
+async function mapfoldl(fun, acc0, list1) {
   const listResult = [];
   let accResult = acc0;
 
   for (const item of list1) {
-    const tuple = fun(item, accResult);
+    const tuple = await fun(item, accResult);
     listResult.push(tuple.get(0));
     accResult = tuple.get(1);
   }
 
-  return new ErlangTypes$1.Tuple(listResult, accResult);
+  return new ErlangTypes.Tuple(listResult, accResult);
 }
 
 function concat(things) {
   return things.map(v => v.toString()).join();
 }
 
-function map(fun, list) {
-  return list.map(value => fun(value));
+async function map(fun, list) {
+  const reList = [];
+
+  for (const value of list) {
+    const result = await fun(value);
+    reList.push(result);
+  }
+
+  return reList;
 }
 
-function filter(pred, list1) {
-  return list1.filter(x => pred(x));
+async function filter(pred, list1) {
+  const reList = [];
+
+  for (const value of list1) {
+    const result = await pred(value);
+    if (result === true) {
+      reList.push(value);
+    }
+  }
+
+  return reList;
 }
 
-function filtermap(fun, list1) {
+async function filtermap(fun, list1) {
   const list2 = [];
 
   for (const item of list1) {
-    const value = fun(item);
+    const value = await fun(item);
 
     if (value === true) {
       list2.push(item);
-    } else if (value instanceof ErlangTypes$1.Tuple && value.get(0) === true) {
+    } else if (value instanceof ErlangTypes.Tuple && value.get(0) === true) {
       list2.push(value.get(1));
     }
   }
@@ -2247,9 +1873,9 @@ function member(elem, list) {
   return false;
 }
 
-function all(pred, list) {
+async function all(pred, list) {
   for (const item of list) {
-    if (pred(item) === false) {
+    if ((await pred(item)) === false) {
       return false;
     }
   }
@@ -2257,9 +1883,9 @@ function all(pred, list) {
   return true;
 }
 
-function any(pred, list) {
+async function any(pred, list) {
   for (const item of list) {
-    if (pred(item) === true) {
+    if ((await pred(item)) === true) {
       return true;
     }
   }
@@ -2267,7 +1893,7 @@ function any(pred, list) {
   return false;
 }
 
-function splitwith(pred, list) {
+async function splitwith(pred, list) {
   let switchToList2 = false;
   const list1 = [];
   const list2 = [];
@@ -2275,7 +1901,7 @@ function splitwith(pred, list) {
   for (const item of list) {
     if (switchToList2 === true) {
       list2.push(item);
-    } else if (pred(item) === true) {
+    } else if ((await pred(item)) === true) {
       list1.push(item);
     } else {
       switchToList2 = true;
@@ -2283,10 +1909,10 @@ function splitwith(pred, list) {
     }
   }
 
-  return new ErlangTypes$1.Tuple(list1, list2);
+  return new ErlangTypes.Tuple(list1, list2);
 }
 
-function sort(...args) {
+async function sort(...args) {
   if (args.length === 1) {
     const list2 = [...args[0]];
     return list2.sort();
@@ -2295,15 +1921,17 @@ function sort(...args) {
   const fun = args[0];
   const list2 = [...args[1]];
 
-  return list2.sort((a, b) => {
-    const result = fun(a, b);
+  const result = list2.sort(async (a, b) => {
+    const sortResult = await fun(a, b);
 
-    if (result === true) {
+    if (sortResult === true) {
       return -1;
     }
 
     return 1;
   });
+
+  return Promise.all(result);
 }
 
 var lists = {
@@ -2333,7 +1961,7 @@ var lists = {
 };
 
 // http://erlang.org/doc/man/erlang.html
-const selfPID = new ErlangTypes$1.PID();
+const selfPID = new ErlangTypes.PID();
 
 function atom_to_binary(atom, encoding = Symbol.for('utf8')) {
   if (encoding !== Symbol.for('utf8')) {
@@ -2440,7 +2068,7 @@ function is_atom(value) {
 }
 
 function is_bitstring$1(value) {
-  return value instanceof ErlangTypes$1.BitString;
+  return value instanceof ErlangTypes.BitString;
 }
 
 function is_boolean$1(value) {
@@ -2472,7 +2100,7 @@ function is_map$1(value) {
 }
 
 function is_pid(value) {
-  return value instanceof ErlangTypes$1.PID;
+  return value instanceof ErlangTypes.PID;
 }
 
 function is_port() {
@@ -2480,11 +2108,11 @@ function is_port() {
 }
 
 function is_reference(value) {
-  return value instanceof ErlangTypes$1.Reference;
+  return value instanceof ErlangTypes.Reference;
 }
 
 function is_tuple(value) {
-  return value instanceof ErlangTypes$1.Tuple;
+  return value instanceof ErlangTypes.Tuple;
 }
 
 function is_binary(value) {
@@ -2500,7 +2128,7 @@ function setelement(index, tuple1, value) {
 
   tupleData[index - 1] = value;
 
-  return new ErlangTypes$1.Tuple(...tupleData);
+  return new ErlangTypes.Tuple(...tupleData);
 }
 
 function make_tuple(arity, initialValue) {
@@ -2510,28 +2138,28 @@ function make_tuple(arity, initialValue) {
     list.push(initialValue);
   }
 
-  return new ErlangTypes$1.Tuple(...list);
+  return new ErlangTypes.Tuple(...list);
 }
 
 function insert_element(index, tuple, term) {
   const list = [...tuple.values];
   list.splice(index - 1, 0, term);
 
-  return new ErlangTypes$1.Tuple(...list);
+  return new ErlangTypes.Tuple(...list);
 }
 
 function append_element(tuple, term) {
   const list = [...tuple.values];
   list.push(term);
 
-  return new ErlangTypes$1.Tuple(...list);
+  return new ErlangTypes.Tuple(...list);
 }
 
 function delete_element(index, tuple) {
   const list = [...tuple.values];
   list.splice(index - 1, 1);
 
-  return new ErlangTypes$1.Tuple(...list);
+  return new ErlangTypes.Tuple(...list);
 }
 
 function tuple_to_list(tuple) {
@@ -2572,7 +2200,7 @@ function length(list) {
 }
 
 function make_ref() {
-  return new ErlangTypes$1.Reference();
+  return new ErlangTypes.Reference();
 }
 
 function map_size(map) {
@@ -2614,10 +2242,10 @@ function binary_to_integer(str, base = 10) {
 function process_info(pid, item) {
   if (item) {
     if (item === Symbol.for('current_stacktrace')) {
-      return new ErlangTypes$1.Tuple(item, []);
+      return new ErlangTypes.Tuple(item, []);
     }
 
-    return new ErlangTypes$1.Tuple(item, null);
+    return new ErlangTypes.Tuple(item, null);
   }
 
   return [];
@@ -2696,7 +2324,7 @@ function _throw(term) {
 }
 
 function error(reason) {
-  throw new ErlangTypes$1.Tuple(reason, []);
+  throw new ErlangTypes.Tuple(reason, []);
 }
 
 function exit(...args) {
@@ -2792,23 +2420,23 @@ const BADKEY = Symbol.for('badkey');
 
 function find(key, map) {
   if (erlang.is_map(map) === false) {
-    return new ErlangTypes$1.Tuple(BADMAP, map);
+    return new ErlangTypes.Tuple(BADMAP, map);
   }
 
   const value = map.get(key);
 
   if (typeof value !== 'undefined') {
-    return new ErlangTypes$1.Tuple(OK, value);
+    return new ErlangTypes.Tuple(OK, value);
   }
 
   return ERROR;
 }
 
-function fold(fun, init, map) {
+async function fold(fun, init, map) {
   let acc = init;
 
   for (const [key, value] of map.entries()) {
-    acc = fun(key, value, acc);
+    acc = await fun(key, value, acc);
   }
 
   return acc;
@@ -2816,7 +2444,7 @@ function fold(fun, init, map) {
 
 function remove(key, map1) {
   if (erlang.is_map(map1) === false) {
-    return new ErlangTypes$1.Tuple(BADMAP, map1);
+    return new ErlangTypes.Tuple(BADMAP, map1);
   }
 
   const map2 = new Map(map1);
@@ -2828,13 +2456,13 @@ function remove(key, map1) {
 
 function to_list(map) {
   if (erlang.is_map(map) === false) {
-    return new ErlangTypes$1.Tuple(BADMAP, map);
+    return new ErlangTypes.Tuple(BADMAP, map);
   }
 
   const list = [];
 
   for (const [key, value] of map.entries()) {
-    list.push(new ErlangTypes$1.Tuple(key, value));
+    list.push(new ErlangTypes.Tuple(key, value));
   }
 
   return list;
@@ -2851,7 +2479,7 @@ function from_list(list) {
 
 function keys(map) {
   if (erlang.is_map(map) === false) {
-    return new ErlangTypes$1.Tuple(BADMAP, map);
+    return new ErlangTypes.Tuple(BADMAP, map);
   }
 
   return Array.from(map.keys());
@@ -2859,7 +2487,7 @@ function keys(map) {
 
 function values$1(map) {
   if (erlang.is_map(map) === false) {
-    return new ErlangTypes$1.Tuple(BADMAP, map);
+    return new ErlangTypes.Tuple(BADMAP, map);
   }
 
   return Array.from(map.values());
@@ -2871,7 +2499,7 @@ function is_key(key, map) {
 
 function put(key, value, map1) {
   if (erlang.is_map(map1) === false) {
-    return new ErlangTypes$1.Tuple(BADMAP, map1);
+    return new ErlangTypes.Tuple(BADMAP, map1);
   }
 
   const map2 = new Map(map1);
@@ -2882,11 +2510,11 @@ function put(key, value, map1) {
 
 function merge(map1, map2) {
   if (erlang.is_map(map1) === false) {
-    return new ErlangTypes$1.Tuple(BADMAP, map1);
+    return new ErlangTypes.Tuple(BADMAP, map1);
   }
 
   if (erlang.is_map(map2) === false) {
-    return new ErlangTypes$1.Tuple(BADMAP, map2);
+    return new ErlangTypes.Tuple(BADMAP, map2);
   }
 
   return new Map([...map1, ...map2]);
@@ -2894,11 +2522,11 @@ function merge(map1, map2) {
 
 function update(key, value, map1) {
   if (erlang.is_map(map1) === false) {
-    return new ErlangTypes$1.Tuple(BADMAP, map1);
+    return new ErlangTypes.Tuple(BADMAP, map1);
   }
 
   if (is_key(key, map1) === false) {
-    return new ErlangTypes$1.Tuple(BADKEY, key);
+    return new ErlangTypes.Tuple(BADKEY, key);
   }
 
   return new Map([...map1, [key, value]]);
@@ -2909,7 +2537,7 @@ function get(...args) {
   const map = args[1];
 
   if (erlang.is_map(map) === false) {
-    return new ErlangTypes$1.Tuple(BADMAP, map);
+    return new ErlangTypes.Tuple(BADMAP, map);
   }
 
   if (is_key(key)) {
@@ -2920,12 +2548,12 @@ function get(...args) {
     return args[2];
   }
 
-  return new ErlangTypes$1.Tuple(BADKEY, key);
+  return new ErlangTypes.Tuple(BADKEY, key);
 }
 
 function take(key, map1) {
   if (erlang.is_map(map1) === false) {
-    return new ErlangTypes$1.Tuple(BADMAP, map1);
+    return new ErlangTypes.Tuple(BADMAP, map1);
   }
 
   if (!is_key(key)) {
@@ -2936,7 +2564,7 @@ function take(key, map1) {
   const map2 = new Map(map1);
   map2.delete(key);
 
-  return new ErlangTypes$1.Tuple(value, map2);
+  return new ErlangTypes.Tuple(value, map2);
 }
 
 var maps = {
@@ -3138,9 +2766,9 @@ globalState.__elixirscript_store__ = new Map();
 globalState.__elixirscript_names__ = new Map();
 
 var Core = {
-  Tuple: ErlangTypes$1.Tuple,
-  PID: ErlangTypes$1.PID,
-  BitString: ErlangTypes$1.BitString,
+  Tuple: ErlangTypes.Tuple,
+  PID: ErlangTypes.PID,
+  BitString: ErlangTypes.BitString,
   Patterns,
   Integer,
   Float,

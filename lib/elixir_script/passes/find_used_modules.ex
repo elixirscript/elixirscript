@@ -165,6 +165,8 @@ defmodule ElixirScript.FindUsedModules do
   end
 
   defp walk({:for, _, generators}, state) do
+    walk(Collectable, state)
+
     Enum.each(generators, fn
       {:<<>>, _, body} ->
         walk(body, state)

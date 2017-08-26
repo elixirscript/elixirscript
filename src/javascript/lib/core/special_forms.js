@@ -1,10 +1,10 @@
 import Core from '../core';
 
-function _case(condition, clauses) {
+async function _case(condition, clauses) {
   return Core.Patterns.defmatchAsync(...clauses)(condition);
 }
 
-function cond(...clauses) {
+async function cond(...clauses) {
   for (const clause of clauses) {
     if (clause[0]) {
       return clause[1]();
@@ -14,16 +14,19 @@ function cond(...clauses) {
   throw new Error();
 }
 
-function _for(expression, generators, collectable_protocol, into = []) {
+async function _for(expression, generators, collectable_protocol, into = []) {
   let [result, fun] = collectable_protocol.into(into);
 
   const generatedValues = run_list_generators(generators.pop()(), generators);
 
   for (const value of generatedValues) {
-    if (expression.guard.apply(this, value)) {
-      result = fun(
+    if (await expression.guard.apply(this, value)) {
+      result = await fun(
         result,
-        new Core.Tuple(Symbol.for('cont'), expression.fn.apply(this, value))
+        new Core.Tuple(
+          Symbol.for('cont'),
+          await expression.fn.apply(this, value)
+        )
       );
     }
   }
@@ -32,7 +35,7 @@ function _for(expression, generators, collectable_protocol, into = []) {
 }
 
 function run_list_generators(generator, generators) {
-  if (generators.length == 0) {
+  if (generators.length === 0) {
     return generator.map(x => {
       if (Array.isArray(x)) {
         return x;
@@ -52,7 +55,7 @@ function run_list_generators(generator, generators) {
   return run_list_generators(next_gen, generators);
 }
 
-function _try(
+async function _try(
   do_fun,
   rescue_function,
   catch_fun,
@@ -62,13 +65,13 @@ function _try(
   let result = null;
 
   try {
-    result = do_fun();
+    result = await do_fun();
   } catch (e) {
     let ex_result = null;
 
     if (rescue_function) {
       try {
-        ex_result = rescue_function(e);
+        ex_result = await rescue_function(e);
         return ex_result;
       } catch (ex) {
         if (ex instanceof Core.Patterns.MatchError) {
@@ -79,7 +82,7 @@ function _try(
 
     if (catch_fun) {
       try {
-        ex_result = catch_fun(e);
+        ex_result = await catch_fun(e);
         return ex_result;
       } catch (ex) {
         if (ex instanceof Core.Patterns.MatchError) {
@@ -91,7 +94,7 @@ function _try(
     throw e;
   } finally {
     if (after_function) {
-      after_function();
+      await after_function();
     }
   }
 
@@ -110,7 +113,7 @@ function _try(
   }
 }
 
-function _with(...args) {
+async function _with(...args) {
   let argsToPass = [];
   let successFunction = null;
   let elseFunction = null;
@@ -124,9 +127,12 @@ function _with(...args) {
   for (let i = 0; i < args.length; i++) {
     const [pattern, func] = args[i];
 
-    const result = func(...argsToPass);
+    const result = await func(...argsToPass);
 
-    const patternResult = Core.Patterns.match_or_default(pattern, result);
+    const patternResult = await Core.Patterns.match_or_default_async(
+      pattern,
+      result
+    );
 
     if (patternResult == null) {
       if (elseFunction) {

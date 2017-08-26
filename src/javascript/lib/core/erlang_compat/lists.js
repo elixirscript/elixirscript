@@ -5,8 +5,10 @@ function reverse(list) {
   return [...list].reverse();
 }
 
-function foreach(fun, list) {
-  list.forEach(x => fun(x));
+async function foreach(fun, list) {
+  for (const x of list) {
+    await fun(x);
+  }
 
   return Symbol.for('ok');
 }
@@ -33,13 +35,17 @@ function flatten(deepList, tail = []) {
   return val.concat(tail);
 }
 
-function foldl(fun, acc0, list) {
-  return list.reduce((acc, value) => {
-    return fun(value, acc);
-  }, acc0);
+async function foldl(fun, acc0, list) {
+  let acc = acc0;
+
+  for (const value of list) {
+    acc = await fun(value, acc);
+  }
+
+  return acc;
 }
 
-function foldr(fun, acc0, list) {
+async function foldr(fun, acc0, list) {
   return foldl(fun, acc0, reverse(list));
 }
 
@@ -130,12 +136,12 @@ function keytake(key, n, tupleList) {
   return false;
 }
 
-function mapfoldl(fun, acc0, list1) {
+async function mapfoldl(fun, acc0, list1) {
   const listResult = [];
   let accResult = acc0;
 
   for (const item of list1) {
-    const tuple = fun(item, accResult);
+    const tuple = await fun(item, accResult);
     listResult.push(tuple.get(0));
     accResult = tuple.get(1);
   }
@@ -147,19 +153,35 @@ function concat(things) {
   return things.map(v => v.toString()).join();
 }
 
-function map(fun, list) {
-  return list.map(value => fun(value));
+async function map(fun, list) {
+  const reList = [];
+
+  for (const value of list) {
+    const result = await fun(value);
+    reList.push(result);
+  }
+
+  return reList;
 }
 
-function filter(pred, list1) {
-  return list1.filter(x => pred(x));
+async function filter(pred, list1) {
+  const reList = [];
+
+  for (const value of list1) {
+    const result = await pred(value);
+    if (result === true) {
+      reList.push(value);
+    }
+  }
+
+  return reList;
 }
 
-function filtermap(fun, list1) {
+async function filtermap(fun, list1) {
   const list2 = [];
 
   for (const item of list1) {
-    const value = fun(item);
+    const value = await fun(item);
 
     if (value === true) {
       list2.push(item);
@@ -181,9 +203,9 @@ function member(elem, list) {
   return false;
 }
 
-function all(pred, list) {
+async function all(pred, list) {
   for (const item of list) {
-    if (pred(item) === false) {
+    if ((await pred(item)) === false) {
       return false;
     }
   }
@@ -191,9 +213,9 @@ function all(pred, list) {
   return true;
 }
 
-function any(pred, list) {
+async function any(pred, list) {
   for (const item of list) {
-    if (pred(item) === true) {
+    if ((await pred(item)) === true) {
       return true;
     }
   }
@@ -201,7 +223,7 @@ function any(pred, list) {
   return false;
 }
 
-function splitwith(pred, list) {
+async function splitwith(pred, list) {
   let switchToList2 = false;
   const list1 = [];
   const list2 = [];
@@ -209,7 +231,7 @@ function splitwith(pred, list) {
   for (const item of list) {
     if (switchToList2 === true) {
       list2.push(item);
-    } else if (pred(item) === true) {
+    } else if ((await pred(item)) === true) {
       list1.push(item);
     } else {
       switchToList2 = true;
@@ -220,7 +242,7 @@ function splitwith(pred, list) {
   return new ErlangTypes.Tuple(list1, list2);
 }
 
-function sort(...args) {
+async function sort(...args) {
   if (args.length === 1) {
     const list2 = [...args[0]];
     return list2.sort();
@@ -229,15 +251,17 @@ function sort(...args) {
   const fun = args[0];
   const list2 = [...args[1]];
 
-  return list2.sort((a, b) => {
-    const result = fun(a, b);
+  const result = list2.sort(async (a, b) => {
+    const sortResult = await fun(a, b);
 
-    if (result === true) {
+    if (sortResult === true) {
       return -1;
     }
 
     return 1;
   });
+
+  return Promise.all(result);
 }
 
 export default {

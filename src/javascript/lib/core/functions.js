@@ -1,7 +1,7 @@
 import Protocol from './protocol';
 import Core from '../core';
 
-function call_property(item, property) {
+async function call_property(item, property) {
   if (!property) {
     if (item instanceof Function || typeof item === 'function') {
       return item();
@@ -112,11 +112,11 @@ class Recurse {
   }
 }
 
-function trampoline(f) {
+async function trampoline(f) {
   let currentValue = f;
 
   while (currentValue && currentValue instanceof Recurse) {
-    currentValue = currentValue.func();
+    currentValue = await currentValue.func();
   }
 
   return currentValue;

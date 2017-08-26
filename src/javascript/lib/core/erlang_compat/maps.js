@@ -21,11 +21,11 @@ function find(key, map) {
   return ERROR;
 }
 
-function fold(fun, init, map) {
+async function fold(fun, init, map) {
   let acc = init;
 
   for (const [key, value] of map.entries()) {
-    acc = fun(key, value, acc);
+    acc = await fun(key, value, acc);
   }
 
   return acc;

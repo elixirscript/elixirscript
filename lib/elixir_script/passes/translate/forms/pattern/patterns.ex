@@ -40,7 +40,7 @@ defmodule ElixirScript.Translate.Forms.Pattern.Patterns do
   )
 
   def parameter() do
-    Helpers.call(
+    Helpers.call_sync(
       @parameter,
       []
     )
