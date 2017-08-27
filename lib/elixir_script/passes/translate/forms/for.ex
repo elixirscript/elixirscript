@@ -27,12 +27,8 @@ defmodule ElixirScript.Translate.Forms.For do
       [JS.array_expression(args.patterns), fun, filter]
     )
 
-<<<<<<< HEAD
-    members = ["Elixir", "Collectable", "__load"]
-=======
     members = ["Elixir", "Collectable" , "__load"]
 
->>>>>>> master
     collectable = Helpers.call(
       Identifier.make_namespace_members(members),
       [JS.identifier("Elixir")]
