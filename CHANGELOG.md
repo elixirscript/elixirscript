@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 - Make sure not to add underscores to erlang functions
+- Make sure any variable names that are javascript keywords are handled properly
 
 ## [0.30.0] - 2017-08-15
 
