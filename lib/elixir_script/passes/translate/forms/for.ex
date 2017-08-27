@@ -2,11 +2,7 @@ defmodule ElixirScript.Translate.Forms.For do
   @moduledoc false
 
   alias ESTree.Tools.Builder, as: JS
-<<<<<<< HEAD
-  alias ElixirScript.Translate.{Form, Clause, Identifier, Helpers}
-=======
   alias ElixirScript.Translate.{Form, Clause, Helpers, Identifier}
->>>>>>> master
   alias ElixirScript.Translate.Forms.Pattern
 
  def compile({:for, _, generators}, state) do
