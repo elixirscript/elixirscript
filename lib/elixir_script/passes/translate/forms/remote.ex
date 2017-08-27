@@ -57,7 +57,7 @@ defmodule ElixirScript.Translate.Forms.Remote do
   def compile({:., _, [module, function]}, state) when module in @erlang_modules do
     ast = J.member_expression(
       Helpers.core_module(module),
-      ElixirScript.Translate.Identifier.make_function_name(function)
+      J.identifier(function)
     )
 
     { ast, state }

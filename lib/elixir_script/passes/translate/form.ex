@@ -9,6 +9,39 @@ defmodule ElixirScript.Translate.Form do
   alias ElixirScript.Translate.Clause
   require Logger
 
+  @js_reserved_words [
+    :break,
+    :case,
+    :class,
+    :const,
+    :continue,
+    :debugger,
+    :default,
+    :delete,
+    :do,
+    :else,
+    :export,
+    :extends,
+    :finally,
+    :function,
+    :if,
+    :import,
+    :in,
+    :instanceof,
+    :new,
+    :return,
+    :super,
+    :switch,
+    :throw,
+    :try,
+    :typeof,
+    :var,
+    :void,
+    :while,
+    :with,
+    :yield
+  ]
+
   def compile!(ast, state) do
     {js_ast, _} = compile(ast, state)
 
@@ -369,10 +402,10 @@ defmodule ElixirScript.Translate.Form do
     end
   end
 
-  def compile({:default, meta, _}, state) do
+  def compile({var, meta, _}, state) when var in @js_reserved_words do
     counter = Pattern.get_counter(meta)
 
-    var = :__default__
+    var = String.to_atom("__#{var}__")
     var = Pattern.get_variable_name(to_string(var) <> counter, state)
     { ElixirScript.Translate.Identifier.make_identifier(var), state }
   end

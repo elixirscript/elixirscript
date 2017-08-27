@@ -2,7 +2,11 @@ defmodule ElixirScript.Translate.Forms.For do
   @moduledoc false
 
   alias ESTree.Tools.Builder, as: JS
+<<<<<<< HEAD
   alias ElixirScript.Translate.{Form, Clause, Identifier, Helpers}
+=======
+  alias ElixirScript.Translate.{Form, Clause, Helpers, Identifier}
+>>>>>>> master
   alias ElixirScript.Translate.Forms.Pattern
 
  def compile({:for, _, generators}, state) do
@@ -23,7 +27,12 @@ defmodule ElixirScript.Translate.Forms.For do
       [JS.array_expression(args.patterns), fun, filter]
     )
 
+<<<<<<< HEAD
     members = ["Elixir", "Collectable", "__load"]
+=======
+    members = ["Elixir", "Collectable" , "__load"]
+
+>>>>>>> master
     collectable = Helpers.call(
       Identifier.make_namespace_members(members),
       [JS.identifier("Elixir")]
