@@ -72,7 +72,7 @@ defmodule ElixirScript.Translate.Forms.Test do
   end
 
   property "local function call translates to local JavaScript function call", %{state: state} do
-    check all func <- StreamData.unquoted_atom(),
+    check all func <- StreamData.filter(StreamData.unquoted_atom(), fn(x) -> not(x in [:fn]) end),
               params <- StreamData.list_of(StreamData.binary()) do
 
       ast = {func, [], params}

@@ -46,7 +46,7 @@ defmodule ElixirScript.Output do
 
   defp concat(code) do
     bootstrap_code = get_bootstrap_js()
-    "'use strict';\n#{bootstrap_code}\n#{code}"
+    "'use strict';\nexport #{bootstrap_code}\n#{code}"
   end
 
   defp get_bootstrap_js() do
@@ -93,6 +93,8 @@ defmodule ElixirScript.Output do
   def get_output_file_name(path) do
     case Path.extname(path) do
       ".js" ->
+        path
+      ".mjs" ->
         path
       _ ->
         Path.join([path, @generated_name])
