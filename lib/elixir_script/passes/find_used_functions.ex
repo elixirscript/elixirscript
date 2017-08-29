@@ -257,6 +257,8 @@ defmodule ElixirScript.FindUsedFunctions do
         nil
       ElixirScript.Translate.Module.is_elixir_module(module) ->
         walk_module(module, function, length(params), state.pid)
+      is_tuple(module) ->
+        walk(module, state)
       true ->
         nil
     end
