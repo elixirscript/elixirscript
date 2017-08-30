@@ -104,7 +104,7 @@ function map_to_object(map, options = []) {
     if (type_keys == Symbol("string") && typeof key == 'number') {
       key = key.toString();
     } else if (
-        (type_keys == Symbol("string") || symbols != Symbol("undefined")) 
+        (type_keys == Symbol("string") || symbols != Symbol("undefined"))
         && typeof key == 'symbol'
     ) {
       key = erlang.atom_to_binary(key);
