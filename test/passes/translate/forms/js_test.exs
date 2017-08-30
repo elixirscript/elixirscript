@@ -96,20 +96,4 @@ defmodule ElixirScript.Translate.Forms.JS.Test do
       ]
     )
   end
-
-  test "map_to_valid_object/1" do
-    ast = {{:., [], [ElixirScript.JS, :map_to_valid_object]}, [], [{:entry, [], nil}]}
-    state = %{function: {:each, nil}, module: Enum, vars: %{:_ => 0, "entry" => 0, "enumerable" => 0, "fun" => 0}}
-
-    {js_ast, _} = Form.compile(ast, state)
-    assert js_ast == J.call_expression(
-      J.member_expression(
-        Helpers.functions(),
-        J.identifier("map_to_valid_object")
-      ),
-      [
-        J.identifier("entry0")
-      ]
-    )
-  end
 end
