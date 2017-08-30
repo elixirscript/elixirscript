@@ -19,3 +19,8 @@ function is_defined(key, list) {
         return false;
     }
 }
+
+export default {
+  get_value,
+  is_defined
+};
