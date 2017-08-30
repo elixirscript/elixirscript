@@ -7,8 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [unreleased]
 ### Added
 - Reimplement `String.split_at/2` to make sure Unicode library isn't compiled
-- Added `ElixirScript.JS.map_to_valid_object/1` to make sure keys are strings, values not symbols
-- Added `ElixirScript.JS.symbol_to_string/1` to turn Symbol (Elixir atom) into string
+- Added `ElixirScript.JS.map_to_object/2` with options [keys: :string, symbols: false]
 
 ### Fixed
 - Make sure not to add underscores to erlang functions

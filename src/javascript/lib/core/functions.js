@@ -1,5 +1,7 @@
 import Protocol from './protocol';
 import Core from '../core';
+import proplists from './erlang_compat/proplists';
+import erlang from './erlang_compat/erlang';
 
 function call_property(item, property) {
   if (!property) {
@@ -92,43 +94,28 @@ function build_namespace(ns, ns_string) {
   return parent;
 }
 
-function map_to_object(map) {
+function map_to_object(map, options = []) {
   const object = {};
 
-  for (const [key, value] of map.entries()) {
+  var type_keys = proplists.get_value(Symbol("keys"), options);
+  var symbols = proplists.get_value(Symbol("symbols"), options);
+
+  for (var [key, value] of map.entries()) {
+    if (type_keys == Symbol("string") && typeof key == 'number') {
+      key = key.toString();
+    } else if (
+        (type_keys == Symbol("string") || symbols != Symbol("undefined")) 
+        && typeof key == 'symbol'
+    ) {
+      key = erlang.atom_to_binary(key);
+    }
+
     if (value instanceof Map) {
-      object[key] = map_to_object(value);
+      object[key] = map_to_object(value, options);
+    } else if (symbols != Symbol("undefined") && typeof value == 'symbol') {
+      object[key] = erlang.atom_to_binary(value);
     } else {
       object[key] = value;
-    }
-  }
-
-  return object;
-}
-
-function symbol_to_string(symbol) {
-  const REGEX = /^Symbol\((.*)\)$/;
-  const string = symbol.toString();
-  return REGEX.exec(string)[1];
-}
-
-function map_to_valid_object(map) {
-  const object = {};
-
-  for (const [key, value] of map.entries()) {
-    var key2 = key;
-    if (typeof key == 'number') {
-      key2 = key.toString()
-    } else if (typeof key == 'symbol') {
-      key2 = symbol_to_string(key)
-    }
-
-    if (value instanceof Map) {
-      object[key2] = map_to_object(value);
-    } else if (typeof value == 'symbol') {
-      object[key2] = symbol_to_string(value);
-    } else {
-      object[key2] = value;
     }
   }
 
@@ -184,8 +171,6 @@ export default {
   defimpl,
   build_namespace,
   map_to_object,
-  symbol_to_string,
-  map_to_valid_object,
   trampoline,
   Recurse,
   split_at
