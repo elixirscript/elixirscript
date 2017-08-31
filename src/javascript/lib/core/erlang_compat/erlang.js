@@ -360,6 +360,19 @@ function node() {
   return Symbol.for('nonode@nohost');
 }
 
+function nodes(arg = []) {
+  const nodeTypes = Array.isArray(arg) ? arg : [arg];
+  const nodesFound = [];
+
+  for (const nodeType of nodeTypes) {
+    if (nodeType === Symbol.for('this')) {
+      nodesFound.push(Symbol.for('nonode@nohost'));
+      console.log(nodesFound);
+    }
+  }
+  return nodesFound;
+}
+
 function self() {
   return selfPID;
 }
@@ -458,5 +471,6 @@ export default {
   error,
   exit,
   raise,
-  list_to_binary
+  list_to_binary,
+  nodes
 };
