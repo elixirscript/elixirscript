@@ -11,10 +11,7 @@
     "lint:fix": "eslint src/javascript/lib/**/*.js src/javascript/tests/**/*.js --fix",
     "build": "rollup -c rollup.config.js",
     "clean": "rm -rf priv/build",
-    "test": "nyc ava src/javascript/tests",
-    "build:test-app": "MIX_ENV=test mix elixirscript Main -o test/app/build/",
-    "test:test-app": "NODE_ENV=test ava 'test/app/spec/**/*.spec.js'",
-    "test-app": "yarn build && yarn build:test-app && yarn test:test-app"
+    "test": "nyc ava src/javascript/tests"
   },
   "repository": {
     "type": "git",
@@ -27,6 +24,7 @@
     "tailored": "^2.7.2"
   },
   "devDependencies": {
+    "@std/esm": "^0.5.1",
     "ava": "^0.21.0",
     "babel-core": "^6.24.0",
     "babel-preset-env": "^1.6.0",
