@@ -3,7 +3,7 @@ import Core from '../lib/core';
 const Patterns = Core.Patterns;
 const SpecialForms = Core.SpecialForms;
 
-test('try', t => {
+test('try', async t => {
   /*
       try do
         1 / x
@@ -18,7 +18,7 @@ test('try', t => {
 
   const x = 1;
 
-  const value = SpecialForms._try(
+  const value = await SpecialForms._try(
     () => {
       return 1 / x;
     },

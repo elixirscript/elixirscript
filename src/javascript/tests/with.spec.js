@@ -16,7 +16,7 @@ function map_fetch(map, key) {
   return Symbol.for('error');
 }
 
-test('with', t => {
+test('with', async t => {
   /*
      opts = %{width: 10, height: 15}
 
@@ -29,7 +29,7 @@ test('with', t => {
 
   const opts = { width: 10, height: 15 };
 
-  const value = SpecialForms._with(
+  const value = await SpecialForms._with(
     [new Tuple(Symbol.for('ok'), $), () => map_fetch(opts, 'width')],
     [new Tuple(Symbol.for('ok'), $), width => map_fetch(opts, 'height')],
     (width, height) => new Tuple(Symbol.for('ok'), width * height)
@@ -38,7 +38,7 @@ test('with', t => {
   t.deepEqual(value, new Tuple(Symbol.for('ok'), 150));
 });
 
-test('with without match', t => {
+test('with without match', async t => {
   /*
      opts = %{width: 10}
 
@@ -51,7 +51,7 @@ test('with without match', t => {
 
   const opts = { width: 10 };
 
-  const value = SpecialForms._with(
+  const value = await SpecialForms._with(
     [new Tuple(Symbol.for('ok'), $), () => map_fetch(opts, 'width')],
     [new Tuple(Symbol.for('ok'), $), width => map_fetch(opts, 'height')],
     (width, height) => new Tuple(Symbol.for('ok'), width * height)
@@ -60,7 +60,7 @@ test('with without match', t => {
   t.deepEqual(value, Symbol.for('error'));
 });
 
-test('with bare expression', t => {
+test('with bare expression', async t => {
   /*
      opts = %{width: 10}
 
@@ -74,7 +74,7 @@ test('with bare expression', t => {
 
   const opts = { width: 10, height: 15 };
 
-  const value = SpecialForms._with(
+  const value = await SpecialForms._with(
     [new Tuple(Symbol.for('ok'), $), () => map_fetch(opts, 'width')],
     [$, width => width * 2],
     [
@@ -88,7 +88,7 @@ test('with bare expression', t => {
   t.deepEqual(value, new Tuple(Symbol.for('ok'), 300));
 });
 
-test('with else', t => {
+test('with else', async t => {
   /*
       opts = %{width: 10}
 
@@ -104,7 +104,7 @@ test('with else', t => {
 
   const opts = { width: 10 };
 
-  const value = SpecialForms._with(
+  const value = await SpecialForms._with(
     [new Tuple(Symbol.for('ok'), $), () => map_fetch(opts, 'width')],
     [new Tuple(Symbol.for('ok'), $), width => map_fetch(opts, 'height')],
     (width, height) => new Tuple(Symbol.for('ok'), width * height),
@@ -119,7 +119,7 @@ test('with else', t => {
   t.deepEqual(value, new Tuple(Symbol.for('error'), Symbol.for('wrong_data')));
 });
 
-test('with else that don`t match', t => {
+test('with else that don`t match', async t => {
   /*
       opts = %{width: 10}
 
@@ -135,8 +135,7 @@ test('with else that don`t match', t => {
 
   const opts = { width: 10 };
 
-  const withFunction = SpecialForms._with.bind(
-    null,
+  const withFunctionPromise = SpecialForms._with(
     [new Tuple(Symbol.for('ok'), $), () => map_fetch(opts, 'width')],
     [new Tuple(Symbol.for('ok'), $), width => map_fetch(opts, 'height')],
     (width, height) => new Tuple(Symbol.for('ok'), width * height),
@@ -148,5 +147,5 @@ test('with else that don`t match', t => {
     )
   );
 
-  t.throws(withFunction, MatchError);
+  await t.throws(withFunctionPromise, MatchError);
 });

@@ -16,13 +16,13 @@ test('flatten', t => {
   t.deepEqual(Core.lists.flatten([1, [[2], 3]]), [1, 2, 3]);
 });
 
-test('foldl', t => {
-  t.deepEqual(Core.lists.foldl((v, acc) => acc + v, 0, [1, 2, 3]), 6);
+test('foldl', async t => {
+  t.deepEqual(await Core.lists.foldl((v, acc) => acc + v, 0, [1, 2, 3]), 6);
 });
 
-test('foldr', t => {
+test('foldr', async t => {
   t.deepEqual(
-    Core.lists.foldr((v, acc) => acc + v.toString(), '', [1, 2, 3]),
+    await Core.lists.foldr((v, acc) => acc + v.toString(), '', [1, 2, 3]),
     '321'
   );
 });

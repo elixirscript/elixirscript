@@ -15,8 +15,8 @@ test('find', t => {
   t.deepEqual(result.values, [Symbol.for('ok'), 'b']);
 });
 
-test('fold', t => {
+test('fold', async t => {
   const myMap = new Map([['a', 1], ['b', 2]]);
-  const result = Core.maps.fold((k, v, acc) => acc + v, 0, myMap);
+  const result = await Core.maps.fold((k, v, acc) => acc + v, 0, myMap);
   t.is(result, 3);
 });

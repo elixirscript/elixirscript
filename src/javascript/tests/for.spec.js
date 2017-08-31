@@ -14,8 +14,8 @@ const collectable = {
         [
           $,
           Patterns.type(Tuple, {
-            values: [Symbol.for('cont'), Patterns.variable()],
-          }),
+            values: [Symbol.for('cont'), Patterns.variable()]
+          })
         ],
         (list, x) => list.concat([x])
       ),
@@ -23,12 +23,12 @@ const collectable = {
     );
 
     return new Tuple([], fun);
-  },
+  }
 };
 
-test('simple for', t => {
+test('simple for', async t => {
   const gen = Patterns.list_generator($, [1, 2, 3, 4]);
-  const result = SpecialForms._for(
+  const result = await SpecialForms._for(
     Patterns.clause([$], x => x * 2),
     [gen],
     collectable
@@ -37,12 +37,12 @@ test('simple for', t => {
   t.deepEqual(result, [2, 4, 6, 8]);
 });
 
-test('for with multiple generators', t => {
+test('for with multiple generators', async t => {
   //for x <- [1, 2], y <- [2, 3], do: x*y
 
   const gen = Patterns.list_generator($, [1, 2]);
   const gen2 = Patterns.list_generator($, [2, 3]);
-  const result = SpecialForms._for(
+  const result = await SpecialForms._for(
     Patterns.clause([$, $], (x, y) => x * y),
     [gen, gen2],
     collectable
@@ -51,10 +51,10 @@ test('for with multiple generators', t => {
   t.deepEqual(result, [2, 3, 4, 6]);
 });
 
-test('for with filter', t => {
+test('for with filter', async t => {
   //for n <- [1, 2, 3, 4, 5, 6], rem(n, 2) == 0, do: n
   const gen = Patterns.list_generator($, [1, 2, 3, 4, 5, 6]);
-  const result = SpecialForms._for(
+  const result = await SpecialForms._for(
     Patterns.clause([$], x => x, x => x % 2 === 0),
     [gen],
     collectable
@@ -63,7 +63,7 @@ test('for with filter', t => {
   t.deepEqual(result, [2, 4, 6]);
 });
 
-test('for with pattern matching', t => {
+test('for with pattern matching', async t => {
   //for {:user, name} <- [user: "john", admin: "john", user: "meg"], do
   // String.upcase(name)
   //end
@@ -73,11 +73,11 @@ test('for with pattern matching', t => {
     [
       [Symbol.for('user'), 'john'],
       [Symbol.for('admin'), 'john'],
-      [Symbol.for('user'), 'meg'],
+      [Symbol.for('user'), 'meg']
     ]
   );
 
-  const result = SpecialForms._for(
+  const result = await SpecialForms._for(
     Patterns.clause([[Symbol.for('user'), $]], name => name.toUpperCase()),
     [gen],
     collectable
@@ -86,7 +86,7 @@ test('for with pattern matching', t => {
   t.deepEqual(result, ['JOHN', 'MEG']);
 });
 
-test('for with bitstring', t => {
+test('for with bitstring', async t => {
   //for <<r::8, g::8, b::8 <- <<213, 45, 132, 64, 76, 32, 76, 0, 0, 234, 32, 15>> >>, do: {r, g, b}
 
   const gen = Patterns.bitstring_generator(
@@ -117,17 +117,17 @@ test('for with bitstring', t => {
         BitString.integer({ value: $ }),
         BitString.integer({ value: $ }),
         BitString.integer({ value: $ })
-      ),
+      )
     ],
     (r, g, b) => new Tuple(r, g, b)
   );
 
-  const result = SpecialForms._for(expression, [gen], collectable);
+  const result = await SpecialForms._for(expression, [gen], collectable);
 
   t.deepEqual(result, [
     new Tuple(213, 45, 132),
     new Tuple(64, 76, 32),
     new Tuple(76, 0, 0),
-    new Tuple(234, 32, 15),
+    new Tuple(234, 32, 15)
   ]);
 });

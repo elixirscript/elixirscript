@@ -5,7 +5,7 @@ const Patterns = Core.Patterns;
 const SpecialForms = Core.SpecialForms;
 const Tuple = Core.Tuple;
 
-test('case', t => {
+test('case', async t => {
   const clauses = [
     Patterns.clause(
       [
@@ -13,7 +13,7 @@ test('case', t => {
           Symbol.for('selector'),
           Patterns.variable(),
           Patterns.variable()
-        ),
+        )
       ],
       (i, value) => {
         return value;
@@ -24,10 +24,10 @@ test('case', t => {
     ),
     Patterns.clause([Patterns.variable()], value => {
       return value;
-    }),
+    })
   ];
 
-  const result = SpecialForms._case('thing', clauses);
+  const result = await SpecialForms._case('thing', clauses);
 
   t.is(result, 'thing');
 });
