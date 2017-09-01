@@ -3,7 +3,7 @@ import Core from '../lib/core';
 
 const SpecialForms = Core.SpecialForms;
 
-test('cond', t => {
+test('cond', (t) => {
   const clauses = [
     [1 + 1 === 1, () => 'This will never match'],
     [2 * 2 !== 4, () => 'Nor this'],

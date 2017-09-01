@@ -54,21 +54,7 @@
         {Credo.Check.Consistency.SpaceAroundOperators},
         {Credo.Check.Consistency.SpaceInParentheses, false},
         {Credo.Check.Consistency.TabsOrSpaces},
-
-        # For some checks, like AliasUsage, you can only customize the priority
-        # Priority values are: `low, normal, high, higher`
-        {Credo.Check.Design.AliasUsage, priority: :low},
-
-        # For others you can set parameters
-
-        # If you don't want the `setup` and `test` macro calls in ExUnit tests
-        # or the `schema` macro in Ecto schemas to trigger DuplicatedCode, just
-        # set the `excluded_macros` parameter to `[:schema, :setup, :test]`.
         {Credo.Check.Design.DuplicatedCode, excluded_macros: []},
-
-        # You can also customize the exit_status of each check.
-        # If you don't want TODO comments to cause `mix credo` to fail, just
-        # set this value to 0 (zero).
         {Credo.Check.Design.TagTODO, exit_status: 2},
         {Credo.Check.Design.TagFIXME},
 
@@ -119,9 +105,6 @@
         {Credo.Check.Warning.UnusedRegexOperation},
         {Credo.Check.Warning.UnusedStringOperation},
         {Credo.Check.Warning.UnusedTupleOperation},
-
-        # Custom checks can be created using `mix credo.gen.check`.
-        #
       ]
     }
   ]
