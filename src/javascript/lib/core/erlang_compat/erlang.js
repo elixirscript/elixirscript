@@ -105,11 +105,7 @@ function is_atom(value) {
     return true;
   }
 
-  return (
-    typeof value === 'symbol' ||
-    value instanceof Symbol ||
-    value.__MODULE__ != null
-  );
+  return typeof value === 'symbol' || value instanceof Symbol || value.__MODULE__ != null;
 }
 
 function is_bitstring(value) {
@@ -407,6 +403,22 @@ function function_exported(module, _function) {
   return module[_function] != null;
 }
 
+function binary_to_term(binary) {
+  let data = null;
+
+  if (is_binary(binary)) {
+    const buf = new ArrayBuffer(binary.length);
+    const bufView = new Uint16Array(buf);
+    for (const i = 0, strLen = str.length; i < strLen; i++) {
+      bufView[i] = binary.charCodeAt(i);
+    }
+
+    data = bufView;
+  } else {
+    data = Uint8Array.of(...binary);
+  }
+}
+
 export default {
   atom_to_binary,
   binary_to_atom,
@@ -472,5 +484,5 @@ export default {
   exit,
   raise,
   list_to_binary,
-  nodes
+  nodes,
 };
