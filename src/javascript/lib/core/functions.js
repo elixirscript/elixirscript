@@ -1,5 +1,7 @@
 import Protocol from './protocol';
 import Core from '../core';
+import proplists from './erlang_compat/proplists';
+import erlang from './erlang_compat/erlang';
 
 function call_property(item, property) {
   if (!property) {
@@ -92,12 +94,26 @@ function build_namespace(ns, ns_string) {
   return parent;
 }
 
-function map_to_object(map) {
+function map_to_object(map, options = []) {
   const object = {};
 
-  for (const [key, value] of map.entries()) {
+  var type_keys = proplists.get_value(Symbol("keys"), options);
+  var symbols = proplists.get_value(Symbol("symbols"), options);
+
+  for (var [key, value] of map.entries()) {
+    if (type_keys == Symbol("string") && typeof key == 'number') {
+      key = key.toString();
+    } else if (
+        (type_keys == Symbol("string") || symbols != Symbol("undefined"))
+        && typeof key == 'symbol'
+    ) {
+      key = erlang.atom_to_binary(key);
+    }
+
     if (value instanceof Map) {
-      object[key] = map_to_object(value);
+      object[key] = map_to_object(value, options);
+    } else if (symbols != Symbol("undefined") && typeof value == 'symbol') {
+      object[key] = erlang.atom_to_binary(value);
     } else {
       object[key] = value;
     }
