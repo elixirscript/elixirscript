@@ -31,7 +31,7 @@ test('map_to_object/2', t => {
     [Symbol.for('anotherKey'), "value2"],
   ]);
 
-  const options = [new Core.Tuple(Symbol.for('keys'),Symbol.for('strings'))];
+  const options = [new Core.Tuple(Symbol.for('keys'), Symbol.for('strings'))];
 
   const result = Functions.map_to_object(map, options);
 
