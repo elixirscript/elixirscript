@@ -7,7 +7,7 @@ class Protocol {
     this.fallback = null;
 
     function createFun(funName) {
-      return function(...args) {
+      return function (...args) {
         const thing = args[0];
         let fun = null;
 
@@ -36,7 +36,7 @@ class Protocol {
           this.hasImplementation(thing)
         ) {
           fun = this.registry.get(
-            thing.get(Symbol.for('__struct__')).__MODULE__
+            thing.get(Symbol.for('__struct__')).__MODULE__,
           )[funName];
         } else if (thing !== null && this.hasImplementation(thing)) {
           fun = this.registry.get(thing.constructor)[funName];

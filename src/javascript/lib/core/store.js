@@ -43,5 +43,5 @@ export default {
   create,
   update,
   read,
-  remove
+  remove,
 };

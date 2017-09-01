@@ -25,10 +25,7 @@ function call_property(item, property) {
       throw new Error(`Property ${property} not found in ${item}`);
     }
 
-    if (
-      item.get(prop) instanceof Function ||
-      typeof item.get(prop) === 'function'
-    ) {
+    if (item.get(prop) instanceof Function || typeof item.get(prop) === 'function') {
       return item.get(prop)();
     }
     return item.get(prop);
@@ -97,22 +94,22 @@ function build_namespace(ns, ns_string) {
 function map_to_object(map, options = []) {
   const object = {};
 
-  var type_keys = proplists.get_value(Symbol("keys"), options);
-  var symbols = proplists.get_value(Symbol("symbols"), options);
+  const type_keys = proplists.get_value(Symbol('keys'), options);
+  const symbols = proplists.get_value(Symbol('symbols'), options);
 
-  for (var [key, value] of map.entries()) {
-    if (type_keys == Symbol("string") && typeof key == 'number') {
+  for (let [key, value] of map.entries()) {
+    if (type_keys === Symbol('string') && typeof key === 'number') {
       key = key.toString();
     } else if (
-        (type_keys == Symbol("string") || symbols != Symbol("undefined"))
-        && typeof key == 'symbol'
+      (type_keys === Symbol('string') || symbols !== Symbol('undefined')) &&
+      typeof key === 'symbol'
     ) {
       key = erlang.atom_to_binary(key);
     }
 
     if (value instanceof Map) {
       object[key] = map_to_object(value, options);
-    } else if (symbols != Symbol("undefined") && typeof value == 'symbol') {
+    } else if (symbols !== Symbol('undefined') && typeof value === 'symbol') {
       object[key] = erlang.atom_to_binary(value);
     } else {
       object[key] = value;
@@ -154,12 +151,12 @@ function split_at(value, position) {
 
   for (const character of value) {
     if (index < position) {
-      first = first + character;
+      first += character;
     } else {
-      second = second + character;
+      second += character;
     }
 
-    index = index + 1;
+    index += 1;
   }
 
   return new Core.Tuple(first, second);
@@ -173,5 +170,5 @@ export default {
   map_to_object,
   trampoline,
   Recurse,
-  split_at
+  split_at,
 };

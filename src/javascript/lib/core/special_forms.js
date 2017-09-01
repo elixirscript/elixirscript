@@ -14,26 +14,9 @@ function cond(...clauses) {
   throw new Error();
 }
 
-function _for(expression, generators, collectable_protocol, into = []) {
-  let [result, fun] = collectable_protocol.into(into);
-
-  const generatedValues = run_list_generators(generators.pop()(), generators);
-
-  for (const value of generatedValues) {
-    if (expression.guard.apply(this, value)) {
-      result = fun(
-        result,
-        new Core.Tuple(Symbol.for('cont'), expression.fn.apply(this, value))
-      );
-    }
-  }
-
-  return fun(result, Symbol.for('done'));
-}
-
 function run_list_generators(generator, generators) {
-  if (generators.length == 0) {
-    return generator.map(x => {
+  if (generators.length === 0) {
+    return generator.map((x) => {
       if (Array.isArray(x)) {
         return x;
       }
@@ -52,13 +35,21 @@ function run_list_generators(generator, generators) {
   return run_list_generators(next_gen, generators);
 }
 
-function _try(
-  do_fun,
-  rescue_function,
-  catch_fun,
-  else_function,
-  after_function
-) {
+function _for(expression, generators, collectable_protocol, into = []) {
+  let [result, fun] = collectable_protocol.into(into);
+
+  const generatedValues = run_list_generators(generators.pop()(), generators);
+
+  for (const value of generatedValues) {
+    if (expression.guard.apply(this, value)) {
+      result = fun(result, new Core.Tuple(Symbol.for('cont'), expression.fn.apply(this, value)));
+    }
+  }
+
+  return fun(result, Symbol.for('done'));
+}
+
+function _try(do_fun, rescue_function, catch_fun, else_function, after_function) {
   let result = null;
 
   try {
@@ -141,7 +132,7 @@ function _with(...args) {
   return successFunction(...argsToPass);
 }
 
-function receive(clauses, after) {
+function receive() {
   console.warn('Receive not supported');
 }
 
@@ -151,5 +142,5 @@ export default {
   _for,
   _try,
   _with,
-  receive
+  receive,
 };
