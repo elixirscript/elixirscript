@@ -13,5 +13,5 @@ function put_chars(ioDevice, charData) {
 }
 
 export default {
-  put_chars
+  put_chars,
 };

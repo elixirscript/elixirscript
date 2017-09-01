@@ -16,10 +16,7 @@ test('call_property', (t) => {
 
 test('split_at', (t) => {
   t.deepEqual(Functions.split_at('sweetelixir', 5).values, ['sweet', 'elixir']);
-  t.deepEqual(Functions.split_at('sweetelixir', -6).values, [
-    'sweet',
-    'elixir',
-  ]);
+  t.deepEqual(Functions.split_at('sweetelixir', -6).values, ['sweet', 'elixir']);
   t.deepEqual(Functions.split_at('abc', 0).values, ['', 'abc']);
   t.deepEqual(Functions.split_at('abc', 1000).values, ['abc', '']);
   t.deepEqual(Functions.split_at('abc', -1000).values, ['', 'abc']);
@@ -27,10 +24,7 @@ test('split_at', (t) => {
 });
 
 test('map_to_object/2', (t) => {
-  const map = new Map([
-    [Symbol.for('key'), 'value'],
-    [Symbol.for('anotherKey'), 'value2'],
-  ]);
+  const map = new Map([[Symbol.for('key'), 'value'], [Symbol.for('anotherKey'), 'value2']]);
 
   const options = [new Core.Tuple(Symbol.for('keys'), Symbol.for('strings'))];
 

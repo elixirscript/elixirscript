@@ -16,7 +16,7 @@ function map_fetch(map, key) {
   return Symbol.for('error');
 }
 
-test('with', t => {
+test('with', (t) => {
   /*
      opts = %{width: 10, height: 15}
 
@@ -32,13 +32,13 @@ test('with', t => {
   const value = SpecialForms._with(
     [new Tuple(Symbol.for('ok'), $), () => map_fetch(opts, 'width')],
     [new Tuple(Symbol.for('ok'), $), width => map_fetch(opts, 'height')],
-    (width, height) => new Tuple(Symbol.for('ok'), width * height)
+    (width, height) => new Tuple(Symbol.for('ok'), width * height),
   );
 
   t.deepEqual(value, new Tuple(Symbol.for('ok'), 150));
 });
 
-test('with without match', t => {
+test('with without match', (t) => {
   /*
      opts = %{width: 10}
 
@@ -53,14 +53,14 @@ test('with without match', t => {
 
   const value = SpecialForms._with(
     [new Tuple(Symbol.for('ok'), $), () => map_fetch(opts, 'width')],
-    [new Tuple(Symbol.for('ok'), $), width => map_fetch(opts, 'height')],
-    (width, height) => new Tuple(Symbol.for('ok'), width * height)
+    [new Tuple(Symbol.for('ok'), $), () => map_fetch(opts, 'height')],
+    (width, height) => new Tuple(Symbol.for('ok'), width * height),
   );
 
   t.deepEqual(value, Symbol.for('error'));
 });
 
-test('with bare expression', t => {
+test('with bare expression', (t) => {
   /*
      opts = %{width: 10}
 
@@ -77,18 +77,14 @@ test('with bare expression', t => {
   const value = SpecialForms._with(
     [new Tuple(Symbol.for('ok'), $), () => map_fetch(opts, 'width')],
     [$, width => width * 2],
-    [
-      new Tuple(Symbol.for('ok'), $),
-      (width, double_width) => map_fetch(opts, 'height')
-    ],
-    (width, double_width, height) =>
-      new Tuple(Symbol.for('ok'), double_width * height)
+    [new Tuple(Symbol.for('ok'), $), () => map_fetch(opts, 'height')],
+    (width, double_width, height) => new Tuple(Symbol.for('ok'), double_width * height),
   );
 
   t.deepEqual(value, new Tuple(Symbol.for('ok'), 300));
 });
 
-test('with else', t => {
+test('with else', (t) => {
   /*
       opts = %{width: 10}
 
@@ -106,20 +102,20 @@ test('with else', t => {
 
   const value = SpecialForms._with(
     [new Tuple(Symbol.for('ok'), $), () => map_fetch(opts, 'width')],
-    [new Tuple(Symbol.for('ok'), $), width => map_fetch(opts, 'height')],
+    [new Tuple(Symbol.for('ok'), $), () => map_fetch(opts, 'height')],
     (width, height) => new Tuple(Symbol.for('ok'), width * height),
     Patterns.defmatch(
       Patterns.clause(
         [Symbol.for('error')],
-        () => new Tuple(Symbol.for('error'), Symbol.for('wrong_data'))
-      )
-    )
+        () => new Tuple(Symbol.for('error'), Symbol.for('wrong_data')),
+      ),
+    ),
   );
 
   t.deepEqual(value, new Tuple(Symbol.for('error'), Symbol.for('wrong_data')));
 });
 
-test('with else that don`t match', t => {
+test('with else that don`t match', (t) => {
   /*
       opts = %{width: 10}
 
@@ -138,14 +134,14 @@ test('with else that don`t match', t => {
   const withFunction = SpecialForms._with.bind(
     null,
     [new Tuple(Symbol.for('ok'), $), () => map_fetch(opts, 'width')],
-    [new Tuple(Symbol.for('ok'), $), width => map_fetch(opts, 'height')],
+    [new Tuple(Symbol.for('ok'), $), () => map_fetch(opts, 'height')],
     (width, height) => new Tuple(Symbol.for('ok'), width * height),
     Patterns.defmatch(
       Patterns.clause(
         [Symbol.for('fail')],
-        () => new Tuple(Symbol.for('error'), Symbol.for('wrong_data'))
-      )
-    )
+        () => new Tuple(Symbol.for('error'), Symbol.for('wrong_data')),
+      ),
+    ),
   );
 
   t.throws(withFunction, MatchError);

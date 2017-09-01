@@ -34,9 +34,7 @@ function flatten(deepList, tail = []) {
 }
 
 function foldl(fun, acc0, list) {
-  return list.reduce((acc, value) => {
-    return fun(value, acc);
-  }, acc0);
+  return list.reduce((acc, value) => fun(value, acc), acc0);
 }
 
 function foldr(fun, acc0, list) {
@@ -120,11 +118,7 @@ function keytake(key, n, tupleList) {
   const result = keyfind(key, n, tupleList);
 
   if (result !== false) {
-    return new ErlangTypes.Tuple(
-      result.get(n - 1),
-      result,
-      keydelete(key, n, tupleList)
-    );
+    return new ErlangTypes.Tuple(result.get(n - 1), result, keydelete(key, n, tupleList));
   }
 
   return false;
@@ -263,5 +257,5 @@ export default {
   all,
   any,
   splitwith,
-  sort
+  sort,
 };

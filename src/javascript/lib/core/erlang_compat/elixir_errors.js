@@ -6,5 +6,5 @@ function warn(message) {
 }
 
 export default {
-  warn
+  warn,
 };

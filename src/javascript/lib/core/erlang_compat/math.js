@@ -3,5 +3,5 @@ function log2(x) {
 }
 
 export default {
-  log2
+  log2,
 };

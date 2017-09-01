@@ -53,5 +53,5 @@ export default {
   binary,
   unicode,
   elixir_config,
-  math
+  math,
 };

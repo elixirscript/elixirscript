@@ -1,7 +1,7 @@
 import test from 'ava';
 import Core from '../../../lib/core';
 
-test('log2/1', t => {
+test('log2/1', (t) => {
   let result = Core.math.log2(1);
   t.is(result, 0);
 

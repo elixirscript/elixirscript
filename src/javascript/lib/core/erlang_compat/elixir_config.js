@@ -39,5 +39,5 @@ export default {
   put,
   get,
   update,
-  get_and_put
+  get_and_put,
 };

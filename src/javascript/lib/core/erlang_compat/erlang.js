@@ -4,6 +4,10 @@ import lists from './lists';
 
 const selfPID = new ErlangTypes.PID();
 
+function is_boolean(value) {
+  return typeof value === 'boolean' || value instanceof Boolean;
+}
+
 function atom_to_binary(atom, encoding = Symbol.for('utf8')) {
   if (encoding !== Symbol.for('utf8')) {
     throw new Error(`unsupported encoding ${encoding}`);
@@ -105,19 +109,11 @@ function is_atom(value) {
     return true;
   }
 
-  return (
-    typeof value === 'symbol' ||
-    value instanceof Symbol ||
-    value.__MODULE__ != null
-  );
+  return typeof value === 'symbol' || value instanceof Symbol || value.__MODULE__ != null;
 }
 
 function is_bitstring(value) {
   return value instanceof ErlangTypes.BitString;
-}
-
-function is_boolean(value) {
-  return typeof value === 'boolean' || value instanceof Boolean;
 }
 
 function is_number(value) {
@@ -472,5 +468,6 @@ export default {
   exit,
   raise,
   list_to_binary,
-  nodes
+  nodes,
+  function_exported,
 };
