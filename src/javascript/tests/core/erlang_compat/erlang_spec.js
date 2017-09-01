@@ -95,3 +95,23 @@ test('list_subtraction', t => {
   t.deepEqual(Core.erlang.list_subtraction([1, 2, 3], [1, 2, 3]), []);
   t.deepEqual(Core.erlang.list_subtraction([1, 2, 3], [1, 2]), [3]);
 });
+
+test('node', t => {
+  t.deepEqual(Core.erlang.node(), Symbol.for('nonode@nohost'));
+});
+
+test('nodes/0', t => {
+  t.deepEqual(Core.erlang.nodes(), []);
+});
+
+test('nodes/1', t => {
+  t.deepEqual(Core.erlang.nodes(Symbol.for('this')), [
+    Symbol.for('nonode@nohost')
+  ]);
+
+  t.deepEqual(Core.erlang.nodes([Symbol.for('this')]), [
+    Symbol.for('nonode@nohost')
+  ]);
+
+  t.deepEqual(Core.erlang.nodes([Symbol.for('connected')]), []);
+});

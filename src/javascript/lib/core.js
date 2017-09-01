@@ -11,6 +11,7 @@ import io from './core/erlang_compat/io';
 import binary from './core/erlang_compat/binary';
 import unicode from './core/erlang_compat/unicode';
 import Store from './core/store';
+import math from './core/erlang_compat/math';
 
 class Integer {}
 class Float {}
@@ -51,5 +52,6 @@ export default {
   io,
   binary,
   unicode,
-  elixir_config
+  elixir_config,
+  math
 };
