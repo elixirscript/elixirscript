@@ -104,4 +104,19 @@ defmodule ElixirScript.Translate.Forms.JS do
 
     {ast, state}
   end
+
+  def compile({{:., _, [ElixirScript.JS, :map_to_object]}, _, [object, options]}, state) do
+    ast = Helpers.call(
+      J.member_expression(
+        Helpers.functions(),
+        J.identifier("map_to_object")
+      ),
+      [
+        Form.compile!(object, state),
+        Form.compile!(options, state)
+      ]
+    )
+
+    {ast, state}
+  end
 end
