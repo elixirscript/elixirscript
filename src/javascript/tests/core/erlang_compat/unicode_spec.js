@@ -1,7 +1,7 @@
 import test from 'ava';
 import Core from '../../../lib/core';
 
-test('characters_to_list', t => {
+test('characters_to_list', (t) => {
   let result = Core.unicode.characters_to_list('hello');
   t.deepEqual(result, [104, 101, 108, 108, 111]);
 
@@ -15,7 +15,7 @@ test('characters_to_list', t => {
   t.deepEqual(result, [104, 101, 108, 108, 111, 102, 103, 34, 115]);
 });
 
-test('characters_to_binary', t => {
+test('characters_to_binary', (t) => {
   let result = Core.unicode.characters_to_binary('hello');
   t.deepEqual(result, 'hello');
 

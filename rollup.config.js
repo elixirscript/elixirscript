@@ -8,12 +8,21 @@ export default {
   plugins: [
     nodeResolve({ jsnext: true }),
     babel({
+<<<<<<< HEAD
       babelrc: false
     })
     //minify({
     //  keepFnName: true,
     //  keepClassName: true
     //})
+=======
+      babelrc: false,
+    }),
+    minify({
+      keepFnName: true,
+      keepClassName: true,
+    }),
+>>>>>>> master
   ],
-  targets: [{ dest: 'priv/build/iife/ElixirScript.Core.js', format: 'iife' }]
+  targets: [{ dest: 'priv/build/iife/ElixirScript.Core.js', format: 'iife' }],
 };

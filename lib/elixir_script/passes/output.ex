@@ -8,16 +8,14 @@ defmodule ElixirScript.Output do
   @doc """
   Takes outputs the JavaScript code in the specified output
   """
-  @spec execute([atom], pid) :: nil
-  def execute(modules, pid) do
+  @spec execute([atom], pid, map) :: nil
+  def execute(modules, pid, opts) do
     modules = modules
     |> Enum.filter(fn {_, info} -> Map.has_key?(info, :js_ast) end)
     |> Enum.map(fn {_module, info} ->
         info.js_ast
       end
     )
-
-    opts = ModuleState.get_compiler_opts(pid)
 
     js_modules = ModuleState.js_modules(pid)
     |> Enum.filter(fn

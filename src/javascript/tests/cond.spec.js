@@ -3,11 +3,11 @@ import Core from '../lib/core';
 
 const SpecialForms = Core.SpecialForms;
 
-test('cond', async t => {
+test('cond', async (t) => {
   const clauses = [
     [1 + 1 === 1, () => 'This will never match'],
     [2 * 2 !== 4, () => 'Nor this'],
-    [true, () => 'This will']
+    [true, () => 'This will'],
   ];
 
   const result = await SpecialForms.cond(...clauses);

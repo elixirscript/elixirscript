@@ -1,9 +1,14 @@
 import test from 'ava';
 import Core from '../lib/core';
+
 const Patterns = Core.Patterns;
 const SpecialForms = Core.SpecialForms;
 
+<<<<<<< HEAD
 test('try', async t => {
+=======
+test('try', (t) => {
+>>>>>>> master
   /*
       try do
         1 / x
@@ -25,20 +30,10 @@ test('try', async t => {
     null,
     null,
     Patterns.defmatch(
-      Patterns.clause(
-        [Patterns.variable()],
-        y => {
-          return Symbol.for('small');
-        },
-        y => {
-          return y < 1 && y > -1;
-        }
-      ),
-      Patterns.clause([Patterns.wildcard()], () => {
-        return Symbol.for('large');
-      })
+      Patterns.clause([Patterns.variable()], () => Symbol.for('small'), y => y < 1 && y > -1),
+      Patterns.clause([Patterns.wildcard()], () => Symbol.for('large')),
     ),
-    null
+    null,
   );
 
   t.is(value, Symbol.for('large'));

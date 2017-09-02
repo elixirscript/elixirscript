@@ -126,11 +126,7 @@ function keytake(key, n, tupleList) {
   const result = keyfind(key, n, tupleList);
 
   if (result !== false) {
-    return new ErlangTypes.Tuple(
-      result.get(n - 1),
-      result,
-      keydelete(key, n, tupleList)
-    );
+    return new ErlangTypes.Tuple(result.get(n - 1), result, keydelete(key, n, tupleList));
   }
 
   return false;
@@ -287,5 +283,5 @@ export default {
   all,
   any,
   splitwith,
-  sort
+  sort,
 };

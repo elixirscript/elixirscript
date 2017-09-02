@@ -169,5 +169,5 @@ export default {
   merge,
   update,
   get,
-  take
+  take,
 };

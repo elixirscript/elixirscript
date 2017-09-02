@@ -29,5 +29,5 @@ function characters_to_binary(characters) {
 
 export default {
   characters_to_list,
-  characters_to_binary
+  characters_to_binary,
 };

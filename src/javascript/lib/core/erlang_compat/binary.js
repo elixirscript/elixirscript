@@ -10,5 +10,5 @@ function list_to_bin(bytelist) {
 
 export default {
   copy,
-  list_to_bin
+  list_to_bin,
 };

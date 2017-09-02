@@ -22,8 +22,8 @@ defmodule ElixirScript.Translate.Forms.Bitstring do
     do_compile_element({:binary, Form.compile!(element, state)})
   end
 
-  def compile_element({:<<>>, _, elements}, state) do
-    {ast, _} = compile(elements, state)
+  def compile_element({:<<>>, _, _} = ast, state) do
+    {ast, _} = compile(ast, state)
     ast
   end
 

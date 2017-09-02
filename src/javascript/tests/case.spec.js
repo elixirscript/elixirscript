@@ -5,26 +5,14 @@ const Patterns = Core.Patterns;
 const SpecialForms = Core.SpecialForms;
 const Tuple = Core.Tuple;
 
-test('case', async t => {
+test('case', async (t) => {
   const clauses = [
     Patterns.clause(
-      [
-        new Tuple(
-          Symbol.for('selector'),
-          Patterns.variable(),
-          Patterns.variable()
-        )
-      ],
-      (i, value) => {
-        return value;
-      },
-      i => {
-        return Kernel.is_integer(i);
-      }
+      [new Tuple(Symbol.for('selector'), Patterns.variable(), Patterns.variable())],
+      (i, value) => value,
+      i => Kernel.is_integer(i),
     ),
-    Patterns.clause([Patterns.variable()], value => {
-      return value;
-    })
+    Patterns.clause([Patterns.variable()], value => value),
   ];
 
   const result = await SpecialForms._case('thing', clauses);
