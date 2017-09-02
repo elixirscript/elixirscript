@@ -6,7 +6,7 @@ defmodule ElixirScript.Translate.Forms.Map.Test do
   import PropertyTest
 
   setup_all do
-    {:ok, pid} = ElixirScript.State.start_link(%{})
+    {:ok, pid} = ElixirScript.State.start_link()
 
     state = %{
       pid: pid

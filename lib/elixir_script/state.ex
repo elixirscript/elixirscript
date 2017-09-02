@@ -3,12 +3,10 @@ defmodule ElixirScript.State do
 
   # Holds the state for the ElixirScript compiler
 
-  def start_link(compiler_opts) do
+  def start_link() do
     Agent.start_link(fn ->
       %{
-        compiler_opts: compiler_opts,
         modules: Keyword.new,
-        refs: [],
         js_modules: []
       }
     end)
@@ -16,12 +14,6 @@ defmodule ElixirScript.State do
 
   def stop(pid) do
     Agent.stop(pid)
-  end
-
-  def get_compiler_opts(pid) do
-    Agent.get(pid, fn(state) ->
-      state.compiler_opts
-    end)
   end
 
   def get_module(pid, module) do
@@ -87,16 +79,6 @@ defmodule ElixirScript.State do
       {_, name, _} = state.js_modules
       |> Enum.find(fn {m, _, _} -> module == m end)
       name
-    end)
-  end
-
-  def list_foreign_modules(pid) do
-    Agent.get(pid, fn(state) ->
-      state.modules
-      |> Enum.filter(fn
-        (%{attributes: [__foreign_info__: _]}) -> true
-        (_) -> false
-      end)
     end)
   end
 

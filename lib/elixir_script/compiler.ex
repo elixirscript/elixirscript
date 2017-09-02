@@ -25,7 +25,7 @@ defmodule ElixirScript.Compiler do
   @spec compile(atom | [atom], []) :: nil
   def compile(entry_modules, opts \\ []) do
     opts = build_compiler_options(opts, entry_modules)
-    {:ok, pid} = ElixirScript.State.start_link(opts)
+    {:ok, pid} = ElixirScript.State.start_link()
 
     entry_modules = List.wrap(entry_modules)
 
@@ -37,7 +37,7 @@ defmodule ElixirScript.Compiler do
     ElixirScript.Translate.execute(modules, pid)
 
     modules = ElixirScript.State.list_modules(pid)
-    result = ElixirScript.Output.execute(modules, pid)
+    result = ElixirScript.Output.execute(modules, pid, opts)
 
     ElixirScript.State.stop(pid)
 
