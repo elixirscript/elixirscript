@@ -61,7 +61,9 @@ defmodule ElixirScript.Translate.Module do
       _ ->
         { compiled_functions, _ } = Enum.map_reduce(combined_defs, state, &Function.compile(&1, &2))
 
-        compiled_functions = compiled_functions ++ [make_info_function(module, defs, state)]
+        info_map = make_info_map(module, state)
+        info_function = make_info_function()
+        compiled_functions = [info_map, info_function] ++ compiled_functions
 
         js_ast = ElixirScript.ModuleSystems.Namespace.build(
           module,
@@ -146,70 +148,92 @@ defmodule ElixirScript.Translate.Module do
     end
   end
 
-  # Builds the __info__ function that Elixir modules
-  # have. Only supports the `functions`, `macros` and
-  # `module` kinds
-  defp make_info_function(module, definitions, state) do
-    functions = Enum.filter(definitions, fn
-      {_, :def, _, _} ->
-        true
-      _ ->
-        false
-    end)
-    |> Enum.map(fn
-      {func, _, _, _} ->
-        func
-    end)
+  defp make_info_map(module, state) do
+    functions = module.__info__(:functions)
+    |> Form.compile!(state)
 
-    functions = Form.compile!(functions, state)
+    macros = module.__info__(:macros)
+    |> Form.compile!(state)
 
-    macros = Enum.filter(definitions, fn
-      {_, :defmacro, _, _} ->
-        true
-      _ ->
-        false
-    end)
-    |> Enum.map(fn
-      {func, _, _, _} ->
-        func
-    end)
+    attributes = module.__info__(:attributes)
+    |> Form.compile!(state)
 
-    macros = Form.compile!(macros, state)
+    compile = module.__info__(:compile)
+    |> Keyword.update(:source, "", fn(x) -> :erlang.list_to_binary(x) end)
+    |> Form.compile!(state)
+
+    md5 = module.__info__(:md5)
+    |> :erlang.binary_to_list
+
+    md5 = Form.compile!({:<<>>, [], md5}, state)
 
     module = Helpers.symbol(to_string(module))
 
+    map_entries = J.array_expression([
+      J.array_expression([
+        Helpers.symbol("functions"),
+        functions
+      ]),
+      J.array_expression([
+        Helpers.symbol("macros"),
+        macros
+      ]),
+      J.array_expression([
+        Helpers.symbol("attributes"),
+        attributes
+      ]),
+      J.array_expression([
+        Helpers.symbol("compile"),
+        compile
+      ]),
+      J.array_expression([
+        Helpers.symbol("md5"),
+        md5
+      ]),
+      J.array_expression([
+        Helpers.symbol("module"),
+        module
+      ]),
+    ])
+
+    map = Helpers.new(
+      J.identifier("Map"),
+      [
+        map_entries
+      ]
+    )
+
+    Helpers.declare("__info__map__", map)
+  end
+
+  # Builds the __info__ function that Elixir modules
+  # have.
+  defp make_info_function do
+    get_call = Helpers.call(
+      J.member_expression(
+        J.identifier("__info__map__"),
+        J.identifier("get")
+      ),
+      [
+        J.identifier("kind")
+      ]
+    )
+
+    value = Helpers.declare("value", get_call)
+
     body = J.if_statement(
       J.binary_expression(
-        :===,
-        J.identifier("kind"),
-        Helpers.symbol("functions")
+        :!==,
+        J.identifier("value"),
+        J.identifier("null")
       ),
       J.block_statement([
-        J.return_statement(functions)
-      ]),
-      J.if_statement(
-        J.binary_expression(
-          :===,
-          J.identifier("kind"),
-          Helpers.symbol("macros")
-        ),
-        J.block_statement([
-          J.return_statement(macros)
-        ]),
-        J.if_statement(
-          J.binary_expression(
-            :===,
-            J.identifier("kind"),
-            Helpers.symbol("module")
-          ),
-          J.block_statement([
-            J.return_statement(module)
-          ])
-        )
-      )
+        J.return_statement(J.identifier("value"))
+      ])
     )
 
     body = J.block_statement([
+      value,
       body,
       J.throw_statement(
         Helpers.new(
