@@ -2,6 +2,7 @@ import Patterns from 'tailored';
 import ErlangTypes from 'erlang-types';
 import Functions from './core/functions';
 import SpecialForms from './core/special_forms';
+import ProcessSystem from './core/processes/process_system';
 import erlang from './core/erlang_compat/erlang';
 import maps from './core/erlang_compat/maps';
 import lists from './core/erlang_compat/lists';
@@ -31,6 +32,7 @@ function get_global() {
 
 const globalState = get_global();
 
+globalState.__elixirscript_process_system__ = new ProcessSystem();
 globalState.__elixirscript_store__ = new Map();
 globalState.__elixirscript_names__ = new Map();
 
