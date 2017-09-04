@@ -15,7 +15,7 @@ defmodule ElixirScript.Translate.Forms.For do
     fun = args.fun
 
 
-    expression = Helpers.call(
+    expression = Helpers.call_non_scheduled(
       JS.member_expression(
         Helpers.patterns(),
         JS.identifier("clause")
@@ -25,12 +25,12 @@ defmodule ElixirScript.Translate.Forms.For do
 
     members = ["Elixir", "Collectable" , "__load"]
 
-    collectable = Helpers.call(
+    collectable = Helpers.call_sync(
       Identifier.make_namespace_members(members),
       [JS.identifier("Elixir")]
     )
 
-    ast = Helpers.call(
+    ast = Helpers.call_non_scheduled(
       JS.member_expression(
         Helpers.special_forms(),
         JS.identifier("_for")

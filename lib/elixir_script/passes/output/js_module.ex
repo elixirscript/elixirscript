@@ -17,7 +17,27 @@ defmodule ElixirScript.Output.JSModule do
   end
 
   def start do
-    normal = Helpers.symbol("normal")
+    start_process_call = Helpers.call(
+      J.member_expression(
+        Helpers.process_system(),
+        J.identifier("spawn")
+      ),
+      [
+        Helpers.call_sync(
+          J.member_expression(
+            J.identifier(:app),
+            J.identifier("__load")
+          ),
+          [J.identifier("Elixir")]
+        ),
+        J.literal("start"),
+        J.array_expression([
+          Helpers.symbol("normal"),
+          J.identifier(:args)
+        ])
+      ]
+    )
+
 
     Helpers.assign(
       J.member_expression(
@@ -27,19 +47,7 @@ defmodule ElixirScript.Output.JSModule do
       Helpers.arrow_function(
         [J.identifier(:app), J.identifier(:args)],
         J.block_statement([
-          Helpers.call(
-            J.member_expression(
-              Helpers.call(
-                J.member_expression(
-                  J.identifier(:app),
-                  J.identifier("__load")
-                ),
-                [J.identifier("Elixir")]
-              ),
-              J.identifier("start")
-            ),
-            [normal, J.identifier(:args)]
-          )
+          start_process_call
         ])
       )
     )
@@ -55,7 +63,7 @@ defmodule ElixirScript.Output.JSModule do
         [J.identifier(:module)],
         J.block_statement([
           J.return_statement(
-            Helpers.call(
+            Helpers.call_sync(
               J.member_expression(
                 J.identifier(:module),
                 J.identifier("__load")

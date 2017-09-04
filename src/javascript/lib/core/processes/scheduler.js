@@ -57,6 +57,7 @@ class Scheduler {
     } else {
       for (const [, queue] of this.queues) {
         let reductions = 0;
+
         while (queue && !queue.empty() && reductions < this.reductions_per_process) {
           const task = queue.next();
           this.isRunning = true;

@@ -85,14 +85,14 @@ defmodule ElixirScript.Translate.Forms.Remote do
       module === Elixir ->
         members = ["Elixir", "__load"]
 
-        Helpers.call(
+        Helpers.call_sync(
           Identifier.make_namespace_members(members),
           [J.identifier("Elixir")]
         )
       ElixirScript.Translate.Module.is_elixir_module(module) ->
         members = ["Elixir"] ++ Module.split(module) ++ ["__load"]
 
-        Helpers.call(
+        Helpers.call_sync(
           Identifier.make_namespace_members(members),
           [J.identifier("Elixir")]
         )

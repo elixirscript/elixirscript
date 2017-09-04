@@ -16,11 +16,7 @@ function map_fetch(map, key) {
   return Symbol.for('error');
 }
 
-<<<<<<< HEAD
-test('with', async t => {
-=======
-test('with', (t) => {
->>>>>>> master
+test('with', async (t) => {
   /*
      opts = %{width: 10, height: 15}
 
@@ -42,11 +38,7 @@ test('with', (t) => {
   t.deepEqual(value, new Tuple(Symbol.for('ok'), 150));
 });
 
-<<<<<<< HEAD
-test('with without match', async t => {
-=======
-test('with without match', (t) => {
->>>>>>> master
+test('with without match', async (t) => {
   /*
      opts = %{width: 10}
 
@@ -68,11 +60,7 @@ test('with without match', (t) => {
   t.deepEqual(value, Symbol.for('error'));
 });
 
-<<<<<<< HEAD
-test('with bare expression', async t => {
-=======
-test('with bare expression', (t) => {
->>>>>>> master
+test('with bare expression', async (t) => {
   /*
      opts = %{width: 10}
 
@@ -96,11 +84,7 @@ test('with bare expression', (t) => {
   t.deepEqual(value, new Tuple(Symbol.for('ok'), 300));
 });
 
-<<<<<<< HEAD
-test('with else', async t => {
-=======
-test('with else', (t) => {
->>>>>>> master
+test('with else', async (t) => {
   /*
       opts = %{width: 10}
 
@@ -131,7 +115,7 @@ test('with else', (t) => {
   t.deepEqual(value, new Tuple(Symbol.for('error'), Symbol.for('wrong_data')));
 });
 
-test('with else that don`t match', async t => {
+test('with else that don`t match', async (t) => {
   /*
       opts = %{width: 10}
 

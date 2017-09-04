@@ -27,6 +27,21 @@ defmodule ElixirScript.Translate.Helpers do
   end
 
   def call(callee, arguments) do
+    J.await_expression(
+      J.call_expression(
+        J.member_expression(
+          process_system(),
+          J.identifier("schedule")
+        ),
+        [
+          callee,
+          J.array_expression(arguments)
+        ]
+      )
+    )
+  end
+
+  def call_non_scheduled(callee, arguments) do
     call_sync(callee, arguments)
     |> J.await_expression()
   end
@@ -98,6 +113,13 @@ defmodule ElixirScript.Translate.Helpers do
 
   def special_forms do
     core_module("SpecialForms")
+  end
+
+  def process_system do
+    J.member_expression(
+      core_module("global"),
+      J.identifier("__elixirscript_process_system__")
+    )
   end
 
   def declare(%ESTree.Identifier{} = name, value) do

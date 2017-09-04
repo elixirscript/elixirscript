@@ -4,11 +4,7 @@ import Core from '../lib/core';
 const Patterns = Core.Patterns;
 const SpecialForms = Core.SpecialForms;
 
-<<<<<<< HEAD
-test('try', async t => {
-=======
-test('try', (t) => {
->>>>>>> master
+test('try', async (t) => {
   /*
       try do
         1 / x
@@ -24,9 +20,7 @@ test('try', (t) => {
   const x = 1;
 
   const value = await SpecialForms._try(
-    () => {
-      return 1 / x;
-    },
+    () => 1 / x,
     null,
     null,
     Patterns.defmatch(

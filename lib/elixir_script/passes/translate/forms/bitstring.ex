@@ -81,7 +81,7 @@ defmodule ElixirScript.Translate.Forms.Bitstring do
   end
 
   defp do_compile_element({type, ast}) do
-    Helpers.call(
+    Helpers.call_sync(
       JS.member_expression(
         Helpers.bitstring(),
         JS.identifier(type)
@@ -93,7 +93,7 @@ defmodule ElixirScript.Translate.Forms.Bitstring do
   end
 
   defp do_compile_element({type, ast, params}) when is_list(params) do
-    Helpers.call(
+    Helpers.call_sync(
       JS.member_expression(
         Helpers.bitstring(),
         JS.identifier(type)
