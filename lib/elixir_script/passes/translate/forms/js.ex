@@ -55,7 +55,7 @@ defmodule ElixirScript.Translate.Forms.JS do
   end
 
   def compile({{:., _, [ElixirScript.JS, :import]}, _, [term]}, state) do
-    ast = Helpers.call(
+    ast = Helpers.call_non_scheduled(
       J.identifier("import"),
       [Form.compile!(term, state)]
     )
@@ -64,7 +64,7 @@ defmodule ElixirScript.Translate.Forms.JS do
   end
 
   def compile({{:., _, [ElixirScript.JS, :mutate]}, _, [object, map]}, state) do
-    ast = Helpers.call(
+    ast = Helpers.call_non_scheduled(
       J.member_expression(
         J.identifier("Object"),
         J.identifier("assign")
@@ -92,7 +92,7 @@ defmodule ElixirScript.Translate.Forms.JS do
   end
 
   def compile({{:., _, [ElixirScript.JS, :map_to_object]}, _, [object]}, state) do
-    ast = Helpers.call(
+    ast = Helpers.call_non_scheduled(
       J.member_expression(
         Helpers.functions(),
         J.identifier("map_to_object")
@@ -106,7 +106,7 @@ defmodule ElixirScript.Translate.Forms.JS do
   end
 
   def compile({{:., _, [ElixirScript.JS, :map_to_object]}, _, [object, options]}, state) do
-    ast = Helpers.call(
+    ast = Helpers.call_non_scheduled(
       J.member_expression(
         Helpers.functions(),
         J.identifier("map_to_object")

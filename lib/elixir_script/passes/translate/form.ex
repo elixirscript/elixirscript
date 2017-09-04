@@ -177,7 +177,7 @@ defmodule ElixirScript.Translate.Form do
   end
 
   def compile({:case, _, [condition, [do: clauses]]}, state) do
-    ast = Helpers.call(
+    ast = Helpers.call_non_scheduled(
       J.member_expression(
         Helpers.special_forms(),
         J.identifier("_case")
@@ -214,7 +214,7 @@ defmodule ElixirScript.Translate.Form do
       J.identifier("cond")
     )
 
-    ast = Helpers.call(
+    ast = Helpers.call_non_scheduled(
       cond_function,
       processed_clauses
     )

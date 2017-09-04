@@ -17,7 +17,7 @@ defmodule ElixirScript.Output.JSModule do
   end
 
   def start do
-    start_process_call = Helpers.call(
+    start_process_call = Helpers.call_non_scheduled(
       J.member_expression(
         Helpers.process_system(),
         J.identifier("spawn")

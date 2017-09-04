@@ -58,7 +58,7 @@ defmodule ElixirScript.Translate.Forms.For do
 
       {patterns, params, module_state} = Pattern.compile([{:<<>>, [], bs_parts}], module_state)
 
-      gen = Helpers.call(
+      gen = Helpers.call_non_scheduled(
         JS.member_expression(
           Helpers.patterns(),
           JS.identifier("bitstring_generator")
@@ -71,7 +71,7 @@ defmodule ElixirScript.Translate.Forms.For do
       ({:<-, _, [identifier, enum]}, state) ->
         {patterns, params, module_state} = Pattern.compile([identifier], module_state)
 
-        gen = Helpers.call(
+        gen = Helpers.call_non_scheduled(
           JS.member_expression(
             Helpers.patterns(),
             JS.identifier("list_generator")

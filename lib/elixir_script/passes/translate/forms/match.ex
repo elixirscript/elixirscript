@@ -18,7 +18,7 @@ defmodule ElixirScript.Translate.Forms.Match do
 
     { patterns, params, state } = Pattern.compile([left], state)
 
-    array_pattern = Helpers.declare(params, Helpers.call(
+    array_pattern = Helpers.declare(params, Helpers.call_non_scheduled(
       J.member_expression(
         Helpers.patterns(),
         J.identifier("match")

@@ -33,7 +33,7 @@ defmodule ElixirScript.Translate.Forms.With do
 
     expressions = result.expressions
 
-    js_ast = Helpers.call(
+    js_ast = Helpers.call_non_scheduled(
       JS.member_expression(
         Helpers.special_forms(),
         JS.identifier("_with")
