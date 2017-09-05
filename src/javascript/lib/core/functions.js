@@ -91,25 +91,26 @@ function build_namespace(ns, ns_string) {
   return parent;
 }
 
+//TODO: Revisit performance of .toString() in tight loop
 function map_to_object(map, options = []) {
+  const opt_keys = proplists.get_value(Symbol.for('keys'), options);
+  const opt_symbols = proplists.get_value(Symbol.for('symbols'), options);
+
   const object = {};
 
-  const type_keys = proplists.get_value(Symbol('keys'), options);
-  const symbols = proplists.get_value(Symbol('symbols'), options);
-
   for (let [key, value] of map.entries()) {
-    if (type_keys === Symbol('string') && typeof key === 'number') {
+    if (opt_keys === Symbol.for('string') && typeof key === 'number') {
       key = key.toString();
     } else if (
-      (type_keys === Symbol('string') || symbols !== Symbol('undefined')) &&
-      typeof key === 'symbol'
+      (opt_keys === Symbol.for('string') || opt_symbols !== Symbol.for('undefined')) 
+      && typeof key === 'symbol'
     ) {
       key = erlang.atom_to_binary(key);
     }
 
     if (value instanceof Map) {
       object[key] = map_to_object(value, options);
-    } else if (symbols !== Symbol('undefined') && typeof value === 'symbol') {
+    } else if (opt_symbols !==  Symbol.for('undefined') && typeof value === 'symbol') {
       object[key] = erlang.atom_to_binary(value);
     } else {
       object[key] = value;

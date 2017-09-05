@@ -1,6 +1,6 @@
 import lists from './lists';
 
-function get_value(key, list, defaultv = Symbol('undefined')) {
+function get_value(key, list, defaultv = Symbol.for('undefined')) {
   const tuple = lists.keyfind(key, 1, list);
   if (tuple) {
     const [, value] = tuple.values;

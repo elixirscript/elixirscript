@@ -23,22 +23,23 @@ function list_to_bin(bytelist) {
   return erlang.list_to_binary(bytelist);
 }
 
-//TODO: How to create a tuple on JS side from part/3?
-//function part(subject, posOrTuple, len=null) {
-//    if (len == null) "/2 called" else "/3 called"
-//}
-
-function part(subject, pos, len) {
-    return subject.substr(pos, len);
+function part(subject, posOrTuple, len=null) {
+    if (len === null) {
+        var pos;
+        [pos, len] = posOrTuple.values;
+        return subject.substr(pos, len);
+    } else {
+        return subject.substr(posOrTuple, len);
+    }
 }
 
 //TODO: Support more options
 //TODO: pattern cannot be list of strings
 function replace(subject, pattern, replacement, options=[]) {
-    const opt_global = proplists.get_value(Symbol('global'), options);
+    const opt_global = proplists.get_value(Symbol.for('global'), options);
 
     var regex;
-    if (opt_global.toString() != Symbol('undefined').toString()) {
+    if (opt_global !== Symbol.for('undefined')) {
         regex = new RegExp(pattern, 'g');
     } else {
         regex = new RegExp(pattern, '');
