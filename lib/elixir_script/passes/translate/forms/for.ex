@@ -15,7 +15,7 @@ defmodule ElixirScript.Translate.Forms.For do
     fun = args.fun
 
 
-    expression = Helpers.call_non_scheduled(
+    expression = Helpers.call(
       JS.member_expression(
         Helpers.patterns(),
         JS.identifier("clause")
@@ -30,7 +30,7 @@ defmodule ElixirScript.Translate.Forms.For do
       [JS.identifier("Elixir")]
     )
 
-    ast = Helpers.call_non_scheduled(
+    ast = Helpers.call(
       JS.member_expression(
         Helpers.special_forms(),
         JS.identifier("_for")
@@ -58,7 +58,7 @@ defmodule ElixirScript.Translate.Forms.For do
 
       {patterns, params, module_state} = Pattern.compile([{:<<>>, [], bs_parts}], module_state)
 
-      gen = Helpers.call_non_scheduled(
+      gen = Helpers.call(
         JS.member_expression(
           Helpers.patterns(),
           JS.identifier("bitstring_generator")
@@ -71,7 +71,7 @@ defmodule ElixirScript.Translate.Forms.For do
       ({:<-, _, [identifier, enum]}, state) ->
         {patterns, params, module_state} = Pattern.compile([identifier], module_state)
 
-        gen = Helpers.call_non_scheduled(
+        gen = Helpers.call(
           JS.member_expression(
             Helpers.patterns(),
             JS.identifier("list_generator")

@@ -28,13 +28,24 @@ test('spawn linked process', async (t) => {
 
 test('spawn linked process', async (t) => {
   const pid1 = system.spawn_link(async () => {
-    await system.schedule(Math.log2, [2]);
+    await system.pause();
+    console.log('1');
+    await Math.log2(2);
+    await system.pause();
+    console.log('2');
+    await Math.log2(4);
   });
 
   const pid2 = system.spawn_link(async () => {
-    await system.schedule(Math.log2, [4]);
-    await system.schedule(Math.log2, [5]);
+    await system.pause();
+    console.log('3');
+    await Math.log2(4);
+    await system.pause();
+    console.log('4');
+    await Math.log2(4);
   });
+
+  await system.sleep(Symbol.for('Infinity'));
 
   t.is(system.list().length, 3);
   t.is(system.list()[1], pid1);

@@ -18,7 +18,7 @@ defmodule ElixirScript.Translate.Clause do
     body = body
     |> return_last_statement
 
-    ast = Helpers.call_non_scheduled(
+    ast = Helpers.call(
       J.member_expression(
         Helpers.patterns(),
         J.identifier("clause")

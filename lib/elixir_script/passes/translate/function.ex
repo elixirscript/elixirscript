@@ -92,7 +92,7 @@ defmodule ElixirScript.Translate.Function do
     clauses
     |> Enum.map(&compile_clause(&1, state))
     |> Enum.map(fn {patterns, _params, guards, body} ->
-      match_or_default_call = Helpers.call_non_scheduled(
+      match_or_default_call = Helpers.call(
         J.member_expression(
           Helpers.patterns(),
           J.identifier("match_or_default_async")
@@ -156,13 +156,26 @@ defmodule ElixirScript.Translate.Function do
       nil ->
         J.identifier("null")
       {:__block__, _, block_body} ->
-        {list, _} = Enum.map_reduce(block_body, state, &Form.compile(&1, &2))
+        {list, _} = Enum.map_reduce(block_body, state, fn(x, acc) ->
+           {ast, acc} = Form.compile(x, acc)
+           {[pause(), ast], acc}
+        end)
         List.flatten(list)
       _ ->
         Form.compile!(block, state)
     end
 
     {ast, state}
+  end
+
+  defp pause() do
+    Helpers.call(
+      J.member_expression(
+        Helpers.process_system,
+        J.identifier("pause")
+      ),
+      []
+    )
   end
 
   defp update_last_call(clause_body, %{function: {name, _}, anonymous_fn: anonymous?}) do

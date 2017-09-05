@@ -1,4 +1,5 @@
 import States from './states';
+import Core from '../../core';
 
 class Process {
   constructor(pid, func, args, mailbox, system) {
@@ -17,7 +18,8 @@ class Process {
     let retval = States.NORMAL;
 
     try {
-      await this.system.schedule(this.func, this.args, this.pid);
+      await this.system.pause(this.pid);
+      await this.func.apply(null, this.args);
     } catch (e) {
       console.error(e);
       retval = e;
@@ -45,25 +47,26 @@ class Process {
   }
 
   // TODO figure out what to do with receive
-  receive(fun) {
-    let value = States.NOMATCH;
+  async receive(clauses) {
     const messages = this.mailbox.get();
 
     for (let i = 0; i < messages.length; i++) {
-      try {
-        value = fun(messages[i]);
+      for (const clause of clauses) {
+        const value = await Core.Patterns.match_or_default_async(
+          clause[0].pattern,
+          messages[i],
+          clause[0].guard,
+          States.NOMATCH,
+        );
+
         if (value !== States.NOMATCH) {
           this.mailbox.removeAt(i);
-          break;
-        }
-      } catch (e) {
-        if (e.constructor.name !== 'MatchError') {
-          this.exit(e);
+          return clause[1].apply(null, value);
         }
       }
     }
 
-    return value;
+    return States.NOMATCH;
   }
 }
 

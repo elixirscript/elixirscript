@@ -135,8 +135,8 @@ async function _with(...args) {
   return successFunction(...argsToPass);
 }
 
-function receive() {
-  console.warn('Receive not supported');
+async function receive(clauses, timeout = 0, timeoutFn = () => true) {
+  return Core.global.__elxirscript_process_system__.receive(clauses, timeout, timeoutFn);
 }
 
 export default {

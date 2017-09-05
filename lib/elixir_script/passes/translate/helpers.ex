@@ -27,21 +27,6 @@ defmodule ElixirScript.Translate.Helpers do
   end
 
   def call(callee, arguments) do
-    J.await_expression(
-      J.call_expression(
-        J.member_expression(
-          process_system(),
-          J.identifier("schedule")
-        ),
-        [
-          callee,
-          J.array_expression(arguments)
-        ]
-      )
-    )
-  end
-
-  def call_non_scheduled(callee, arguments) do
     call_sync(callee, arguments)
     |> J.await_expression()
   end

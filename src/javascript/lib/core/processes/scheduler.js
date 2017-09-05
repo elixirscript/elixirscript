@@ -20,11 +20,13 @@ class ProcessQueue {
 }
 
 class Scheduler {
-  constructor(throttle = 0, reductions_per_process = 8) {
+  constructor(system, reductions_per_process = 8) {
     this.isRunning = false;
     this.invokeLater = (callback) => {
-      setTimeout(callback, throttle);
+      setTimeout(callback, 0);
     };
+
+    this.system = system;
 
     // In our case a reduction is equal to a task call
     // Controls how many tasks are called at a time per process
@@ -49,35 +51,21 @@ class Scheduler {
     this.isRunning = false;
   }
 
-  async run() {
+  run() {
     if (this.isRunning) {
       this.invokeLater(() => {
         this.run();
       });
     } else {
-      for (const [, queue] of this.queues) {
+      for (const [pid, queue] of this.queues) {
         let reductions = 0;
 
+        this.system.set_current(pid);
         while (queue && !queue.empty() && reductions < this.reductions_per_process) {
-          const task = queue.next();
+          const resolver = queue.next();
           this.isRunning = true;
-
-          let result;
-
-          try {
-            result = await task.func.apply(null, task.args);
-            task.resolver(result);
-          } catch (e) {
-            console.error(e);
-            result = e;
-          }
-
+          resolver(true);
           this.isRunning = false;
-
-          if (result instanceof Error) {
-            throw result;
-          }
-
           reductions++;
         }
       }
@@ -88,8 +76,8 @@ class Scheduler {
     }
   }
 
-  schedule(pid, func, args, resolver) {
-    this.addToQueue(pid, new Task(pid, func, args, resolver));
+  pause(pid, resolver) {
+    this.addToQueue(pid, resolver);
   }
 }
 

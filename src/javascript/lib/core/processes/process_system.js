@@ -12,9 +12,8 @@ class ProcessSystem {
     this.links = new Map();
     this.monitors = new Map();
 
-    const throttle = 5; // ms between scheduled tasks
     this.current_process = null;
-    this.scheduler = new Scheduler(throttle);
+    this.scheduler = new Scheduler(this);
     this.suspended = new Map();
 
     const process_system_scope = this;
@@ -184,33 +183,46 @@ class ProcessSystem {
     return pid;
   }
 
-  send(id, msg) {
+  async send(id, msg) {
     const pid = this.pidof(id);
 
     if (pid) {
       this.mailboxes.get(pid).deliver(msg);
 
       if (this.suspended.has(pid)) {
-        const [fun, args, resolver] = this.suspended.get(pid);
-        this.suspended.delete(pid);
-        this.scheduler.schedule(pid, fun, args, resolver);
+        const [args, resolver] = this.suspended.get(pid);
+
+        const result = await this.__receive(pid, args);
+        if (result !== States.NOMATCH) {
+          this.suspended.delete(pid);
+          resolver(result);
+        }
       }
     }
 
     return msg;
   }
 
-  // TODO give pairs of patterns and clauses.
-  receive(fun, args, timeout = 0, timeoutFn = () => true) {
+  async __receive(pid, args) {
+    const process = this.pids.get(pid);
+    return process.receive(args);
+  }
+
+  async receive(args, timeout = 0, timeoutFn = () => true) {
     let DateTimeout = null;
+    const pid = this.current_process.pid;
 
     if (timeout === 0 || timeout === Infinity) {
-      return this.suspend(fun, args);
+      const result = await this.__receive(pid, args);
+      if (result !== States.NOMATCH) {
+        return result;
+      }
+      return this.suspend(args);
     }
 
     DateTimeout = Date.now() + timeout;
     return Promise.race(
-      this.suspend(fun, args),
+      this.receive(args),
       new Promise((resolver) => {
         setTimeout(() => {
           resolver(timeoutFn());
@@ -232,21 +244,19 @@ class ProcessSystem {
     });
   }
 
-  suspend(fun, args) {
+  suspend(args) {
     this.current_process.status = States.SUSPENDED;
 
     return new Promise((resolver) => {
-      this.suspended.set(this.current_process.pid, [fun, args, resolver]);
+      this.suspended.set(this.current_process.pid, [args, resolver]);
     });
   }
 
-  schedule(fun, args, pid) {
+  pause(pid) {
     const the_pid = pid != null ? pid : this.current_process.pid;
 
-    // We return a promise that is resolved when
-    // the scheduler runs the given function
     return new Promise((resolver) => {
-      this.scheduler.schedule(the_pid, fun, args, resolver);
+      this.scheduler.pause(the_pid, resolver);
     });
   }
 

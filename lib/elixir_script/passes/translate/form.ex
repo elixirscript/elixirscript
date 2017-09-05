@@ -4,9 +4,8 @@ defmodule ElixirScript.Translate.Form do
   # Handles translation of all forms that are not functions or clauses
 
   alias ESTree.Tools.Builder, as: J
-  alias ElixirScript.Translate.Helpers
+  alias ElixirScript.Translate.{Helpers, Clause}
   alias ElixirScript.Translate.Forms.{Bitstring, Match, Try, For, Receive, Remote, Pattern, With}
-  alias ElixirScript.Translate.Clause
   require Logger
 
   @js_reserved_words [
@@ -177,7 +176,7 @@ defmodule ElixirScript.Translate.Form do
   end
 
   def compile({:case, _, [condition, [do: clauses]]}, state) do
-    ast = Helpers.call_non_scheduled(
+    ast = Helpers.call(
       J.member_expression(
         Helpers.special_forms(),
         J.identifier("_case")
@@ -214,7 +213,7 @@ defmodule ElixirScript.Translate.Form do
       J.identifier("cond")
     )
 
-    ast = Helpers.call_non_scheduled(
+    ast = Helpers.call(
       cond_function,
       processed_clauses
     )
