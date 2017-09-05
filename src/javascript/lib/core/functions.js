@@ -91,7 +91,6 @@ function build_namespace(ns, ns_string) {
   return parent;
 }
 
-//TODO: Revisit performance of .toString() in tight loop
 function map_to_object(map, options = []) {
   const opt_keys = proplists.get_value(Symbol.for('keys'), options);
   const opt_symbols = proplists.get_value(Symbol.for('symbols'), options);
