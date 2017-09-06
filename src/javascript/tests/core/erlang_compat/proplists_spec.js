@@ -13,14 +13,14 @@ test('get_value/2', (t) => {
 });
 
 test('get_value/3', (t) => {
-  let result = Core.proplists.get_value('abc', [new Core.Tuple('abc', '123')], "xyz");
+  let result = Core.proplists.get_value('abc', [new Core.Tuple('abc', '123')], 'xyz');
   t.deepEqual(result, '123');
 
-  result = Core.proplists.get_value('abcd', [new Core.Tuple('abc', '123')], "xyz");
-  t.deepEqual(result, "xyz");
+  result = Core.proplists.get_value('abcd', [new Core.Tuple('abc', '123')], 'xyz');
+  t.deepEqual(result, 'xyz');
 });
 
 test('is_defined/2', (t) => {
-  let result = Core.binary.at('abc', 0);
+  const result = Core.binary.at('abc', 0);
   t.deepEqual(result, 'a');
 });

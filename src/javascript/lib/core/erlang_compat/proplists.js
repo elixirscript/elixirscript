@@ -1,4 +1,3 @@
-import ErlangTypes from 'erlang-types';
 import lists from './lists';
 
 function get_value(key, list, defaultv = Symbol.for('undefined')) {

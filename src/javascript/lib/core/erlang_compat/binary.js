@@ -23,7 +23,7 @@ function list_to_bin(bytelist) {
   return erlang.list_to_binary(bytelist);
 }
 
-function part(subject, posOrTuple, len=null) {
+function part(subject, posOrTuple, len = null) {
   if (len === null) {
     var pos;
     [pos, len] = posOrTuple.values;
@@ -35,7 +35,7 @@ function part(subject, posOrTuple, len=null) {
 
 //TODO: Support more options
 //TODO: pattern cannot be list of strings
-function replace(subject, pattern, replacement, options=[]) {
+function replace(subject, pattern, replacement, options = []) {
   const opt_global = proplists.get_value(Symbol.for('global'), options);
 
   var regex;
@@ -50,7 +50,7 @@ function replace(subject, pattern, replacement, options=[]) {
 
 //TODO: Support more options, global is implied
 //TODO: pattern cannot be list of strings
-function split(subject, pattern, options=[]) {
+function split(subject, pattern, options = []) {
   return subject.split(pattern);
 }
 

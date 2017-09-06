@@ -55,5 +55,5 @@ export default {
   unicode,
   elixir_config,
   math,
-  proplists
+  proplists,
 };
