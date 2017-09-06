@@ -101,7 +101,7 @@ function map_to_object(map, options = []) {
     if (opt_keys === Symbol.for('string') && typeof key === 'number') {
       key = key.toString();
     } else if (
-      (opt_keys === Symbol.for('string') || opt_symbols !== Symbol.for('undefined')) 
+      (opt_keys === Symbol.for('string') || opt_symbols !== Symbol.for('undefined'))
       && typeof key === 'symbol'
     ) {
       key = erlang.atom_to_binary(key);
@@ -109,7 +109,7 @@ function map_to_object(map, options = []) {
 
     if (value instanceof Map) {
       object[key] = map_to_object(value, options);
-    } else if (opt_symbols !==  Symbol.for('undefined') && typeof value === 'symbol') {
+    } else if (opt_symbols !== Symbol.for('undefined') && typeof value === 'symbol') {
       object[key] = erlang.atom_to_binary(value);
     } else {
       object[key] = value;

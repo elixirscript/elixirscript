@@ -24,34 +24,34 @@ function list_to_bin(bytelist) {
 }
 
 function part(subject, posOrTuple, len=null) {
-    if (len === null) {
-        var pos;
-        [pos, len] = posOrTuple.values;
-        return subject.substr(pos, len);
-    } else {
-        return subject.substr(posOrTuple, len);
-    }
+  if (len === null) {
+    var pos;
+    [pos, len] = posOrTuple.values;
+    return subject.substr(pos, len);
+  } else {
+    return subject.substr(posOrTuple, len);
+  }
 }
 
 //TODO: Support more options
 //TODO: pattern cannot be list of strings
 function replace(subject, pattern, replacement, options=[]) {
-    const opt_global = proplists.get_value(Symbol.for('global'), options);
+  const opt_global = proplists.get_value(Symbol.for('global'), options);
 
-    var regex;
-    if (opt_global !== Symbol.for('undefined')) {
-        regex = new RegExp(pattern, 'g');
-    } else {
-        regex = new RegExp(pattern, '');
-    }
-    
-    return subject.replace(regex, replacement)
+  var regex;
+  if (opt_global !== Symbol.for('undefined')) {
+    regex = new RegExp(pattern, 'g');
+  } else {
+    regex = new RegExp(pattern, '');
+  }
+
+  return subject.replace(regex, replacement);
 }
 
 //TODO: Support more options, global is implied
 //TODO: pattern cannot be list of strings
 function split(subject, pattern, options=[]) {
-    return subject.split(pattern)
+  return subject.split(pattern);
 }
 
 export default {

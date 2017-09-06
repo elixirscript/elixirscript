@@ -36,6 +36,6 @@ test('keyfind/3', (t) => {
   let result = Core.lists.keyfind('abc', 1, ['abc']);
   t.deepEqual(result, false);
 
-  result = Core.lists.keyfind('abc', 1, [{'abc'}]);
-  t.deepEqual(result, true);
+  result = Core.lists.keyfind('abc', 1, [new Core.Tuple('abc')]);
+  t.deepEqual(result, new Core.Tuple('abc'));
 });
