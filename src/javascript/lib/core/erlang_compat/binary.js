@@ -10,12 +10,16 @@ function copy(subject, n = 1) {
 }
 
 function first(subject) {
-  //TODO: raise badarg on size 0
+  if (subject.length == 0) {
+    throw new Error(`Binary is of length 0`);
+  }
   return at(subject, 0);
 }
 
 function last(subject) {
-  //TODO: raise badarg on size 0
+  if (subject.length == 0) {
+    throw new Error(`Binary is of length 0`);
+  }
   return subject.slice(-1);
 }
 
