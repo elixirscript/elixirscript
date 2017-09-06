@@ -1,5 +1,5 @@
+import Patterns from 'tailored';
 import States from './states';
-import Core from '../../core';
 
 class Process {
   constructor(pid, func, args, mailbox, system) {
@@ -18,7 +18,7 @@ class Process {
     let retval = States.NORMAL;
 
     try {
-      await this.system.pause(this.pid);
+      await this.system.set_current(this.pid);
       await this.func.apply(null, this.args);
     } catch (e) {
       console.error(e);
@@ -52,16 +52,16 @@ class Process {
 
     for (let i = 0; i < messages.length; i++) {
       for (const clause of clauses) {
-        const value = await Core.Patterns.match_or_default_async(
-          clause[0].pattern,
+        const value = await Patterns.match_or_default_async(
+          clause.pattern,
           messages[i],
-          clause[0].guard,
+          clause.guard,
           States.NOMATCH,
         );
 
         if (value !== States.NOMATCH) {
           this.mailbox.removeAt(i);
-          return clause[1].apply(null, value);
+          return clause.fn.apply(null, value);
         }
       }
     }

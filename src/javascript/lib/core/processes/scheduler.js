@@ -1,5 +1,3 @@
-import Task from './task';
-
 class ProcessQueue {
   constructor(pid) {
     this.pid = pid;
@@ -59,12 +57,13 @@ class Scheduler {
     } else {
       for (const [pid, queue] of this.queues) {
         let reductions = 0;
-
-        this.system.set_current(pid);
         while (queue && !queue.empty() && reductions < this.reductions_per_process) {
           const resolver = queue.next();
           this.isRunning = true;
+
           resolver(true);
+          this.system.set_current(pid);
+          console.log(`Scheduler ${pid}`);
           this.isRunning = false;
           reductions++;
         }
@@ -78,6 +77,10 @@ class Scheduler {
 
   pause(pid, resolver) {
     this.addToQueue(pid, resolver);
+  }
+
+  schedule(pid, fun, args, resolver) {
+    this.addToQueue(pid, [fun, args, resolver]);
   }
 }
 

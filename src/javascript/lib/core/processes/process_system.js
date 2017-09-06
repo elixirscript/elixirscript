@@ -188,8 +188,10 @@ class ProcessSystem {
 
     if (pid) {
       this.mailboxes.get(pid).deliver(msg);
-
+      console.log('sending');
+      console.log(pid);
       if (this.suspended.has(pid)) {
+        console.log('Got suspended');
         const [args, resolver] = this.suspended.get(pid);
 
         const result = await this.__receive(pid, args);
@@ -204,6 +206,7 @@ class ProcessSystem {
   }
 
   async __receive(pid, args) {
+    this.set_current(pid);
     const process = this.pids.get(pid);
     return process.receive(args);
   }
@@ -211,13 +214,15 @@ class ProcessSystem {
   async receive(args, timeout = 0, timeoutFn = () => true) {
     let DateTimeout = null;
     const pid = this.current_process.pid;
-
+    console.log('Received');
+    console.log(pid);
     if (timeout === 0 || timeout === Infinity) {
       const result = await this.__receive(pid, args);
+      console.log(result);
       if (result !== States.NOMATCH) {
         return result;
       }
-      return this.suspend(args);
+      return this.suspend(pid, args);
     }
 
     DateTimeout = Date.now() + timeout;
@@ -244,11 +249,13 @@ class ProcessSystem {
     });
   }
 
-  suspend(args) {
+  suspend(pid, args) {
     this.current_process.status = States.SUSPENDED;
+    console.log(pid);
 
     return new Promise((resolver) => {
-      this.suspended.set(this.current_process.pid, [args, resolver]);
+      this.suspended.set(pid, [args, resolver]);
+      console.log('suspended');
     });
   }
 
