@@ -25,9 +25,6 @@ function call_property(item, property) {
       throw new Error(`Property ${property} not found in ${item}`);
     }
 
-    if (item.get(prop) instanceof Function || typeof item.get(prop) === 'function') {
-      return item.get(prop)();
-    }
     return item.get(prop);
   }
 
