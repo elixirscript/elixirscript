@@ -23,28 +23,54 @@ test('split_at', (t) => {
   t.deepEqual(Functions.split_at('😀abélkm', 4).values, ['😀abé', 'lkm']);
 });
 
-//TODO: Fix these tests
-/*test('map_to_object/1', (t) => {
-  const s_key = Symbol.for('key');
-  const s_anotherKey = Symbol.for('anotherKey');
-
-  const map = new Map([[s_key, 'value'], [s_anotherKey, 'value2']]);
+test('map_to_object/1', (t) => {
+  const map = new Map([[Symbol.for('key'), 'value'], [Symbol.for('anotherKey'), 'value2']]);
   const result = Functions.map_to_object(map);
-  t.deepEqual(result, { s_key: 'value', s_anotherKey: 'value2' });
+  const obj = {};
+  obj[Symbol.for('key')] = 'value';
+  obj[Symbol.for('anotherKey')] = 'value2';
+  t.deepEqual(result, obj);
 });
 
 test('map_to_object/2', (t) => {
-  const s_key = Symbol.for('key');
-  const s_anotherKey = Symbol.for('anotherKey');
-
-  const map = new Map([[s_key, 'value'], [s_anotherKey, 'value2']]);
-  const options = [new Core.Tuple(Symbol.for('keys'), Symbol.for('strings'))];
+  const map = new Map([[Symbol.for('key'), 'value'], [Symbol.for('anotherKey'), 'value2']]);
+  const options = [new Core.Tuple(Symbol.for('keys'), Symbol.for('string'))];
   const result = Functions.map_to_object(map, options);
 
   t.deepEqual(result, { key: 'value', anotherKey: 'value2' });
+});
 
-  map = new Map([[s_key, 'value'], [s_anotherKey, 'value2']]);
-  result = Functions.map_to_object(map, []);
+test('object_to_map/1', (t) => {
+  let obj = {};
+  let result = Functions.object_to_map(obj);
+  t.deepEqual(result, new Map());
 
-  t.deepEqual(result, { s_key: 'value', s_anotherKey: 'value2' });
-});*/
+  obj = {key: 'value'};
+  result = Functions.object_to_map(obj);
+  t.deepEqual(result, new Map([['key', 'value']]));
+
+  obj = {};
+  obj[Symbol.for('key')] = 'value';
+  result = Functions.object_to_map(obj);
+  t.deepEqual(result, new Map([[Symbol.for('key'), 'value']]));
+});
+
+test('object_to_map/2', (t) => {
+  let obj = {};
+  let result = Functions.object_to_map(obj, []);
+  t.deepEqual(result, new Map());
+
+  obj = {key: 'value'};
+  result = Functions.object_to_map(obj, [new Core.Tuple(Symbol.for('keys'), Symbol.for('atom'))]);
+  t.deepEqual(result, new Map([[Symbol.for('key'), 'value']]));
+
+  obj = {};
+  obj[Symbol.for('key')] = [{nest1: 'valuenest1'},{nest2: 'valuenest2'}];
+  result = Functions.object_to_map(obj, [
+    new Core.Tuple(Symbol.for('keys'), Symbol.for('atom')), 
+    new Core.Tuple(Symbol.for('recurse_array'), true)]);
+  t.deepEqual(result, new Map([[Symbol.for('key'), [
+    new Map([[Symbol.for('nest1'), 'valuenest1']]),
+    new Map([[Symbol.for('nest2'), 'valuenest2']])
+  ]]]));
+});

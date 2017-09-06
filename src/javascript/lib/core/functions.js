@@ -119,6 +119,39 @@ function map_to_object(map, options = []) {
   return object;
 }
 
+function object_to_map(object, options = []) {
+  const opt_atom_keys = proplists.get_value(Symbol.for('keys'), options) === Symbol.for('atom');
+  const opt_recurse_array = proplists.get_value(Symbol.for('recurse_array'), options) === true;
+
+  if (object.constructor === Object) {
+    let map = new Map();
+    Reflect.ownKeys(object).forEach(key => {
+      let key2 = key;
+      let value = object[key];
+      if (opt_atom_keys && typeof key === 'string') {
+        key2 = Symbol.for(key);
+      }
+
+      if (value.constructor === Object || (value instanceof Array && opt_recurse_array)) {
+        value = object_to_map(value, options);
+      }
+      map.set(key2, value);
+    });
+    return map;
+
+  } else if (object instanceof Array && opt_recurse_array) {
+    return object.map(function(ele) {
+      if (ele.constructor === Object || ele instanceof Array) {
+        return object_to_map(ele, options);
+      }
+      return ele;
+    });
+
+  } else {
+    throw new Error(`Object ${object} is not an native object or array`);
+  }
+}
+
 class Recurse {
   constructor(func) {
     this.func = func;
@@ -168,6 +201,7 @@ export default {
   defimpl,
   build_namespace,
   map_to_object,
+  object_to_map,
   trampoline,
   Recurse,
   split_at,
