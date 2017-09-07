@@ -23,3 +23,19 @@ test('foldl', (t) => {
 test('foldr', (t) => {
   t.deepEqual(Core.lists.foldr((v, acc) => acc + v.toString(), '', [1, 2, 3]), '321');
 });
+
+test('member/2', (t) => {
+  let result = Core.lists.member('abc', ['abc']);
+  t.deepEqual(result, true);
+
+  result = Core.lists.member('abc', ['abcd']);
+  t.deepEqual(result, false);
+});
+
+test('keyfind/3', (t) => {
+  let result = Core.lists.keyfind('abc', 1, ['abc']);
+  t.deepEqual(result, false);
+
+  result = Core.lists.keyfind('abc', 1, [new Core.Tuple('abc')]);
+  t.deepEqual(result, new Core.Tuple('abc'));
+});

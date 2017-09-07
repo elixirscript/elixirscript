@@ -229,6 +229,9 @@ function bit_size(bitstring) {
 }
 
 function byte_size(bitstring) {
+  if (typeof bitstring === 'string' || bitstring instanceof String) {
+    return bitstring.length;
+  }
   return bitstring.byte_size;
 }
 

@@ -91,11 +91,40 @@ defmodule ElixirScript.Translate.Forms.JS do
     {ast, state}
   end
 
-  def compile({{:., _, [ElixirScript.JS, :map_to_object]}, _, [object]}, state) do
+  def compile({{:., _, [ElixirScript.JS, :map_to_object]}, _, [map]}, state) do
     ast = Helpers.call(
       J.member_expression(
         Helpers.functions(),
         J.identifier("map_to_object")
+      ),
+      [
+        Form.compile!(map, state)
+      ]
+    )
+
+    {ast, state}
+  end
+
+  def compile({{:., _, [ElixirScript.JS, :map_to_object]}, _, [map, options]}, state) do
+    ast = Helpers.call(
+      J.member_expression(
+        Helpers.functions(),
+        J.identifier("map_to_object")
+      ),
+      [
+        Form.compile!(map, state),
+        Form.compile!(options, state)
+      ]
+    )
+
+    {ast, state}
+  end
+
+  def compile({{:., _, [ElixirScript.JS, :object_to_map]}, _, [object]}, state) do
+    ast = Helpers.call(
+      J.member_expression(
+        Helpers.functions(),
+        J.identifier("object_to_map")
       ),
       [
         Form.compile!(object, state)
@@ -105,11 +134,11 @@ defmodule ElixirScript.Translate.Forms.JS do
     {ast, state}
   end
 
-  def compile({{:., _, [ElixirScript.JS, :map_to_object]}, _, [object, options]}, state) do
+  def compile({{:., _, [ElixirScript.JS, :object_to_map]}, _, [object, options]}, state) do
     ast = Helpers.call(
       J.member_expression(
         Helpers.functions(),
-        J.identifier("map_to_object")
+        J.identifier("object_to_map")
       ),
       [
         Form.compile!(object, state),
