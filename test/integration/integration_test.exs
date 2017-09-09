@@ -19,4 +19,9 @@ defmodule ElixirScript.Integration.Test do
       [:option, %{value: "test2@hotmail.com"}, "test2@hotmail.com"]
     ]
   end
+
+  test "map equals" do
+    val = call_compiled_function Integration, :map_equals, []
+    assert val == true
+  end
 end

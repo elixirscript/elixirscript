@@ -10,4 +10,10 @@ defmodule Integration do
     options = Enum.reduce(orders, [],
     &(&2 ++ [ [:option, %{value: &1.email}, &1.email] ]))
   end
+
+  def map_equals do
+    map1 = %{test: "map"}
+    map2 = %{test: "map"}
+    map1 == map2
+  end
 end

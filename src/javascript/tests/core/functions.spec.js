@@ -45,7 +45,7 @@ test('object_to_map/1', (t) => {
   let result = Functions.object_to_map(obj);
   t.deepEqual(result, new Map());
 
-  obj = {key: 'value'};
+  obj = { key: 'value' };
   result = Functions.object_to_map(obj);
   t.deepEqual(result, new Map([['key', 'value']]));
 
@@ -60,17 +60,26 @@ test('object_to_map/2', (t) => {
   let result = Functions.object_to_map(obj, []);
   t.deepEqual(result, new Map());
 
-  obj = {key: 'value'};
+  obj = { key: 'value' };
   result = Functions.object_to_map(obj, [new Core.Tuple(Symbol.for('keys'), Symbol.for('atom'))]);
   t.deepEqual(result, new Map([[Symbol.for('key'), 'value']]));
 
   obj = {};
-  obj[Symbol.for('key')] = [{nest1: 'valuenest1'},{nest2: 'valuenest2'}];
+  obj[Symbol.for('key')] = [{ nest1: 'valuenest1' }, { nest2: 'valuenest2' }];
   result = Functions.object_to_map(obj, [
-    new Core.Tuple(Symbol.for('keys'), Symbol.for('atom')), 
-    new Core.Tuple(Symbol.for('recurse_array'), true)]);
-  t.deepEqual(result, new Map([[Symbol.for('key'), [
-    new Map([[Symbol.for('nest1'), 'valuenest1']]),
-    new Map([[Symbol.for('nest2'), 'valuenest2']])
-  ]]]));
+    new Core.Tuple(Symbol.for('keys'), Symbol.for('atom')),
+    new Core.Tuple(Symbol.for('recurse_array'), true),
+  ]);
+  t.deepEqual(
+    result,
+    new Map([
+      [
+        Symbol.for('key'),
+        [
+          new Map([[Symbol.for('nest1'), 'valuenest1']]),
+          new Map([[Symbol.for('nest2'), 'valuenest2']]),
+        ],
+      ],
+    ]),
+  );
 });

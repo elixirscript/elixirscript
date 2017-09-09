@@ -253,7 +253,19 @@ defmodule ElixirScript.Translate.Form do
     {ast, state}
   end
 
-  def compile({{:., _, [:erlang, op]}, _, [left, right]}, state) when op in [:+, :-, :*, :/, :==, :>, :<, :>=] do
+  def compile({{:., _, [:erlang, op]}, _, [left, right]}, state) when op in [:==, :===] do
+    ast = Helpers.call(
+      J.member_expression(
+        Helpers.core_module("erlang"),
+        J.identifier("equals")
+      ),
+      [compile!(left, state), compile!(right, state)]
+    )
+
+    {ast, state}
+  end
+
+  def compile({{:., _, [:erlang, op]}, _, [left, right]}, state) when op in [:+, :-, :*, :/, :>, :<, :>=] do
     ast = J.binary_expression(
       op,
       compile!(left, state),
