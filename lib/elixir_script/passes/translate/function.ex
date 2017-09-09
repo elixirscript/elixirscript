@@ -168,7 +168,7 @@ defmodule ElixirScript.Translate.Function do
     {ast, state}
   end
 
-  defp update_last_call(clause_body, %{function: {name, _}, anonymous_fn: anonymous?}) do
+  def update_last_call(clause_body, %{function: {name, _}, anonymous_fn: anonymous?}) do
     last_item = List.last(clause_body)
     function_name = ElixirScript.Translate.Identifier.make_function_name(name)
 

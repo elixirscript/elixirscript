@@ -198,6 +198,10 @@ function graphemes(str) {
   return splitter.splitGraphemes(str);
 }
 
+function concat(head, tail) {
+  return [head].concat(tail);
+}
+
 export default {
   call_property,
   defprotocol,
@@ -209,4 +213,5 @@ export default {
   Recurse,
   split_at,
   graphemes,
+  concat,
 };

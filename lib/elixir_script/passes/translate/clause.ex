@@ -17,6 +17,7 @@ defmodule ElixirScript.Translate.Clause do
 
     body = body
     |> return_last_statement
+    |> Function.update_last_call(state)
 
     ast = Helpers.call(
       J.member_expression(

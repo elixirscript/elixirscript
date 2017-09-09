@@ -56,25 +56,17 @@ defmodule ElixirScript.Translate.Form do
     { J.literal(form), state }
   end
 
-  def compile([{:|, _, [head, tail]}], state) do
-    ast = Helpers.call(
-      J.member_expression(
-        J.array_expression([compile!(head, state)]),
-        J.identifier("concat")
-      ),
-      [compile!(tail, state)]
-    )
-
-    { ast, state }
+  def compile([{:|, _, [_head, _tail]} = ast], state) do
+    compile(ast, state)
   end
 
   def compile({:|, _, [head, tail]}, state) do
     ast = Helpers.call(
       J.member_expression(
-        J.array_expression([compile!(head, state)]),
+        Helpers.functions(),
         J.identifier("concat")
       ),
-      [compile!(tail, state)]
+      [compile!(head, state), compile!(tail, state)]
     )
 
     { ast, state }
