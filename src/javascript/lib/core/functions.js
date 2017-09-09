@@ -98,8 +98,8 @@ function map_to_object(map, options = []) {
     if (opt_keys === Symbol.for('string') && typeof key === 'number') {
       key = key.toString();
     } else if (
-      (opt_keys === Symbol.for('string') || opt_symbols !== Symbol.for('undefined'))
-      && typeof key === 'symbol'
+      (opt_keys === Symbol.for('string') || opt_symbols !== Symbol.for('undefined')) &&
+      typeof key === 'symbol'
     ) {
       key = erlang.atom_to_binary(key);
     }
@@ -121,8 +121,8 @@ function object_to_map(object, options = []) {
   const opt_recurse_array = proplists.get_value(Symbol.for('recurse_array'), options) === true;
 
   if (object.constructor === Object) {
-    let map = new Map();
-    Reflect.ownKeys(object).forEach(key => {
+    const map = new Map();
+    Reflect.ownKeys(object).forEach((key) => {
       let key2 = key;
       let value = object[key];
       if (opt_atom_keys && typeof key === 'string') {
@@ -135,18 +135,15 @@ function object_to_map(object, options = []) {
       map.set(key2, value);
     });
     return map;
-
   } else if (object instanceof Array && opt_recurse_array) {
-    return object.map(function(ele) {
+    return object.map((ele) => {
       if (ele.constructor === Object || ele instanceof Array) {
         return object_to_map(ele, options);
       }
       return ele;
     });
-
-  } else {
-    throw new Error(`Object ${object} is not an native object or array`);
   }
+  throw new Error(`Object ${object} is not an native object or array`);
 }
 
 class Recurse {
