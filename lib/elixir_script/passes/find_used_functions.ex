@@ -9,18 +9,23 @@ defmodule ElixirScript.FindUsedFunctions do
   """
   @spec execute([atom], pid) :: nil
   def execute(entry_modules, pid) do
-    Enum.each(entry_modules, fn
+    entry_modules
+    |> List.wrap
+    |> Task.async_stream(fn
       module ->
         walk_module(module, pid)
     end)
+    |> Stream.run()
 
-    modules = ElixirScript.State.list_modules(pid)
-    Enum.each(modules, fn
+    pid
+    |> ElixirScript.State.list_modules
+    |> Task.async_stream(fn
       {module, info} ->
         if get_in(info, [:attributes, :protocol_impl]) do
           walk_module(module, pid)
         end
     end)
+    |> Stream.run()
   end
 
   defp walk_module(module, pid) do

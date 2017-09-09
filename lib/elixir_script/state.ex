@@ -25,7 +25,8 @@ defmodule ElixirScript.State do
   def put_module(pid, module, value) do
     Agent.update(pid, fn(state) ->
       value = Map.put(value, :used, [])
-      %{ state | modules: Keyword.put(state.modules, module, value) }
+      modules = Keyword.put(state.modules, module, value)
+      %{ state | modules: modules }
     end)
   end
 
@@ -41,7 +42,7 @@ defmodule ElixirScript.State do
       module_info = Keyword.get(state.modules, module)
 
       used = Map.get(module_info, :used, [])
-      used = used ++ [func]
+      used = [func | used]
 
       module_info = Map.put(module_info, :used, used)
       modules = Keyword.put(state.modules, module, module_info)
@@ -53,7 +54,7 @@ defmodule ElixirScript.State do
   def put_javascript_module(pid, module, name, path) do
     Agent.update(pid, fn(state) ->
       js_modules = Map.get(state, :js_modules, [])
-      js_modules = js_modules ++ [{module, name, path}]
+      js_modules = [{module, name, path} | js_modules]
       %{ state | js_modules: js_modules }
     end)
   end
