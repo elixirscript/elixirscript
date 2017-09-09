@@ -323,7 +323,7 @@ defmodule ElixirScript.Translate.Form do
     {ast, state}
   end
 
-  def compile({{:., _, [{_, _, atom} = var, func_or_prop]}, _, []}, state) when is_atom(atom) do
+  def compile({{:., _, [var, func_or_prop]}, _, []}, state) when not is_atom(var) do
     ast = Helpers.call(
       ElixirScript.Translate.Forms.JS.call_property(),
       [compile!(var, state), J.literal(to_string(func_or_prop))]

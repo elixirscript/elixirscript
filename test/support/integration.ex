@@ -10,4 +10,9 @@ defmodule Integration do
     options = Enum.reduce(orders, [],
     &(&2 ++ [ [:option, %{value: &1.email}, &1.email] ]))
   end
+
+  def multi_field_call do
+    map = %{token_count: 5000000}
+    map.token_count.toLocaleString()
+  end
 end
