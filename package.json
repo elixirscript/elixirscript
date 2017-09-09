@@ -21,10 +21,12 @@
   "license": "MIT",
   "dependencies": {
     "erlang-types": "^1.0.1",
+    "grapheme-splitter": "^1.0.2",
+    "rollup-plugin-commonjs": "^8.2.1",
     "tailored": "^2.7.2"
   },
   "devDependencies": {
-    "@std/esm": "^0.5.1",
+    "@std/esm": "^0.8.3",
     "ava": "^0.21.0",
     "babel-core": "^6.24.0",
     "babel-preset-env": "^1.6.0",
@@ -40,7 +42,9 @@
     "sinon": "^2.4.1"
   },
   "ava": {
-    "require": ["babel-register"],
+    "require": [
+      "babel-register"
+    ],
     "babel": {
       "babelrc": true
     }

@@ -86,7 +86,7 @@ defmodule ElixirScript.String do
   end
 
   def graphemes(str) do
-    str.split('')
+    ElixirScript.Core.Functions.graphemes(str)
   end
 
   def length(str) do
