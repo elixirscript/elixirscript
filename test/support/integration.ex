@@ -16,4 +16,9 @@ defmodule Integration do
     map2 = %{test: "map"}
     map1 == map2
   end
+
+  def multi_field_call do
+    map = %{token_count: 5000000}
+    map.token_count.toLocaleString()
+  end
 end
