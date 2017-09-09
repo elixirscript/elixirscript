@@ -7,7 +7,7 @@ defmodule Integration do
 
   def shorthand_failure do
     orders = [%{email: "test@hotmail.com"},%{email: "test2@hotmail.com"}]
-    options = Enum.reduce(orders, [],
+    Enum.reduce(orders, [],
     &(&2 ++ [ [:option, %{value: &1.email}, &1.email] ]))
   end
 

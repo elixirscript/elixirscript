@@ -132,3 +132,34 @@ test('equals', (t) => {
   t.is(Core.erlang.equals(ref, ref), true);
   t.is(Core.erlang.equals(ref, new Core.Reference()), false);
 });
+
+test('error/1', (t) => {
+  let error = t.throws(() => {
+    Core.erlang.error(
+      new Map([
+        [Symbol.for('__exception__'), true],
+        [Symbol.for('message'), 'hi'],
+        [
+          Symbol.for('__struct__'),
+          {
+            __MODULE__: Symbol.for('Elixir.ArgumentError'),
+          },
+        ],
+      ]),
+    );
+  }, Error);
+
+  t.is(error.message, '** (ArgumentError) hi');
+
+  error = t.throws(() => {
+    Core.erlang.error('hi');
+  }, Error);
+
+  t.is(error.message, '** (RuntimeError) hi');
+
+  error = t.throws(() => {
+    Core.erlang.error(new Core.Tuple('abc', 's'));
+  }, Error);
+
+  t.is(error.message, '** (ErlangError) Erlang Error {abc, s}');
+});
