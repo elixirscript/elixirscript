@@ -38,8 +38,6 @@ defmodule Helpers do
 
     {out, _a} = System.cmd "node", ["-r", "@std/esm", main_path]
 
-    IO.puts out
-
     out
     |> Poison.decode!
     |> ElixirScript.TermConverter.decode
