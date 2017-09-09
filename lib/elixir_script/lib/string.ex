@@ -68,7 +68,6 @@ defmodule ElixirScript.String do
     end)
   end
 
-
   def next_grapheme(nil), do: nil
   def next_grapheme(""), do: nil
 

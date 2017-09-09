@@ -55,7 +55,6 @@ defmodule ElixirScript.JS do
   Throws an error if any key is not a
   number, binary, or atom
 
-
   ```elixir
   ElixirScript.JS.map_to_object(%{my: "map"})
   ```
@@ -76,7 +75,6 @@ defmodule ElixirScript.JS do
     @doc """
   Takes the given object and returns a map
   Options include [{:keys, :atom}, {:recurse_array, true}]
-
 
   ```elixir
   ElixirScript.JS.object_to_object({my: "object"})
