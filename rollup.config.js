@@ -4,21 +4,21 @@ import babel from 'rollup-plugin-babel';
 import minify from 'rollup-plugin-babel-minify';
 
 export default {
-  entry: 'src/javascript/elixir.js',
-  moduleName: 'ElixirScript',
+  input: 'src/javascript/elixir.js',
+  name: 'ElixirScript',
   plugins: [
     nodeResolve({
       jsnext: true,
-      main: true,
+      main: true
     }),
     commonjs(),
     babel({
-      babelrc: false,
+      babelrc: false
     }),
     minify({
       keepFnName: true,
-      keepClassName: true,
-    }),
+      keepClassName: true
+    })
   ],
-  targets: [{ dest: 'priv/build/iife/ElixirScript.Core.js', format: 'iife' }],
+  output: [{ file: 'priv/build/iife/ElixirScript.Core.js', format: 'iife' }]
 };
