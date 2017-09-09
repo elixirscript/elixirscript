@@ -1,3 +1,4 @@
+import GraphemeSplitter from 'grapheme-splitter';
 import Protocol from './protocol';
 import Core from '../core';
 import proplists from './erlang_compat/proplists';
@@ -163,8 +164,11 @@ function trampoline(f) {
 }
 
 function split_at(value, position) {
+  const splitter = new GraphemeSplitter();
+  const splitValues = splitter.splitGraphemes(value);
+
   if (position < 0) {
-    const newPosition = value.length + position;
+    const newPosition = splitValues.length + position;
     if (newPosition < 0) {
       return new Core.Tuple('', value);
     }
@@ -176,7 +180,7 @@ function split_at(value, position) {
   let second = '';
   let index = 0;
 
-  for (const character of value) {
+  for (const character of splitValues) {
     if (index < position) {
       first += character;
     } else {
@@ -189,6 +193,11 @@ function split_at(value, position) {
   return new Core.Tuple(first, second);
 }
 
+function graphemes(str) {
+  const splitter = new GraphemeSplitter();
+  return splitter.splitGraphemes(str);
+}
+
 export default {
   call_property,
   defprotocol,
@@ -199,4 +208,5 @@ export default {
   trampoline,
   Recurse,
   split_at,
+  graphemes,
 };

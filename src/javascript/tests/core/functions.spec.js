@@ -21,6 +21,7 @@ test('split_at', (t) => {
   t.deepEqual(Functions.split_at('abc', 1000).values, ['abc', '']);
   t.deepEqual(Functions.split_at('abc', -1000).values, ['', 'abc']);
   t.deepEqual(Functions.split_at('😀abélkm', 4).values, ['😀abé', 'lkm']);
+  t.deepEqual(Functions.split_at('👨‍👩‍👦‍👦abélkm', 4).values, ['👨‍👩‍👦‍👦abé', 'lkm']);
 });
 
 test('map_to_object/1', (t) => {

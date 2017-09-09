@@ -86,11 +86,11 @@ defmodule ElixirScript.String do
   end
 
   def graphemes(str) do
-    str.split('')
+    ElixirScript.Core.Functions.graphemes(str)
   end
 
   def length(str) do
-    str.length()
+    graphemes(str).length()
   end
 
   def match?(str, regex) do
