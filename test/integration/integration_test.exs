@@ -11,4 +11,12 @@ defmodule ElixirScript.Integration.Test do
     val = call_compiled_function Integration, :test_string_interpolation, []
     assert val == "5"
   end
+
+  test "shorthand failure" do
+    val = call_compiled_function Integration, :shorthand_failure, []
+    assert val == [
+      [:option, %{value: "test@hotmail.com"}, "test@hotmail.com"],
+      [:option, %{value: "test2@hotmail.com"}, "test2@hotmail.com"]
+    ]
+  end
 end
