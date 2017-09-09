@@ -39,6 +39,7 @@ export default {
   Tuple: ErlangTypes.Tuple,
   PID: ErlangTypes.PID,
   BitString: ErlangTypes.BitString,
+  Reference: ErlangTypes.Reference,
   Patterns,
   Integer,
   Float,

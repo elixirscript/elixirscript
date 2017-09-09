@@ -20,6 +20,11 @@ defmodule ElixirScript.Integration.Test do
     ]
   end
 
+  test "map equals" do
+    val = call_compiled_function Integration, :map_equals, []
+    assert val == true
+  end
+
   test "multi-remote call" do
     val = call_compiled_function Integration, :multi_field_call, []
     assert val == "5,000,000"

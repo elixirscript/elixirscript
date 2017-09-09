@@ -10,15 +10,15 @@ function copy(subject, n = 1) {
 }
 
 function first(subject) {
-  if (subject.length == 0) {
-    throw new Error(`Binary is of length 0`);
+  if (subject.length === 0) {
+    throw new Error('Binary is of length 0');
   }
   return at(subject, 0);
 }
 
 function last(subject) {
-  if (subject.length == 0) {
-    throw new Error(`Binary is of length 0`);
+  if (subject.length === 0) {
+    throw new Error('Binary is of length 0');
   }
   return subject.slice(-1);
 }
@@ -29,20 +29,19 @@ function list_to_bin(bytelist) {
 
 function part(subject, posOrTuple, len = null) {
   if (len === null) {
-    var pos;
-    [pos, len] = posOrTuple.values;
-    return subject.substr(pos, len);
-  } else {
-    return subject.substr(posOrTuple, len);
+    const [pos, theLen] = posOrTuple.values;
+    return subject.substr(pos, theLen);
   }
+
+  return subject.substr(posOrTuple, len);
 }
 
-//TODO: Support more options
-//TODO: pattern cannot be list of strings
+// TODO: Support more options
+// TODO: pattern cannot be list of strings
 function replace(subject, pattern, replacement, options = []) {
   const opt_global = proplists.get_value(Symbol.for('global'), options);
 
-  var regex;
+  let regex;
   if (opt_global !== Symbol.for('undefined')) {
     regex = new RegExp(pattern, 'g');
   } else {
@@ -52,8 +51,8 @@ function replace(subject, pattern, replacement, options = []) {
   return subject.replace(regex, replacement);
 }
 
-//TODO: Support more options, global is implied
-//TODO: pattern cannot be list of strings
+// TODO: Support more options, global is implied
+// TODO: pattern cannot be list of strings
 function split(subject, pattern, options = []) {
   return subject.split(pattern);
 }
