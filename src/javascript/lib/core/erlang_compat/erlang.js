@@ -478,7 +478,19 @@ function _throw(term) {
 }
 
 function error(reason) {
-  throw new ErlangTypes.Tuple(reason, []);
+  if (reason instanceof Map && reason.has(Symbol.for('__exception__'))) {
+    let name = Symbol.keyFor(reason.get(Symbol.for('__struct__')).__MODULE__);
+    name = name
+      .split('.')
+      .slice(1)
+      .join('.');
+    const message = reason.get(Symbol.for('message'));
+    throw new Error(`** (${name}) ${message}`);
+  } else if (is_binary(reason)) {
+    throw new Error(`** (RuntimeError) ${reason}`);
+  } else {
+    throw new Error(`** (ErlangError) Erlang Error ${reason.toString()}`);
+  }
 }
 
 function exit(...args) {
