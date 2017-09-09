@@ -18,7 +18,7 @@ defmodule ElixirScript.Translate.Forms.Map.Test do
   property "maps convert to Map objects", %{state: state} do
     check all tuple <- StreamData.tuple({
       StreamData.one_of([
-        StreamData.int(),
+        StreamData.integer(),
         StreamData.boolean(),
         StreamData.binary(),
         StreamData.uniform_float()
@@ -46,8 +46,8 @@ defmodule ElixirScript.Translate.Forms.Map.Test do
 
   property "maps update converts to new Map objects using old version", %{state: state} do
     check all key <- StreamData.binary(),
-              old_value <- StreamData.int(),
-              new_value <- StreamData.int() do
+              old_value <- StreamData.integer(),
+              new_value <- StreamData.integer() do
 
       properties = [{key, old_value}]
       map_ast = {:%{}, [], properties}

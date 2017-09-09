@@ -20,7 +20,7 @@ defmodule ElixirScript.Translate.Forms.Test do
 
   property "integers, floats, binaries, and booleans translates to a literal JavaScript AST node", %{state: state} do
     check all value <- StreamData.one_of([
-        StreamData.int(),
+        StreamData.integer(),
         StreamData.boolean(),
         StreamData.binary(),
         StreamData.uniform_float()
@@ -44,7 +44,7 @@ defmodule ElixirScript.Translate.Forms.Test do
   end
 
   property "tuple translates to new Tuple object", %{state: state} do
-    check all tuple <- StreamData.tuple({StreamData.int(), StreamData.binary()}) do
+    check all tuple <- StreamData.tuple({StreamData.integer(), StreamData.binary()}) do
       {js_ast, _} = Form.compile(tuple, state)
       assert js_ast == J.new_expression(
         J.member_expression(
