@@ -55,7 +55,9 @@ test('replace/3', (t) => {
 });
 
 test('replace/4', (t) => {
-  const result = Core.binary.replace('abcb', 'b', 'c', [new Core.Tuple(Symbol.for('global'), true)]);
+  const result = Core.binary.replace('abcb', 'b', 'c', [
+    new Core.Tuple(Symbol.for('global'), true),
+  ]);
   t.deepEqual(result, 'accc');
 });
 
