@@ -19,4 +19,9 @@ defmodule ElixirScript.Integration.Test do
       [:option, %{value: "test2@hotmail.com"}, "test2@hotmail.com"]
     ]
   end
+
+  test "multi-remote call" do
+    val = call_compiled_function Integration, :multi_field_call, []
+    assert val == "5,000,000"
+  end
 end
