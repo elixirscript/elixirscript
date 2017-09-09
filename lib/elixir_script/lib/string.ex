@@ -90,7 +90,7 @@ defmodule ElixirScript.String do
   end
 
   def length(str) do
-    str.length()
+    graphemes(str).length()
   end
 
   def match?(str, regex) do
