@@ -93,6 +93,7 @@ defmodule ElixirScript.Translate.Clause do
   end
 
   def compile_guard(params, guards, state) do
+    state = Map.put(state, :in_guard, true)
 
     guards = guards
     |> List.wrap
