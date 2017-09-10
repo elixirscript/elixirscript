@@ -16,7 +16,7 @@ function cond(...clauses) {
 
 function run_list_generators(generator, generators) {
   if (generators.length === 0) {
-    return generator.map(x => {
+    return generator.map((x) => {
       if (Array.isArray(x)) {
         return x;
       }
@@ -36,29 +36,24 @@ function run_list_generators(generator, generators) {
 }
 
 function _for(expression, generators, collectable_protocol, into = []) {
-  let [result, fun] = collectable_protocol.into(into);
+  const [result, fun] = collectable_protocol.into(into);
+  let accumulatingResult = result;
 
   const generatedValues = run_list_generators(generators.pop()(), generators);
 
   for (const value of generatedValues) {
     if (expression.guard.apply(this, value)) {
-      result = fun(
-        result,
-        new Core.Tuple(Symbol.for('cont'), expression.fn.apply(this, value))
+      accumulatingResult = fun(
+        accumulatingResult,
+        new Core.Tuple(Symbol.for('cont'), expression.fn.apply(this, value)),
       );
     }
   }
 
-  return fun(result, Symbol.for('done'));
+  return fun(accumulatingResult, Symbol.for('done'));
 }
 
-function _try(
-  do_fun,
-  rescue_function,
-  catch_fun,
-  else_function,
-  after_function
-) {
+function _try(do_fun, rescue_function, catch_fun, else_function, after_function) {
   let result = null;
 
   try {
@@ -153,7 +148,7 @@ function receive(clauses, timeout = 0, timeoutFn = () => true) {
         clause.pattern,
         messages[i],
         clause.guard,
-        NOMATCH
+        NOMATCH,
       );
 
       if (value !== NOMATCH) {
