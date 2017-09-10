@@ -6,6 +6,9 @@
   "bin": {
     "elixirscript": "./elixirscript"
   },
+  "engines": {
+    "node": ">=7.1"
+  },
   "scripts": {
     "lint": "eslint src/javascript/lib/**/*.js src/javascript/tests/**/*.js",
     "lint:fix": "eslint src/javascript/lib/**/*.js src/javascript/tests/**/*.js --fix",
