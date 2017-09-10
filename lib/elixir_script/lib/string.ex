@@ -68,7 +68,6 @@ defmodule ElixirScript.String do
     end)
   end
 
-
   def next_grapheme(nil), do: nil
   def next_grapheme(""), do: nil
 
@@ -87,11 +86,11 @@ defmodule ElixirScript.String do
   end
 
   def graphemes(str) do
-    str.split('')
+    ElixirScript.Core.Functions.graphemes(str)
   end
 
   def length(str) do
-    str.length()
+    graphemes(str).length()
   end
 
   def match?(str, regex) do

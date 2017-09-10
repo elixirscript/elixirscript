@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Reimplement `String.split_at/2` to make sure Unicode library isn't compiled
 - Added `ElixirScript.JS.map_to_object/2` with options [keys: :string, symbols: false]
+- Added `ElixirScript.JS.object_to_map/1|2` with options [keys: :atom, recurse_array: true]
 
 ### Fixed
 - Make sure not to add underscores to erlang functions

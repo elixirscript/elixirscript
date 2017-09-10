@@ -12,6 +12,8 @@ defmodule ElixirScript.Translate.Function do
     anonymous? = Map.get(state, :anonymous_fn, false)
 
     state = Map.put(state, :anonymous_fn, true)
+    |> Map.put(:in_guard, false)
+
     clauses = compile_clauses(clauses, state)
 
     arg_matches_declaration = Helpers.declare_let("__arg_matches__", J.identifier("null"))
@@ -51,6 +53,7 @@ defmodule ElixirScript.Translate.Function do
   def compile({{name, arity}, _type, _, clauses}, state) do
     state = Map.put(state, :function, {name, arity})
     |> Map.put(:anonymous_fn, false)
+    |> Map.put(:in_guard, false)
 
     clauses = compile_clauses(clauses, state)
 

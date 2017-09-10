@@ -66,6 +66,103 @@ function list_subtraction(list1, list2) {
   return list;
 }
 
+function arrayEquals(left, right) {
+  if (!Array.isArray(right)) {
+    return false;
+  }
+
+  if (left.length !== right.length) {
+    return false;
+  }
+
+  for (let i = 0; i < left.length; i++) {
+    if (equals(left[i], right[i]) === false) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function tupleEquals(left, right) {
+  if (right instanceof ErlangTypes.Tuple === false) {
+    return false;
+  }
+
+  if (left.length !== right.length) {
+    return false;
+  }
+
+  return arrayEquals(left.values, right.values);
+}
+
+function bitstringEquals(left, right) {
+  if (right instanceof ErlangTypes.BitString === false) {
+    return false;
+  }
+
+  if (left.length !== right.length) {
+    return false;
+  }
+
+  return arrayEquals(left.value, right.value);
+}
+
+function pidEquals(left, right) {
+  if (right instanceof ErlangTypes.PID === false) {
+    return false;
+  }
+
+  return left.id === right.id;
+}
+
+function referenceEquals(left, right) {
+  if (right instanceof ErlangTypes.Reference === false) {
+    return false;
+  }
+
+  return left.id === right.id;
+}
+
+function mapEquals(left, right) {
+  if (right instanceof Map === false) {
+    return false;
+  }
+
+  const leftEntries = Array.from(left.entries());
+  const rightEntries = Array.from(right.entries());
+
+  return arrayEquals(leftEntries, rightEntries);
+}
+
+function equals(left, right) {
+  if (Array.isArray(left)) {
+    return arrayEquals(left, right);
+  }
+
+  if (left instanceof ErlangTypes.Tuple) {
+    return tupleEquals(left, right);
+  }
+
+  if (left instanceof ErlangTypes.PID) {
+    return pidEquals(left, right);
+  }
+
+  if (left instanceof ErlangTypes.BitString) {
+    return bitstringEquals(left, right);
+  }
+
+  if (left instanceof ErlangTypes.Reference) {
+    return referenceEquals(left, right);
+  }
+
+  if (left instanceof Map) {
+    return mapEquals(left, right);
+  }
+
+  return left === right;
+}
+
 function div(left, right) {
   return left / right;
 }
@@ -229,6 +326,9 @@ function bit_size(bitstring) {
 }
 
 function byte_size(bitstring) {
+  if (typeof bitstring === 'string' || bitstring instanceof String) {
+    return bitstring.length;
+  }
   return bitstring.byte_size;
 }
 
@@ -378,7 +478,19 @@ function _throw(term) {
 }
 
 function error(reason) {
-  throw new ErlangTypes.Tuple(reason, []);
+  if (reason instanceof Map && reason.has(Symbol.for('__exception__'))) {
+    let name = Symbol.keyFor(reason.get(Symbol.for('__struct__')).__MODULE__);
+    name = name
+      .split('.')
+      .slice(1)
+      .join('.');
+    const message = reason.get(Symbol.for('message'));
+    throw new Error(`** (${name}) ${message}`);
+  } else if (is_binary(reason)) {
+    throw new Error(`** (RuntimeError) ${reason}`);
+  } else {
+    throw new Error(`** (ErlangError) Erlang Error ${reason.toString()}`);
+  }
 }
 
 function exit(...args) {
@@ -470,4 +582,5 @@ export default {
   list_to_binary,
   nodes,
   function_exported,
+  equals,
 };

@@ -2,6 +2,7 @@ defmodule ElixirScript.Translate.Forms.Test do
   use ExUnit.Case
   alias ElixirScript.Translate.Form
   alias ElixirScript.Translate.Identifier
+  alias ElixirScript.Translate.Helpers
   alias ESTree.Tools.Builder, as: J
   require StreamData
   import PropertyTest
@@ -19,7 +20,7 @@ defmodule ElixirScript.Translate.Forms.Test do
 
   property "integers, floats, binaries, and booleans translates to a literal JavaScript AST node", %{state: state} do
     check all value <- StreamData.one_of([
-        StreamData.int(),
+        StreamData.integer(),
         StreamData.boolean(),
         StreamData.binary(),
         StreamData.uniform_float()
@@ -43,7 +44,7 @@ defmodule ElixirScript.Translate.Forms.Test do
   end
 
   property "tuple translates to new Tuple object", %{state: state} do
-    check all tuple <- StreamData.tuple({StreamData.int(), StreamData.binary()}) do
+    check all tuple <- StreamData.tuple({StreamData.integer(), StreamData.binary()}) do
       {js_ast, _} = Form.compile(tuple, state)
       assert js_ast == J.new_expression(
         J.member_expression(
@@ -145,5 +146,26 @@ defmodule ElixirScript.Translate.Forms.Test do
       J.literal(2),
       J.literal(3)
     ])
+  end
+
+  test "calling field on field" do
+    ast = {{:., [line: 16],
+    [{{:., [line: 16], [{:map, [line: 16], nil}, :token_count]}, [line: 16],
+      []}, :toLocaleString]}, [line: 16], []}
+
+    state = %{function: {:something, nil}, vars: %{}}
+
+    {js_ast, _} = Form.compile(ast, state)
+
+    assert js_ast == Helpers.call(
+      ElixirScript.Translate.Forms.JS.call_property(),
+      [
+        Helpers.call(
+          ElixirScript.Translate.Forms.JS.call_property(),
+          [J.identifier("map"), J.literal("token_count")]
+        ),
+        J.literal("toLocaleString")
+      ]
+    )
   end
 end

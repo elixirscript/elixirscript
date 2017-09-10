@@ -3,4 +3,6 @@ defmodule ElixirScript.Core.Functions do
   use ElixirScript.FFI, global: true
 
   defexternal split_at(value, position)
+
+  defexternal graphemes(str)
 end

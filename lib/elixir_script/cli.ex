@@ -34,7 +34,7 @@ defmodule ElixirScript.CLI do
 
   end
 
-  defp help_message() do
+  defp help_message do
   """
   usage: elixirscript <module> [options]
   <module> the entry module of your application
@@ -64,7 +64,7 @@ defmodule ElixirScript.CLI do
     end
   end
 
-  def do_process(input, options) do
+  defp do_process(input, options) do
     compile_opts = [
       output: Keyword.get(options, :output, :stdout),
       root: Keyword.get(options, :root, ".")
