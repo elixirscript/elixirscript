@@ -16,7 +16,7 @@ function cond(...clauses) {
 
 function run_list_generators(generator, generators) {
   if (generators.length === 0) {
-    return generator.map(x => {
+    return generator.map((x) => {
       if (Array.isArray(x)) {
         return x;
       }
@@ -44,7 +44,7 @@ function _for(expression, generators, collectable_protocol, into = []) {
     if (expression.guard.apply(this, value)) {
       result = fun(
         result,
-        new Core.Tuple(Symbol.for('cont'), expression.fn.apply(this, value))
+        new Core.Tuple(Symbol.for('cont'), expression.fn.apply(this, value)),
       );
     }
   }
@@ -57,7 +57,7 @@ function _try(
   rescue_function,
   catch_fun,
   else_function,
-  after_function
+  after_function,
 ) {
   let result = null;
 
@@ -144,16 +144,16 @@ function _with(...args) {
 function receive(clauses, timeout = 0, timeoutFn = () => true) {
   console.warn('Receive not supported');
 
-  const messages = []; //this.mailbox.get();
+  const messages = []; // this.mailbox.get();
   const NOMATCH = Symbol();
 
   for (let i = 0; i < messages.length; i++) {
     for (const clause of clauses) {
-      const value = Patterns.match_or_default(
+      const value = Core.Patterns.match_or_default(
         clause.pattern,
         messages[i],
         clause.guard,
-        NOMATCH
+        NOMATCH,
       );
 
       if (value !== NOMATCH) {
@@ -172,5 +172,5 @@ export default {
   _for,
   _try,
   _with,
-  receive
+  receive,
 };
