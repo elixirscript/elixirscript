@@ -8,10 +8,12 @@ defmodule ElixirScript.Translate.Forms.Receive do
   to a stub function for now
   """
   def compile(blocks, state) do
-    receive_block = Keyword.get(blocks, :do)
-    after_block = Keyword.get(blocks, :after, nil)
-
-    receive_block = Enum.map(receive_block, fn x -> Clause.compile(x, state) |> elem(0) end)
+    receive_block = blocks
+    |> Keyword.get(:do)
+    |> Enum.map(fn x ->
+      Clause.compile(x, state)
+      |> elem(0)
+    end)
     |> List.flatten
     |> J.array_expression()
 
@@ -20,6 +22,7 @@ defmodule ElixirScript.Translate.Forms.Receive do
       J.identifier("receive")
     )
 
+    after_block = Keyword.get(blocks, :after, nil)
     args = [receive_block] ++ process_after(after_block, state)
 
     ast = Helpers.call(
