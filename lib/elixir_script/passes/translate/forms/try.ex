@@ -70,7 +70,7 @@ defmodule ElixirScript.Translate.Forms.Try do
       Helpers.call(
         JS.member_expression(
           Helpers.patterns(),
-          JS.identifier("defmatchAsync")
+          JS.identifier("defmatchGen")
         ),
         processed_clauses
       )

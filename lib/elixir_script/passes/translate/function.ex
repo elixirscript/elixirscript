@@ -98,7 +98,7 @@ defmodule ElixirScript.Translate.Function do
       match_or_default_call = Helpers.call(
         J.member_expression(
           Helpers.patterns(),
-          J.identifier("match_or_default_async")
+          J.identifier("match_or_default_gen")
         ),
         [J.array_expression(patterns), J.identifier("__function_args__"), guards]
       )
@@ -160,8 +160,7 @@ defmodule ElixirScript.Translate.Function do
         J.identifier("null")
       {:__block__, _, block_body} ->
         {list, _} = Enum.map_reduce(block_body, state, fn(x, acc) ->
-           {ast, acc} = Form.compile(x, acc)
-           {[pause(), ast], acc}
+           Form.compile(x, acc)
         end)
         List.flatten(list)
       _ ->
@@ -171,17 +170,7 @@ defmodule ElixirScript.Translate.Function do
     {ast, state}
   end
 
-  defp pause() do
-    Helpers.call(
-      J.member_expression(
-        Helpers.process_system,
-        J.identifier("pause")
-      ),
-      []
-    )
-  end
-
-  defp update_last_call(clause_body, %{function: {name, _}, anonymous_fn: anonymous?}) do
+  def update_last_call(clause_body, %{function: {name, _}, anonymous_fn: anonymous?}) do
     last_item = List.last(clause_body)
     function_name = ElixirScript.Translate.Identifier.make_function_name(name)
 

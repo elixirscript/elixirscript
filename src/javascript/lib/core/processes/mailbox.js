@@ -1,22 +1,26 @@
-class Mailbox {
-  constructor() {
+"use strict";
+
+/* @flow */
+
+class Mailbox{
+  constructor(){
     this.messages = [];
   }
 
-  deliver(message) {
+  deliver(message){
     this.messages.push(message);
     return message;
   }
 
-  get() {
+  get(){
     return this.messages;
   }
 
-  isEmpty() {
+  isEmpty(){
     return this.messages.length === 0;
   }
 
-  removeAt(index) {
+  removeAt(index){
     this.messages.splice(index, 1);
   }
 }

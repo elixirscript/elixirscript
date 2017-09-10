@@ -1,10 +1,10 @@
 import Core from '../core';
 
-async function _case(condition, clauses) {
-  return Core.Patterns.defmatchAsync(...clauses)(condition);
+function* _case(condition, clauses) {
+  return Core.Patterns.defmatchGen(...clauses)(condition);
 }
 
-async function cond(...clauses) {
+function* cond(...clauses) {
   for (const clause of clauses) {
     if (clause[0]) {
       return clause[1]();
@@ -16,7 +16,7 @@ async function cond(...clauses) {
 
 function run_list_generators(generator, generators) {
   if (generators.length === 0) {
-    return generator.map((x) => {
+    return generator.map(x => {
       if (Array.isArray(x)) {
         return x;
       }
@@ -35,16 +35,19 @@ function run_list_generators(generator, generators) {
   return run_list_generators(next_gen, generators);
 }
 
-async function _for(expression, generators, collectable_protocol, into = []) {
+function* _for(expression, generators, collectable_protocol, into = []) {
   let [result, fun] = collectable_protocol.into(into);
 
   const generatedValues = run_list_generators(generators.pop()(), generators);
 
   for (const value of generatedValues) {
-    if (await expression.guard.apply(this, value)) {
-      result = await fun(
+    if (yield* expression.guard.apply(this, value)) {
+      result = yield* fun(
         result,
-        new Core.Tuple(Symbol.for('cont'), await expression.fn.apply(this, value)),
+        new Core.Tuple(
+          Symbol.for('cont'),
+          yield* expression.fn.apply(this, value)
+        )
       );
     }
   }
@@ -52,17 +55,23 @@ async function _for(expression, generators, collectable_protocol, into = []) {
   return fun(result, Symbol.for('done'));
 }
 
-async function _try(do_fun, rescue_function, catch_fun, else_function, after_function) {
+function* _try(
+  do_fun,
+  rescue_function,
+  catch_fun,
+  else_function,
+  after_function
+) {
   let result = null;
 
   try {
-    result = await do_fun();
+    result = yield* do_fun();
   } catch (e) {
     let ex_result = null;
 
     if (rescue_function) {
       try {
-        ex_result = await rescue_function(e);
+        ex_result = yield* rescue_function(e);
         return ex_result;
       } catch (ex) {
         if (ex instanceof Core.Patterns.MatchError) {
@@ -73,7 +82,7 @@ async function _try(do_fun, rescue_function, catch_fun, else_function, after_fun
 
     if (catch_fun) {
       try {
-        ex_result = await catch_fun(e);
+        ex_result = yield* catch_fun(e);
         return ex_result;
       } catch (ex) {
         if (ex instanceof Core.Patterns.MatchError) {
@@ -85,7 +94,7 @@ async function _try(do_fun, rescue_function, catch_fun, else_function, after_fun
     throw e;
   } finally {
     if (after_function) {
-      await after_function();
+      yield* after_function();
     }
   }
 
@@ -104,7 +113,7 @@ async function _try(do_fun, rescue_function, catch_fun, else_function, after_fun
   }
 }
 
-async function _with(...args) {
+function* _with(...args) {
   let argsToPass = [];
   let successFunction = null;
   let elseFunction = null;
@@ -118,9 +127,12 @@ async function _with(...args) {
   for (let i = 0; i < args.length; i++) {
     const [pattern, func] = args[i];
 
-    const result = await func(...argsToPass);
+    const result = yield* func(...argsToPass);
 
-    const patternResult = await Core.Patterns.match_or_default_async(pattern, result);
+    const patternResult = yield* Core.Patterns.match_or_default_gen(
+      pattern,
+      result
+    );
 
     if (patternResult == null) {
       if (elseFunction) {
@@ -135,8 +147,12 @@ async function _with(...args) {
   return successFunction(...argsToPass);
 }
 
-async function receive(clauses, timeout = 0, timeoutFn = () => true) {
-  return Core.global.__elxirscript_process_system__.receive(clauses, timeout, timeoutFn);
+function* receive(clauses, timeout = 0, timeoutFn = () => true) {
+  return Core.global.__elxirscript_process_system__.receive(
+    clauses,
+    timeout,
+    timeoutFn
+  );
 }
 
 export default {
@@ -145,5 +161,5 @@ export default {
   _for,
   _try,
   _with,
-  receive,
+  receive
 };

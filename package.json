@@ -23,7 +23,7 @@
     "erlang-types": "^1.0.1",
     "grapheme-splitter": "^1.0.2",
     "rollup-plugin-commonjs": "^8.2.1",
-    "tailored": "^2.7.2"
+    "tailored": "file:/Users/bryanjos/projects/basstype/tailored"
   },
   "devDependencies": {
     "@std/esm": "^0.8.3",

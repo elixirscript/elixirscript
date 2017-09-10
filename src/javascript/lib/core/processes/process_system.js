@@ -1,8 +1,11 @@
-import ErlangTypes from 'erlang-types';
+/* @flow */
+'use strict';
+
 import Mailbox from './mailbox';
 import Process from './process';
 import States from './states';
 import Scheduler from './scheduler';
+import ErlangTypes from 'erlang-types';
 
 class ProcessSystem {
   constructor() {
@@ -12,40 +15,50 @@ class ProcessSystem {
     this.links = new Map();
     this.monitors = new Map();
 
+    const throttle = 5; //ms between scheduled tasks
     this.current_process = null;
-    this.scheduler = new Scheduler(this);
+    this.scheduler = new Scheduler(throttle);
     this.suspended = new Map();
 
-    const process_system_scope = this;
-    this.main_process_pid = this.spawn(async () => {
-      await process_system_scope.sleep(Symbol.for('Infinity'));
+    let process_system_scope = this;
+    this.main_process_pid = this.spawn(function*() {
+      yield process_system_scope.sleep(Symbol.for('Infinity'));
     });
-
     this.set_current(this.main_process_pid);
+  }
+
+  static *run(fun, args, context = null) {
+    if (fun.constructor.name === 'GeneratorFunction') {
+      return yield* fun.apply(context, args);
+    } else {
+      return yield fun.apply(context, args);
+    }
   }
 
   spawn(...args) {
     if (args.length === 1) {
-      const fun = args[0];
+      let fun = args[0];
       return this.add_proc(fun, [], false).pid;
-    }
-    const mod = args[0];
-    const fun = args[1];
-    const the_args = args[2];
+    } else {
+      let mod = args[0];
+      let fun = args[1];
+      let the_args = args[2];
 
-    return this.add_proc(mod[fun], the_args, false, false).pid;
+      return this.add_proc(mod[fun], the_args, false, false).pid;
+    }
   }
 
   spawn_link(...args) {
     if (args.length === 1) {
-      const fun = args[0];
+      let fun = args[0];
       return this.add_proc(fun, [], true, false).pid;
-    }
-    const mod = args[0];
-    const fun = args[1];
-    const the_args = args[2];
+    } else {
+      let mod = args[0];
+      let fun = args[1];
+      let the_args = args[2];
 
-    return this.add_proc(mod[fun], the_args, true, false).pid;
+      return this.add_proc(mod[fun], the_args, true, false).pid;
+    }
   }
 
   link(pid) {
@@ -60,16 +73,17 @@ class ProcessSystem {
 
   spawn_monitor(...args) {
     if (args.length === 1) {
-      const fun = args[0];
-      const process = this.add_proc(fun, [], false, true);
+      let fun = args[0];
+      let process = this.add_proc(fun, [], false, true);
+      return [process.pid, process.monitors[0]];
+    } else {
+      let mod = args[0];
+      let fun = args[1];
+      let the_args = args[2];
+      let process = this.add_proc(mod[fun], the_args, false, true);
+
       return [process.pid, process.monitors[0]];
     }
-    const mod = args[0];
-    const fun = args[1];
-    const the_args = args[2];
-    const process = this.add_proc(mod[fun], the_args, false, true);
-
-    return [process.pid, process.monitors[0]];
   }
 
   monitor(pid) {
@@ -77,15 +91,19 @@ class ProcessSystem {
     const ref = this.make_ref();
 
     if (real_pid) {
-      this.monitors.set(ref, { monitor: this.current_process.pid, monitee: real_pid });
+      this.monitors.set(ref, {
+        monitor: this.current_process.pid,
+        monitee: real_pid
+      });
       this.pids.get(real_pid).monitors.push(ref);
       return ref;
+    } else {
+      this.send(
+        this.current_process.pid,
+        new ErlangTypes.Tuple('DOWN', ref, pid, real_pid, Symbol.for('noproc'))
+      );
+      return ref;
     }
-    this.send(
-      this.current_process.pid,
-      new ErlangTypes.Tuple('DOWN', ref, pid, real_pid, Symbol.for('noproc')),
-    );
-    return ref;
   }
 
   demonitor(ref) {
@@ -98,7 +116,7 @@ class ProcessSystem {
   }
 
   set_current(id) {
-    const pid = this.pidof(id);
+    let pid = this.pidof(id);
     if (pid !== null) {
       this.current_process = this.pids.get(pid);
       this.current_process.status = States.RUNNING;
@@ -106,9 +124,9 @@ class ProcessSystem {
   }
 
   add_proc(fun, args, linked, monitored) {
-    const newpid = new ErlangTypes.PID();
-    const mailbox = new Mailbox();
-    const newproc = new Process(newpid, fun, args, mailbox, this);
+    let newpid = new ErlangTypes.PID();
+    let mailbox = new Mailbox();
+    let newproc = new Process(newpid, fun, args, mailbox, this);
 
     this.pids.set(newpid, newproc);
     this.mailboxes.set(newpid, mailbox);
@@ -132,7 +150,7 @@ class ProcessSystem {
     this.scheduler.removePid(pid);
 
     if (this.links.has(pid)) {
-      for (const linkpid of this.links.get(pid)) {
+      for (let linkpid of this.links.get(pid)) {
         this.exit(linkpid, exitreason);
         this.links.get(linkpid).delete(pid);
       }
@@ -158,7 +176,7 @@ class ProcessSystem {
   }
 
   unregister(pid) {
-    for (const name of this.names.keys()) {
+    for (let name of this.names.keys()) {
       if (this.names.has(name) && this.names.get(name) === pid) {
         this.names.delete(name);
       }
@@ -174,97 +192,62 @@ class ProcessSystem {
       return this.pids.has(id) ? id : null;
     } else if (id instanceof Process) {
       return id.pid;
+    } else {
+      let pid = this.whereis(id);
+      if (pid === null)
+        throw 'Process name not registered: ' + id + ' (' + typeof id + ')';
+      return pid;
     }
-    const pid = this.whereis(id);
-    if (pid === null) {
-      throw new Error(`Process name not registered: ${id} (${typeof id})`);
-    }
-
-    return pid;
   }
 
-  async send(id, msg) {
+  send(id, msg) {
     const pid = this.pidof(id);
 
     if (pid) {
       this.mailboxes.get(pid).deliver(msg);
-      console.log('sending');
-      console.log(pid);
-      if (this.suspended.has(pid)) {
-        console.log('Got suspended');
-        const [args, resolver] = this.suspended.get(pid);
 
-        const result = await this.__receive(pid, args);
-        if (result !== States.NOMATCH) {
-          this.suspended.delete(pid);
-          resolver(result);
-        }
+      if (this.suspended.has(pid)) {
+        let fun = this.suspended.get(pid);
+        this.suspended.delete(pid);
+        this.schedule(fun);
       }
     }
 
     return msg;
   }
 
-  async __receive(pid, args) {
-    this.set_current(pid);
-    const process = this.pids.get(pid);
-    return process.receive(args);
-  }
-
-  async receive(args, timeout = 0, timeoutFn = () => true) {
+  receive(args, timeout = 0, timeoutFn = () => true) {
     let DateTimeout = null;
-    const pid = this.current_process.pid;
-    console.log('Received');
-    console.log(pid);
+
     if (timeout === 0 || timeout === Infinity) {
-      const result = await this.__receive(pid, args);
-      console.log(result);
-      if (result !== States.NOMATCH) {
-        return result;
-      }
-      return this.suspend(pid, args);
+      DateTimeout = null;
+    } else {
+      DateTimeout = Date.now() + timeout;
     }
 
-    DateTimeout = Date.now() + timeout;
-    return Promise.race(
-      this.receive(args),
-      new Promise((resolver) => {
-        setTimeout(() => {
-          resolver(timeoutFn());
-        }, DateTimeout);
-      }),
-    );
+    return [States.RECEIVE, args, DateTimeout, timeoutFn];
   }
 
   sleep(duration) {
+    return [States.SLEEP, duration];
+  }
+
+  suspend(fun) {
+    this.current_process.status = States.SUSPENDED;
+    this.suspended.set(this.current_process.pid, fun);
+  }
+
+  delay(fun, time) {
     this.current_process.status = States.SLEEPING;
 
-    return new Promise((resolver) => {
-      if (duration !== Symbol.for('Infinity')) {
-        setTimeout(() => {
-          this.current_process.status = States.RUNNING;
-          resolver(true);
-        }, duration);
-      }
-    });
+    if (Number.isInteger(time)) {
+      this.scheduler.scheduleFuture(this.current_process.pid, time, fun);
+    }
   }
 
-  suspend(pid, args) {
-    this.current_process.status = States.SUSPENDED;
-    console.log(pid);
-
-    return new Promise((resolver) => {
-      this.suspended.set(pid, [args, resolver]);
-      console.log('suspended');
-    });
-  }
-
-  pause(pid) {
+  schedule(fun, pid) {
     const the_pid = pid != null ? pid : this.current_process.pid;
-
-    return new Promise((resolver) => {
-      this.scheduler.pause(the_pid, resolver);
-    });
+    this.scheduler.schedule(the_pid, fun);
   }
 
   exit(one, two) {
@@ -296,11 +279,17 @@ class ProcessSystem {
       process.signal(reason);
     }
 
-    for (const ref in process.monitors) {
-      const mons = this.monitors.get(ref);
+    for (let ref in process.monitors) {
+      let mons = this.monitors.get(ref);
       this.send(
-        mons.monitor,
-        new ErlangTypes.Tuple('DOWN', ref, mons.monitee, mons.monitee, reason),
+        mons['monitor'],
+        new ErlangTypes.Tuple(
+          'DOWN',
+          ref,
+          mons['monitee'],
+          mons['monitee'],
+          reason
+        )
       );
     }
   }
@@ -310,15 +299,16 @@ class ProcessSystem {
   }
 
   process_flag(...args) {
-    if (args.length === 2) {
+    if (args.length == 2) {
       const flag = args[0];
       const value = args[1];
       return this.current_process.process_flag(flag, value);
+    } else {
+      const pid = this.pidof(args[0]);
+      const flag = args[1];
+      const value = args[2];
+      return this.pids.get(pid).process_flag(flag, value);
     }
-    const pid = this.pidof(args[0]);
-    const flag = args[1];
-    const value = args[2];
-    return this.pids.get(pid).process_flag(flag, value);
   }
 
   put(key, value) {
@@ -332,15 +322,16 @@ class ProcessSystem {
   get(key, default_value = null) {
     if (key in this.current_process.dict) {
       return this.current_process.dict[key];
+    } else {
+      return default_value;
     }
-    return default_value;
   }
 
   get_keys(value) {
     if (value) {
-      const keys = [];
+      let keys = [];
 
-      for (const key of Object.keys(this.current_process.dict)) {
+      for (let key of Object.keys(this.current_process.dict)) {
         if (this.current_process.dict[key] === value) {
           keys.push(key);
         }

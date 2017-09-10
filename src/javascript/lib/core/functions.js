@@ -4,7 +4,7 @@ import Core from '../core';
 import proplists from './erlang_compat/proplists';
 import erlang from './erlang_compat/erlang';
 
-async function call_property(item, property) {
+function* call_property(item, property) {
   if (!property) {
     if (item instanceof Function || typeof item === 'function') {
       return item();
@@ -99,7 +99,8 @@ function map_to_object(map, options = []) {
     if (opt_keys === Symbol.for('string') && typeof key === 'number') {
       key = key.toString();
     } else if (
-      (opt_keys === Symbol.for('string') || opt_symbols !== Symbol.for('undefined')) &&
+      (opt_keys === Symbol.for('string') ||
+        opt_symbols !== Symbol.for('undefined')) &&
       typeof key === 'symbol'
     ) {
       key = erlang.atom_to_binary(key);
@@ -107,7 +108,10 @@ function map_to_object(map, options = []) {
 
     if (value instanceof Map) {
       object[key] = map_to_object(value, options);
-    } else if (opt_symbols !== Symbol.for('undefined') && typeof value === 'symbol') {
+    } else if (
+      opt_symbols !== Symbol.for('undefined') &&
+      typeof value === 'symbol'
+    ) {
       object[key] = erlang.atom_to_binary(value);
     } else {
       object[key] = value;
@@ -118,26 +122,31 @@ function map_to_object(map, options = []) {
 }
 
 function object_to_map(object, options = []) {
-  const opt_atom_keys = proplists.get_value(Symbol.for('keys'), options) === Symbol.for('atom');
-  const opt_recurse_array = proplists.get_value(Symbol.for('recurse_array'), options) === true;
+  const opt_atom_keys =
+    proplists.get_value(Symbol.for('keys'), options) === Symbol.for('atom');
+  const opt_recurse_array =
+    proplists.get_value(Symbol.for('recurse_array'), options) === true;
 
   if (object.constructor === Object) {
     const map = new Map();
-    Reflect.ownKeys(object).forEach((key) => {
+    Reflect.ownKeys(object).forEach(key => {
       let key2 = key;
       let value = object[key];
       if (opt_atom_keys && typeof key === 'string') {
         key2 = Symbol.for(key);
       }
 
-      if (value.constructor === Object || (value instanceof Array && opt_recurse_array)) {
+      if (
+        value.constructor === Object ||
+        (value instanceof Array && opt_recurse_array)
+      ) {
         value = object_to_map(value, options);
       }
       map.set(key2, value);
     });
     return map;
   } else if (object instanceof Array && opt_recurse_array) {
-    return object.map((ele) => {
+    return object.map(ele => {
       if (ele.constructor === Object || ele instanceof Array) {
         return object_to_map(ele, options);
       }
@@ -153,11 +162,11 @@ class Recurse {
   }
 }
 
-async function trampoline(f) {
+function* trampoline(f) {
   let currentValue = f;
 
   while (currentValue && currentValue instanceof Recurse) {
-    currentValue = await currentValue.func();
+    currentValue = yield* currentValue.func();
   }
 
   return currentValue;
@@ -213,5 +222,5 @@ export default {
   Recurse,
   split_at,
   graphemes,
-  concat,
+  concat
 };

@@ -7,13 +7,16 @@ class Protocol {
     this.fallback = null;
 
     function createFun(funName) {
-      return async function (...args) {
+      return function*(...args) {
         const thing = args[0];
         let fun = null;
 
         if (thing === null && this.hasImplementation(Symbol('null'))) {
           fun = this.registry.get(Symbol)[funName];
-        } else if (Number.isInteger(thing) && this.hasImplementation(Core.Integer)) {
+        } else if (
+          Number.isInteger(thing) &&
+          this.hasImplementation(Core.Integer)
+        ) {
           fun = this.registry.get(Core.Integer)[funName];
         } else if (
           typeof thing === 'number' &&
@@ -21,7 +24,10 @@ class Protocol {
           this.hasImplementation(Core.Float)
         ) {
           fun = this.registry.get(Core.Float)[funName];
-        } else if (typeof thing === 'string' && this.hasImplementation(Core.BitString)) {
+        } else if (
+          typeof thing === 'string' &&
+          this.hasImplementation(Core.BitString)
+        ) {
           fun = this.registry.get(Core.BitString)[funName];
         } else if (
           thing &&
@@ -29,7 +35,9 @@ class Protocol {
           thing.has(Symbol.for('__struct__')) &&
           this.hasImplementation(thing)
         ) {
-          fun = this.registry.get(thing.get(Symbol.for('__struct__')).__MODULE__)[funName];
+          fun = this.registry.get(
+            thing.get(Symbol.for('__struct__')).__MODULE__
+          )[funName];
         } else if (thing !== null && this.hasImplementation(thing)) {
           fun = this.registry.get(thing.constructor)[funName];
         } else if (this.fallback) {
@@ -37,7 +45,7 @@ class Protocol {
         }
 
         if (fun != null) {
-          const retval = await fun.apply(this, args);
+          const retval = yield* fun.apply(this, args);
           return retval;
         }
 
@@ -59,9 +67,17 @@ class Protocol {
   }
 
   hasImplementation(thing) {
-    if (thing === Core.Integer || thing === Core.Float || thing === Core.BitString) {
+    if (
+      thing === Core.Integer ||
+      thing === Core.Float ||
+      thing === Core.BitString
+    ) {
       return this.registry.has(thing);
-    } else if (thing && thing instanceof Map && thing.has(Symbol.for('__struct__'))) {
+    } else if (
+      thing &&
+      thing instanceof Map &&
+      thing.has(Symbol.for('__struct__'))
+    ) {
       return this.registry.has(thing.get(Symbol.for('__struct__')).__MODULE__);
     }
 
