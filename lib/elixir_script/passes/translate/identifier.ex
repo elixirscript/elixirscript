@@ -47,8 +47,14 @@ defmodule ElixirScript.Translate.Identifier do
 
   defp filter_name(name) do
     name = to_string(name)
-    |> String.replace("?", "__qmark__")
-    |> String.replace("!", "__emark__")
+
+    if String.contains?(name, ["?", "!"]) do
+      name
+      |> String.replace("?", "__qmark__")
+      |> String.replace("!", "__emark__")
+    else
+      name
+    end
   end
 
   defp make_alias([x]) do
