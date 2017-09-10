@@ -7,7 +7,7 @@ import erlang from './erlang_compat/erlang';
 function* call_property(item, property) {
   if (!property) {
     if (item instanceof Function || typeof item === 'function') {
-      return item();
+      return yield* item();
     }
 
     return item;

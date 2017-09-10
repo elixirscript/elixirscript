@@ -18,8 +18,7 @@ defmodule ElixirScript.Translate.Function do
 
     arg_matches_declaration = Helpers.declare_let("__arg_matches__", J.identifier("null"))
 
-    function_recur_dec = Helpers.function(
-      "recur",
+    function_dec = Helpers.arrow_function(
       [J.rest_element(J.identifier("__function_args__"))],
       J.block_statement([
         arg_matches_declaration,
@@ -36,15 +35,15 @@ defmodule ElixirScript.Translate.Function do
       ])
     )
 
-    function_dec = Helpers.arrow_function(
-      [J.rest_element(J.identifier("__function_args__"))],
-      J.block_statement([
-        function_recur_dec,
-        J.return_statement(
-          trampoline()
-        )
-      ])
-    )
+    #function_dec = Helpers.arrow_function(
+    #  [J.rest_element(J.identifier("__function_args__"))],
+    #  J.block_statement([
+    #    function_recur_dec,
+    #    J.return_statement(
+    #      trampoline()
+    #    )
+    #  ])
+    #)
 
     state = Map.put(state, :anonymous_fn, anonymous?)
     { function_dec, state }
@@ -59,8 +58,8 @@ defmodule ElixirScript.Translate.Function do
 
     arg_matches_declaration = Helpers.declare_let("__arg_matches__", J.identifier("null"))
 
-    function_recur_dec = Helpers.function(
-      "recur",
+    function_dec = Helpers.function(
+      ElixirScript.Translate.Identifier.make_function_name(name),
       [J.rest_element(J.identifier("__function_args__"))],
       J.block_statement([
         arg_matches_declaration,
@@ -77,16 +76,16 @@ defmodule ElixirScript.Translate.Function do
       ])
     )
 
-    function_dec = Helpers.function(
-      ElixirScript.Translate.Identifier.make_function_name(name),
-      [J.rest_element(J.identifier("__function_args__"))],
-      J.block_statement([
-        function_recur_dec,
-        J.return_statement(
-          trampoline()
-        )
-      ])
-    )
+    #function_dec = Helpers.function(
+    #  ElixirScript.Translate.Identifier.make_function_name(name),
+    #  [J.rest_element(J.identifier("__function_args__"))],
+    #  J.block_statement([
+    #    function_recur_dec,
+    #    J.return_statement(
+    #      trampoline()
+    #    )
+    #  ])
+    #)
 
     { function_dec, state }
   end
@@ -135,7 +134,7 @@ defmodule ElixirScript.Translate.Function do
 
     body = body
     |> Clause.return_last_statement
-    |> update_last_call(state)
+    #|> update_last_call(state)
 
     declaration = Helpers.declare(params, J.identifier("__arg_matches__"))
 

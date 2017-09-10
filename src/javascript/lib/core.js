@@ -59,4 +59,5 @@ export default {
   elixir_config,
   math,
   proplists,
+  ProcessSystem
 };

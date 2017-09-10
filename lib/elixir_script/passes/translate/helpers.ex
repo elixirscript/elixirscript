@@ -28,7 +28,7 @@ defmodule ElixirScript.Translate.Helpers do
 
   def call(callee, arguments) do
     J.call_expression(
-      J.member_expression(process_system(), J.identifier("run")),
+      J.member_expression(core_module("ProcessSystem"), J.identifier("run")),
       [
         callee,
         J.array_expression(arguments)
