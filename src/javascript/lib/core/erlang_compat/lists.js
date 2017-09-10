@@ -49,10 +49,10 @@ async function foldr(fun, acc0, list) {
   return foldl(fun, acc0, reverse(list));
 }
 
-function keyfind(key, n, tupleList) {
-  for (const tuple of tupleList) {
-    if (tuple.get(n - 1) === key) {
-      return tuple;
+function keyfind(key, n, list) {
+  for (const ele of list) {
+    if (ele instanceof ErlangTypes.Tuple && ele.get(n - 1) === key) {
+      return ele;
     }
   }
 

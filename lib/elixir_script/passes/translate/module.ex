@@ -61,9 +61,8 @@ defmodule ElixirScript.Translate.Module do
       _ ->
         { compiled_functions, _ } = Enum.map_reduce(combined_defs, state, &Function.compile(&1, &2))
 
-        info_map = make_info_map(module, state)
-        info_function = make_info_function()
-        compiled_functions = [info_map, info_function] ++ compiled_functions
+        info_function = make_info_function(module, state)
+        compiled_functions = [info_function] ++ compiled_functions
 
         js_ast = ElixirScript.ModuleSystems.Namespace.build(
           module,
@@ -208,7 +207,9 @@ defmodule ElixirScript.Translate.Module do
 
   # Builds the __info__ function that Elixir modules
   # have.
-  defp make_info_function do
+  defp make_info_function(module, state) do
+    info_map = make_info_map(module, state)
+
     get_call = Helpers.call(
       J.member_expression(
         J.identifier("__info__map__"),
@@ -233,6 +234,7 @@ defmodule ElixirScript.Translate.Module do
     )
 
     body = J.block_statement([
+      info_map,
       value,
       body,
       J.throw_statement(

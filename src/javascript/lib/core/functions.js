@@ -1,3 +1,4 @@
+import GraphemeSplitter from 'grapheme-splitter';
 import Protocol from './protocol';
 import Core from '../core';
 import proplists from './erlang_compat/proplists';
@@ -25,9 +26,6 @@ async function call_property(item, property) {
       throw new Error(`Property ${property} not found in ${item}`);
     }
 
-    if (item.get(prop) instanceof Function || typeof item.get(prop) === 'function') {
-      return item.get(prop)();
-    }
     return item.get(prop);
   }
 
@@ -92,16 +90,16 @@ function build_namespace(ns, ns_string) {
 }
 
 function map_to_object(map, options = []) {
+  const opt_keys = proplists.get_value(Symbol.for('keys'), options);
+  const opt_symbols = proplists.get_value(Symbol.for('symbols'), options);
+
   const object = {};
 
-  const type_keys = proplists.get_value(Symbol('keys'), options);
-  const symbols = proplists.get_value(Symbol('symbols'), options);
-
   for (let [key, value] of map.entries()) {
-    if (type_keys === Symbol('string') && typeof key === 'number') {
+    if (opt_keys === Symbol.for('string') && typeof key === 'number') {
       key = key.toString();
     } else if (
-      (type_keys === Symbol('string') || symbols !== Symbol('undefined')) &&
+      (opt_keys === Symbol.for('string') || opt_symbols !== Symbol.for('undefined')) &&
       typeof key === 'symbol'
     ) {
       key = erlang.atom_to_binary(key);
@@ -109,7 +107,7 @@ function map_to_object(map, options = []) {
 
     if (value instanceof Map) {
       object[key] = map_to_object(value, options);
-    } else if (symbols !== Symbol('undefined') && typeof value === 'symbol') {
+    } else if (opt_symbols !== Symbol.for('undefined') && typeof value === 'symbol') {
       object[key] = erlang.atom_to_binary(value);
     } else {
       object[key] = value;
@@ -117,6 +115,36 @@ function map_to_object(map, options = []) {
   }
 
   return object;
+}
+
+function object_to_map(object, options = []) {
+  const opt_atom_keys = proplists.get_value(Symbol.for('keys'), options) === Symbol.for('atom');
+  const opt_recurse_array = proplists.get_value(Symbol.for('recurse_array'), options) === true;
+
+  if (object.constructor === Object) {
+    const map = new Map();
+    Reflect.ownKeys(object).forEach((key) => {
+      let key2 = key;
+      let value = object[key];
+      if (opt_atom_keys && typeof key === 'string') {
+        key2 = Symbol.for(key);
+      }
+
+      if (value.constructor === Object || (value instanceof Array && opt_recurse_array)) {
+        value = object_to_map(value, options);
+      }
+      map.set(key2, value);
+    });
+    return map;
+  } else if (object instanceof Array && opt_recurse_array) {
+    return object.map((ele) => {
+      if (ele.constructor === Object || ele instanceof Array) {
+        return object_to_map(ele, options);
+      }
+      return ele;
+    });
+  }
+  throw new Error(`Object ${object} is not an native object or array`);
 }
 
 class Recurse {
@@ -136,8 +164,11 @@ async function trampoline(f) {
 }
 
 function split_at(value, position) {
+  const splitter = new GraphemeSplitter();
+  const splitValues = splitter.splitGraphemes(value);
+
   if (position < 0) {
-    const newPosition = value.length + position;
+    const newPosition = splitValues.length + position;
     if (newPosition < 0) {
       return new Core.Tuple('', value);
     }
@@ -149,7 +180,7 @@ function split_at(value, position) {
   let second = '';
   let index = 0;
 
-  for (const character of value) {
+  for (const character of splitValues) {
     if (index < position) {
       first += character;
     } else {
@@ -162,13 +193,25 @@ function split_at(value, position) {
   return new Core.Tuple(first, second);
 }
 
+function graphemes(str) {
+  const splitter = new GraphemeSplitter();
+  return splitter.splitGraphemes(str);
+}
+
+function concat(head, tail) {
+  return [head].concat(tail);
+}
+
 export default {
   call_property,
   defprotocol,
   defimpl,
   build_namespace,
   map_to_object,
+  object_to_map,
   trampoline,
   Recurse,
   split_at,
+  graphemes,
+  concat,
 };

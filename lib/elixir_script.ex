@@ -46,7 +46,6 @@ defmodule ElixirScript do
 
   * `root`: Optional root for imports of FFI JavaScript modules. Defaults to `.`. If using output directly in a browser, you may want to make it something like `/js` or some uri.
 
-
   Now run `mix compile` and you should see a JavaScript file named `elixirscript.build.js` in the `priv/elixir_script/build/` directory. ElixirScript outputs JavaScript in the ES Module format. If your browser supports it, you can include the output in a script tag with the type "module"
 
   ```html

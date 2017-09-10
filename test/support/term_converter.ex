@@ -38,11 +38,7 @@ defmodule ElixirScript.TermConverter do
     String.to_atom(term)
   end
 
-  def decode("null") do
-    nil
-  end
-
-  def decode(term) when is_binary(term) or is_boolean(term) or is_number(term) do
+  def decode(term) when is_binary(term) or is_boolean(term) or is_number(term) or is_nil(term) do
     term
   end
 
@@ -54,8 +50,8 @@ defmodule ElixirScript.TermConverter do
     List.to_tuple(terms)
   end
 
-  def decode(%{"__type__" => "map", "terms" => terms}) do
-    Enum.map(terms, fn [key, term] -> {decode(key), decode(term)} end)
+  def decode(%{"__type__" => "map", "values" => values}) do
+    Enum.map(values, fn [key, term] -> {decode(key), decode(term)} end)
     |> Enum.into(%{})
   end
 end

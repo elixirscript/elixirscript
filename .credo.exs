@@ -57,6 +57,7 @@
         {Credo.Check.Design.DuplicatedCode, excluded_macros: []},
         {Credo.Check.Design.TagTODO, exit_status: 2},
         {Credo.Check.Design.TagFIXME},
+        {Credo.Check.Design.AliasUsage, false},
 
         {Credo.Check.Readability.FunctionNames},
         {Credo.Check.Readability.LargeNumbers},

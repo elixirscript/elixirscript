@@ -17,6 +17,7 @@ defmodule ElixirScript.Translate.Clause do
 
     body = body
     |> return_last_statement
+    |> Function.update_last_call(state)
 
     ast = Helpers.call(
       J.member_expression(
@@ -93,6 +94,7 @@ defmodule ElixirScript.Translate.Clause do
   end
 
   def compile_guard(params, guards, state) do
+    state = Map.put(state, :in_guard, true)
 
     guards = guards
     |> List.wrap

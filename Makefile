@@ -1,6 +1,6 @@
 .PHONY: compile test clean js_compile elixir_compile elixir_test js_test deps elixir_deps js_deps
 
-default: compile
+default: deps compile
 
 compile: js_compile elixir_compile
 

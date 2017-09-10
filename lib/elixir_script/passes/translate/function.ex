@@ -12,6 +12,8 @@ defmodule ElixirScript.Translate.Function do
     anonymous? = Map.get(state, :anonymous_fn, false)
 
     state = Map.put(state, :anonymous_fn, true)
+    |> Map.put(:in_guard, false)
+
     clauses = compile_clauses(clauses, state)
 
     arg_matches_declaration = Helpers.declare_let("__arg_matches__", J.identifier("null"))
@@ -51,6 +53,7 @@ defmodule ElixirScript.Translate.Function do
   def compile({{name, arity}, _type, _, clauses}, state) do
     state = Map.put(state, :function, {name, arity})
     |> Map.put(:anonymous_fn, false)
+    |> Map.put(:in_guard, false)
 
     clauses = compile_clauses(clauses, state)
 
@@ -165,7 +168,7 @@ defmodule ElixirScript.Translate.Function do
     {ast, state}
   end
 
-  defp update_last_call(clause_body, %{function: {name, _}, anonymous_fn: anonymous?}) do
+  def update_last_call(clause_body, %{function: {name, _}, anonymous_fn: anonymous?}) do
     last_item = List.last(clause_body)
     function_name = ElixirScript.Translate.Identifier.make_function_name(name)
 

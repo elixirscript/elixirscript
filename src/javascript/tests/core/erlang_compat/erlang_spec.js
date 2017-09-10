@@ -98,3 +98,68 @@ test('nodes/1', (t) => {
 
   t.deepEqual(Core.erlang.nodes([Symbol.for('connected')]), []);
 });
+
+test('equals', (t) => {
+  t.is(Core.erlang.equals(1, 1), true);
+  t.is(Core.erlang.equals(1, 'a'), false);
+  t.is(Core.erlang.equals('a', 'a'), true);
+  t.is(Core.erlang.equals('a', 'b'), false);
+  t.is(Core.erlang.equals(Symbol.for('this'), Symbol.for('this')), true);
+  t.is(Core.erlang.equals([], []), true);
+  t.is(Core.erlang.equals([1], []), false);
+  t.is(
+    Core.erlang.equals(
+      new Map([[Symbol.for('nest1'), 'valuenest1']]),
+      new Map([[Symbol.for('nest2'), 'valuenest2']]),
+    ),
+    false,
+  );
+  t.is(
+    Core.erlang.equals(
+      new Map([[Symbol.for('nest1'), 'valuenest1']]),
+      new Map([[Symbol.for('nest1'), 'valuenest1']]),
+    ),
+    true,
+  );
+  t.is(Core.erlang.equals(new Core.Tuple('abc'), new Core.Tuple('abc')), true);
+  t.is(Core.erlang.equals(new Core.Tuple('abc'), new Core.Tuple('abc', 's')), false);
+
+  const pid = new Core.PID();
+  t.is(Core.erlang.equals(pid, pid), true);
+  t.is(Core.erlang.equals(pid, new Core.PID()), false);
+
+  const ref = new Core.Reference();
+  t.is(Core.erlang.equals(ref, ref), true);
+  t.is(Core.erlang.equals(ref, new Core.Reference()), false);
+});
+
+test('error/1', (t) => {
+  let error = t.throws(() => {
+    Core.erlang.error(
+      new Map([
+        [Symbol.for('__exception__'), true],
+        [Symbol.for('message'), 'hi'],
+        [
+          Symbol.for('__struct__'),
+          {
+            __MODULE__: Symbol.for('Elixir.ArgumentError'),
+          },
+        ],
+      ]),
+    );
+  }, Error);
+
+  t.is(error.message, '** (ArgumentError) hi');
+
+  error = t.throws(() => {
+    Core.erlang.error('hi');
+  }, Error);
+
+  t.is(error.message, '** (RuntimeError) hi');
+
+  error = t.throws(() => {
+    Core.erlang.error(new Core.Tuple('abc', 's'));
+  }, Error);
+
+  t.is(error.message, '** (ErlangError) Erlang Error {abc, s}');
+});

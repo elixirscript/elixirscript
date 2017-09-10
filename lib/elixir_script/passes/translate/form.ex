@@ -56,25 +56,17 @@ defmodule ElixirScript.Translate.Form do
     { J.literal(form), state }
   end
 
-  def compile([{:|, _, [head, tail]}], state) do
-    ast = Helpers.call(
-      J.member_expression(
-        J.array_expression([compile!(head, state)]),
-        J.identifier("concat")
-      ),
-      [compile!(tail, state)]
-    )
-
-    { ast, state }
+  def compile([{:|, _, [_head, _tail]} = ast], state) do
+    compile(ast, state)
   end
 
   def compile({:|, _, [head, tail]}, state) do
     ast = Helpers.call(
       J.member_expression(
-        J.array_expression([compile!(head, state)]),
+        Helpers.functions(),
         J.identifier("concat")
       ),
-      [compile!(tail, state)]
+      [compile!(head, state), compile!(tail, state)]
     )
 
     { ast, state }
@@ -253,7 +245,19 @@ defmodule ElixirScript.Translate.Form do
     {ast, state}
   end
 
-  def compile({{:., _, [:erlang, op]}, _, [left, right]}, state) when op in [:+, :-, :*, :/, :==, :>, :<, :>=] do
+  def compile({{:., _, [:erlang, op]}, _, [left, right]}, state) when op in [:==, :===] do
+    ast = Helpers.call(
+      J.member_expression(
+        Helpers.core_module("erlang"),
+        J.identifier("equals")
+      ),
+      [compile!(left, state), compile!(right, state)]
+    )
+
+    {ast, state}
+  end
+
+  def compile({{:., _, [:erlang, op]}, _, [left, right]}, state) when op in [:+, :-, :*, :/, :>, :<, :>=] do
     ast = J.binary_expression(
       op,
       compile!(left, state),
@@ -323,7 +327,7 @@ defmodule ElixirScript.Translate.Form do
     {ast, state}
   end
 
-  def compile({{:., _, [{_, _, nil} = var, func_or_prop]}, _, []}, state) do
+  def compile({{:., _, [var, func_or_prop]}, _, []}, state) when not is_atom(var) do
     ast = Helpers.call(
       ElixirScript.Translate.Forms.JS.call_property(),
       [compile!(var, state), J.literal(to_string(func_or_prop))]

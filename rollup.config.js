@@ -1,19 +1,24 @@
 import nodeResolve from 'rollup-plugin-node-resolve';
+import commonjs from 'rollup-plugin-commonjs';
 import babel from 'rollup-plugin-babel';
 import minify from 'rollup-plugin-babel-minify';
 
 export default {
-  entry: 'src/javascript/elixir.js',
-  moduleName: 'ElixirScript',
+  input: 'src/javascript/elixir.js',
+  name: 'ElixirScript',
   plugins: [
-    nodeResolve({ jsnext: true }),
-    babel({
-      babelrc: false,
+    nodeResolve({
+      jsnext: true,
+      main: true
     }),
-    // minify({
-    //  keepFnName: true,
-    //  keepClassName: true
-    // })
+    commonjs(),
+    babel({
+      babelrc: false
+    }),
+    minify({
+      keepFnName: true,
+      keepClassName: true
+    })
   ],
-  targets: [{ dest: 'priv/build/iife/ElixirScript.Core.js', format: 'iife' }],
+  output: [{ file: 'priv/build/iife/ElixirScript.Core.js', format: 'iife' }]
 };

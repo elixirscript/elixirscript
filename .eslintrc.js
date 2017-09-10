@@ -6,6 +6,7 @@ module.exports = {
     'no-restricted-syntax': 'off',
     'no-underscore-dangle': 'off',
     'import/extensions': 'off',
+    'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
   },
   extends: 'airbnb-base',
   plugins: ['import'],
