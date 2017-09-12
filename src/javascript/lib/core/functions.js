@@ -130,7 +130,7 @@ function object_to_map(object, options = []) {
         key2 = Symbol.for(key);
       }
 
-      if (value.constructor === Object || (value instanceof Array && opt_recurse_array)) {
+      if (value !== null && (value.constructor === Object || (value instanceof Array && opt_recurse_array))) {
         value = object_to_map(value, options);
       }
       map.set(key2, value);
@@ -138,7 +138,7 @@ function object_to_map(object, options = []) {
     return map;
   } else if (object instanceof Array && opt_recurse_array) {
     return object.map((ele) => {
-      if (ele.constructor === Object || ele instanceof Array) {
+      if (ele !== null && (ele.constructor === Object || ele instanceof Array)) {
         return object_to_map(ele, options);
       }
       return ele;
