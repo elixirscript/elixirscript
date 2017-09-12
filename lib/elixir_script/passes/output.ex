@@ -35,10 +35,16 @@ defmodule ElixirScript.Output do
   defp bundle(modules, opts, js_modules) do
     modules
     |> ElixirScript.Output.JSModule.compile(opts, js_modules)
-    |> List.wrap
-    |> Builder.program
-    |> prepare_js_ast
-    |> Generator.generate
+    |> Task.async_stream(fn(js_part) ->
+      js_part
+      |> List.wrap
+      |> Builder.program
+      |> prepare_js_ast
+      |> Generator.generate
+    end)
+    |> Stream.map(fn {:ok, js_code} -> js_code end)
+    |> Enum.to_list
+    |> Enum.join("\n")
     |> concat
   end
 
