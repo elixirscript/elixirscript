@@ -46,9 +46,9 @@ test('object_to_map/1', (t) => {
   let result = Functions.object_to_map(obj);
   t.deepEqual(result, new Map());
 
-  obj = { key: 'value' };
+  obj = { key: 'value', key2: null };
   result = Functions.object_to_map(obj);
-  t.deepEqual(result, new Map([['key', 'value']]));
+  t.deepEqual(result, new Map([['key', 'value'], ['key2', null]]));
 
   obj = {};
   obj[Symbol.for('key')] = 'value';
