@@ -95,7 +95,10 @@ function map_to_object(map, options = []) {
 
   const object = {};
 
-  for (let [key, value] of map.entries()) {
+  for (const entry of map.entries()) {
+    let key = entry[0];
+    const value = entry[1];
+
     if (opt_keys === Symbol.for('string') && typeof key === 'number') {
       key = key.toString();
     } else if (

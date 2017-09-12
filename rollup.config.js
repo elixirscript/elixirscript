@@ -9,16 +9,16 @@ export default {
   plugins: [
     nodeResolve({
       jsnext: true,
-      main: true
+      main: true,
     }),
     commonjs(),
     babel({
-      babelrc: false
+      babelrc: false,
     }),
     minify({
       keepFnName: true,
-      keepClassName: true
-    })
+      keepClassName: true,
+    }),
   ],
-  output: [{ file: 'priv/build/iife/ElixirScript.Core.js', format: 'iife' }]
+  output: [{ file: 'priv/build/iife/ElixirScript.Core.js', format: 'iife' }],
 };
