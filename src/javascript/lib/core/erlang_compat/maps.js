@@ -13,7 +13,8 @@ function is_non_primitive(key) {
     erlang.is_map(key) ||
     erlang.is_pid(key) ||
     erlang.is_reference(key) ||
-    erlang.is_bitstring(key)
+    erlang.is_bitstring(key) ||
+    erlang.is_tuple(key)
   );
 }
 
