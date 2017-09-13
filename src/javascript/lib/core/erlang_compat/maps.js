@@ -7,12 +7,63 @@ const ERROR = Symbol.for('error');
 const BADMAP = Symbol.for('badmap');
 const BADKEY = Symbol.for('badkey');
 
+function is_non_primitive(key) {
+  return (
+    erlang.is_list(key) ||
+    erlang.is_map(key) ||
+    erlang.is_pid(key) ||
+    erlang.is_reference(key) ||
+    erlang.is_bitstring(key) ||
+    erlang.is_tuple(key)
+  );
+}
+
+function __has(map, key) {
+  if (is_non_primitive(key)) {
+    for (const map_key of map.keys()) {
+      if (erlang.equals(map_key, key)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  return map.has(key);
+}
+
+function __get(map, key) {
+  if (is_non_primitive(key)) {
+    for (const map_key of map.keys()) {
+      if (erlang.equals(map_key, key)) {
+        return map.get(map_key);
+      }
+    }
+
+    return null;
+  }
+
+  return map.get(key);
+}
+
+function __delete(map, key) {
+  if (is_non_primitive(key)) {
+    for (const map_key of map.keys()) {
+      if (erlang.equals(map_key, key)) {
+        map.delete(map_key);
+      }
+    }
+  } else {
+    map.delete(key);
+  }
+}
+
 function find(key, map) {
   if (erlang.is_map(map) === false) {
     return new ErlangTypes.Tuple(BADMAP, map);
   }
 
-  const value = map.get(key);
+  const value = __get(map, key);
 
   if (typeof value !== 'undefined') {
     return new ErlangTypes.Tuple(OK, value);
@@ -38,7 +89,7 @@ function remove(key, map1) {
 
   const map2 = new Map(map1);
 
-  map2.delete(key);
+  __delete(map2, key);
 
   return map2;
 }
@@ -83,7 +134,7 @@ function values(map) {
 }
 
 function is_key(key, map) {
-  return map.has(key);
+  return __has(map, key);
 }
 
 function put(key, value, map1) {
@@ -130,7 +181,7 @@ function get(...args) {
   }
 
   if (is_key(key)) {
-    return map.get(key);
+    return __get(map, key);
   }
 
   if (args.length === 3) {
@@ -149,9 +200,9 @@ function take(key, map1) {
     return ERROR;
   }
 
-  const value = map1.get(key);
+  const value = __get(map1, key);
   const map2 = new Map(map1);
-  map2.delete(key);
+  __delete(map2, key);
 
   return new ErlangTypes.Tuple(value, map2);
 }
@@ -170,4 +221,5 @@ export default {
   update,
   get,
   take,
+  __has,
 };

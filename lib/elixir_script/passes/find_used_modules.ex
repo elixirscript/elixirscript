@@ -8,11 +8,14 @@ defmodule ElixirScript.FindUsedModules do
   """
   @spec execute([atom], pid) :: nil
   def execute(modules, pid) do
-    Enum.each(List.wrap(modules), fn(module) ->
+    modules
+    |> List.wrap
+    |> Task.async_stream(fn(module) ->
       if ElixirScript.State.get_module(pid, module) == nil do
         do_execute(module, pid)
       end
     end)
+    |> Stream.run()
   end
 
   defp do_execute(module, pid) do
@@ -72,7 +75,6 @@ defmodule ElixirScript.FindUsedModules do
     }
 
     Enum.each(reachable_defs, &walk(&1, state))
-
   end
 
   defp walk_protocol(module, implementations, pid) do
@@ -128,7 +130,7 @@ defmodule ElixirScript.FindUsedModules do
   defp walk(form, state) when is_atom(form) and form not in [BitString, Function, PID, Port, Reference, Any, Elixir] do
     if ElixirScript.Translate.Module.is_elixir_module(form) and !ElixirScript.Translate.Module.is_js_module(form, state) do
       if ModuleState.get_module(state.pid, form) == nil do
-        execute(form, state.pid)
+        do_execute(form, state.pid)
       end
     end
   end
@@ -292,7 +294,7 @@ defmodule ElixirScript.FindUsedModules do
     cond do
       ElixirScript.Translate.Module.is_elixir_module(module) ->
         if ModuleState.get_module(state.pid, module) == nil do
-          execute(module, state.pid)
+          do_execute(module, state.pid)
         end
       true ->
         walk(module, state)

@@ -7,13 +7,10 @@ defmodule ElixirScript.Output.JSModule do
   def compile(body, opts, js_modules) do
     elixir = Helpers.declare("Elixir", J.object_expression([]))
 
-    ast = opts.module_formatter.build(
-      js_modules,
-      [elixir, create_atom_table(), start(), load()] ++ body,
-      J.identifier("Elixir")
-    )
+    imports = opts.module_formatter.build_imports(js_modules)
+    exports = opts.module_formatter.build_export(J.identifier("Elixir"))
 
-    ast
+    [elixir, create_atom_table(), start(), load(), imports, body, exports]
   end
 
   def start do

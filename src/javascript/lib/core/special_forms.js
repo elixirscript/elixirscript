@@ -36,20 +36,21 @@ function run_list_generators(generator, generators) {
 }
 
 async function _for(expression, generators, collectable_protocol, into = []) {
-  let [result, fun] = collectable_protocol.into(into);
+  const [result, fun] = collectable_protocol.into(into);
+  let accumulatingResult = result;
 
   const generatedValues = run_list_generators(generators.pop()(), generators);
 
   for (const value of generatedValues) {
     if (await expression.guard.apply(this, value)) {
-      result = await fun(
-        result,
+      accumulatingResult = await fun(
+        accumulatingResult,
         new Core.Tuple(Symbol.for('cont'), await expression.fn.apply(this, value)),
       );
     }
   }
 
-  return fun(result, Symbol.for('done'));
+  return fun(accumulatingResult, Symbol.for('done'));
 }
 
 async function _try(do_fun, rescue_function, catch_fun, else_function, after_function) {
@@ -135,8 +136,29 @@ async function _with(...args) {
   return successFunction(...argsToPass);
 }
 
-function receive() {
+function receive(clauses, timeout = 0, timeoutFn = () => true) {
   console.warn('Receive not supported');
+
+  const messages = []; // this.mailbox.get();
+  const NOMATCH = Symbol('NOMATCH');
+
+  for (let i = 0; i < messages.length; i++) {
+    for (const clause of clauses) {
+      const value = Core.Patterns.match_or_default(
+        clause.pattern,
+        messages[i],
+        clause.guard,
+        NOMATCH,
+      );
+
+      if (value !== NOMATCH) {
+        this.mailbox.removeAt(i);
+        return clause.fn.apply(null, value);
+      }
+    }
+  }
+
+  return null;
 }
 
 export default {
