@@ -8,9 +8,12 @@ defmodule ElixirScript.Translate do
   """
   @spec execute([atom], pid) :: nil
   def execute(modules, pid) do
-    Enum.each(modules, fn
+    modules
+    |> List.wrap()
+    |> Task.async_stream(fn
       {module, info} ->
         ElixirScript.Translate.Module.compile(module, info, pid)
     end)
+    |> Stream.run()
   end
 end
