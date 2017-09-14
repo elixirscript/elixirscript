@@ -168,4 +168,14 @@ defmodule ElixirScript.Translate.Forms.Test do
       ]
     )
   end
+
+  test "make sure counter used in guard", %{state: state} do
+    state = Map.merge(state, %{anonymous_fn: false, function: {:filter_names_in_guards, nil}, in_guard: true,
+    module: Integration, vars: %{"has__qmark__" => 0}})
+
+    ast = {{:., [], [:erlang, :==]}, [line: 29], [{:has?, [line: 29], nil}, 5]}
+
+    {js_ast, _} = Form.compile(ast, state)
+    assert hd(js_ast.arguments).name === "has__qmark__0"
+  end
 end

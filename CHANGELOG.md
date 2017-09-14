@@ -6,13 +6,34 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [unreleased]
 ### Added
-- Reimplement `String.split_at/2` to make sure Unicode library isn't compiled
-- Added `ElixirScript.JS.map_to_object/2` with options [keys: :string, symbols: false]
-- Added `ElixirScript.JS.object_to_map/1|2` with options [keys: :atom, recurse_array: true]
+- [Added `ElixirScript.JS.map_to_object/2` with options [keys: :string, symbols: false]](https://github.com/elixirscript/elixirscript/issues/362)
+- [Added `ElixirScript.JS.object_to_map/1|2` with options [keys: :atom, recurse_array: true]](https://github.com/elixirscript/elixirscript/issues/381)
+- [Fully implement `__info__` on modules](https://github.com/elixirscript/elixirscript/pull/378)
+- [Concurrent Compilation](https://github.com/elixirscript/elixirscript/issues/376)
+- [The following erlang functions have been implemented](https://github.com/elixirscript/elixirscript/issues/306):
+  * :erlang.nodes/0
+  * :erlang.nodes/1
+  * :math.log2/1
+  * :binary.copy/1
+  * :binary.copy/2
+  * :binary.part/2
+  * :binary.part/3
+  * :binary.replace/3
+  * :binary.replace/4 (some options still missing)
 
 ### Fixed
 - Make sure not to add underscores to erlang functions
-- Make sure any variable names that are javascript keywords are handled properly
+- [Make sure any variable names that are javascript keywords are handled properly](https://github.com/elixirscript/elixirscript/issues/355)
+- [Make sure variables that begin with `_` are available](https://github.com/elixirscript/elixirscript/issues/356)
+- [Finding the use of functions within anonymous functions](https://github.com/elixirscript/elixirscript/issues/358)
+- [Reimplement `String.split_at/2` to make sure Unicode library isn't compiled](https://github.com/elixirscript/elixirscript/issues/353)
+- [byte_size does not work on binaries that started via "" elixir string syntax](https://github.com/elixirscript/elixirscript/issues/384)
+- [using . (dot) reference syntax on a map fails when value is a function](https://github.com/elixirscript/elixirscript/issues/380)
+- [Make sure that remote ast works correctly with variables](https://github.com/elixirscript/elixirscript/issues/390)
+- [Make sure == works as expected](https://github.com/elixirscript/elixirscript/issues/382)
+- [Make sure that erlang function names that are also JavaScript keywords are not filters](https://github.com/elixirscript/elixirscript/issues/359)
+- [erlang.error now throws errors resembling those in Elixir](https://github.com/elixirscript/elixirscript/pull/397)
+- [Map.get fails if key is tuple or list](https://github.com/elixirscript/elixirscript/issues/406)
 
 ## [0.30.0] - 2017-08-15
 

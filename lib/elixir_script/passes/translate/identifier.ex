@@ -41,11 +41,11 @@ defmodule ElixirScript.Translate.Identifier do
     |> J.identifier
   end
 
-  defp filter_name(reserved_word) when reserved_word in @js_reserved_words do
+  def filter_name(reserved_word) when reserved_word in @js_reserved_words do
     "__#{Atom.to_string(reserved_word)}__"
   end
 
-  defp filter_name(name) do
+  def filter_name(name) do
     name = to_string(name)
 
     if String.contains?(name, ["?", "!"]) do
