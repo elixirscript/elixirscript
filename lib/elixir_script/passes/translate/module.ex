@@ -23,8 +23,9 @@ defmodule ElixirScript.Translate.Module do
       line: _line,
       module: ^module,
       unreachable: unreachable,
-      used: used
     } = info
+
+    used = Map.get(info, :used, defs)
 
     state = %{
       module: module,
