@@ -21,4 +21,13 @@ defmodule Integration do
     map = %{token_count: 5000000}
     map.token_count.toLocaleString()
   end
+
+  def filter_names_in_guards do
+    has? = 5
+
+    case 5 do
+      _ when has? == 5 ->
+        true
+    end
+  end
 end
