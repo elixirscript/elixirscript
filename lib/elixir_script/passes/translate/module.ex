@@ -14,6 +14,10 @@ defmodule ElixirScript.Translate.Module do
     ElixirScript.Translate.Protocol.compile(module, info, pid)
   end
 
+  def compile(_module, %{attributes: [__foreign_info__: %{path: _, name: _, global: _}]}, _) do
+    nil
+  end
+
   def compile(module, info, pid) do
     %{
       attributes: attrs,
@@ -25,7 +29,7 @@ defmodule ElixirScript.Translate.Module do
       unreachable: unreachable,
     } = info
 
-    used = Map.get(info, :used, defs)
+    used = Map.get(info, :used)
 
     state = %{
       module: module,
@@ -40,7 +44,7 @@ defmodule ElixirScript.Translate.Module do
         _ -> true
       end)
 
-    used_defs = if Keyword.has_key?(attrs, :protocol_impl) do
+    used_defs = if Keyword.has_key?(attrs, :protocol_impl) or used == nil do
       reachable_defs
     else
       Enum.filter(reachable_defs, fn
