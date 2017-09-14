@@ -12,7 +12,8 @@ defmodule ElixirScript.Translate.Forms.Test do
     {:ok, pid} = ElixirScript.State.start_link()
 
     state = %{
-      pid: pid
+      pid: pid,
+      vars: %{}
     }
 
     [state: state]
@@ -177,5 +178,18 @@ defmodule ElixirScript.Translate.Forms.Test do
 
     {js_ast, _} = Form.compile(ast, state)
     assert hd(js_ast.arguments).name === "has__qmark__0"
+  end
+
+  test "multi bind", %{state: state} do
+    ast =
+    {:=, [line: 35],
+     [[{:|, [line: 35], [{:a, [line: 35], nil}, {:_, [line: 35], nil}]}],
+      {:=, [line: 35], [{:b, [line: 35], nil}, [1, 2, 3, 4, 5]]}]}
+
+    {js_ast, _} = Form.compile(ast, state)
+    js_ast
+    |> hd
+    |> IO.inspect
+    |> ESTree.Tools.Generator.generate
   end
 end
