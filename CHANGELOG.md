@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - [Added `ElixirScript.JS.map_to_object/2` with options [keys: :string, symbols: false]](https://github.com/elixirscript/elixirscript/issues/362)
 - [Added `ElixirScript.JS.object_to_map/1|2` with options [keys: :atom, recurse_array: true]](https://github.com/elixirscript/elixirscript/issues/381)
-- [Fully implement __info__ on modules](https://github.com/elixirscript/elixirscript/pull/378)
+- [Fully implement `__info__` on modules](https://github.com/elixirscript/elixirscript/pull/378)
 - [Concurrent Compilation](https://github.com/elixirscript/elixirscript/issues/376)
 - [The following erlang functions have been implemented](https://github.com/elixirscript/elixirscript/issues/306):
   * :erlang.nodes/0
