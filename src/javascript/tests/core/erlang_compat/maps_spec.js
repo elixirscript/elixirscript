@@ -50,8 +50,8 @@ test('get/3', (t) => {
   t.is(result, 1);
 
   myMap = new Map([['a', 1], ['b', 2]]);
-  result = Core.maps.get('c', myMap, "undefined");
-  t.is(result, "undefined");
+  result = Core.maps.get('c', myMap, 'undefined');
+  t.is(result, 'undefined');
 });
 
 test('put/3', (t) => {
@@ -67,7 +67,8 @@ test('put/3', (t) => {
 
 test('take/2', (t) => {
   const myMap = new Map([['a', 1], ['b', 2]]);
-  var a, result;
+  let a; 
+  let result;
   [a, result] = Core.maps.take('a', myMap);
   t.is(a, 1);
   t.is(result.has('a'), false);
