@@ -187,9 +187,7 @@ defmodule ElixirScript.Translate.Forms.Test do
       {:=, [line: 35], [{:b, [line: 35], nil}, [1, 2, 3, 4, 5]]}]}
 
     {js_ast, _} = Form.compile(ast, state)
-    js_ast
-    |> hd
-    |> IO.inspect
-    |> ESTree.Tools.Generator.generate
+
+    assert length(js_ast) > 1
   end
 end

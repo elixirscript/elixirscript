@@ -39,4 +39,9 @@ defmodule ElixirScript.Integration.Test do
     val = call_compiled_function Integration, :tuple_get, []
     assert val == 5
   end
+
+  test "multi_bind" do
+    val = call_compiled_function Integration, :multi_bind, []
+    assert val == [1, 2, 3, 4, 5]
+  end
 end
