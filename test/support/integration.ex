@@ -34,4 +34,9 @@ defmodule Integration do
   def multi_bind do
     [a | _] = b = [1, 2, 3, 4, 5]
   end
+
+  def tuple_get do
+    map = %{{1} => 5}
+    Map.get(map, {1})
+  end
 end

@@ -34,4 +34,9 @@ defmodule ElixirScript.Integration.Test do
     val = call_compiled_function Integration, :filter_names_in_guards, []
     assert val == true
   end
+
+  test "tuple_get" do
+    val = call_compiled_function Integration, :tuple_get, []
+    assert val == 5
+  end
 end
