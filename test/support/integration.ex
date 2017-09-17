@@ -30,4 +30,9 @@ defmodule Integration do
         true
     end
   end
+
+  def tuple_get do
+    map = %{{1} => 5}
+    Map.get(map, {1})
+  end
 end
