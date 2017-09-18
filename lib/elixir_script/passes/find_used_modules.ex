@@ -10,12 +10,11 @@ defmodule ElixirScript.FindUsedModules do
   def execute(modules, pid) do
     modules
     |> List.wrap
-    |> Task.async_stream(fn(module) ->
+    |> Enum.each(fn(module) ->
       if ElixirScript.State.get_module(pid, module) == nil do
         do_execute(module, pid)
       end
     end)
-    |> Stream.run()
   end
 
   defp do_execute(module, pid) do
