@@ -70,7 +70,9 @@ defmodule ElixirScript.Translate.Module do
           exports
         )
 
-        ModuleState.put_module(pid, module, Map.put(info, :js_ast, hd(js_ast)))
+        info = Map.put(info, :js_ast, hd(js_ast))
+
+        ModuleState.put_module(pid, module, info)
     end
   end
 
