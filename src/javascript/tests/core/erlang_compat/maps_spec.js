@@ -38,6 +38,42 @@ test('is_key', (t) => {
   t.is(result, false);
 });
 
+test('get/2', (t) => {
+  const myMap = new Map([['a', 1], ['b', 2]]);
+  const result = Core.maps.get('a', myMap);
+  t.is(result, 1);
+});
+
+test('get/3', (t) => {
+  let myMap = new Map([['a', 1], ['b', 2]]);
+  let result = Core.maps.get('a', myMap);
+  t.is(result, 1);
+
+  myMap = new Map([['a', 1], ['b', 2]]);
+  result = Core.maps.get('c', myMap, 'undefined');
+  t.is(result, 'undefined');
+});
+
+test('put/3', (t) => {
+  const keyMap = new Map([['a', 5]]);
+
+  let myMap = new Map([]);
+  myMap = Core.maps.put(keyMap, 5, myMap);
+  myMap = Core.maps.put(new Map([['a', 5]]), 6, myMap);
+
+  const result = Core.maps.get(new Map([['a', 5]]), myMap);
+  t.is(result, 6);
+});
+
+test('take/2', (t) => {
+  const myMap = new Map([['a', 1], ['b', 2]]);
+  let a; 
+  let result;
+  [a, result] = Core.maps.take('a', myMap);
+  t.is(a, 1);
+  t.is(result.has('a'), false);
+});
+
 test('remove', (t) => {
   let myMap = new Map([['a', 1], ['b', 2]]);
   let result = Core.maps.remove('a', myMap);

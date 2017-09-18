@@ -58,12 +58,14 @@ defmodule ElixirScript.Translate.Function do
     clauses = compile_clauses(clauses, state)
 
     arg_matches_declaration = Helpers.declare_let("__arg_matches__", J.identifier("null"))
+    intermediate_declaration = Helpers.declare_let("__intermediate__", J.identifier("null"))
 
     function_recur_dec = Helpers.function(
       "recur",
       [J.rest_element(J.identifier("__function_args__"))],
       J.block_statement([
         arg_matches_declaration,
+        intermediate_declaration,
         clauses,
         J.throw_statement(
           Helpers.new(

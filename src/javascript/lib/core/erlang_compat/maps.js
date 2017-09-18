@@ -18,6 +18,22 @@ function is_non_primitive(key) {
   );
 }
 
+function __put(map, key, value) {
+  const map2 = new Map(map);
+
+  if (is_non_primitive(key)) {
+    for (const map_key of map.keys()) {
+      if (erlang.equals(map_key, key)) {
+        map2.set(map_key, value);
+        return map2;
+      }
+    }
+  }
+
+  map2.set(key, value);
+  return map2;
+}
+
 function __has(map, key) {
   if (is_non_primitive(key)) {
     for (const map_key of map.keys()) {
@@ -142,10 +158,7 @@ function put(key, value, map1) {
     return new ErlangTypes.Tuple(BADMAP, map1);
   }
 
-  const map2 = new Map(map1);
-  map2.set(key, value);
-
-  return map2;
+  return __put(map1, key, value);
 }
 
 function merge(map1, map2) {
@@ -180,7 +193,7 @@ function get(...args) {
     return new ErlangTypes.Tuple(BADMAP, map);
   }
 
-  if (is_key(key)) {
+  if (is_key(key, map)) {
     return __get(map, key);
   }
 
@@ -196,7 +209,7 @@ function take(key, map1) {
     return new ErlangTypes.Tuple(BADMAP, map1);
   }
 
-  if (!is_key(key)) {
+  if (!is_key(key, map1)) {
     return ERROR;
   }
 
