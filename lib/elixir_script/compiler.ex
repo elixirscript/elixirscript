@@ -22,13 +22,40 @@ defmodule ElixirScript.Compiler do
 
   * `root`: Optional root for imports of FFI JavaScript modules. Defaults to `.`.
   """
-  @spec compile(atom | [atom], []) :: nil
-  def compile(entry_modules, opts \\ []) do
+  @spec compile(atom | [atom] | binary, []) :: nil
+  def compile(path, opts \\ [])
+
+  def compile(path, opts) when is_binary(path) do
+    opts = build_compiler_options(opts, [])
+    {:ok, pid} = ElixirScript.State.start_link()
+
+    path = if String.ends_with?(path, ".ex") or String.ends_with?(path, ".exs") do
+      path
+    else
+      Path.join([path, "**", "*.{ex,exs}"])
+    end
+
+    files = Path.wildcard(path)
+
+    Kernel.ParallelCompiler.files(files, [each_module: &on_module_compile(pid, &1, &2, &3)])
+
+    entry_modules = pid
+    |> ElixirScript.State.get_in_memory_modules
+    |> Keyword.keys
+
+    do_compile(entry_modules, pid, opts)
+  end
+
+  def compile(entry_modules, opts) do
     opts = build_compiler_options(opts, entry_modules)
     {:ok, pid} = ElixirScript.State.start_link()
 
     entry_modules = List.wrap(entry_modules)
 
+    do_compile(entry_modules, pid, opts)
+  end
+
+  defp do_compile(entry_modules, pid, opts) do
     ElixirScript.FindUsedModules.execute(entry_modules, pid)
 
     ElixirScript.FindUsedFunctions.execute(entry_modules, pid)
@@ -53,5 +80,9 @@ defmodule ElixirScript.Compiler do
 
     options = default_options
     Map.put(options, :module_formatter, ElixirScript.ModuleSystems.ES)
+  end
+
+  defp on_module_compile(pid, _file, module, beam) do
+    ElixirScript.State.put_in_memory_module(pid, module, beam)
   end
 end
