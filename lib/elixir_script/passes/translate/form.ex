@@ -19,6 +19,11 @@ defmodule ElixirScript.Translate.Form do
     { J.identifier("null"), state }
   end
 
+  def compile(map, state) when is_map(map) do
+    quoted = Code.string_to_quoted!("#{inspect map}")
+    compile(quoted, state)
+  end
+
   def compile(form, state) when is_boolean(form) or is_integer(form) or is_float(form) or is_binary(form)  do
     { J.literal(form), state }
   end
@@ -122,7 +127,7 @@ defmodule ElixirScript.Translate.Form do
     { ast, state }
   end
 
-  def compile({:for, _, _} = ast, state) do
+  def compile({:for, _, generators} = ast, state) when is_list(generators) do
     For.compile(ast, state)
   end
 

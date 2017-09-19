@@ -78,7 +78,9 @@ defmodule ElixirScript.FindUsedModules do
       module: module
     }
 
-    Enum.each(reachable_defs, &walk(&1, state))
+    Enum.each(reachable_defs, fn(x) ->
+      walk(x, state)
+    end)
   end
 
   defp walk_protocol(module, implementations, pid) do
@@ -170,7 +172,7 @@ defmodule ElixirScript.FindUsedModules do
     walk(params, state)
   end
 
-  defp walk({:for, _, generators}, state) do
+  defp walk({:for, _, generators}, state) when is_list(generators) do
     walk(Collectable, state)
 
     Enum.each(generators, fn

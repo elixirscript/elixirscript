@@ -137,7 +137,7 @@ defmodule ElixirScript.FindUsedFunctions do
     walk(params, state)
   end
 
-  defp walk({:for, _, generators}, state) do
+  defp walk({:for, _, generators}, state) when is_list(generators) do
     Enum.each(generators, fn
       {:<<>>, _, body} ->
         walk(body, state)

@@ -105,7 +105,7 @@ defmodule ElixirScript.State do
   def put_in_memory_module(pid, module, beam) do
     Agent.update(pid, fn(state) ->
       in_memory_modules = Map.get(state, :in_memory_modules, [])
-      in_memory_modules = [{module, beam} | in_memory_modules]
+      in_memory_modules = Keyword.put(in_memory_modules, module, beam)
       %{ state | in_memory_modules: in_memory_modules }
     end)
   end

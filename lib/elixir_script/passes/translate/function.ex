@@ -51,6 +51,7 @@ defmodule ElixirScript.Translate.Function do
   end
 
   def compile({{name, arity}, _type, _, clauses}, state) do
+
     state = Map.put(state, :function, {name, arity})
     |> Map.put(:anonymous_fn, false)
     |> Map.put(:in_guard, false)
