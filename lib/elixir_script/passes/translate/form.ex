@@ -9,11 +9,15 @@ defmodule ElixirScript.Translate.Form do
   alias ElixirScript.Translate.Clause
   require Logger
 
+  @spec compile!(any, map) :: ESTree.Node.t
   def compile!(ast, state) do
     {js_ast, _} = compile(ast, state)
 
     js_ast
   end
+
+  @spec compile(any, map) :: {ESTree.Node.t, map}
+  def compile(ast, state)
 
   def compile(nil, state) do
     { J.identifier("null"), state }
