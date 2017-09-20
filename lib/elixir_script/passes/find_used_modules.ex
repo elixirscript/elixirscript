@@ -11,14 +11,19 @@ defmodule ElixirScript.FindUsedModules do
     modules
     |> List.wrap
     |> Enum.each(fn(module) ->
-      if ElixirScript.State.get_module(pid, module) == nil do
-        do_execute(module, pid)
-      end
+      do_execute(module, pid)
     end)
   end
 
   defp do_execute(module, pid) do
-    case ElixirScript.Beam.debug_info(module) do
+    result = case ModuleState.get_in_memory_module(pid, module) do
+      nil ->
+        ElixirScript.Beam.debug_info(module)
+      beam ->
+        ElixirScript.Beam.debug_info(beam)
+    end
+
+    case result do
       {:ok, info} ->
         walk_module(module, info, pid)
       {:ok, module, implementations} ->
@@ -73,7 +78,9 @@ defmodule ElixirScript.FindUsedModules do
       module: module
     }
 
-    Enum.each(reachable_defs, &walk(&1, state))
+    Enum.each(reachable_defs, fn(x) ->
+      walk(x, state)
+    end)
   end
 
   defp walk_protocol(module, implementations, pid) do
@@ -165,7 +172,7 @@ defmodule ElixirScript.FindUsedModules do
     walk(params, state)
   end
 
-  defp walk({:for, _, generators}, state) do
+  defp walk({:for, _, generators}, state) when is_list(generators) do
     walk(Collectable, state)
 
     Enum.each(generators, fn

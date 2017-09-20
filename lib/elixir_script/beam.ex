@@ -7,7 +7,7 @@ defmodule ElixirScript.Beam do
   For protocols, this will return a list of
   all the protocol implementations
   """
-  @spec debug_info(atom) :: {:ok | :error, map | binary}
+  @spec debug_info(atom | bitstring) :: {:ok | :error, map | binary}
   def debug_info(module)
 
   # We get debug info from String and then replace
@@ -39,9 +39,23 @@ defmodule ElixirScript.Beam do
     do_debug_info(module)
   end
 
-  defp do_debug_info(module) when is_atom(module) do
-    with  {_, beam, beam_path} <- :code.get_object_code(module),
-          {:ok, {^module, [debug_info: {:debug_info_v1, backend, data}]}} <- :beam_lib.chunks(beam, [:debug_info]),
+  def debug_info(beam) when is_bitstring(beam) do
+    do_debug_info(beam)
+  end
+
+  defp do_debug_info(module, path \\ nil)
+
+  defp do_debug_info(module, _) when is_atom(module) do
+    case :code.get_object_code(module) do
+      {_, beam, beam_path} ->
+        do_debug_info(beam, beam_path)
+      :error ->
+        {:error, "Unknown module"}
+    end
+  end
+
+  defp do_debug_info(beam, beam_path) do
+    with  {:ok, {module, [debug_info: {:debug_info_v1, backend, data}]}} <- :beam_lib.chunks(beam, [:debug_info]),
           {:ok, {^module, attribute_info}} = :beam_lib.chunks(beam, [:attributes]) do
 
           if Keyword.get(attribute_info[:attributes], :protocol) do
@@ -60,6 +74,11 @@ defmodule ElixirScript.Beam do
       {:error, :beam_lib, {:file_error, "non_existing.beam", :enoent}} ->
         {:error, "Debug info not available"}
     end
+  end
+
+  defp process_debug_info({:ok, info}, nil) do
+    info = Map.put(info, :last_modified, nil)
+    {:ok, info}
   end
 
   defp process_debug_info({:ok, info}, beam_path) do
