@@ -2,11 +2,13 @@ defmodule ElixirScript.Compiler do
   @moduledoc """
   The entry point for the ElixirScript compilation process.
   Takes the given module(s) and compiles them and all modules
-  and functions they use into JavaScript
+  and functions they use into JavaScript.
+
+  Will also take a path to Elixir files
   """
 
   @doc """
-  Takes either a module name or a list of module names as
+  Takes either a module name, list of module names, or a path as
   the entry point(s) of an application/library. From there
   it will determine which modules and functions are needed
   to be compiled.
@@ -22,12 +24,16 @@ defmodule ElixirScript.Compiler do
 
   * `root`: Optional root for imports of FFI JavaScript modules. Defaults to `.`.
   """
+  alias ElixirScript.{State, Translate, FindUsedModules, FindUsedFunctions, Output}
+  alias ElixirScript.ModuleSystems.ES
+  alias Kernel.ParallelCompiler
+
   @spec compile(atom | [atom] | binary, []) :: nil
   def compile(path, opts \\ [])
 
   def compile(path, opts) when is_binary(path) do
-    opts = build_compiler_options(opts, [])
-    {:ok, pid} = ElixirScript.State.start_link()
+    opts = build_compiler_options(opts)
+    {:ok, pid} = State.start_link()
 
     path = if String.ends_with?(path, ".ex") or String.ends_with?(path, ".exs") do
       path
@@ -37,18 +43,18 @@ defmodule ElixirScript.Compiler do
 
     files = Path.wildcard(path)
 
-    Kernel.ParallelCompiler.files(files, [each_module: &on_module_compile(pid, &1, &2, &3)])
+    ParallelCompiler.files(files, [each_module: &on_module_compile(pid, &1, &2, &3)])
 
     entry_modules = pid
-    |> ElixirScript.State.get_in_memory_modules
+    |> State.get_in_memory_modules
     |> Keyword.keys
 
     do_compile(entry_modules, pid, opts)
   end
 
   def compile(entry_modules, opts) do
-    opts = build_compiler_options(opts, entry_modules)
-    {:ok, pid} = ElixirScript.State.start_link()
+    opts = build_compiler_options(opts)
+    {:ok, pid} = State.start_link()
 
     entry_modules = List.wrap(entry_modules)
 
@@ -56,33 +62,32 @@ defmodule ElixirScript.Compiler do
   end
 
   defp do_compile(entry_modules, pid, opts) do
-    ElixirScript.FindUsedModules.execute(entry_modules, pid)
+    FindUsedModules.execute(entry_modules, pid)
 
-    ElixirScript.FindUsedFunctions.execute(entry_modules, pid)
+    FindUsedFunctions.execute(entry_modules, pid)
 
-    modules = ElixirScript.State.list_modules(pid)
-    ElixirScript.Translate.execute(modules, pid)
+    modules = State.list_modules(pid)
+    Translate.execute(modules, pid)
 
-    modules = ElixirScript.State.list_modules(pid)
-    result = ElixirScript.Output.execute(modules, pid, opts)
+    modules = State.list_modules(pid)
+    result = Output.execute(modules, pid, opts)
 
-    ElixirScript.State.stop(pid)
+    State.stop(pid)
 
     result
   end
 
-  defp build_compiler_options(opts, entry_modules) do
+  defp build_compiler_options(opts) do
     default_options = Map.new
     |> Map.put(:output, Keyword.get(opts, :output))
     |> Map.put(:format, :es)
-    |> Map.put(:entry_modules, entry_modules)
     |> Map.put(:root, Keyword.get(opts, :root, "."))
 
     options = default_options
-    Map.put(options, :module_formatter, ElixirScript.ModuleSystems.ES)
+    Map.put(options, :module_formatter, ES)
   end
 
   defp on_module_compile(pid, _file, module, beam) do
-    ElixirScript.State.put_in_memory_module(pid, module, beam)
+    State.put_in_memory_module(pid, module, beam)
   end
 end
