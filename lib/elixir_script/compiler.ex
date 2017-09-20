@@ -24,7 +24,13 @@ defmodule ElixirScript.Compiler do
 
   * `root`: Optional root for imports of FFI JavaScript modules. Defaults to `.`.
   """
-  alias ElixirScript.{State, Translate, FindUsedModules, FindUsedFunctions, Output}
+  alias ElixirScript.{
+    State,
+    Translate,
+    FindUsedModules,
+    FindUsedFunctions,
+    Output
+  }
   alias ElixirScript.ModuleSystems.ES
   alias Kernel.ParallelCompiler
 
@@ -35,7 +41,7 @@ defmodule ElixirScript.Compiler do
     opts = build_compiler_options(opts)
     {:ok, pid} = State.start_link()
 
-    path = if String.ends_with?(path, ".ex") or String.ends_with?(path, ".exs") do
+    path = if String.ends_with?(path, [".ex", ".exs"]) do
       path
     else
       Path.join([path, "**", "*.{ex,exs}"])
@@ -43,7 +49,9 @@ defmodule ElixirScript.Compiler do
 
     files = Path.wildcard(path)
 
-    ParallelCompiler.files(files, [each_module: &on_module_compile(pid, &1, &2, &3)])
+    ParallelCompiler.files(files, [
+      each_module: &on_module_compile(pid, &1, &2, &3)
+    ])
 
     entry_modules = pid
     |> State.get_in_memory_modules
