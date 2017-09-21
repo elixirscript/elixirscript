@@ -10,7 +10,7 @@ defmodule ElixirScript.Output.JSModule do
     imports = opts.module_formatter.build_imports(js_modules)
     exports = opts.module_formatter.build_export(J.identifier("Elixir"))
 
-    [elixir, create_atom_table(), start(), load(), imports, body, exports]
+    [elixir, create_atom_table(), start(), load(), imports] ++ body ++ [exports]
   end
 
   def start do

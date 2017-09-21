@@ -9,47 +9,23 @@ defmodule ElixirScript.Translate.Form do
   alias ElixirScript.Translate.Clause
   require Logger
 
-  @js_reserved_words [
-    :break,
-    :case,
-    :class,
-    :const,
-    :continue,
-    :debugger,
-    :default,
-    :delete,
-    :do,
-    :else,
-    :export,
-    :extends,
-    :finally,
-    :function,
-    :if,
-    :import,
-    :in,
-    :instanceof,
-    :new,
-    :return,
-    :super,
-    :switch,
-    :throw,
-    :try,
-    :typeof,
-    :var,
-    :void,
-    :while,
-    :with,
-    :yield
-  ]
-
+  @spec compile!(any, map) :: ESTree.Node.t
   def compile!(ast, state) do
     {js_ast, _} = compile(ast, state)
 
     js_ast
   end
 
+  @spec compile(any, map) :: {ESTree.Node.t, map}
+  def compile(ast, state)
+
   def compile(nil, state) do
     { J.identifier("null"), state }
+  end
+
+  def compile(map, state) when is_map(map) do
+    quoted = Code.string_to_quoted!("#{inspect map}")
+    compile(quoted, state)
   end
 
   def compile(form, state) when is_boolean(form) or is_integer(form) or is_float(form) or is_binary(form)  do
@@ -155,7 +131,7 @@ defmodule ElixirScript.Translate.Form do
     { ast, state }
   end
 
-  def compile({:for, _, _} = ast, state) do
+  def compile({:for, _, generators} = ast, state) when is_list(generators) do
     For.compile(ast, state)
   end
 
@@ -406,18 +382,11 @@ defmodule ElixirScript.Translate.Form do
     end
   end
 
-  def compile({var, meta, _}, state) when var in @js_reserved_words do
-    counter = Pattern.get_counter(meta)
-
-    var = String.to_atom("__#{var}__")
-    var = Pattern.get_variable_name(to_string(var) <> counter, state)
-    { ElixirScript.Translate.Identifier.make_identifier(var), state }
-  end
-
   def compile({var, meta, _}, state) do
     counter = Pattern.get_counter(meta)
 
-    var = Pattern.get_variable_name(to_string(var) <> counter, state)
+    var = ElixirScript.Translate.Identifier.filter_name(var)
+    var = Pattern.get_variable_name(var <> counter, state)
     { ElixirScript.Translate.Identifier.make_identifier(var), state }
   end
 

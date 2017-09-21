@@ -11,21 +11,19 @@ defmodule ElixirScript.FindUsedFunctions do
   def execute(entry_modules, pid) do
     entry_modules
     |> List.wrap
-    |> Task.async_stream(fn
+    |> Enum.each(fn
       module ->
         walk_module(module, pid)
     end)
-    |> Stream.run()
 
     pid
     |> ElixirScript.State.list_modules
-    |> Task.async_stream(fn
+    |> Enum.each(fn
       {module, info} ->
         if get_in(info, [:attributes, :protocol_impl]) do
           walk_module(module, pid)
         end
     end)
-    |> Stream.run()
   end
 
   defp walk_module(module, pid) do
@@ -139,7 +137,7 @@ defmodule ElixirScript.FindUsedFunctions do
     walk(params, state)
   end
 
-  defp walk({:for, _, generators}, state) do
+  defp walk({:for, _, generators}, state) when is_list(generators) do
     Enum.each(generators, fn
       {:<<>>, _, body} ->
         walk(body, state)

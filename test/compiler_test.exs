@@ -30,4 +30,26 @@ defmodule ElixirScript.Compiler.Test do
     ElixirScript.Compiler.compile(Atom, [output: path])
     assert File.exists?(path)
   end
+
+  test "compile file" do
+    path = System.tmp_dir()
+    path = Path.join([path, "myfile.js"])
+
+    input_path = Path.join([File.cwd!(), "test", "beam_test.exs"])
+
+    ElixirScript.Compiler.compile(input_path, [output: path])
+    assert File.exists?(path)
+    assert String.contains?(File.read!(path), "Elixir.ElixirScript.Beam.Test")
+  end
+
+  test "compile wildcard" do
+    path = System.tmp_dir()
+    path = Path.join([path, "myfile.js"])
+
+    input_path = Path.join([File.cwd!(), "test", "*fi_test.exs"])
+
+    ElixirScript.Compiler.compile(input_path, [output: path])
+    assert File.exists?(path)
+    assert String.contains?(File.read!(path), "Elixir.ElixirScript.FFI.Test")
+  end
 end
