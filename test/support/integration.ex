@@ -21,4 +21,22 @@ defmodule Integration do
     map = %{token_count: 5000000}
     map.token_count.toLocaleString()
   end
+
+  def filter_names_in_guards do
+    has? = 5
+
+    case 5 do
+      _ when has? == 5 ->
+        true
+    end
+  end
+
+  def multi_bind do
+    [a | _] = b = [1, 2, 3, 4, 5]
+  end
+
+  def tuple_get do
+    map = %{{1} => 5}
+    Map.get(map, {1})
+  end
 end

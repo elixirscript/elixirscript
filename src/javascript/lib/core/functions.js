@@ -95,12 +95,14 @@ function map_to_object(map, options = []) {
 
   const object = {};
 
-  for (let [key, value] of map.entries()) {
+  for (const entry of map.entries()) {
+    let key = entry[0];
+    const value = entry[1];
+
     if (opt_keys === Symbol.for('string') && typeof key === 'number') {
       key = key.toString();
     } else if (
-      (opt_keys === Symbol.for('string') ||
-        opt_symbols !== Symbol.for('undefined')) &&
+      (opt_keys === Symbol.for('string') || opt_symbols !== Symbol.for('undefined')) &&
       typeof key === 'symbol'
     ) {
       key = erlang.atom_to_binary(key);
@@ -108,10 +110,7 @@ function map_to_object(map, options = []) {
 
     if (value instanceof Map) {
       object[key] = map_to_object(value, options);
-    } else if (
-      opt_symbols !== Symbol.for('undefined') &&
-      typeof value === 'symbol'
-    ) {
+    } else if (opt_symbols !== Symbol.for('undefined') && typeof value === 'symbol') {
       object[key] = erlang.atom_to_binary(value);
     } else {
       object[key] = value;
@@ -122,14 +121,12 @@ function map_to_object(map, options = []) {
 }
 
 function object_to_map(object, options = []) {
-  const opt_atom_keys =
-    proplists.get_value(Symbol.for('keys'), options) === Symbol.for('atom');
-  const opt_recurse_array =
-    proplists.get_value(Symbol.for('recurse_array'), options) === true;
+  const opt_atom_keys = proplists.get_value(Symbol.for('keys'), options) === Symbol.for('atom');
+  const opt_recurse_array = proplists.get_value(Symbol.for('recurse_array'), options) === true;
 
   if (object.constructor === Object) {
     const map = new Map();
-    Reflect.ownKeys(object).forEach(key => {
+    Reflect.ownKeys(object).forEach((key) => {
       let key2 = key;
       let value = object[key];
       if (opt_atom_keys && typeof key === 'string') {
@@ -137,8 +134,8 @@ function object_to_map(object, options = []) {
       }
 
       if (
-        value.constructor === Object ||
-        (value instanceof Array && opt_recurse_array)
+        value !== null &&
+        (value.constructor === Object || (value instanceof Array && opt_recurse_array))
       ) {
         value = object_to_map(value, options);
       }
@@ -146,8 +143,8 @@ function object_to_map(object, options = []) {
     });
     return map;
   } else if (object instanceof Array && opt_recurse_array) {
-    return object.map(ele => {
-      if (ele.constructor === Object || ele instanceof Array) {
+    return object.map((ele) => {
+      if (ele !== null && (ele.constructor === Object || ele instanceof Array)) {
         return object_to_map(ele, options);
       }
       return ele;
@@ -222,5 +219,5 @@ export default {
   Recurse,
   split_at,
   graphemes,
-  concat
+  concat,
 };

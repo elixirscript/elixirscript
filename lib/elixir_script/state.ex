@@ -7,7 +7,8 @@ defmodule ElixirScript.State do
     Agent.start_link(fn ->
       %{
         modules: Keyword.new,
-        js_modules: []
+        js_modules: [],
+        in_memory_modules: []
       }
     end)
   end
@@ -25,7 +26,8 @@ defmodule ElixirScript.State do
   def put_module(pid, module, value) do
     Agent.update(pid, fn(state) ->
       value = Map.put(value, :used, [])
-      %{ state | modules: Keyword.put(state.modules, module, value) }
+      modules = Keyword.put(state.modules, module, value)
+      %{ state | modules: modules }
     end)
   end
 
@@ -41,7 +43,7 @@ defmodule ElixirScript.State do
       module_info = Keyword.get(state.modules, module)
 
       used = Map.get(module_info, :used, [])
-      used = used ++ [func]
+      used = [func | used]
 
       module_info = Map.put(module_info, :used, used)
       modules = Keyword.put(state.modules, module, module_info)
@@ -53,7 +55,7 @@ defmodule ElixirScript.State do
   def put_javascript_module(pid, module, name, path) do
     Agent.update(pid, fn(state) ->
       js_modules = Map.get(state, :js_modules, [])
-      js_modules = js_modules ++ [{module, name, path}]
+      js_modules = [{module, name, path} | js_modules]
       %{ state | js_modules: js_modules }
     end)
   end
@@ -85,6 +87,26 @@ defmodule ElixirScript.State do
   def list_modules(pid) do
     Agent.get(pid, fn(state) ->
       state.modules
+    end)
+  end
+
+  def get_in_memory_module(pid, module) do
+    Agent.get(pid, fn(state) ->
+      Keyword.get(state.in_memory_modules, module)
+    end)
+  end
+
+  def get_in_memory_modules(pid) do
+    Agent.get(pid, fn(state) ->
+      state.in_memory_modules
+    end)
+  end
+
+  def put_in_memory_module(pid, module, beam) do
+    Agent.update(pid, fn(state) ->
+      in_memory_modules = Map.get(state, :in_memory_modules, [])
+      in_memory_modules = Keyword.put(in_memory_modules, module, beam)
+      %{ state | in_memory_modules: in_memory_modules }
     end)
   end
 end

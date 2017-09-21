@@ -12,6 +12,17 @@ defmodule ElixirScript.ModuleSystems.ES do
     imports ++ body ++ export
   end
 
+  def build_imports(js_imports) do
+    js_imports
+    |> Enum.map(fn
+      {_module, name, _path, import_path} -> import_module(name, import_path)
+    end)
+  end
+
+  def build_export(exports) do
+    if is_nil(exports), do: [], else: [export_module(exports)]
+  end
+
   defp import_module(import_name, from) do
     js_module_name = JS.identifier(import_name)
 

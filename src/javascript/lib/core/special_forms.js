@@ -7,7 +7,7 @@ function* _case(condition, clauses) {
 function* cond(...clauses) {
   for (const clause of clauses) {
     if (clause[0]) {
-      return clause[1]();
+      return yield* clause[1]();
     }
   }
 
@@ -16,7 +16,7 @@ function* cond(...clauses) {
 
 function run_list_generators(generator, generators) {
   if (generators.length === 0) {
-    return generator.map(x => {
+    return generator.map((x) => {
       if (Array.isArray(x)) {
         return x;
       }
@@ -36,32 +36,24 @@ function run_list_generators(generator, generators) {
 }
 
 function* _for(expression, generators, collectable_protocol, into = []) {
-  let [result, fun] = collectable_protocol.into(into);
+  const [result, fun] = collectable_protocol.into(into);
+  let accumulatingResult = result;
 
   const generatedValues = run_list_generators(generators.pop()(), generators);
 
   for (const value of generatedValues) {
-    if (yield* expression.guard.apply(this, value)) {
-      result = yield* fun(
-        result,
-        new Core.Tuple(
-          Symbol.for('cont'),
-          yield* expression.fn.apply(this, value)
-        )
+    if (expression.guard.apply(this, value)) {
+      accumulatingResult = yield* fun(
+        accumulatingResult,
+        new Core.Tuple(Symbol.for('cont'), expression.fn.apply(this, value)),
       );
     }
   }
 
-  return fun(result, Symbol.for('done'));
+  return fun(accumulatingResult, Symbol.for('done'));
 }
 
-function* _try(
-  do_fun,
-  rescue_function,
-  catch_fun,
-  else_function,
-  after_function
-) {
+function* _try(do_fun, rescue_function, catch_fun, else_function, after_function) {
   let result = null;
 
   try {
@@ -129,10 +121,7 @@ function* _with(...args) {
 
     const result = yield* func(...argsToPass);
 
-    const patternResult = yield* Core.Patterns.match_or_default_gen(
-      pattern,
-      result
-    );
+    const patternResult = yield* Core.Patterns.match_or_default_gen(pattern, result);
 
     if (patternResult == null) {
       if (elseFunction) {
@@ -148,11 +137,7 @@ function* _with(...args) {
 }
 
 function* receive(clauses, timeout = 0, timeoutFn = () => true) {
-  return Core.global.__elxirscript_process_system__.receive(
-    clauses,
-    timeout,
-    timeoutFn
-  );
+  return yield* Core.global.__elxirscript_process_system__.receive(clauses, timeout, timeoutFn);
 }
 
 export default {
@@ -161,5 +146,5 @@ export default {
   _for,
   _try,
   _with,
-  receive
+  receive,
 };

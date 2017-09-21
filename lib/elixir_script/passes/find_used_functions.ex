@@ -9,13 +9,16 @@ defmodule ElixirScript.FindUsedFunctions do
   """
   @spec execute([atom], pid) :: nil
   def execute(entry_modules, pid) do
-    Enum.each(entry_modules, fn
+    entry_modules
+    |> List.wrap
+    |> Enum.each(fn
       module ->
         walk_module(module, pid)
     end)
 
-    modules = ElixirScript.State.list_modules(pid)
-    Enum.each(modules, fn
+    pid
+    |> ElixirScript.State.list_modules
+    |> Enum.each(fn
       {module, info} ->
         if get_in(info, [:attributes, :protocol_impl]) do
           walk_module(module, pid)
@@ -134,7 +137,7 @@ defmodule ElixirScript.FindUsedFunctions do
     walk(params, state)
   end
 
-  defp walk({:for, _, generators}, state) do
+  defp walk({:for, _, generators}, state) when is_list(generators) do
     Enum.each(generators, fn
       {:<<>>, _, body} ->
         walk(body, state)
