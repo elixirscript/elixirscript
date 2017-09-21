@@ -36,8 +36,9 @@ defmodule ElixirScript.CLI do
 
   defp help_message do
   """
-  usage: elixirscript <module> [options]
+  usage: elixirscript <module | path> [options]
   <module> the entry module of your application
+  <path> the path to .ex(s) files to compile
 
   options:
   -o  --output [path]   places output at the given path.
