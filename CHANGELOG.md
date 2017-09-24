@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [unreleased]
+## [0.31.0] - 2017-09-24
 ### Added
 - [Compiler will now accept a path to Elixir Files to compile](https://github.com/elixirscript/elixirscript/issues/420)
 - [Added `ElixirScript.JS.map_to_object/2` with options [keys: :string, symbols: false]](https://github.com/elixirscript/elixirscript/issues/362)
