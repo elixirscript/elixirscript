@@ -31,6 +31,21 @@ defmodule ElixirScript.State do
     end)
   end
 
+  def add_used_module(pid, module, used_module) do
+    Agent.update(pid, fn(state) ->
+      module_info = Keyword.get(state.modules, module)
+
+      used_module = Map.get(module_info, :used_module, [])
+      used_module = Enum.uniq([used_module | used_module])
+
+      module_info = Map.put(module_info, :used_module, used_module)
+      modules = Keyword.put(state.modules, module, module_info)
+
+      %{ state | modules: modules }
+    end)
+  end
+
+
   def has_used?(pid, module, func) do
     Agent.get(pid, fn(state) ->
       module_info = Keyword.get(state.modules, module)
