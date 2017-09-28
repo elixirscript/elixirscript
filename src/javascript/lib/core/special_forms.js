@@ -1,7 +1,7 @@
 import Core from '../core';
 
 function* _case(condition, clauses) {
-  return Core.Patterns.defmatchGen(...clauses)(condition);
+  return yield* Core.Patterns.defmatchGen(...clauses)(condition);
 }
 
 function* cond(...clauses) {

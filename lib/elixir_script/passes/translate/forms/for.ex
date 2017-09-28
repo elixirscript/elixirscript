@@ -15,7 +15,7 @@ defmodule ElixirScript.Translate.Forms.For do
     fun = args.fun
 
 
-    expression = Helpers.call(
+    expression = Helpers.call_sync(
       JS.member_expression(
         Helpers.patterns(),
         JS.identifier("clause")
@@ -30,7 +30,7 @@ defmodule ElixirScript.Translate.Forms.For do
       [JS.identifier("Elixir")]
     )
 
-    ast = Helpers.call(
+    ast = Helpers.call_gen(
       JS.member_expression(
         Helpers.special_forms(),
         JS.identifier("_for")

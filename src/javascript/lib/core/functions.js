@@ -208,6 +208,17 @@ function concat(head, tail) {
   return [head].concat(tail);
 }
 
+function to_js_function(generator) {
+  const genObj = generator();
+  let value = null;
+
+  while (genObj.done === false) {
+    value = genObj.next(value);
+  }
+
+  return value;
+}
+
 export default {
   call_property,
   defprotocol,
@@ -220,4 +231,5 @@ export default {
   split_at,
   graphemes,
   concat,
+  to_js_function,
 };

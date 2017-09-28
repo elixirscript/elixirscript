@@ -148,4 +148,18 @@ defmodule ElixirScript.Translate.Forms.JS do
 
     {ast, state}
   end
+
+  def compile({{:., _, [ElixirScript.JS, :to_js_function]}, _, [func]}, state) do
+    ast = Helpers.call_sync(
+      J.member_expression(
+        Helpers.functions(),
+        J.identifier("to_js_function")
+      ),
+      [
+        Form.compile!(func, state)
+      ]
+    )
+
+    {ast, state}
+  end
 end

@@ -19,7 +19,7 @@ defmodule ElixirScript.Translate.Clause do
     |> return_last_statement
     #|> Function.update_last_call(state)
 
-    ast = Helpers.call(
+    ast = Helpers.call_sync(
       J.member_expression(
         Helpers.patterns(),
         J.identifier("clause")

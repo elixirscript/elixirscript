@@ -98,7 +98,7 @@ defmodule ElixirScript.Translate.Function do
     clauses
     |> Enum.map(&compile_clause(&1, state))
     |> Enum.map(fn {patterns, _params, guards, body} ->
-      match_or_default_call = Helpers.call(
+      match_or_default_call = Helpers.call_gen(
         J.member_expression(
           Helpers.patterns(),
           J.identifier("match_or_default_gen")

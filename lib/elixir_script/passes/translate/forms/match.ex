@@ -65,10 +65,10 @@ defmodule ElixirScript.Translate.Forms.Match do
 
     { patterns, params, state } = Pattern.compile([left], state)
 
-    array_pattern = Helpers.declare(params, Helpers.call(
+    array_pattern = Helpers.declare(params, Helpers.call_gen(
       J.member_expression(
         Helpers.patterns(),
-        J.identifier("match")
+        J.identifier("match_gen")
       ),
       [hd(patterns), right_ast]
     ))
@@ -112,10 +112,10 @@ defmodule ElixirScript.Translate.Forms.Match do
     {js_ast, state} = Enum.map_reduce(lefts, state, fn(left, state) ->
       { patterns, params, state } = Pattern.compile([left], state)
 
-      array_pattern = Helpers.declare(params, Helpers.call(
+      array_pattern = Helpers.declare(params, Helpers.call_gen(
         J.member_expression(
           Helpers.patterns(),
-          J.identifier("match")
+          J.identifier("match_gen")
         ),
         [hd(patterns), J.identifier("__intermediate__")]
       ))

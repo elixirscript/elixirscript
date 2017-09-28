@@ -37,6 +37,14 @@ defmodule ElixirScript.Translate.Helpers do
     |> J.yield_expression(true)
   end
 
+  def call_gen(callee, arguments) do
+    J.call_expression(
+      callee,
+      arguments
+    )
+    |> J.yield_expression(true)
+  end
+
   def arrow_function(params, body) do
     J.function_expression(
       params,

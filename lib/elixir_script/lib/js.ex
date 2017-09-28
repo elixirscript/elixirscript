@@ -91,4 +91,9 @@ defmodule ElixirScript.JS do
   ```
   """
   defexternal object_to_map(object, options)
+
+  @doc """
+  Turns an Elixir function into a JavaScript one
+  """
+  defexternal to_js_function(function)
 end

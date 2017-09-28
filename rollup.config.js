@@ -15,10 +15,10 @@ export default {
     babel({
       babelrc: false,
     }),
-    minify({
-      keepFnName: true,
-      keepClassName: true,
-    }),
+    //minify({
+    //  keepFnName: true,
+    //  keepClassName: true,
+    //}),
   ],
   output: [{ file: 'priv/build/iife/ElixirScript.Core.js', format: 'iife' }],
 };
