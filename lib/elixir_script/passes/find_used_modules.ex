@@ -210,7 +210,7 @@ defmodule ElixirScript.FindUsedModules do
     end)
   end
 
-  defp walk({:receive, _context, blocks}, state) do
+  defp walk({:receive, _context, blocks}, state) when is_list(blocks) do
     do_block = Keyword.get(blocks, :do)
     after_block = Keyword.get(blocks, :after, nil)
 
