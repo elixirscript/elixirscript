@@ -26,6 +26,8 @@ defmodule ElixirScript.State do
   def put_module(pid, module, value) do
     Agent.update(pid, fn(state) ->
       value = Map.put(value, :used, [])
+      |> Map.put(:used_modules, [])
+
       modules = Keyword.put(state.modules, module, value)
       %{ state | modules: modules }
     end)
@@ -35,10 +37,10 @@ defmodule ElixirScript.State do
     Agent.update(pid, fn(state) ->
       module_info = Keyword.get(state.modules, module)
 
-      used_module = Map.get(module_info, :used_module, [])
-      used_module = Enum.uniq([used_module | used_module])
+      used_modules = Map.get(module_info, :used_modules, [])
+      used_modules = Enum.uniq([used_module | used_modules])
 
-      module_info = Map.put(module_info, :used_module, used_module)
+      module_info = Map.put(module_info, :used_modules, used_modules)
       modules = Keyword.put(state.modules, module, module_info)
 
       %{ state | modules: modules }
