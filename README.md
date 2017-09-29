@@ -25,7 +25,7 @@ Also add `elixir_script` configuration
   [
     app: :my_app,
     # ...
-    # Add elixir_script as a compilter
+    # Add elixir_script as a compiler
     compilers: Mix.compilers ++ [:elixir_script],
     # Our elixir_script configuration
     elixir_script: [
