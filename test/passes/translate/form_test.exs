@@ -4,8 +4,7 @@ defmodule ElixirScript.Translate.Forms.Test do
   alias ElixirScript.Translate.Identifier
   alias ElixirScript.Translate.Helpers
   alias ESTree.Tools.Builder, as: J
-  require StreamData
-  import PropertyTest
+  use ExUnitProperties
 
 
   setup_all do

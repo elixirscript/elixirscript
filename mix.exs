@@ -31,7 +31,7 @@ defmodule ElixirScript.Mixfile do
       {:ex_doc, "~> 0.16", only: :dev},
       {:excoveralls, "~> 0.7", only: :test},
       {:credo, "~> 0.8", only: [:dev, :test]},
-      {:stream_data, "~> 0.1", only: :test},
+      {:stream_data, "~> 0.3", only: :test},
       {:poison, "~> 3.1", only: :test}
     ]
   end
