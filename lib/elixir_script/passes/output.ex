@@ -49,14 +49,7 @@ defmodule ElixirScript.Output do
   end
 
   defp concat(code) do
-    bootstrap_code = get_bootstrap_js()
-    "'use strict';\nexport #{bootstrap_code}\n#{code}"
-  end
-
-  defp get_bootstrap_js() do
-    operating_path = Path.join([Mix.Project.build_path, "lib", "elixir_script", "priv"])
-    path = Path.join([operating_path, "build", "iife", "ElixirScript.Core.js"])
-    File.read!(path)
+    "'use strict';\nimport ElixirScript from './ElixirScript.Core.js';\n#{code}"
   end
 
   defp prepare_js_ast(js_ast) do
@@ -80,18 +73,25 @@ defmodule ElixirScript.Output do
 
   defp output(code, path, js_modules) do
     file_name = get_output_file_name(path)
+    output_dir = Path.dirname(file_name)
 
-    if !File.exists?(Path.dirname(file_name)) do
-      File.mkdir_p!(Path.dirname(file_name))
+    if !File.exists?(output_dir) do
+      File.mkdir_p!(output_dir)
     end
 
     apps = get_app_names()
-    output_dir = Path.dirname(file_name)
     Enum.each(js_modules, fn({_, _, path, _}) ->
       copy_javascript_module(apps, output_dir, path)
     end)
 
+    copy_bootstrap_js(output_dir)
     File.write!(file_name, code)
+  end
+
+  defp copy_bootstrap_js(directory) do
+    operating_path = Path.join([Mix.Project.build_path, "lib", "elixir_script", "priv"])
+    path = Path.join([operating_path, "build", "es", "ElixirScript.Core.js"])
+    File.cp!(path, Path.join([directory, "ElixirScript.Core.js"]))
   end
 
   def get_output_file_name(path) do

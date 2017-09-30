@@ -13,7 +13,8 @@ defmodule Helpers do
     |> Enum.join(",")
 
     main = """
-    import Elixir, {ElixirScript} from './#{filename}.mjs'
+    import ElixirScript from './ElixirScript.Core.js';
+    import Elixir from './#{filename}.mjs';
 
     const mod = Elixir.#{inspect module}.__load(Elixir)
     const ret = mod.#{func}(#{args_to_js})
