@@ -20,5 +20,8 @@ export default {
       keepClassName: true,
     }),
   ],
-  output: [{ file: 'priv/build/iife/ElixirScript.Core.js', format: 'iife' }],
+  output: [
+    { file: 'priv/build/iife/ElixirScript.Core.js', format: 'iife' },
+    { file: 'priv/build/es/ElixirScript.Core.js', format: 'es', sourcemap: 'inline' },
+  ],
 };
