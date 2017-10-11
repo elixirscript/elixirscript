@@ -49,7 +49,12 @@ defmodule ElixirScript.Output do
   end
 
   defp concat(code) do
-    "'use strict';\nimport ElixirScript from './ElixirScript.Core.js';\n#{code}"
+    """
+    'use strict';
+    import ElixirScript from './ElixirScript.Core.js';
+    const Elixir = ElixirScript.Core.initApp();
+    #{code}
+    """
   end
 
   defp prepare_js_ast(js_ast) do

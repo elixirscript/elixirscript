@@ -30,6 +30,18 @@ function get_global() {
   return null;
 }
 
+function initApp() {
+  const Elixir = {};
+
+  Elixir.__table__ = {};
+  Elixir.start = (app, args) => {
+    app.__load(Elixir).start(Symbol.for('normal'), args);
+  };
+  Elixir.load = module => module.__load(Elixir);
+
+  return Elixir;
+}
+
 const globalState = get_global();
 
 globalState.__elixirscript_store__ = new Map();
@@ -57,4 +69,5 @@ export default {
   elixir_config,
   math,
   proplists,
+  initApp,
 };
