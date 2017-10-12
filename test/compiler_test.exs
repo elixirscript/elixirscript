@@ -13,7 +13,7 @@ defmodule ElixirScript.Compiler.Test do
 
   test "Output" do
     result = ElixirScript.Compiler.compile(Atom, [])
-    assert result =~ "export default Elixir"
+    assert result =~ "export default"
   end
 
   test "Output file with default name" do
@@ -44,12 +44,12 @@ defmodule ElixirScript.Compiler.Test do
 
   test "compile wildcard" do
     path = System.tmp_dir()
-    path = Path.join([path, "myfile.js"])
+    file = Path.join([path, "Elixir.ElixirScript.FFI.Test.js"])
 
     input_path = Path.join([File.cwd!(), "test", "*fi_test.exs"])
 
     ElixirScript.Compiler.compile(input_path, [output: path])
-    assert File.exists?(path)
-    assert String.contains?(File.read!(path), "Elixir.ElixirScript.FFI.Test")
+    assert File.exists?(file)
+    assert String.contains?(File.read!(path), "export default")
   end
 end

@@ -64,13 +64,9 @@ defmodule ElixirScript.Translate.Module do
         info_function = make_info_function(module, state)
         compiled_functions = [info_function] ++ compiled_functions
 
-        js_ast = ElixirScript.ModuleSystems.Namespace.build(
-          module,
-          compiled_functions,
-          exports
-        )
+        js_ast = [compiled_functions, exports]
 
-        ModuleState.put_module(pid, module, Map.put(info, :js_ast, hd(js_ast)))
+        ModuleState.put_module(pid, module, Map.put(info, :js_ast, js_ast))
     end
   end
 
