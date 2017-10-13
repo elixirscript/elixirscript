@@ -67,7 +67,8 @@ defmodule ElixirScript.Output do
       |> concat
       |> output(module, Map.get(opts, :output), js_modules)
     end)
-    |> Stream.run
+    |> Stream.map(fn {:ok, code} -> code end)
+    |> Enum.to_list()
   end
 
   defp modules_to_import(modules) do
