@@ -2,6 +2,8 @@
 
 The goal is to convert a subset (or full set) of Elixir code to JavaScript, providing the ability to write JavaScript in Elixir. This is done by taking the Elixir AST and converting it into JavaScript AST and then to JavaScript code. This is done using the [Elixir-ESTree](https://github.com/elixirscript/elixir-estree) library.
 
+[Documentation for current release](http://hexdocs.pm/elixir_script/)
+
 Requirements
 ===========
 * Erlang 20 or greater

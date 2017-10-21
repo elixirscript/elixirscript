@@ -25,8 +25,8 @@ defmodule ElixirScript.State do
 
   def put_module(pid, module, value) do
     Agent.update(pid, fn(state) ->
-      value = Map.put(value, :used, [])
-      |> Map.put(:used_modules, [])
+      value = Map.put_new(value, :used, [])
+      |> Map.put_new(:used_modules, [])
 
       modules = Keyword.put(state.modules, module, value)
       %{ state | modules: modules }

@@ -28,6 +28,6 @@ defmodule ElixirScript.CLI.Test do
   test "process input" do
     assert capture_io(fn ->
       ElixirScript.CLI.process({["Atom"], []})
-    end) =~ "export default Elixir"
+    end) =~ "export default"
   end
 end

@@ -54,24 +54,14 @@ defmodule ElixirScript.Translate.Module do
     combined_defs = combine_defs(used_defs)
     exports = make_exports(module, combined_defs)
 
-    # If there are no public exports, skip compilation
-    case exports do
-      %ESTree.ObjectExpression{ properties: props } when length(props) == 2 ->
-        nil
-      _ ->
-        { compiled_functions, _ } = Enum.map_reduce(combined_defs, state, &Function.compile(&1, &2))
+    { compiled_functions, _ } = Enum.map_reduce(combined_defs, state, &Function.compile(&1, &2))
 
-        info_function = make_info_function(module, state)
-        compiled_functions = [info_function] ++ compiled_functions
+    info_function = make_info_function(module, state)
+    compiled_functions = [info_function] ++ compiled_functions
 
-        js_ast = ElixirScript.ModuleSystems.Namespace.build(
-          module,
-          compiled_functions,
-          exports
-        )
+    js_ast = [compiled_functions, exports]
 
-        ModuleState.put_module(pid, module, Map.put(info, :js_ast, hd(js_ast)))
-    end
+    ModuleState.put_module(pid, module, Map.put(info, :js_ast, js_ast))
   end
 
   defp combine_defs(used_defs) do

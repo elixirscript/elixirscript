@@ -2,7 +2,7 @@ defmodule ElixirScript.Translate.Forms.Remote do
   @moduledoc false
 
   alias ESTree.Tools.Builder, as: J
-  alias ElixirScript.Translate.{Form, Identifier, Helpers}
+  alias ElixirScript.Translate.{Form, Helpers}
   alias ElixirScript.State, as: ModuleState
 
   @erlang_modules [
@@ -83,26 +83,17 @@ defmodule ElixirScript.Translate.Forms.Remote do
       ElixirScript.Translate.Module.is_js_module(module, state) ->
         process_js_module_name(module, state)
       module === Elixir ->
-        members = ["Elixir", "__load"]
-
-        Helpers.call(
-          Identifier.make_namespace_members(members),
-          [J.identifier("Elixir")]
-        )
+        module
+        |> ElixirScript.Output.module_to_name()
+        |> J.identifier
       module === :ElixirScript ->
-        members = ["Elixir", "ElixirScript", "__load"]
-
-        Helpers.call(
-          Identifier.make_namespace_members(members),
-          [J.identifier("Elixir")]
-        )
+        module
+        |> ElixirScript.Output.module_to_name()
+        |> J.identifier
       ElixirScript.Translate.Module.is_elixir_module(module) ->
-        members = ["Elixir"] ++ Module.split(module) ++ ["__load"]
-
-        Helpers.call(
-          Identifier.make_namespace_members(members),
-          [J.identifier("Elixir")]
-        )
+        module
+        |> ElixirScript.Output.module_to_name()
+        |> J.identifier
       true ->
         ElixirScript.Translate.Identifier.make_identifier(module)
     end
@@ -119,8 +110,9 @@ defmodule ElixirScript.Translate.Forms.Remote do
       name when is_atom(name) ->
         case to_string(name) do
           "Elixir." <> _ ->
-            members = Module.split(module)
-            Identifier.make_namespace_members(members)
+            module
+            |> ElixirScript.Output.module_to_name()
+            |> J.identifier
           x ->
             J.identifier(x)
         end
