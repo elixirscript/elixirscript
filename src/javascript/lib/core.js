@@ -8,6 +8,7 @@ import lists from './core/erlang_compat/lists';
 import elixir_errors from './core/erlang_compat/elixir_errors';
 import elixir_config from './core/erlang_compat/elixir_config';
 import io from './core/erlang_compat/io';
+import filename from './core/erlang_compat/filename';
 import binary from './core/erlang_compat/binary';
 import unicode from './core/erlang_compat/unicode';
 import Store from './core/store';
@@ -64,6 +65,7 @@ export default {
   lists,
   elixir_errors,
   io,
+  filename,
   binary,
   unicode,
   elixir_config,
