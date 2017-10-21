@@ -81,14 +81,14 @@ For more information and options. Check the documentation for `ElixirScript.FFI`
   ```
 
   ```javascript
-  import Elixir from './elixirscript.build.js'
-  Elixir.start(Elixir.Main, [1, 2, 3])
+  import Main from './Elixir.Main.js'
+  Main.start(Symbol.for('normal'), [1, 2, 3])
   ```
 
-  In the above example, we have an ElixirScript module, `Main` with a `start/2` function. This function is the entry point into your ElixirScript application. when we call `Elixir.start`, we give it this module's name (All modules when compiled begin with `Elixir.`) and a list of the initial args.
+  In the above example, we have an ElixirScript module, `Main` with a `start/2` function.
 
 
-  If you want to use an ElixirScript module inside of your JavaScript code, you can do so using `Elixir.load`.
+  If you want to use an ElixirScript module inside of your JavaScript code, you can do so like below.
 
   ```Elixir
   # Our ElixirScript module
@@ -102,6 +102,6 @@ For more information and options. Check the documentation for `ElixirScript.FFI`
 
 
   ```javascript
-  const MyModule = Elixir.load(Elixir.MyModule);
+  import MyModule from './Elixir.MyModule.js'
   MyModule.hi()
   ```

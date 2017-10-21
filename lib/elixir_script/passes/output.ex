@@ -80,7 +80,7 @@ defmodule ElixirScript.Output do
   end
 
   def module_to_name(module) do
-    "#{inspect module}"
+    "$#{inspect module}$"
     |> String.replace(".", "$")
   end
 
@@ -93,7 +93,12 @@ defmodule ElixirScript.Output do
   end
 
   defp output(code, module, path, js_modules) do
-    output_dir = Path.dirname(path)
+    output_dir = if File.dir?(path) do
+      path
+    else
+      Path.dirname(path)
+    end
+
     file_name = Path.join(output_dir, "Elixir.#{inspect module}.js")
 
     if !File.exists?(output_dir) do

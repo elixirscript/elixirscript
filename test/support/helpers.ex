@@ -3,10 +3,7 @@ defmodule Helpers do
 
   def call_compiled_function(module, func, args \\ []) when is_list(args) do
     File.mkdir "tmp"
-    filename = Macro.underscore(inspect(module) <> "_" <> to_string(func))
-    path = Path.join("tmp", filename <> ".mjs")
-
-    ElixirScript.Compiler.compile(module, [output: path])
+    ElixirScript.Compiler.compile(module, [output: "tmp"])
 
     args_to_js = args
     |> Enum.map(&ElixirScript.TermConverter.encode/1)
@@ -14,9 +11,7 @@ defmodule Helpers do
 
     main = """
     import ElixirScript from './ElixirScript.Core.js';
-    import Elixir from './#{filename}.mjs';
-
-    const mod = Elixir.#{inspect module}.__load(Elixir)
+    import mod from './Elixir.#{inspect module}.js';
     const ret = mod.#{func}(#{args_to_js})
 
     const jsonRet = JSON.stringify(ret, (name, value) => {
@@ -34,7 +29,7 @@ defmodule Helpers do
     process.stdout.write(jsonRet)
     """
 
-    main_path = Path.join("tmp", filename <> ".main.mjs")
+    main_path = Path.join("tmp", "Elixir.#{inspect module}.main.mjs")
     File.write!(main_path, main)
 
     {out, _a} = System.cmd "node", ["-r", "@std/esm", main_path]

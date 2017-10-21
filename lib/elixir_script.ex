@@ -29,7 +29,7 @@ defmodule ElixirScript do
           # Entry module. Can also be a list of modules
           input: MyEntryModule,
           # Output path. Either a path to a js file or a directory
-          output: "priv/elixir_script/build/elixirscript.build.js"
+          output: "priv/elixir_script/build"
       ]
       ]
       end
@@ -39,10 +39,9 @@ defmodule ElixirScript do
 
   * `input` (required): The entry module(s) for your application or library
 
-  * `output`: The path of the generated JavaScript file. (defaults to `priv/elixir_script/build`)
+  * `output`: The path of the generated JavaScript files. (defaults to `priv/elixir_script/build`)
 
-      If path ends in `.js` then that will be the name of the file. If a directory is given,
-      file will be named `elixirscript.build.js`
+      This should be a directory. If given a file, it will dump JavaScript files into the same directory as the given file path
 
   * `root`: Optional root for imports of FFI JavaScript modules. Defaults to `.`. If using output directly in a browser, you may want to make it something like `/js` or some uri.
 
@@ -50,10 +49,10 @@ defmodule ElixirScript do
 
   ```html
   <script type="module">
-    import Elixir from '/js/elixirscript.build.js'
+    import MyEntryModule from '/js/Elixir.MyEntryModule.js'
     const myInitialArgs = []
 
-    Elixir.start(Elixir.MyEntryModule, myInitialArgs)
+    MyEntryModule.start(Symbol.for('normal'), myInitialArgs)
   </script>
   ```
 

@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+## Changed
+- Compiler now returns a file per module instead of just one file
+
 ## [0.31.1] - 2017-09-27
 ### Fixed
 - Compiler error when `receive` is used as variable name
