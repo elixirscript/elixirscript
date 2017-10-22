@@ -16,7 +16,7 @@ function join(arg, extra = null) {
 function dirname(arg) {
   const path = join([arg]);
   const index = path.lastIndexOf('/');
-  return index == -1 ? '.' : path.substr(0, index);
+  return index == -1 ? '.' : path.substr(0, index) || '/';
 }
 
 export default {
