@@ -1,6 +1,5 @@
-function join(arg = [], extra = []) {
-  let components = Array.isArray(arg) ? arg : [arg];
-  components = components.concat(extra)
+function join(arg, extra = null) {
+  const components = Array.isArray(arg) ? arg : [arg, extra];
   let names = [];
   for (let i = components.length - 1; i >= 0; i--) {
     const name = components[i];

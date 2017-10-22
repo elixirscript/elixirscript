@@ -19,3 +19,8 @@ test('join/1', (t) => {
   result = Core.filename.join(['a/b///c/']);
   t.is(result, 'a/b/c');
 });
+
+test('join/2', (t) => {
+  let result = Core.filename.join('/usr', 'bin');
+  t.is(result, '/usr/bin');
+});
