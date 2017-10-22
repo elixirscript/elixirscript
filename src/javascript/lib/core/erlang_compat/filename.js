@@ -5,7 +5,7 @@ function join(arg, extra = null) {
     const name = components[i];
     const normalized_name = name.replace(/\/+/g, '/').replace(/^\/|\/$/g, '');
     names.push(normalized_name);
-    if (name[0] == '/') {
+    if (name[0] === '/') {
       names.push('');
       break;
     }
@@ -16,7 +16,7 @@ function join(arg, extra = null) {
 function dirname(arg) {
   const path = join([arg]);
   const index = path.lastIndexOf('/');
-  return index == -1 ? '.' : path.substr(0, index) || '/';
+  return index === -1 ? '.' : (path.substr(0, index) || '/');
 }
 
 export default {

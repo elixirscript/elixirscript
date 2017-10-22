@@ -27,6 +27,6 @@ test('join/1', (t) => {
 });
 
 test('join/2', (t) => {
-  let result = Core.filename.join('/usr', 'bin');
+  const result = Core.filename.join('/usr', 'bin');
   t.is(result, '/usr/bin');
 });
