@@ -13,6 +13,14 @@ function join(arg = [], extra = []) {
   }
   return names.reverse().join('/');
 }
+
+function dirname(arg) {
+  const path = join([arg]);
+  const index = path.lastIndexOf('/');
+  return index == -1 ? '.' : path.substr(0, index);
+}
+
 export default {
   join,
+  dirname,
 };
