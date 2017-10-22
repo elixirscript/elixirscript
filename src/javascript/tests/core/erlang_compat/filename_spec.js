@@ -5,8 +5,14 @@ test('dirname/1', (t) => {
   let result = Core.filename.dirname('/usr/src/kalle.erl');
   t.is(result, '/usr/src');
 
+  result = Core.filename.dirname('usr/kalle.erl');
+  t.is(result, 'usr');
+
   result = Core.filename.dirname('kalle.erl');
   t.is(result, '.');
+
+  result = Core.filename.dirname('/kalle.erl');
+  t.is(result, '/');
 });
 
 test('join/1', (t) => {
