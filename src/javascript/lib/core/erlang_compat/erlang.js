@@ -478,6 +478,8 @@ function _throw(term) {
 }
 
 function error(reason) {
+  let theError = null;
+
   if (reason instanceof Map && reason.has(Symbol.for('__exception__'))) {
     let name = Symbol.keyFor(reason.get(Symbol.for('__struct__')).__MODULE__);
     name = name
@@ -485,12 +487,16 @@ function error(reason) {
       .slice(1)
       .join('.');
     const message = reason.get(Symbol.for('message'));
-    throw new Error(`** (${name}) ${message}`);
+    theError = new Error(`** (${name}) ${message}`);
   } else if (is_binary(reason)) {
-    throw new Error(`** (RuntimeError) ${reason}`);
+    theError = new Error(`** (RuntimeError) ${reason}`);
   } else {
-    throw new Error(`** (ErlangError) Erlang Error ${reason.toString()}`);
+    theError = new Error(`** (ErlangError) Erlang Error ${reason.toString()}`);
   }
+
+  theError.__reason = reason;
+
+  throw theError;
 }
 
 function exit(...args) {
