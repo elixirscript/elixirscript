@@ -3,7 +3,7 @@ defmodule ElixirScript.Test do
     defmacro __using__(_opts) do
       quote do
         import unquote(__MODULE__), only: [test: 2, test: 3]
-        import ElixirScript.Test.Assertions
+        import ExUnit.Assertions
 
         def __elixir_script_test_module__(), do: true
       end
