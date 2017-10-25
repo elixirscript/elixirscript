@@ -52,7 +52,7 @@ defmodule ElixirScript.Test do
       |> Path.join("Elixir.*.js")
       |> Path.wildcard()
 
-      test_script_path = Path.join([:code.priv_dir(:elixir_script), "index.js"])
+      test_script_path = Path.join([:code.priv_dir(:elixir_script), "testrunner", "index.js"])
 
       {out, _a} = System.cmd "node", [test_script_path] ++ js_files, into: IO.stream(:stdio, :line)
 

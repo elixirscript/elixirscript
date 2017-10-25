@@ -22,6 +22,6 @@ stdlib_state.bin
 test/app/build
 .vscode
 cover
-/priv
+/priv/build
 /tmp
 .esm-cache
