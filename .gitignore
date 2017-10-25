@@ -10,7 +10,6 @@ deploy.sh
 .DS_Store
 sample/dest
 fprof.trace
-index.js
 /doc
 /bench/snapshots
 .tern-port
