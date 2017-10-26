@@ -25,24 +25,43 @@ function runTests(mod, results) {
       try {
         test.get(Symbol.for('test'))(context);
         results.success++;
+        process.stdout.write('.');
       } catch (e) {
-        handleError(e);
         results.failed++;
+        handleError(e, test, results, mod);
       }
     }
   }
 }
 
-function handleError(e) {
+function handleError(e, test, results, mod) {
   if (e.__reason) {
     if (e.__reason instanceof Map && e.__reason.get(Symbol.for('message'))) {
-      console.error(e.__reason.get(Symbol.for('message')));
-      console.error(e.__reason.get(Symbol.for('expr')).toString());
-      console.error(e.__reason.get(Symbol.for('left')).toString());
-      console.error(e.__reason.get(Symbol.for('right')).toString());
+      const errorMessage = e.__reason.get(Symbol.for('message'));
+      const expr = e.__reason.get(Symbol.for('expr'));
+      const left = e.__reason.get(Symbol.for('left'));
+      const right = e.__reason.get(Symbol.for('right'));
+      const moduleName = Symbol.keyFor(mod.default.__MODULE__).replace('Elixir.', '');
+      let testMessage = test.get(Symbol.for('message'));
+      testMessage = `${results.failed}) ${testMessage} (${moduleName})`;
+
+      printErrorLine(testMessage);
+      printErrorLine(errorMessage);
+      printErrorLine(left, 'left');
+      printErrorLine(right, 'right');
     }
   } else {
     console.error(e.message);
+  }
+}
+
+function printErrorLine(value, label = null) {
+  if (value !== Symbol.for('ex_unit_no_meaningful_value')) {
+    if (label) {
+      console.error(`${label}: ${value}`);
+    } else {
+      console.error(`${value}`);
+    }
   }
 }
 

@@ -26,7 +26,11 @@ defmodule ElixirScript.Test do
 
       context = Macro.escape(context)
       contents = Macro.escape(contents, unquote: true)
-      name = String.to_atom("__test_#{String.replace(message, " ", "_")}")
+      name = message
+      |> String.replace(" ", "_")
+      |> String.replace(~r/[^A-Za-z0-9]/, "")
+
+      name = String.to_atom("__test_#{name}")
 
       quote bind_quoted: [context: context, contents: contents, message: message, name: name] do
         def unquote(name)(unquote(context)) do
@@ -54,11 +58,16 @@ defmodule ElixirScript.Test do
 
       test_script_path = Path.join([:code.priv_dir(:elixir_script), "testrunner", "index.js"])
 
-      {out, _a} = System.cmd "node", [test_script_path] ++ js_files, into: IO.stream(:stdio, :line)
+      {_, exit_status} = System.cmd "node", [test_script_path] ++ js_files, into: IO.stream(:stdio, :line)
 
       # Delete directory at the end
       File.rm_rf!(output)
 
-      :ok
+      case exit_status do
+        0 ->
+          :ok
+        _ ->
+          :error
+      end
     end
 end

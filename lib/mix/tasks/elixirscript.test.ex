@@ -11,7 +11,12 @@ defmodule Mix.Tasks.Elixirscript.Test do
     Mix.Task.run "app.start"
 
     path = Path.join([default_test_path(), "**", "*_test.exs"])
-    ElixirScript.Test.start(path)
+    case ElixirScript.Test.start(path) do
+      :error ->
+        System.at_exit(fn _ -> exit({:shutdown, 1}) end)
+      :ok ->
+        :ok
+    end
   end
 
   defp default_test_path do

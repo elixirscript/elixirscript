@@ -17,6 +17,7 @@ js_test:
 
 elixir_test:
 	mix test --cover
+	mix elixirscript.test
 
 clean:
 	rm -rf priv/build

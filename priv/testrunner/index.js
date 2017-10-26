@@ -3,7 +3,8 @@ const runner = require('./testRunner.js').default;
 
 const testFiles = process.argv.slice(2);
 runner.start(testFiles).then((results) => {
-  console.log(`${results.tests} tests, ${results.success} succeeded, ${results.failed} failed`);
+  process.stdout.write('\n\n');
+  process.stdout.write(`${results.tests} tests, ${results.success} succeeded, ${results.failed} failed\n`);
 
   if (results.failed > 0) {
     process.exit(1);
