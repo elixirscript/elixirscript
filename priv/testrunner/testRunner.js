@@ -1,3 +1,5 @@
+import Colors from './colors.js';
+
 async function start(files) {
   const results = {
     tests: 0,
@@ -25,9 +27,10 @@ function runTests(mod, results) {
       try {
         test.get(Symbol.for('test'))(context);
         results.success++;
-        process.stdout.write('.');
+        process.stdout.write(Colors.fg.Green + '.' + Colors.Reset);
       } catch (e) {
         results.failed++;
+        process.stdout.write('\n');
         handleError(e, test, results, mod);
       }
     }
@@ -46,7 +49,7 @@ function handleError(e, test, results, mod) {
       testMessage = `${results.failed}) ${testMessage} (${moduleName})`;
 
       printErrorLine(testMessage);
-      printErrorLine(errorMessage);
+      console.log(Colors.fg.Red, errorMessage, Colors.Reset);
       printErrorLine(left, 'left');
       printErrorLine(right, 'right');
     }
@@ -58,9 +61,9 @@ function handleError(e, test, results, mod) {
 function printErrorLine(value, label = null) {
   if (value !== Symbol.for('ex_unit_no_meaningful_value')) {
     if (label) {
-      console.error(`${label}: ${value}`);
+      console.log(Colors.fg.Cyan, `${label}:`, Colors.Reset, `${value}`);
     } else {
-      console.error(`${value}`);
+      console.log(`${value}`, Colors.Reset);
     }
   }
 }

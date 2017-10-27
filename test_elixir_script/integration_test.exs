@@ -1,6 +1,10 @@
 defmodule ElixirScript.Test.Test do
   use ElixirScript.Test
 
+  test "Something" do
+    assert {:ok, 2} = {:ok, 1}
+  end
+
   test "Atom.to_string" do
     val = Atom.to_string(:atom)
     assert val == "atom"
