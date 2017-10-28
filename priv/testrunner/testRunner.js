@@ -10,7 +10,7 @@ async function start(files) {
 
   for (const file of files) {
     const mod = await import(file);
-    if (mod.default.__elixir_script_test_module__) {
+    if (mod.default.__elixirscript_test_module__) {
       runTests(mod, results);
     }
   }
@@ -26,6 +26,12 @@ function runSetup(mod, name, incomingContext = new Map()) {
   }
 
   return incomingContext;
+}
+
+function runTeardown(mod, name, incomingContext) {
+  if (mod.default[name]) {
+    const result = mod.default[name](incomingContext);
+  }
 }
 
 function resolveContext(context, parentContext) {
@@ -56,22 +62,36 @@ function runTests(mod, results) {
   const contextSetupAll = runSetup(mod, '__elixirscript_test_setup_all');
 
   for (const key of Object.keys(mod.default)) {
-    const context = runSetup(mod, '__elixirscript_test_setup', contextSetupAll);
-
     if (key.startsWith('__elixirscript_test_case')) {
       results.tests++;
-      const test = mod.default[key](context);
-      try {
-        test.get(Symbol.for('test'))(context);
+      const test = mod.default[key]();
+      const result = runTest(mod, test, contextSetupAll, results);
+
+      if (result) {
         results.success++;
-        process.stdout.write(Colors.fg.Green + '.' + Colors.Reset);
-      } catch (e) {
-        results.failed++;
-        process.stdout.write('\n');
-        handleError(e, test, results, mod);
+      } else {
+        resuls.failed++;
       }
     }
   }
+
+  runTeardown(mod, '__elixirscript_test_teardown_all', contextSetupAll);
+}
+
+function runTest(mod, test, incomingContext, results) {
+  const context = runSetup(mod, '__elixirscript_test_setup', incomingContext);
+  const testPassed = true;
+  try {
+    test.get(Symbol.for('test'))(context);
+    process.stdout.write(Colors.fg.Green + '.' + Colors.Reset);
+  } catch (e) {
+    process.stdout.write('\n');
+    handleError(e, test, results, mod);
+    testPassed = false;
+  }
+
+  runTeardown(mod, '__elixirscript_test_teardown', context);
+  return testPassed;
 }
 
 function handleError(e, test, results, mod) {

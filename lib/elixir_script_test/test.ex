@@ -2,81 +2,23 @@ defmodule ElixirScript.Test do
     @doc false
     defmacro __using__(_opts) do
       quote do
-        import unquote(__MODULE__), only: [test: 2, test: 3, setup: 1, setup: 2, setup_all: 1, setup_all: 2]
+        import ElixirScript.Test.Callbacks, only: [
+                                            test: 2, test: 3,
+                                            setup: 1, setup: 2,
+                                            setup_all: 1, setup_all: 2,
+                                            teardown: 1, teardown: 2,
+                                            teardown_all: 1, teardown_all: 2
+                                          ]
         import ExUnit.Assertions
 
-        def __elixir_script_test_module__(), do: true
-      end
-    end
-
-    defmacro setup_all(context \\ quote(do: _), contents) do
-      do_setup(context, contents, :__elixirscript_test_setup_all)
-    end
-
-    defmacro setup(context \\ quote(do: _), contents) do
-      do_setup(context, contents, :__elixirscript_test_setup)
-    end
-
-    defp do_setup(context, contents, name) do
-      contents =
-      case contents do
-        [do: block] ->
-          quote do
-            unquote(block)
-          end
-        _ ->
-          quote do
-            try(unquote(contents))
-          end
-      end
-
-      context = Macro.escape(context)
-      contents = Macro.escape(contents, unquote: true)
-
-      quote bind_quoted: [context: context, contents: contents, name: name] do
-        def unquote(name)(unquote(context)) do
-          unquote(contents)
-        end
-      end
-    end
-
-    defmacro test(message, context \\ quote(do: _), contents) do
-      contents =
-        case contents do
-          [do: block] ->
-            quote do
-              unquote(block)
-              :ok
-            end
-          _ ->
-            quote do
-              try(unquote(contents))
-              :ok
-            end
-        end
-
-      context = Macro.escape(context)
-      contents = Macro.escape(contents, unquote: true)
-      name = message
-      |> String.replace(" ", "_")
-      |> String.replace(~r/[^A-Za-z0-9]/, "")
-
-      name = String.to_atom("__elixirscript_test_case_#{name}")
-
-      quote bind_quoted: [context: context, contents: contents, message: message, name: name] do
-        def unquote(name)(unquote(context)) do
-          %{
-            message: unquote(message),
-            test: fn(context) -> unquote(contents) end
-          }
-        end
+        def __elixirscript_test_module__(), do: true
       end
     end
 
     @doc """
     Runs tests found in the given path. Accepts wildcards
     """
-    def start(path, opts \\ %{}) do
+    def start(path, _opts \\ %{}) do
       output = Path.join([System.tmp_dir!(), "elixirscript_tests"])
       File.mkdir_p!(output)
 
