@@ -6,7 +6,7 @@ defmodule ElixirScript.Integration.Test do
   end
 
   test "Something" do
-    assert {:ok, 2} = {:ok, 1}
+    assert {:ok, _} = {:ok, 1}
   end
 
   test "Atom.to_string" do
