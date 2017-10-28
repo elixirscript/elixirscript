@@ -66,7 +66,7 @@ defmodule ElixirScript.Output do
       |> Generator.generate
       |> concat
       |> output(module, Map.get(opts, :output), js_modules)
-    end)
+    end, timeout: 10_000)
     |> Stream.map(fn {:ok, code} -> code end)
     |> Enum.to_list()
   end

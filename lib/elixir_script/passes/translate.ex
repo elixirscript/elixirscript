@@ -13,7 +13,7 @@ defmodule ElixirScript.Translate do
     |> Task.async_stream(fn
       {module, info} ->
         ElixirScript.Translate.Module.compile(module, info, pid)
-    end)
+    end, timeout: 10_000)
     |> Stream.run()
   end
 end
