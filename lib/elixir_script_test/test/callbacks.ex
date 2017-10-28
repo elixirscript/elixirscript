@@ -1,9 +1,18 @@
 defmodule ElixirScript.Test.Callbacks do
+  @moduledoc """
+  Defines ElixirScript.Test callbacks
+  """
 
+  @doc """
+  Called before all tests are run in a test file
+  """
   defmacro setup_all(context \\ quote(do: _), contents) do
     do_setup(context, contents, :__elixirscript_test_setup_all)
   end
 
+  @doc """
+  Called before each test is run in a test file
+  """
   defmacro setup(context \\ quote(do: _), contents) do
     do_setup(context, contents, :__elixirscript_test_setup)
   end
@@ -31,10 +40,16 @@ defmodule ElixirScript.Test.Callbacks do
     end
   end
 
+  @doc """
+  Called after all tests are run in a test file
+  """
   defmacro teardown_all(context \\ quote(do: _), contents) do
     do_teardown(context, contents, :__elixirscript_test_teardown_all)
   end
 
+  @doc """
+  Called after each test is run in a test file
+  """
   defmacro teardown(context \\ quote(do: _), contents) do
     do_teardown(context, contents, :__elixirscript_test_teardown)
   end
@@ -64,6 +79,9 @@ defmodule ElixirScript.Test.Callbacks do
     end
   end
 
+  @doc """
+  Defines a test
+  """
   defmacro test(message, context \\ quote(do: _), contents) do
     contents =
       case contents do

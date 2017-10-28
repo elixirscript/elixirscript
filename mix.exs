@@ -4,7 +4,7 @@ defmodule ElixirScript.Mixfile do
   def project do
     [
       app: :elixir_script,
-      version: "0.31.1",
+      version: "0.32.0-dev",
       elixir: "~> 1.5",
       elixirc_paths: elixirc_paths(Mix.env),
       deps: deps(),

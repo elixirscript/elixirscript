@@ -7,7 +7,7 @@ defmodule Mix.Tasks.Elixirscript.Test do
   @shortdoc "Runs ElixirScript Tests"
   @preferred_cli_env :test
 
-  def run(args) do
+  def run(_args) do
     Mix.Task.run "app.start"
 
     path = Path.join([default_test_path(), "**", "*_test.exs"])

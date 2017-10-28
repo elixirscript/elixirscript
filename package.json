@@ -23,7 +23,6 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "chalk": "^2.3.0",
     "erlang-types": "^1.0.1",
     "grapheme-splitter": "^1.0.2",
     "rollup-plugin-commonjs": "^8.2.1",
