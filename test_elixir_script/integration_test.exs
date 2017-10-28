@@ -1,5 +1,9 @@
-defmodule ElixirScript.Test.Test do
+defmodule ElixirScript.Integration.Test do
   use ElixirScript.Test
+
+  setup do
+    [item: true]
+  end
 
   test "Something" do
     assert {:ok, 2} = {:ok, 1}

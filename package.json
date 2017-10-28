@@ -11,9 +11,8 @@
   },
   "scripts": {
     "lint": "eslint src/javascript/lib/**/*.js src/javascript/tests/**/*.js",
-    "lint:fix":
-      "eslint src/javascript/lib/**/*.js src/javascript/tests/**/*.js --fix",
-    "build": "rollup -c rollup.config.js",
+    "lint:fix": "eslint src/javascript/lib/**/*.js src/javascript/tests/**/*.js --fix",
+    "build": "node rollup.config.js",
     "clean": "rm -rf priv/build",
     "test": "nyc ava src/javascript/tests"
   },
@@ -24,6 +23,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "chalk": "^2.3.0",
     "erlang-types": "^1.0.1",
     "grapheme-splitter": "^1.0.2",
     "rollup-plugin-commonjs": "^8.2.1",
@@ -45,7 +45,9 @@
     "rollup-plugin-node-resolve": "^3.0.0"
   },
   "ava": {
-    "require": ["babel-register"],
+    "require": [
+      "babel-register"
+    ],
     "babel": {
       "babelrc": true
     }

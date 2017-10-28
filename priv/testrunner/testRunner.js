@@ -1,4 +1,5 @@
 import Colors from './colors.js';
+import Vendor from './vendor.build.js';
 
 async function start(files) {
   const results = {
@@ -17,11 +18,47 @@ async function start(files) {
   return results;
 }
 
+function runSetup(mod, name, incomingContext = new Map()) {
+  if (mod.default[name]) {
+    const result = mod.default[name](incomingContext);
+
+    return resolveContext(result, incomingContext);
+  }
+
+  return incomingContext;
+}
+
+function resolveContext(context, parentContext) {
+  if (context === Symbol.for('ok')) {
+    return parentContext;
+  } else if (context instanceof Vendor.ErlangTypes.Tuple && context.get(0) === Symbol.for('ok')) {
+    return resolveContext(context.get(1), parentContext);
+  } else if (context instanceof Map) {
+    return new Map([...parentContext, ...context]);
+  } else if (Array.isArray(context)) {
+    return mergeContextKeywordList(context, parentContext);
+  }
+
+  throw new Error('Invalid context');
+}
+
+function mergeContextKeywordList(context, parentContext) {
+  const newContext = new Map([...parentContext]);
+
+  for (const entry of context) {
+    newContext.set(entry.get(0), entry.get(1));
+  }
+
+  return newContext;
+}
+
 function runTests(mod, results) {
-  const context = [];
+  const contextSetupAll = runSetup(mod, '__elixirscript_test_setup_all');
 
   for (const key of Object.keys(mod.default)) {
-    if (key.startsWith('__test_')) {
+    const context = runSetup(mod, '__elixirscript_test_setup', contextSetupAll);
+
+    if (key.startsWith('__elixirscript_test_case')) {
       results.tests++;
       const test = mod.default[key](context);
       try {
@@ -54,7 +91,7 @@ function handleError(e, test, results, mod) {
       printErrorLine(right, 'right');
     }
   } else {
-    console.error(e.message);
+    console.log(e);
   }
 }
 
