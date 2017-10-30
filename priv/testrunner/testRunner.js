@@ -70,7 +70,7 @@ function runTests(mod, results) {
       if (result) {
         results.success++;
       } else {
-        resuls.failed++;
+        results.failed++;
       }
     }
   }
@@ -80,7 +80,7 @@ function runTests(mod, results) {
 
 function runTest(mod, test, incomingContext, results) {
   const context = runSetup(mod, '__elixirscript_test_setup', incomingContext);
-  const testPassed = true;
+  let testPassed = true;
   try {
     test.get(Symbol.for('test'))(context);
     process.stdout.write(Colors.fg.Green + '.' + Colors.Reset);
@@ -116,7 +116,7 @@ function handleError(e, test, results, mod) {
 }
 
 function printErrorLine(value, label = null) {
-  if (value !== Symbol.for('ex_unit_no_meaningful_value')) {
+  if (value && value !== Symbol.for('ex_unit_no_meaningful_value')) {
     if (label) {
       console.log(Colors.fg.Cyan, `${label}:`, Colors.Reset, `${value}`);
     } else {
