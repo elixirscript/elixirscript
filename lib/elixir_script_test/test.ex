@@ -72,7 +72,6 @@ defmodule ElixirScript.Test do
   ```
   """
 
-
   defmacro __using__(_opts) do
     quote do
       import ElixirScript.Test.Callbacks, only: [
@@ -84,7 +83,7 @@ defmodule ElixirScript.Test do
                                         ]
       import ExUnit.Assertions
 
-      def __elixirscript_test_module__(), do: true
+      def __elixirscript_test_module__, do: true
     end
   end
 
@@ -118,7 +117,13 @@ defmodule ElixirScript.Test do
 
   defp node_test_runner(js_files) do
     test_script_path = Path.join([:code.priv_dir(:elixir_script), "testrunner", "index.js"])
-    {_, exit_status} = System.cmd "node", [test_script_path] ++ js_files, into: IO.stream(:stdio, :line)
+    test_script_path = [test_script_path] ++ js_files
+    {_, exit_status} = System.cmd(
+      "node",
+      test_script_path,
+      into: IO.stream(:stdio, :line)
+    )
+
     exit_status
   end
 end
