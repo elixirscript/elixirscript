@@ -60,7 +60,6 @@ function _try(do_fun, rescue_function, catch_fun, else_function, after_function)
     result = do_fun();
   } catch (e) {
     let ex_result = null;
-
     if (rescue_function) {
       try {
         ex_result = rescue_function(e);

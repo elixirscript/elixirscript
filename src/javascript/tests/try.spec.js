@@ -1,8 +1,7 @@
 import test from 'ava';
 import Core from '../lib/core';
 
-const Patterns = Core.Patterns;
-const SpecialForms = Core.SpecialForms;
+const { Patterns, SpecialForms } = Core;
 
 test('try', (t) => {
   /*

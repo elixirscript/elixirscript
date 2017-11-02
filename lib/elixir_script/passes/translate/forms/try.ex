@@ -58,8 +58,34 @@ defmodule ElixirScript.Translate.Forms.Try do
 
   defp process_rescue_block(rescue_block, state) do
     processed_clauses = Enum.map(rescue_block, fn
+      {:->, _, [ [{:in, _, [{:_, context, atom}, names]}], body]} ->
+        names = Enum.map(names, &make_exception_ast(&1))
+
+        param = {:_e, context, atom}
+        reason_call = {{:., [], [{:_e0, context, atom}, :__reason]}, [], []}
+        reason_call = {{:., [], [reason_call, :__struct__]}, [], []}
+        reason_call = {{:., [], [reason_call, :__MODULE__]}, [], []}
+
+        {ast, _} = Clause.compile({
+          [],
+          [param],
+          [{{:., [], [Enum, :member?]}, [], [names, reason_call]}],
+          body},
+          state)
+        ast
       {:->, _, [ [{:in, _, [param, names]}], body]} ->
-        {ast, _} = Clause.compile({[], [param], [{{:., [], [Enum, :member?]}, [], [param, names]}], body}, state)
+        names = Enum.map(names, &make_exception_ast(&1))
+
+        reason_call = {{:., [], [param, :__reason]}, [], []}
+        reason_call = {{:., [], [reason_call, :__struct__]}, [], []}
+        reason_call = {{:., [], [reason_call, :__MODULE__]}, [], []}
+
+        {ast, _} = Clause.compile({
+          [],
+          [param],
+          [{{:., [], [Enum, :member?]}, [], [names, reason_call]}],
+          body},
+          state)
         ast
       {:->, _, [ [param], body]} ->
         {ast, _} = Clause.compile({[], [param], [], body}, state)
@@ -75,6 +101,10 @@ defmodule ElixirScript.Translate.Forms.Try do
         processed_clauses
       )
 
+  end
+
+  defp make_exception_ast(name) do
+    {{:., [], [name, :__MODULE__]}, [], []}
   end
 
   defp process_after_block(after_block, state) do

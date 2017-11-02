@@ -225,6 +225,8 @@ defmodule ElixirScript.FindUsedModules do
   end
 
   defp walk({:try, _, [blocks]}, state) do
+    walk(Enum, state)
+
     try_block = Keyword.get(blocks, :do)
     rescue_block = Keyword.get(blocks, :rescue, nil)
     catch_block = Keyword.get(blocks, :catch, nil)
@@ -236,7 +238,8 @@ defmodule ElixirScript.FindUsedModules do
     if rescue_block do
       Enum.each(rescue_block, fn
         {:->, _, [ [{:in, _, [param, names]}], body]} ->
-          walk({[], [param], [{{:., [], [Enum, :member?]}, [], [param, names]}], body}, state)
+          Enum.each(names, &walk(&1, state))
+          walk({[], [param], [{{:., [], [Enum, :member?]}, [], [names, param]}], body}, state)
         {:->, _, [ [param], body]} ->
           walk({[], [param], [], body}, state)
       end)

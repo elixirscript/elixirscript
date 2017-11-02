@@ -11,9 +11,8 @@
   },
   "scripts": {
     "lint": "eslint src/javascript/lib/**/*.js src/javascript/tests/**/*.js",
-    "lint:fix":
-      "eslint src/javascript/lib/**/*.js src/javascript/tests/**/*.js --fix",
-    "build": "rollup -c rollup.config.js",
+    "lint:fix": "eslint src/javascript/lib/**/*.js src/javascript/tests/**/*.js --fix",
+    "build": "node rollup.config.js",
     "clean": "rm -rf priv/build",
     "test": "nyc ava src/javascript/tests"
   },
@@ -45,7 +44,9 @@
     "rollup-plugin-node-resolve": "^3.0.0"
   },
   "ava": {
-    "require": ["babel-register"],
+    "require": [
+      "babel-register"
+    ],
     "babel": {
       "babelrc": true
     }
