@@ -62,20 +62,30 @@ defmodule ElixirScript.Translate.Forms.Try do
         names = Enum.map(names, &make_exception_ast(&1))
 
         param = {:_e, context, atom}
-        reasonCall = {{:., [], [{:_e0, context, atom}, :__reason]}, [], []}
-        reasonCall = {{:., [], [reasonCall, :__struct__]}, [], []}
-        reasonCall = {{:., [], [reasonCall, :__MODULE__]}, [], []}
+        reason_call = {{:., [], [{:_e0, context, atom}, :__reason]}, [], []}
+        reason_call = {{:., [], [reason_call, :__struct__]}, [], []}
+        reason_call = {{:., [], [reason_call, :__MODULE__]}, [], []}
 
-        {ast, _} = Clause.compile({[], [param], [{{:., [], [Enum, :member?]}, [], [names, reasonCall]}], body}, state)
+        {ast, _} = Clause.compile({
+          [],
+          [param],
+          [{{:., [], [Enum, :member?]}, [], [names, reason_call]}],
+          body},
+          state)
         ast
       {:->, _, [ [{:in, _, [param, names]}], body]} ->
         names = Enum.map(names, &make_exception_ast(&1))
 
-        reasonCall = {{:., [], [param, :__reason]}, [], []}
-        reasonCall = {{:., [], [reasonCall, :__struct__]}, [], []}
-        reasonCall = {{:., [], [reasonCall, :__MODULE__]}, [], []}
+        reason_call = {{:., [], [param, :__reason]}, [], []}
+        reason_call = {{:., [], [reason_call, :__struct__]}, [], []}
+        reason_call = {{:., [], [reason_call, :__MODULE__]}, [], []}
 
-        {ast, _} = Clause.compile({[], [param], [{{:., [], [Enum, :member?]}, [], [names, reasonCall]}], body}, state)
+        {ast, _} = Clause.compile({
+          [],
+          [param],
+          [{{:., [], [Enum, :member?]}, [], [names, reason_call]}],
+          body},
+          state)
         ast
       {:->, _, [ [param], body]} ->
         {ast, _} = Clause.compile({[], [param], [], body}, state)
