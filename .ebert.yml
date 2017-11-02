@@ -11,3 +11,4 @@ engines:
 exclude_paths:
 - config
 - test
+- priv/testrunner/vendor.build.js
