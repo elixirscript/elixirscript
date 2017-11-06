@@ -75,7 +75,7 @@ defmodule ElixirScript.Compiler do
     FindUsedModules.execute(entry_modules, pid)
 
     if opts.remove_unused_functions do
-      ElixirScript.FindUsedFunctions.execute(entry_modules, pid)
+      FindUsedFunctions.execute(entry_modules, pid)
     end
 
     modules = State.list_modules(pid)
