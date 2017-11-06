@@ -8,6 +8,7 @@ defmodule ElixirScript.Translate.Function do
   alias ElixirScript.Translate.{Clause, Form, Helpers}
   alias ElixirScript.Translate.Forms.Pattern
 
+  @spec compile(any, map) :: {ESTree.Node.t, map}
   def compile({:fn, _, clauses}, state) do
     anonymous? = Map.get(state, :anonymous_fn, false)
 
@@ -51,6 +52,7 @@ defmodule ElixirScript.Translate.Function do
   end
 
   def compile({{name, arity}, _type, _, clauses}, state) do
+
     state = Map.put(state, :function, {name, arity})
     |> Map.put(:anonymous_fn, false)
     |> Map.put(:in_guard, false)
@@ -156,6 +158,7 @@ defmodule ElixirScript.Translate.Function do
     compile_clause({[], params, [], body}, state)
   end
 
+  @spec compile_block(any, map) :: {ESTree.Node.t, map}
   def compile_block(block, state) do
     ast = case block do
       nil ->
@@ -170,6 +173,7 @@ defmodule ElixirScript.Translate.Function do
     {ast, state}
   end
 
+  @spec update_last_call([ESTree.Node.t], map) :: ESTree.Node.t
   def update_last_call(clause_body, %{function: {name, _}, anonymous_fn: anonymous?}) do
     last_item = List.last(clause_body)
     function_name = ElixirScript.Translate.Identifier.make_function_name(name)

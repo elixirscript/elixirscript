@@ -7,7 +7,8 @@ defmodule ElixirScript.State do
     Agent.start_link(fn ->
       %{
         modules: Keyword.new,
-        js_modules: []
+        js_modules: [],
+        in_memory_modules: []
       }
     end)
   end
@@ -24,10 +25,28 @@ defmodule ElixirScript.State do
 
   def put_module(pid, module, value) do
     Agent.update(pid, fn(state) ->
+      value = Map.put_new(value, :used, [])
+      |> Map.put_new(:used_modules, [])
+
       modules = Keyword.put(state.modules, module, value)
       %{ state | modules: modules }
     end)
   end
+
+  def add_used_module(pid, module, used_module) do
+    Agent.update(pid, fn(state) ->
+      module_info = Keyword.get(state.modules, module)
+
+      used_modules = Map.get(module_info, :used_modules, [])
+      used_modules = Enum.uniq([used_module | used_modules])
+
+      module_info = Map.put(module_info, :used_modules, used_modules)
+      modules = Keyword.put(state.modules, module, module_info)
+
+      %{ state | modules: modules }
+    end)
+  end
+
 
   def has_used?(pid, module, func) do
     Agent.get(pid, fn(state) ->
@@ -87,6 +106,26 @@ defmodule ElixirScript.State do
   def list_modules(pid) do
     Agent.get(pid, fn(state) ->
       state.modules
+    end)
+  end
+
+  def get_in_memory_module(pid, module) do
+    Agent.get(pid, fn(state) ->
+      Keyword.get(state.in_memory_modules, module)
+    end)
+  end
+
+  def get_in_memory_modules(pid) do
+    Agent.get(pid, fn(state) ->
+      state.in_memory_modules
+    end)
+  end
+
+  def put_in_memory_module(pid, module, beam) do
+    Agent.update(pid, fn(state) ->
+      in_memory_modules = Map.get(state, :in_memory_modules, [])
+      in_memory_modules = Keyword.put(in_memory_modules, module, beam)
+      %{ state | in_memory_modules: in_memory_modules }
     end)
   end
 end

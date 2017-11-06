@@ -4,7 +4,7 @@ defmodule ElixirScript.Mixfile do
   def project do
     [
       app: :elixir_script,
-      version: "0.31.0-dev",
+      version: "0.32.0-dev",
       elixir: "~> 1.5",
       elixirc_paths: elixirc_paths(Mix.env),
       deps: deps(),
@@ -31,7 +31,7 @@ defmodule ElixirScript.Mixfile do
       {:ex_doc, "~> 0.16", only: :dev},
       {:excoveralls, "~> 0.7", only: :test},
       {:credo, "~> 0.8", only: [:dev, :test]},
-      {:stream_data, "~> 0.1", only: :test},
+      {:stream_data, "~> 0.3", only: :test},
       {:poison, "~> 3.1", only: :test}
     ]
   end

@@ -2,8 +2,7 @@ defmodule ElixirScript.Translate.Forms.Map.Test do
   use ExUnit.Case
   alias ElixirScript.Translate.Form
   alias ESTree.Tools.Builder, as: J
-  require StreamData
-  import PropertyTest
+  use ExUnitProperties
 
   setup_all do
     {:ok, pid} = ElixirScript.State.start_link()

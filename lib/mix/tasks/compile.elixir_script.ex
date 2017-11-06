@@ -45,15 +45,6 @@ defmodule Mix.Tasks.Compile.ElixirScript do
   end
 
   def clean do
-    {_, opts} = get_compiler_params()
-
-    case opts[:output] do
-      path when is_binary(path) ->
-        file_name = ElixirScript.Output.get_output_file_name(path)
-        File.rm!(file_name)
-      _ ->
-        nil
-    end
     :ok
   end
 

@@ -1,11 +1,9 @@
 defmodule ElixirScript.Translate.Forms.Test do
   use ExUnit.Case
   alias ElixirScript.Translate.Form
-  alias ElixirScript.Translate.Identifier
   alias ElixirScript.Translate.Helpers
   alias ESTree.Tools.Builder, as: J
-  require StreamData
-  import PropertyTest
+  use ExUnitProperties
 
 
   setup_all do
@@ -128,10 +126,7 @@ defmodule ElixirScript.Translate.Forms.Test do
     ast = IO
 
     {js_ast, _} = Form.compile(ast, state)
-    assert js_ast == J.call_expression(
-          Identifier.make_namespace_members(["Elixir", "IO", "__load"]),
-          [J.identifier("Elixir")]
-        )
+    assert js_ast == %ESTree.Identifier{loc: nil, name: "$IO$", type: "Identifier"}
   end
 
   test "function returning an array" do

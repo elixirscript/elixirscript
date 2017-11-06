@@ -9,14 +9,23 @@ defmodule ElixirScript.Translate.Form do
   alias ElixirScript.Translate.Clause
   require Logger
 
+  @spec compile!(any, map) :: ESTree.Node.t
   def compile!(ast, state) do
     {js_ast, _} = compile(ast, state)
 
     js_ast
   end
 
+  @spec compile(any, map) :: {ESTree.Node.t, map}
+  def compile(ast, state)
+
   def compile(nil, state) do
     { J.identifier("null"), state }
+  end
+
+  def compile(map, state) when is_map(map) do
+    quoted = Code.string_to_quoted!("#{inspect map}")
+    compile(quoted, state)
   end
 
   def compile(form, state) when is_boolean(form) or is_integer(form) or is_float(form) or is_binary(form)  do
@@ -122,7 +131,7 @@ defmodule ElixirScript.Translate.Form do
     { ast, state }
   end
 
-  def compile({:for, _, _} = ast, state) do
+  def compile({:for, _, generators} = ast, state) when is_list(generators) do
     For.compile(ast, state)
   end
 

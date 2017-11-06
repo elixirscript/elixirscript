@@ -3,7 +3,6 @@ defmodule ElixirScript.Output do
 
   alias ElixirScript.State, as: ModuleState
   alias ESTree.Tools.{Builder, Generator}
-  @generated_name "elixirscript.build.js"
 
   @doc """
   Takes outputs the JavaScript code in the specified output
@@ -12,8 +11,8 @@ defmodule ElixirScript.Output do
   def execute(modules, pid, opts) do
     modules = modules
     |> Enum.filter(fn {_, info} -> Map.has_key?(info, :js_ast) end)
-    |> Enum.map(fn {_module, info} ->
-        info.js_ast
+    |> Enum.map(fn {module, info} ->
+        {module, info.js_ast, info.used_modules}
       end
     )
 
@@ -28,35 +27,16 @@ defmodule ElixirScript.Output do
         {module, name, path, import_path}
     end)
 
-    bundle(modules, opts, js_modules)
-    |> output(Map.get(opts, :output), js_modules)
-  end
-
-  defp bundle(modules, opts, js_modules) do
     modules
-    |> ElixirScript.Output.JSModule.compile(opts, js_modules)
-    |> Task.async_stream(fn(js_part) ->
-      js_part
-      |> List.wrap
-      |> Builder.program
-      |> prepare_js_ast
-      |> Generator.generate
-    end)
-    |> Stream.map(fn {:ok, js_code} -> js_code end)
-    |> Enum.to_list
-    |> Enum.join("\n")
-    |> concat
+    |> create_modules(opts, js_modules)
   end
 
   defp concat(code) do
-    bootstrap_code = get_bootstrap_js()
-    "'use strict';\nexport #{bootstrap_code}\n#{code}"
-  end
-
-  defp get_bootstrap_js() do
-    operating_path = Path.join([Mix.Project.build_path, "lib", "elixir_script", "priv"])
-    path = Path.join([operating_path, "build", "iife", "ElixirScript.Core.js"])
-    File.read!(path)
+    """
+    'use strict';
+    import ElixirScript from './ElixirScript.Core.js';
+    #{code}
+    """
   end
 
   defp prepare_js_ast(js_ast) do
@@ -70,39 +50,74 @@ defmodule ElixirScript.Output do
     end
   end
 
-  defp output(code, nil, _) do
+  defp create_modules(modules, opts, js_modules) do
+    modules
+    |> Task.async_stream(fn({module, [body, exports], used_modules}) ->
+      modules = modules_to_import(used_modules) ++ js_modules
+
+      imports = opts.module_formatter.build_imports(modules)
+      exports = opts.module_formatter.build_export(exports)
+
+      js_parts = List.wrap(imports) ++ body ++ List.wrap(exports)
+
+      js_parts
+      |> Builder.program
+      |> prepare_js_ast
+      |> Generator.generate
+      |> concat
+      |> output(module, Map.get(opts, :output), js_modules)
+    end, timeout: 10_000)
+    |> Stream.map(fn {:ok, code} -> code end)
+    |> Enum.to_list()
+  end
+
+  defp modules_to_import(modules) do
+    Enum.map(modules, &module_to_import(&1))
+  end
+
+  defp module_to_import(module) do
+    {module, module_to_name(module), "", "./Elixir.#{inspect module}.js"}
+  end
+
+  def module_to_name(module) do
+    "$#{inspect module}$"
+    |> String.replace(".", "$")
+  end
+
+  defp output(code, _, nil, _) do
      code
   end
 
-  defp output(code, :stdout, _) do
+  defp output(code, _, :stdout, _) do
     IO.puts(code)
   end
 
-  defp output(code, path, js_modules) do
-    file_name = get_output_file_name(path)
+  defp output(code, module, path, js_modules) do
+    output_dir = if File.dir?(path) do
+      path
+    else
+      Path.dirname(path)
+    end
 
-    if !File.exists?(Path.dirname(file_name)) do
-      File.mkdir_p!(Path.dirname(file_name))
+    file_name = Path.join(output_dir, "Elixir.#{inspect module}.js")
+
+    if !File.exists?(output_dir) do
+      File.mkdir_p!(output_dir)
     end
 
     apps = get_app_names()
-    output_dir = Path.dirname(file_name)
     Enum.each(js_modules, fn({_, _, path, _}) ->
       copy_javascript_module(apps, output_dir, path)
     end)
 
+    copy_bootstrap_js(output_dir)
     File.write!(file_name, code)
   end
 
-  def get_output_file_name(path) do
-    case Path.extname(path) do
-      ".js" ->
-        path
-      ".mjs" ->
-        path
-      _ ->
-        Path.join([path, @generated_name])
-    end
+  defp copy_bootstrap_js(directory) do
+    operating_path = Path.join([Mix.Project.build_path, "lib", "elixir_script", "priv"])
+    path = Path.join([operating_path, "build", "es", "ElixirScript.Core.js"])
+    File.cp!(path, Path.join([directory, "ElixirScript.Core.js"]))
   end
 
   defp get_app_names() do

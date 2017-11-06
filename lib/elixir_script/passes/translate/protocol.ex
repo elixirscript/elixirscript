@@ -31,23 +31,16 @@ defmodule ElixirScript.Translate.Protocol do
 
     body = [declaration] ++ body
 
-    js_ast = ElixirScript.ModuleSystems.Namespace.build(
-      module,
-      body,
-      J.identifier("protocol")
-    )
+    js_ast = [body, J.identifier("protocol")]
 
-    ModuleState.put_module(pid, module, Map.put(info, :js_ast, hd(js_ast)))
+    ModuleState.put_module(pid, module, Map.put(info, :js_ast, js_ast))
   end
 
   defp build_implementations(impls) do
     Enum.map(impls, fn({impl, impl_for}) ->
-      members = ["Elixir"] ++ Module.split(impl) ++ ["__load"]
-
-      ast = Helpers.call(
-        Identifier.make_namespace_members(members),
-        [J.identifier("Elixir")]
-      )
+      ast = impl
+      |> ElixirScript.Output.module_to_name()
+      |> J.identifier
 
       Helpers.call(
         J.member_expression(

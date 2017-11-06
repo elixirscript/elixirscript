@@ -4,8 +4,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [unreleased]
+## Unreleased
+## Changed
+- Compiler now returns a file per module instead of just one file
+
+## [0.31.1] - 2017-09-27
+### Fixed
+- Compiler error when `receive` is used as variable name
+
+
+## [0.31.0] - 2017-09-24
 ### Added
+- [Compiler will now accept a path to Elixir Files to compile](https://github.com/elixirscript/elixirscript/issues/420)
 - [Added `ElixirScript.JS.map_to_object/2` with options [keys: :string, symbols: false]](https://github.com/elixirscript/elixirscript/issues/362)
 - [Added `ElixirScript.JS.object_to_map/1|2` with options [keys: :atom, recurse_array: true]](https://github.com/elixirscript/elixirscript/issues/381)
 - [Fully implement `__info__` on modules](https://github.com/elixirscript/elixirscript/pull/378)

@@ -1,19 +1,26 @@
 defmodule ElixirScript.Integration.Test do
-  use ExUnit.Case
-  import Helpers
+  use ElixirScript.Test
+
+  test "Something" do
+    assert {:ok, _} = {:ok, 1}
+  end
 
   test "Atom.to_string" do
-    val = call_compiled_function Atom, :to_string, [:atom]
+    val = Atom.to_string(:atom)
     assert val == "atom"
   end
 
   test "String interpolation with number" do
-    val = call_compiled_function Integration, :test_string_interpolation, []
+    val = "#{5}"
     assert val == "5"
   end
 
   test "shorthand failure" do
-    val = call_compiled_function Integration, :shorthand_failure, []
+    orders = [%{email: "test@hotmail.com"},%{email: "test2@hotmail.com"}]
+
+    val = Enum.reduce(orders, [],
+    &(&2 ++ [ [:option, %{value: &1.email}, &1.email] ]))
+
     assert val == [
       [:option, %{value: "test@hotmail.com"}, "test@hotmail.com"],
       [:option, %{value: "test2@hotmail.com"}, "test2@hotmail.com"]
@@ -21,27 +28,39 @@ defmodule ElixirScript.Integration.Test do
   end
 
   test "map equals" do
-    val = call_compiled_function Integration, :map_equals, []
-    assert val == true
+    map1 = %{test: "map"}
+    map2 = %{test: "map"}
+
+    assert map1 == map2
   end
 
   test "multi-remote call" do
-    val = call_compiled_function Integration, :multi_field_call, []
+    map = %{token_count: 5_000_000}
+    val = map.token_count.toLocaleString()
+
     assert val == "5,000,000"
   end
 
   test "filter names in guards" do
-    val = call_compiled_function Integration, :filter_names_in_guards, []
+    has? = 5
+
+    val = case 5 do
+      _ when has? == 5 ->
+        true
+    end
+
     assert val == true
   end
 
   test "tuple_get" do
-    val = call_compiled_function Integration, :tuple_get, []
+    map = %{{1} => 5}
+    val = Map.get(map, {1})
+
     assert val == 5
   end
 
   test "multi_bind" do
-    val = call_compiled_function Integration, :multi_bind, []
+    [_a | _] = val = [1, 2, 3, 4, 5]
     assert val == [1, 2, 3, 4, 5]
   end
 end
