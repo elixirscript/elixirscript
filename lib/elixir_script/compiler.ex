@@ -23,6 +23,8 @@ defmodule ElixirScript.Compiler do
     If a directory is given, file will be named `elixirscript.build.js`
 
   * `root`: Optional root for imports of FFI JavaScript modules. Defaults to `.`.
+  * `remove_unused_functions`: Removed unused functions in output. Defaults to
+    removing unused functions when Mix.env == :prod
   """
   alias ElixirScript.{
     State,
@@ -72,7 +74,9 @@ defmodule ElixirScript.Compiler do
   defp do_compile(entry_modules, pid, opts) do
     FindUsedModules.execute(entry_modules, pid)
 
-    FindUsedFunctions.execute(entry_modules, pid)
+    if opts.remove_unused_functions do
+      FindUsedFunctions.execute(entry_modules, pid)
+    end
 
     modules = State.list_modules(pid)
     Translate.execute(modules, pid)
@@ -90,6 +94,7 @@ defmodule ElixirScript.Compiler do
     |> Map.put(:output, Keyword.get(opts, :output))
     |> Map.put(:format, :es)
     |> Map.put(:root, Keyword.get(opts, :root, "."))
+    |> Map.put(:remove_unused_functions, Keyword.get(opts, :remove_unused_functions, Mix.env == :prod))
 
     options = default_options
     Map.put(options, :module_formatter, ES)

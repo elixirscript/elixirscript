@@ -9,7 +9,7 @@ defmodule ElixirScript.Translate.Forms.Receive do
   """
   def compile(blocks, state) do
     receive_block = blocks
-    |> Keyword.get(:do)
+    |> Keyword.get(:do, [])
     |> Enum.map(fn x ->
       Clause.compile(x, state)
       |> elem(0)
