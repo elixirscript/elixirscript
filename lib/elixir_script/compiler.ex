@@ -31,12 +31,13 @@ defmodule ElixirScript.Compiler do
     Translate,
     FindUsedModules,
     FindUsedFunctions,
-    Output
+    Output,
+    Manifest,
   }
   alias ElixirScript.ModuleSystems.ES
   alias Kernel.ParallelCompiler
 
-  @spec compile(atom | [atom] | binary, []) :: nil
+  @spec compile(atom | [atom] | binary, []) :: [{atom, map}]
   def compile(path, opts \\ [])
 
   def compile(path, opts) when is_binary(path) do
@@ -85,6 +86,9 @@ defmodule ElixirScript.Compiler do
     result = Output.execute(modules, pid, opts)
 
     State.stop(pid)
+
+    manifest_path = Path.join(Mix.Project.manifest_path(), ".compile.elixir_script")
+    Manifest.write_manifest(manifest_path, modules, opts)
 
     result
   end

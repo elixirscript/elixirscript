@@ -3,7 +3,6 @@ defmodule ElixirScript.Output do
 
   alias ElixirScript.State, as: ModuleState
   alias ESTree.Tools.{Builder, Generator}
-  alias ElixirScript.Manifest
 
   @doc """
   Takes outputs the JavaScript code in the specified output
@@ -29,12 +28,7 @@ defmodule ElixirScript.Output do
     end)
 
 
-    result = create_modules(prepared_modules, opts, js_modules)
-
-    manifest_path = Path.join(Mix.Project.manifest_path(), ".compile.elixir_script")
-    Manifest.write_manifest(manifest_path, modules)
-
-    result
+    create_modules(prepared_modules, opts, js_modules)
   end
 
   defp concat(code) do

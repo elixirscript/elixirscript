@@ -6,8 +6,8 @@ defmodule ElixirScript.Manifest do
 
   end
 
-  @spec write_manifest(binary, [{atom, map}]) :: :ok
-  def write_manifest(manifest_path, modules) do
+  @spec write_manifest(binary, [{atom, map}], map) :: :ok
+  def write_manifest(manifest_path, modules, _opts) do
     data = Enum.reduce(modules, %{}, fn {module, info}, current_data ->
       info = %{
         references: info.used_modules,

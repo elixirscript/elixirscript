@@ -2,6 +2,8 @@ defmodule Mix.Tasks.Compile.ElixirScript do
   use Mix.Task
 
   @recursive true
+  @manifest ".compile.elixir_script"
+  @manifest_vsn 1
 
   @moduledoc """
   Mix compiler to allow mix to compile Elixirscript source files into JavaScript
@@ -47,6 +49,9 @@ defmodule Mix.Tasks.Compile.ElixirScript do
   def clean do
     :ok
   end
+
+  def manifests, do: [manifest()]
+  defp manifest, do: Path.join(Mix.Project.manifest_path(), @manifest)
 
   @doc false
   def get_compiler_params() do
