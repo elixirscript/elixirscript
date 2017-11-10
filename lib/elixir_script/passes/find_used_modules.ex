@@ -6,7 +6,7 @@ defmodule ElixirScript.FindUsedModules do
   @doc """
   Takes a list of entry modules and finds modules they use.
   """
-  @spec execute([atom], pid) :: nil
+  @spec execute([atom], pid) :: :ok
   def execute(modules, pid) do
     modules
     |> List.wrap
@@ -94,7 +94,10 @@ defmodule ElixirScript.FindUsedModules do
 
     functions = Enum.map(first_implementation_functions, fn { name, _, _, _} -> name end)
 
-    module_info = Map.merge(module_info, %{protocol: true, impls: impls, functions: functions})
+    module_info = Map.merge(
+      module_info,
+      %{protocol: true, impls: impls, functions: functions}
+    )
 
     ModuleState.put_module(pid, module, module_info)
 
@@ -305,15 +308,14 @@ defmodule ElixirScript.FindUsedModules do
   end
 
   defp walk({:., _, [module, function]}, state) do
-    cond do
-      ElixirScript.Translate.Module.is_elixir_module(module) ->
-        ModuleState.add_used_module(state.pid, state.module, module)
-        if ModuleState.get_module(state.pid, module) == nil do
-          do_execute(module, state.pid)
-        end
-      true ->
-        walk(module, state)
-        walk(function, state)
+    if ElixirScript.Translate.Module.is_elixir_module(module) do
+      ModuleState.add_used_module(state.pid, state.module, module)
+      if ModuleState.get_module(state.pid, module) == nil do
+        do_execute(module, state.pid)
+      end
+    else
+      walk(module, state)
+      walk(function, state)
     end
   end
 

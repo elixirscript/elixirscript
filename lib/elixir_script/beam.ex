@@ -7,7 +7,7 @@ defmodule ElixirScript.Beam do
   For protocols, this will return a list of
   all the protocol implementations
   """
-  @spec debug_info(atom | bitstring) :: {:ok | :error, map | binary}
+  @spec debug_info(atom | bitstring) :: {:ok, map} | {:ok, atom, map, list} | {:error, binary}
   def debug_info(module)
 
   # We get debug info from String and then replace

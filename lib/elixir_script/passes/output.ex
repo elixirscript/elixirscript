@@ -27,7 +27,6 @@ defmodule ElixirScript.Output do
         {module, name, path, import_path}
     end)
 
-
     create_modules(prepared_modules, opts, js_modules)
   end
 
