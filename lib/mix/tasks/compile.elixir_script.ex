@@ -1,5 +1,6 @@
 defmodule Mix.Tasks.Compile.ElixirScript do
   use Mix.Task
+  alias ElixirScript.Manifest
 
   @recursive true
   @manifest ".compile.elixir_script"
@@ -43,7 +44,9 @@ defmodule Mix.Tasks.Compile.ElixirScript do
 
   defp do_compile() do
     {input, opts} = get_compiler_params()
-    ElixirScript.Compiler.compile(input, opts)
+    result = ElixirScript.Compiler.compile(input, opts)
+
+    Manifest.write_manifest(manifest(), result)
   end
 
   def clean do

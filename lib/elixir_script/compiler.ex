@@ -32,12 +32,11 @@ defmodule ElixirScript.Compiler do
     FindUsedModules,
     FindUsedFunctions,
     Output,
-    Manifest,
   }
   alias ElixirScript.ModuleSystems.ES
   alias Kernel.ParallelCompiler
 
-  @spec compile(atom | [atom] | binary, []) :: [{atom, map}]
+  @spec compile(atom | [atom] | binary, []) :: map
   def compile(path, opts \\ [])
 
   def compile(path, opts) when is_binary(path) do
@@ -87,10 +86,7 @@ defmodule ElixirScript.Compiler do
 
     State.stop(pid)
 
-    manifest_path = Path.join(Mix.Project.manifest_path(), ".compile.elixir_script")
-    Manifest.write_manifest(manifest_path, modules, opts)
-
-    result
+    transform_output(modules, result, opts)
   end
 
   defp build_compiler_options(opts) do
@@ -106,5 +102,26 @@ defmodule ElixirScript.Compiler do
 
   defp on_module_compile(pid, _file, module, beam) do
     State.put_in_memory_module(pid, module, beam)
+  end
+
+  defp transform_output(modules, compiled_js, opts) do
+    output_path = if opts.output == nil or opts.output == :stdout do
+     ""
+    else
+      Path.dirname(opts.output)
+    end
+
+    Enum.reduce(modules, %{}, fn {module, info}, current_data ->
+      info = %{
+        references: info.used_modules,
+        last_modified: info.last_modified,
+        beam_path: Map.get(info, :beam_path),
+        source: Map.get(info, :file),
+        js_path: Path.join(output_path, "#{module}.js"),
+        js_code: Keyword.get(compiled_js, module)
+      }
+
+      Map.put(current_data, module, info)
+    end)
   end
 end
