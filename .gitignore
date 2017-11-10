@@ -24,3 +24,4 @@ cover
 /priv/build
 /tmp
 .esm-cache
+.elixir_ls

@@ -3,13 +3,14 @@ defmodule ElixirScript.Output do
 
   alias ElixirScript.State, as: ModuleState
   alias ESTree.Tools.{Builder, Generator}
+  alias ElixirScript.Manifest
 
   @doc """
   Takes outputs the JavaScript code in the specified output
   """
-  @spec execute([atom], pid, map) :: nil
+  @spec execute([atom], pid, map) :: any
   def execute(modules, pid, opts) do
-    modules = modules
+    prepared_modules = modules
     |> Enum.filter(fn {_, info} -> Map.has_key?(info, :js_ast) end)
     |> Enum.map(fn {module, info} ->
         {module, info.js_ast, info.used_modules}
@@ -27,8 +28,13 @@ defmodule ElixirScript.Output do
         {module, name, path, import_path}
     end)
 
-    modules
-    |> create_modules(opts, js_modules)
+
+    result = create_modules(prepared_modules, opts, js_modules)
+
+    manifest_path = Path.join(Mix.Project.manifest_path(), ".compile.elixir_script")
+    Manifest.write_manifest(manifest_path, modules)
+
+    result
   end
 
   defp concat(code) do
@@ -37,17 +43,6 @@ defmodule ElixirScript.Output do
     import ElixirScript from './ElixirScript.Core.js';
     #{code}
     """
-  end
-
-  defp prepare_js_ast(js_ast) do
-    case js_ast do
-      modules when is_list(modules) ->
-        modules
-        |> Enum.reduce([], &(&2 ++ &1.body))
-        |> Builder.program
-      _ ->
-        js_ast
-    end
   end
 
   defp create_modules(modules, opts, js_modules) do
@@ -62,7 +57,6 @@ defmodule ElixirScript.Output do
 
       js_parts
       |> Builder.program
-      |> prepare_js_ast
       |> Generator.generate
       |> concat
       |> output(module, Map.get(opts, :output), js_modules)

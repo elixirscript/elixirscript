@@ -26,8 +26,8 @@ defmodule ElixirScript.FindUsedModules do
     case result do
       {:ok, info} ->
         walk_module(module, info, pid)
-      {:ok, module, implementations} ->
-        walk_protocol(module, implementations, pid)
+      {:ok, module, module_info, implementations} ->
+        walk_protocol(module, module_info, implementations, pid)
       {:error, "Unknown module"} ->
         Logger.warn fn() ->
           "ElixirScript: #{inspect module} is missing or unavailable"
@@ -83,7 +83,7 @@ defmodule ElixirScript.FindUsedModules do
     end)
   end
 
-  defp walk_protocol(module, implementations, pid) do
+  defp walk_protocol(module, module_info, implementations, pid) do
     impls = Enum.map(implementations, fn {impl, %{attributes: attrs}} ->
       protocol_impl = Keyword.fetch!(attrs, :protocol_impl)
       impl_for = Keyword.fetch!(protocol_impl, :for)
@@ -94,7 +94,9 @@ defmodule ElixirScript.FindUsedModules do
 
     functions = Enum.map(first_implementation_functions, fn { name, _, _, _} -> name end)
 
-    ModuleState.put_module(pid, module, %{protocol: true, impls: impls, functions: functions})
+    module_info = Map.merge(module_info, %{protocol: true, impls: impls, functions: functions})
+
+    ModuleState.put_module(pid, module, module_info)
 
     Enum.each(implementations, fn {impl, info} ->
       ModuleState.add_used_module(pid, module, impl)

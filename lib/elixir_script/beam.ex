@@ -59,7 +59,7 @@ defmodule ElixirScript.Beam do
           {:ok, {^module, attribute_info}} = :beam_lib.chunks(beam, [:attributes]) do
 
           if Keyword.get(attribute_info[:attributes], :protocol) do
-            get_protocol_implementations(module)
+            get_protocol_implementations(module, beam_path)
           else
             backend.debug_info(:elixir_v1, module, data, [])
             |> process_debug_info(beam_path)
@@ -89,6 +89,8 @@ defmodule ElixirScript.Beam do
         Map.put(info, :last_modified, nil)
     end
 
+    info = Map.put(info, :beam_path, beam_path)
+
     {:ok, info}
   end
 
@@ -96,7 +98,9 @@ defmodule ElixirScript.Beam do
     error
   end
 
-  defp get_protocol_implementations(module) do
+  defp get_protocol_implementations(module, beam_path) do
+    {:ok, protocol_module_info} = process_debug_info({:ok, %{}}, beam_path)
+
     implementations = module
     |> Protocol.extract_impls(:code.get_path())
     |> Enum.map(fn(x) -> Module.concat([module, x]) end)
@@ -109,7 +113,7 @@ defmodule ElixirScript.Beam do
       end
     end)
 
-    {:ok, module, implementations}
+    {:ok, module, protocol_module_info, implementations}
   end
 
   defp replace_definitions(original_definitions, replacement_definitions) do
