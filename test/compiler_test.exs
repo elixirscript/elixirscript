@@ -3,17 +3,17 @@ defmodule ElixirScript.Compiler.Test do
 
   test "Can compile one entry module" do
     result = ElixirScript.Compiler.compile(Version)
-    assert is_binary(hd(result))
+    assert result |> Map.to_list |> hd |> elem(1) |> Map.get(:js_code) |> is_binary
   end
 
   test "Can compile multiple entry modules" do
     result = ElixirScript.Compiler.compile([Atom, String, Agent])
-    assert is_binary(hd(result))
+    assert result |> Map.to_list |> hd |> elem(1) |> Map.get(:js_code) |> is_binary
   end
 
   test "Output" do
     result = ElixirScript.Compiler.compile(Atom, [])
-    assert hd(result) =~ "export default"
+    assert result |> Map.to_list |> hd |> elem(1) |> Map.get(:js_code) =~ "export default"
   end
 
   test "compile file" do

@@ -7,9 +7,9 @@ defmodule ElixirScript.Output do
   @doc """
   Takes outputs the JavaScript code in the specified output
   """
-  @spec execute([atom], pid, map) :: nil
+  @spec execute([atom], pid, map) :: [{atom, binary}]
   def execute(modules, pid, opts) do
-    modules = modules
+    prepared_modules = modules
     |> Enum.filter(fn {_, info} -> Map.has_key?(info, :js_ast) end)
     |> Enum.map(fn {module, info} ->
         {module, info.js_ast, info.used_modules}
@@ -27,8 +27,7 @@ defmodule ElixirScript.Output do
         {module, name, path, import_path}
     end)
 
-    modules
-    |> create_modules(opts, js_modules)
+    create_modules(prepared_modules, opts, js_modules)
   end
 
   defp concat(code) do
@@ -37,17 +36,6 @@ defmodule ElixirScript.Output do
     import ElixirScript from './ElixirScript.Core.js';
     #{code}
     """
-  end
-
-  defp prepare_js_ast(js_ast) do
-    case js_ast do
-      modules when is_list(modules) ->
-        modules
-        |> Enum.reduce([], &(&2 ++ &1.body))
-        |> Builder.program
-      _ ->
-        js_ast
-    end
   end
 
   defp create_modules(modules, opts, js_modules) do
@@ -62,7 +50,6 @@ defmodule ElixirScript.Output do
 
       js_parts
       |> Builder.program
-      |> prepare_js_ast
       |> Generator.generate
       |> concat
       |> output(module, Map.get(opts, :output), js_modules)
@@ -84,12 +71,10 @@ defmodule ElixirScript.Output do
     |> String.replace(".", "$")
   end
 
-  defp output(code, _, nil, _) do
-     code
-  end
-
-  defp output(code, _, :stdout, _) do
+  defp output(code, module, nil, _), do: {module, code}
+  defp output(code, module, :stdout, _) do
     IO.puts(code)
+    {module, code}
   end
 
   defp output(code, module, path, js_modules) do
@@ -112,6 +97,8 @@ defmodule ElixirScript.Output do
 
     copy_bootstrap_js(output_dir)
     File.write!(file_name, code)
+
+    {module, code}
   end
 
   defp copy_bootstrap_js(directory) do

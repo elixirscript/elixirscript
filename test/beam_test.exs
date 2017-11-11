@@ -10,6 +10,6 @@ defmodule ElixirScript.Beam.Test do
   end
 
   test "can get ast from beam that is protocol" do
-    assert {:ok, Enumerable, _} = ElixirScript.Beam.debug_info(Enumerable)
+    assert {:ok, Enumerable, _, _} = ElixirScript.Beam.debug_info(Enumerable)
   end
 end
