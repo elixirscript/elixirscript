@@ -9,7 +9,7 @@ defmodule ElixirScript.Manifest do
   @spec write_manifest(binary, map) :: :ok
   def write_manifest(manifest_path, modules) do
     data = Enum.reduce(modules, %{}, fn {module, info}, current_data ->
-      Map.put(current_data, module, Map.drop(info, :js_code))
+      Map.put(current_data, module, Map.drop(info, [:js_code]))
     end)
 
     data = :erlang.term_to_binary(data, [:compressed])
