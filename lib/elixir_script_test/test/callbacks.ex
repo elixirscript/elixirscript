@@ -2,6 +2,7 @@ defmodule ElixirScript.Test.Callbacks do
   @moduledoc """
   Defines ElixirScript.Test callbacks
   """
+  require ExUnit.Assertions
 
   @doc """
   Called before all tests are run in a test file
@@ -112,6 +113,18 @@ defmodule ElixirScript.Test.Callbacks do
           test: fn(context) -> unquote(contents) end
         }
       end
+    end
+  end
+
+  defmacro assert(assertion) do
+    quote do
+      ExUnit.Assertions.assert(unquote(assertion))
+    end
+  end
+
+  defmacro assert(value, message) do
+    quote do
+      ExUnit.Assertions.assert(unquote(value), unquote(message))
     end
   end
 end

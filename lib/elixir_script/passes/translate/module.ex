@@ -30,6 +30,7 @@ defmodule ElixirScript.Translate.Module do
     } = info
 
     used = Map.get(info, :used)
+    remove_unused_functions = ModuleState.remove_unused_functions(pid)
 
     state = %{
       module: module,
@@ -50,7 +51,12 @@ defmodule ElixirScript.Translate.Module do
       Enum.filter(reachable_defs, fn
         { {:start, 2}, _, _, _ } -> true
         { {:__struct__, _}, _, _, _ } -> true
-        { name, _, _, _} -> name in used
+        { name, _, _, _} ->
+          if remove_unused_functions do
+            name in used
+          else
+            true
+          end
         _ -> false
       end)
     end

@@ -9,13 +9,6 @@ defmodule ElixirScript.Output do
   """
   @spec execute([atom], pid, map) :: [{atom, binary}]
   def execute(modules, pid, opts) do
-    prepared_modules = modules
-    |> Enum.filter(fn {_, info} -> Map.has_key?(info, :js_ast) end)
-    |> Enum.map(fn {module, info} ->
-        {module, info.js_ast, info.used_modules}
-      end
-    )
-
     js_modules = ModuleState.js_modules(pid)
     |> Enum.filter(fn
       {_module, _name, nil} -> false
@@ -27,7 +20,19 @@ defmodule ElixirScript.Output do
         {module, name, path, import_path}
     end)
 
+    prepared_modules = modules
+    |> Enum.filter(fn {_, info} -> Map.has_key?(info, :js_ast) end)
+    |> Enum.map(fn {module, info} ->
+        {module, info.js_ast, filter_used_modules(info.used_modules, pid)}
+      end
+    )
+
     create_modules(prepared_modules, opts, js_modules)
+  end
+
+  defp filter_used_modules(used_modules, pid) do
+    used_modules
+    |> Enum.filter(fn module -> ModuleState.is_global_module(pid, module) == false end)
   end
 
   defp concat(code) do

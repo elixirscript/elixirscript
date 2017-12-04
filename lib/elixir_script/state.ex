@@ -3,12 +3,13 @@ defmodule ElixirScript.State do
 
   # Holds the state for the ElixirScript compiler
 
-  def start_link() do
+  def start_link(compiler_opts) do
     Agent.start_link(fn ->
       %{
         modules: Keyword.new,
         js_modules: [],
-        in_memory_modules: []
+        in_memory_modules: [],
+        compiler_opts: compiler_opts,
       }
     end)
   end
@@ -92,6 +93,20 @@ defmodule ElixirScript.State do
   def js_modules(pid) do
     Agent.get(pid, fn(state) ->
       state.js_modules
+    end)
+  end
+
+  def is_global_module(pid, module) do
+    Agent.get(pid, fn(state) ->
+      result = Enum.find(state.js_modules, fn {mod, _, _} -> mod == module end)
+
+      if result == nil, do: false, else: true
+    end)
+  end
+
+  def remove_unused_functions(pid) do
+    Agent.get(pid, fn(state) ->
+      state.compiler_opts.remove_unused_functions
     end)
   end
 

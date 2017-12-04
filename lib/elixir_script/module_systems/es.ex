@@ -4,6 +4,10 @@ defmodule ElixirScript.ModuleSystems.ES do
 
   def build(js_imports, body, exports) do
     imports = js_imports
+    |> Enum.filter(fn
+      {_module, _name, nil, _import_path} -> false
+      _ -> true
+    end)
     |> Enum.map(fn
       {_module, name, _path, import_path} -> import_module(name, import_path)
     end)

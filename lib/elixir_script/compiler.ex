@@ -41,7 +41,7 @@ defmodule ElixirScript.Compiler do
 
   def compile(path, opts) when is_binary(path) do
     opts = build_compiler_options(opts)
-    {:ok, pid} = State.start_link()
+    {:ok, pid} = State.start_link(opts)
 
     path = if String.ends_with?(path, [".ex", ".exs"]) do
       path
@@ -64,7 +64,7 @@ defmodule ElixirScript.Compiler do
 
   def compile(entry_modules, opts) do
     opts = build_compiler_options(opts)
-    {:ok, pid} = State.start_link()
+    {:ok, pid} = State.start_link(opts)
 
     entry_modules = List.wrap(entry_modules)
 
