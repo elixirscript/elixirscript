@@ -173,7 +173,7 @@ defmodule ElixirScript.Translate.Function do
     {ast, state}
   end
 
-  @spec update_last_call([ESTree.Node.t], map) :: ESTree.Node.t
+  @spec update_last_call([ESTree.Node.t], map) :: list
   def update_last_call(clause_body, %{function: {name, _}, anonymous_fn: anonymous?}) do
     last_item = List.last(clause_body)
     function_name = ElixirScript.Translate.Identifier.make_function_name(name)

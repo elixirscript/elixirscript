@@ -96,12 +96,9 @@ defmodule ElixirScript.Translate.Forms.For do
 
 
   defp create_function_expression(ast, state, module_state) do
-    { ast, _ } = Enum.map_reduce(List.wrap(ast), module_state, fn x, acc_state ->
-       Form.compile(x, acc_state)
-    end)
-
     ast = ast
-    |> List.flatten
+    |> ElixirScript.Translate.Function.compile_block(module_state)
+    |> elem(0)
     |> Clause.return_last_statement
 
     Helpers.arrow_function(
