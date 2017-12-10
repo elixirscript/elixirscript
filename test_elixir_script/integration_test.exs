@@ -16,7 +16,7 @@ defmodule ElixirScript.Integration.Test do
   end
 
   test "shorthand failure" do
-    orders = [%{email: "test@hotmail.com"},%{email: "test2@hotmail.com"}]
+    orders = [%{email: "test@hotmail.com"}, %{email: "test2@hotmail.com"}]
 
     val = Enum.reduce(orders, [],
     &(&2 ++ [ [:option, %{value: &1.email}, &1.email] ]))

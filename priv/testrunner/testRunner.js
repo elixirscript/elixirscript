@@ -97,7 +97,6 @@ function runTest(mod, test, incomingContext, results) {
 function handleError(e, test, results, mod) {
   if (e.__reason) {
     if (e.__reason instanceof Map && e.__reason.get(Symbol.for('message'))) {
-      console.log(e.__reason);
       const errorMessage = e.__reason.get(Symbol.for('message'));
       const expr = e.__reason.get(Symbol.for('expr'));
       const left = e.__reason.get(Symbol.for('left'));
