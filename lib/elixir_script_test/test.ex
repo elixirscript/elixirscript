@@ -79,9 +79,9 @@ defmodule ElixirScript.Test do
                                           setup: 1, setup: 2,
                                           setup_all: 1, setup_all: 2,
                                           teardown: 1, teardown: 2,
-                                          teardown_all: 1, teardown_all: 2
+                                          teardown_all: 1, teardown_all: 2,
+                                          assert: 1, assert: 2
                                         ]
-      import ExUnit.Assertions
 
       def __elixirscript_test_module__, do: true
     end
@@ -105,7 +105,7 @@ defmodule ElixirScript.Test do
     exit_status = node_test_runner(js_files)
 
     # Delete directory at the end
-    File.rm_rf!(output)
+    # File.rm_rf!(output)
 
     case exit_status do
       0 ->

@@ -4,7 +4,7 @@ defmodule ElixirScript.Translate.Forms.JS.Test do
   alias ESTree.Tools.Builder, as: J
 
   setup_all do
-    {:ok, pid} = ElixirScript.State.start_link()
+    {:ok, pid} = ElixirScript.State.start_link(%{})
 
     state = %{
       pid: pid,

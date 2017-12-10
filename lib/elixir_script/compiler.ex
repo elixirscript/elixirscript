@@ -41,7 +41,7 @@ defmodule ElixirScript.Compiler do
 
   def compile(path, opts) when is_binary(path) do
     opts = build_compiler_options(opts)
-    {:ok, pid} = State.start_link()
+    {:ok, pid} = State.start_link(opts)
 
     path = if String.ends_with?(path, [".ex", ".exs"]) do
       path
@@ -64,7 +64,7 @@ defmodule ElixirScript.Compiler do
 
   def compile(entry_modules, opts) do
     opts = build_compiler_options(opts)
-    {:ok, pid} = State.start_link()
+    {:ok, pid} = State.start_link(opts)
 
     entry_modules = List.wrap(entry_modules)
 
@@ -90,11 +90,13 @@ defmodule ElixirScript.Compiler do
   end
 
   defp build_compiler_options(opts) do
+    remove_used_functions? = Keyword.get(opts, :remove_unused_functions, true)
+
     default_options = Map.new
     |> Map.put(:output, Keyword.get(opts, :output))
     |> Map.put(:format, :es)
     |> Map.put(:root, Keyword.get(opts, :root, "."))
-    |> Map.put(:remove_unused_functions, Keyword.get(opts, :remove_unused_functions, Mix.env == :prod))
+    |> Map.put(:remove_unused_functions, remove_used_functions?)
 
     options = default_options
     Map.put(options, :module_formatter, ES)

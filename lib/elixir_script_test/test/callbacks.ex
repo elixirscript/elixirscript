@@ -114,4 +114,46 @@ defmodule ElixirScript.Test.Callbacks do
       end
     end
   end
+
+  defmacro assert(assertion) do
+    %{file: file, line: line} = __CALLER__
+
+    quote [file: file, line: line] do
+      require ExUnit.Assertions
+      try do
+        ExUnit.Assertions.assert(unquote(assertion))
+      rescue
+        x in [ExUnit.AssertionError] ->
+          reraise(ElixirScript.Test.AssertionError, [
+            left: x.left,
+            right: x.right,
+            message: x.message,
+            expr: x.expr,
+            file: unquote(file),
+            line: unquote(line)
+          ], [])
+      end
+    end
+  end
+
+  defmacro assert(value, message) do
+    %{file: file, line: line} = __CALLER__
+
+    quote [file: file, line: line] do
+      require ExUnit.Assertions
+      try do
+        ExUnit.Assertions.assert(unquote(value), unquote(message))
+      rescue
+        x in [ExUnit.AssertionError] ->
+          reraise(ElixirScript.Test.AssertionError, [
+            left: x.left,
+            right: x.right,
+            message: x.message,
+            expr: x.expr,
+            file: unquote(file),
+            line: unquote(line)
+          ], [])
+      end
+    end
+  end
 end

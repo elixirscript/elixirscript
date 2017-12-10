@@ -7,7 +7,7 @@ defmodule ElixirScript.Translate.Forms.Test do
 
 
   setup_all do
-    {:ok, pid} = ElixirScript.State.start_link()
+    {:ok, pid} = ElixirScript.State.start_link(%{})
 
     state = %{
       pid: pid,

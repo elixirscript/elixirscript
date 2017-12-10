@@ -56,11 +56,15 @@ defmodule ElixirScript.Translate.Forms.Match do
   defp compile_match(%{patterns: [left], expression: right}, state) do
     { right_ast, state } = Form.compile(right, state)
 
-    {var_dec, right_ast} = case right_ast do
-      [variable_declaration, x] ->
-        {variable_declaration, x}
+    {var_decs, right_ast} = case right_ast do
+      x when is_list(x) ->
+        l = Enum.reverse(x)
+        [head | tail] = l
+        l = Enum.reverse(tail)
+
+        {l, head}
       x ->
-        {nil, x}
+        {[], x}
     end
 
     { patterns, params, state } = Pattern.compile([left], state)
@@ -84,14 +88,7 @@ defmodule ElixirScript.Translate.Forms.Match do
         List.wrap(array_pattern)
     end
 
-    js_ast = case var_dec do
-      nil ->
-        js_ast
-      x ->
-        [x] ++ js_ast
-    end
-
-    { js_ast, state }
+    { var_decs ++ js_ast, state }
   end
 
   defp compile_match(%{patterns: lefts, expression: right}, state) do

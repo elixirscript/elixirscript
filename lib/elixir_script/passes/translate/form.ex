@@ -392,13 +392,26 @@ defmodule ElixirScript.Translate.Form do
 
   defp compile_params(params, state) do
     {params, var_decs} = Enum.map_reduce(params, [], fn
+      ({:=, _, [{left_var, _, atom} = left, right]} = ast, acc) when is_atom(atom) ->
+        case Atom.to_string(left_var) do
+          "_" <> _ ->
+            {compile!(right, state), acc}
+          _ ->
+            {ast, state} = compile(ast, state)
+            left = compile!(left, state)
+
+            {left, acc ++ List.wrap(ast)}
+        end
+
       ({:=, _, [left, _]} = ast, acc) ->
         {ast, state} = compile(ast, state)
         left = compile!(left, state)
 
         {left, acc ++ List.wrap(ast)}
       (x, acc) ->
-        {compile!(x, state), acc}
+        compiled = compile!(x, state)
+
+        {compiled, acc}
     end)
 
     {var_decs, params}

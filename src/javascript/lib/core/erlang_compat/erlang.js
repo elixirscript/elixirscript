@@ -521,6 +521,14 @@ function function_exported(module, _function) {
   return module[_function] != null;
 }
 
+function lessThanEqualTo(one, two) {
+  return one <= two;
+}
+
+function add(one, two) {
+  return one + two;
+}
+
 export default {
   atom_to_binary,
   binary_to_atom,
@@ -589,4 +597,6 @@ export default {
   nodes,
   function_exported,
   equals,
+  lessThanEqualTo,
+  add,
 };

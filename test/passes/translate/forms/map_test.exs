@@ -5,7 +5,7 @@ defmodule ElixirScript.Translate.Forms.Map.Test do
   use ExUnitProperties
 
   setup_all do
-    {:ok, pid} = ElixirScript.State.start_link()
+    {:ok, pid} = ElixirScript.State.start_link(%{})
 
     state = %{
       pid: pid

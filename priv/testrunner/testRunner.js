@@ -101,6 +101,8 @@ function handleError(e, test, results, mod) {
       const expr = e.__reason.get(Symbol.for('expr'));
       const left = e.__reason.get(Symbol.for('left'));
       const right = e.__reason.get(Symbol.for('right'));
+      const file = e.__reason.get(Symbol.for('file'));
+      const line = e.__reason.get(Symbol.for('line'));
       const moduleName = Symbol.keyFor(mod.default.__MODULE__).replace('Elixir.', '');
       let testMessage = test.get(Symbol.for('message'));
       testMessage = `${results.failed}) ${testMessage} (${moduleName})`;
@@ -109,6 +111,8 @@ function handleError(e, test, results, mod) {
       console.log(Colors.fg.Red, errorMessage, Colors.Reset);
       printErrorLine(left, 'left');
       printErrorLine(right, 'right');
+      printErrorLine(file, 'file');
+      printErrorLine(line, 'line');
     }
   } else {
     console.log(e);

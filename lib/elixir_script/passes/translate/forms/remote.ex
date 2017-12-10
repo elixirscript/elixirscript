@@ -54,6 +54,16 @@ defmodule ElixirScript.Translate.Forms.Remote do
     { ast, state }
   end
 
+  def compile({:., _, [:erlang, :"=<"]}, state) do
+    ast = erlang_compat_function("erlang", "lessThanEqualTo")
+    { ast, state }
+  end
+
+  def compile({:., _, [:erlang, :+]}, state) do
+    ast = erlang_compat_function("erlang", "add")
+    { ast, state }
+  end
+
   def compile({:., _, [module, function]}, state) when module in @erlang_modules do
     ast = J.member_expression(
       Helpers.core_module(module),

@@ -62,7 +62,7 @@ defmodule ElixirScript.Translate.Forms.Try do
         names = Enum.map(names, &make_exception_ast(&1))
 
         param = {:_e, context, atom}
-        reason_call = {{:., [], [{:_e0, context, atom}, :__reason]}, [], []}
+        reason_call = {{:., [], [param, :__reason]}, [], []}
         reason_call = {{:., [], [reason_call, :__struct__]}, [], []}
         reason_call = {{:., [], [reason_call, :__MODULE__]}, [], []}
 
