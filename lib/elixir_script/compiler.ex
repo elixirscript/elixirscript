@@ -90,11 +90,13 @@ defmodule ElixirScript.Compiler do
   end
 
   defp build_compiler_options(opts) do
+    remove_used_functions? = Keyword.get(opts, :remove_unused_functions, true)
+
     default_options = Map.new
     |> Map.put(:output, Keyword.get(opts, :output))
     |> Map.put(:format, :es)
     |> Map.put(:root, Keyword.get(opts, :root, "."))
-    |> Map.put(:remove_unused_functions, Keyword.get(opts, :remove_unused_functions, true))
+    |> Map.put(:remove_unused_functions, remove_used_functions?)
 
     options = default_options
     Map.put(options, :module_formatter, ES)
