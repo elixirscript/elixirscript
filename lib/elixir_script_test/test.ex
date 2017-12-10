@@ -75,8 +75,7 @@ defmodule ElixirScript.Test do
   defmacro __using__(_opts) do
     quote do
       require ExUnit.Assertions
-      import ElixirScript.Test.Callbacks
-      import ElixirScript.Test.Assertions
+      import ElixirScript.Test.{Callbacks, Assertions}
 
       def __elixirscript_test_module__, do: true
     end

@@ -87,7 +87,11 @@ defmodule ElixirScript.Test.Assertions do
 
     quote [file: file, line: line] do
       try do
-        ExUnit.Assertions.assert(unquote(exception), unquote(message), unquote(function))
+        ExUnit.Assertions.assert(
+          unquote(exception),
+          unquote(message),
+          unquote(function)
+        )
       rescue
         error in [ExUnit.AssertionError] ->
           ElixirScript.Test.Assertions.raise_elixir_script_assert(
