@@ -78,6 +78,11 @@ defmodule ElixirScript.Translate.Forms.For do
       ([into: expression], state) ->
         %{state | into: Form.compile!(expression, module_state)}
 
+      ([do: expression2, into: expression], state) ->
+        fun = create_function_expression(expression2, state, module_state)
+
+        %{state | into: Form.compile!(expression, module_state), fun: fun}
+
       ([into: expression, do: expression2], state) ->
         fun = create_function_expression(expression2, state, module_state)
 

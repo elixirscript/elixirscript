@@ -94,7 +94,7 @@ defmodule ElixirScript.Compiler do
     |> Map.put(:output, Keyword.get(opts, :output))
     |> Map.put(:format, :es)
     |> Map.put(:root, Keyword.get(opts, :root, "."))
-    |> Map.put(:remove_unused_functions, Keyword.get(opts, :remove_unused_functions, Mix.env == :prod))
+    |> Map.put(:remove_unused_functions, Keyword.get(opts, :remove_unused_functions, true))
 
     options = default_options
     Map.put(options, :module_formatter, ES)

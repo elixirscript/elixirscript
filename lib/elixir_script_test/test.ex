@@ -105,7 +105,7 @@ defmodule ElixirScript.Test do
     exit_status = node_test_runner(js_files)
 
     # Delete directory at the end
-    File.rm_rf!(output)
+    # File.rm_rf!(output)
 
     case exit_status do
       0 ->

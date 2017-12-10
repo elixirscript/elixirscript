@@ -62,12 +62,16 @@ function _try(do_fun, rescue_function, catch_fun, else_function, after_function)
     let ex_result = null;
     if (rescue_function) {
       try {
-        ex_result = rescue_function(e);
+        let value = e;
+        if (e.__reason) {
+          value = e.__reason;
+          value.set('__reason', e.__reason);
+        }
+
+        ex_result = rescue_function(value);
         return ex_result;
       } catch (ex) {
-        if (ex instanceof Core.Patterns.MatchError) {
-          throw ex;
-        }
+        throw ex;
       }
     }
 
@@ -76,9 +80,7 @@ function _try(do_fun, rescue_function, catch_fun, else_function, after_function)
         ex_result = catch_fun(e);
         return ex_result;
       } catch (ex) {
-        if (ex instanceof Core.Patterns.MatchError) {
-          throw ex;
-        }
+        throw ex;
       }
     }
 

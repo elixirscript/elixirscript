@@ -6,6 +6,11 @@ defmodule ElixirScript.Translate.Module do
   alias ElixirScript.State, as: ModuleState
   alias ElixirScript.Translate.Form
 
+  @operators [
+    :+, :-, :*, :/, :!=, :==, :===, :<=, :>=, :=~, :++,
+    :!==, :--, :<, :>
+  ]
+
   @doc """
   Translate the given module's ast to
   JavaScript AST
@@ -51,6 +56,7 @@ defmodule ElixirScript.Translate.Module do
       Enum.filter(reachable_defs, fn
         { {:start, 2}, _, _, _ } -> true
         { {:__struct__, _}, _, _, _ } -> true
+        { {name, _}, _, _, _ } when name in @operators -> false
         { name, _, _, _} ->
           if remove_unused_functions do
             name in used
