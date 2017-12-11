@@ -104,6 +104,31 @@ defmodule ElixirScript.Test.Assertions do
   end
 
   @doc """
+  Asserts that `value1` and `value2` differ by no more than `delta`
+  """
+  defmacro assert_in_delta(value1, value2, delta, message \\ nil) do
+    %{file: file, line: line} = __CALLER__
+
+    quote [file: file, line: line] do
+      try do
+        ExUnit.Assertions.assert_in_delta(
+          unquote(value1),
+          unquote(value2),
+          unquote(delta),
+          unquote(message)
+        )
+      rescue
+        error in [ExUnit.AssertionError] ->
+          ElixirScript.Test.Assertions.raise_elixir_script_assert(
+            error,
+            unquote(file),
+            unquote(line)
+          )
+      end
+    end
+  end
+
+  @doc """
   A negative assertion, expects the expression to be `false` or `nil`.
   """
   defmacro refute(assertion) do
@@ -132,6 +157,31 @@ defmodule ElixirScript.Test.Assertions do
     quote [file: file, line: line] do
       try do
         ExUnit.Assertions.assert(unquote(value), unquote(message))
+      rescue
+        error in [ExUnit.AssertionError] ->
+          ElixirScript.Test.Assertions.raise_elixir_script_assert(
+            error,
+            unquote(file),
+            unquote(line)
+          )
+      end
+    end
+  end
+
+  @doc """
+  Asserts that `value1` and `value2` are not within `delta`
+  """
+  defmacro refute_in_delta(value1, value2, delta, message \\ nil) do
+    %{file: file, line: line} = __CALLER__
+
+    quote [file: file, line: line] do
+      try do
+        ExUnit.Assertions.refute_in_delta(
+          unquote(value1),
+          unquote(value2),
+          unquote(delta),
+          unquote(message)
+        )
       rescue
         error in [ExUnit.AssertionError] ->
           ElixirScript.Test.Assertions.raise_elixir_script_assert(
