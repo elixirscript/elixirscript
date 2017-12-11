@@ -23,8 +23,6 @@ defmodule ElixirScript.Compiler do
     If a directory is given, file will be named `elixirscript.build.js`
 
   * `root`: Optional root for imports of FFI JavaScript modules. Defaults to `.`.
-  * `remove_unused_functions`: Removed unused functions in output. Defaults to
-    removing unused functions when Mix.env == :prod
   """
   alias ElixirScript.{
     State,

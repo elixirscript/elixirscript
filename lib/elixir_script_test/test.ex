@@ -74,14 +74,8 @@ defmodule ElixirScript.Test do
 
   defmacro __using__(_opts) do
     quote do
-      import ElixirScript.Test.Callbacks, only: [
-                                          test: 2, test: 3,
-                                          setup: 1, setup: 2,
-                                          setup_all: 1, setup_all: 2,
-                                          teardown: 1, teardown: 2,
-                                          teardown_all: 1, teardown_all: 2,
-                                          assert: 1, assert: 2
-                                        ]
+      require ExUnit.Assertions
+      import ElixirScript.Test.{Callbacks, Assertions}
 
       def __elixirscript_test_module__, do: true
     end
@@ -102,10 +96,10 @@ defmodule ElixirScript.Test do
     |> Path.join("Elixir.*.js")
     |> Path.wildcard()
 
-    exit_status = node_test_runner(js_files)
+    exit_status = ElixirScript.Test.Runner.Node.run(js_files)
 
     # Delete directory at the end
-    # File.rm_rf!(output)
+    File.rm_rf!(output)
 
     case exit_status do
       0 ->
@@ -113,17 +107,5 @@ defmodule ElixirScript.Test do
       _ ->
         :error
     end
-  end
-
-  defp node_test_runner(js_files) do
-    test_script_path = Path.join([:code.priv_dir(:elixir_script), "testrunner", "index.js"])
-    test_script_path = [test_script_path] ++ js_files
-    {_, exit_status} = System.cmd(
-      "node",
-      test_script_path,
-      into: IO.stream(:stdio, :line)
-    )
-
-    exit_status
   end
 end
