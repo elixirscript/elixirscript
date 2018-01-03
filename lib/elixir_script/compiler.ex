@@ -29,33 +29,39 @@ defmodule ElixirScript.Compiler do
     Translate,
     FindUsedModules,
     FindUsedFunctions,
-    Output,
+    Output
   }
+
   alias ElixirScript.ModuleSystems.ES
   alias Kernel.ParallelCompiler
 
-  @spec compile(atom | [atom] | binary, []) :: map
+  @type compiler_input ::
+          atom
+          | [atom]
+          | binary
+
+  @spec compile(compiler_input, []) :: map
   def compile(path, opts \\ [])
 
   def compile(path, opts) when is_binary(path) do
     opts = build_compiler_options(opts)
     {:ok, pid} = State.start_link(opts)
 
-    path = if String.ends_with?(path, [".ex", ".exs"]) do
-      path
-    else
-      Path.join([path, "**", "*.{ex,exs}"])
-    end
+    path =
+      if String.ends_with?(path, [".ex", ".exs"]) do
+        path
+      else
+        Path.join([path, "**", "*.{ex,exs}"])
+      end
 
     files = Path.wildcard(path)
 
-    ParallelCompiler.files(files, [
-      each_module: &on_module_compile(pid, &1, &2, &3)
-    ])
+    ParallelCompiler.files(files, each_module: &on_module_compile(pid, &1, &2, &3))
 
-    entry_modules = pid
-    |> State.get_in_memory_modules
-    |> Keyword.keys
+    entry_modules =
+      pid
+      |> State.get_in_memory_modules()
+      |> Keyword.keys()
 
     do_compile(entry_modules, pid, opts)
   end
@@ -90,11 +96,12 @@ defmodule ElixirScript.Compiler do
   defp build_compiler_options(opts) do
     remove_used_functions? = Keyword.get(opts, :remove_unused_functions, true)
 
-    default_options = Map.new
-    |> Map.put(:output, Keyword.get(opts, :output))
-    |> Map.put(:format, :es)
-    |> Map.put(:root, Keyword.get(opts, :root, "."))
-    |> Map.put(:remove_unused_functions, remove_used_functions?)
+    default_options =
+      Map.new()
+      |> Map.put(:output, Keyword.get(opts, :output))
+      |> Map.put(:format, :es)
+      |> Map.put(:root, Keyword.get(opts, :root, "."))
+      |> Map.put(:remove_unused_functions, remove_used_functions?)
 
     options = default_options
     Map.put(options, :module_formatter, ES)
@@ -105,23 +112,51 @@ defmodule ElixirScript.Compiler do
   end
 
   defp transform_output(modules, compiled_js, opts) do
-    output_path = if opts.output == nil or opts.output == :stdout do
-     ""
-    else
-      Path.dirname(opts.output)
-    end
+    output_path =
+      if opts.output == nil or opts.output == :stdout do
+        ""
+      else
+        Path.dirname(opts.output)
+      end
 
-    Enum.reduce(modules, %{}, fn {module, info}, current_data ->
-      info = %{
-        references: info.used_modules,
-        last_modified: info.last_modified,
-        beam_path: Map.get(info, :beam_path),
-        source: Map.get(info, :file),
-        js_path: Path.join(output_path, "#{module}.js"),
-        js_code: Keyword.get(compiled_js, module)
-      }
+    Enum.reduce(modules, %{}, fn
+      {module, info}, current_data ->
+        info = %{
+          references: info.used_modules,
+          last_modified: info.last_modified,
+          beam_path: Map.get(info, :beam_path),
+          source: Map.get(info, :file),
+          js_path: Path.join(output_path, "#{module}.js"),
+          js_code: Keyword.get(compiled_js, module),
+          diagnostics: Map.get(info, :diagnostics, []),
+          type: :module
+        }
 
-      Map.put(current_data, module, info)
+        Map.put(current_data, module, info)
+
+      {module, js_input_path, js_output_path}, current_data ->
+        last_modified =
+          case File.stat(js_input_path, time: :posix) do
+            {:ok, file_info} ->
+              file_info.mtime
+
+            _ ->
+              nil
+          end
+
+        info = %{
+          references: [],
+          last_modified: last_modified,
+          beam_path: nil,
+          source: nil,
+          js_input_path: js_input_path,
+          js_path: js_output_path,
+          js_code: nil,
+          diagnostics: [],
+          type: :ffi
+        }
+
+        Map.put(current_data, module, info)
     end)
   end
 end

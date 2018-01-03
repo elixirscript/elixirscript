@@ -35,7 +35,7 @@ defmodule ElixirScript.State do
     end)
   end
 
-  def add_used_module(pid, module, used_module) do
+  def put_used_module(pid, module, used_module) do
     Agent.update(pid, fn state ->
       module_info = Keyword.get(state.modules, module)
 
@@ -58,7 +58,7 @@ defmodule ElixirScript.State do
     end)
   end
 
-  def add_used(pid, module, {_function, _arity} = func) do
+  def put_used(pid, module, {_function, _arity} = func) do
     Agent.update(pid, fn state ->
       module_info = Keyword.get(state.modules, module)
 
@@ -77,6 +77,24 @@ defmodule ElixirScript.State do
       js_modules = Map.get(state, :js_modules, [])
       js_modules = [{module, name, path} | js_modules]
       %{state | js_modules: js_modules}
+    end)
+  end
+
+  def put_diagnostic(pid, module, diagnostic) do
+    Agent.update(pid, fn state ->
+      module_info = Keyword.get(state.modules, module)
+
+      if module_info do
+        diagnostics = Map.get(module_info, :diagnostics, [])
+        diagnostics = [diagnostic | diagnostics]
+
+        module_info = Map.put(module_info, :diagnostics, diagnostics)
+        modules = Keyword.put(state.modules, module, module_info)
+
+        %{state | modules: modules}
+      else
+        state
+      end
     end)
   end
 

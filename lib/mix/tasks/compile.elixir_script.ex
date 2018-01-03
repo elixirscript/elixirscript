@@ -1,5 +1,5 @@
 defmodule Mix.Tasks.Compile.ElixirScript do
-  use Mix.Task
+  use Mix.Task.Compiler
   alias ElixirScript.Manifest
 
   @recursive true
@@ -35,7 +35,6 @@ defmodule Mix.Tasks.Compile.ElixirScript do
   The mix compiler will also compile any dependencies that have the elixirscript compiler in its mix compilers as well
   """
 
-
   @spec run(any()) :: :ok
   def run(_) do
     do_compile()
@@ -60,6 +59,7 @@ defmodule Mix.Tasks.Compile.ElixirScript do
   def get_compiler_params() do
     elixirscript_config = get_elixirscript_config()
     input = Keyword.fetch!(elixirscript_config, :input)
+
     opts = [
       output: Keyword.get(elixirscript_config, :output)
     ]
@@ -68,15 +68,19 @@ defmodule Mix.Tasks.Compile.ElixirScript do
   end
 
   defp get_elixirscript_config() do
-    config  = Mix.Project.config
-    exjs_config = cond do
-      Keyword.has_key?(config, :elixir_script) ->
-        Keyword.get(config, :elixir_script, [])
-      Keyword.has_key?(config, :elixirscript) ->
-        Keyword.get(config, :elixirscript, [])
-      true ->
-        defaults()
-    end
+    config = Mix.Project.config()
+
+    exjs_config =
+      cond do
+        Keyword.has_key?(config, :elixir_script) ->
+          Keyword.get(config, :elixir_script, [])
+
+        Keyword.has_key?(config, :elixirscript) ->
+          Keyword.get(config, :elixirscript, [])
+
+        true ->
+          defaults()
+      end
 
     Keyword.merge(defaults(), exjs_config)
   end
@@ -86,5 +90,4 @@ defmodule Mix.Tasks.Compile.ElixirScript do
       output: "priv/elixir_script/build"
     ]
   end
-
 end
