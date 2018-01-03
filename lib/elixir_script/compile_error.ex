@@ -1,3 +1,3 @@
 defmodule ElixirScript.CompileError do
-  defexception [:message]
+  defexception [:message, :severity]
 end

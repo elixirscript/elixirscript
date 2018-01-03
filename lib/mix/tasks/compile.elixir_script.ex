@@ -1,6 +1,7 @@
 defmodule Mix.Tasks.Compile.ElixirScript do
   use Mix.Task.Compiler
   alias ElixirScript.Manifest
+  alias ElixirScript.Compiler
 
   @recursive true
   @manifest ".compile.elixir_script"
@@ -35,17 +36,41 @@ defmodule Mix.Tasks.Compile.ElixirScript do
   The mix compiler will also compile any dependencies that have the elixirscript compiler in its mix compilers as well
   """
 
-  @spec run(any()) :: :ok
+  @spec run([binary()]) ::
+          :ok | :noop | {:ok | :noop | :error, [Mix.Task.Compiler.Diagnostic.t()]}
   def run(_) do
-    do_compile()
-    :ok
-  end
-
-  defp do_compile() do
     {input, opts} = get_compiler_params()
-    result = ElixirScript.Compiler.compile(input, opts)
 
-    Manifest.write_manifest(manifest(), result)
+    try do
+      result = Compiler.compile(input, opts)
+      Manifest.write_manifest(manifest(), result)
+
+      result
+      |> Enum.map(fn {_module, info} ->
+        info.diagnositcs
+      end)
+      |> List.flatten()
+      |> Enum.map(fn x ->
+        %Mix.Task.Compiler.Diagnostic{
+          compiler_name: "elixir_script",
+          file: x.file,
+          message: x.message,
+          position: x.position,
+          severity: x.severity
+        }
+      end)
+    rescue
+      x in [ElixirScript.CompileError] ->
+        [
+          %Mix.Task.Compiler.Diagnostic{
+            compiler_name: "elixir_script",
+            message: x.message,
+            severity: x.severity,
+            position: nil,
+            file: nil
+          }
+        ]
+    end
   end
 
   def clean do

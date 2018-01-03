@@ -121,6 +121,12 @@ defmodule ElixirScript.Compiler do
 
     Enum.reduce(modules, %{}, fn
       {module, info}, current_data ->
+        diagnostics =
+          Map.get(info, :diagnostics, [])
+          |> Enum.map(fn x ->
+            Map.put(x, :file, Map.get(info, :file))
+          end)
+
         info = %{
           references: info.used_modules,
           last_modified: info.last_modified,
@@ -128,7 +134,7 @@ defmodule ElixirScript.Compiler do
           source: Map.get(info, :file),
           js_path: Path.join(output_path, "#{module}.js"),
           js_code: Keyword.get(compiled_js, module),
-          diagnostics: Map.get(info, :diagnostics, []),
+          diagnostics: diagnostics,
           type: :module
         }
 
@@ -148,8 +154,7 @@ defmodule ElixirScript.Compiler do
           references: [],
           last_modified: last_modified,
           beam_path: nil,
-          source: nil,
-          js_input_path: js_input_path,
+          source: js_input_path,
           js_path: js_output_path,
           js_code: nil,
           diagnostics: [],

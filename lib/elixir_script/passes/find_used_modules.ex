@@ -43,13 +43,9 @@ defmodule ElixirScript.FindUsedModules do
         })
 
       {:error, error} ->
-        ModuleState.put_diagnostic(pid, module, %{
-          severity: :error,
-          message: "An error occurred while compiling #{inspect(module)}: #{error}"
-        })
-
         raise ElixirScript.CompileError,
-              "An error occurred while compiling #{inspect(module)}: #{error}"
+          message: "An error occurred while compiling #{inspect(module)}: #{error}",
+          severity: :error
     end
   end
 
