@@ -113,55 +113,74 @@ defmodule ElixirScript.Compiler do
 
   defp transform_output(modules, compiled_js, opts) do
     output_path =
-      if opts.output == nil or opts.output == :stdout do
-        ""
-      else
-        Path.dirname(opts.output)
+      cond do
+        opts.output == nil or opts.output == :stdout ->
+          ""
+
+        File.dir?(opts.output) ->
+          opts.output
+
+        true ->
+          Path.dirname(opts.output)
       end
 
-    Enum.reduce(modules, %{}, fn
-      {module, info}, current_data ->
-        diagnostics =
-          Map.get(info, :diagnostics, [])
-          |> Enum.map(fn x ->
-            Map.put(x, :file, Map.get(info, :file))
-          end)
+    data = %{
+      ElixirScript.Core => %{
+        references: [],
+        last_modified: nil,
+        beam_path: nil,
+        source: nil,
+        js_path: Path.join(output_path, "ElixirScript.Core.js"),
+        diagnostics: [],
+        js_code: nil,
+        type: :ffi
+      }
+    }
 
-        info = %{
-          references: info.used_modules,
-          last_modified: info.last_modified,
-          beam_path: Map.get(info, :beam_path),
-          source: Map.get(info, :file),
-          js_path: Path.join(output_path, "#{module}.js"),
-          js_code: Keyword.get(compiled_js, module),
-          diagnostics: diagnostics,
-          type: :module
-        }
+    Enum.reduce(modules, data, fn {module, info}, current_data ->
+      diagnostics =
+        Map.get(info, :diagnostics, [])
+        |> Enum.map(fn x ->
+          Map.put(x, :file, Map.get(info, :file))
+        end)
 
-        Map.put(current_data, module, info)
+      info = %{
+        references: Map.get(info, :used_modules, []),
+        last_modified: Map.get(info, :last_modified, nil),
+        beam_path: Map.get(info, :beam_path),
+        source: Map.get(info, :file),
+        js_path: Path.join(output_path, "#{module}.js"),
+        diagnostics: diagnostics
+      }
 
-      {module, js_input_path, js_output_path}, current_data ->
-        last_modified =
-          case File.stat(js_input_path, time: :posix) do
-            {:ok, file_info} ->
-              file_info.mtime
+      info =
+        case Keyword.get(compiled_js, module) do
+          [js_input_path, js_output_path] ->
+            last_modified =
+              case File.stat(js_input_path, time: :posix) do
+                {:ok, file_info} ->
+                  file_info.mtime
 
-            _ ->
-              nil
-          end
+                _ ->
+                  nil
+              end
 
-        info = %{
-          references: [],
-          last_modified: last_modified,
-          beam_path: nil,
-          source: js_input_path,
-          js_path: js_output_path,
-          js_code: nil,
-          diagnostics: [],
-          type: :ffi
-        }
+            info
+            |> Map.put(:last_modified, last_modified)
+            |> Map.put(:beam_path, nil)
+            |> Map.put(:source, js_input_path)
+            |> Map.put(:js_path, js_output_path)
+            |> Map.put(:js_code, nil)
+            |> Map.put(:type, :ffi)
 
-        Map.put(current_data, module, info)
+          js_code ->
+            info
+            |> Map.put(:js_path, Path.join(output_path, "#{module}.js"))
+            |> Map.put(:js_code, js_code)
+            |> Map.put(:type, :module)
+        end
+
+      Map.put(current_data, module, info)
     end)
   end
 end

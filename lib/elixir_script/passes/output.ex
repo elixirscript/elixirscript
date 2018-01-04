@@ -92,10 +92,12 @@ defmodule ElixirScript.Output do
 
   defp output(code, module, path, js_modules) do
     output_dir =
-      if File.dir?(path) do
-        path
-      else
-        Path.dirname(path)
+      case Path.extname(path) do
+        "" ->
+          path
+
+        _ ->
+          Path.dirname(path)
       end
 
     file_name = Path.join(output_dir, "Elixir.#{inspect(module)}.js")
@@ -158,9 +160,9 @@ defmodule ElixirScript.Output do
         end
 
         File.cp(js_input_path, js_output_path)
-        acc ++ [{module, js_input_path, js_output_path}]
+        acc ++ [{module, [js_input_path, js_output_path]}]
       else
-        []
+        acc
       end
     end)
   end
