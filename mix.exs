@@ -5,8 +5,8 @@ defmodule ElixirScript.Mixfile do
     [
       app: :elixir_script,
       version: "0.32.0-dev",
-      elixir: "~> 1.6-rc",
-      elixirc_paths: elixirc_paths(Mix.env),
+      elixir: "~> 1.6",
+      elixirc_paths: elixirc_paths(Mix.env()),
       deps: deps(),
       description: description(),
       package: package(),
@@ -37,7 +37,7 @@ defmodule ElixirScript.Mixfile do
   end
 
   defp elixirc_paths(:test), do: ["lib", "test/support"]
-  defp elixirc_paths(_),     do: ["lib"]
+  defp elixirc_paths(_), do: ["lib"]
 
   defp description do
     """
@@ -56,5 +56,4 @@ defmodule ElixirScript.Mixfile do
       build_tools: ["mix"]
     ]
   end
-
 end

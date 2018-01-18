@@ -59,10 +59,16 @@ defmodule ElixirScript.Translate.Form do
 
   def compile(form, state) when is_atom(form) do
     ast =
-      if ElixirScript.Translate.Module.is_elixir_module(form) do
-        Remote.process_module_name(form, state)
-      else
-        Helpers.symbol(form)
+      cond do
+        ElixirScript.Translate.Module.is_elixir_module(form) and
+            ModuleState.get_module(state.pid, form) != nil ->
+          Remote.process_module_name(form, state)
+
+        ElixirScript.Translate.Module.is_elixir_module(form) ->
+          J.object_expression([])
+
+        true ->
+          Helpers.symbol(form)
       end
 
     {ast, state}
