@@ -33,7 +33,7 @@ defmodule ElixirScript.Output do
   defp filter_used_modules(used_modules, pid) do
     used_modules
     |> Enum.filter(fn module ->
-      ModuleState.is_global_module(pid, module) == false
+      module in ModuleState.list_javascript_modules(pid) == false
     end)
   end
 

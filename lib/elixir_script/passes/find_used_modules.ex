@@ -133,7 +133,9 @@ defmodule ElixirScript.FindUsedModules do
     Enum.each(clauses, &walk(&1, state))
   end
 
-  defp walk({_, _args, _guards, body}, state) do
+  defp walk({_, args, guards, body}, state) do
+    walk(args, state)
+    walk(guards, state)
     walk_block(body, state)
   end
 

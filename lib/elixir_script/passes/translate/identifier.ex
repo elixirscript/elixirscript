@@ -38,7 +38,7 @@ defmodule ElixirScript.Translate.Identifier do
   def make_identifier(ast) do
     ast
     |> filter_name
-    |> J.identifier
+    |> J.identifier()
   end
 
   def filter_name(reserved_word) when reserved_word in @js_reserved_words do
@@ -57,11 +57,11 @@ defmodule ElixirScript.Translate.Identifier do
     end
   end
 
-  defp make_alias([x]) do
+  def make_alias([x]) do
     make_identifier(x)
   end
 
-  defp make_alias([h|t]) do
+  def make_alias([h | t]) do
     J.member_expression(make_alias(t), make_identifier(h))
   end
 
@@ -69,10 +69,11 @@ defmodule ElixirScript.Translate.Identifier do
     case module_name do
       m when is_list(m) ->
         m
+
       m when is_atom(m) ->
         Module.split(m)
     end
-    |> Enum.reverse
+    |> Enum.reverse()
     |> make_alias
   end
 
@@ -84,5 +85,4 @@ defmodule ElixirScript.Translate.Identifier do
   def js_reserved_words() do
     @js_reserved_words
   end
-
 end
