@@ -115,7 +115,8 @@ defmodule ElixirScript.State do
 
   def is_global_module(pid, module) do
     Agent.get(pid, fn state ->
-      result = Enum.find(state.js_modules, fn {mod, _, _} -> mod == module end)
+      result =
+        Enum.find(state.js_modules, fn {mod, _name, path} -> mod == module and path == nil end)
 
       if result == nil, do: false, else: true
     end)

@@ -15,16 +15,7 @@ defmodule ElixirScript.FindUsedModules do
     end)
   end
 
-  defp do_execute(module, pid) do
-    result =
-      case ModuleState.get_in_memory_module(pid, module) do
-        nil ->
-          ElixirScript.Beam.debug_info(module)
-
-        beam ->
-          ElixirScript.Beam.debug_info(beam)
-      end
-
+  defp do_execute(module, result, pid) do
     case result do
       {:ok, info} ->
         walk_module(module, info, pid)
@@ -46,6 +37,21 @@ defmodule ElixirScript.FindUsedModules do
         raise ElixirScript.CompileError,
           message: "An error occurred while compiling #{inspect(module)}: #{error}",
           severity: :error
+    end
+  end
+
+  defp do_execute(module, pid) do
+    result = get_debug_info(module, pid)
+    do_execute(module, result, pid)
+  end
+
+  defp get_debug_info(module, pid) do
+    case ModuleState.get_in_memory_module(pid, module) do
+      nil ->
+        ElixirScript.Beam.debug_info(module)
+
+      beam ->
+        ElixirScript.Beam.debug_info(beam)
     end
   end
 
@@ -127,7 +133,9 @@ defmodule ElixirScript.FindUsedModules do
     Enum.each(clauses, &walk(&1, state))
   end
 
-  defp walk({_, _args, _guards, body}, state) do
+  defp walk({_, args, guards, body}, state) do
+    walk(args, state)
+    walk(guards, state)
     walk_block(body, state)
   end
 
@@ -159,10 +167,17 @@ defmodule ElixirScript.FindUsedModules do
        when is_atom(form) and form not in [BitString, Function, PID, Port, Reference, Any, Elixir] do
     if ElixirScript.Translate.Module.is_elixir_module(form) and
          !ElixirScript.Translate.Module.is_js_module(form, state) do
-      ModuleState.put_used_module(state.pid, state.module, form)
-
       if ModuleState.get_module(state.pid, form) == nil do
-        do_execute(form, state.pid)
+        case get_debug_info(form, state.pid) do
+          {:ok, _} = result ->
+            ModuleState.put_used_module(state.pid, state.module, form)
+            do_execute(form, result, state.pid)
+
+          result ->
+            do_execute(form, result, state.pid)
+        end
+      else
+        ModuleState.put_used_module(state.pid, state.module, form)
       end
     end
   end
@@ -191,10 +206,17 @@ defmodule ElixirScript.FindUsedModules do
   defp walk({:%, _, [module, params]}, state) do
     if ElixirScript.Translate.Module.is_elixir_module(module) and
          !ElixirScript.Translate.Module.is_js_module(module, state) do
-      ModuleState.put_used_module(state.pid, state.module, module)
-
       if ModuleState.get_module(state.pid, module) == nil do
-        do_execute(module, state.pid)
+        case get_debug_info(module, state.pid) do
+          {:ok, _} = result ->
+            ModuleState.put_used_module(state.pid, state.module, module)
+            do_execute(module, result, state.pid)
+
+          result ->
+            do_execute(module, result, state.pid)
+        end
+      else
+        ModuleState.put_used_module(state.pid, state.module, module)
       end
     end
 
@@ -331,10 +353,17 @@ defmodule ElixirScript.FindUsedModules do
 
   defp walk({:., _, [module, function]}, state) do
     if ElixirScript.Translate.Module.is_elixir_module(module) do
-      ModuleState.put_used_module(state.pid, state.module, module)
-
       if ModuleState.get_module(state.pid, module) == nil do
-        do_execute(module, state.pid)
+        case get_debug_info(module, state.pid) do
+          {:ok, _} = result ->
+            ModuleState.put_used_module(state.pid, state.module, module)
+            do_execute(module, result, state.pid)
+
+          result ->
+            do_execute(module, result, state.pid)
+        end
+      else
+        ModuleState.put_used_module(state.pid, state.module, module)
       end
     else
       walk(module, state)

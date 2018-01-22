@@ -33,7 +33,7 @@ defmodule ElixirScript.Translate.Forms.Remote do
     :orddict,
     :filelib,
     :net_adm,
-    :net_kernel,
+    :net_kernel
   ]
 
   @doc """
@@ -46,31 +46,32 @@ defmodule ElixirScript.Translate.Forms.Remote do
 
   def compile({:., _, [:erlang, :++]}, state) do
     ast = erlang_compat_function("erlang", "list_concatenation")
-    { ast, state }
+    {ast, state}
   end
 
   def compile({:., _, [:erlang, :--]}, state) do
     ast = erlang_compat_function("erlang", "list_substraction")
-    { ast, state }
+    {ast, state}
   end
 
   def compile({:., _, [:erlang, :"=<"]}, state) do
     ast = erlang_compat_function("erlang", "lessThanEqualTo")
-    { ast, state }
+    {ast, state}
   end
 
   def compile({:., _, [:erlang, :+]}, state) do
     ast = erlang_compat_function("erlang", "add")
-    { ast, state }
+    {ast, state}
   end
 
   def compile({:., _, [module, function]}, state) when module in @erlang_modules do
-    ast = J.member_expression(
-      Helpers.core_module(module),
-      J.identifier(function)
-    )
+    ast =
+      J.member_expression(
+        Helpers.core_module(module),
+        J.identifier(function)
+      )
 
-    { ast, state }
+    {ast, state}
   end
 
   def compile({:., _, [function_name]}, state) do
@@ -80,30 +81,39 @@ defmodule ElixirScript.Translate.Forms.Remote do
   def compile({:., _, [module, function]}, state) do
     function_name = ElixirScript.Translate.Identifier.make_function_name(function)
 
-    ast = J.member_expression(
-      process_module_name(module, state),
-      function_name
-    )
+    ast =
+      J.member_expression(
+        process_module_name(module, state),
+        function_name
+      )
 
     {ast, state}
   end
 
   def process_module_name(module, state) when is_atom(module) do
     cond do
+      ElixirScript.Translate.Module.is_js_module(module, state) and
+          ModuleState.is_global_module(state.pid, module) ->
+        ElixirScript.Translate.Identifier.make_alias(Module.split(module) |> Enum.reverse())
+
       ElixirScript.Translate.Module.is_js_module(module, state) ->
         process_js_module_name(module, state)
+
       module === Elixir ->
         module
         |> ElixirScript.Output.module_to_name()
-        |> J.identifier
+        |> J.identifier()
+
       module === :ElixirScript ->
         module
         |> ElixirScript.Output.module_to_name()
-        |> J.identifier
+        |> J.identifier()
+
       ElixirScript.Translate.Module.is_elixir_module(module) ->
         module
         |> ElixirScript.Output.module_to_name()
-        |> J.identifier
+        |> J.identifier()
+
       true ->
         ElixirScript.Translate.Identifier.make_identifier(module)
     end
@@ -117,12 +127,14 @@ defmodule ElixirScript.Translate.Forms.Remote do
     case ModuleState.get_js_module_name(state.pid, module) do
       name when is_binary(name) ->
         J.identifier(name)
+
       name when is_atom(name) ->
         case to_string(name) do
           "Elixir." <> _ ->
             module
             |> ElixirScript.Output.module_to_name()
-            |> J.identifier
+            |> J.identifier()
+
           x ->
             J.identifier(x)
         end
