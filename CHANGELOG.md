@@ -5,12 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## Unreleased
+## [0.32.0] - Unreleased
 
-## Changed
+### Added
 
-* Compiler now returns a file per module instead of just one file
-* Requires Elixir 1.6
+* `ElixirScript.Test` for testing ElixirScript modules in JavaScript. ElixirScript.Test is for unit testing modules that interact with JavaScript in some way. For modules that are can be used in both Elixir and ElixirScript, ExUnit is still preferred. Tests that use ElixirScript.Test must be placed in a `test_elixir_script` folder in the root of your project. These tests are run using node.js. The API for ElixirScript.Test is meant to be as close to ExUnit as possible.
+
+### Changed
+
+* ElixirScript now requires Elixir 1.6. This is so that ElixirScript can use the new `Mix.Task.Compiler` behaviour.
+* `mix clean` will now correctly clean up ElixirScript output.
+* Compiler will now output a JavaScript file per Elixir module.
+* Modules with a start function **must** be started directly.
+
+  ```elixir
+  # Before ElixirScript 0.32.0:
+  import Elixir from './elixirscript.build.js'
+  Elixir.start(Elixir.Main, [1, 2, 3])
+
+
+  # ElixirScript 0.32.0 and later:
+  import Main from './Elixir.Main.js'
+  Main.start(Symbol.for('normal'), [1, 2, 3])
+  ```
 
 ## [0.31.1] - 2017-09-27
 
