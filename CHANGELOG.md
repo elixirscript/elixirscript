@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [0.32.0] - Unreleased
+## [0.32.0] - 2018-02-10
 
 ### Added
 
@@ -22,7 +22,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   # Before ElixirScript 0.32.0:
   import Elixir from './elixirscript.build.js'
   Elixir.start(Elixir.Main, [1, 2, 3])
-
 
   # ElixirScript 0.32.0 and later:
   import Main from './Elixir.Main.js'
@@ -45,15 +44,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 * [Fully implement `__info__` on modules](https://github.com/elixirscript/elixirscript/pull/378)
 * [Concurrent Compilation](https://github.com/elixirscript/elixirscript/issues/376)
 * [The following erlang functions have been implemented](https://github.com/elixirscript/elixirscript/issues/306):
-  * :erlang.nodes/0
-  * :erlang.nodes/1
-  * :math.log2/1
-  * :binary.copy/1
-  * :binary.copy/2
-  * :binary.part/2
-  * :binary.part/3
-  * :binary.replace/3
-  * :binary.replace/4 (some options still missing)
+* :erlang.nodes/0
+* :erlang.nodes/1
+* :math.log2/1
+* :binary.copy/1
+* :binary.copy/2
+* :binary.part/2
+* :binary.part/3
+* :binary.replace/3
+* :binary.replace/4 (some options still missing)
 
 ### Fixed
 
