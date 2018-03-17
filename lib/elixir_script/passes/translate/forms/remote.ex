@@ -94,7 +94,7 @@ defmodule ElixirScript.Translate.Forms.Remote do
     cond do
       ElixirScript.Translate.Module.is_js_module(module, state) and
           ModuleState.is_global_module(state.pid, module) ->
-        ElixirScript.Translate.Identifier.make_alias(Module.split(module) |> Enum.reverse())
+        process_global_js_module_name(module, state)
 
       ElixirScript.Translate.Module.is_js_module(module, state) ->
         process_js_module_name(module, state)
@@ -121,6 +121,22 @@ defmodule ElixirScript.Translate.Forms.Remote do
 
   def process_module_name(module, state) do
     Form.compile!(module, state)
+  end
+
+  defp process_global_js_module_name(module, state) do
+    case ModuleState.get_js_module_name(state.pid, module) do
+      name when is_binary(name) ->
+        J.identifier(name)
+
+      name when is_atom(name) ->
+        case to_string(name) do
+          "Elixir." <> _ ->
+            ElixirScript.Translate.Identifier.make_alias(Module.split(name) |> Enum.reverse())
+
+          x ->
+            J.identifier(x)
+        end
+    end
   end
 
   defp process_js_module_name(module, state) do

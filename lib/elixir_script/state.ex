@@ -122,6 +122,15 @@ defmodule ElixirScript.State do
     end)
   end
 
+  def get_global_module_name(pid, module) do
+    Agent.get(pid, fn state ->
+      result =
+        Enum.find(state.js_modules, fn {mod, _name, path} -> mod == module and path == nil end)
+
+      if result == nil, do: nil, else: elem(result, 1)
+    end)
+  end
+
   def remove_unused_functions(pid) do
     Agent.get(pid, fn state ->
       state.compiler_opts.remove_unused_functions
