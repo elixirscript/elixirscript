@@ -14,7 +14,7 @@ defmodule ElixirScript.Mixfile do
       test_coverage: [tool: ExCoveralls],
       docs: [
         main: "ElixirScript",
-        extras: ["JavaScriptInterop.md"]
+        extras: ["JavaScriptInterop.md", "CompilerInternals.md"]
       ]
     ]
   end
