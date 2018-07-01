@@ -51,6 +51,10 @@ Run `mix compile`
 
 [ElixirScript React](https://github.com/elixirscript/elixirscript_react)
 
+### Starter kit
+
+[Elixirscript Starter Kit](https://github.com/harlantwood/elixirscript-starter-kit)
+
 # Development
 
 ```bash
