@@ -2,7 +2,7 @@ defmodule ElixirScript.FFI do
   @moduledoc """
   The Foreign Function Interface (FFI) for interacting with JavaScript
 
-  To define a foreign module, make a new module and add `use ElixirScript.FFI`. to it
+  To define a foreign module, make a new module and add `use ElixirScript.FFI` to it.
   To define external functions, use the `defexternal` macro.
 
   Here is an example of a foreign module for a JSON module
