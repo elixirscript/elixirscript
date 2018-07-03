@@ -60,7 +60,7 @@ defmodule ElixirScript do
 
   ### JavaScript Interop
 
-  Check out the [JavaScript Interoperability](JavascriptInterop.html) documentation
+  Check out the [JavaScript Interoperability](javascriptinterop.html) documentation
 
   ### Dependencies
 
