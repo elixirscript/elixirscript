@@ -17,21 +17,21 @@ defmodule ElixirScript do
 
   ``` elixir
       def project do
-      [
-      app: :my_app,
-      version: "0.1.0",
-      elixir: "~> 1.0",
-      deps: deps,
-      # Add elixir_script as a compilter
-      compilers: Mix.compilers ++ [:elixir_script],
-      # Our elixir_script configuration
-      elixir_script: [
-          # Entry module. Can also be a list of modules
-          input: MyEntryModule,
-          # Output path. Either a path to a js file or a directory
-          output: "priv/elixir_script/build"
-      ]
-      ]
+        [
+          app: :my_app,
+          version: "0.1.0",
+          elixir: "~> 1.0",
+          deps: deps,
+          # Add elixir_script as a compilter
+          compilers: Mix.compilers() ++ [:elixir_script],
+          # Our elixir_script configuration
+          elixir_script: [
+            # Entry module. Can also be a list of modules
+            input: MyEntryModule,
+            # Output path. Either a path to a js file or a directory
+            output: "priv/elixir_script/build"
+          ]
+        ]
       end
   ```
 
