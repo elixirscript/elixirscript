@@ -1618,8 +1618,8 @@ equal-length@^1.0.0:
   resolved "https://registry.yarnpkg.com/equal-length/-/equal-length-1.0.1.tgz#21ca112d48ab24b4e1e7ffc0e5339d31fdfc274c"
 
 erlang-types@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/erlang-types/-/erlang-types-1.0.1.tgz#943a57a9324e0d0edc0273690a8c702686d9b780"
+  version "1.1.3"
+  resolved "https://registry.yarnpkg.com/erlang-types/-/erlang-types-1.1.3.tgz#833538d82a33f300c307ee19fab93bf625c92d89"
 
 error-ex@^1.2.0:
   version "1.3.1"
