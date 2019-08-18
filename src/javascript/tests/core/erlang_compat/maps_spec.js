@@ -67,9 +67,7 @@ test('put/3', (t) => {
 
 test('take/2', (t) => {
   const myMap = new Map([['a', 1], ['b', 2]]);
-  let a; 
-  let result;
-  [a, result] = Core.maps.take('a', myMap);
+  const [a, result] = Core.maps.take('a', myMap);
   t.is(a, 1);
   t.is(result.has('a'), false);
 });
