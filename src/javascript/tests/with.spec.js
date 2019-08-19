@@ -1,5 +1,5 @@
-import Core from '../lib/core';
 import test from 'ava';
+import Core from '../lib/core';
 
 const Patterns = Core.Patterns;
 const SpecialForms = Core.SpecialForms;
@@ -31,7 +31,7 @@ test('with', (t) => {
 
   const value = SpecialForms._with(
     [new Tuple(Symbol.for('ok'), $), () => map_fetch(opts, 'width')],
-    [new Tuple(Symbol.for('ok'), $), width => map_fetch(opts, 'height')],
+    [new Tuple(Symbol.for('ok'), $), () => map_fetch(opts, 'height')],
     (width, height) => new Tuple(Symbol.for('ok'), width * height),
   );
 
