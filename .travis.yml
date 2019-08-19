@@ -1,13 +1,16 @@
 sudo: false
 language: elixir
 elixir:
-  - 1.6.0
+  - 1.9
 otp_release:
-  - 20.2
-env:
-  - TRAVIS_NODE_VERSION="8"
+  - 22.0
+cache:
+  directories:
+    - _build
+    - deps
+    - node_modules
 install:
-  - rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm && (cd ~/.nvm && git checkout `git describe --abbrev=0 --tags`) && source ~/.nvm/nvm.sh && nvm install $TRAVIS_NODE_VERSION
+  - nvm install 12.8.0 && nvm use 12.8.0
   - npm install -g yarn
   - yarn
   - mix local.hex --force
