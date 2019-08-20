@@ -23,7 +23,7 @@ defmodule ElixirScript.Translate.Forms.Test do
                   StreamData.integer(),
                   StreamData.boolean(),
                   StreamData.binary(),
-                  StreamData.uniform_float()
+                  StreamData.float()
                 ]) do
       {js_ast, _} = Form.compile(value, state)
       assert js_ast == J.literal(value)
@@ -31,7 +31,7 @@ defmodule ElixirScript.Translate.Forms.Test do
   end
 
   property "atom translates to Symbol.for call", %{state: state} do
-    check all atom <- StreamData.unquoted_atom() do
+    check all atom <- StreamData.atom(:alphanumeric) do
       {js_ast, _} = Form.compile(atom, state)
 
       assert js_ast ==
@@ -77,7 +77,7 @@ defmodule ElixirScript.Translate.Forms.Test do
   end
 
   property "local function call translates to local JavaScript function call", %{state: state} do
-    check all func <- StreamData.filter(StreamData.unquoted_atom(), fn x -> x not in [:fn] end),
+    check all func <- StreamData.filter(StreamData.atom(:alphanumeric), fn x -> x not in [:fn] end),
               params <- StreamData.list_of(StreamData.binary()) do
       ast = {func, [], params}
 
@@ -102,7 +102,7 @@ defmodule ElixirScript.Translate.Forms.Test do
   end
 
   property "super function call translates to local JavaScript function call" do
-    check all func <- StreamData.unquoted_atom(),
+    check all func <- StreamData.atom(:alphanumeric),
               params <- StreamData.list_of(StreamData.binary()) do
       ast = {:super, [], [{:def, func}] ++ params}
       state = %{function: {func, nil}, vars: %{}}

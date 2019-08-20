@@ -20,7 +20,7 @@ defmodule ElixirScript.Translate.Forms.Map.Test do
         StreamData.integer(),
         StreamData.boolean(),
         StreamData.binary(),
-        StreamData.uniform_float()
+        StreamData.float()
       ]),
       StreamData.binary()
       }) do

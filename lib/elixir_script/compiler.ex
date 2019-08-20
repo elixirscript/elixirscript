@@ -56,7 +56,7 @@ defmodule ElixirScript.Compiler do
 
     files = Path.wildcard(path)
 
-    ParallelCompiler.files(files, each_module: &on_module_compile(pid, &1, &2, &3))
+    ParallelCompiler.compile(files, each_module: &on_module_compile(pid, &1, &2, &3))
 
     entry_modules =
       pid
