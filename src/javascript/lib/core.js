@@ -27,7 +27,12 @@ function get_global() {
     return global;
   }
 
+  /* As long as the window check precedes this, it won't display in a browser,
+     unless the ground cracks open and swallows JavaScript whole. */
+  /* eslint-disable no-console */
   console.warn('No global state found');
+  /* eslint-enable no-console */
+
   return null;
 }
 

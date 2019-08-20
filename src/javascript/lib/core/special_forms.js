@@ -138,7 +138,10 @@ function _with(...args) {
 }
 
 function receive(clauses, timeout = 0, timeoutFn = () => true) {
+  /* It's more important to warn developers than follow style guides */
+  /* eslint-disable no-console */
   console.warn('Receive not supported');
+  /* eslint-enable no-console */
 
   const messages = []; // this.mailbox.get();
   const NOMATCH = Symbol('NOMATCH');

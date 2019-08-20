@@ -1,3 +1,5 @@
+/* The purpose of this module is, in fact, to do IO. */
+/* eslint-disable no-console */
 import erlang from './erlang';
 
 function put_chars(ioDevice, charData) {
