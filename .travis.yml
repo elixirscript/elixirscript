@@ -10,9 +10,8 @@ cache:
     - deps
     - node_modules
 install:
-  - nvm install 12.8.0 && nvm use 12.8.0
-  - npm install -g yarn
-  - yarn
+  - nvm install 12.8.1 && nvm use 12.8.1
+  - npm install
   - mix local.hex --force
   - mix local.rebar --force
   - mix deps.get
@@ -23,6 +22,6 @@ notifications:
   webhooks:
     urls:
       - https://webhooks.gitter.im/e/fbd8944d285c0696dc41
-    on_success: always  # options: [always|never|change] default: always
-    on_failure: always  # options: [always|never|change] default: always
-    on_start: never     # options: [always|never|change] default: always
+    on_success: always # options: [always|never|change] default: always
+    on_failure: always # options: [always|never|change] default: always
+    on_start: never # options: [always|never|change] default: always

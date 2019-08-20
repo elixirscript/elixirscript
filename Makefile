@@ -5,7 +5,7 @@ default: deps compile
 compile: js_compile elixir_compile
 
 js_compile:
-	yarn build
+	npm run build
 
 elixir_compile:
 	mix compile
@@ -13,7 +13,7 @@ elixir_compile:
 test: js_compile elixir_test js_test
 
 js_test:
-	yarn test
+	npm test
 
 elixir_test:
 	mix test --cover
@@ -29,4 +29,4 @@ elixir_deps:
 	mix deps.get
 
 js_deps:
-	yarn
+	npm install

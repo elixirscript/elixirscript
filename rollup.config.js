@@ -1,13 +1,12 @@
-const rollup = require('rollup');
-const babel = require('rollup-plugin-babel');
-const nodeResolve = require('rollup-plugin-node-resolve');
-const commonjs = require('rollup-plugin-commonjs');
-const minify = require('rollup-plugin-babel-minify');
+const rollup = require('rollup')
+const babel = require('rollup-plugin-babel')
+const nodeResolve = require('rollup-plugin-node-resolve')
+const commonjs = require('rollup-plugin-commonjs')
+const minify = require('rollup-plugin-babel-minify')
 
 const plugins = [
   nodeResolve({
-    jsnext: true,
-    main: true,
+    mainFields: ['jsnext', 'main'],
   }),
   commonjs(),
   babel({
@@ -17,33 +16,37 @@ const plugins = [
     keepFnName: true,
     keepClassName: true,
   }),
-];
+]
 
 rollup
   .rollup({
     input: 'src/javascript/elixir.js',
-    output: 'priv/build/es/ElixirScript.Core.js',
-    sourcemap: 'inline',
-    format: 'es',
+    output: {
+      file: 'priv/build/es/ElixirScript.Core.js',
+      format: 'es',
+    },
     plugins,
   })
-  .then((bundle) => {
+  .then(bundle => {
     bundle.write({
       format: 'es',
       file: 'priv/build/es/ElixirScript.Core.js',
-    });
-  });
+      sourcemap: 'inline',
+    })
+  })
 
 rollup
   .rollup({
     input: 'priv/testrunner/vendor.js',
-    output: 'priv/testrunner/vendor.build.js',
-    format: 'es',
+    output: {
+      file: 'priv/testrunner/vendor.build.js',
+      format: 'es',
+    },
     plugins,
   })
-  .then((bundle) => {
+  .then(bundle => {
     bundle.write({
       format: 'es',
       file: 'priv/testrunner/vendor.build.js',
-    });
-  });
+    })
+  })

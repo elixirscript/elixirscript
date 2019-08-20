@@ -6,9 +6,9 @@ This contributing guide is based on the contributing for Elixir with changes sui
 
 Use the issues tracker for:
 
-* [bug reports](#bug-reports)
-* [submitting pull requests](#pull-requests)
-* [feature requests](#feature-requests)
+- [bug reports](#bug-reports)
+- [submitting pull requests](#pull-requests)
+- [feature requests](#feature-requests)
 
 ## Bug reports
 
@@ -51,7 +51,7 @@ Example:
 ## Feature requests
 
 Feature requests are welcome. But take a moment to find
-out whether your idea fits with the scope and aims of the project. It's up to *you*
+out whether your idea fits with the scope and aims of the project. It's up to _you_
 to make a strong case to convince the community of the merits of this feature.
 Please provide as much detail and context as possible.
 
@@ -63,18 +63,18 @@ found in Elixir in ElixirScript.
 
 ElixirScript is broken up into the following parts:
 
-* The compiler, written in Elixir
-* The JavaScript core
+- The compiler, written in Elixir
+- The JavaScript core
 
-The ElixirScript compiler is in the `lib` folder of the project. 
+The ElixirScript compiler is in the `lib` folder of the project.
 Here is where Elixir code is converted into JavaScript.
 
-The JavaScript code is in the `src/javascript`. 
+The JavaScript code is in the `src/javascript`.
 This is where the special forms and the Erlang Compatibility Layer are defined
 
-The ElixirScript tests can be run using `mix test`
+The ElixirScript tests are ran using `mix test`
 
-The JavaScript tests can be run using `yarn test`
+The JavaScript tests are ran using `npm test`
 
 Please make sure all tests pass after making changes. Also make sure to include tests for
 the changes you made.
@@ -104,72 +104,72 @@ documentation. When working with Git, we recommend the following process
 in order to craft an excellent pull request:
 
 1. [Fork](https://help.github.com/fork-a-repo/) the project, clone your fork,
-  and configure the remotes:
+   and configure the remotes:
 
-  ```sh
-  # Clone your fork of the repo into the current directory
-  git clone https://github.com/<your-username>/elixirscript
-  # Navigate to the newly cloned directory
-  cd elixirscript
-  # Assign the original repo to a remote called "upstream"
-  git remote add upstream https://github.com/elixirscript/elixirscript
-  ```
+```sh
+# Clone your fork of the repo into the current directory
+git clone https://github.com/<your-username>/elixirscript
+# Navigate to the newly cloned directory
+cd elixirscript
+# Assign the original repo to a remote called "upstream"
+git remote add upstream https://github.com/elixirscript/elixirscript
+```
 
 2. If you cloned a while ago, get the latest changes from upstream:
 
-  ```sh
-  git checkout master
-  git pull upstream master
-  ```
+```sh
+git checkout master
+git pull upstream master
+```
 
 3. Create a new topic branch (off of `master`) to contain your feature, change,
-  or fix.
+   or fix.
 
-  **IMPORTANT**: Making changes in `master` is discouraged. You should always
-  keep your local `master` in sync with upstream `master` and make your
-  changes in topic branches.
+   **IMPORTANT**: Making changes in `master` is discouraged. You should always
+   keep your local `master` in sync with upstream `master` and make your
+   changes in topic branches.
 
-  ```sh
-  git checkout -b <topic-branch-name>
-  ```
+```sh
+git checkout -b <topic-branch-name>
+```
 
 4. Commit your changes in logical chunks. Keep your commit messages organized,
-  with a short description in the first line and more detailed information on
-  the following lines. Feel free to use Git's
-  [interactive rebase](https://help.github.com/articles/interactive-rebase)
-  feature to tidy up your commits before making them public.
+   with a short description in the first line and more detailed information on
+   the following lines. Feel free to use Git's
+   [interactive rebase](https://help.github.com/articles/interactive-rebase)
+   feature to tidy up your commits before making them public.
 
 5. Make sure all the tests are still passing.
 
-  ```sh
-  mix test
-  yarn test
-  ```
+```sh
+mix test
+npm test
+```
 
-  This is needed to ensure your changes can
-  pass all the tests.
+This is needed to ensure your changes can
+pass all the tests.
 
 6. Push your topic branch up to your fork:
 
-  ```sh
-  git push origin <topic-branch-name>
-  ```
+```sh
+git push origin <topic-branch-name>
+```
 
 7. [Open a Pull Request](https://help.github.com/articles/using-pull-requests/)
-  with a clear title and description.
+   with a clear title and description.
 
 8. If you haven't updated your pull request for a while, you should consider
-  rebasing on master and resolving any conflicts.
+   rebasing on master and resolving any conflicts.
 
-  **IMPORTANT**: _Never ever_ merge upstream `master` into your branches. You
-  should always `git rebase` on `master` to bring your changes up to date when
-  necessary.
+   **IMPORTANT**: _Never ever_ merge upstream `master` into your branches. You
+   should always `git rebase` on `master` to bring your changes up to date when
+   necessary.
 
-  ```sh
-  git checkout master
-  git pull upstream master
-  git checkout <your-topic-branch>
-  git rebase master
-  ```
+```sh
+git checkout master
+git pull upstream master
+git checkout <your-topic-branch>
+git rebase master
+```
 
 Thank you for your contributions!
