@@ -8,6 +8,14 @@ module.exports = {
     'import/extensions': 'off',
     'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
   },
+  'overrides': [
+    {
+      'files': ['*spec.js', 'priv/testrunner/**/*'],
+      'rules': {
+        'no-console': 'off'
+      }
+    }
+  ],
   extends: 'airbnb-base',
   plugins: ['import'],
   env: {
